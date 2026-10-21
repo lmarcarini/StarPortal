@@ -55,6 +55,50 @@ static func from_dict(data: Dictionary) -> RandomState:
 	return random
 
 
+## Returns human-readable errors for saved [param data], empty when it is valid:
+## "base_seed" must be a 64-bit integer written as a canonical decimal string, and
+## "streams" an object whose entries each hold "seed" and "state" strings of that form.
+static func validate_dict(data: Dictionary) -> Array[String]:
+	var errors: Array[String] = []
+	if not data.has("base_seed"):
+		errors.append("missing 'base_seed'")
+	elif not _is_int64_string(data["base_seed"]):
+		errors.append("'base_seed' is not a 64-bit integer string")
+	if not data.has("streams"):
+		errors.append("missing 'streams'")
+		return errors
+	if not data["streams"] is Dictionary:
+		errors.append("'streams' is not an object")
+		return errors
+	var streams_dict: Dictionary = data["streams"]
+	for system_id: Variant in streams_dict:
+		errors.append_array(_validate_stream(str(system_id), streams_dict[system_id]))
+	return errors
+
+
+static func _validate_stream(system_id: String, entry_data: Variant) -> Array[String]:
+	var errors: Array[String] = []
+	if not entry_data is Dictionary:
+		errors.append("stream '%s' is not an object" % system_id)
+		return errors
+	var entry: Dictionary = entry_data
+	for key: String in ["seed", "state"]:
+		if not entry.has(key):
+			errors.append("stream '%s': missing '%s'" % [system_id, key])
+		elif not _is_int64_string(entry[key]):
+			errors.append("stream '%s': '%s' is not a 64-bit integer string" % [system_id, key])
+	return errors
+
+
+## True when [param value] is a String that round-trips exactly through a 64-bit int, so
+## out-of-range numbers, signs like "+1", leading zeros and spaces are rejected.
+static func _is_int64_string(value: Variant) -> bool:
+	if not value is String:
+		return false
+	var text: String = value
+	return text.is_valid_int() and str(text.to_int()) == text
+
+
 ## Derives a stream seed: 64-bit FNV-1a over the 8 little-endian bytes of
 ## [param from_seed] followed by the UTF-8 bytes of [param system_id].
 ## Computed here, not with String.hash(), so it is stable across platforms and versions.
