@@ -56,8 +56,8 @@ Summary only. The full rules win on any doubt:
 
 ## 4. Tests and lint
 
-- Tests: `TODO: M0-03`
-- Lint and format: `TODO: M0-04`
+- Tests: `GODOT_BIN=/path/to/godot scripts/test.sh` (gdUnit4, headless; exits non-zero on any failure)
+- Lint and format: `scripts/lint.sh` (gdtoolkit 4.5.0: `gdformat --check` + `gdlint` over `src/`, `tests/`, `tools/`; fix with `gdformat src tests tools`)
 
 ## 5. Branches, commits and pull requests
 

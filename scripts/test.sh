@@ -21,7 +21,7 @@ fi
 # A fresh checkout has no .godot/ cache yet; import once so gdUnit4's
 # global classes are registered before the runner starts.
 echo "test.sh: importing project ..."
-"$GODOT_BIN" --headless --path "$PROJECT_DIR" --import > /dev/null 2>&1
+"$GODOT_BIN" --headless --path "$PROJECT_DIR" --import
 import_code=$?
 if [ "$import_code" -ne 0 ]; then
 	echo "test.sh: project import failed with exit code $import_code" >&2
