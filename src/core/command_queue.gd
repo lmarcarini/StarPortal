@@ -14,9 +14,10 @@ var _log: Array[Dictionary] = []
 
 
 ## Validates [param command] against [param state]. A rejected command is reported through
-## [signal command_rejected] and not queued. A valid command applies at once while the
-## clock is paused (after any commands still pending, to keep submission order) and
-## otherwise waits for the next [method flush].
+## [signal command_rejected] and not queued. While running, a valid command waits for the
+## next [method flush]. While paused, any commands still pending are flushed first, to
+## keep submission order; the command is then validated again against the updated state
+## and applies at once, or is rejected if a pending command invalidated it.
 func submit(command: Command, state: GameState) -> CommandResult:
 	assert(state != null, "CommandQueue.submit() needs a state")
 	if command == null:
@@ -27,9 +28,11 @@ func submit(command: Command, state: GameState) -> CommandResult:
 	if not state.clock.is_paused:
 		_pending.append(command)
 		return result
+	if _pending.is_empty():
+		_apply(command, state)
+		return result
 	flush(state)
-	_apply(command, state)
-	return result
+	return _validate_and_apply(command, state)
 
 
 ## Re-validates and applies every pending command to [param state] in submission order,
@@ -41,11 +44,7 @@ func flush(state: GameState) -> void:
 	var batch: Array[Command] = _pending
 	_pending = []
 	for command: Command in batch:
-		var result: CommandResult = command.validate(state)
-		if not result.is_ok:
-			_reject(command.get_type(), result)
-			continue
-		_apply(command, state)
+		_validate_and_apply(command, state)
 
 
 ## Returns a copy of the log of applied commands, oldest first. Each entry is
@@ -63,6 +62,14 @@ func clear_log() -> void:
 ## Returns how many valid commands are waiting for the next flush.
 func pending_count() -> int:
 	return _pending.size()
+
+
+func _validate_and_apply(command: Command, state: GameState) -> CommandResult:
+	var result: CommandResult = command.validate(state)
+	if not result.is_ok:
+		return _reject(command.get_type(), result)
+	_apply(command, state)
+	return result
 
 
 func _apply(command: Command, state: GameState) -> void:

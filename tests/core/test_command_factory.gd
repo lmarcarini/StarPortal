@@ -99,6 +99,28 @@ func test_from_dict_keeps_fractional_float_for_validation() -> void:
 	assert_that(command.validate(GameState.new_game(1)).error_code).is_equal(&"invalid_value")
 
 
+## A whole-number float outside the int64 range stays a float, so validate() rejects it
+## instead of it wrapping to a bogus int.
+func test_from_dict_keeps_out_of_range_float_for_validation() -> void:
+	for value: float in [1e30, -1e30, 9223372036854775808.0]:
+		var data: Dictionary = {"type": "set_flag", "key": "a", "value": value}
+		var result := CommandFactory.from_dict(data)
+		assert_bool(result.is_ok).is_true()
+		var command: Command = result.value
+		assert_int(typeof(command.get("value"))).is_equal(TYPE_FLOAT)
+		var check := command.validate(GameState.new_game(1))
+		assert_that(check.error_code).is_equal(&"invalid_value")
+
+
+## Whole-number floats inside the int64 range, including its lower limit, become ints.
+func test_from_dict_converts_in_range_whole_floats_to_int() -> void:
+	for value: float in [0.0, -3.0, 1e15, -9223372036854775808.0]:
+		var data: Dictionary = {"type": "set_flag", "key": "a", "value": value}
+		var result := CommandFactory.from_dict(data)
+		var command: Command = result.value
+		assert_that(command.get("value")).is_equal(int(value))
+
+
 ## The built-in types are registered without any setup.
 func test_defaults_are_registered_lazily() -> void:
 	assert_array(CommandFactory.registered_types()).contains_exactly([&"set_flag"])

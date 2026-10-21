@@ -6,6 +6,8 @@ extends Command
 
 ## The command's stable type id.
 const TYPE: StringName = &"set_flag"
+## 2^63 as a float: integral floats in [-2^63, 2^63) fit in an int64.
+const INT64_BOUND: float = 9223372036854775808.0
 
 ## The flag to set; must not be empty.
 var key: StringName
@@ -23,7 +25,8 @@ static func create(key: StringName, value: Variant) -> SetFlagCommand:
 
 ## Rebuilds a command from its to_dict() [param data], e.g. after a JSON round trip.
 ## Fails with &"malformed_command" when "key" is not a string or "value" is missing.
-## Integral float values become ints again; other values are left for validate().
+## Integral float values in the int64 range become ints again; other values are left for
+## validate() to reject.
 static func from_dict(data: Dictionary) -> Result:
 	var key_data: Variant = data.get("key")
 	if not (key_data is String or key_data is StringName):
@@ -39,6 +42,8 @@ static func from_dict(data: Dictionary) -> Result:
 
 static func _int_if_integral(number: float) -> Variant:
 	if number != floorf(number):
+		return number
+	if number < -INT64_BOUND or number >= INT64_BOUND:
 		return number
 	return int(number)
 

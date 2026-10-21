@@ -126,6 +126,24 @@ func test_submit_while_paused_applies_pending_commands_first() -> void:
 	assert_int(queue.get_log().size()).is_equal(2)
 
 
+## A paused submit re-validates the new command after the pending ones apply: if one of
+## them invalidated it, it is rejected, not applied and not logged, and the log replays.
+func test_submit_while_paused_rejects_command_invalidated_by_pending_ones() -> void:
+	var queue := _make_queue()
+	var state := _make_running_state()
+	queue.submit(SetFlagCommand.create(&"locked", true), state)
+	state.clock.is_paused = true
+	var result := queue.submit(GuardedCommand.new(), state)
+	assert_bool(result.is_ok).is_false()
+	assert_that(result.error_code).is_equal(&"locked")
+	assert_bool(state.flags.has(&"guarded_applied")).is_false()
+	assert_int(queue.pending_count()).is_equal(0)
+	assert_int(queue.get_log().size()).is_equal(1)
+	assert_array(_rejections).contains_exactly(["guarded:locked"])
+	var replayed := _replay(queue.get_log(), state.clock.tick)
+	assert_dict(replayed.to_dict()).is_equal(state.to_dict())
+
+
 # --- flush ----------------------------------------------------------------------------
 
 
