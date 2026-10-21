@@ -7,6 +7,7 @@ The Ring is built first, because if deducing and dialing an address is not fun, 
 | Milestone | Builds | Done when |
 | --- | --- | --- |
 | M0 Foundations | Project setup, layers, `SimClock`, `EventBus`, `Registry`, save skeleton, input actions and remapping, CI | An empty game ticks, saves, loads and passes tests headless |
+| M0.5 Hardening | Time controls as an explicit state machine (Running, Paused, Held), save and state robustness, CI hardening, housekeeping from M0 reviews | System holds never override the player's pause; old saves migrate to the new format; CI and soak stay green |
 | M1 The Ring | Address rule, world generator, Workbench, Analysis Board, dialing, outcomes, energy | A tester deduces three addresses from clues alone, using placeholder art |
 | M2 The Base | Base cutaway, rooms, power and priorities, staff, budget, time controls | A 30-day run balances power and money with real trade-offs |
 | M3 Beyond the Ring | Probes, drone feed, World Reports, expeditions, check-ins | A full dial, probe, expedition and return loop works |
@@ -126,7 +127,7 @@ M0 Foundations breaks into 15 cards. After the contracts card (M0-05) merges, fo
 | M0-14 Shell scene and debug overlay | Main scene showing date and time; speed controls on input actions; save and load buttons; overlay with speed, tick time and a state inspector | feature, M | M0-06, M0-07, M0-10, M0-12, M0-13 |
 | M0-15 Soak test | Headless bot runs 365 in-game days, saves and reloads each month, checks for errors and identical state | test, S | M0-04, M0-06, M0-07, M0-10 |
 
-M0 is done when M0-14 and M0-15 are merged and the milestone check passes: an empty game ticks, saves, loads and passes every test headless.
+M0 is done when M0-14 and M0-15 are merged and the milestone check passes: an empty game ticks, saves, loads and passes every test headless. M0 closed on 2026-10-21 with all 15 cards merged; the owner playtested it, and review follow-ups became the M0.5 Hardening milestone.
 
 ## Decisions and open questions
 

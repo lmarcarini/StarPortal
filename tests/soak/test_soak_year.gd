@@ -79,6 +79,8 @@ func after_test() -> void:
 	_service.free()
 
 
+## Plays the year twice, once uninterrupted and once reloading at every month close, and
+## checks both saw the expected events, stayed within budget and ended in the same state.
 func test_year_with_monthly_save_and_load_matches_uninterrupted_run() -> void:
 	var started_msec := Time.get_ticks_msec()
 	await assert_error(_play_both_runs).is_success()
@@ -137,18 +139,22 @@ func _play(run: SoakRun, reload_each_month: bool) -> void:
 			_reload(run)
 
 
-## Saves the run's state, loads it into a new Simulation and switches the run to it.
+## Saves the run's state, loads it into a new Simulation and switches the run to it, then
+## checks the run now drives the loaded copy rather than the original.
 func _reload(run: SoakRun) -> void:
 	var before: Dictionary = run.simulation.state.to_dict()
 	var saved: Result = _service.save_game(run.simulation.state, SLOT)
 	assert_bool(saved.is_ok).override_failure_message(str(saved.error_code)).is_true()
 	var loaded: Result = _service.load_game(SLOT)
 	assert_bool(loaded.is_ok).override_failure_message(str(loaded.error_code)).is_true()
+	var original: Simulation = run.simulation
 	var loaded_state: GameState = loaded.value
 	assert_bool(loaded_state == run.simulation.state).is_false()
 	var copy := Simulation.new(loaded_state)
 	assert_dict(copy.state.to_dict()).is_equal(before)
 	run.attach(copy)
+	assert_object(run.simulation).is_same(copy)
+	assert_object(run.simulation).is_not_same(original)
 	run.switches += 1
 
 

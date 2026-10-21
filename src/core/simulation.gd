@@ -30,7 +30,9 @@ func _init(initial_state: GameState, systems: Array[SimSystem] = []) -> void:
 	commands.command_rejected.connect(_on_command_rejected)
 
 
-## Submits [param command] to the queue; it applies at the start of the next tick.
+## Submits [param command] and returns its [CommandResult]. While the clock is paused a valid
+## command applies immediately, after any commands already queued, and is re-validated
+## against them; otherwise it applies at the start of the next tick.
 func submit(command: Command) -> CommandResult:
 	return commands.submit(command, state)
 
