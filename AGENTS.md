@@ -5,11 +5,12 @@ The design bible in `docs/bible/` is the source of truth; this file only summari
 
 ## 1. The project
 
-Far Side Protocol is a real-time-with-pause base management and deduction game built in
-Godot 4 with statically typed GDScript. You run a secret base around an alien ring, deduce
-gate addresses from clues, and pay in power, money and risk for every dial.
+FAR SIDE PROTOCOL is a real-time-with-pause base management and deduction game, built in
+Godot 4 with statically typed GDScript. You direct Site CAIRN, a secret base built around an
+alien ring that opens wormholes to other worlds, and every address must be deduced from clues.
 
-Full pitch and locked decisions: [overview.md#locked-decisions](docs/bible/overview.md#locked-decisions).
+Full pitch: [overview.md#pitch](docs/bible/overview.md#pitch). Locked decisions:
+[overview.md#locked-decisions](docs/bible/overview.md#locked-decisions).
 
 ## 2. Architecture
 
@@ -24,7 +25,7 @@ Four layers. A layer may depend only on what its row allows.
 
 Hard rules:
 
-- **The simulation never touches a Node,** scene or `get_tree()`. It must run headless in a test.
+- **The simulation never touches a Node,** scene or `get_tree()`. It can run headless in a test.
 - **The UI never mutates state.** It builds a command and submits it.
 
 At runtime only two channels touch the simulation: commands in, events out (`EventBus`).
@@ -55,8 +56,6 @@ Summary only. The full rules win on any doubt:
 
 ## 4. Tests and lint
 
-Run both before opening a pull request. CI runs the same checks on every push.
-
 - Tests: `TODO: M0-03`
 - Lint and format: `TODO: M0-04`
 
@@ -64,7 +63,7 @@ Run both before opening a pull request. CI runs the same checks on every push.
 
 - **One card per PR.** One card, one branch, one pull request.
 - **Branch:** `card/<issue>-<slug>`, e.g. `card/7-command-queue`.
-- **PR body:** says `Closes #<issue>` and maps each acceptance criterion to how it is met.
+- **PR body:** says `Closes #<issue>`.
 - **Commits:** each change covers one feature, includes its tests, and names the bible section
       it implements.
 - **Merge:** squash merge, after review approval.
