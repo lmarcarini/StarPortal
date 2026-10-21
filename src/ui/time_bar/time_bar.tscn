@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/time_bar/time_bar.gd" id="1_time_bar"]
+
+[node name="TimeBar" type="HBoxContainer"]
+theme_override_constants/separation = 12
+script = ExtResource("1_time_bar")
+
+[node name="PauseButton" type="Button" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 2
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+
+[node name="SlowerButton" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "UI_TIME_SLOWER"
+
+[node name="FasterButton" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "UI_TIME_FASTER"
+
+[node name="DateLabel" type="Label" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 2
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="SpeedLabel" type="Label" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 2
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+vertical_alignment = 1
