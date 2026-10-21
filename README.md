@@ -56,3 +56,29 @@ gdformat src tests tools         # fix formatting in place
 CI (`.github/workflows/ci.yml`, status check `ci`) runs on every pull request and every push to
 `main`: lint, then Godot project import, then `scripts/test.sh`. When tests fail, the reports in
 `.godot/test-reports/` are uploaded as the `test-reports` artifact of the run.
+
+## Translations
+
+All visible text comes from one translation table, `localization/strings.csv` (UTF-8, no BOM),
+with the columns `keys,en,pt_BR`: English and Brazilian Portuguese. Godot imports it into
+`.translation` files (generated, not committed) that are listed under `[internationalization]`
+in `project.godot`.
+
+- **Keys** are `AREA_SCREEN_NAME` in UPPER_SNAKE_CASE, for example `UI_SHELL_DATE` or
+  `UI_SPEED_PAUSED`. Scenes store the key as the text (`text = "UI_SPEED_PAUSED"`); Godot
+  translates it at runtime. A test fails if any `text`, `tooltip_text` or `placeholder_text` in
+  a `.tscn` under `src/` is not a key from the table.
+- **Placeholders** are named braces, filled with `String.format`, never string concatenation:
+  `tr("UI_SPEED_MULTIPLIER").format({"speed": 2})` gives `2×`. Both languages must use the
+  same placeholders.
+- **Adding a string:** add a row with a non-empty `en` and `pt_BR` value, then run
+  `scripts/test.sh` (it re-imports the table and checks it).
+- **Overflow check:** Brazilian Portuguese runs about 25% longer than English, so lay every label
+  out to grow. `scripts/pseudo.sh` runs the game with Godot's pseudolocalization on (accented
+  text, about 30% longer, wrapped in `[ ]`), so clipped or overflowing labels are easy to spot. It
+  needs a display, takes `GODOT_BIN` like `scripts/test.sh`, and switches pseudolocalization on
+  for that run only, through a temporary `override.cfg` it deletes on exit.
+
+```sh
+GODOT_BIN=/path/to/godot scripts/pseudo.sh
+```
