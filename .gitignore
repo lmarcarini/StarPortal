@@ -12,3 +12,6 @@
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Temporary engine override written by scripts/pseudo.sh for one run
+/override.cfg

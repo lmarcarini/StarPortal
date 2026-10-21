@@ -69,7 +69,7 @@ Definitions describe what can exist and never change at runtime; state records w
 
 **`Registry`** loads every definition at start-up into dictionaries keyed by id and validates the references.
 
-**Runtime state** is a tree of plain classes under `GameState`: clock, economy, power, base, personnel, gate, worlds, expeditions, research, factions, intel and flags. Each class implements `to_dict()` and `from_dict()`. A definition Resource is shared, so code never writes to one at runtime.
+**Runtime state** is a tree of plain classes under `GameState`: clock, economy, power, base, personnel, gate, worlds, expeditions, research, factions, intel and flags. Each class implements `to_dict()` and `from_dict()`. Each class also implements a static validate\_dict() that returns a list of errors; save data is checked with it before from\_dict() runs, so a hand-edited or corrupt save fails cleanly instead of loading wrong values. A definition Resource is shared, so code never writes to one at runtime.
 
 ## Narrative and event scripting
 
