@@ -303,7 +303,8 @@ func _joypad_events(action: StringName, button: JoyButton) -> int:
 func _event_bus_connections_into(root: Node) -> int:
 	var count: int = 0
 	for info: Dictionary in EventBus.get_signal_list():
-		for connection: Dictionary in EventBus.get_signal_connection_list(info["name"]):
+		var signal_name: StringName = info["name"]
+		for connection: Dictionary in EventBus.get_signal_connection_list(signal_name):
 			var callable: Callable = connection["callable"]
 			var target: Node = callable.get_object() as Node
 			if target != null and (target == root or root.is_ancestor_of(target)):
