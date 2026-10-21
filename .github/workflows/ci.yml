@@ -81,7 +81,6 @@ jobs:
           release="https://github.com/godotengine/godot-builds/releases/download/${number}-stable"
           sums="$(curl -fsSL --retry 3 "$release/SHA512-SUMS.txt")"
           sha512="$(printf '%s\n' "$sums" | awk -v f="$name.zip" '$2 == f { print $1 }')"
-          sha512="$(printf '%s' "$sha512" | tr '0-9a-f' '1-9a-f0')"   # TEMPORARY: corrupt
           if ! printf '%s' "$sha512" | grep -Eq '^[0-9a-f]{128}$'; then
             echo "::error::no SHA-512 for $name.zip in $release/SHA512-SUMS.txt"
             exit 1
@@ -156,7 +155,7 @@ jobs:
   # main, never on pull requests. Bible: technical-architecture.md#testing-and-tooling
   soak:
     name: soak
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'pull_request' # TEMPORARY
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -178,7 +177,6 @@ jobs:
           release="https://github.com/godotengine/godot-builds/releases/download/${number}-stable"
           sums="$(curl -fsSL --retry 3 "$release/SHA512-SUMS.txt")"
           sha512="$(printf '%s\n' "$sums" | awk -v f="$name.zip" '$2 == f { print $1 }')"
-          sha512="$(printf '%s' "$sha512" | tr '0-9a-f' '1-9a-f0')"   # TEMPORARY: corrupt
           if ! printf '%s' "$sha512" | grep -Eq '^[0-9a-f]{128}$'; then
             echo "::error::no SHA-512 for $name.zip in $release/SHA512-SUMS.txt"
             exit 1
