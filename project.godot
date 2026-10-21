@@ -15,6 +15,15 @@ run/main_scene="res://src/scenes/shell/shell.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+EventBus="*res://src/core/event_bus.gd"
+Settings="*res://src/services/settings.gd"
+Registry="*res://src/content/registry.gd"
+SimClock="*res://src/core/sim_clock.gd"
+SaveService="*res://src/services/save_service.gd"
+InputService="*res://src/services/input_service.gd"
+
 [debug]
 
 gdscript/warnings/untyped_declaration=2
