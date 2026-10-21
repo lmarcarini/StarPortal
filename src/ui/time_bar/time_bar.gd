@@ -22,10 +22,19 @@ func _ready() -> void:
 	_pause_button.pressed.connect(SimClock.toggle_pause)
 	_slower_button.pressed.connect(SimClock.slower)
 	_faster_button.pressed.connect(SimClock.faster)
+	refresh()
+
+
+func _enter_tree() -> void:
 	EventBus.tick_advanced.connect(_on_tick_advanced)
 	EventBus.speed_changed.connect(_on_speed_changed)
 	EventBus.paused_changed.connect(_on_paused_changed)
-	refresh()
+
+
+func _exit_tree() -> void:
+	EventBus.tick_advanced.disconnect(_on_tick_advanced)
+	EventBus.speed_changed.disconnect(_on_speed_changed)
+	EventBus.paused_changed.disconnect(_on_paused_changed)
 
 
 func _input(event: InputEvent) -> void:
@@ -48,7 +57,7 @@ func _notification(what: int) -> void:
 ## Redraws the date, the speed and the pause button from the bound clock. Call it after
 ## SimClock.start() binds a new simulation, which emits no signal.
 func refresh() -> void:
-	var clock: ClockState = _clock()
+	var clock: ClockState = _get_clock()
 	if clock == null:
 		_date_label.text = ""
 		_speed_label.text = ""
@@ -63,7 +72,7 @@ func get_buttons() -> Array[Button]:
 	return [_pause_button, _slower_button, _faster_button]
 
 
-func _clock() -> ClockState:
+func _get_clock() -> ClockState:
 	if SimClock.simulation == null:
 		return null
 	return SimClock.simulation.state.clock

@@ -27,6 +27,7 @@ var debug_overlay: DebugOverlay = null
 var _simulation: Simulation = null
 var _debug_flag_count: int = 0
 
+## The time bar at the top of the screen.
 @onready var time_bar: TimeBar = %TimeBar
 @onready var _quick_save_button: Button = %QuickSaveButton
 @onready var _quick_load_button: Button = %QuickLoadButton
@@ -40,16 +41,20 @@ func _ready() -> void:
 	_quick_save_button.pressed.connect(quick_save)
 	_quick_load_button.pressed.connect(quick_load)
 	_toast_timer.timeout.connect(_toast.hide)
-	EventBus.day_started.connect(_on_day_started)
 	_setup_debug_tools()
 	_start(GameState.new_game(_choose_seed()))
 	SimClock.pause()
-	var buttons: Array[Button] = focus_order()
+	var buttons: Array[Button] = get_focus_order()
 	_link_focus(buttons)
 	buttons[0].grab_focus()
 
 
+func _enter_tree() -> void:
+	EventBus.day_started.connect(_on_day_started)
+
+
 func _exit_tree() -> void:
+	EventBus.day_started.disconnect(_on_day_started)
 	if _simulation != null and SimClock.simulation == _simulation:
 		SimClock.stop()
 
@@ -92,7 +97,7 @@ func quick_load() -> void:
 
 ## Returns every button in focus order: the time bar's, then save, load and (debug only)
 ## the flag button. Neighbours wrap around, so a gamepad reaches them all.
-func focus_order() -> Array[Button]:
+func get_focus_order() -> Array[Button]:
 	var buttons: Array[Button] = time_bar.get_buttons()
 	buttons.append_array([_quick_save_button, _quick_load_button])
 	if _debug_flag_button != null:
@@ -101,7 +106,7 @@ func focus_order() -> Array[Button]:
 
 
 ## Returns the text of the toast on screen, or "" when none is shown.
-func toast_text() -> String:
+func get_toast_text() -> String:
 	return _toast.text if _toast.visible else ""
 
 

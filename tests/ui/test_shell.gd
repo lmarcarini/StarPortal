@@ -35,7 +35,7 @@ func after_test() -> void:
 	TranslationServer.set_locale(_real_locale)
 
 
-func test_starts_paused_with_new_game() -> void:
+func test_starts_paused_with_new_game_and_minimum_window_size() -> void:
 	var simulation: Simulation = SimClock.simulation
 	assert_object(simulation).is_not_null()
 	assert_dict(simulation.state.to_dict()).is_equal(GameState.new_game(TEST_SEED).to_dict())
@@ -43,9 +43,6 @@ func test_starts_paused_with_new_game() -> void:
 	assert_bool(SimClock.is_running()).is_false()
 	assert_str(_label("DateLabel").text).is_equal("2026-01-01 00:00")
 	assert_str(_label("SpeedLabel").text).is_equal(tr("UI_SPEED_PAUSED"))
-
-
-func test_keeps_minimum_window_size() -> void:
 	assert_object(_shell.get_window().min_size).is_equal(ShellScript.MIN_WINDOW_SIZE)
 	assert_object(ShellScript.MIN_WINDOW_SIZE).is_equal(Vector2i(1280, 720))
 
@@ -116,7 +113,7 @@ func test_date_label_follows_ticks() -> void:
 func test_quick_save_then_load_restores_date() -> void:
 	SimClock.step_ticks(90)
 	await _runner.simulate_key_pressed(KEY_F5)
-	assert_str(_shell.toast_text()).is_equal(tr("UI_SAVED"))
+	assert_str(_shell.get_toast_text()).is_equal(tr("UI_SAVED"))
 	assert_bool(FileAccess.file_exists(SaveService.slot_path(&"quick"))).is_true()
 	var before_load: Simulation = SimClock.simulation
 	SimClock.step_ticks(500)
@@ -125,7 +122,7 @@ func test_quick_save_then_load_restores_date() -> void:
 	assert_object(SimClock.simulation).is_not_same(before_load)
 	assert_int(SimClock.simulation.state.clock.tick).is_equal(90)
 	assert_str(_label("DateLabel").text).is_equal("2026-01-01 01:30")
-	assert_str(_shell.toast_text()).is_equal(tr("UI_LOADED"))
+	assert_str(_shell.get_toast_text()).is_equal(tr("UI_LOADED"))
 	SimClock.step_ticks(1)
 	assert_str(_label("DateLabel").text).is_equal("2026-01-01 01:31")
 
@@ -144,7 +141,7 @@ func test_quick_load_without_a_save_keeps_the_game() -> void:
 	await _press_action(&"quick_load")
 	assert_object(SimClock.simulation).is_same(running)
 	assert_int(running.state.clock.tick).is_equal(5)
-	assert_str(_shell.toast_text()).is_equal(tr("UI_QUICK_SAVE_MISSING"))
+	assert_str(_shell.get_toast_text()).is_equal(tr("UI_QUICK_SAVE_MISSING"))
 
 
 func test_autosaves_on_each_day_start() -> void:
@@ -174,7 +171,7 @@ func test_time_bar_text_comes_from_translation_keys() -> void:
 
 
 func test_first_button_has_focus_and_neighbours_reach_every_button() -> void:
-	var buttons: Array[Button] = _shell.focus_order()
+	var buttons: Array[Button] = _shell.get_focus_order()
 	assert_int(buttons.size()).is_equal(6)
 	assert_object(_focus_owner()).is_same(buttons[0])
 	var visited: Array[Control] = []
@@ -187,6 +184,28 @@ func test_first_button_has_focus_and_neighbours_reach_every_button() -> void:
 		assert_bool(visited.has(button)).override_failure_message(button.name).is_true()
 	await _press_action(&"ui_left")
 	assert_object(_focus_owner()).is_same(buttons[buttons.size() - 1])
+
+
+func test_gamepad_a_presses_the_focused_button() -> void:
+	var quick_save: Button = _shell.get_focus_order()[3]
+	var presses: Array[int] = [0]
+	quick_save.pressed.connect(func() -> void: presses[0] += 1)
+	quick_save.grab_focus()
+	await _press_joypad(JOY_BUTTON_A)
+	assert_int(presses[0]).is_equal(1)
+	assert_str(_shell.get_toast_text()).is_equal(tr("UI_SAVED"))
+	assert_bool(FileAccess.file_exists(SaveService.slot_path(&"quick"))).is_true()
+
+
+func test_ui_actions_gain_gamepad_buttons_and_keep_keys() -> void:
+	assert_int(_joypad_events(&"ui_accept", JOY_BUTTON_A)).is_equal(1)
+	assert_int(_joypad_events(&"ui_cancel", JOY_BUTTON_B)).is_equal(1)
+	var enter: InputEventKey = InputEventKey.new()
+	enter.keycode = KEY_ENTER
+	var escape: InputEventKey = InputEventKey.new()
+	escape.keycode = KEY_ESCAPE
+	assert_bool(InputMap.event_is_action(enter, &"ui_accept")).is_true()
+	assert_bool(InputMap.event_is_action(escape, &"ui_cancel")).is_true()
 
 
 func test_debug_overlay_toggles_and_shows_state() -> void:
@@ -217,29 +236,28 @@ func test_debug_overlay_measures_ticks() -> void:
 	assert_str(speed_label.text).is_equal(tr("UI_DEBUG_SPEED_INDEX").format({"index": "3"}))
 
 
-func test_debug_flag_button_submits_set_flag_command() -> void:
-	var button: Button = _shell.focus_order()[5]
+## The debug button's SetFlagCommand reaches the state, and the overlay's state tree shows
+## it on its next timed refresh, not before.
+func test_debug_flag_button_sets_flag_shown_in_state_tree() -> void:
+	var overlay: DebugOverlay = _shell.debug_overlay
+	overlay.toggle()
+	var button: Button = _shell.get_focus_order()[5]
 	button.pressed.emit()
 	button.pressed.emit()
 	SimClock.step_ticks(1)
 	var flags: Dictionary = SimClock.simulation.state.flags
 	assert_int(flags.get(ShellScript.DEBUG_FLAG_KEY, 0)).is_equal(2)
-
-
-func test_state_tree_follows_the_refresh_timer() -> void:
-	var overlay: DebugOverlay = _shell.debug_overlay
-	overlay.toggle()
-	_shell.focus_order()[5].pressed.emit()
-	SimClock.step_ticks(1)
 	assert_str(_tree_value(overlay, ["flags", "debug_counter"])).is_null()
 	await get_tree().create_timer(DebugOverlay.REFRESH_SECONDS + 0.2).timeout
-	assert_str(_tree_value(overlay, ["flags", "debug_counter"])).is_equal("1")
+	assert_str(_tree_value(overlay, ["flags", "debug_counter"])).is_equal("2")
 	assert_str(_tree_value(overlay, ["clock", "tick"])).is_equal("1")
 
 
-func test_leaving_the_tree_releases_the_clock() -> void:
+func test_leaving_the_tree_releases_the_clock_and_event_bus() -> void:
+	assert_int(_event_bus_connections_into(_shell)).is_greater_equal(6)
 	_shell.get_parent().remove_child(_shell)
 	assert_object(SimClock.simulation).is_null()
+	assert_int(_event_bus_connections_into(_shell)).is_equal(0)
 
 
 func _press_action(action: StringName) -> void:
@@ -270,6 +288,27 @@ func _tree_value(overlay: DebugOverlay, path: Array[String]) -> Variant:
 			return null
 		item = found
 	return item.get_text(1)
+
+
+func _joypad_events(action: StringName, button: JoyButton) -> int:
+	var count: int = 0
+	for event: InputEvent in InputMap.action_get_events(action):
+		var joypad: InputEventJoypadButton = event as InputEventJoypadButton
+		if joypad != null and joypad.button_index == button:
+			count += 1
+	return count
+
+
+## Counts EventBus connections whose target is [param root] or one of its descendants.
+func _event_bus_connections_into(root: Node) -> int:
+	var count: int = 0
+	for info: Dictionary in EventBus.get_signal_list():
+		for connection: Dictionary in EventBus.get_signal_connection_list(info["name"]):
+			var callable: Callable = connection["callable"]
+			var target: Node = callable.get_object() as Node
+			if target != null and (target == root or root.is_ancestor_of(target)):
+				count += 1
+	return count
 
 
 func _label(label_name: String) -> Label:

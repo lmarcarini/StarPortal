@@ -38,11 +38,20 @@ func _ready() -> void:
 	_window_ticks.resize(WINDOWS_PER_SECOND)
 	_window_usec.resize(WINDOWS_PER_SECOND)
 	_tree.create_item()
+	_refresh_timer.timeout.connect(_on_refresh_timeout)
+	_refresh_timer.start(REFRESH_SECONDS)
+
+
+func _enter_tree() -> void:
 	EventBus.tick_advanced.connect(_on_tick_advanced)
 	EventBus.speed_changed.connect(_on_speed_changed)
 	get_tree().process_frame.connect(_on_process_frame)
-	_refresh_timer.timeout.connect(_on_refresh_timeout)
-	_refresh_timer.start(REFRESH_SECONDS)
+
+
+func _exit_tree() -> void:
+	EventBus.tick_advanced.disconnect(_on_tick_advanced)
+	EventBus.speed_changed.disconnect(_on_speed_changed)
+	get_tree().process_frame.disconnect(_on_process_frame)
 
 
 func _unhandled_input(event: InputEvent) -> void:
