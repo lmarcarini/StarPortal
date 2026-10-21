@@ -85,7 +85,7 @@ func test_newer_version_fails() -> void:
 
 ## Missing, non-numeric, fractional or negative versions fail with &"bad_format_version".
 func test_bad_versions_fail() -> void:
-	var bad_values: Array = [null, "1", 1.5, -1, [1], true]
+	var bad_values: Array = [null, "1", 1.5, -1, [1], true, 1e20, INF, NAN]
 	for bad: Variant in bad_values:
 		var data := {"format_version": bad}
 		if bad == null:

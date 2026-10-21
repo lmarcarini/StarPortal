@@ -5,18 +5,28 @@ extends Node
 ## File shape: {"format_version", "game_version", "saved_at_unix", "tick", "state"}.
 ## Error codes: &"bad_slot_name", &"missing_file", &"read_failed", &"corrupt_json",
 ## &"bad_format_version", &"newer_format_version", &"missing_migration_step",
-## &"migration_failed", &"corrupt_save", &"write_failed", &"delete_failed".
+## &"migration_failed", &"corrupt_save", &"invalid_state", &"write_failed",
+## &"delete_failed".
 ## Bible: technical-architecture.md#save-system
 
 ## Version of the file format written by save_game().
 const FORMAT_VERSION: int = SaveMigrator.TARGET_VERSION
 ## Number of rotating autosave slots: autosave_1 (newest) to autosave_3 (oldest).
 const AUTOSAVE_SLOTS: int = 3
+## Slot name prefix of the autosaves; the slot index (1 to AUTOSAVE_SLOTS) follows it.
 const AUTOSAVE_PREFIX: String = "autosave_"
+## Extension of a save file: <slot>.json.
 const FILE_EXTENSION: String = ".json"
+## Suffix of the temporary file a save is written to before the rename: <slot>.json.tmp.
 const TEMP_SUFFIX: String = ".tmp"
-const SLOT_NAME_PATTERN: String = "^[a-z0-9_]{1,32}$"
+## The only characters allowed in a slot name.
+const SLOT_NAME_CHARS: String = "abcdefghijklmnopqrstuvwxyz0123456789_"
+## Longest allowed slot name, in characters.
+const SLOT_NAME_MAX_LENGTH: int = 32
+## Game version written when application/config/version is not set.
 const DEFAULT_GAME_VERSION: String = "0.0.0"
+## Largest header number accepted: 2^53, the largest whole number a JSON double holds exactly.
+const MAX_HEADER_NUMBER: float = 9007199254740992.0
 
 ## Folder holding the save files. Tests point this at a temporary folder.
 var saves_dir: String = "user://saves"
@@ -39,7 +49,9 @@ func save_game(state: GameState, slot: StringName) -> Result:
 
 
 ## Reads [param slot], migrates it to the current format and returns the GameState as the
-## value. Emits EventBus.game_loaded on success. Never crashes on a bad file.
+## value. The state is checked with GameState.validate_dict() before it is built, so a
+## hand-edited value of the wrong type fails with &"invalid_state" instead of loading as a
+## default. Emits EventBus.game_loaded on success. Never crashes on a bad file.
 func load_game(slot: StringName) -> Result:
 	if not is_valid_slot_name(slot):
 		return Result.fail(&"bad_slot_name", "invalid slot name '%s'" % slot)
@@ -55,6 +67,9 @@ func load_game(slot: StringName) -> Result:
 	if not checked.is_ok:
 		return checked
 	var state_data: Dictionary = data["state"]
+	var errors := GameState.validate_dict(state_data)
+	if not errors.is_empty():
+		return Result.fail(&"invalid_state", "; ".join(errors))
 	var state := GameState.from_dict(state_data)
 	EventBus.game_loaded.emit(slot)
 	return Result.ok(state)
@@ -62,7 +77,9 @@ func load_game(slot: StringName) -> Result:
 
 ## Writes [param state] to autosave_1, after shifting older autosaves down one slot.
 ## The oldest (autosave_3) is dropped, so at most three autosave files exist. The new file
-## is fully written before anything is rotated.
+## is fully written before anything is rotated. Known gap: a crash after the rotation and
+## before the final rename leaves the newest data only in autosave_1.json.tmp, which is
+## not read back.
 func autosave(state: GameState) -> Result:
 	var slot := StringName(AUTOSAVE_PREFIX + "1")
 	var path := slot_path(slot)
@@ -104,18 +121,22 @@ func list_slots() -> Array[Dictionary]:
 	return slots
 
 
-## Deletes [param slot] and any leftover temporary file for it.
+## Deletes [param slot] and any leftover temporary file for it. A leftover temporary file
+## is removed even when the slot itself is missing, which still fails with &"missing_file".
 func delete_slot(slot: StringName) -> Result:
 	if not is_valid_slot_name(slot):
 		return Result.fail(&"bad_slot_name", "invalid slot name '%s'" % slot)
 	var path := slot_path(slot)
+	var temp_path := path + TEMP_SUFFIX
+	if FileAccess.file_exists(temp_path):
+		var temp_error := DirAccess.remove_absolute(temp_path)
+		if temp_error != OK:
+			return Result.fail(&"delete_failed", "%s: %s" % [temp_path, error_string(temp_error)])
 	if not FileAccess.file_exists(path):
 		return Result.fail(&"missing_file", path)
 	var error := DirAccess.remove_absolute(path)
 	if error != OK:
 		return Result.fail(&"delete_failed", "%s: %s" % [path, error_string(error)])
-	if FileAccess.file_exists(path + TEMP_SUFFIX):
-		DirAccess.remove_absolute(path + TEMP_SUFFIX)
 	return Result.ok()
 
 
@@ -124,9 +145,16 @@ func slot_path(slot: StringName) -> String:
 	return saves_dir.path_join(String(slot) + FILE_EXTENSION)
 
 
-## Returns true when [param slot] matches [code][a-z0-9_]{1,32}[/code].
+## Returns true when [param slot] is 1 to 32 characters, each one of [code]a-z 0-9 _[/code].
+## Checked character by character, so no regex anchor can let a trailing newline through.
 static func is_valid_slot_name(slot: StringName) -> bool:
-	return RegEx.create_from_string(SLOT_NAME_PATTERN).search(String(slot)) != null
+	var text := String(slot)
+	if text.is_empty() or text.length() > SLOT_NAME_MAX_LENGTH:
+		return false
+	for character: String in text:
+		if not SLOT_NAME_CHARS.contains(character):
+			return false
+	return true
 
 
 ## Returns the game version from ProjectSettings application/config/version, or
@@ -209,7 +237,7 @@ func _read_data(path: String) -> Result:
 static func _check_header(data: Dictionary) -> Result:
 	for key: String in ["tick", "saved_at_unix"]:
 		if not _is_whole_number(data.get(key)):
-			return Result.fail(&"corrupt_save", "'%s' is not a whole number" % key)
+			return Result.fail(&"corrupt_save", "'%s' is not a whole number from 0 to 2^53" % key)
 	if not data.get("game_version") is String:
 		return Result.fail(&"corrupt_save", "'game_version' is not a string")
 	if not data.get("state") is Dictionary:
@@ -218,12 +246,10 @@ static func _check_header(data: Dictionary) -> Result:
 
 
 static func _is_whole_number(value: Variant) -> bool:
-	if value is int:
-		return true
-	if not value is float:
+	if not (value is int or value is float):
 		return false
 	var number: float = value
-	return is_finite(number) and number == floorf(number)
+	return number == floorf(number) and number >= 0.0 and number <= MAX_HEADER_NUMBER
 
 
 ## Returns the list_slots() entry for [param slot], or {} when it cannot be read.
