@@ -10,10 +10,9 @@ signal command_rejected(type: StringName, code: StringName)
 
 var _pending: Array[Command] = []
 
-
 ## Enqueues [param command] for the next flush. Stub: always accepts a non-null command.
 @warning_ignore("unused_parameter")
-func submit(command: Command, state: GameState) -> CommandResult:
+func submit(command: Command, state: GameState) -> CommandResult:  # gdlint: ignore=unused-argument
 	if command == null:
 		return CommandResult.fail(&"no_command")
 	_pending.append(command)

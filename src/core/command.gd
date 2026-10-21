@@ -13,14 +13,14 @@ func get_type() -> StringName:
 
 ## Checks the command against [param state] without changing it. Subclasses must override.
 @warning_ignore("unused_parameter")
-func validate(state: GameState) -> CommandResult:
+func validate(state: GameState) -> CommandResult:  # gdlint: ignore=unused-argument
 	assert(false, "Command.validate(): subclasses must override")
 	return CommandResult.fail(&"not_implemented")
 
 
 ## Mutates [param state]. Only called after validate() succeeded. Subclasses must override.
 @warning_ignore("unused_parameter")
-func apply(state: GameState) -> void:
+func apply(state: GameState) -> void:  # gdlint: ignore=unused-argument
 	assert(false, "Command.apply(): subclasses must override")
 
 

@@ -13,7 +13,6 @@ var error_code: StringName
 ## Human-readable failure detail for logs. Empty on success.
 var detail: String
 
-
 ## Returns a successful result carrying [param value].
 @warning_ignore("shadowed_variable")
 static func ok(value: Variant = null) -> Result:

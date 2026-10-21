@@ -14,17 +14,17 @@ func get_id() -> StringName:
 
 ## Advances the system by one tick against [param state]. Subclasses must override.
 @warning_ignore("unused_parameter")
-func tick(state: GameState) -> void:
+func tick(state: GameState) -> void:  # gdlint: ignore=unused-argument
 	assert(false, "SimSystem.tick(): subclasses must override")
 
 
 ## Called at the first tick of each day. Default: does nothing.
 @warning_ignore("unused_parameter")
-func on_day(state: GameState) -> void:
+func on_day(state: GameState) -> void:  # gdlint: ignore=unused-argument
 	pass
 
 
 ## Called at the first tick of each month. Default: does nothing.
 @warning_ignore("unused_parameter")
-func on_month(state: GameState) -> void:
+func on_month(state: GameState) -> void:  # gdlint: ignore=unused-argument
 	pass
