@@ -1,0 +1,21 @@
+# gdlint configuration (gdtoolkit 4.x). YAML; any key left out keeps gdlint's default.
+# Rules come from docs/bible/technical-architecture.md#code-standards.
+# scripts/lint.sh lints src/, tests/ and tools/ only; vendored addons/ are never linted.
+
+# Format
+max-line-length: 100
+max-file-lines: 400
+
+# Design
+function-arguments-number: 4
+
+# Names
+# snake_case; a leading underscore is allowed for private functions and Godot virtuals (_ready).
+function-name: _?[a-z][a-z0-9]*(_[a-z0-9]+)*
+class-name: ([A-Z][a-z0-9]*)+
+
+# Directory names skipped when walking a path.
+excluded_directories:
+  - .git
+  - .godot
+  - addons
