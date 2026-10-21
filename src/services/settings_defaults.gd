@@ -32,4 +32,15 @@ const VALUES: Dictionary = {
 	{
 		&"language": "en",
 	},
+	# One key per InputActions.ACTIONS entry, holding that action's bindings encoded by
+	# InputService. An empty Dictionary means "use the built-in defaults".
+	&"input":
+	{
+		&"time_toggle_pause": {},
+		&"time_faster": {},
+		&"time_slower": {},
+		&"quick_save": {},
+		&"quick_load": {},
+		&"debug_toggle_overlay": {},
+	},
 }
