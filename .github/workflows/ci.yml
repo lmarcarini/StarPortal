@@ -10,13 +10,15 @@ on:
 permissions:
   contents: read
 
+# Pull requests: one group per branch, and a newer push cancels the older run.
+# Everything else (pushes to main): one group per run, so a run is never cancelled, neither
+# while in progress nor while pending behind a newer one. Covers both the ci and soak jobs.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  # Exact gdtoolkit release; bump deliberately, together with any reformatting it causes.
-  GDTOOLKIT_VERSION: "4.5.0"
+  group: >-
+    ${{ github.event_name == 'pull_request'
+    && format('ci-pr-{0}', github.ref)
+    || format('ci-run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   ci:
@@ -32,13 +34,41 @@ jobs:
         with:
           python-version: "3.12"
 
+      # The gdtoolkit version is written only in .gdtoolkit-version; bump it deliberately,
+      # together with any reformatting it causes.
+      - name: Read gdtoolkit version
+        id: gdtoolkit
+        run: |
+          version="$(tr -d '[:space:]' < .gdtoolkit-version)"
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error file=.gdtoolkit-version::expected 'X.Y.Z', got '$version'"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check gdtoolkit version has a single source
+        env:
+          GDTOOLKIT_VERSION: ${{ steps.gdtoolkit.outputs.version }}
+        run: |
+          # Tracked text files only (so .git/ is never searched); vendored addons/ are skipped.
+          if git grep -n -I -F -e "$GDTOOLKIT_VERSION" -- . \
+              ':(exclude)addons/' ':(exclude).gdtoolkit-version'; then
+            echo "::error::gdtoolkit version $GDTOOLKIT_VERSION is repeated above; use .gdtoolkit-version only"
+            exit 1
+          fi
+          echo "gdtoolkit $GDTOOLKIT_VERSION is written only in .gdtoolkit-version"
+
       - name: Install gdtoolkit
+        env:
+          GDTOOLKIT_VERSION: ${{ steps.gdtoolkit.outputs.version }}
         run: python -m pip install --disable-pip-version-check "gdtoolkit==${GDTOOLKIT_VERSION}"
 
       - name: Lint
         run: scripts/lint.sh
 
-      - name: Read Godot version
+      # The expected hash comes from SHA512-SUMS.txt of the same godot-builds release as the
+      # zip; nothing is hard-coded. It is also part of the cache key.
+      - name: Read Godot version and checksum
         id: godot
         run: |
           full="$(tr -d '[:space:]' < .godot-version)"   # e.g. 4.7.2.stable
@@ -47,28 +77,54 @@ jobs:
             echo "::error file=.godot-version::expected '<version>.stable', got '$full'"
             exit 1
           fi
-          echo "number=$number" >> "$GITHUB_OUTPUT"
-          echo "dir=$RUNNER_TOOL_CACHE/godot-$number" >> "$GITHUB_OUTPUT"
+          name="Godot_v${number}-stable_linux.x86_64"
+          release="https://github.com/godotengine/godot-builds/releases/download/${number}-stable"
+          sums="$(curl -fsSL --retry 3 "$release/SHA512-SUMS.txt")"
+          sha512="$(printf '%s\n' "$sums" | awk -v f="$name.zip" '$2 == f { print $1 }')"
+          if ! printf '%s' "$sha512" | grep -Eq '^[0-9a-f]{128}$'; then
+            echo "::error::no SHA-512 for $name.zip in $release/SHA512-SUMS.txt"
+            exit 1
+          fi
+          {
+            echo "number=$number"
+            echo "name=$name"
+            echo "url=$release/$name.zip"
+            echo "sha512=$sha512"
+            echo "zip-dir=$RUNNER_TOOL_CACHE/godot-zip-$number"
+            echo "dir=$RUNNER_TEMP/godot-$number"
+          } >> "$GITHUB_OUTPUT"
 
-      - name: Cache Godot
+      - name: Cache Godot zip
         id: godot-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ steps.godot.outputs.dir }}
-          key: godot-${{ steps.godot.outputs.number }}-stable-linux.x86_64
+          path: ${{ steps.godot.outputs.zip-dir }}
+          key: godot-${{ steps.godot.outputs.number }}-stable-linux.x86_64-${{ steps.godot.outputs.sha512 }}
 
-      - name: Download Godot
-        if: steps.godot-cache.outputs.cache-hit != 'true'
+      # Downloads on a cache miss, then always verifies the zip (fresh or cached) before
+      # unpacking it. A mismatch fails here, before Godot ever runs.
+      - name: Download and verify Godot
         env:
-          GODOT_NUMBER: ${{ steps.godot.outputs.number }}
+          GODOT_NAME: ${{ steps.godot.outputs.name }}
+          GODOT_URL: ${{ steps.godot.outputs.url }}
+          GODOT_SHA512: ${{ steps.godot.outputs.sha512 }}
+          GODOT_ZIP_DIR: ${{ steps.godot.outputs.zip-dir }}
           GODOT_DIR: ${{ steps.godot.outputs.dir }}
+          CACHE_HIT: ${{ steps.godot-cache.outputs.cache-hit }}
         run: |
-          name="Godot_v${GODOT_NUMBER}-stable_linux.x86_64"
-          url="https://github.com/godotengine/godot-builds/releases/download/${GODOT_NUMBER}-stable/${name}.zip"
+          zip="$GODOT_ZIP_DIR/$GODOT_NAME.zip"
+          if [ "$CACHE_HIT" != "true" ]; then
+            mkdir -p "$GODOT_ZIP_DIR"
+            curl -fsSL --retry 3 -o "$zip" "$GODOT_URL"
+          fi
+          if ! echo "$GODOT_SHA512  $zip" | sha512sum --check --strict; then
+            echo "::error::$GODOT_NAME.zip does not match SHA512-SUMS.txt of its release"
+            rm -f "$zip"
+            exit 1
+          fi
           mkdir -p "$GODOT_DIR"
-          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot.zip" "$url"
-          unzip -q "$RUNNER_TEMP/godot.zip" -d "$GODOT_DIR"
-          mv "$GODOT_DIR/$name" "$GODOT_DIR/godot"
+          unzip -q "$zip" -d "$GODOT_DIR"
+          mv "$GODOT_DIR/$GODOT_NAME" "$GODOT_DIR/godot"
           chmod +x "$GODOT_DIR/godot"
 
       - name: Locate Godot
@@ -106,7 +162,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Read Godot version
+      # The expected hash comes from SHA512-SUMS.txt of the same godot-builds release as the
+      # zip; nothing is hard-coded. It is also part of the cache key.
+      - name: Read Godot version and checksum
         id: godot
         run: |
           full="$(tr -d '[:space:]' < .godot-version)"   # e.g. 4.7.2.stable
@@ -115,28 +173,54 @@ jobs:
             echo "::error file=.godot-version::expected '<version>.stable', got '$full'"
             exit 1
           fi
-          echo "number=$number" >> "$GITHUB_OUTPUT"
-          echo "dir=$RUNNER_TOOL_CACHE/godot-$number" >> "$GITHUB_OUTPUT"
+          name="Godot_v${number}-stable_linux.x86_64"
+          release="https://github.com/godotengine/godot-builds/releases/download/${number}-stable"
+          sums="$(curl -fsSL --retry 3 "$release/SHA512-SUMS.txt")"
+          sha512="$(printf '%s\n' "$sums" | awk -v f="$name.zip" '$2 == f { print $1 }')"
+          if ! printf '%s' "$sha512" | grep -Eq '^[0-9a-f]{128}$'; then
+            echo "::error::no SHA-512 for $name.zip in $release/SHA512-SUMS.txt"
+            exit 1
+          fi
+          {
+            echo "number=$number"
+            echo "name=$name"
+            echo "url=$release/$name.zip"
+            echo "sha512=$sha512"
+            echo "zip-dir=$RUNNER_TOOL_CACHE/godot-zip-$number"
+            echo "dir=$RUNNER_TEMP/godot-$number"
+          } >> "$GITHUB_OUTPUT"
 
-      - name: Cache Godot
+      - name: Cache Godot zip
         id: godot-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ steps.godot.outputs.dir }}
-          key: godot-${{ steps.godot.outputs.number }}-stable-linux.x86_64
+          path: ${{ steps.godot.outputs.zip-dir }}
+          key: godot-${{ steps.godot.outputs.number }}-stable-linux.x86_64-${{ steps.godot.outputs.sha512 }}
 
-      - name: Download Godot
-        if: steps.godot-cache.outputs.cache-hit != 'true'
+      # Downloads on a cache miss, then always verifies the zip (fresh or cached) before
+      # unpacking it. A mismatch fails here, before Godot ever runs.
+      - name: Download and verify Godot
         env:
-          GODOT_NUMBER: ${{ steps.godot.outputs.number }}
+          GODOT_NAME: ${{ steps.godot.outputs.name }}
+          GODOT_URL: ${{ steps.godot.outputs.url }}
+          GODOT_SHA512: ${{ steps.godot.outputs.sha512 }}
+          GODOT_ZIP_DIR: ${{ steps.godot.outputs.zip-dir }}
           GODOT_DIR: ${{ steps.godot.outputs.dir }}
+          CACHE_HIT: ${{ steps.godot-cache.outputs.cache-hit }}
         run: |
-          name="Godot_v${GODOT_NUMBER}-stable_linux.x86_64"
-          url="https://github.com/godotengine/godot-builds/releases/download/${GODOT_NUMBER}-stable/${name}.zip"
+          zip="$GODOT_ZIP_DIR/$GODOT_NAME.zip"
+          if [ "$CACHE_HIT" != "true" ]; then
+            mkdir -p "$GODOT_ZIP_DIR"
+            curl -fsSL --retry 3 -o "$zip" "$GODOT_URL"
+          fi
+          if ! echo "$GODOT_SHA512  $zip" | sha512sum --check --strict; then
+            echo "::error::$GODOT_NAME.zip does not match SHA512-SUMS.txt of its release"
+            rm -f "$zip"
+            exit 1
+          fi
           mkdir -p "$GODOT_DIR"
-          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot.zip" "$url"
-          unzip -q "$RUNNER_TEMP/godot.zip" -d "$GODOT_DIR"
-          mv "$GODOT_DIR/$name" "$GODOT_DIR/godot"
+          unzip -q "$zip" -d "$GODOT_DIR"
+          mv "$GODOT_DIR/$GODOT_NAME" "$GODOT_DIR/godot"
           chmod +x "$GODOT_DIR/godot"
 
       - name: Locate Godot

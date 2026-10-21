@@ -42,20 +42,26 @@ Test suites extend `GdUnitTestSuite`; test functions start with `test_`.
 ## Lint
 
 GDScript under `src/`, `tests/` and `tools/` is checked with
-[gdtoolkit](https://github.com/Scony/godot-gdscript-toolkit) **4.5.0** (`gdformat` and `gdlint`).
+[gdtoolkit](https://github.com/Scony/godot-gdscript-toolkit) (`gdformat` and `gdlint`) at the
+exact version pinned in `.gdtoolkit-version`. That file is the only place the version is
+written: CI installs from it, `scripts/lint.sh` names it in its install hint, and CI fails if
+the version string appears in any other tracked file outside `addons/`.
 Vendored `addons/` are not checked. Rules live in `gdlintrc` at the repository root: max line
 length 100, max 400 lines per file, max 4 function arguments, snake_case function names and
 PascalCase class names.
 
 ```sh
-pip install "gdtoolkit==4.5.0"   # once
-scripts/lint.sh                  # check formatting and lint; exits non-zero on any problem
-gdformat src tests tools         # fix formatting in place
+pip install "gdtoolkit==$(cat .gdtoolkit-version)"   # once
+scripts/lint.sh                # check formatting and lint; exits non-zero on any problem
+gdformat src tests tools       # fix formatting in place
 ```
 
 CI (`.github/workflows/ci.yml`, status check `ci`) runs on every pull request and every push to
 `main`: lint, then Godot project import, then `scripts/test.sh`. When tests fail, the reports in
-`.godot/test-reports/` are uploaded as the `test-reports` artifact of the run.
+`.godot/test-reports/` are uploaded as the `test-reports` artifact of the run. The Godot zip is
+checked against the `SHA512-SUMS.txt` of the same `godotengine/godot-builds` release, on every
+run (cached or not), before Godot is started. A newer push to a pull request cancels its older
+run; runs for pushes to `main` (`ci` and `soak`) are never cancelled.
 
 ## Translations
 
