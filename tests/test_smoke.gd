@@ -9,7 +9,7 @@ const EXPECTED_MAIN_SCENE: String = "res://src/scenes/shell/shell.tscn"
 ## The harness evaluates a trivial assertion.
 func test_one_plus_one_equals_two() -> void:
 	var sum: int = 1 + 1
-	assert_int(sum).is_equal(2)
+	assert_int(sum).is_equal(3)
 
 
 ## The project boots into the shell scene.
