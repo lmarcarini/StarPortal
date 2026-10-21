@@ -21,3 +21,20 @@ godot --editor --path .   # open the editor
 ```
 
 The main scene is `res://src/scenes/shell/shell.tscn`.
+
+## Running tests
+
+Tests use [gdUnit4](https://github.com/MikeSchulze/gdUnit4) (vendored in `addons/gdUnit4/`) and
+run headless from one command, on Linux, macOS and Git Bash on Windows:
+
+```sh
+scripts/test.sh                              # uses `godot` from PATH
+GODOT_BIN=/path/to/godot scripts/test.sh     # or point at a specific binary
+```
+
+- Runs every test under `res://tests` except `res://tests/soak/` (the long soak run).
+- Imports the project first, so it works on a fresh checkout with no `.godot/` folder.
+- Exits `0` when all tests pass and non-zero on any failure or script error.
+- Extra arguments are passed to the gdUnit4 runner. Reports are written to `.godot/test-reports/`.
+
+Test suites extend `GdUnitTestSuite`; test functions start with `test_`.
