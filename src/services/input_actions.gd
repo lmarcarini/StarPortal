@@ -21,6 +21,14 @@ const ACTIONS: Array[StringName] = [
 	&"debug_toggle_overlay",
 ]
 
+## Gamepad bindings added to Godot's built-in UI actions at start-up, as {action: [encoded]},
+## so a gamepad can press (A) and cancel (B) focused controls. The built-in keyboard bindings
+## of these actions stay. They are not rebindable.
+const UI_GAMEPAD_DEFAULTS: Dictionary = {
+	&"ui_accept": [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_A}],
+	&"ui_cancel": [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_B}],
+}
+
 ## Default bindings as {action: {KEYBOARD: [encoded], GAMEPAD: [encoded]}}, each event
 ## encoded by [InputEventCodec], at most [code]InputService.BINDINGS_PER_DEVICE[/code] each.
 ## The gamepad chord Back + Right stick press for [code]debug_toggle_overlay[/code] cannot be

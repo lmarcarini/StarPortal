@@ -43,6 +43,7 @@ func _ready() -> void:
 	for action: StringName in InputActions.ACTIONS:
 		_bindings[action] = _stored_or_default_layout(action)
 		_apply_to_input_map(action)
+	_add_ui_gamepad_bindings()
 
 
 func _input(event: InputEvent) -> void:
@@ -163,6 +164,20 @@ func _commit(action: StringName) -> Result:
 	var saved: Result = settings.set_value(SETTINGS_SECTION, action, encoded)
 	bindings_changed.emit(action)
 	return saved
+
+
+## Adds [constant InputActions.UI_GAMEPAD_DEFAULTS] to Godot's built-in UI actions, keeping
+## their existing events and skipping any already bound.
+static func _add_ui_gamepad_bindings() -> void:
+	for action: StringName in InputActions.UI_GAMEPAD_DEFAULTS:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
+		var encoded_events: Array = InputActions.UI_GAMEPAD_DEFAULTS[action]
+		for encoded: Dictionary in encoded_events:
+			var event: InputEvent = InputEventCodec.decode(encoded)
+			assert(event != null, "InputService: invalid UI default for %s" % action)
+			if event != null and not InputMap.action_has_event(action, event):
+				InputMap.action_add_event(action, event)
 
 
 ## Registers [param action] in [InputMap] if needed and replaces its events with the

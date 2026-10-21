@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/debug/debug_overlay.gd" id="1_debug_overlay"]
+
+[node name="DebugOverlay" type="PanelContainer"]
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -456.0
+offset_top = 72.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("1_debug_overlay")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Rows" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TitleLabel" type="Label" parent="Margin/Rows"]
+layout_mode = 2
+text = "UI_DEBUG_TITLE"
+
+[node name="SpeedIndexLabel" type="Label" parent="Margin/Rows"]
+unique_name_in_owner = true
+auto_translate_mode = 2
+layout_mode = 2
+
+[node name="TicksPerSecondLabel" type="Label" parent="Margin/Rows"]
+unique_name_in_owner = true
+auto_translate_mode = 2
+layout_mode = 2
+
+[node name="TickTimeLabel" type="Label" parent="Margin/Rows"]
+unique_name_in_owner = true
+auto_translate_mode = 2
+layout_mode = 2
+
+[node name="StateLabel" type="Label" parent="Margin/Rows"]
+layout_mode = 2
+text = "UI_DEBUG_STATE"
+
+[node name="StateTree" type="Tree" parent="Margin/Rows"]
+unique_name_in_owner = true
+auto_translate_mode = 2
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 1
+columns = 2
+hide_root = true
+
+[node name="RefreshTimer" type="Timer" parent="."]
+unique_name_in_owner = true
