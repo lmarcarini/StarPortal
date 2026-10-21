@@ -1,3 +1,14 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Compiled translations (generated from source CSV/PO files)
+*.translation
+
+# Export output
+/build/
+/export/
+
+# OS junk
+.DS_Store
+Thumbs.db
