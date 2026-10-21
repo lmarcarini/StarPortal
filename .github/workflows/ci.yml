@@ -94,3 +94,71 @@ jobs:
           include-hidden-files: true
           if-no-files-found: warn
           retention-days: 14
+
+  # One in-game year with a save and load every month (tests/soak). Runs only on pushes to
+  # main, never on pull requests. Bible: technical-architecture.md#testing-and-tooling
+  soak:
+    name: soak
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Read Godot version
+        id: godot
+        run: |
+          full="$(tr -d '[:space:]' < .godot-version)"   # e.g. 4.7.2.stable
+          number="${full%.stable}"                         # e.g. 4.7.2
+          if [ "$full" = "$number" ]; then
+            echo "::error file=.godot-version::expected '<version>.stable', got '$full'"
+            exit 1
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          echo "dir=$RUNNER_TOOL_CACHE/godot-$number" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Godot
+        id: godot-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.godot.outputs.dir }}
+          key: godot-${{ steps.godot.outputs.number }}-stable-linux.x86_64
+
+      - name: Download Godot
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        env:
+          GODOT_NUMBER: ${{ steps.godot.outputs.number }}
+          GODOT_DIR: ${{ steps.godot.outputs.dir }}
+        run: |
+          name="Godot_v${GODOT_NUMBER}-stable_linux.x86_64"
+          url="https://github.com/godotengine/godot-builds/releases/download/${GODOT_NUMBER}-stable/${name}.zip"
+          mkdir -p "$GODOT_DIR"
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot.zip" "$url"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$GODOT_DIR"
+          mv "$GODOT_DIR/$name" "$GODOT_DIR/godot"
+          chmod +x "$GODOT_DIR/godot"
+
+      - name: Locate Godot
+        env:
+          GODOT_DIR: ${{ steps.godot.outputs.dir }}
+        run: |
+          echo "GODOT_BIN=$GODOT_DIR/godot" >> "$GITHUB_ENV"
+          "$GODOT_DIR/godot" --headless --version
+
+      - name: Import project
+        run: '"$GODOT_BIN" --headless --path . --import'
+
+      - name: Soak
+        id: soak
+        run: scripts/soak.sh
+
+      - name: Upload soak reports
+        if: failure() && steps.soak.outcome == 'failure'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: soak-reports
+          path: .godot/test-reports/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
