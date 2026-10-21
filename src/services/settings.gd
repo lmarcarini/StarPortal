@@ -91,16 +91,17 @@ func reset_section(section: StringName) -> void:
 		_save()
 
 
-## Reloads every setting from [member file_path]. A missing or unreadable file, or a stored
-## value of the wrong type, logs a warning and falls back to the default; the file is
-## rewritten in full on the next save. Unknown entries in the file are ignored.
+## Reloads every setting from [member file_path]. A missing file (first run) silently gives
+## the defaults. An unreadable or corrupt file, or a stored value of the wrong type, logs a
+## warning and falls back to the default. Either way the file is rewritten in full on the
+## next save. Unknown entries in the file are ignored.
 func reload() -> void:
 	var loaded: Dictionary[StringName, Dictionary] = _defaults_copy()
 	var config := ConfigFile.new()
 	var error: Error = config.load(file_path)
 	if error == OK:
 		_read_config(config, loaded)
-	else:
+	elif error != ERR_FILE_NOT_FOUND:
 		push_warning(
 			"Settings: could not read %s (%s); using defaults." % [file_path, error_string(error)]
 		)

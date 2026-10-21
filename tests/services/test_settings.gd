@@ -35,17 +35,16 @@ func test_missing_file_uses_starting_defaults() -> void:
 	assert_str(settings.get_value(&"gameplay", &"language")).is_equal("en")
 
 
-## A missing file logs a warning and does not create the file by itself.
-func test_missing_file_logs_warning() -> void:
+## A missing file (first run) is silent: no warning or error, and no file is created until
+## the next save.
+func test_missing_file_is_silent() -> void:
 	var settings: SettingsScript = auto_free(SettingsScript.new())
 	settings.file_path = TEST_PATH
-	await (
-		assert_error(func() -> void: settings.reload())
-		. is_push_warning(
-			"Settings: could not read %s (File not found); using defaults." % TEST_PATH
-		)
-	)
+	await assert_error(func() -> void: settings.reload()).is_success()
+	assert_float(settings.get_float(&"audio", &"music")).is_equal(0.8)
 	assert_bool(FileAccess.file_exists(TEST_PATH)).is_false()
+	assert_bool(settings.set_value(&"audio", &"music", 0.5).is_ok).is_true()
+	assert_bool(FileAccess.file_exists(TEST_PATH)).is_true()
 
 
 ## set_value stores the value with ConfigFile at file_path, and a new instance reads it back.
@@ -243,8 +242,7 @@ func _make_settings() -> SettingsScript:
 	var settings: SettingsScript = auto_free(SettingsScript.new())
 	settings.file_path = TEST_PATH
 	settings.setting_changed.connect(_on_setting_changed)
-	if FileAccess.file_exists(TEST_PATH):
-		settings.reload()
+	settings.reload()
 	return settings
 
 
