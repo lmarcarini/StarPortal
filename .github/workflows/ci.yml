@@ -155,7 +155,7 @@ jobs:
   # main, never on pull requests. Bible: technical-architecture.md#testing-and-tooling
   soak:
     name: soak
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'pull_request' # TEMPORARY
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
