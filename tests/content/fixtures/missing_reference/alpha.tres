@@ -1,0 +1,8 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://tests/content/fixtures/fixture_def.gd" id="1_ceshk"]
+
+[resource]
+script = ExtResource("1_ceshk")
+references = Array[StringName]([&"ghost"])
+id = &"alpha"
