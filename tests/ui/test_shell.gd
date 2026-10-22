@@ -72,9 +72,9 @@ func test_keyboard_and_gamepad_bindings_drive_the_clock() -> void:
 	assert_bool(clock.is_paused).is_false()
 	await _runner.simulate_key_pressed(KEY_EQUAL)
 	assert_int(clock.speed_index).is_equal(2)
-	await _press_joypad(JOY_BUTTON_LEFT_SHOULDER)
+	await _pull_trigger(JOY_AXIS_TRIGGER_LEFT, [1.0, 0.0])
 	assert_int(clock.speed_index).is_equal(1)
-	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
+	await _pull_trigger(JOY_AXIS_TRIGGER_RIGHT, [1.0, 0.0])
 	assert_int(clock.speed_index).is_equal(2)
 	await _press_joypad(JOY_BUTTON_START)
 	assert_bool(clock.is_paused).is_true()
@@ -170,7 +170,9 @@ func test_time_bar_text_comes_from_translation_keys() -> void:
 	assert_str(_shell.time_bar.get_buttons()[0].text).is_equal("Pause")
 
 
-func test_first_button_has_focus_and_neighbours_reach_every_button() -> void:
+## Focus navigation alone walks the top bar ring, goes down to the view tabs and into the
+## shown view, moves along the tabs to the other view and through it, and back up.
+func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void:
 	var buttons: Array[Button] = _shell.get_focus_order()
 	assert_int(buttons.size()).is_equal(6)
 	assert_object(_focus_owner()).is_same(buttons[0])
@@ -184,6 +186,25 @@ func test_first_button_has_focus_and_neighbours_reach_every_button() -> void:
 		assert_bool(visited.has(button)).override_failure_message(button.name).is_true()
 	await _press_action(&"ui_left")
 	assert_object(_focus_owner()).is_same(buttons[buttons.size() - 1])
+	var switcher: ViewSwitcher = _shell.view_switcher
+	var tabs: TabBar = switcher.get_tab_bar()
+	var analysis: GameView = switcher.get_view(&"analysis")
+	await _press_action(&"ui_down")
+	assert_object(_focus_owner()).is_same(tabs)
+	await _press_action(&"ui_down")
+	assert_object(_focus_owner()).is_same(switcher.get_view(&"gate_room").get_default_focus())
+	await _press_action(&"ui_up")
+	assert_object(_focus_owner()).is_same(tabs)
+	await _press_action(&"ui_right")
+	assert_str(String(switcher.current_view_id())).is_equal("analysis")
+	await _press_action(&"ui_down")
+	assert_object(_focus_owner()).is_same(analysis.get_default_focus())
+	await _press_action(&"ui_right")
+	assert_object(_focus_owner()).is_same(analysis.find_child("Board", true, false))
+	await _press_action(&"ui_up")
+	assert_object(_focus_owner()).is_same(tabs)
+	await _press_action(&"ui_up")
+	assert_object(_focus_owner()).is_same(buttons[0])
 
 
 func test_gamepad_a_presses_the_focused_button() -> void:
@@ -270,6 +291,20 @@ func _press_joypad(button: JoyButton) -> void:
 		var event: InputEventJoypadButton = InputEventJoypadButton.new()
 		event.button_index = button
 		event.pressed = pressed
+		Input.parse_input_event(event)
+		Input.flush_buffered_events()
+	await _runner.await_input_processed()
+
+
+## Moves trigger [param axis] through [param values], one motion event each. The events are
+## sent from a process frame, as the engine sends real ones: inside a physics frame Input
+## checks "just pressed" against physics frames instead.
+func _pull_trigger(axis: JoyAxis, values: Array[float]) -> void:
+	await get_tree().process_frame
+	for value: float in values:
+		var event: InputEventJoypadMotion = InputEventJoypadMotion.new()
+		event.axis = axis
+		event.axis_value = value
 		Input.parse_input_event(event)
 		Input.flush_buffered_events()
 	await _runner.await_input_processed()

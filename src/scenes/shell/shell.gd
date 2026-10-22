@@ -1,8 +1,9 @@
 extends Control
 ## Main scene. Starts a new paused game, wires the time bar, quick save and quick load, the
-## autosave on each new day and, in debug builds only, the debug overlay and a button that
-## submits a SetFlagCommand. Holds no game rules: it reads state and sends commands.
-## Bible: game-design.md#time-real-time-with-pause,
+## autosave on each new day, the game views under the top bar and, in debug builds only, the
+## debug overlay and a button that submits a SetFlagCommand. Holds no game rules: it reads
+## state and sends commands.
+## Bible: game-design.md#time-real-time-with-pause, game-design.md#core-loop,
 ## technical-architecture.md#architecture-overview
 
 ## Smallest window size the game supports, in pixels.
@@ -29,6 +30,8 @@ var _debug_flag_count: int = 0
 
 ## The time bar at the top of the screen.
 @onready var time_bar: TimeBar = %TimeBar
+## The game views and their tabs, under the top bar.
+@onready var view_switcher: ViewSwitcher = %ViewSwitcher
 @onready var _quick_save_button: Button = %QuickSaveButton
 @onready var _quick_load_button: Button = %QuickLoadButton
 @onready var _debug_flag_button: Button = %DebugFlagButton
@@ -44,8 +47,10 @@ func _ready() -> void:
 	_setup_debug_tools()
 	_start(GameState.new_game(_choose_seed()))
 	SimClock.pause()
+	_bind_views(_simulation)
 	var buttons: Array[Button] = get_focus_order()
-	_link_focus(buttons)
+	_link_focus(buttons, view_switcher.get_tab_bar())
+	view_switcher.set_focus_above(buttons[0])
 	buttons[0].grab_focus()
 
 
@@ -92,11 +97,13 @@ func quick_load() -> void:
 		return
 	var state: GameState = result.value
 	_start(state)
+	_bind_views(_simulation)
 	_show_toast(&"UI_LOADED")
 
 
 ## Returns every button in focus order: the time bar's, then save, load and (debug only)
-## the flag button. Neighbours wrap around, so a gamepad reaches them all.
+## the flag button. Neighbours wrap around, so a gamepad reaches them all; down from any of
+## them is the view tabs.
 func get_focus_order() -> Array[Button]:
 	var buttons: Array[Button] = time_bar.get_buttons()
 	buttons.append_array([_quick_save_button, _quick_load_button])
@@ -143,7 +150,7 @@ func _setup_debug_tools() -> void:
 	add_child(debug_overlay)
 
 
-static func _link_focus(buttons: Array[Button]) -> void:
+static func _link_focus(buttons: Array[Button], below: Control) -> void:
 	var count: int = buttons.size()
 	for index: int in count:
 		var button: Button = buttons[index]
@@ -154,7 +161,13 @@ static func _link_focus(buttons: Array[Button]) -> void:
 		button.focus_neighbor_right = next
 		button.focus_next = next
 		button.focus_neighbor_top = NodePath(".")
-		button.focus_neighbor_bottom = NodePath(".")
+		button.focus_neighbor_bottom = button.get_path_to(below)
+
+
+## Passes [param simulation] to the game views. Called after each [method _start]: at start
+## and after a quick load.
+func _bind_views(simulation: Simulation) -> void:
+	view_switcher.setup(simulation)
 
 
 func _show_toast(key: StringName) -> void:

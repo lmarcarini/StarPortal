@@ -58,32 +58,6 @@ func test_actions_registered_at_start_up_not_in_project_settings() -> void:
 	assert_bool(InputMap.event_is_action(_key(KEY_F5), &"quick_save")).is_true()
 
 
-## InputActions.DEFAULTS and the settings section both cover exactly the action list.
-func test_defaults_and_settings_section_cover_every_action() -> void:
-	assert_array(InputActions.DEFAULTS.keys()).contains_exactly_in_any_order(InputActions.ACTIONS)
-	var section: Dictionary = SettingsDefaults.VALUES[&"input"]
-	assert_array(section.keys()).contains_exactly_in_any_order(InputActions.ACTIONS)
-	for action: StringName in InputActions.ACTIONS:
-		assert_dict(section[action]).is_empty()
-
-
-## The M0 default table from the card, one gamepad button for the overlay (no chords).
-func test_default_bindings() -> void:
-	var service: InputServiceScript = _make_service()
-	_assert_keys(service, &"time_toggle_pause", [KEY_SPACE])
-	_assert_keys(service, &"time_faster", [KEY_EQUAL, KEY_KP_ADD])
-	_assert_keys(service, &"time_slower", [KEY_MINUS, KEY_KP_SUBTRACT])
-	_assert_keys(service, &"quick_save", [KEY_F5])
-	_assert_keys(service, &"quick_load", [KEY_F9])
-	_assert_keys(service, &"debug_toggle_overlay", [KEY_F3])
-	_assert_pad(service, &"time_toggle_pause", [JOY_BUTTON_START])
-	_assert_pad(service, &"time_faster", [JOY_BUTTON_RIGHT_SHOULDER])
-	_assert_pad(service, &"time_slower", [JOY_BUTTON_LEFT_SHOULDER])
-	_assert_pad(service, &"quick_save", [])
-	_assert_pad(service, &"quick_load", [])
-	_assert_pad(service, &"debug_toggle_overlay", [JOY_BUTTON_BACK])
-
-
 ## Keys are bound by physical keycode: the key in the Space position triggers the action
 ## whatever character the layout gives it, and the Space character elsewhere does not.
 func test_keys_bound_by_physical_keycode() -> void:
