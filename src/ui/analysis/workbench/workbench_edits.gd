@@ -39,13 +39,17 @@ static func with_added(
 	return result
 
 
-## Returns [param constraints] without the one at [param index]; unchanged when out of range.
-static func without_index(
-	constraints: Array[AddressConstraint], index: int
+## Returns [param constraints] without the first one equal to [param removed]
+## (AddressConstraint.equals); unchanged when none is. Matching by value, not position, keeps a
+## remove on the constraint the player saw even when the list it applies to has moved on.
+static func without(
+	constraints: Array[AddressConstraint], removed: AddressConstraint
 ) -> Array[AddressConstraint]:
 	var result: Array[AddressConstraint] = copy(constraints)
-	if index >= 0 and index < result.size():
-		result.remove_at(index)
+	for position: int in result.size():
+		if result[position].equals(removed):
+			result.remove_at(position)
+			break
 	return result
 
 

@@ -138,6 +138,26 @@ func test_remove_button_removes_its_row() -> void:
 	)
 
 
+## While the clock runs, removing a shown row after an edit that has not applied yet removes
+## that row's constraint (matched by value), not whatever sits at its position in the pending
+## list.
+func test_remove_targets_the_shown_row_while_an_edit_is_pending() -> void:
+	_set_draft([AddressConstraint.excluded(HERON), AddressConstraint.excluded(ANVIL)])
+	_simulation.state.clock.mode = ClockState.Mode.RUNNING
+	await _key_accept(_palette().get_button(HERON))
+	await _key_accept(_actions().get_button(ActionBar.Action.RULE_OUT))
+	var rows: Array[ConstraintRow] = _constraints().get_rows()
+	assert_int(rows.size()).is_equal(2)
+	assert_str(rows[1].get_text()).is_equal(
+		"%s is not in the address" % tr(WorkbenchText.glyph_name_key(ANVIL))
+	)
+	await _pad_accept(rows[1].get_remove_button())
+	assert_int(_simulation.commands.pending_count()).is_equal(2)
+	_simulation.advance_tick()
+	await UiInput.settle(_workbench)
+	_assert_constraints([])
+
+
 ## "Clear all" asks first: cancelling keeps everything, confirming clears it.
 func test_clear_all_asks_for_confirmation() -> void:
 	_set_draft([AddressConstraint.excluded(HERON), AddressConstraint.included(ANVIL)])

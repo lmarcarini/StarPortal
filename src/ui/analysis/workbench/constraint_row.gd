@@ -3,11 +3,8 @@ extends HBoxContainer
 ## One constraint of the Address Workbench draft in plain words, with a remove button.
 ## Bible: gate-and-address-spec.md#player-tools
 
-## The player pressed remove on the row at [param index].
-signal remove_pressed(index: int)
-
-## Position of the constraint in the draft.
-var index: int = -1
+## The player pressed remove on the row showing [param constraint].
+signal remove_pressed(constraint: AddressConstraint)
 
 var _constraint: AddressConstraint = null
 
@@ -16,7 +13,7 @@ var _constraint: AddressConstraint = null
 
 
 func _ready() -> void:
-	_remove.pressed.connect(func() -> void: remove_pressed.emit(index))
+	_remove.pressed.connect(func() -> void: remove_pressed.emit(_constraint))
 
 
 func _notification(what: int) -> void:
@@ -24,9 +21,8 @@ func _notification(what: int) -> void:
 		_refresh_text()
 
 
-## Shows [param constraint], the draft's constraint number [param position].
-func show_constraint(position: int, constraint: AddressConstraint) -> void:
-	index = position
+## Shows [param constraint].
+func show_constraint(constraint: AddressConstraint) -> void:
 	_constraint = constraint
 	_refresh_text()
 

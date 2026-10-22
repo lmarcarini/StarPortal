@@ -5,8 +5,8 @@ extends VBoxContainer
 ## the draft.
 ## Bible: gate-and-address-spec.md#player-tools
 
-## The player asked to remove the constraint at [param index].
-signal remove_requested(index: int)
+## The player asked to remove [param constraint] (the row's own copy; match it by value).
+signal remove_requested(constraint: AddressConstraint)
 ## The player confirmed removing every constraint.
 signal clear_confirmed
 
@@ -39,7 +39,7 @@ func show_constraints(constraints: Array[AddressConstraint]) -> void:
 	for position: int in constraints.size():
 		var row: ConstraintRow = _ROW_SCENE.instantiate() as ConstraintRow
 		_rows.add_child(row)
-		row.show_constraint(position, constraints[position])
+		row.show_constraint(constraints[position])
 		row.remove_pressed.connect(remove_requested.emit)
 	_empty.visible = constraints.is_empty()
 	_clear_button.disabled = constraints.is_empty()
