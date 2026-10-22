@@ -1,2 +1,51 @@
 keys,en,pt_BR
 WORKBENCH_TITLE,Address Workbench,Bancada de Endereços
+WORKBENCH_COUNT_MANY,{count} possible,{count} possíveis
+WORKBENCH_COUNT_ONE,{count} possible,{count} possível
+WORKBENCH_COUNT_NONE,No address fits: a constraint is wrong,Nenhum endereço serve: alguma restrição está errada
+WORKBENCH_DIGIT_SEPARATOR,",",.
+WORKBENCH_LIST_SEPARATOR,", ",", "
+WORKBENCH_SLOT_EMPTY,Seal {seal}: empty,Selo {seal}: vazio
+WORKBENCH_SLOT_FILLED,Seal {seal}: {glyph},Selo {seal}: {glyph}
+WORKBENCH_ORIGIN_HOME,"Seal 8 is the origin: {glyph}, CAIRN's own","O selo 8 é a origem: {glyph}, a da CAIRN"
+WORKBENCH_ORIGIN_SET,Seal 8 is the origin: {glyph},O selo 8 é a origem: {glyph}
+WORKBENCH_ORIGIN_RESET,Use CAIRN's origin,Usar a origem da CAIRN
+WORKBENCH_HINT_IDLE,"Pick a glyph, then a seal or an action. You can also drag a glyph onto a seal.",Escolha um glifo e depois um selo ou uma ação. Também pode arrastar um glifo até um selo.
+WORKBENCH_HINT_PICKED,{glyph} picked: choose a seal or an action.,{glyph} escolhido: escolha um selo ou uma ação.
+WORKBENCH_HINT_NOT_AT,Choose the seal {glyph} is not at.,Escolha o selo em que {glyph} não está.
+WORKBENCH_HINT_NEARER,Pick the glyph that {glyph} is nearer than.,Escolha o glifo do qual {glyph} está mais perto.
+WORKBENCH_ACTION_RULE_OUT,Rule out,Descartar
+WORKBENCH_ACTION_NOT_AT,Not at seal…,Não no selo…
+WORKBENCH_ACTION_INCLUDE,In the address,No endereço
+WORKBENCH_ACTION_NEARER,Nearer than…,Mais perto que…
+WORKBENCH_ACTION_GROUP,Group the seven as a set,Agrupar os sete como conjunto
+WORKBENCH_ACTION_CANCEL,Cancel,Cancelar
+WORKBENCH_PALETTE_TOOLTIP,{glyph}: {status},{glyph}: {status}
+WORKBENCH_STATUS_NEUTRAL,undecided,indefinido
+WORKBENCH_STATUS_RULED_OUT,ruled out,descartado
+WORKBENCH_STATUS_IN_ADDRESS,in the address,no endereço
+WORKBENCH_RULE_GLYPH_AT,{glyph} is at seal {seal},{glyph} está no selo {seal}
+WORKBENCH_RULE_GLYPH_NOT_AT,{glyph} is not at seal {seal},{glyph} não está no selo {seal}
+WORKBENCH_RULE_EXCLUDED,{glyph} is not in the address,{glyph} não está no endereço
+WORKBENCH_RULE_INCLUDED,{glyph} is in the address,{glyph} está no endereço
+WORKBENCH_RULE_EXACT_SET,"The seven glyphs are {glyphs}, in some order","Os sete glifos são {glyphs}, em alguma ordem"
+WORKBENCH_RULE_NEARER_THAN,{nearer} is nearer than {farther},{nearer} está mais perto que {farther}
+WORKBENCH_CONSTRAINTS_HEADER,Constraints,Restrições
+WORKBENCH_CONSTRAINTS_EMPTY,No constraints yet.,Nenhuma restrição ainda.
+WORKBENCH_REMOVE,Remove,Remover
+WORKBENCH_CLEAR_ALL,Clear all,Limpar tudo
+WORKBENCH_CLEAR_TITLE,Clear all constraints,Limpar todas as restrições
+WORKBENCH_CLEAR_QUESTION,Remove every constraint from the workbench?,Remover todas as restrições da bancada?
+WORKBENCH_CLEAR_YES,Clear all,Limpar tudo
+WORKBENCH_CLEAR_NO,Keep them,Manter
+WORKBENCH_EDIT_TOO_MANY,The workbench holds at most {max} constraints.,A bancada comporta no máximo {max} restrições.
+WORKBENCH_EDIT_FAILED,That change could not be made.,Não foi possível fazer essa alteração.
+WORKBENCH_CANDIDATES_HEADER,Candidates,Candidatos
+WORKBENCH_CANDIDATES_TOO_MANY,Narrow it to {limit} or fewer to list the addresses.,Reduza a {limit} ou menos para listar os endereços.
+WORKBENCH_ENERGY,Lock energy: {energy} MWh,Energia de travamento: {energy} MWh
+WORKBENCH_IN_QUEUE,In the dial queue,Na fila de discagem
+WORKBENCH_SEND,Send to dial queue,Enviar à fila de discagem
+WORKBENCH_QUEUE_SENT,Sent to the dial queue.,Enviado à fila de discagem.
+WORKBENCH_QUEUE_ALREADY,That address is already in the dial queue.,Esse endereço já está na fila de discagem.
+WORKBENCH_QUEUE_FULL,The dial queue is full ({max} addresses).,A fila de discagem está cheia ({max} endereços).
+WORKBENCH_QUEUE_FAILED,That address could not be queued.,Não foi possível pôr esse endereço na fila.
