@@ -170,7 +170,9 @@ func test_time_bar_text_comes_from_translation_keys() -> void:
 	assert_str(_shell.time_bar.get_buttons()[0].text).is_equal("Pause")
 
 
-func test_first_button_has_focus_and_neighbours_reach_every_button() -> void:
+## Focus navigation alone walks the top bar ring, goes down to the view tabs and into the
+## shown view, moves along the tabs to the other view and through it, and back up.
+func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void:
 	var buttons: Array[Button] = _shell.get_focus_order()
 	assert_int(buttons.size()).is_equal(6)
 	assert_object(_focus_owner()).is_same(buttons[0])
@@ -184,6 +186,25 @@ func test_first_button_has_focus_and_neighbours_reach_every_button() -> void:
 		assert_bool(visited.has(button)).override_failure_message(button.name).is_true()
 	await _press_action(&"ui_left")
 	assert_object(_focus_owner()).is_same(buttons[buttons.size() - 1])
+	var switcher: ViewSwitcher = _shell.view_switcher
+	var tabs: TabBar = switcher.get_tab_bar()
+	var analysis: GameView = switcher.get_view(&"analysis")
+	await _press_action(&"ui_down")
+	assert_object(_focus_owner()).is_same(tabs)
+	await _press_action(&"ui_down")
+	assert_object(_focus_owner()).is_same(switcher.get_view(&"gate_room").get_default_focus())
+	await _press_action(&"ui_up")
+	assert_object(_focus_owner()).is_same(tabs)
+	await _press_action(&"ui_right")
+	assert_str(String(switcher.current_view_id())).is_equal("analysis")
+	await _press_action(&"ui_down")
+	assert_object(_focus_owner()).is_same(analysis.get_default_focus())
+	await _press_action(&"ui_right")
+	assert_object(_focus_owner()).is_same(analysis.find_child("Board", true, false))
+	await _press_action(&"ui_up")
+	assert_object(_focus_owner()).is_same(tabs)
+	await _press_action(&"ui_up")
+	assert_object(_focus_owner()).is_same(buttons[0])
 
 
 func test_gamepad_a_presses_the_focused_button() -> void:
