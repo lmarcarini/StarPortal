@@ -169,7 +169,10 @@ func _serialize(state: GameState) -> String:
 		"tick": state.clock.tick,
 		"state": state.to_dict(),
 	}
-	return JSON.stringify(data, "\t")
+	# full_precision writes the shortest exact text of a float, but Godot's JSON parser can
+	# drop digits when reading it back, so it does not make a round trip exact by itself.
+	# State floats are saved as ExactFloat strings instead.
+	return JSON.stringify(data, "\t", true, true)
 
 
 ## Writes [param text] to [param path].tmp. The real file is untouched, so an interrupted

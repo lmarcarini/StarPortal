@@ -1,5 +1,6 @@
 ## Tests for SaveMigrator: pass-through at the current version, ordered step functions,
-## distinct failures for bad, newer and unmigratable versions, and the v1 -> v2 clock step.
+## distinct failures for bad, newer and unmigratable versions, the v1 -> v2 clock step and
+## the v2 -> v3 gate, power and worlds step.
 ## Bible: technical-architecture.md#save-system
 extends GdUnitTestSuite
 
@@ -31,10 +32,15 @@ func test_current_version_is_pass_through() -> void:
 	assert_dict(result.value).is_equal(data)
 
 
-## The target version is 2, with one built-in step from v1.
-func test_target_version_is_two() -> void:
-	assert_int(SaveMigrator.TARGET_VERSION).is_equal(2)
-	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([1])
+## The target version is 3, with built-in steps from v1 and v2.
+func test_target_version_is_three() -> void:
+	assert_int(SaveMigrator.TARGET_VERSION).is_equal(3)
+	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([1, 2])
+
+
+## Runs only the built-in v1 -> v2 step on [param data].
+func _migrate_to_v2(data: Dictionary) -> Result:
+	return SaveMigrator.migrate_with_steps(data, SaveMigrator.built_in_steps(), 2)
 
 
 ## A v1 save with the given clock, as JSON would parse it.
@@ -48,7 +54,7 @@ func test_v1_clock_migrates_to_mode() -> void:
 	var cases: Array[Array] = [[true, "paused"], [false, "running"]]
 	for case: Array in cases:
 		var data := _v1_save({"tick": 5.0, "speed_index": 2.0, "is_paused": case[0]})
-		var result := SaveMigrator.migrate(data)
+		var result := _migrate_to_v2(data)
 		assert_bool(result.is_ok).is_true()
 		var migrated: Dictionary = result.value
 		assert_int(migrated["format_version"]).is_equal(2)
@@ -83,7 +89,7 @@ func test_v1_bad_is_paused_is_left_for_validation() -> void:
 ## A v1 save with no state object or no clock object passes through the step untouched.
 func test_v1_without_clock_is_left_for_validation() -> void:
 	for data: Dictionary in [{"format_version": 1}, {"format_version": 1, "state": {"x": 1}}]:
-		var result := SaveMigrator.migrate(data)
+		var result := _migrate_to_v2(data)
 		assert_bool(result.is_ok).is_true()
 		var expected := data.duplicate(true)
 		expected["format_version"] = 2
@@ -220,3 +226,89 @@ func test_v1_save_file_loads_into_mode() -> void:
 		assert_int(loaded.clock.mode_after_hold).is_equal(ClockState.Mode.PAUSED)
 		assert_int(loaded.clock.tick).is_equal(3)
 		assert_int(loaded.clock.speed_index).is_equal(2)
+
+
+## The v3 defaults the v2 -> v3 step adds for a save whose base seed is [param base_seed].
+func _v3_sections(base_seed: int) -> Dictionary:
+	var galaxy_seed := RandomState.derive_seed(base_seed, &"galaxy")
+	return {
+		"gate":
+		{
+			"mode": "idle",
+			"current_address": null,
+			"dial_started_tick": -1,
+			"lock_energy_mwh": "0000000000000000",
+			"connected_world_id": "",
+			"lock_started_tick": -1,
+			"is_hostile": false,
+			"dial_queue": [],
+			"dial_log": [],
+		},
+		"power":
+		{
+			"stored_mwh": "0000000000000000",
+			"capacity_mwh": "4079000000000000",
+			"plant_output_mw": "403e000000000000",
+		},
+		"worlds": {"galaxy_seed": str(galaxy_seed), "generator_version": 1, "statuses": {}},
+	}
+
+
+## v2 -> v3 adds an idle Ring, the starting power and the worlds section seeded from the
+## save's base seed, leaving the other sections untouched; the result is a valid state.
+func test_v2_adds_gate_power_and_worlds() -> void:
+	var base_seed: int = -5000000000000000001
+	var clock := {
+		"tick": 9.0, "speed_index": 1.0, "mode": "paused", "holds": [], "mode_after_hold": "paused"
+	}
+	var random := {"base_seed": str(base_seed), "streams": {}}
+	var state := {"clock": clock, "random": random, "flags": {"f": true}}
+	var result := SaveMigrator.migrate({"format_version": 2.0, "tick": 9.0, "state": state})
+	assert_bool(result.is_ok).is_true()
+	var migrated: Dictionary = result.value
+	assert_int(migrated["format_version"]).is_equal(3)
+	var expected := state.duplicate(true)
+	expected.merge(_v3_sections(base_seed))
+	assert_dict(migrated["state"]).is_equal(expected)
+	var migrated_state: Dictionary = migrated["state"]
+	assert_array(GameState.validate_dict(migrated_state)).is_empty()
+
+
+## v2 data with no state object passes through the step untouched.
+func test_v2_without_state_is_left_for_validation() -> void:
+	var result := SaveMigrator.migrate({"format_version": 2})
+	assert_bool(result.is_ok).is_true()
+	assert_dict(result.value).is_equal({"format_version": 3})
+
+
+## A real v2 file, written by the v2 SaveService (tests/services/fixtures/save_v2.json),
+## loads through the SaveService into v3 defaults with the galaxy seed of its base seed,
+## and keeps its v2 state.
+func test_v2_save_file_loads_into_v3_defaults() -> void:
+	var service: SaveServiceScript = SaveServiceScript.new()
+	var dir := "user://test_migrator_v2_%d_%d" % [Time.get_ticks_usec(), get_instance_id()]
+	service.saves_dir = dir
+	DirAccess.make_dir_recursive_absolute(dir)
+	var path := dir.path_join("old_v2.json")
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	file.store_string(FileAccess.get_file_as_string("res://tests/services/fixtures/save_v2.json"))
+	file.close()
+	var result: Result = service.load_game(&"old_v2")
+	DirAccess.remove_absolute(path)
+	DirAccess.remove_absolute(dir)
+	service.free()
+	assert_bool(result.is_ok).override_failure_message(str(result.detail)).is_true()
+	var loaded: GameState = result.value
+	assert_int(loaded.clock.tick).is_equal(1500)
+	assert_int(loaded.random.base_seed).is_equal(20260101)
+	assert_bool(loaded.flags[&"met_director"]).is_true()
+	assert_int(loaded.gate.mode).is_equal(GateState.RingMode.IDLE)
+	assert_array(loaded.gate.dial_queue).is_empty()
+	assert_array(loaded.gate.dial_log).is_empty()
+	assert_float(loaded.power.capacity_mwh).is_equal(400.0)
+	assert_float(loaded.power.plant_output_mw).is_equal(30.0)
+	assert_float(loaded.power.stored_mwh).is_equal(0.0)
+	assert_int(loaded.worlds.galaxy_seed).is_equal(RandomState.derive_seed(20260101, &"galaxy"))
+	assert_int(loaded.worlds.galaxy_seed).is_equal(GameState.new_game(20260101).worlds.galaxy_seed)
+	assert_int(loaded.worlds.generator_version).is_equal(1)
+	assert_dict(loaded.worlds.statuses).is_empty()
