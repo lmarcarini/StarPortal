@@ -15,7 +15,9 @@ signal command_rejected(type: StringName, code: StringName)
 signal pause_requested(reason: StringName)
 ## Emitted once per domain event drained from [code]state.events[/code], in posting order:
 ## at the end of each tick, and after a command that applied at once while paused.
-## [constant PAUSE_EVENT] is emitted as [signal pause_requested] instead.
+## [constant PAUSE_EVENT] is emitted as [signal pause_requested] instead. Emission never
+## nests: a handler may submit a command, and that command's events come out after the
+## events already waiting, from the same emission.
 signal event_posted(name: StringName, args: Array)
 
 ## Outbox event name emitted as [signal pause_requested] (args [code][reason][/code]),
@@ -38,6 +40,7 @@ var commands: CommandQueue = CommandQueue.new():
 		commands.command_rejected.connect(_on_command_rejected)
 
 var _systems: Array[SimSystem] = []
+var _emitting: bool = false
 
 
 ## Creates a simulation over [param initial_state]; [param systems] tick in list order.
@@ -50,13 +53,15 @@ func _init(initial_state: GameState, systems: Array[SimSystem] = []) -> void:
 
 ## Submits [param command] and returns its [CommandResult]. While the clock is paused a valid
 ## command applies immediately, after any commands already queued, and is re-validated
-## against them; otherwise it applies at the start of the next tick. Events posted by a
-## command that applied at once are emitted before this returns; a queued command's events
-## come out with its tick.
+## against them; otherwise it applies at the start of the next tick. While paused, events
+## posted by the commands that applied are emitted before this returns (or, when called
+## from an event handler, by the emission already running); a queued command's events come
+## out with its tick.
 func submit(command: Command) -> CommandResult:
+	var applies_now: bool = state.clock.is_paused
 	var result: CommandResult = commands.submit(command, state)
-	# Only a command applied at once can have posted: tick events are drained in the tick.
-	_emit_events()
+	if applies_now:
+		_emit_events()
 	return result
 
 
@@ -89,14 +94,23 @@ func _close_month(new_tick: int) -> void:
 	month_closed.emit(ended["year"], ended["month"])
 
 
+# Drains until the outbox stays empty. A nested call (a handler submitting while paused)
+# returns at once; the running loop picks up its events, keeping posting order.
 func _emit_events() -> void:
-	if state.events.size() == 0:
+	if _emitting:
 		return
-	for event: SimEvent in state.events.drain():
-		if event.name == PAUSE_EVENT:
-			_emit_pause_request(event.args)
-		else:
-			event_posted.emit(event.name, event.args)
+	_emitting = true
+	while state.events.size() > 0:
+		for event: SimEvent in state.events.drain():
+			_emit_event(event)
+	_emitting = false
+
+
+func _emit_event(event: SimEvent) -> void:
+	if event.name == PAUSE_EVENT:
+		_emit_pause_request(event.args)
+	else:
+		event_posted.emit(event.name, event.args)
 
 
 func _emit_pause_request(args: Array) -> void:
