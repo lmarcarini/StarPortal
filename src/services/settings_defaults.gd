@@ -42,5 +42,9 @@ const VALUES: Dictionary = {
 		&"quick_save": {},
 		&"quick_load": {},
 		&"debug_toggle_overlay": {},
+		&"view_next": {},
+		&"view_previous": {},
+		&"view_gate_room": {},
+		&"view_analysis": {},
 	},
 }

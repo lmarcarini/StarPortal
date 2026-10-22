@@ -72,9 +72,9 @@ func test_keyboard_and_gamepad_bindings_drive_the_clock() -> void:
 	assert_bool(clock.is_paused).is_false()
 	await _runner.simulate_key_pressed(KEY_EQUAL)
 	assert_int(clock.speed_index).is_equal(2)
-	await _press_joypad(JOY_BUTTON_LEFT_SHOULDER)
+	await _pull_trigger(JOY_AXIS_TRIGGER_LEFT, [1.0, 0.0])
 	assert_int(clock.speed_index).is_equal(1)
-	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
+	await _pull_trigger(JOY_AXIS_TRIGGER_RIGHT, [1.0, 0.0])
 	assert_int(clock.speed_index).is_equal(2)
 	await _press_joypad(JOY_BUTTON_START)
 	assert_bool(clock.is_paused).is_true()
@@ -270,6 +270,20 @@ func _press_joypad(button: JoyButton) -> void:
 		var event: InputEventJoypadButton = InputEventJoypadButton.new()
 		event.button_index = button
 		event.pressed = pressed
+		Input.parse_input_event(event)
+		Input.flush_buffered_events()
+	await _runner.await_input_processed()
+
+
+## Moves trigger [param axis] through [param values], one motion event each. The events are
+## sent from a process frame, as the engine sends real ones: inside a physics frame Input
+## checks "just pressed" against physics frames instead.
+func _pull_trigger(axis: JoyAxis, values: Array[float]) -> void:
+	await get_tree().process_frame
+	for value: float in values:
+		var event: InputEventJoypadMotion = InputEventJoypadMotion.new()
+		event.axis = axis
+		event.axis_value = value
 		Input.parse_input_event(event)
 		Input.flush_buffered_events()
 	await _runner.await_input_processed()

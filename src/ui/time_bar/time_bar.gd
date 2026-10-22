@@ -3,7 +3,9 @@ extends HBoxContainer
 ## Shows the in-game date and time and the clock speed (or "Paused"), with pause, slower and
 ## faster buttons. Reads the clock of SimClock.simulation and redraws on EventBus signals
 ## only; it never polls. The time actions (time_toggle_pause, time_faster, time_slower) are
-## read in _input, before the GUI, so Space pauses instead of pressing the focused button.
+## read in _input, before the GUI, so Space pauses instead of pressing the focused button,
+## and once per press ([method InputActions.is_new_press]), so one trigger pull steps the
+## speed once.
 ## Bible: game-design.md#time-real-time-with-pause,
 ## technical-architecture.md#architecture-overview
 
@@ -38,11 +40,11 @@ func _exit_tree() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed(_ACTION_TOGGLE_PAUSE):
+	if InputActions.is_new_press(event, _ACTION_TOGGLE_PAUSE):
 		SimClock.toggle_pause()
-	elif event.is_action_pressed(_ACTION_FASTER):
+	elif InputActions.is_new_press(event, _ACTION_FASTER):
 		SimClock.faster()
-	elif event.is_action_pressed(_ACTION_SLOWER):
+	elif InputActions.is_new_press(event, _ACTION_SLOWER):
 		SimClock.slower()
 	else:
 		return
