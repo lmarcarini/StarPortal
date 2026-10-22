@@ -119,3 +119,99 @@ func test_validate_rejects_flags_beyond_two_pow_53() -> void:
 		assert_array(errors).override_failure_message(str(value)).contains(
 			["flag 'edge' is not a bool, String or whole number"]
 		)
+
+
+## A state with a LOCKED Ring, a queue of two, a log of three, fractional energy and two
+## world statuses, at clock tick 500.
+func _gate_power_worlds_state() -> GameState:
+	var state := GameState.new_game(987654321, BalanceConfig.new())
+	state.clock.tick = 500
+	var coordinates: Array[int] = [1, 2, 3, 4, 5, 6, 7]
+	var address := GateAddress.create(coordinates, 30)
+	state.gate.mode = GateState.RingMode.LOCKED
+	state.gate.current_address = address
+	state.gate.dial_started_tick = 400
+	state.gate.lock_started_tick = 402
+	state.gate.lock_energy_mwh = 1.0 / 3.0
+	state.gate.connected_world_id = &"abydos"
+	state.gate.dial_queue.append(address)
+	state.gate.dial_queue.append(GateAddress.create(coordinates, 31))
+	for kind: DialOutcome.Kind in [
+		DialOutcome.Kind.NO_GATE, DialOutcome.Kind.ORIGIN_REJECTED, DialOutcome.Kind.LOCK
+	]:
+		var entry := DialLogEntry.new()
+		entry.tick = 100 + kind
+		entry.address = address
+		entry.outcome = kind
+		entry.energy_spent_mwh = 0.1 + 0.2
+		entry.world_id = &"" if kind == DialOutcome.Kind.NO_GATE else &"abydos"
+		state.gate.dial_log.append(entry)
+	state.power.stored_mwh = 0.1 + 0.2
+	state.worlds.statuses[&"abydos"] = WorldsState.WorldStatus.LOCKED
+	state.worlds.statuses[&"chulak"] = WorldsState.WorldStatus.LOCKED
+	return state
+
+
+## new_game() derives the galaxy seed from the base seed, sets the generator version and,
+## without a balance, leaves power at zero; the Ring starts idle with nothing queued.
+func test_new_game_gate_power_worlds_defaults() -> void:
+	var state := GameState.new_game(42)
+	assert_int(state.worlds.galaxy_seed).is_equal(RandomState.derive_seed(42, &"galaxy"))
+	assert_int(state.worlds.generator_version).is_equal(WorldGenerator.GENERATOR_VERSION)
+	assert_dict(state.worlds.statuses).is_empty()
+	assert_dict(state.power.to_dict()).is_equal(PowerState.new().to_dict())
+	assert_dict(state.gate.to_dict()).is_equal(GateState.new().to_dict())
+	assert_array(GameState.validate_dict(state.to_dict())).is_empty()
+
+
+## new_game() with a balance starts power from it.
+func test_new_game_with_balance_starts_power() -> void:
+	var balance := BalanceConfig.new()
+	var state := GameState.new_game(42, balance)
+	assert_dict(state.power.to_dict()).is_equal(PowerState.starting(balance).to_dict())
+
+
+## The new sections are saved under "gate", "power" and "worlds"; the event outbox is not.
+func test_to_dict_sections() -> void:
+	var data := _gate_power_worlds_state().to_dict()
+	assert_array(data.keys()).contains_exactly_in_any_order(
+		["clock", "random", "flags", "gate", "power", "worlds"]
+	)
+	assert_bool(_is_json_safe(data)).is_true()
+
+
+## The full state survives a full-precision JSON round trip with an equal dictionary.
+func test_gate_power_worlds_json_round_trip() -> void:
+	var data := _gate_power_worlds_state().to_dict()
+	assert_array(GameState.validate_dict(data)).is_empty()
+	var parsed: Dictionary = JSON.parse_string(JSON.stringify(data, "", true, true))
+	assert_array(GameState.validate_dict(parsed)).is_empty()
+	assert_dict(GameState.from_dict(parsed).to_dict()).is_equal(data)
+
+
+## validate_dict requires the new sections, prefixes their errors, and rejects Ring ticks
+## later than the clock tick.
+func test_validate_gate_power_worlds() -> void:
+	var good := _gate_power_worlds_state().to_dict()
+	for key: String in ["gate", "power", "worlds"]:
+		var missing := good.duplicate(true)
+		missing.erase(key)
+		assert_array(GameState.validate_dict(missing)).is_equal(["missing '%s'" % key])
+		var wrong := good.duplicate(true)
+		wrong[key] = []
+		assert_array(GameState.validate_dict(wrong)).is_equal(["'%s' is not an object" % key])
+	var bad_power := good.duplicate(true)
+	bad_power["power"]["stored_mwh"] = 1000.0
+	assert_array(GameState.validate_dict(bad_power)).is_equal(
+		["power: 'stored_mwh' is above 'capacity_mwh'"]
+	)
+	for key: String in ["dial_started_tick", "lock_started_tick"]:
+		var late := good.duplicate(true)
+		late["gate"][key] = 501
+		late["gate"]["lock_started_tick"] = 501
+		assert_array(GameState.validate_dict(late)).contains(
+			["gate: '%s' is later than the clock tick" % key]
+		)
+	var at_clock := good.duplicate(true)
+	at_clock["gate"]["lock_started_tick"] = 500
+	assert_array(GameState.validate_dict(at_clock)).is_empty()

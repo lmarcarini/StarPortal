@@ -4,21 +4,37 @@ extends RefCounted
 ## classes that convert to and from JSON-safe dictionaries.
 ## Bible: technical-architecture.md#data-model
 
+## Saved sections, in to_dict() order.
+const _SECTIONS: Array[String] = ["clock", "random", "flags", "gate", "power", "worlds"]
+
 ## The simulation clock.
 var clock: ClockState = ClockState.new()
 ## Seeds and stream states for every random generator.
 var random: RandomState = RandomState.new()
 ## Story and progress flags: StringName -> bool | int | String.
 var flags: Dictionary = {}
+## The Ring: mode, current dial, queue and Dial Log.
+var gate: GateState = GateState.new()
+## Stored energy, capacity and plant output.
+var power: PowerState = PowerState.new()
+## Galaxy seed, generator version and world statuses.
+var worlds: WorldsState = WorldsState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
 
 
-## Returns a fresh campaign state seeded with [param base_seed].
-static func new_game(base_seed: int) -> GameState:
+## Returns a fresh campaign state seeded with [param base_seed]. The galaxy seed is
+## RandomState.derive_seed(base_seed, &"galaxy") and the generator version is
+## WorldGenerator.GENERATOR_VERSION. With a [param balance], power starts at
+## PowerState.starting(balance); without one it is all zero.
+static func new_game(base_seed: int, balance: BalanceConfig = null) -> GameState:
 	var state := GameState.new()
 	state.random.base_seed = base_seed
+	state.worlds.galaxy_seed = RandomState.derive_seed(base_seed, &"galaxy")
+	state.worlds.generator_version = WorldGenerator.GENERATOR_VERSION
+	if balance != null:
+		state.power = PowerState.starting(balance)
 	return state
 
 
@@ -27,7 +43,14 @@ func to_dict() -> Dictionary:
 	var flag_data: Dictionary = {}
 	for key: Variant in flags:
 		flag_data[str(key)] = flags[key]
-	return {"clock": clock.to_dict(), "random": random.to_dict(), "flags": flag_data}
+	return {
+		"clock": clock.to_dict(),
+		"random": random.to_dict(),
+		"flags": flag_data,
+		"gate": gate.to_dict(),
+		"power": power.to_dict(),
+		"worlds": worlds.to_dict(),
+	}
 
 
 ## Builds a GameState from saved [param data], e.g. after a JSON round trip. Flag keys
@@ -37,6 +60,9 @@ static func from_dict(data: Dictionary) -> GameState:
 	var state := GameState.new()
 	state.clock = ClockState.from_dict(_dict_or_empty(data.get("clock")))
 	state.random = RandomState.from_dict(_dict_or_empty(data.get("random")))
+	state.gate = GateState.from_dict(_dict_or_empty(data.get("gate")))
+	state.power = PowerState.from_dict(_dict_or_empty(data.get("power")))
+	state.worlds = WorldsState.from_dict(_dict_or_empty(data.get("worlds")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -49,30 +75,61 @@ static func from_dict(data: Dictionary) -> GameState:
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock",
-## "random" and "flags" must be objects, the sub-states must pass their own validate_dict(),
-## and every flag must be a bool, a String or a whole number with absolute value at most
-## [constant JsonLimits.MAX_EXACT_INT] (larger numbers do not survive JSON, whether they
-## arrive as ints or as floats). Errors from a sub-state are
+## "random", "flags", "gate", "power" and "worlds" must be objects, the sub-states must pass
+## their own validate_dict(), and every flag must be a bool, a String or a whole number with
+## absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do not survive
+## JSON, whether they arrive as ints or as floats). The Ring's "dial_started_tick" and
+## "lock_started_tick" must not be later than the clock's tick. Errors from a sub-state are
 ## prefixed with its key, e.g. "clock: 'tick' is not a whole number ...".
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
-	for key: String in ["clock", "random", "flags"]:
+	for key: String in _SECTIONS:
 		if not data.has(key):
 			errors.append("missing '%s'" % key)
 		elif not data[key] is Dictionary:
 			errors.append("'%s' is not an object" % key)
 	if not errors.is_empty():
 		return errors
-	var clock_data: Dictionary = data["clock"]
-	var random_data: Dictionary = data["random"]
+	for key: String in _SECTIONS:
+		var section: Dictionary = data[key]
+		for error: String in _section_errors(key, section):
+			errors.append(key + ": " + error)
 	var flag_data: Dictionary = data["flags"]
-	for error: String in ClockState.validate_dict(clock_data):
-		errors.append("clock: " + error)
-	for error: String in RandomState.validate_dict(random_data):
-		errors.append("random: " + error)
 	for key: Variant in flag_data:
 		if not _is_flag_value(flag_data[key]):
 			errors.append("flag '%s' is not a bool, String or whole number" % str(key))
+	if errors.is_empty():
+		var clock_data: Dictionary = data["clock"]
+		var gate_data: Dictionary = data["gate"]
+		errors.append_array(_ring_tick_errors(clock_data, gate_data))
+	return errors
+
+
+## Errors of the sub-state saved under [param key]; flags are checked by the caller.
+static func _section_errors(key: String, section: Dictionary) -> Array[String]:
+	match key:
+		"clock":
+			return ClockState.validate_dict(section)
+		"random":
+			return RandomState.validate_dict(section)
+		"gate":
+			return GateState.validate_dict(section)
+		"power":
+			return PowerState.validate_dict(section)
+		"worlds":
+			return WorldsState.validate_dict(section)
+	return []
+
+
+## Errors for Ring ticks later than the clock tick, in valid [param clock_data] and
+## [param gate_data].
+static func _ring_tick_errors(clock_data: Dictionary, gate_data: Dictionary) -> Array[String]:
+	var errors: Array[String] = []
+	var now: float = clock_data["tick"]
+	for key: String in ["dial_started_tick", "lock_started_tick"]:
+		var tick: float = gate_data[key]
+		if tick > now:
+			errors.append("gate: '%s' is later than the clock tick" % key)
 	return errors
 
 
