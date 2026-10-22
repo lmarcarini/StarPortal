@@ -44,6 +44,63 @@ class FakeSystem:
 		_log.append("%s.on_month@%d" % [_id, state.clock.tick])
 
 
+## Posts an event named after its id and hook from tick() and on_day().
+class PostingSystem:
+	extends SimSystem
+
+	var _id: StringName
+
+	func _init(id: StringName) -> void:
+		_id = id
+
+	func get_id() -> StringName:
+		return _id
+
+	func tick(state: GameState) -> void:
+		state.events.post(StringName("%s_tick" % _id), [state.clock.tick])
+
+	func on_day(state: GameState) -> void:
+		state.events.post(StringName("%s_day" % _id), [state.clock.tick])
+
+
+## Posts [code]event[/code] with [code]args[/code] once, on the tick it is armed for.
+class PostOnceSystem:
+	extends SimSystem
+
+	var at_tick: int
+	var event: StringName
+	var args: Array
+
+	func _init(post_at_tick: int, event_name: StringName, event_args: Array) -> void:
+		at_tick = post_at_tick
+		event = event_name
+		args = event_args
+
+	func get_id() -> StringName:
+		return &"post_once"
+
+	func tick(state: GameState) -> void:
+		if state.clock.tick == at_tick:
+			state.events.post(event, args)
+
+
+## Posts an event when applied.
+class PostingCommand:
+	extends Command
+
+	func get_type() -> StringName:
+		return &"posting"
+
+	func validate(_state: GameState) -> CommandResult:
+		return CommandResult.ok()
+
+	func apply(state: GameState) -> void:
+		state.events.post(&"command_event", [state.clock.tick])
+
+	func to_dict() -> Dictionary:
+		return {"type": String(get_type())}
+
+
 ## Sets a flag when applied and records the application in the shared log.
 class FakeCommand:
 	extends Command
@@ -87,6 +144,14 @@ func _on_day_started(day_index: int) -> void:
 
 func _on_month_closed(year: int, month: int) -> void:
 	_log.append("month_closed(%d,%d)" % [year, month])
+
+
+func _on_event_posted(name: StringName, args: Array) -> void:
+	_log.append("event(%s,%s)" % [name, args])
+
+
+func _on_pause_requested(reason: StringName) -> void:
+	_log.append("pause_requested(%s)" % reason)
 
 
 func _on_command_rejected(type: StringName, code: StringName) -> void:
@@ -225,3 +290,83 @@ func test_reassigning_same_queue_forwards_once() -> void:
 	simulation.commands = queue
 	queue.command_rejected.emit(&"fake", &"once")
 	assert_array(_log).contains_exactly(["command_rejected(fake,once)"])
+
+
+## Events posted from tick() and on_day() come out last, after day_started, in posting
+## order, exactly once each.
+func test_events_emitted_last_in_order_once() -> void:
+	var systems: Array[SimSystem] = [PostingSystem.new(&"a"), PostingSystem.new(&"b")]
+	var simulation := Simulation.new(GameState.new_game(1), systems)
+	simulation.state.clock.tick = DAY - 1
+	simulation.day_started.connect(_on_day_started)
+	simulation.event_posted.connect(_on_event_posted)
+	simulation.advance_tick()
+	var expected: Array[String] = [
+		"day_started(1)",
+		"event(a_tick,[1439])",
+		"event(b_tick,[1439])",
+		"event(a_day,[1440])",
+		"event(b_day,[1440])",
+	]
+	assert_array(_log).contains_exactly(expected)
+	assert_int(simulation.state.events.size()).is_equal(0)
+	simulation.advance_tick()
+	assert_array(_log.slice(5)).contains_exactly(["event(a_tick,[1440])", "event(b_tick,[1440])"])
+
+
+## Events come out after month_closed too.
+func test_events_emitted_after_month_closed() -> void:
+	var systems: Array[SimSystem] = [PostOnceSystem.new(31 * DAY - 1, &"late", [])]
+	var simulation := Simulation.new(GameState.new_game(1), systems)
+	simulation.state.clock.tick = 31 * DAY - 1
+	simulation.month_closed.connect(_on_month_closed)
+	simulation.event_posted.connect(_on_event_posted)
+	simulation.advance_tick()
+	assert_array(_log).contains_exactly(["month_closed(2026,1)", "event(late,[])"])
+
+
+## A command applied at once while paused has its events emitted from submit().
+func test_paused_command_events_emitted_from_submit() -> void:
+	var simulation := Simulation.new(GameState.new_game(1))
+	simulation.state.clock.is_paused = true
+	simulation.event_posted.connect(_on_event_posted)
+	simulation.submit(PostingCommand.new())
+	assert_array(_log).contains_exactly(["event(command_event,[0])"])
+	assert_int(simulation.state.events.size()).is_equal(0)
+
+
+## A command queued while running has its events emitted with its tick, not at submit.
+func test_running_command_events_emitted_with_tick() -> void:
+	var simulation := Simulation.new(GameState.new_game(1))
+	simulation.state.clock.is_paused = false
+	simulation.event_posted.connect(_on_event_posted)
+	simulation.submit(PostingCommand.new())
+	assert_array(_log).is_empty()
+	simulation.advance_tick()
+	assert_array(_log).contains_exactly(["event(command_event,[0])"])
+
+
+## A pause_requested event is emitted as the pause_requested signal, not event_posted.
+func test_pause_event_emits_pause_requested_only() -> void:
+	var systems: Array[SimSystem] = [PostOnceSystem.new(0, &"pause_requested", [&"wormhole"])]
+	var simulation := Simulation.new(GameState.new_game(1), systems)
+	simulation.event_posted.connect(_on_event_posted)
+	simulation.pause_requested.connect(_on_pause_requested)
+	simulation.advance_tick()
+	simulation.advance_tick()
+	assert_array(_log).contains_exactly(["pause_requested(wormhole)"])
+
+
+## A pause_requested event without exactly one reason asserts and is dropped.
+func test_pause_event_with_bad_args_asserts() -> void:
+	var simulation := Simulation.new(GameState.new_game(1))
+	simulation.event_posted.connect(_on_event_posted)
+	simulation.pause_requested.connect(_on_pause_requested)
+	simulation.state.events.post(&"pause_requested", [])
+	await (
+		assert_error(func() -> void: simulation.advance_tick())
+		. is_runtime_error(
+			"Assertion failed: Simulation: pause_requested needs args [reason], got []"
+		)
+	)
+	assert_array(_log).is_empty()
