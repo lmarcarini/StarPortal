@@ -5,7 +5,9 @@ extends Control
 ## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
 ## (view_next and view_previous wrap at the ends; view_gate_room, view_analysis) and the
 ## gamepad shoulders switch views. Hidden views stay in the tree and keep their own state,
-## but are invisible, do not process and cannot take focus or the mouse.
+## but are invisible, do not process and cannot take focus or the mouse. Only the view root's
+## own process, focus and mouse modes are changed, and showing the view restores the values
+## it had before it was hidden; descendants inherit and keep their own settings.
 ## The switcher holds no game state: it passes the simulation down and forgets it.
 ## Bible: game-design.md#core-loop, technical-architecture.md#signals-and-scenes,
 ## technical-architecture.md#input-accessibility-and-localisation
@@ -30,6 +32,9 @@ const _DIRECT_ACTIONS: Dictionary = {
 var _ids: Array[StringName] = []
 var _views: Dictionary[StringName, GameView] = {}
 var _current: StringName = &""
+## The root modes each hidden view had before the switcher hid it, as
+## {view id: [process_mode, focus_behavior_recursive, mouse_behavior_recursive]}.
+var _saved_modes: Dictionary[StringName, Array] = {}
 
 @onready var _tabs: TabBar = %Tabs
 @onready var _views_root: Control = %Views
@@ -113,7 +118,7 @@ func _collect_views() -> void:
 		var id: StringName = StringName(String(child.name).to_snake_case())
 		_ids.append(id)
 		_views[id] = view
-		_set_active(view, false)
+		_set_active(id, false)
 
 
 ## Shows [param view_id] and hides the others, without moving focus.
@@ -122,7 +127,7 @@ func _activate(view_id: StringName) -> void:
 		return
 	_current = view_id
 	for id: StringName in _ids:
-		_set_active(_views[id], id == view_id)
+		_set_active(id, id == view_id)
 	var view: GameView = _views[view_id]
 	_tabs.focus_neighbor_bottom = _tabs.get_path_to(view.get_default_focus())
 	_tabs.current_tab = _ids.find(view_id)
@@ -153,16 +158,37 @@ func _refresh_titles() -> void:
 		_tabs.set_tab_title(index, tr(_views[_ids[index]].get_title_key()))
 
 
-## Shows or hides [param view]; a hidden view does not process and takes no focus or mouse.
-static func _set_active(view: GameView, active: bool) -> void:
-	view.visible = active
-	view.process_mode = PROCESS_MODE_INHERIT if active else PROCESS_MODE_DISABLED
-	view.focus_behavior_recursive = (
-		FOCUS_BEHAVIOR_INHERITED if active else FOCUS_BEHAVIOR_DISABLED
-	)
-	view.mouse_behavior_recursive = (
-		MOUSE_BEHAVIOR_INHERITED if active else MOUSE_BEHAVIOR_DISABLED
-	)
+## Shows or hides the view [param view_id].
+func _set_active(view_id: StringName, active: bool) -> void:
+	if active:
+		_show(_views[view_id], view_id)
+	else:
+		_hide(_views[view_id], view_id)
+
+
+## Makes [param view] visible and restores the root modes saved when it was hidden.
+func _show(view: GameView, view_id: StringName) -> void:
+	view.visible = true
+	if not _saved_modes.has(view_id):
+		return
+	var saved: Array = _saved_modes[view_id]
+	_saved_modes.erase(view_id)
+	view.process_mode = saved[0]
+	view.focus_behavior_recursive = saved[1]
+	view.mouse_behavior_recursive = saved[2]
+
+
+## Hides [param view]: saves its root modes (once, while hidden), then disables processing,
+## focus and the mouse for it and everything under it that inherits.
+func _hide(view: GameView, view_id: StringName) -> void:
+	view.visible = false
+	if not _saved_modes.has(view_id):
+		_saved_modes[view_id] = [
+			view.process_mode, view.focus_behavior_recursive, view.mouse_behavior_recursive
+		]
+	view.process_mode = PROCESS_MODE_DISABLED
+	view.focus_behavior_recursive = FOCUS_BEHAVIOR_DISABLED
+	view.mouse_behavior_recursive = MOUSE_BEHAVIOR_DISABLED
 
 
 ## Keyboard or gamepad moves along the focused tab bar: the view changes but focus stays on

@@ -13,6 +13,8 @@ var _switcher: ViewSwitcher = null
 var _runner: GdUnitSceneRunner = null
 var _changes: Array[StringName] = []
 var _real_locale: String = ""
+## An event a test bound to a view action; after_test removes it.
+var _extra_event: InputEvent = null
 
 
 func before_test() -> void:
@@ -25,6 +27,9 @@ func before_test() -> void:
 func after_test() -> void:
 	if is_instance_valid(_root):
 		_root.free()
+	if _extra_event != null:
+		InputMap.action_erase_event(&"view_next", _extra_event)
+		_extra_event = null
 	TranslationServer.set_locale(_real_locale)
 
 
@@ -128,6 +133,44 @@ func test_only_the_shown_view_is_visible_focusable_and_processing() -> void:
 	_assert_active(&"analysis", true)
 
 
+## A view action rebound to an axis switches once per pull, however many motion events the
+## pull sends, and again on the next pull.
+func test_view_action_on_an_axis_fires_once_per_pull() -> void:
+	var stick := InputEventJoypadMotion.new()
+	stick.axis = JOY_AXIS_RIGHT_X
+	stick.axis_value = 1.0
+	stick.device = -1
+	_extra_event = stick
+	InputMap.action_add_event(&"view_next", stick)
+	await _move_axis(JOY_AXIS_RIGHT_X, [0.1, 0.4, 0.8, 1.0, 1.0, 0.6, 0.3, 0.0])
+	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
+	await _move_axis(JOY_AXIS_RIGHT_X, [0.9, 1.0, 0.0])
+	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
+	await _move_axis(JOY_AXIS_RIGHT_X, [-0.9, -1.0, 0.0])
+	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
+
+
+## Hiding and showing a view restores its root's own modes and leaves a descendant that is
+## disabled on purpose disabled.
+func test_showing_a_view_restores_only_what_hiding_changed() -> void:
+	var view: GameView = _view(&"analysis")
+	var board: Control = view.find_child("Board", true, false) as Control
+	_switcher.show_view(&"analysis")
+	view.process_mode = Node.PROCESS_MODE_ALWAYS
+	view.mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_DISABLED
+	board.focus_behavior_recursive = Control.FOCUS_BEHAVIOR_DISABLED
+	_switcher.show_view(&"gate_room")
+	_assert_active(&"analysis", false)
+	_switcher.show_view(&"gate_room")
+	_switcher.show_view(&"analysis")
+	assert_int(view.process_mode).is_equal(Node.PROCESS_MODE_ALWAYS)
+	assert_int(view.mouse_behavior_recursive).is_equal(Control.MOUSE_BEHAVIOR_DISABLED)
+	assert_int(view.focus_behavior_recursive).is_equal(Control.FOCUS_BEHAVIOR_INHERITED)
+	assert_int(board.focus_behavior_recursive).is_equal(Control.FOCUS_BEHAVIOR_DISABLED)
+	assert_int(board.get_focus_mode_with_override()).is_equal(Control.FOCUS_NONE)
+	assert_int(view.get_default_focus().get_focus_mode_with_override()).is_equal(Control.FOCUS_ALL)
+
+
 func test_hidden_view_keeps_its_nodes() -> void:
 	var board: Control = _view(&"analysis").find_child("Board", true, false) as Control
 	_switcher.show_view(&"analysis")
@@ -214,6 +257,19 @@ func _press_joypad(button: JoyButton) -> void:
 		var event: InputEventJoypadButton = InputEventJoypadButton.new()
 		event.button_index = button
 		event.pressed = pressed
+		Input.parse_input_event(event)
+		Input.flush_buffered_events()
+	await _runner.await_input_processed()
+
+
+## Moves [param axis] through [param values], one motion event each, sent from a process
+## frame as the engine sends real ones.
+func _move_axis(axis: JoyAxis, values: Array[float]) -> void:
+	await get_tree().process_frame
+	for value: float in values:
+		var event := InputEventJoypadMotion.new()
+		event.axis = axis
+		event.axis_value = value
 		Input.parse_input_event(event)
 		Input.flush_buffered_events()
 	await _runner.await_input_processed()
