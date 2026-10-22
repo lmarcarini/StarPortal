@@ -1,6 +1,8 @@
 extends Node
 ## Autoload. Domain events for the presentation layer: views subscribe here and redraw.
-## The simulation never references this node; bind_simulation() forwards its signals.
+## The simulation never references this node; bind_simulation() forwards its signals,
+## and re-emits each outbox event (Simulation.event_posted) as the signal of the same name
+## declared here, with the same arguments.
 ## Bible: technical-architecture.md#architecture-overview
 
 ## Emitted after each simulation tick, by the clock.
@@ -31,10 +33,15 @@ signal game_saved(slot: StringName)
 signal game_loaded(slot: StringName)
 
 var _simulation: Simulation = null
+## Declared argument count per event name, -1 when no such signal is declared here.
+var _arg_counts: Dictionary[StringName, int] = {}
 
 
-## Forwards [param simulation]'s signals to this bus and disconnects any previously bound
-## simulation. Passing null only unbinds.
+## Forwards [param simulation]'s signals to this bus, including its outbox events, and
+## disconnects any previously bound simulation. Passing null only unbinds. A posted event
+## whose name is not a signal declared here, or whose argument count differs from the
+## signal's, is a programmer error: it asserts in debug, otherwise reports an error, and is
+## not emitted.
 func bind_simulation(simulation: Simulation) -> void:
 	_unbind_simulation()
 	if simulation == null:
@@ -44,6 +51,7 @@ func bind_simulation(simulation: Simulation) -> void:
 	simulation.month_closed.connect(_on_month_closed)
 	simulation.command_rejected.connect(_on_command_rejected)
 	simulation.pause_requested.connect(_on_pause_requested)
+	simulation.event_posted.connect(_on_event_posted)
 
 
 func _unbind_simulation() -> void:
@@ -53,6 +61,7 @@ func _unbind_simulation() -> void:
 	_simulation.month_closed.disconnect(_on_month_closed)
 	_simulation.command_rejected.disconnect(_on_command_rejected)
 	_simulation.pause_requested.disconnect(_on_pause_requested)
+	_simulation.event_posted.disconnect(_on_event_posted)
 	_simulation = null
 
 
@@ -70,3 +79,42 @@ func _on_command_rejected(type: StringName, code: StringName) -> void:
 
 func _on_pause_requested(reason: StringName) -> void:
 	pause_requested.emit(reason)
+
+
+func _on_event_posted(event_name: StringName, args: Array) -> void:
+	var expected: int = _declared_arg_count(event_name)
+	if expected < 0:
+		_report("EventBus: no signal declared for posted event '%s'" % event_name)
+		return
+	if args.size() != expected:
+		_report(
+			(
+				"EventBus: event '%s' posted with %d args, its signal declares %d"
+				% [event_name, args.size(), expected]
+			)
+		)
+		return
+	emit_signal.callv([event_name] + args)
+
+
+## Looks up the signal's argument count once per name. Signals inherited from Node, such
+## as ready, are not domain events and count as undeclared.
+func _declared_arg_count(event_name: StringName) -> int:
+	if _arg_counts.has(event_name):
+		return _arg_counts[event_name]
+	var count: int = -1
+	if not ClassDB.class_has_signal(get_class(), event_name):
+		for info: Dictionary in get_signal_list():
+			var signal_name: String = info["name"]
+			if StringName(signal_name) == event_name:
+				var signal_args: Array = info["args"]
+				count = signal_args.size()
+				break
+	_arg_counts[event_name] = count
+	return count
+
+
+# In debug the assert stops here; release builds strip it and report through push_error.
+func _report(message: String) -> void:
+	assert(false, message)
+	push_error(message)
