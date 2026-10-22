@@ -6,20 +6,23 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 1
+const TARGET_VERSION: int = 2
 ## Largest format_version accepted: 2^53, so the float-to-int conversion never overflows.
 const MAX_VERSION: float = 9007199254740992.0
 
-## Built-in steps, keyed by the version they migrate from. Version 1 is the first format,
-## so there is none yet. A v1 -> v2 change adds [code]1: _v1_to_v2[/code] here.
-const STEPS: Dictionary[int, Callable] = {}
+
+## Returns the built-in steps, keyed by the version they migrate from. Version 1 is the
+## first format. (A function, not a constant: a Callable is not a constant expression.)
+static func built_in_steps() -> Dictionary[int, Callable]:
+	var built_in: Dictionary[int, Callable] = {1: _v1_to_v2}
+	return built_in
 
 
 ## Returns [param data] migrated to [constant TARGET_VERSION] with the built-in steps.
 ## Fails with &"bad_format_version", &"newer_format_version", &"missing_migration_step"
 ## or &"migration_failed". The input dictionary is never modified.
 static func migrate(data: Dictionary) -> Result:
-	return migrate_with_steps(data, STEPS, TARGET_VERSION)
+	return migrate_with_steps(data, built_in_steps(), TARGET_VERSION)
 
 
 ## Returns [param data] migrated to [param target] by running [param steps] in version
@@ -61,3 +64,25 @@ static func read_version(data: Dictionary) -> Result:
 		return Result.fail(&"bad_format_version", "format_version %s is invalid" % str(raw))
 	var version: int = raw
 	return Result.ok(version)
+
+
+## v1 -> v2: the clock's "is_paused" bool becomes the time-control "mode" ("paused" or
+## "running") with no "holds" and "mode_after_hold" "paused". Data whose clock is missing
+## or whose "is_paused" is not a bool is left as is, for validation to reject.
+static func _v1_to_v2(data: Dictionary) -> Dictionary:
+	var state: Variant = data.get("state")
+	if not state is Dictionary:
+		return data
+	var state_data: Dictionary = state
+	var clock: Variant = state_data.get("clock")
+	if not clock is Dictionary:
+		return data
+	var clock_data: Dictionary = clock
+	var paused: Variant = clock_data.get("is_paused")
+	if not paused is bool:
+		return data
+	clock_data["mode"] = "paused" if paused else "running"
+	clock_data["holds"] = []
+	clock_data["mode_after_hold"] = "paused"
+	clock_data.erase("is_paused")
+	return data
