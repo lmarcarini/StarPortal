@@ -65,10 +65,11 @@ run; runs for pushes to `main` (`ci` and `soak`) are never cancelled.
 
 ## Translations
 
-All visible text comes from one translation table, `localization/strings.csv` (UTF-8, no BOM),
-with the columns `keys,en,pt_BR`: English and Brazilian Portuguese. Godot imports it into
-`.translation` files (generated, not committed) that are listed under `[internationalization]`
-in `project.godot`.
+All visible text comes from translation tables, one CSV per area in `localization/` (`core`,
+`gate`, `glyphs`, `clues`, `workbench`, `board`; UTF-8, no BOM), each with the columns
+`keys,en,pt_BR`: English and Brazilian Portuguese. A key lives in exactly one table. Godot imports
+each table into `.translation` files (generated, not committed) that are listed under
+`[internationalization]` in `project.godot`.
 
 - **Keys** are `AREA_SCREEN_NAME` in UPPER_SNAKE_CASE, for example `UI_SHELL_DATE` or
   `UI_SPEED_PAUSED`. Scenes store the key as the text (`text = "UI_SPEED_PAUSED"`); Godot
@@ -77,8 +78,8 @@ in `project.godot`.
 - **Placeholders** are named braces, filled with `String.format`, never string concatenation:
   `tr("UI_SPEED_MULTIPLIER").format({"speed": 2})` gives `2×`. Both languages must use the
   same placeholders.
-- **Adding a string:** add a row with a non-empty `en` and `pt_BR` value, then run
-  `scripts/test.sh` (it re-imports the table and checks it).
+- **Adding a string:** add a row to your area's table with a non-empty `en` and `pt_BR` value,
+  then run `scripts/test.sh` (it re-imports the tables and checks them).
 - **Overflow check:** Brazilian Portuguese runs about 25% longer than English, so lay every label
   out to grow. `scripts/pseudo.sh` runs the game with Godot's pseudolocalization on (accented
   text, about 30% longer, wrapped in `[ ]`), so clipped or overflowing labels are easy to spot. It

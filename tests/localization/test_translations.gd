@@ -1,9 +1,9 @@
-## Checks the translation table (localization/strings.csv) and that scenes show only keys.
+## Checks every translation table (localization/*.csv) and that scenes show only keys.
 ## Bible: technical-architecture.md#input-accessibility-and-localisation;
 ## overview.md#locked-decisions (Languages: English and Brazilian Portuguese)
 extends GdUnitTestSuite
 
-const STRINGS_PATH: String = "res://localization/strings.csv"
+const TABLES_DIR: String = "res://localization"
 const SCENES_ROOT: String = "res://src"
 const LOCALES: Array[String] = ["en", "pt_BR"]
 const TRANSLATIONS_SETTING: String = "internationalization/locale/translations"
@@ -20,19 +20,32 @@ var _text_property_regex: RegEx = RegEx.create_from_string(TEXT_PROPERTY_PATTERN
 
 ## The CSV header is the key column followed by one column per launch locale.
 func test_header_lists_keys_then_locales() -> void:
-	var rows: Array[PackedStringArray] = _read_rows()
-	assert_bool(rows.is_empty()).is_false()
-	assert_array(Array(rows[0])).is_equal(["keys", "en", "pt_BR"])
+	var tables: Array[String] = _table_paths()
+	assert_bool(tables.is_empty()).is_false()
+	for path: String in tables:
+		var rows: Array[PackedStringArray] = _read_rows(path)
+		assert_bool(rows.is_empty()).override_failure_message("%s: empty file" % path).is_false()
+		if rows.is_empty():
+			continue
+		assert_array(Array(rows[0])).override_failure_message(path).is_equal(
+			["keys", "en", "pt_BR"]
+		)
 
 
-## Every key follows the AREA_SCREEN_NAME UPPER_SNAKE_CASE convention and appears once.
+## Every key follows the AREA_SCREEN_NAME UPPER_SNAKE_CASE convention and appears once
+## across all tables.
 func test_keys_are_upper_snake_and_unique() -> void:
-	var seen: Dictionary[String, bool] = {}
-	for row: PackedStringArray in _data_rows():
-		var key: String = row[0]
-		assert_bool(_is_key(key)).override_failure_message("bad key '%s'" % key).is_true()
-		assert_bool(seen.has(key)).override_failure_message("duplicate key %s" % key).is_false()
-		seen[key] = true
+	var problems: Array[String] = _key_problems(_all_tables())
+	assert_array(problems).override_failure_message("\n".join(problems)).is_empty()
+
+
+## The uniqueness check reports a key that appears in two tables (a temporary duplicate).
+func test_duplicate_key_across_tables_is_reported() -> void:
+	var tables: Dictionary[String, Array] = {
+		"a.csv": [PackedStringArray(["UI_ONE", "One", "Um"])],
+		"b.csv": [PackedStringArray(["UI_ONE", "Uno", "Um"])],
+	}
+	assert_int(_key_problems(tables).size()).is_equal(1)
 
 
 ## Every key has a non-empty value in every locale.
@@ -66,14 +79,42 @@ func test_multiplier_fills_named_placeholder() -> void:
 		assert_str(template.format({"speed": 2})).is_equal("2×")
 
 
-## Godot imported the CSV and both locales are registered as project translations.
-func test_both_locales_are_registered() -> void:
+## Every localization/*.csv is registered in project.godot for both locales, every registered
+## table has a CSV, and both locales are loaded.
+func test_every_table_is_registered() -> void:
 	var translations: PackedStringArray = ProjectSettings.get_setting(TRANSLATIONS_SETTING)
+	var expected: Dictionary[String, bool] = {}
+	for table: String in _table_names():
+		for locale: String in LOCALES:
+			expected[_translation_path(table, locale)] = true
+	for path: String in expected:
+		(
+			assert_bool(translations.has(path))
+			. override_failure_message("CSV not registered: %s" % path)
+			. is_true()
+		)
+	for path: String in translations:
+		if path.begins_with(TABLES_DIR):
+			(
+				assert_bool(expected.has(path))
+				. override_failure_message("registered without a CSV: %s" % path)
+				. is_true()
+			)
 	var loaded: PackedStringArray = TranslationServer.get_loaded_locales()
 	for locale: String in LOCALES:
-		var path: String = "res://localization/strings.%s.translation" % locale
-		assert_bool(translations.has(path)).override_failure_message(path).is_true()
 		assert_bool(loaded.has(locale)).override_failure_message(locale).is_true()
+
+
+## Importing a table produced both .translation outputs, so an empty (header-only) table,
+## which Godot imports to nothing, cannot come back. Run after the project import.
+func test_every_table_imports_both_outputs() -> void:
+	for table: String in _table_names():
+		var rows: Array[PackedStringArray] = _read_rows(_table_path(table))
+		assert_int(rows.size()).override_failure_message("%s has no strings" % table).is_greater(1)
+		for locale: String in LOCALES:
+			var path: String = _translation_path(table, locale)
+			var message: String = "%s was not produced by the import" % path
+			assert_bool(ResourceLoader.exists(path)).override_failure_message(message).is_true()
 
 
 ## Both locales translate a known key.
@@ -116,9 +157,58 @@ func test_scene_scan_flags_plain_text() -> void:
 	assert_int(problems.size()).is_equal(2)
 
 
-func _read_rows() -> Array[PackedStringArray]:
+## Table names (file name without extension) of every CSV in the localization folder.
+func _table_names() -> Array[String]:
+	var names: Array[String] = []
+	for file_name: String in DirAccess.get_files_at(TABLES_DIR):
+		if file_name.get_extension() == "csv":
+			names.append(file_name.get_basename())
+	names.sort()
+	return names
+
+
+func _table_path(table: String) -> String:
+	return "%s/%s.csv" % [TABLES_DIR, table]
+
+
+func _translation_path(table: String, locale: String) -> String:
+	return "%s/%s.%s.translation" % [TABLES_DIR, table, locale]
+
+
+func _table_paths() -> Array[String]:
+	var paths: Array[String] = []
+	for table: String in _table_names():
+		paths.append(_table_path(table))
+	return paths
+
+
+## Data rows (no header) of every table, keyed by CSV path.
+func _all_tables() -> Dictionary[String, Array]:
+	var tables: Dictionary[String, Array] = {}
+	for path: String in _table_paths():
+		tables[path] = _read_rows(path).slice(1)
+	return tables
+
+
+## One message per key that is badly formed or appears more than once across the tables.
+func _key_problems(tables: Dictionary[String, Array]) -> Array[String]:
+	var problems: Array[String] = []
+	var seen: Dictionary[String, String] = {}
+	for path: String in tables:
+		for row: PackedStringArray in tables[path]:
+			var key: String = row[0]
+			if not _is_key(key):
+				problems.append("%s: bad key '%s'" % [path, key])
+			elif seen.has(key):
+				problems.append("%s: key %s is also in %s" % [path, key, seen[key]])
+			else:
+				seen[key] = path
+	return problems
+
+
+func _read_rows(path: String) -> Array[PackedStringArray]:
 	var rows: Array[PackedStringArray] = []
-	var file: FileAccess = FileAccess.open(STRINGS_PATH, FileAccess.READ)
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
 	if file == null:
 		return rows
 	while not file.eof_reached():
@@ -130,10 +220,10 @@ func _read_rows() -> Array[PackedStringArray]:
 
 
 func _data_rows() -> Array[PackedStringArray]:
-	var rows: Array[PackedStringArray] = _read_rows()
-	if rows.is_empty():
-		return rows
-	return rows.slice(1)
+	var rows: Array[PackedStringArray] = []
+	for path: String in _table_paths():
+		rows.append_array(_read_rows(path).slice(1))
+	return rows
 
 
 func _known_keys() -> Dictionary[String, bool]:
@@ -176,7 +266,9 @@ func _text_violations(content: String, keys: Dictionary[String, bool]) -> Array[
 		if not _is_key(value):
 			problems.append('%s is "%s", not an UPPER_SNAKE key' % [found.get_string(1), value])
 		elif not keys.has(value):
-			problems.append("%s key %s is not in strings.csv" % [found.get_string(1), value])
+			problems.append(
+				"%s key %s is not in any localization table" % [found.get_string(1), value]
+			)
 	return problems
 
 

@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://rl0yfg5rvprl"
+
+[deps]
+
+files=["res://localization/glyphs.en.translation", "res://localization/glyphs.pt_BR.translation"]
+
+source_file="res://localization/glyphs.csv"
+dest_files=["res://localization/glyphs.en.translation", "res://localization/glyphs.pt_BR.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
