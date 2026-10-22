@@ -169,8 +169,9 @@ func _serialize(state: GameState) -> String:
 		"tick": state.clock.tick,
 		"state": state.to_dict(),
 	}
-	# full_precision: floats keep every significant digit (up to 17), so they load back
-	# bit for bit.
+	# full_precision writes the shortest exact text of a float, but Godot's JSON parser can
+	# drop digits when reading it back, so it does not make a round trip exact by itself.
+	# State floats are saved as ExactFloat strings instead.
 	return JSON.stringify(data, "\t", true, true)
 
 

@@ -237,14 +237,19 @@ func _v3_sections(base_seed: int) -> Dictionary:
 			"mode": "idle",
 			"current_address": null,
 			"dial_started_tick": -1,
-			"lock_energy_mwh": 0.0,
+			"lock_energy_mwh": "0000000000000000",
 			"connected_world_id": "",
 			"lock_started_tick": -1,
 			"is_hostile": false,
 			"dial_queue": [],
 			"dial_log": [],
 		},
-		"power": {"stored_mwh": 0.0, "capacity_mwh": 400.0, "plant_output_mw": 30.0},
+		"power":
+		{
+			"stored_mwh": "0000000000000000",
+			"capacity_mwh": "4079000000000000",
+			"plant_output_mw": "403e000000000000",
+		},
 		"worlds": {"galaxy_seed": str(galaxy_seed), "generator_version": 1, "statuses": {}},
 	}
 

@@ -3,8 +3,8 @@ extends RefCounted
 ## One dial attempt in the Dial Log: when it ended, the address, the outcome and the energy
 ## it cost. The log keeps the true world id even when the player is not told it; views
 ## decide what to show.
-## Saved shape: {"tick", "address": {"seals"}, "outcome": DialOutcome key, "energy_spent_mwh",
-## "world_id"}.
+## Saved shape: {"tick", "address": {"seals"}, "outcome": DialOutcome key,
+## "energy_spent_mwh": ExactFloat string, "world_id"}.
 ## Bible: gate-and-address-spec.md#player-tools (Dial Log),
 ## technical-architecture.md#data-model
 
@@ -27,13 +27,14 @@ func to_dict() -> Dictionary:
 		"tick": tick,
 		"address": address_data,
 		"outcome": String(DialOutcome.to_key(outcome)),
-		"energy_spent_mwh": energy_spent_mwh,
+		"energy_spent_mwh": ExactFloat.encode(energy_spent_mwh),
 		"world_id": String(world_id),
 	}
 
 
 ## Builds an entry from saved [param data]; JSON floats become ints where needed. Missing or
-## unreadable values fall back to defaults (an unknown outcome reads as NO_GATE). Call
+## unreadable values fall back to defaults (an unknown outcome reads as NO_GATE, an
+## unencoded energy as 0.0). Call
 ## validate_dict() first for untrusted data.
 static func from_dict(data: Dictionary) -> DialLogEntry:
 	var entry := DialLogEntry.new()
@@ -44,14 +45,18 @@ static func from_dict(data: Dictionary) -> DialLogEntry:
 		entry.address = GateAddress.from_dict(address_dict)
 	var kind: int = DialOutcome.from_key(StringName(str(data.get("outcome", ""))))
 	entry.outcome = maxi(kind, DialOutcome.Kind.NO_GATE) as DialOutcome.Kind
-	entry.energy_spent_mwh = type_convert(data.get("energy_spent_mwh", 0.0), TYPE_FLOAT)
+	var energy: Variant = data.get("energy_spent_mwh")
+	if ExactFloat.is_encoded(energy):
+		var energy_text: String = energy
+		entry.energy_spent_mwh = ExactFloat.decode(energy_text)
 	entry.world_id = StringName(str(data.get("world_id", "")))
 	return entry
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "tick" a
 ## whole number from 0 to 2^53; "address" a valid GateAddress object; "outcome" a
-## DialOutcome key; "energy_spent_mwh" a finite number of at least 0; "world_id" a string,
+## DialOutcome key; "energy_spent_mwh" an ExactFloat string of a finite number of at least
+## 0; "world_id" a string,
 ## empty for "no_gate" and not empty for "blocked", "lock" and "hostile_lock".
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
@@ -69,8 +74,8 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 			errors.append("address: " + error)
 	if not data.has("energy_spent_mwh"):
 		errors.append("missing 'energy_spent_mwh'")
-	elif not _is_energy(data["energy_spent_mwh"]):
-		errors.append("'energy_spent_mwh' is not a finite number of at least 0")
+	elif not ExactFloat.is_finite_non_negative(data["energy_spent_mwh"]):
+		errors.append("'energy_spent_mwh' is not an exact float, finite and at least 0")
 	errors.append_array(_validate_outcome_and_world(data))
 	return errors
 
@@ -110,11 +115,3 @@ static func _is_tick(value: Variant) -> bool:
 		return false
 	var number: float = value
 	return number >= 0.0
-
-
-## True for a finite int or float of at least 0.
-static func _is_energy(value: Variant) -> bool:
-	if not (value is int or value is float):
-		return false
-	var number: float = value
-	return is_finite(number) and number >= 0.0

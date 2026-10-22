@@ -72,7 +72,7 @@ func test_defaults_and_dict_shape() -> void:
 				"mode": "idle",
 				"current_address": null,
 				"dial_started_tick": -1,
-				"lock_energy_mwh": 0.0,
+				"lock_energy_mwh": "0000000000000000",
 				"connected_world_id": "",
 				"lock_started_tick": -1,
 				"is_hostile": false,
@@ -125,7 +125,7 @@ func test_dial_log_entry_dict_shape() -> void:
 				"tick": 120,
 				"address": {"seals": [3, 4, 5, 6, 7, 8, 9, 35]},
 				"outcome": "origin_rejected",
-				"energy_spent_mwh": 0.1 + 0.2,
+				"energy_spent_mwh": ExactFloat.encode(0.1 + 0.2),
 				"world_id": "chulak",
 			}
 		)
@@ -146,9 +146,10 @@ func test_dial_log_entry_validate_errors() -> void:
 		["address", {"seals": [1, 1, 2, 3, 4, 5, 6, 7]}, "address: seal 2 repeats"],
 		["outcome", "warp", "outcome"],
 		["outcome", 3, "outcome"],
-		["energy_spent_mwh", -0.5, "energy_spent_mwh"],
-		["energy_spent_mwh", INF, "energy_spent_mwh"],
-		["energy_spent_mwh", NAN, "energy_spent_mwh"],
+		["energy_spent_mwh", ExactFloat.encode(-0.5), "energy_spent_mwh"],
+		["energy_spent_mwh", ExactFloat.encode(INF), "energy_spent_mwh"],
+		["energy_spent_mwh", ExactFloat.encode(NAN), "energy_spent_mwh"],
+		["energy_spent_mwh", 0.5, "energy_spent_mwh"],
 		["energy_spent_mwh", "1", "energy_spent_mwh"],
 		["world_id", 7, "world_id"],
 		["world_id", "", "'world_id' is empty"],
@@ -177,8 +178,9 @@ func test_gate_validate_type_errors() -> void:
 	_assert_gate_error("current_address", {"seals": [1, 2]}, "current_address: 'seals' has 2")
 	_assert_gate_error("dial_started_tick", -2, "dial_started_tick")
 	_assert_gate_error("lock_started_tick", 2.5, "lock_started_tick")
-	_assert_gate_error("lock_energy_mwh", -1.0, "lock_energy_mwh")
-	_assert_gate_error("lock_energy_mwh", INF, "lock_energy_mwh")
+	_assert_gate_error("lock_energy_mwh", ExactFloat.encode(-1.0), "lock_energy_mwh")
+	_assert_gate_error("lock_energy_mwh", ExactFloat.encode(INF), "lock_energy_mwh")
+	_assert_gate_error("lock_energy_mwh", 2.5, "lock_energy_mwh")
 	_assert_gate_error("connected_world_id", 4, "connected_world_id")
 	_assert_gate_error("is_hostile", 1, "'is_hostile' is not a bool")
 	_assert_gate_error("dial_queue", {}, "'dial_queue' is not an array")
@@ -253,3 +255,18 @@ func test_gate_validate_hostile_and_tick_order() -> void:
 	assert_array(GateState.validate_dict(early_lock)).is_equal(
 		["'lock_started_tick' is before 'dial_started_tick'"]
 	)
+
+
+## from_dict() keeps the defaults for unreadable values instead of failing: a non-bool
+## "is_hostile" and an unencoded energy.
+func test_from_dict_tolerates_unreadable_values() -> void:
+	for hostile: Variant in ["true", 1, null]:
+		var data := _locked_gate().to_dict()
+		data["is_hostile"] = hostile
+		data["lock_energy_mwh"] = 12.5
+		var gate := GateState.from_dict(data)
+		assert_bool(gate.is_hostile).override_failure_message(str(hostile)).is_false()
+		assert_float(gate.lock_energy_mwh).is_equal(0.0)
+	var entry_data := _entry(DialOutcome.Kind.LOCK, &"abydos").to_dict()
+	entry_data["energy_spent_mwh"] = "3FD5555555555555"
+	assert_float(DialLogEntry.from_dict(entry_data).energy_spent_mwh).is_equal(0.0)

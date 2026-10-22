@@ -79,7 +79,8 @@ static func from_dict(data: Dictionary) -> GameState:
 ## their own validate_dict(), and every flag must be a bool, a String or a whole number with
 ## absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do not survive
 ## JSON, whether they arrive as ints or as floats). The Ring's "dial_started_tick" and
-## "lock_started_tick" must not be later than the clock's tick. Errors from a sub-state are
+## "lock_started_tick" and every Dial Log entry's "tick" must not be later than the clock's
+## tick. Errors from a sub-state are
 ## prefixed with its key, e.g. "clock: 'tick' is not a whole number ...".
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
@@ -121,8 +122,8 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 	return []
 
 
-## Errors for Ring ticks later than the clock tick, in valid [param clock_data] and
-## [param gate_data].
+## Errors for Ring and Dial Log ticks later than the clock tick, in valid
+## [param clock_data] and [param gate_data].
 static func _ring_tick_errors(clock_data: Dictionary, gate_data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	var now: float = clock_data["tick"]
@@ -130,6 +131,12 @@ static func _ring_tick_errors(clock_data: Dictionary, gate_data: Dictionary) -> 
 		var tick: float = gate_data[key]
 		if tick > now:
 			errors.append("gate: '%s' is later than the clock tick" % key)
+	var log_data: Array = gate_data["dial_log"]
+	for index: int in log_data.size():
+		var entry: Dictionary = log_data[index]
+		var entry_tick: float = entry["tick"]
+		if entry_tick > now:
+			errors.append("gate: dial_log %d 'tick' is later than the clock tick" % index)
 	return errors
 
 

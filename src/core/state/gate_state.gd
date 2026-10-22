@@ -4,7 +4,8 @@ extends RefCounted
 ## dialing queue and the Dial Log. The fields of the current dial are set only in the modes
 ## that have one; validate_dict() rejects any other combination.
 ## Saved shape: {"mode": "idle" | "dialing" | "locked", "current_address": address or null,
-## "dial_started_tick", "lock_energy_mwh", "connected_world_id", "lock_started_tick",
+## "dial_started_tick", "lock_energy_mwh": ExactFloat string, "connected_world_id",
+## "lock_started_tick",
 ## "is_hostile", "dial_queue": [address], "dial_log": [DialLogEntry]}. Unset ticks are -1.
 ## Bible: technical-architecture.md#data-model, technical-architecture.md#state-machines,
 ## gate-and-address-spec.md#dialing-outcomes-and-energy, gate-and-address-spec.md#player-tools
@@ -30,7 +31,7 @@ static var _field_rules: Dictionary[String, Array] = {
 	"mode": [_is_mode_name, "one of %s" % str(_MODE_NAMES)],
 	"current_address": [_is_address_or_null, "null or an object"],
 	"dial_started_tick": [_is_tick_or_unset, "-1 or a whole number from 0 to 2^53"],
-	"lock_energy_mwh": [_is_energy, "a finite number of at least 0"],
+	"lock_energy_mwh": [ExactFloat.is_finite_non_negative, "an exact float, finite and at least 0"],
 	"connected_world_id": [_is_string, "a string"],
 	"lock_started_tick": [_is_tick_or_unset, "-1 or a whole number from 0 to 2^53"],
 	"is_hostile": [_is_bool, "a bool"],
@@ -69,7 +70,7 @@ func to_dict() -> Dictionary:
 		"mode": _MODE_NAMES[mode],
 		"current_address": address_data,
 		"dial_started_tick": dial_started_tick,
-		"lock_energy_mwh": lock_energy_mwh,
+		"lock_energy_mwh": ExactFloat.encode(lock_energy_mwh),
 		"connected_world_id": String(connected_world_id),
 		"lock_started_tick": lock_started_tick,
 		"is_hostile": is_hostile,
@@ -90,10 +91,15 @@ static func from_dict(data: Dictionary) -> GateState:
 		var address_dict: Dictionary = address_data
 		gate.current_address = GateAddress.from_dict(address_dict)
 	gate.dial_started_tick = type_convert(data.get("dial_started_tick", _NO_TICK), TYPE_INT)
-	gate.lock_energy_mwh = type_convert(data.get("lock_energy_mwh", 0.0), TYPE_FLOAT)
+	var energy: Variant = data.get("lock_energy_mwh")
+	if ExactFloat.is_encoded(energy):
+		var energy_text: String = energy
+		gate.lock_energy_mwh = ExactFloat.decode(energy_text)
 	gate.connected_world_id = StringName(str(data.get("connected_world_id", "")))
 	gate.lock_started_tick = type_convert(data.get("lock_started_tick", _NO_TICK), TYPE_INT)
-	gate.is_hostile = data.get("is_hostile", false) == true
+	var hostile: Variant = data.get("is_hostile")
+	if hostile is bool:
+		gate.is_hostile = hostile
 	for item: Dictionary in _dicts_in(data.get("dial_queue")):
 		gate.dial_queue.append(GateAddress.from_dict(item))
 	for item: Dictionary in _dicts_in(data.get("dial_log")):
@@ -103,7 +109,8 @@ static func from_dict(data: Dictionary) -> GateState:
 
 ## Returns human-readable errors for saved [param data], empty when it is valid. Types:
 ## "mode" a mode name; "current_address" null or a valid address; both ticks -1 or a whole
-## number from 0 to 2^53; "lock_energy_mwh" a finite number of at least 0;
+## number from 0 to 2^53; "lock_energy_mwh" an ExactFloat string of a finite number of at
+## least 0;
 ## "connected_world_id" a string; "is_hostile" a bool; "dial_queue" an array of valid
 ## addresses; "dial_log" an array of valid DialLogEntry objects. Then the Ring fields must
 ## fit the mode: IDLE has no address, ticks, world or hostility; DIALING has an address and
@@ -205,14 +212,6 @@ static func _is_tick_or_unset(value: Variant) -> bool:
 		return false
 	var number: float = value
 	return number >= float(_NO_TICK)
-
-
-## True for a finite int or float of at least 0.
-static func _is_energy(value: Variant) -> bool:
-	if not (value is int or value is float):
-		return false
-	var number: float = value
-	return is_finite(number) and number >= 0.0
 
 
 static func _is_string(value: Variant) -> bool:

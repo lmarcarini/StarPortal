@@ -1,6 +1,6 @@
-## Tests for SaveService with the gate, power and worlds sections: an exact round trip with
-## fractional energy, full-precision digits in the file, and hand-edited Ring data failing
-## cleanly. Each test uses its own instance pointed at a unique temporary user:// folder.
+## Tests for SaveService with the gate, power and worlds sections: exact round trips of
+## fractional and random energy, ExactFloat strings in the file, and hand-edited data
+## failing cleanly. Each test uses its own instance pointed at a unique temporary user:// folder.
 ## Bible: technical-architecture.md#save-system (round-trip test),
 ## technical-architecture.md#data-model
 extends GdUnitTestSuite
@@ -77,13 +77,86 @@ func test_round_trip_is_identical() -> void:
 	assert_int(loaded.worlds.galaxy_seed).is_equal(state.worlds.galaxy_seed)
 
 
-## The file holds every significant digit of the floats, not the 15-digit default.
-func test_file_has_full_precision_digits() -> void:
+## The reviewer's case: 1.0 / 300.0 (which Godot's JSON parser cannot read back from its
+## shortest decimal text) in every float field saves and loads bit for bit.
+func test_one_three_hundredth_in_every_float_field() -> void:
+	var value := 1.0 / 300.0
+	var state := _sample_state()
+	state.power.stored_mwh = value
+	state.power.capacity_mwh = value
+	state.power.plant_output_mw = value
+	state.gate.lock_energy_mwh = value
+	for entry: DialLogEntry in state.gate.dial_log:
+		entry.energy_spent_mwh = value
+	var loaded := _save_and_load(state, &"one_300th")
+	assert_dict(loaded.to_dict()).is_equal(state.to_dict())
+	var floats: Array[float] = [
+		loaded.power.stored_mwh,
+		loaded.power.capacity_mwh,
+		loaded.power.plant_output_mw,
+		loaded.gate.lock_energy_mwh,
+	]
+	for entry: DialLogEntry in loaded.gate.dial_log:
+		floats.append(entry.energy_spent_mwh)
+	for loaded_value: float in floats:
+		assert_bool(_bits(loaded_value) == _bits(value)).is_true()
+
+
+## 1,000 seeded random energies (half random bit patterns, half decimal-looking values
+## across magnitudes) in one Dial Log save and load bit for bit.
+func test_random_energies_round_trip() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 47
+	var state := _sample_state()
+	var values: Array[float] = []
+	while values.size() < 1000:
+		var value := _random_energy(rng, values.size() % 2 == 0)
+		if not is_finite(value):
+			continue
+		values.append(value)
+		state.gate.dial_log.append(_log_entry(DialOutcome.Kind.NO_GATE, value, &""))
+	var loaded := _save_and_load(state, &"random_energies")
+	assert_dict(loaded.to_dict()).is_equal(state.to_dict())
+	for index: int in values.size():
+		var entry: DialLogEntry = loaded.gate.dial_log[index + 3]
+		var label := "%d: %s" % [index, ExactFloat.encode(values[index])]
+		var same := _bits(entry.energy_spent_mwh) == _bits(values[index])
+		assert_bool(same).override_failure_message(label).is_true()
+
+
+## The file stores floats as ExactFloat strings, not decimal numbers.
+func test_file_has_exact_float_strings() -> void:
 	_service.save_game(_sample_state(), &"digits")
 	var text := FileAccess.get_file_as_string(_service.slot_path(&"digits"))
-	assert_str(text).contains("0.30000000000000004")
-	assert_str(text).contains("0.3333333333333333")
+	assert_str(text).contains('"3fd5555555555555"')
+	assert_str(text).contains('"%s"' % ExactFloat.encode(0.1 + 0.2))
+	assert_str(text).not_contains("0.30000000000000004")
 	assert_str(text).contains(str(_sample_state().worlds.galaxy_seed))
+
+
+func _save_and_load(state: GameState, slot: StringName) -> GameState:
+	assert_bool(_service.save_game(state, slot).is_ok).is_true()
+	var result: Result = _service.load_game(slot)
+	assert_bool(result.is_ok).override_failure_message(str(result.detail)).is_true()
+	return result.value
+
+
+## The raw bytes of [param value], independent of ExactFloat.
+func _bits(value: float) -> PackedByteArray:
+	return PackedFloat64Array([value]).to_byte_array()
+
+
+## A non-negative random float: a random bit pattern with the sign cleared when
+## [param from_bits], else a uniform value scaled by a power of ten from 1e-12 to 1e15.
+## May be infinite or NaN when [param from_bits]; the caller skips those.
+func _random_energy(rng: RandomNumberGenerator, from_bits: bool) -> float:
+	if not from_bits:
+		return rng.randf() * pow(10.0, rng.randi_range(-12, 15))
+	var bytes := PackedByteArray()
+	bytes.resize(8)
+	bytes.encode_u32(0, rng.randi())
+	bytes.encode_u32(4, rng.randi() & 0x7fffffff)
+	return bytes.decode_double(0)
 
 
 ## Hand-edited Ring, power and worlds data fails with &"invalid_state".
@@ -96,7 +169,9 @@ func test_hand_edited_sections_are_invalid_state() -> void:
 		["gate", "mode", "warping", "gate: 'mode'"],
 		["gate", "connected_world_id", "", "gate: 'connected_world_id' is not set"],
 		["gate", "lock_started_tick", 1001, "later than the clock tick"],
-		["power", "stored_mwh", -1.0, "power: 'stored_mwh'"],
+		["power", "stored_mwh", ExactFloat.encode(-1.0), "power: 'stored_mwh'"],
+		["power", "stored_mwh", 0.5, "power: 'stored_mwh'"],
+		["gate", "lock_energy_mwh", ExactFloat.encode(NAN), "gate: 'lock_energy_mwh'"],
 		["worlds", "galaxy_seed", 5, "worlds: 'galaxy_seed'"],
 	]
 	for case: Array in cases:

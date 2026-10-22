@@ -201,7 +201,7 @@ func test_validate_gate_power_worlds() -> void:
 		wrong[key] = []
 		assert_array(GameState.validate_dict(wrong)).is_equal(["'%s' is not an object" % key])
 	var bad_power := good.duplicate(true)
-	bad_power["power"]["stored_mwh"] = 1000.0
+	bad_power["power"]["stored_mwh"] = ExactFloat.encode(1000.0)
 	assert_array(GameState.validate_dict(bad_power)).is_equal(
 		["power: 'stored_mwh' is above 'capacity_mwh'"]
 	)
@@ -215,3 +215,14 @@ func test_validate_gate_power_worlds() -> void:
 	var at_clock := good.duplicate(true)
 	at_clock["gate"]["lock_started_tick"] = 500
 	assert_array(GameState.validate_dict(at_clock)).is_empty()
+
+
+## validate_dict rejects a Dial Log entry whose tick is later than the clock tick.
+func test_validate_rejects_dial_log_tick_after_clock() -> void:
+	var data := _gate_power_worlds_state().to_dict()
+	data["gate"]["dial_log"][1]["tick"] = 501
+	assert_array(GameState.validate_dict(data)).is_equal(
+		["gate: dial_log 1 'tick' is later than the clock tick"]
+	)
+	data["gate"]["dial_log"][1]["tick"] = 500
+	assert_array(GameState.validate_dict(data)).is_empty()

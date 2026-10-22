@@ -8,6 +8,11 @@ extends RefCounted
 ## The save format version the game writes and loads.
 const TARGET_VERSION: int = 3
 
+## v3 defaults as ExactFloat strings, frozen here: 0.0, 400.0 and 30.0.
+const _EXACT_ZERO: String = "0000000000000000"
+const _EXACT_400: String = "4079000000000000"
+const _EXACT_30: String = "403e000000000000"
+
 
 ## Returns the built-in steps, keyed by the version they migrate from. Version 1 is the
 ## first format. (A function, not a constant: a Callable is not a constant expression.)
@@ -91,7 +96,8 @@ static func _v1_to_v2(data: Dictionary) -> Dictionary:
 ## v2 -> v3: adds the "gate", "power" and "worlds" sections with the v3 defaults, written
 ## here as literals so later changes to the game's defaults never change this step:
 ## the Ring idle with an empty queue and Dial Log; power at capacity 400 MWh, plant output
-## 30 MW, nothing stored (the bible's starting plant and storage); the galaxy seed derived
+## 30 MW, nothing stored (the bible's starting plant and storage), floats written as
+## ExactFloat strings (IEEE-754 bit patterns in hex); the galaxy seed derived
 ## from the save's base seed with RandomState.derive_seed(base, &"galaxy"), as a decimal
 ## string; generator version 1. The base seed is read like RandomState.from_dict() reads
 ## it. Data with no state object is left as is, for validation to reject.
@@ -104,14 +110,18 @@ static func _v2_to_v3(data: Dictionary) -> Dictionary:
 		"mode": "idle",
 		"current_address": null,
 		"dial_started_tick": -1,
-		"lock_energy_mwh": 0.0,
+		"lock_energy_mwh": _EXACT_ZERO,
 		"connected_world_id": "",
 		"lock_started_tick": -1,
 		"is_hostile": false,
 		"dial_queue": [],
 		"dial_log": [],
 	}
-	state_data["power"] = {"stored_mwh": 0.0, "capacity_mwh": 400.0, "plant_output_mw": 30.0}
+	state_data["power"] = {
+		"stored_mwh": _EXACT_ZERO,
+		"capacity_mwh": _EXACT_400,
+		"plant_output_mw": _EXACT_30,
+	}
 	var galaxy_seed := RandomState.derive_seed(_v2_base_seed(state_data), &"galaxy")
 	state_data["worlds"] = {"galaxy_seed": str(galaxy_seed), "generator_version": 1, "statuses": {}}
 	return data
