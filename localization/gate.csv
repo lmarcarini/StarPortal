@@ -1,2 +1,70 @@
 keys,en,pt_BR
 GATE_ROOM_TITLE,Gate Room,Sala do Portal
+GATE_QUEUE_TITLE,Dial queue,Fila de discagem
+GATE_QUEUE_EMPTY,The queue is empty. Type an address below to add one.,A fila está vazia. Digite um endereço abaixo para adicionar.
+GATE_QUEUE_REMOVE,Remove,Remover
+GATE_QUEUE_ROW_INFO,{energy} · {ready},{energy} · {ready}
+GATE_READY_NOW,"Charged, ready now","Carga completa, pronto agora"
+GATE_READY_IN,Ready in {time},Pronto em {time}
+GATE_READY_NEVER,Never at current output,Nunca com a saída atual
+GATE_DURATION_MINUTES,{minutes} min,{minutes} min
+GATE_DURATION_HOURS,{hours} h {minutes} min,{hours} h {minutes} min
+GATE_ENERGY,{value} MWh,{value} MWh
+GATE_OUTCOME_NO_GATE,No gate,Sem portal
+GATE_OUTCOME_BLOCKED,Blocked,Bloqueado
+GATE_OUTCOME_ORIGIN_REJECTED,Origin rejected,Origem rejeitada
+GATE_OUTCOME_LOCK,Lock,Conexão aberta
+GATE_OUTCOME_HOSTILE_LOCK,Hostile lock,Conexão hostil
+GATE_MEANING_NO_GATE,There is no Ring at those coordinates: the address is wrong.,Não há um Anel nessas coordenadas: o endereço está errado.
+GATE_MEANING_BLOCKED,"A Ring is there: the coordinates are right. It is buried, busy or shielded.","Há um Anel ali: as coordenadas estão certas. Ele está soterrado, ocupado ou blindado."
+GATE_MEANING_ORIGIN_REJECTED,The last seal is not this Ring's origin glyph. Fix the origin; a recorded address needs converting.,O último selo não é o glifo de origem deste Anel. Corrija a origem; um endereço registrado precisa ser convertido.
+GATE_MEANING_LOCK,The wormhole is open. Nothing is known about the other side yet: probe it.,O buraco de minhoca está aberto. Ainda não se sabe nada do outro lado: envie uma sonda.
+GATE_MEANING_HOSTILE_LOCK,"The wormhole is open and the far side is guarded. It may answer, or come through.","O buraco de minhoca está aberto e o outro lado é vigiado. Ele pode responder, ou atravessar."
+GATE_CAPTION_NO_GATE,[The seals fall silent. Nothing answers.],[Os selos silenciam. Nada responde.]
+GATE_CAPTION_BLOCKED,"[The Ring answers, then shuts out the call.]","[O Anel responde, mas recusa a chamada.]"
+GATE_CAPTION_ORIGIN_REJECTED,[The last seal fails to engage.],[O último selo não se encaixa.]
+GATE_CAPTION_LOCK,[A low surge. The wormhole opens.],[Um pulso grave. O buraco de minhoca se abre.]
+GATE_CAPTION_HOSTILE_LOCK,[A low surge. The wormhole opens. Something stirs beyond it.],[Um pulso grave. O buraco de minhoca se abre. Algo se move do outro lado.]
+GATE_RING_IDLE,Ring idle,Anel inativo
+GATE_RING_DIALING,Seals engaging: {lit} of {total},Selos engatando: {lit} de {total}
+GATE_RING_LOCKED,Wormhole open,Buraco de minhoca aberto
+GATE_DIAL_HOLD,Hold to dial,Segure para discar
+GATE_DIAL_HOLD_AGAIN,Hold again to dial anyway,Segure de novo para discar mesmo assim
+GATE_DIAL_NEEDS,Needs {energy}. {ready}.,Requer {energy}. {ready}.
+GATE_REPEAT_WARNING,Dialed on {date}: {outcome}. Dialing it again will spend the energy again.,Discado em {date}: {outcome}. Discar de novo vai gastar a energia outra vez.
+GATE_REASON_NONE_SELECTED,Select an address from the queue first.,Selecione antes um endereço da fila.
+GATE_REASON_BUSY,The Ring is busy: it is dialing or has a wormhole open.,O Anel está ocupado: está discando ou há um buraco de minhoca aberto.
+GATE_REASON_CHARGE,"Not enough charge: needs {needed}, the capacitors hold {stored}.","Carga insuficiente: requer {needed}, os capacitores têm {stored}."
+GATE_REASON_REJECTED,The dial was refused.,A discagem foi recusada.
+GATE_ENTRY_TITLE,Enter an address,Digitar um endereço
+GATE_ENTRY_UNSET,Choose a glyph,Escolha um glifo
+GATE_ENTRY_SEAL,Seal {number},Selo {number}
+GATE_ENTRY_ORIGIN,Seal {number} (origin),Selo {number} (origem)
+GATE_ENTRY_HINT,Choose a glyph for each of the eight seals.,Escolha um glifo para cada um dos oito selos.
+GATE_ENTRY_DUPLICATE,A glyph cannot appear twice in an address.,Um glifo não pode aparecer duas vezes num endereço.
+GATE_ENTRY_ADD,Add to queue,Adicionar à fila
+GATE_ENTRY_ALREADY_QUEUED,That address is already in the queue.,Esse endereço já está na fila.
+GATE_ENTRY_QUEUE_FULL,The queue is full. Remove an address first.,A fila está cheia. Remova um endereço antes.
+GATE_ENTRY_REJECTED,The address could not be added.,Não foi possível adicionar o endereço.
+GATE_GAUGE_TITLE,Capacitors,Capacitores
+GATE_GAUGE_VALUES,{stored} of {capacity},{stored} de {capacity}
+GATE_GAUGE_NEEDED,The marker shows the {energy} the selected dial needs.,O marcador mostra os {energy} que a discagem selecionada requer.
+GATE_GAUGE_OVER_CAPACITY,This is more than the capacitors can hold.,Isso é mais do que os capacitores comportam.
+GATE_BANNER_NONE,No dial yet,Nenhuma discagem ainda
+GATE_BANNER_NONE_MEANING,Select an address and hold the dial button.,Selecione um endereço e segure o botão de discar.
+GATE_BANNER_DIALING,Seals engaging,Selos engatando
+GATE_BANNER_DIALING_MEANING,The Ring is dialing. The result comes in two minutes.,O Anel está discando. O resultado sai em dois minutos.
+GATE_WORMHOLE_TITLE,Wormhole,Buraco de minhoca
+GATE_WORMHOLE_DESTINATION,Destination: {designation},Destino: {designation}
+GATE_WORMHOLE_TIME_LEFT,Time left: {left} of {total},Tempo restante: {left} de {total}
+GATE_WORMHOLE_DRAIN,Power drain: {power} MW,Consumo de energia: {power} MW
+GATE_WORMHOLE_CLOSE,Close wormhole,Fechar buraco de minhoca
+GATE_WORMHOLE_UNNAMED,unnamed world,mundo sem nome
+GATE_CLOSED_PLAYER,Wormhole closed on your order.,Buraco de minhoca fechado por sua ordem.
+GATE_CLOSED_TIMEOUT,Wormhole closed: the maximum open time ran out.,Buraco de minhoca fechado: o tempo máximo aberto acabou.
+GATE_CLOSED_POWER,Wormhole collapsed: the capacitors ran dry.,Buraco de minhoca colapsou: os capacitores secaram.
+GATE_CLOSED_OTHER,Wormhole closed.,Buraco de minhoca fechado.
+GATE_LOG_TITLE,Dial Log,Registro de discagens
+GATE_LOG_EMPTY,No dial has been made yet.,Nenhuma discagem foi feita ainda.
+GATE_LOG_ENERGY,Energy spent: {energy},Energia gasta: {energy}
+GATE_LOG_DESTINATION,Destination: {designation},Destino: {designation}

@@ -1,0 +1,44 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/gate_room/capacitor_gauge.gd" id="1_gauge"]
+
+[node name="CapacitorGauge" type="VBoxContainer"]
+script = ExtResource("1_gauge")
+
+[node name="Heading" type="Label" parent="."]
+layout_mode = 2
+text = "GATE_GAUGE_TITLE"
+
+[node name="BarArea" type="Control" parent="."]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+
+[node name="Bar" type="ProgressBar" parent="BarArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+show_percentage = false
+
+[node name="Marker" type="Control" parent="BarArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Values" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Needed" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3

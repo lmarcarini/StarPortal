@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/gate_room/outcome_banner.gd" id="1_banner"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/outcome_icon.tscn" id="2_icon"]
+
+[node name="OutcomeBanner" type="HBoxContainer"]
+script = ExtResource("1_banner")
+
+[node name="Icon" parent="." instance=ExtResource("2_icon")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="Texts" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Name" type="Label" parent="Texts"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Meaning" type="Label" parent="Texts"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Caption" type="Label" parent="Texts"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3

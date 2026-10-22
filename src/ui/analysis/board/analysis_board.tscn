@@ -1,6 +1,8 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/ui/analysis/board/analysis_board.gd" id="1_analysis_board"]
+[ext_resource type="Script" path="res://src/ui/analysis/board/link_layer.gd" id="2_link_layer"]
+[ext_resource type="PackedScene" path="res://src/ui/analysis/board/clue_detail.tscn" id="3_detail"]
 
 [node name="AnalysisBoard" type="Control"]
 layout_mode = 3
@@ -12,13 +14,74 @@ grow_vertical = 2
 focus_mode = 2
 script = ExtResource("1_analysis_board")
 
-[node name="Title" type="Label" parent="."]
+[node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = -16.0
-offset_bottom = 56.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="Toolbar" type="HBoxContainer" parent="Layout"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Layout/Toolbar"]
+layout_mode = 2
 text = "BOARD_TITLE"
+
+[node name="FilterButton" type="OptionButton" parent="Layout/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "BOARD_FILTER_TOOLTIP"
+
+[node name="ZoomButton" type="Button" parent="Layout/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BOARD_ZOOM_OUT"
+
+[node name="ModeLabel" type="Label" parent="Layout/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text_overrun_behavior = 3
+
+[node name="EmptyLabel" type="Label" parent="Layout"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "BOARD_EMPTY"
+
+[node name="Split" type="HBoxContainer" parent="Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Scroll" type="ScrollContainer" parent="Layout/Split"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+follow_focus = true
+
+[node name="Holder" type="Control" parent="Layout/Split/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Surface" type="Control" parent="Layout/Split/Scroll/Holder"]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="LinkLayer" type="Control" parent="Layout/Split/Scroll/Holder/Surface"]
+unique_name_in_owner = true
+anchors_preset = 0
+script = ExtResource("2_link_layer")
+
+[node name="Cards" type="Control" parent="Layout/Split/Scroll/Holder/Surface"]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Detail" parent="Layout/Split" instance=ExtResource("3_detail")]
+unique_name_in_owner = true
+layout_mode = 2
