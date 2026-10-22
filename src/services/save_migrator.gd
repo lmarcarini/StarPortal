@@ -7,8 +7,6 @@ extends RefCounted
 
 ## The save format version the game writes and loads.
 const TARGET_VERSION: int = 2
-## Largest format_version accepted: 2^53, so the float-to-int conversion never overflows.
-const MAX_VERSION: float = 9007199254740992.0
 
 
 ## Returns the built-in steps, keyed by the version they migrate from. Version 1 is the
@@ -54,13 +52,15 @@ static func migrate_with_steps(
 
 ## Returns the whole-number "format_version" of [param data] as an int, or fails with
 ## &"bad_format_version" when it is missing, not a number, fractional, negative or above
-## [constant MAX_VERSION].
+## [constant JsonLimits.MAX_EXACT_INT] (2^53, so the float-to-int conversion never
+## overflows).
 static func read_version(data: Dictionary) -> Result:
 	var raw: Variant = data.get("format_version")
 	if not (raw is int or raw is float):
 		return Result.fail(&"bad_format_version", "format_version is missing or not a number")
 	var as_float: float = raw
-	if not (as_float == floorf(as_float) and as_float >= 0.0 and as_float <= MAX_VERSION):
+	var limit: float = float(JsonLimits.MAX_EXACT_INT)
+	if not (as_float == floorf(as_float) and as_float >= 0.0 and as_float <= limit):
 		return Result.fail(&"bad_format_version", "format_version %s is invalid" % str(raw))
 	var version: int = raw
 	return Result.ok(version)

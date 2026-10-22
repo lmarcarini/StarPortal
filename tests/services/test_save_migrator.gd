@@ -152,6 +152,17 @@ func test_bad_versions_fail() -> void:
 		)
 
 
+## The version limit is exactly 2^53 (JsonLimits.MAX_EXACT_INT): the float 2^53 reads as
+## that int, the next double above it fails with &"bad_format_version".
+func test_version_boundary_is_two_pow_53() -> void:
+	var limit: float = float(JsonLimits.MAX_EXACT_INT)
+	var at_limit := SaveMigrator.read_version({"format_version": limit})
+	assert_bool(at_limit.is_ok).is_true()
+	assert_int(at_limit.value).is_equal(JsonLimits.MAX_EXACT_INT)
+	var above := SaveMigrator.read_version({"format_version": limit + 2.0})
+	assert_str(above.error_code).is_equal(&"bad_format_version")
+
+
 ## An old version with no step to bring it forward fails with &"missing_migration_step".
 func test_missing_step_fails() -> void:
 	var result := SaveMigrator.migrate({"format_version": 0})

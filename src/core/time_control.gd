@@ -8,6 +8,9 @@ extends RefCounted
 ## Holds stack: time stays HELD until the last reason is released, then returns to
 ## [member ClockState.mode_after_hold]. While HELD, pause/resume requests change only what
 ## the mode becomes when the hold ends, so a hold never undoes the player's pause.
+## [br][br]
+## In debug builds every mode change is printed (from, to, and the hold reason when a hold
+## caused it). That print is the only side effect, and release builds skip it.
 ## Bible: technical-architecture.md#code-standards (State machines),
 ## game-design.md#time-real-time-with-pause
 
@@ -58,7 +61,7 @@ static func add_hold(clock: ClockState, reason: StringName) -> bool:
 	clock.holds.append(reason)
 	if clock.mode != ClockState.Mode.HELD:
 		clock.mode_after_hold = clock.mode
-		_transition(clock, ClockState.Mode.HELD)
+		_transition(clock, ClockState.Mode.HELD, reason)
 	return true
 
 
@@ -70,7 +73,7 @@ static func release_hold(clock: ClockState, reason: StringName) -> bool:
 		return false
 	clock.holds.erase(reason)
 	if clock.holds.is_empty() and clock.mode == ClockState.Mode.HELD:
-		_transition(clock, clock.mode_after_hold)
+		_transition(clock, clock.mode_after_hold, reason)
 	return true
 
 
@@ -87,8 +90,9 @@ static func _request(clock: ClockState, wanted: ClockState.Mode) -> bool:
 
 
 ## Changes [param clock] to [param to]. An illegal transition fails an assert in debug
-## builds and is refused (returns false) in release builds.
-static func _transition(clock: ClockState, to: ClockState.Mode) -> bool:
+## builds and is refused (returns false) in release builds. [param reason] is the hold that
+## caused the change, empty for a player request; it is used only for the debug log.
+static func _transition(clock: ClockState, to: ClockState.Mode, reason: StringName = &"") -> bool:
 	var allowed: bool = can_transition(clock.mode, to)
 	assert(
 		allowed,
@@ -99,5 +103,19 @@ static func _transition(clock: ClockState, to: ClockState.Mode) -> bool:
 	)
 	if not allowed:
 		return false
+	var from: ClockState.Mode = clock.mode
 	clock.mode = to
+	if OS.is_debug_build():
+		_log_transition(from, to, reason)
 	return true
+
+
+## Prints one mode change; called only in debug builds. Plain print output, never a warning.
+static func _log_transition(from: ClockState.Mode, to: ClockState.Mode, reason: StringName) -> void:
+	var line := (
+		"TimeControl: %s -> %s" % [ClockState.Mode.find_key(from), ClockState.Mode.find_key(to)]
+	)
+	if not reason.is_empty():
+		var action: String = "added" if to == ClockState.Mode.HELD else "released"
+		line += " (hold %s %s)" % [reason, action]
+	print(line)

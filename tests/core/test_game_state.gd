@@ -100,3 +100,22 @@ func test_sub_states_round_trip() -> void:
 	var random_data := random.to_dict()
 	var restored_random := RandomState.from_dict(_json_round_trip(random_data))
 	assert_dict(restored_random.to_dict()).is_equal(random_data)
+
+
+## validate_dict accepts int and float flags up to 2^53 in absolute value and rejects
+## larger ones, whether they arrive as ints or as whole floats.
+func test_validate_rejects_flags_beyond_two_pow_53() -> void:
+	var limit: int = JsonLimits.MAX_EXACT_INT
+	var base := _sample_state().to_dict()
+	for value: Variant in [limit, -limit, float(limit), -float(limit)]:
+		var data := base.duplicate(true)
+		data["flags"]["edge"] = value
+		var errors := GameState.validate_dict(data)
+		assert_array(errors).override_failure_message(str(value)).is_empty()
+	for value: Variant in [limit + 1, -limit - 1, float(limit) + 2.0, 1e300]:
+		var data := base.duplicate(true)
+		data["flags"]["edge"] = value
+		var errors := GameState.validate_dict(data)
+		assert_array(errors).override_failure_message(str(value)).contains(
+			["flag 'edge' is not a bool, String or whole number"]
+		)

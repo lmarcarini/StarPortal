@@ -53,8 +53,9 @@ func get_type() -> StringName:
 	return TYPE
 
 
-## Rejects an empty key (&"empty_key") and a value that is not bool, int or String
-## (&"invalid_value"). Flags have no other preconditions, so [param state] is unused.
+## Rejects an empty key (&"empty_key"), a value that is not bool, int or String, and an int
+## with absolute value above [constant JsonLimits.MAX_EXACT_INT], which would not survive a
+## save (&"invalid_value"). Flags have no other preconditions, so [param state] is unused.
 @warning_ignore("unused_parameter")
 func validate(state: GameState) -> CommandResult:  # gdlint: ignore=unused-argument
 	if key.is_empty():
@@ -62,6 +63,10 @@ func validate(state: GameState) -> CommandResult:  # gdlint: ignore=unused-argum
 	if not (value is bool or value is int or value is String):
 		return CommandResult.fail(
 			&"invalid_value", "flag %s: %s" % [key, type_string(typeof(value))]
+		)
+	if value is int and not JsonLimits.is_exact_int(value):
+		return CommandResult.fail(
+			&"invalid_value", "flag %s: %d is outside -2^53 to 2^53" % [key, value]
 		)
 	return CommandResult.ok()
 

@@ -25,8 +25,6 @@ const SLOT_NAME_CHARS: String = "abcdefghijklmnopqrstuvwxyz0123456789_"
 const SLOT_NAME_MAX_LENGTH: int = 32
 ## Game version written when application/config/version is not set.
 const DEFAULT_GAME_VERSION: String = "0.0.0"
-## Largest header number accepted: 2^53, the largest whole number a JSON double holds exactly.
-const MAX_HEADER_NUMBER: float = 9007199254740992.0
 
 ## Folder holding the save files. Tests point this at a temporary folder.
 var saves_dir: String = "user://saves"
@@ -51,7 +49,8 @@ func save_game(state: GameState, slot: StringName) -> Result:
 ## Reads [param slot], migrates it to the current format and returns the GameState as the
 ## value. The state is checked with GameState.validate_dict() before it is built, so a
 ## hand-edited value of the wrong type fails with &"invalid_state" instead of loading as a
-## default. Emits EventBus.game_loaded on success. Never crashes on a bad file.
+## default. A header "tick" that differs from the state's clock tick also fails with
+## &"invalid_state". Emits EventBus.game_loaded on success. Never crashes on a bad file.
 func load_game(slot: StringName) -> Result:
 	if not is_valid_slot_name(slot):
 		return Result.fail(&"bad_slot_name", "invalid slot name '%s'" % slot)
@@ -66,13 +65,10 @@ func load_game(slot: StringName) -> Result:
 	var checked := _check_header(data)
 	if not checked.is_ok:
 		return checked
-	var state_data: Dictionary = data["state"]
-	var errors := GameState.validate_dict(state_data)
-	if not errors.is_empty():
-		return Result.fail(&"invalid_state", "; ".join(errors))
-	var state := GameState.from_dict(state_data)
-	EventBus.game_loaded.emit(slot)
-	return Result.ok(state)
+	var built := _build_state(data)
+	if built.is_ok:
+		EventBus.game_loaded.emit(slot)
+	return built
 
 
 ## Writes [param state] to autosave_1, after shifting older autosaves down one slot.
@@ -102,7 +98,8 @@ func autosave(state: GameState) -> Result:
 
 ## Returns one entry per readable save file, newest first:
 ## {slot: StringName, tick: int, saved_at_unix: int, format_version: int}.
-## Temporary files, invalid names and unreadable or corrupt files are skipped.
+## Temporary files, invalid names, unreadable or corrupt files, and files whose header
+## "tick" differs from the state's clock tick are skipped.
 func list_slots() -> Array[Dictionary]:
 	var slots: Array[Dictionary] = []
 	var dir := DirAccess.open(saves_dir)
@@ -245,11 +242,45 @@ static func _check_header(data: Dictionary) -> Result:
 	return Result.ok()
 
 
+## Validates the "state" of migrated, header-checked [param data] and returns the built
+## GameState as the value. Fails with &"invalid_state" when GameState.validate_dict()
+## reports errors or when the header "tick" differs from the state's clock tick.
+static func _build_state(data: Dictionary) -> Result:
+	var state_data: Dictionary = data["state"]
+	var errors := GameState.validate_dict(state_data)
+	if not errors.is_empty():
+		return Result.fail(&"invalid_state", "; ".join(errors))
+	var state := GameState.from_dict(state_data)
+	var header_tick: int = data["tick"]
+	if header_tick != state.clock.tick:
+		var detail := "header tick %d differs from clock tick %d" % [header_tick, state.clock.tick]
+		return Result.fail(&"invalid_state", detail)
+	return Result.ok(state)
+
+
 static func _is_whole_number(value: Variant) -> bool:
 	if not (value is int or value is float):
 		return false
 	var number: float = value
-	return number == floorf(number) and number >= 0.0 and number <= MAX_HEADER_NUMBER
+	var limit: float = float(JsonLimits.MAX_EXACT_INT)
+	return number == floorf(number) and number >= 0.0 and number <= limit
+
+
+## True when the header "tick" of [param data] (already checked by _check_header) equals
+## the whole-number "tick" of its state's clock. A missing or non-numeric clock tick does
+## not match. Used by list_slots(), which does not validate the whole state.
+static func _header_tick_matches_clock(data: Dictionary) -> bool:
+	var state_data: Dictionary = data["state"]
+	var clock: Variant = state_data.get("clock")
+	if not clock is Dictionary:
+		return false
+	var clock_data: Dictionary = clock
+	var clock_tick: Variant = clock_data.get("tick")
+	if not (clock_tick is int or clock_tick is float):
+		return false
+	var header_tick: float = data["tick"]
+	var state_tick: float = clock_tick
+	return header_tick == state_tick
 
 
 ## Returns the list_slots() entry for [param slot], or {} when it cannot be read.
@@ -260,6 +291,8 @@ func _slot_entry(slot: StringName) -> Dictionary:
 	var data: Dictionary = read.value
 	var version := SaveMigrator.read_version(data)
 	if not version.is_ok or not _check_header(data).is_ok:
+		return {}
+	if not _header_tick_matches_clock(data):
 		return {}
 	var tick: int = data["tick"]
 	var saved_at_unix: int = data["saved_at_unix"]

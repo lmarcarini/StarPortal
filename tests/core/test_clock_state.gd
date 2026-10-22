@@ -171,3 +171,16 @@ func test_validate_rejects_holds_when_not_held() -> void:
 		data["mode"] = mode
 		var errors := ClockState.validate_dict(data)
 		assert_array(errors).contains(["'holds' is not empty but 'mode' is not \"held\""])
+
+
+## The tick limit is exactly 2^53 (JsonLimits.MAX_EXACT_INT): the float 2^53 is accepted,
+## the next double above it is not.
+func test_validate_tick_boundary_is_two_pow_53() -> void:
+	var limit: float = float(JsonLimits.MAX_EXACT_INT)
+	var data := _held_data()
+	data["tick"] = limit
+	assert_array(ClockState.validate_dict(data)).is_empty()
+	data["tick"] = limit + 2.0
+	assert_array(ClockState.validate_dict(data)).contains(
+		["'tick' is not a whole number from 0 to 2^53"]
+	)

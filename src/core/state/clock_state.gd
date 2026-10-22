@@ -13,8 +13,6 @@ enum Mode { RUNNING, PAUSED, HELD }
 
 ## Number of clock speeds; must equal SimClock.SPEEDS.size().
 const SPEED_COUNT: int = 4
-## Largest whole number a JSON number (a double) holds exactly: 2^53.
-const _MAX_EXACT_JSON_INT: float = 9007199254740992.0
 ## Saved names of the modes, indexed by Mode value.
 const _MODE_NAMES: Array[String] = ["running", "paused", "held"]
 
@@ -141,9 +139,11 @@ static func _is_mode_name(value: Variant) -> bool:
 	return value is String and _MODE_NAMES.has(value)
 
 
-## True for an int, or a whole float, from 0 to 2^53.
+## True for an int, or a whole float, from 0 to 2^53. The value is compared as a float
+## against the float of [constant JsonLimits.MAX_EXACT_INT], which is exact.
 static func _is_count(value: Variant) -> bool:
 	if not (value is int or value is float):
 		return false
 	var number: float = value
-	return number == floorf(number) and number >= 0.0 and number <= _MAX_EXACT_JSON_INT
+	var limit: float = float(JsonLimits.MAX_EXACT_INT)
+	return number == floorf(number) and number >= 0.0 and number <= limit
