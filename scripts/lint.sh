@@ -4,7 +4,8 @@
 # Exit code: 0 when both pass, non-zero otherwise.
 #
 # Usage: scripts/lint.sh
-# Needs: gdtoolkit 4.x on PATH (pip install "gdtoolkit==4.5.0").
+# Needs: gdtoolkit on PATH, at the exact version pinned in .gdtoolkit-version
+#        (pip install "gdtoolkit==<that version>").
 #        To fix formatting: gdformat src tests tools
 #
 # Portable across Linux, macOS and Git Bash on Windows: POSIX tools only.
@@ -17,9 +18,16 @@ cd "$PROJECT_DIR" || exit 2
 
 LINT_PATHS="src tests tools"
 
+# The pinned gdtoolkit version lives only in .gdtoolkit-version (CI reads the same file).
+GDTOOLKIT_VERSION="$(tr -d '[:space:]' < .gdtoolkit-version 2> /dev/null)"
+if [ -z "$GDTOOLKIT_VERSION" ]; then
+	echo "lint.sh: .gdtoolkit-version is missing or empty" >&2
+	exit 2
+fi
+
 for tool in gdformat gdlint; do
 	if ! command -v "$tool" > /dev/null 2>&1; then
-		echo "lint.sh: '$tool' not found. Install gdtoolkit: pip install \"gdtoolkit==4.5.0\"" >&2
+		echo "lint.sh: '$tool' not found. Install gdtoolkit: pip install \"gdtoolkit==$GDTOOLKIT_VERSION\"" >&2
 		exit 2
 	fi
 done
