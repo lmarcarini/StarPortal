@@ -31,6 +31,15 @@ signal game_saved(slot: StringName)
 ## Emitted after a load completes.
 @warning_ignore("unused_signal")
 signal game_loaded(slot: StringName)
+## Emitted when a new clue reaches the base (posted through the outbox).
+@warning_ignore("unused_signal")
+signal clue_received(clue_id: StringName)
+## Emitted when the player's note on a clue changes (posted through the outbox).
+@warning_ignore("unused_signal")
+signal clue_note_changed(clue_id: StringName)
+## Emitted when the Address Workbench draft changes (posted through the outbox).
+@warning_ignore("unused_signal")
+signal workbench_changed
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared
