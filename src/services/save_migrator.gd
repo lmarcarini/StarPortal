@@ -6,13 +6,13 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 2
+const TARGET_VERSION: int = 3
 
 
 ## Returns the built-in steps, keyed by the version they migrate from. Version 1 is the
 ## first format. (A function, not a constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
-	var built_in: Dictionary[int, Callable] = {1: _v1_to_v2}
+	var built_in: Dictionary[int, Callable] = {1: _v1_to_v2, 2: _v2_to_v3}
 	return built_in
 
 
@@ -86,3 +86,46 @@ static func _v1_to_v2(data: Dictionary) -> Dictionary:
 	clock_data["mode_after_hold"] = "paused"
 	clock_data.erase("is_paused")
 	return data
+
+
+## v2 -> v3: adds the "gate", "power" and "worlds" sections with the v3 defaults, written
+## here as literals so later changes to the game's defaults never change this step:
+## the Ring idle with an empty queue and Dial Log; power at capacity 400 MWh, plant output
+## 30 MW, nothing stored (the bible's starting plant and storage); the galaxy seed derived
+## from the save's base seed with RandomState.derive_seed(base, &"galaxy"), as a decimal
+## string; generator version 1. The base seed is read like RandomState.from_dict() reads
+## it. Data with no state object is left as is, for validation to reject.
+static func _v2_to_v3(data: Dictionary) -> Dictionary:
+	var state: Variant = data.get("state")
+	if not state is Dictionary:
+		return data
+	var state_data: Dictionary = state
+	state_data["gate"] = {
+		"mode": "idle",
+		"current_address": null,
+		"dial_started_tick": -1,
+		"lock_energy_mwh": 0.0,
+		"connected_world_id": "",
+		"lock_started_tick": -1,
+		"is_hostile": false,
+		"dial_queue": [],
+		"dial_log": [],
+	}
+	state_data["power"] = {"stored_mwh": 0.0, "capacity_mwh": 400.0, "plant_output_mw": 30.0}
+	var galaxy_seed := RandomState.derive_seed(_v2_base_seed(state_data), &"galaxy")
+	state_data["worlds"] = {"galaxy_seed": str(galaxy_seed), "generator_version": 1, "statuses": {}}
+	return data
+
+
+## The base seed of a v2 [param state_data]: "random"."base_seed", a decimal string (a
+## plain number is still accepted), or 0 when missing.
+static func _v2_base_seed(state_data: Dictionary) -> int:
+	var random: Variant = state_data.get("random")
+	if not random is Dictionary:
+		return 0
+	var random_data: Dictionary = random
+	var base_seed: Variant = random_data.get("base_seed", 0)
+	if base_seed is String:
+		var text: String = base_seed
+		return text.to_int()
+	return type_convert(base_seed, TYPE_INT)

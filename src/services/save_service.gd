@@ -169,7 +169,9 @@ func _serialize(state: GameState) -> String:
 		"tick": state.clock.tick,
 		"state": state.to_dict(),
 	}
-	return JSON.stringify(data, "\t")
+	# full_precision: floats keep every significant digit (up to 17), so they load back
+	# bit for bit.
+	return JSON.stringify(data, "\t", true, true)
 
 
 ## Writes [param text] to [param path].tmp. The real file is untouched, so an interrupted
