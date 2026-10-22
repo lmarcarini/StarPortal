@@ -32,6 +32,22 @@ signal game_saved(slot: StringName)
 @warning_ignore("unused_signal")
 signal game_loaded(slot: StringName)
 
+## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
+## posted domain event may not use one of these names: it is rejected like an undeclared
+## name, so a system can never fake a tick, a day, a pause or a save. pause_requested is
+## not listed: the Simulation routes that event to its own pause_requested signal.
+const RESERVED_EVENT_NAMES: Array[StringName] = [
+	&"tick_advanced",
+	&"day_started",
+	&"month_closed",
+	&"command_rejected",
+	&"speed_changed",
+	&"paused_changed",
+	&"time_mode_changed",
+	&"game_saved",
+	&"game_loaded",
+]
+
 var _simulation: Simulation = null
 ## Declared argument count per event name, -1 when no such signal is declared here.
 var _arg_counts: Dictionary[StringName, int] = {}
@@ -39,9 +55,9 @@ var _arg_counts: Dictionary[StringName, int] = {}
 
 ## Forwards [param simulation]'s signals to this bus, including its outbox events, and
 ## disconnects any previously bound simulation. Passing null only unbinds. A posted event
-## whose name is not a signal declared here, or whose argument count differs from the
-## signal's, is a programmer error: it asserts in debug, otherwise reports an error, and is
-## not emitted.
+## whose name is in [constant RESERVED_EVENT_NAMES], is not a signal declared here, or whose
+## argument count differs from the signal's, is a programmer error: it asserts in debug,
+## otherwise reports an error, and is not emitted.
 func bind_simulation(simulation: Simulation) -> void:
 	_unbind_simulation()
 	if simulation == null:
@@ -82,6 +98,9 @@ func _on_pause_requested(reason: StringName) -> void:
 
 
 func _on_event_posted(event_name: StringName, args: Array) -> void:
+	if event_name in RESERVED_EVENT_NAMES:
+		_report("EventBus: posted event '%s' uses a reserved bus signal name" % event_name)
+		return
 	var expected: int = _declared_arg_count(event_name)
 	if expected < 0:
 		_report("EventBus: no signal declared for posted event '%s'" % event_name)

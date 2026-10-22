@@ -52,13 +52,50 @@ func test_caches_declared_arg_count() -> void:
 	assert_int(_received.size()).is_equal(2)
 
 
-## Existing domain signals declared on the bus forward too.
-func test_reemits_existing_bus_signal() -> void:
-	var days: Array[int] = []
-	var on_day := func(day_index: int) -> void: days.append(day_index)
-	_bus.day_started.connect(on_day)
-	_simulation.event_posted.emit(&"day_started", [7])
-	assert_array(days).is_equal([7])
+## The reserved list is exactly the clock, save and simulation-forward signals.
+func test_reserved_names_are_the_bus_service_signals() -> void:
+	var expected: Array[StringName] = [
+		&"tick_advanced",
+		&"day_started",
+		&"month_closed",
+		&"command_rejected",
+		&"speed_changed",
+		&"paused_changed",
+		&"time_mode_changed",
+		&"game_saved",
+		&"game_loaded",
+	]
+	assert_array(TestBus.RESERVED_EVENT_NAMES).contains_exactly(expected)
+	assert_bool(TestBus.RESERVED_EVENT_NAMES.has(&"pause_requested")).is_false()
+
+
+## A posted event using a reserved bus signal name asserts and emits nothing.
+func test_reserved_names_assert_and_do_not_emit() -> void:
+	var emitted: Array[StringName] = []
+	for reserved: StringName in TestBus.RESERVED_EVENT_NAMES:
+		var count: int = _signal_arg_count(reserved)
+		var record := func(...args: Array) -> void: emitted.append(reserved)
+		_bus.connect(reserved, record)
+		var args: Array = []
+		args.resize(count)
+		var message: String = (
+			"Assertion failed: EventBus: posted event '%s' uses a reserved bus signal name"
+			% reserved
+		)
+		await (
+			assert_error(func() -> void: _simulation.event_posted.emit(reserved, args))
+			. is_runtime_error(message)
+		)
+	assert_array(emitted).is_empty()
+
+
+func _signal_arg_count(signal_name: StringName) -> int:
+	for info: Dictionary in _bus.get_signal_list():
+		var name: String = info["name"]
+		if StringName(name) == signal_name:
+			var signal_args: Array = info["args"]
+			return signal_args.size()
+	return -1
 
 
 ## An undeclared event name asserts and emits nothing.
