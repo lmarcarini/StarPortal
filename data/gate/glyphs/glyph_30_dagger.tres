@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlyphDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/glyph_def.gd" id="1_glyph"]
+
+[resource]
+script = ExtResource("1_glyph")
+index = 30
+name_key = &"GLYPH_DAGGER_NAME"
+picture_key = &"GLYPH_DAGGER_PICTURE"
+points = PackedVector2Array(0.5, 0.96, 0.4, 0.38, 0.6, 0.38, 0.18, 0.26, 0.82, 0.26, 0.5, 0.26, 0.5, 0.04)
+lines = PackedInt32Array(5, 1, 1, 0, 0, 2, 2, 5, 3, 5, 5, 4, 5, 6)
+id = &"glyph_30"

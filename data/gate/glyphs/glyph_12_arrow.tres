@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlyphDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/glyph_def.gd" id="1_glyph"]
+
+[resource]
+script = ExtResource("1_glyph")
+index = 12
+name_key = &"GLYPH_ARROW_NAME"
+picture_key = &"GLYPH_ARROW_PICTURE"
+points = PackedVector2Array(0.92, 0.08, 0.58, 0.16, 0.84, 0.42, 0.08, 0.92)
+lines = PackedInt32Array(0, 1, 0, 2, 0, 3)
+id = &"glyph_12"
