@@ -53,6 +53,8 @@ static func registered_types() -> Array[StringName]:
 static func register_defaults() -> void:
 	_defaults_registered = true
 	_types[SetFlagCommand.TYPE] = SetFlagCommand
+	_types[SetWorkbenchCommand.TYPE] = SetWorkbenchCommand
+	_types[AnnotateClueCommand.TYPE] = AnnotateClueCommand
 
 
 ## Drops every registration, so tests can restore a clean registry. The built-in types are

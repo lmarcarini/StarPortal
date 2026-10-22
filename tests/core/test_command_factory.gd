@@ -3,6 +3,8 @@
 ## Bible: technical-architecture.md#simulation-clock-and-commands
 extends GdUnitTestSuite
 
+const IntelFixture := preload("res://tests/core/intel_fixture.gd")
+
 
 ## A test-only command type, registered and then removed by reset().
 class PingCommand:
@@ -34,6 +36,8 @@ func _samples() -> Array[Command]:
 		SetFlagCommand.create(&"met_kessler", true),
 		SetFlagCommand.create(&"dial_attempts", 7),
 		SetFlagCommand.create(&"last_world", "P3X-118"),
+		SetWorkbenchCommand.create(30, IntelFixture.five_constraints()),
+		AnnotateClueCommand.create(&"clue_0001", IntelFixture.note([&"clue_0002"], ["Heron?"])),
 	]
 
 
@@ -123,7 +127,9 @@ func test_from_dict_converts_in_range_whole_floats_to_int() -> void:
 
 ## The built-in types are registered without any setup.
 func test_defaults_are_registered_lazily() -> void:
-	assert_array(CommandFactory.registered_types()).contains_exactly([&"set_flag"])
+	assert_array(CommandFactory.registered_types()).contains_exactly(
+		[&"annotate_clue", &"set_flag", &"set_workbench"]
+	)
 
 
 ## register_type() adds a type that from_dict() can then rebuild.
@@ -133,7 +139,9 @@ func test_register_type_adds_a_type() -> void:
 	assert_bool(result.is_ok).is_true()
 	var rebuilt: Command = result.value
 	assert_that(rebuilt.get_type()).is_equal(&"ping")
-	assert_array(CommandFactory.registered_types()).contains_exactly([&"ping", &"set_flag"])
+	assert_array(CommandFactory.registered_types()).contains_exactly(
+		[&"annotate_clue", &"ping", &"set_flag", &"set_workbench"]
+	)
 
 
 ## reset() removes test registrations and the defaults come back on next use.
@@ -145,4 +153,6 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 		assert_bool(CommandFactory.from_dict({"type": "set_flag", "key": "a", "value": 1}).is_ok)
 		. is_true()
 	)
-	assert_array(CommandFactory.registered_types()).contains_exactly([&"set_flag"])
+	assert_array(CommandFactory.registered_types()).contains_exactly(
+		[&"annotate_clue", &"set_flag", &"set_workbench"]
+	)
