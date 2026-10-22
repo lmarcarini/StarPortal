@@ -20,6 +20,9 @@ signal speed_changed(speed_index: int)
 ## Emitted when the clock pauses or resumes.
 @warning_ignore("unused_signal")
 signal paused_changed(is_paused: bool)
+## Emitted when the clock's time-control mode changes, with the new ClockState.Mode.
+@warning_ignore("unused_signal")
+signal time_mode_changed(mode: int)
 ## Emitted after a save completes.
 @warning_ignore("unused_signal")
 signal game_saved(slot: StringName)

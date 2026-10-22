@@ -1,7 +1,8 @@
 extends Node
 ## Autoload. Fixed-step clock that drives the Simulation in real time at the chosen speed.
 ## Real seconds feed an accumulator in tick units; whole ticks run and the remainder carries
-## over. Pause and speed live in [code]simulation.state.clock[/code], so they are saved.
+## over. Mode (running, paused, held) and speed live in [code]simulation.state.clock[/code],
+## so they are saved; mode changes go through TimeControl. Ticks run only while RUNNING.
 ## Bible: technical-architecture.md#simulation-clock-and-commands,
 ## game-design.md#time-real-time-with-pause
 
@@ -26,8 +27,8 @@ func _process(delta: float) -> void:
 	advance_by_seconds(delta)
 
 
-## Binds [param new_simulation] and the EventBus to this clock. Keeps the speed and pause
-## state saved in its clock; any previously bound simulation is released first.
+## Binds [param new_simulation] and the EventBus to this clock. Keeps the speed and mode
+## saved in its clock; any previously bound simulation is released first.
 func start(new_simulation: Simulation) -> void:
 	stop()
 	if new_simulation == null:
@@ -48,21 +49,41 @@ func stop() -> void:
 	simulation = null
 
 
-## Pauses the clock and emits EventBus.paused_changed; no-op if already paused.
+## Player pause through TimeControl: pauses a running clock, or while HELD makes the clock
+## pause when the hold ends. Emits EventBus.paused_changed / time_mode_changed on change.
 func pause() -> void:
-	_set_paused(true)
+	_apply(TimeControl.request_pause)
 
 
-## Resumes the clock and emits EventBus.paused_changed; no-op if already running.
+## Player resume through TimeControl: resumes a paused clock, or while HELD makes the clock
+## run when the hold ends. Emits EventBus.paused_changed / time_mode_changed on change.
 func resume() -> void:
-	_set_paused(false)
+	_apply(TimeControl.request_resume)
 
 
-## Pauses a running clock or resumes a paused one.
+## Pauses a running clock or resumes a paused one; while HELD, flips the mode the clock
+## returns to when the hold ends.
 func toggle_pause() -> void:
+	_apply(TimeControl.request_toggle)
+
+
+## Adds system hold [param reason] (e.g. &"cutscene"): time stops until every hold is
+## released. Adding a reason already held is a no-op.
+func hold(reason: StringName) -> void:
+	_apply(TimeControl.add_hold.bind(reason))
+
+
+## Releases system hold [param reason]; when the last hold goes, the clock returns to the
+## mode the player wanted. Releasing a reason that is not held is a no-op.
+func release(reason: StringName) -> void:
+	_apply(TimeControl.release_hold.bind(reason))
+
+
+## Returns the current time-control mode; PAUSED when no simulation is bound.
+func get_mode() -> ClockState.Mode:
 	if simulation == null:
-		return
-	_set_paused(not simulation.state.clock.is_paused)
+		return ClockState.Mode.PAUSED
+	return simulation.state.clock.mode
 
 
 ## Sets the speed to SPEEDS[[param index]] and emits EventBus.speed_changed. Indices out of
@@ -101,7 +122,7 @@ func set_slow_mode(enabled: bool) -> void:
 	_slow_mode = enabled
 
 
-## Returns true while a simulation is bound and the clock is not paused.
+## Returns true while a simulation is bound and the clock is RUNNING.
 func is_running() -> bool:
 	if simulation == null:
 		return false
@@ -117,8 +138,8 @@ func step_ticks(count: int) -> void:
 
 
 ## Advances the clock by [param real_seconds] of real time and returns the ticks run. Runs
-## at most MAX_TICKS_PER_FRAME ticks; beyond that the excess time is dropped. A pause
-## requested mid-call stops the remaining ticks.
+## at most MAX_TICKS_PER_FRAME ticks; beyond that the excess time is dropped. A pause or
+## hold requested mid-call stops the remaining ticks.
 func advance_by_seconds(real_seconds: float) -> int:
 	if simulation == null:
 		return 0
@@ -154,13 +175,19 @@ func _ticks_per_second() -> float:
 	return SPEEDS[clampi(simulation.state.clock.speed_index, 0, SPEEDS.size() - 1)]
 
 
-func _set_paused(paused: bool) -> void:
+## Runs [param rule], a TimeControl function taking the ClockState, then emits
+## EventBus.time_mode_changed and paused_changed once each if the mode or pause changed.
+func _apply(rule: Callable) -> void:
 	if simulation == null:
 		return
-	if simulation.state.clock.is_paused == paused:
-		return
-	simulation.state.clock.is_paused = paused
-	EventBus.paused_changed.emit(paused)
+	var clock: ClockState = simulation.state.clock
+	var mode_before: ClockState.Mode = clock.mode
+	var paused_before: bool = clock.is_paused
+	rule.call(clock)
+	if clock.mode != mode_before:
+		EventBus.time_mode_changed.emit(clock.mode)
+	if clock.is_paused != paused_before:
+		EventBus.paused_changed.emit(clock.is_paused)
 
 
 func _warn_cap_once(due: int) -> void:
@@ -175,5 +202,7 @@ func _warn_cap_once(due: int) -> void:
 	)
 
 
+## Auto-pause: while RUNNING the clock pauses; while HELD only the mode after the hold
+## becomes PAUSED.
 func _on_pause_requested(reason: StringName) -> void:  # gdlint: ignore=unused-argument
 	pause()

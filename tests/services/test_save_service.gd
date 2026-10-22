@@ -314,7 +314,10 @@ func test_empty_or_misshaped_state_is_invalid_state() -> void:
 		[
 			[[], {}, "clock"],
 			[["clock"], "x", "clock"],
-			[["clock", "is_paused"], 1, "is_paused"],
+			[["clock", "mode"], 1, "mode"],
+			[["clock", "mode"], "frozen", "mode"],
+			[["clock", "holds"], [1], "hold"],
+			[["clock", "mode_after_hold"], "held", "mode_after_hold"],
 			[["clock", "speed_index"], "fast", "speed_index"],
 			[["clock", "tick"], -1, "tick"],
 			[["flags", "f"], [1], "flag"],
