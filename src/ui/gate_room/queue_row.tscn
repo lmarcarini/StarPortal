@@ -1,0 +1,46 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/gate_room/queue_row.gd" id="1_queue_row"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/address_strip.tscn" id="2_strip"]
+
+[node name="QueueRow" type="HBoxContainer"]
+script = ExtResource("1_queue_row")
+
+[node name="SelectButton" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+toggle_mode = true
+
+[node name="Content" type="VBoxContainer" parent="SelectButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Strip" parent="SelectButton/Content" instance=ExtResource("2_strip")]
+unique_name_in_owner = true
+layout_mode = 2
+icon_size = 24
+
+[node name="Info" type="Label" parent="SelectButton/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text_overrun_behavior = 3
+
+[node name="RemoveButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "GATE_QUEUE_REMOVE"

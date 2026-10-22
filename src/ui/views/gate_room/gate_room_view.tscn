@@ -1,6 +1,14 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/ui/views/gate_room/gate_room_view.gd" id="1_gate_room_view"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/dial_queue_panel.tscn" id="2_queue"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/address_entry.tscn" id="3_entry"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/ring_display.tscn" id="4_ring"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/capacitor_gauge.tscn" id="5_gauge"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/dial_controls.tscn" id="6_controls"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/outcome_banner.tscn" id="7_banner"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/wormhole_panel.tscn" id="8_wormhole"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/dial_log_panel.tscn" id="9_log"]
 
 [node name="GateRoomView" type="Control"]
 layout_mode = 3
@@ -12,15 +20,68 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_gate_room_view")
 
-[node name="Title" type="Label" parent="."]
-unique_name_in_owner = true
+[node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = -16.0
-offset_bottom = 56.0
+anchor_bottom = 1.0
 grow_horizontal = 2
-focus_mode = 2
-text = "GATE_ROOM_TITLE"
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="Columns" type="HBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Left" type="VBoxContainer" parent="Margin/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 5.0
+
+[node name="DialQueuePanel" parent="Margin/Columns/Left" instance=ExtResource("2_queue")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AddressEntry" parent="Margin/Columns/Left" instance=ExtResource("3_entry")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Middle" type="VBoxContainer" parent="Margin/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="RingDisplay" parent="Margin/Columns/Middle" instance=ExtResource("4_ring")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CapacitorGauge" parent="Margin/Columns/Middle" instance=ExtResource("5_gauge")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DialControls" parent="Margin/Columns/Middle" instance=ExtResource("6_controls")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="OutcomeBanner" parent="Margin/Columns/Middle" instance=ExtResource("7_banner")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Right" type="VBoxContainer" parent="Margin/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="WormholePanel" parent="Margin/Columns/Right" instance=ExtResource("8_wormhole")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DialLogPanel" parent="Margin/Columns/Right" instance=ExtResource("9_log")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
