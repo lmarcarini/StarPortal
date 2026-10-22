@@ -19,6 +19,10 @@ const ACTIONS: Array[StringName] = [
 	&"quick_save",
 	&"quick_load",
 	&"debug_toggle_overlay",
+	&"view_next",
+	&"view_previous",
+	&"view_gate_room",
+	&"view_analysis",
 ]
 
 ## Gamepad bindings added to Godot's built-in UI actions at start-up, as {action: [encoded]},
@@ -32,7 +36,9 @@ const UI_GAMEPAD_DEFAULTS: Dictionary = {
 ## Default bindings as {action: {KEYBOARD: [encoded], GAMEPAD: [encoded]}}, each event
 ## encoded by [InputEventCodec], at most [code]InputService.BINDINGS_PER_DEVICE[/code] each.
 ## The gamepad chord Back + Right stick press for [code]debug_toggle_overlay[/code] cannot be
-## bound in [InputMap], so its default is Back alone.
+## bound in [InputMap], so its default is Back alone. The shoulders switch views (the usual
+## tab convention), so the time speed sits on the triggers: an axis pulled past the action's
+## deadzone, read once per pull by [method Input.is_action_just_pressed_by_event].
 const DEFAULTS: Dictionary = {
 	&"time_toggle_pause":
 	{
@@ -49,8 +55,9 @@ const DEFAULTS: Dictionary = {
 		GAMEPAD:
 		[
 			{
-				"kind": InputEventCodec.KIND_JOYPAD_BUTTON,
-				"button_index": JOY_BUTTON_RIGHT_SHOULDER,
+				"kind": InputEventCodec.KIND_JOYPAD_MOTION,
+				"axis": JOY_AXIS_TRIGGER_RIGHT,
+				"direction": 1,
 			},
 		],
 	},
@@ -64,8 +71,9 @@ const DEFAULTS: Dictionary = {
 		GAMEPAD:
 		[
 			{
-				"kind": InputEventCodec.KIND_JOYPAD_BUTTON,
-				"button_index": JOY_BUTTON_LEFT_SHOULDER,
+				"kind": InputEventCodec.KIND_JOYPAD_MOTION,
+				"axis": JOY_AXIS_TRIGGER_LEFT,
+				"direction": 1,
 			},
 		],
 	},
@@ -84,4 +92,48 @@ const DEFAULTS: Dictionary = {
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F3}],
 		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_BACK}],
 	},
+	&"view_next":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_E}],
+		GAMEPAD:
+		[
+			{
+				"kind": InputEventCodec.KIND_JOYPAD_BUTTON,
+				"button_index": JOY_BUTTON_RIGHT_SHOULDER,
+			},
+		],
+	},
+	&"view_previous":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_Q}],
+		GAMEPAD:
+		[
+			{
+				"kind": InputEventCodec.KIND_JOYPAD_BUTTON,
+				"button_index": JOY_BUTTON_LEFT_SHOULDER,
+			},
+		],
+	},
+	&"view_gate_room":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F1}],
+		GAMEPAD: [],
+	},
+	&"view_analysis":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F2}],
+		GAMEPAD: [],
+	},
 }
+
+
+## True if [param event] starts a press of [param action]: a key, button or action press
+## that is not an echo, or the one axis motion that crossed the action's deadzone. An axis
+## held past the deadzone keeps sending motion events that each count as pressed; only the
+## first of them is a new press.
+static func is_new_press(event: InputEvent, action: StringName) -> bool:
+	if not event.is_action_pressed(action):
+		return false
+	if event is InputEventJoypadMotion:
+		return Input.is_action_just_pressed_by_event(action, event)
+	return true
