@@ -4,7 +4,9 @@
 ## Both must end with the same to_dict(), which catches any state to_dict() forgets.
 ## Both runs are built by GameSetup from the real data/ content, so PowerSystem and
 ## GateSystem tick all year (and are rebuilt with the galaxy after every load); stored power
-## must stay within 0..capacity on every tick.
+## must stay within 0..capacity, and never NaN, on every tick. The new game plans the opening
+## (GameSetup.build_new()), so IntelSystem delivers its three dossiers, and the bot dials all
+## year: random addresses mostly, the delivered targets' true addresses sometimes.
 ## Run with scripts/soak.sh; scripts/test.sh skips this folder.
 ## Bible: technical-architecture.md#testing-and-tooling (Soak test),
 ## technical-architecture.md#save-system
@@ -56,14 +58,15 @@ class SoakRun:
 	## Starts a run on a new game seeded with [param base_seed], built by GameSetup from
 	## [param defs].
 	func _init(base_seed: int, defs: GameDefs) -> void:
-		var built: Result = GameSetup.build(GameState.new_game(base_seed, defs.balance), defs)
+		var built: Result = GameSetup.build_new(GameState.new_game(base_seed, defs.balance), defs)
 		var first: Simulation = built.value
 		attach(first)
 
-	## Counts the tick just run when stored power left 0..capacity.
+	## Counts the tick just run when stored power was NaN or left 0..capacity.
 	func check_power() -> void:
 		var power: PowerState = simulation.state.power
-		if power.stored_mwh < 0.0 or power.stored_mwh > power.capacity_mwh:
+		var stored: float = power.stored_mwh
+		if is_nan(stored) or stored < 0.0 or stored > power.capacity_mwh:
 			power_out_of_bounds += 1
 
 	## Makes [param next] the simulation this run plays and listens to its signals.
@@ -116,7 +119,8 @@ func test_year_with_monthly_save_and_load_matches_uninterrupted_run() -> void:
 ## Returns the one-line report printed after the runs: duration and what was observed.
 func _summary(elapsed_msec: int) -> String:
 	var template := "soak: %d ticks x 2 runs in %.2f s; %d day_started, %d month_closed, "
-	template += "%d reloads, %d commands (%d while paused), %d pauses"
+	template += "%d reloads, %d commands (%d while paused), %d pauses; %d dials (%d locks), "
+	template += "%d closes, %d queued (%d targets, %d dropped), %d clues"
 	var bot: SoakBot = _reloaded.bot
 	var values: Array = [
 		YEAR_TICKS,
@@ -127,6 +131,13 @@ func _summary(elapsed_msec: int) -> String:
 		bot.commands_submitted,
 		bot.commands_while_paused,
 		bot.pauses,
+		bot.dials,
+		_locks(_reloaded),
+		bot.closes,
+		bot.addresses_queued,
+		bot.targets_queued,
+		bot.addresses_dropped,
+		_reloaded.simulation.state.intel.clues.size(),
 	]
 	return template % values
 
@@ -190,8 +201,9 @@ func _assert_run_events(
 	assert_int(run.simulation.state.clock.tick).is_equal(YEAR_TICKS)
 	assert_int(run.power_out_of_bounds).is_equal(0)
 	var power: PowerState = run.simulation.state.power
-	assert_float(power.stored_mwh).is_equal(power.capacity_mwh)
+	assert_float(power.stored_mwh).is_between(0.0, power.capacity_mwh)
 	assert_float(power.capacity_mwh).is_equal(_defs.balance.starting_capacity_mwh)
+	_assert_run_ring(run)
 	var commands: int = run.bot.commands_submitted
 	assert_int(commands).is_between(15 * YEAR_DAYS, 25 * YEAR_DAYS)
 	assert_int(run.bot.commands_while_paused).is_greater(0)
@@ -204,6 +216,40 @@ func _assert_run_events(
 			. override_failure_message("flag %s is a %s" % [key, type_string(typeof(value))])
 			. is_true()
 		)
+
+
+## Checks [param run] got the three dossiers and worked the Ring all year: it dialed, locked
+## (a true target address, at least), closed, and the Dial Log holds every dial.
+func _assert_run_ring(run: SoakRun) -> void:
+	var state: GameState = run.simulation.state
+	var bot: SoakBot = run.bot
+	assert_dict(state.intel.scheduled_dossiers).is_empty()
+	assert_int(state.intel.next_dossier_number).is_equal(OpeningScenario.TARGET_COUNT + 1)
+	assert_bool(state.intel.clues.is_empty()).is_false()
+	assert_int(bot.dials).is_greater(YEAR_DAYS)
+	assert_int(state.gate.dial_log.size()).is_between(bot.dials - 1, bot.dials)
+	assert_int(bot.targets_queued).is_greater(0)
+	assert_int(_locks(run)).is_greater(0)
+	assert_int(bot.closes).is_greater(0)
+	for world_id: StringName in state.worlds.statuses:
+		assert_bool(_is_target(state, world_id)).override_failure_message(world_id).is_true()
+
+
+## Locks and hostile locks in [param run]'s Dial Log.
+func _locks(run: SoakRun) -> int:
+	var count: int = 0
+	for entry: DialLogEntry in run.simulation.state.gate.dial_log:
+		if DialOutcome.is_lock(entry.outcome):
+			count += 1
+	return count
+
+
+## True when some delivered clue points at [param world_id].
+func _is_target(state: GameState, world_id: StringName) -> bool:
+	for clue: ClueRecord in state.intel.clues:
+		if clue.target_world_id == world_id:
+			return true
+	return false
 
 
 ## Counts the ticks in 1..YEAR_TICKS that TimeMath says start a day.

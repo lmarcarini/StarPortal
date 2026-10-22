@@ -39,6 +39,8 @@ func test_starts_paused_with_new_game_and_minimum_window_size() -> void:
 	var simulation: Simulation = SimClock.simulation
 	assert_object(simulation).is_not_null()
 	var expected: GameState = GameState.new_game(TEST_SEED, Registry.balance())
+	GameSetup.build_new(expected, GameDefs.from_registry(Registry))
+	assert_int(expected.intel.scheduled_dossiers.size()).is_equal(OpeningScenario.TARGET_COUNT)
 	assert_dict(simulation.state.to_dict()).is_equal(expected.to_dict())
 	assert_object(simulation.state.balance).is_same(Registry.balance())
 	assert_str(String(simulation.state.galaxy.home().id)).is_equal("world_cairn")
