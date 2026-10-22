@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlyphDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/glyph_def.gd" id="1_glyph"]
+
+[resource]
+script = ExtResource("1_glyph")
+index = 19
+name_key = &"GLYPH_CACTUS_NAME"
+picture_key = &"GLYPH_CACTUS_PICTURE"
+points = PackedVector2Array(0.5, 0.94, 0.5, 0.08, 0.5, 0.68, 0.22, 0.68, 0.22, 0.38, 0.5, 0.54, 0.78, 0.54, 0.78, 0.24)
+lines = PackedInt32Array(0, 2, 2, 5, 5, 1, 2, 3, 3, 4, 5, 6, 6, 7)
+id = &"glyph_19"

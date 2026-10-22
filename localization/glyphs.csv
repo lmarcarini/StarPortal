@@ -1,2 +1,75 @@
 keys,en,pt_BR
 GLYPHS_SECTION_TITLE,Glyphs,Glifos
+WORLD_CAIRN_NAME,CAIRN,CAIRN
+GLYPH_HERON_NAME,Heron,Garça
+GLYPH_HERON_PICTURE,"A tall bird with a long curved neck, standing on a single thin leg.","Uma ave alta de pescoço longo e curvo, apoiada em uma única perna fina."
+GLYPH_ANVIL_NAME,Anvil,Bigorna
+GLYPH_ANVIL_PICTURE,A heavy block with a pointed horn on one side and a narrow waist.,Um bloco pesado com uma ponta afilada de um lado e uma cintura estreita.
+GLYPH_KETTLE_NAME,Kettle,Chaleira
+GLYPH_KETTLE_PICTURE,A round-bellied pot with a short spout leaning out on one side and a loop on the other.,Um pote de barriga redonda com um bico curto inclinado para fora de um lado e uma alça do outro.
+GLYPH_LADDER_NAME,Ladder,Escada
+GLYPH_LADDER_PICTURE,"Two long rails leaning together, joined by short crossbars.","Dois trilhos longos inclinados, unidos por travessas curtas."
+GLYPH_KEY_NAME,Key,Chave
+GLYPH_KEY_PICTURE,"A small diamond-shaped loop on a long bar, with two short teeth hanging near the far end.","Uma pequena argola em losango presa a uma barra longa, com dois dentes curtos pendurados perto da ponta."
+GLYPH_CROWN_NAME,Crown,Coroa
+GLYPH_CROWN_PICTURE,A flat band with three tall points rising from it and a notch between each pair.,Uma faixa reta com três pontas altas se erguendo dela e um vão entre cada par.
+GLYPH_SAILBOAT_NAME,Sailboat,Veleiro
+GLYPH_SAILBOAT_PICTURE,A shallow boat with a tall pole and two triangles of cloth above it.,Um barco raso com um mastro alto e dois triângulos de pano acima dele.
+GLYPH_HAMMER_NAME,Hammer,Martelo
+GLYPH_HAMMER_PICTURE,"A long stick leaning to one side, with a heavy block across its top end.","Uma vara longa inclinada para um lado, com um bloco pesado atravessado na ponta de cima."
+GLYPH_TREE_NAME,Tree,Árvore
+GLYPH_TREE_PICTURE,"A single trunk that splits again and again as it climbs, each side reaching a different height.","Um único tronco que se divide e se divide de novo ao subir, cada lado chegando a uma altura diferente."
+GLYPH_SCORPION_NAME,Scorpion,Escorpião
+GLYPH_SCORPION_PICTURE,A low body with two pincers in front and a long tail curling up and over its back.,Um corpo baixo com duas pinças na frente e uma cauda longa que se enrola por cima das costas.
+GLYPH_FLAG_NAME,Flag,Bandeira
+GLYPH_FLAG_PICTURE,A tall upright line with a triangle pointing sideways from its upper part.,"Uma linha alta na vertical com um triângulo apontando para o lado, na parte de cima."
+GLYPH_BRIDGE_NAME,Bridge,Ponte
+GLYPH_BRIDGE_PICTURE,"A long flat road with two tall posts, and a sagging line strung between their tops.",Uma pista longa e plana com dois postes altos e uma linha frouxa esticada entre os topos.
+GLYPH_ARROW_NAME,Arrow,Flecha
+GLYPH_ARROW_PICTURE,"A straight line slanting upward, with a small open V at its upper end.","Uma linha reta inclinada para cima, com um pequeno V aberto na ponta de cima."
+GLYPH_FISH_NAME,Fish,Peixe
+GLYPH_FISH_PICTURE,A slim pointed body with a notched tail on one end and a lone spot near the other.,Um corpo esguio e pontudo com uma cauda entalhada numa ponta e um ponto solitário perto da outra.
+GLYPH_HOURGLASS_NAME,Hourglass,Ampulheta
+GLYPH_HOURGLASS_PICTURE,"Two triangles joined tip to tip, with a flat line across each far end.","Dois triângulos unidos pelas pontas, com uma linha reta em cada extremidade."
+GLYPH_ANCHOR_NAME,Anchor,Âncora
+GLYPH_ANCHOR_PICTURE,"A tall upright line crossed by a short bar near its top, with two long curved arms sweeping up from its foot.","Uma linha alta na vertical cruzada por uma barra curta perto do topo, com dois braços longos e curvos subindo a partir do pé."
+GLYPH_GOBLET_NAME,Goblet,Cálice
+GLYPH_GOBLET_PICTURE,A wide open top narrowing to a thin stem that stands on a flat foot.,Uma boca larga e aberta que se estreita numa haste fina apoiada em uma base plana.
+GLYPH_SPIDER_NAME,Spider,Aranha
+GLYPH_SPIDER_PICTURE,"A small centre with four long limbs, bent like knees, reaching out to each side.","Um pequeno centro com quatro membros longos, dobrados como joelhos, abertos para os lados."
+GLYPH_TENT_NAME,Tent,Tenda
+GLYPH_TENT_PICTURE,A tall triangle with one line dropped from its peak to the middle of its base.,Um triângulo alto com uma linha descendo do topo até o meio da base.
+GLYPH_CACTUS_NAME,Cactus,Cacto
+GLYPH_CACTUS_PICTURE,"A tall upright stroke with two shorter arms that bend upward, one on each side.","Um traço alto na vertical com dois braços mais curtos que dobram para cima, um de cada lado."
+GLYPH_EYE_NAME,Eye,Olho
+GLYPH_EYE_PICTURE,A wide pointed oval with a single dot at its centre.,Um oval largo e pontudo com um único ponto no centro.
+GLYPH_WHEEL_NAME,Wheel,Roda
+GLYPH_WHEEL_PICTURE,A ring with six corners and six straight lines running from its centre to each corner.,Um anel de seis cantos com seis linhas retas indo do centro até cada canto.
+GLYPH_DOORWAY_NAME,Doorway,Porta
+GLYPH_DOORWAY_PICTURE,A tall frame with a flat slab swung half open inside it and a dot near the slab's edge.,Uma moldura alta com uma placa plana entreaberta dentro dela e um ponto perto da borda da placa.
+GLYPH_HAND_NAME,Hand,Mão
+GLYPH_HAND_PICTURE,"Five lines fanning out from one point, with a single stem leading away below.","Cinco linhas se abrindo a partir de um ponto, com uma única haste saindo para baixo."
+GLYPH_BUTTERFLY_NAME,Butterfly,Borboleta
+GLYPH_BUTTERFLY_PICTURE,"Two pairs of pointed flaps, the upper pair larger, spread to either side of a short upright line.","Dois pares de abas pontudas, o de cima maior, abertos dos dois lados de uma linha curta na vertical."
+GLYPH_BOOMERANG_NAME,Boomerang,Bumerangue
+GLYPH_BOOMERANG_PICTURE,"Two arms of unequal length, joined at a wide bend.","Dois braços de comprimentos diferentes, unidos em uma curva aberta."
+GLYPH_FORK_NAME,Fork,Garfo
+GLYPH_FORK_PICTURE,"Three prongs on a curved base, with a long handle running down the middle.","Três dentes sobre uma base curva, com um cabo longo descendo pelo meio."
+GLYPH_MOUNTAIN_NAME,Mountain,Montanha
+GLYPH_MOUNTAIN_PICTURE,"A jagged line that climbs to two peaks of different heights, with a deep notch between them.","Uma linha irregular que sobe até dois picos de alturas diferentes, com um vão fundo entre eles."
+GLYPH_KITE_NAME,Kite,Pipa
+GLYPH_KITE_PICTURE,"A tilted diamond crossed by two lines, with a short zigzag trailing from its lower point.","Um losango inclinado cortado por duas linhas, com um pequeno zigue-zague saindo da ponta de baixo."
+GLYPH_WEDGE_NAME,Wedge,Cunha
+GLYPH_WEDGE_PICTURE,"A thin triangle lying flat, with a square corner at its lower right.","Um triângulo fino deitado, com um canto reto embaixo, à direita."
+GLYPH_DAGGER_NAME,Dagger,Adaga
+GLYPH_DAGGER_PICTURE,"A long diamond pointing downward, with a bar across its top and a stem above the bar.","Um losango longo apontando para baixo, com uma barra no topo e uma haste acima da barra."
+GLYPH_MOON_NAME,Moon,Lua
+GLYPH_MOON_PICTURE,"A thick curved sliver, rounded on the left and hollow on the right.","Uma faixa grossa e curva, arredondada à esquerda e oca à direita."
+GLYPH_BELL_NAME,Bell,Sino
+GLYPH_BELL_PICTURE,"A dome that flares wide at the bottom, with a small dot hanging inside.","Uma cúpula que se abre larga embaixo, com um pequeno ponto pendurado dentro."
+GLYPH_CHAIR_NAME,Chair,Cadeira
+GLYPH_CHAIR_PICTURE,A tall back leaning slightly away from a flat seat that rests on two upright supports.,"Um encosto alto, levemente inclinado para trás, preso a um assento plano apoiado em duas hastes verticais."
+GLYPH_CANDLE_NAME,Candle,Vela
+GLYPH_CANDLE_PICTURE,"A narrow upright block with a short line rising from the middle of its top, ending in a dot.",Um bloco estreito na vertical com uma linha curta subindo do meio do topo e terminando em um ponto.
+GLYPH_STAIRS_NAME,Stairs,Degraus
+GLYPH_STAIRS_PICTURE,A line that climbs in square steps from the lower left toward the upper right.,"Uma linha que sobe em ressaltos quadrados, do canto inferior esquerdo em direção ao superior direito."
