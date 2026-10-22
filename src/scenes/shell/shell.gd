@@ -47,6 +47,7 @@ func _ready() -> void:
 	_setup_debug_tools()
 	_start(GameState.new_game(_choose_seed()))
 	SimClock.pause()
+	_bind_views(_simulation)
 	var buttons: Array[Button] = get_focus_order()
 	_link_focus(buttons, view_switcher.get_tab_bar())
 	view_switcher.set_focus_above(buttons[0])
@@ -96,6 +97,7 @@ func quick_load() -> void:
 		return
 	var state: GameState = result.value
 	_start(state)
+	_bind_views(_simulation)
 	_show_toast(&"UI_LOADED")
 
 
@@ -128,13 +130,11 @@ func _choose_seed() -> int:
 	return int(Time.get_unix_time_from_system() * 1000.0)
 
 
-## Wraps [param state] in a Simulation with no systems, binds it to SimClock and passes it to
-## the views.
+## Wraps [param state] in a Simulation with no systems and binds it to SimClock.
 func _start(state: GameState) -> void:
 	_simulation = Simulation.new(state)
 	SimClock.start(_simulation)
 	time_bar.refresh()
-	view_switcher.setup(_simulation)
 
 
 ## Adds the debug overlay and keeps the flag button in debug builds; removes the button in
@@ -162,6 +162,12 @@ static func _link_focus(buttons: Array[Button], below: Control) -> void:
 		button.focus_next = next
 		button.focus_neighbor_top = NodePath(".")
 		button.focus_neighbor_bottom = button.get_path_to(below)
+
+
+## Passes [param simulation] to the game views. Called after each [method _start]: at start
+## and after a quick load.
+func _bind_views(simulation: Simulation) -> void:
+	view_switcher.setup(simulation)
 
 
 func _show_toast(key: StringName) -> void:
