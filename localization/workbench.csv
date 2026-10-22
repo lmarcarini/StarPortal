@@ -45,6 +45,7 @@ WORKBENCH_CANDIDATES_TOO_MANY,Narrow it to {limit} or fewer to list the addresse
 WORKBENCH_ENERGY,Lock energy: {energy} MWh,Energia de travamento: {energy} MWh
 WORKBENCH_IN_QUEUE,In the dial queue,Na fila de discagem
 WORKBENCH_SEND,Send to dial queue,Enviar à fila de discagem
+WORKBENCH_QUEUE_PENDING,Queuing…,Enfileirando…
 WORKBENCH_QUEUE_SENT,Sent to the dial queue.,Enviado à fila de discagem.
 WORKBENCH_QUEUE_ALREADY,That address is already in the dial queue.,Esse endereço já está na fila de discagem.
 WORKBENCH_QUEUE_FULL,The dial queue is full ({max} addresses).,A fila de discagem está cheia ({max} endereços).

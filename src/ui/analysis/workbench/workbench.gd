@@ -10,6 +10,10 @@ extends Control
 ## one has applied (the clock running) builds on that pending command, so quick edits are not
 ## lost. Click-to-pick is view-local state (WorkbenchPicker).
 ##
+## "Send to dial queue" reports "Sent" only once the address is in the queue: at once while
+## paused, else when dial_queue_changed shows it; a refusal at the tick arrives as
+## EventBus.command_rejected and is shown translated (SendTracker).
+##
 ## Focus: the root takes focus as one stop in the Analysis view; accept or down enters it (the
 ## first seal slot), and cancel drops a pick while focus is inside.
 ## Bible: gate-and-address-spec.md#player-tools,
@@ -35,6 +39,11 @@ var _picker: WorkbenchPicker = WorkbenchPicker.new()
 ## The last SetWorkbenchCommand submitted and not yet applied, or null.
 var _pending: SetWorkbenchCommand = null
 var _summary: CandidateSummary = CandidateSummary.new()
+## Sends accepted while the clock runs, waiting for their tick.
+var _sends: SendTracker = SendTracker.new()
+## True while this view's own submit() runs: its refusal comes back as the result, so the
+## command_rejected that also reports it is not matched to a waiting send.
+var _submitting_send: bool = false
 
 @onready var _count: CountDisplay = %Count
 @onready var _seals: SealRow = %SealRow
@@ -61,11 +70,13 @@ func _ready() -> void:
 func _enter_tree() -> void:
 	EventBus.workbench_changed.connect(_on_workbench_changed)
 	EventBus.dial_queue_changed.connect(_on_dial_queue_changed)
+	EventBus.command_rejected.connect(_on_command_rejected)
 
 
 func _exit_tree() -> void:
 	EventBus.workbench_changed.disconnect(_on_workbench_changed)
 	EventBus.dial_queue_changed.disconnect(_on_dial_queue_changed)
+	EventBus.command_rejected.disconnect(_on_command_rejected)
 
 
 func _notification(what: int) -> void:
@@ -100,6 +111,7 @@ func setup(simulation: Simulation) -> void:
 	_simulation = simulation
 	_pending = null
 	_picker.cancel()
+	_sends.clear()
 	if not is_node_ready():
 		return
 	_show_edit_message("")
@@ -152,8 +164,18 @@ func _on_workbench_changed() -> void:
 
 
 func _on_dial_queue_changed() -> void:
-	if _simulation != null:
-		_candidates.show_queue(_simulation.state.gate.dial_queue)
+	if _simulation == null:
+		return
+	_candidates.show_queue(_simulation.state.gate.dial_queue)
+	_sends.on_queue_changed(_simulation.state.gate.dial_queue)
+	_show_send_result()
+
+
+func _on_command_rejected(type: StringName, code: StringName) -> void:
+	if _simulation == null or type != QueueAddressCommand.TYPE or _submitting_send:
+		return
+	_sends.on_rejected(code, _simulation.state.gate.dial_queue)
+	_show_send_result()
 
 
 func _on_glyph_chosen(glyph: int) -> void:
@@ -216,8 +238,8 @@ func _on_origin_reset() -> void:
 	_submit(WorkbenchState.HOME_ORIGIN, _draft())
 
 
-func _on_remove_requested(index: int) -> void:
-	_edit(WorkbenchEdits.without_index(_draft(), index))
+func _on_remove_requested(constraint: AddressConstraint) -> void:
+	_edit(WorkbenchEdits.without(_draft(), constraint))
 
 
 func _on_clear_confirmed() -> void:
@@ -227,11 +249,33 @@ func _on_clear_confirmed() -> void:
 func _on_send_requested(address: GateAddress) -> void:
 	if _simulation == null or address == null:
 		return
+	_submitting_send = true
 	var result: CommandResult = _simulation.submit(QueueAddressCommand.create(address))
-	if result.is_ok:
+	_submitting_send = false
+	if not result.is_ok:
+		_show_send_message(result.error_code)
+	elif SendTracker.contains(_simulation.state.gate.dial_queue, address):
+		_show_send_message(SendTracker.SENT)
+	else:
+		_sends.add(address)
+		_show_send_result()
+
+
+## Shows "Queuing…" while a send waits for its tick, then the latest send's result.
+func _show_send_result() -> void:
+	if _sends.is_waiting():
+		_candidates.show_message(tr(&"WORKBENCH_QUEUE_PENDING"))
+		return
+	var outcome: StringName = _sends.take_result()
+	if not outcome.is_empty():
+		_show_send_message(outcome)
+
+
+func _show_send_message(outcome: StringName) -> void:
+	if outcome == SendTracker.SENT:
 		_candidates.show_message(tr(&"WORKBENCH_QUEUE_SENT"))
 		return
-	var key: StringName = QUEUE_MESSAGE_KEYS.get(result.error_code, &"WORKBENCH_QUEUE_FAILED")
+	var key: StringName = QUEUE_MESSAGE_KEYS.get(outcome, &"WORKBENCH_QUEUE_FAILED")
 	_candidates.show_message(tr(key).format({"max": QueueAddressCommand.MAX_QUEUE}))
 
 

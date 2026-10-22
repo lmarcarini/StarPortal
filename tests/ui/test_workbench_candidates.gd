@@ -121,6 +121,51 @@ func test_sky_chart_and_orderings_to_one_then_queue() -> void:
 	assert_str(_candidates().get_message()).is_equal("That address is already in the dial queue.")
 
 
+## While the clock runs a send only says "Queuing…" until its tick; two sends of the same
+## address in one tick end as "Sent" for the first and "already in the queue" for the second,
+## and the address is queued once.
+func test_two_sends_in_one_running_tick() -> void:
+	var target: GateAddress = _set_one_candidate()
+	_simulation.state.clock.mode = ClockState.Mode.RUNNING
+	var send: Button = _candidates().get_rows()[0].get_send_button()
+	await UiInput.key(send, KEY_ENTER)
+	assert_str(_candidates().get_message()).is_equal("Queuing…")
+	await UiInput.pad(send, JOY_BUTTON_A)
+	assert_str(_candidates().get_message()).is_equal("Queuing…")
+	assert_array(_simulation.state.gate.dial_queue).is_empty()
+	_simulation.advance_tick()
+	await UiInput.settle(_workbench)
+	assert_int(_simulation.state.gate.dial_queue.size()).is_equal(1)
+	assert_bool(_simulation.state.gate.dial_queue[0].equals(target)).is_true()
+	assert_str(_candidates().get_message()).is_equal("That address is already in the dial queue.")
+
+
+## While the clock runs, one send that applies at the tick shows "Sent" only then.
+func test_running_send_says_sent_at_its_tick() -> void:
+	_set_one_candidate()
+	_simulation.state.clock.mode = ClockState.Mode.RUNNING
+	await UiInput.pad(_candidates().get_rows()[0].get_send_button(), JOY_BUTTON_A)
+	assert_str(_candidates().get_message()).is_equal("Queuing…")
+	_simulation.advance_tick()
+	await UiInput.settle(_workbench)
+	assert_str(_candidates().get_message()).is_equal("Sent to the dial queue.")
+
+
+## While the clock runs, a send the tick refuses because the queue filled meanwhile shows the
+## translated refusal instead of "Sent".
+func test_running_send_refused_at_its_tick() -> void:
+	_set_one_candidate()
+	_simulation.state.clock.mode = ClockState.Mode.RUNNING
+	await UiInput.pad(_candidates().get_rows()[0].get_send_button(), JOY_BUTTON_A)
+	_fill_queue_directly()
+	_simulation.advance_tick()
+	await UiInput.settle(_workbench)
+	assert_int(_simulation.state.gate.dial_queue.size()).is_equal(QueueAddressCommand.MAX_QUEUE)
+	assert_str(_candidates().get_message()).is_equal(
+		"The dial queue is full (%d addresses)." % QueueAddressCommand.MAX_QUEUE
+	)
+
+
 ## A full queue rejects the send with a translated message.
 func test_full_queue_shows_its_message() -> void:
 	var target: GateAddress = Fixture.target_address(_simulation.state)
@@ -178,6 +223,24 @@ func _set_draft(constraints: Array[AddressConstraint]) -> void:
 		SetWorkbenchCommand.create(WorkbenchState.HOME_ORIGIN, constraints)
 	)
 	assert_bool(result.is_ok).is_true()
+
+
+## Sets a draft that leaves only the fixture's target address, and returns it.
+func _set_one_candidate() -> GateAddress:
+	var target: GateAddress = Fixture.target_address(_simulation.state)
+	var constraints: Array[AddressConstraint] = _chain(target.coordinates, 6)
+	constraints.append(AddressConstraint.exact_set(target.coordinates))
+	_set_draft(constraints)
+	assert_int(_candidates().get_rows().size()).is_equal(1)
+	return target
+
+
+## Fills the queue with addresses the workbench never sent, bypassing the command queue's
+## wait for a tick (test setup only).
+func _fill_queue_directly() -> void:
+	for filler: int in QueueAddressCommand.MAX_QUEUE:
+		var coordinates: Array[int] = [30, 31, 32, 33, 34, 35, filler]
+		_simulation.state.gate.dial_queue.append(GateAddress.create(coordinates, 29))
 
 
 func _chain(glyphs: Array[int], links: int) -> Array[AddressConstraint]:

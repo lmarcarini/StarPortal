@@ -54,7 +54,7 @@ func test_edits_never_change_their_input() -> void:
 	var before: Array = start.map(func(c: AddressConstraint) -> Dictionary: return c.to_dict())
 	WorkbenchEdits.toggled_excluded(start, HERON)
 	WorkbenchEdits.with_added(start, AddressConstraint.excluded(ANVIL))
-	WorkbenchEdits.without_index(start, 0)
+	WorkbenchEdits.without(start, AddressConstraint.included(HERON))
 	var after: Array = start.map(func(c: AddressConstraint) -> Dictionary: return c.to_dict())
 	assert_array(after).is_equal(before)
 	assert_object(WorkbenchEdits.copy(start)[0]).is_not_same(start[0])
@@ -98,11 +98,16 @@ func test_group_needs_exactly_seven_included() -> void:
 	)
 
 
-func test_without_index_ignores_out_of_range() -> void:
-	var one: Array[AddressConstraint] = [AddressConstraint.included(HERON)]
-	assert_int(WorkbenchEdits.without_index(one, 3).size()).is_equal(1)
-	assert_int(WorkbenchEdits.without_index(one, -1).size()).is_equal(1)
-	assert_array(WorkbenchEdits.without_index(one, 0)).is_empty()
+func test_without_removes_by_value() -> void:
+	var two: Array[AddressConstraint] = [
+		AddressConstraint.excluded(HERON), AddressConstraint.exact_set([6, 5, 4, 3, 2, 1, 0])
+	]
+	var no_set: Array[AddressConstraint] = WorkbenchEdits.without(
+		two, AddressConstraint.exact_set([0, 1, 2, 3, 4, 5, 6])
+	)
+	assert_int(no_set.size()).is_equal(1)
+	assert_bool(no_set[0].equals(AddressConstraint.excluded(HERON))).is_true()
+	assert_int(WorkbenchEdits.without(two, AddressConstraint.excluded(ANVIL)).size()).is_equal(2)
 
 
 func test_picker_modes() -> void:
@@ -145,3 +150,23 @@ func test_describe_uses_glyph_names_in_both_locales() -> void:
 	assert_str(WorkbenchText.describe(AddressConstraint.glyph_not_at(3, HERON), tr)).is_equal(
 		"Garça não está no selo 3"
 	)
+
+
+func test_send_tracker_matches_refusals_to_waiting_sends() -> void:
+	var a: GateAddress = GateAddress.create([1, 2, 3, 4, 5, 6, 7], 0)
+	var b: GateAddress = GateAddress.create([7, 6, 5, 4, 3, 2, 1], 0)
+	var tracker := SendTracker.new()
+	tracker.add(a)
+	tracker.add(a)
+	var queue: Array[GateAddress] = [a]
+	tracker.on_rejected(&"already_queued", queue)
+	assert_bool(tracker.is_waiting()).is_true()
+	assert_str(String(tracker.take_result())).is_empty()
+	tracker.on_queue_changed(queue)
+	assert_str(String(tracker.take_result())).is_equal("already_queued")
+	tracker.add(a)
+	tracker.add(b)
+	tracker.on_rejected(&"queue_full", queue)
+	tracker.on_queue_changed(queue)
+	assert_str(String(tracker.take_result())).is_equal("queue_full")
+	assert_bool(tracker.is_waiting()).is_false()
