@@ -4,4 +4,18 @@
 
 [resource]
 script = ExtResource("1_wdgbq")
+lock_energy_base_mwh = 300.0
+lock_reference_distance_ly = 10000.0
+seal_multiplier_8 = 1.0
+seal_multiplier_9 = 25.0
+seal_multiplier_10 = 400.0
+open_drain_mw_8 = 20.0
+open_drain_mw_9 = 200.0
+starting_plant_output_mw = 30.0
+starting_capacity_mwh = 400.0
+cost_fraction_no_gate = 0.1
+cost_fraction_blocked = 0.25
+cost_fraction_origin_rejected = 0.25
+dial_duration_ticks = 2
+max_open_ticks = 60
 id = &"balance"
