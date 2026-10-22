@@ -6,7 +6,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 3
+const TARGET_VERSION: int = 4
 
 ## v3 defaults as ExactFloat strings, frozen here: 0.0, 400.0 and 30.0.
 const _EXACT_ZERO: String = "0000000000000000"
@@ -17,7 +17,7 @@ const _EXACT_30: String = "403e000000000000"
 ## Returns the built-in steps, keyed by the version they migrate from. Version 1 is the
 ## first format. (A function, not a constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
-	var built_in: Dictionary[int, Callable] = {1: _v1_to_v2, 2: _v2_to_v3}
+	var built_in: Dictionary[int, Callable] = {1: _v1_to_v2, 2: _v2_to_v3, 3: _v3_to_v4}
 	return built_in
 
 
@@ -139,3 +139,24 @@ static func _v2_base_seed(state_data: Dictionary) -> int:
 		var text: String = base_seed
 		return text.to_int()
 	return type_convert(base_seed, TYPE_INT)
+
+
+## v3 -> v4: adds the "intel" and "workbench" sections with the v4 defaults, written here
+## as literals so later changes to the game's defaults never change this step: no clues,
+## notes or scheduled dossiers, both counters at 1, and an empty Workbench draft using the
+## home Ring's origin (-1). Data with no state object is left as is, for validation to
+## reject.
+static func _v3_to_v4(data: Dictionary) -> Dictionary:
+	var state: Variant = data.get("state")
+	if not state is Dictionary:
+		return data
+	var state_data: Dictionary = state
+	state_data["intel"] = {
+		"clues": [],
+		"notes": {},
+		"next_clue_number": 1,
+		"next_dossier_number": 1,
+		"scheduled_dossiers": {},
+	}
+	state_data["workbench"] = {"origin_glyph": -1, "constraints": []}
+	return data
