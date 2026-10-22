@@ -189,12 +189,7 @@ func _text_of(clue: ClueRecord) -> String:
 
 
 func _update_filter(intel: IntelState) -> void:
-	var tags: Array[String] = []
-	for clue: ClueRecord in intel.clues:
-		for tag: String in intel.note_for(clue.id).tags:
-			if not tags.has(tag):
-				tags.append(tag)
-	tags.sort()
+	var tags: Array[String] = NoteEdits.all_tags(intel)
 	if not tags.has(_filter_tag):
 		_filter_tag = ""
 	_filter_button.clear()
@@ -247,11 +242,7 @@ func _show_detail(clue_id: StringName) -> void:
 	var record: ClueRecord = intel.get_clue(clue_id)
 	var note: ClueNote = intel.note_for(clue_id)
 	var link_texts: Dictionary[StringName, String] = {}
-	var linked: Array[StringName] = note.links.duplicate()
-	for other: ClueRecord in intel.clues:
-		if intel.note_for(other.id).links.has(clue_id) and not linked.has(other.id):
-			linked.append(other.id)
-	for other_id: StringName in linked:
+	for other_id: StringName in NoteEdits.linked_ids(intel, clue_id):
 		var other: ClueRecord = intel.get_clue(other_id)
 		if other != null:
 			link_texts[other_id] = _text_of(other).left(_LINK_TEXT_LENGTH)
@@ -359,9 +350,7 @@ func _commit_position(clue_id: StringName) -> void:
 	if dropped_at == _positions[clue_id]:
 		_cards[clue_id].position = Vector2(dropped_at)
 		return
-	var note: ClueNote = ClueNote.from_dict(_simulation.state.intel.note_for(clue_id).to_dict())
-	note.board_position = dropped_at
-	_submit_note(clue_id, note)
+	_submit_note(clue_id, NoteEdits.moved(_simulation.state.intel, clue_id, dropped_at))
 
 
 # A link lives on one note, the first card's, so linking is one command. Nothing happens when
@@ -381,14 +370,9 @@ func _on_unlink_requested(clue_id: StringName, other_id: StringName) -> void:
 
 # Submits the note of [param clue_id] with a link to [param other_id] added or removed.
 func _set_link(clue_id: StringName, other_id: StringName, linked: bool) -> void:
-	var note: ClueNote = ClueNote.from_dict(_simulation.state.intel.note_for(clue_id).to_dict())
-	if note.links.has(other_id) == linked:
-		return
-	if linked:
-		note.links.append(other_id)
-	else:
-		note.links.erase(other_id)
-	_submit_note(clue_id, note)
+	var note: ClueNote = NoteEdits.relinked(_simulation.state.intel, clue_id, other_id, linked)
+	if note != null:
+		_submit_note(clue_id, note)
 
 
 func _submit_note(clue_id: StringName, note: ClueNote) -> void:
