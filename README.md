@@ -63,6 +63,35 @@ checked against the `SHA512-SUMS.txt` of the same `godotengine/godot-builds` rel
 run (cached or not), before Godot is started. A newer push to a pull request cancels its older
 run; runs for pushes to `main` (`ci` and `soak`) are never cancelled.
 
+## Tools
+
+Headless content tools live in `tools/` (run from the project root; `tools/` is for development
+only: no game file refers to it, and a test checks that).
+
+- **Content validator:** `GODOT_BIN=/path/to/godot scripts/validate.sh` checks the Registry, the 36
+  glyphs (indices, translation keys in `glyphs.csv`, constellations), the home anchor field (36
+  anchors within the coordinate bounds, at least 2,500 ly apart), CAIRN and the authored worlds
+  (origin glyphs, unique addresses from every origin), the balance tunables, and, for galaxy seeds
+  1..20, the generator (early reach, unique addresses) and generated dossiers (candidates left
+  within 1..20 at least 95% of the time, clue keys in `clues.csv`). It prints one line per
+  problem and exits non-zero on any; the run takes about 10 seconds and prints its timing. CI runs
+  it after the tests.
+- **Clue Solver:** counts the candidate addresses a dossier leaves, for tuning.
+
+  ```sh
+  godot --headless --path . --script tools/clue_solver.gd -- --seed 7 --world R-0042 --list 10
+  godot --headless --path . --script tools/clue_solver.gd -- --constraints clues.json
+  ```
+
+  The first form prints the world's designation and address from the home Ring, then each clue
+  of a fresh dossier (kind, text key, arguments, constraints) and the candidates left after each;
+  `--list <n>` also prints up to n remaining candidates. The second counts a JSON list of
+  constraints (`{"kind": "glyph_at", "seal": 2, "glyphs": [14]}`, as `AddressConstraint.to_dict()`
+  writes them), optionally from another origin with `--origin <glyph>`. A malformed file is
+  rejected with the position of the problem.
+- **Export:** the project has no `export_presets.cfg` yet. When export presets are added, their
+  exclude filter must list `tools/*` (and a test fails if a preset file exists without it).
+
 ## Translations
 
 All visible text comes from translation tables, one CSV per area in `localization/` (`core`,
