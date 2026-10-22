@@ -45,7 +45,7 @@ func _ready() -> void:
 	_quick_load_button.pressed.connect(quick_load)
 	_toast_timer.timeout.connect(_toast.hide)
 	_setup_debug_tools()
-	_start(GameState.new_game(_choose_seed(), Registry.balance()))
+	_start(GameState.new_game(_choose_seed(), Registry.balance()), true)
 	SimClock.pause()
 	_bind_views(_simulation)
 	var buttons: Array[Button] = get_focus_order()
@@ -133,10 +133,14 @@ func _choose_seed() -> int:
 
 
 ## Builds the Simulation for [param state] through GameSetup, from the Registry's content,
-## and binds it to SimClock. Returns false, keeping the running game, when the state cannot
-## be set up (e.g. a save from another galaxy generator version).
-func _start(state: GameState) -> bool:
-	var built: Result = GameSetup.build(state, GameDefs.from_registry(Registry))
+## and binds it to SimClock; a [param is_new_game] also plans the opening dossiers. Returns
+## false, keeping the running game, when the state cannot be set up (e.g. a save from another
+## galaxy generator version).
+func _start(state: GameState, is_new_game: bool = false) -> bool:
+	var defs: GameDefs = GameDefs.from_registry(Registry)
+	var built: Result = (
+		GameSetup.build_new(state, defs) if is_new_game else GameSetup.build(state, defs)
+	)
 	if not built.is_ok:
 		push_warning("Shell: cannot set up the game: %s %s" % [built.error_code, built.detail])
 		return false
