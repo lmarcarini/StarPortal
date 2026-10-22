@@ -19,6 +19,7 @@ signal closed
 
 var _clue_id: StringName = &""
 var _note: ClueNote = ClueNote.new()
+var _link_ids: Array[StringName] = []
 
 @onready var _grade_label: Label = %GradeLabel
 @onready var _source_label: Label = %SourceLabel
@@ -51,12 +52,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 ## Shows clue [param record] with the filled-in [param text] and the player's [param note].
-## [param link_texts] maps each linked clue id to the text to show for it.
+## [param link_texts] maps each linked clue id, in the order to show them, to its text; a link
+## may sit on either clue's note, so the panel lists what the board gives it.
 func show_clue(
 	record: ClueRecord, text: String, note: ClueNote, link_texts: Dictionary[StringName, String]
 ) -> void:
+	var slot: Vector2i = _focused_slot()
 	_clue_id = record.id
 	_note = ClueNote.from_dict(note.to_dict())
+	_link_ids.assign(link_texts.keys())
 	_grade_label.text = ClueCard.grade_letter(record.grade)
 	_source_label.text = tr(&"BOARD_DETAIL_SOURCE").format({"source": tr(record.source_key)})
 	_date_label.text = tr(&"BOARD_DETAIL_DATE").format(
@@ -68,6 +72,7 @@ func show_clue(
 	_fill_tags()
 	_fill_links(link_texts)
 	show()
+	_restore_focus(slot)
 
 
 ## Returns the id of the clue shown.
@@ -92,7 +97,7 @@ func get_tag_texts() -> Array[String]:
 
 ## Returns the ids of the linked clues shown, in order.
 func get_link_ids() -> Array[StringName]:
-	return _note.links.duplicate()
+	return _link_ids.duplicate()
 
 
 ## Returns the button that marks or clears the suspect mark.
@@ -133,7 +138,7 @@ func _fill_tags() -> void:
 
 func _fill_links(link_texts: Dictionary[StringName, String]) -> void:
 	_clear(_links_box)
-	for other_id: StringName in _note.links:
+	for other_id: StringName in _link_ids:
 		var row: HBoxContainer = HBoxContainer.new()
 		var label: Label = Label.new()
 		label.text = link_texts.get(other_id, String(other_id))
@@ -145,6 +150,35 @@ func _fill_links(link_texts: Dictionary[StringName, String]) -> void:
 		row.add_child(label)
 		row.add_child(unlink)
 		_links_box.add_child(row)
+
+
+# Which row of the tags or links holds focus: x is 1 for tags, 2 for links, 0 for neither.
+func _focused_slot() -> Vector2i:
+	var focused: Control = get_viewport().gui_get_focus_owner() if is_inside_tree() else null
+	if focused == null:
+		return Vector2i.ZERO
+	for kind: int in 2:
+		var box: Container = _tags_box if kind == 0 else _links_box
+		for index: int in box.get_child_count():
+			if box.get_child(index).is_ancestor_of(focused) or box.get_child(index) == focused:
+				return Vector2i(kind + 1, index)
+	return Vector2i.ZERO
+
+
+# Rebuilding frees the row that had focus; put focus on the row that took its place, else on
+# the tag field (tags) or the suspect button (links).
+func _restore_focus(slot: Vector2i) -> void:
+	if slot.x == 0:
+		return
+	var box: Container = _tags_box if slot.x == 1 else _links_box
+	if box.get_child_count() > 0:
+		var row: Node = box.get_child(mini(slot.y, box.get_child_count() - 1))
+		var target: Control = row if row is Button else row.get_child(row.get_child_count() - 1)
+		target.grab_focus()
+	elif slot.x == 1:
+		_tag_edit.grab_focus()
+	else:
+		_suspect_button.grab_focus()
 
 
 func _clear(box: Container) -> void:

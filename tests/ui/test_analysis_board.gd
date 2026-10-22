@@ -191,13 +191,16 @@ func test_link_and_unlink_without_a_mouse() -> void:
 	_accept(THIRD)
 	assert_int(_board.get_mode()).is_equal(AnalysisBoard.Mode.BROWSE)
 	assert_array(_note(FIRST).links).is_equal([THIRD])
-	assert_array(_note(THIRD).links).is_equal([FIRST])
+	assert_array(_note(THIRD).links).is_empty()
 	assert_int(_board.get_link_layer().get_segments().size()).is_equal(2)
-	_accept(FIRST)
-	assert_array(_board.get_detail().get_link_ids()).is_equal([THIRD])
+	_accept(THIRD)
+	assert_array(_board.get_detail().get_link_ids()).is_equal([FIRST])
+	var changes: Array[StringName] = []
+	EventBus.clue_note_changed.connect(func(id: StringName) -> void: changes.append(id))
 	var unlink: Button = _button(_board.get_detail(), "BOARD_UNLINK")
 	assert_object(unlink).is_not_null()
 	unlink.pressed.emit()
+	assert_array(changes).is_equal([FIRST])
 	assert_array(_note(FIRST).links).is_empty()
 	assert_array(_note(THIRD).links).is_empty()
 	assert_int(_board.get_link_layer().get_segments().size()).is_equal(0)
@@ -282,7 +285,7 @@ func test_notes_survive_save_and_load() -> void:
 	assert_bool(card.shows_suspect()).is_true()
 	assert_array(card.get_chip_texts()).is_equal(["keep"])
 	assert_object(card.position).is_equal(Vector2(_note(FIRST).board_position))
-	assert_array(_note(FIRST).links).is_equal([SECOND])
+	assert_array(_note(SECOND).links).is_equal([FIRST])
 	assert_int(_board.get_link_layer().get_segments().size()).is_equal(2)
 
 
@@ -343,3 +346,75 @@ func test_sixty_cards_stay_smooth() -> void:
 		times.append((Time.get_ticks_usec() - started) / 1000.0)
 	print("AnalysisBoard, 60 cards: frame times in ms ", times)
 	assert_float(times.max()).is_less(1000.0)
+
+
+## Linking is one command, on the first card's note; linking the pair again changes nothing.
+func test_link_is_one_command() -> void:
+	var changes: Array[StringName] = []
+	EventBus.clue_note_changed.connect(func(id: StringName) -> void: changes.append(id))
+	_accept(FIRST)
+	_board.get_detail().get_link_button().pressed.emit()
+	_accept(SECOND)
+	assert_array(changes).is_equal([FIRST])
+	_accept(SECOND)
+	_board.get_detail().get_link_button().pressed.emit()
+	_accept(FIRST)
+	assert_array(changes).is_equal([FIRST])
+
+
+## A move that ends where it started submits nothing.
+func test_move_that_ends_in_place_submits_nothing() -> void:
+	var changes: Array[StringName] = []
+	EventBus.clue_note_changed.connect(func(id: StringName) -> void: changes.append(id))
+	var card: ClueCard = _board.get_card(SECOND)
+	_accept(SECOND)
+	_board.get_detail().get_move_button().pressed.emit()
+	_press(card, &"ui_right")
+	_press(card, &"ui_left")
+	_press(card, &"ui_accept")
+	assert_array(changes).is_empty()
+	assert_int(_board.get_mode()).is_equal(AnalysisBoard.Mode.BROWSE)
+
+
+## Tab (focus_next) walks the cards in arrival order.
+func test_focus_next_walks_cards_in_arrival_order() -> void:
+	var ids: Array[StringName] = _board.get_card_ids()
+	for index: int in ids.size() - 1:
+		var next: Control = _board.get_card(ids[index]).find_next_valid_focus()
+		assert_object(next).is_same(_board.get_card(ids[index + 1]))
+
+
+## After removing a tag by keyboard or gamepad, focus moves to the next chip, then the
+## previous one, then the tag field: never nowhere.
+func test_focus_survives_removing_tags() -> void:
+	_accept(FIRST)
+	var detail: ClueDetail = _board.get_detail()
+	var edit: LineEdit = detail.get_tag_edit()
+	for tag: String in ["a", "b"]:
+		edit.text = tag
+		edit.text_submitted.emit(tag)
+	var first_chip: Button = _button(detail, "a ×")
+	first_chip.grab_focus()
+	first_chip.pressed.emit()
+	await await_idle_frame()
+	var owner_now: Button = get_viewport().gui_get_focus_owner() as Button
+	assert_object(owner_now).is_same(_button(detail, "b ×"))
+	owner_now.pressed.emit()
+	await await_idle_frame()
+	assert_object(get_viewport().gui_get_focus_owner()).is_same(edit)
+
+
+## After unlinking, focus stays inside the panel.
+func test_focus_survives_unlinking() -> void:
+	_accept(FIRST)
+	_board.get_detail().get_link_button().pressed.emit()
+	_accept(SECOND)
+	_accept(FIRST)
+	var detail: ClueDetail = _board.get_detail()
+	var unlink: Button = _button(detail, "BOARD_UNLINK")
+	unlink.grab_focus()
+	unlink.pressed.emit()
+	await await_idle_frame()
+	var owner_now: Control = get_viewport().gui_get_focus_owner()
+	assert_object(owner_now).is_not_null()
+	assert_bool(detail.is_ancestor_of(owner_now)).is_true()

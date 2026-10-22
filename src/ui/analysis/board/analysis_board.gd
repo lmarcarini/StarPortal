@@ -15,10 +15,9 @@ enum Mode { BROWSE, MOVE, LINK }
 
 ## Board zoom levels, widest first.
 const ZOOM_LEVELS: Array[float] = [1.0, 0.6]
+
 const _CARD_SCENE: PackedScene = preload("res://src/ui/analysis/board/clue_card.tscn")
-## Longest linked-clue text shown in the detail panel, in characters.
-## Width of the outline drawn on the board when it has focus.
-const FOCUS_WIDTH: float = 3.0
+# Longest linked-clue text shown in the detail panel, in characters.
 const _LINK_TEXT_LENGTH: int = 60
 
 var _simulation: Simulation = null
@@ -28,8 +27,7 @@ var _zoom_index: int = 0
 var _filter_tag: String = ""
 var _cards: Dictionary[StringName, ClueCard] = {}
 var _positions: Dictionary[StringName, Vector2i] = {}
-var _glyph_names: Array[String] = []
-var _picture_texts: Array[String] = []
+var _glyphs: GlyphTables = GlyphTables.new()
 
 @onready var _filter_button: OptionButton = %FilterButton
 @onready var _zoom_button: Button = %ZoomButton
@@ -76,7 +74,7 @@ func _notification(what: int) -> void:
 func _draw() -> void:
 	if has_focus():
 		var color: Color = get_theme_color(&"font_color", &"Label")
-		draw_rect(Rect2(Vector2.ZERO, size), color, false, FOCUS_WIDTH)
+		draw_rect(Rect2(Vector2.ZERO, size), color, false, ClueCard.FOCUS_WIDTH)
 
 
 # The board itself is the view's focus target: Accept steps into the cards, Cancel steps back.
@@ -151,7 +149,7 @@ func _refresh() -> void:
 	if _simulation == null:
 		return
 	var intel: IntelState = _simulation.state.intel
-	_rebuild_glyph_tables()
+	_glyphs = GlyphTables.build()
 	_positions = BoardLayout.positions(intel)
 	_sync_cards(intel)
 	_update_filter(intel)
@@ -159,17 +157,6 @@ func _refresh() -> void:
 	_empty_label.visible = intel.clues.is_empty()
 	if _detail.visible and intel.get_clue(_detail.get_clue_id()) != null:
 		_show_detail(_detail.get_clue_id())
-
-
-func _rebuild_glyph_tables() -> void:
-	_glyph_names.clear()
-	_picture_texts.clear()
-	for index: int in GateAddress.GLYPH_COUNT:
-		var glyph: GlyphDef = (
-			Registry.get_def(StringName(GlyphIcon.GLYPH_ID_FORMAT % index)) as GlyphDef
-		)
-		_glyph_names.append(tr(glyph.name_key) if glyph != null else "")
-		_picture_texts.append(tr(glyph.picture_key) if glyph != null else "")
 
 
 func _sync_cards(intel: IntelState) -> void:
@@ -198,7 +185,7 @@ func _make_card() -> ClueCard:
 
 
 func _text_of(clue: ClueRecord) -> String:
-	return ClueText.format(tr(clue.text_key), clue.text_args, _glyph_names, _picture_texts)
+	return ClueText.format(tr(clue.text_key), clue.text_args, _glyphs.names, _glyphs.pictures)
 
 
 func _update_filter(intel: IntelState) -> void:
@@ -260,7 +247,11 @@ func _show_detail(clue_id: StringName) -> void:
 	var record: ClueRecord = intel.get_clue(clue_id)
 	var note: ClueNote = intel.note_for(clue_id)
 	var link_texts: Dictionary[StringName, String] = {}
-	for other_id: StringName in note.links:
+	var linked: Array[StringName] = note.links.duplicate()
+	for other: ClueRecord in intel.clues:
+		if intel.note_for(other.id).links.has(clue_id) and not linked.has(other.id):
+			linked.append(other.id)
+	for other_id: StringName in linked:
 		var other: ClueRecord = intel.get_clue(other_id)
 		if other != null:
 			link_texts[other_id] = _text_of(other).left(_LINK_TEXT_LENGTH)
@@ -359,19 +350,30 @@ func _end_mode() -> void:
 		_cards[_active_id].grab_focus()
 
 
-# Submits the dropped position of card [param clue_id], kept on the board.
+# Submits the dropped position of card [param clue_id], kept on the board; a card dropped
+# where it already was submits nothing.
 func _commit_position(clue_id: StringName) -> void:
+	var dropped_at: Vector2i = BoardLayout.clamp_position(
+		Vector2i(_cards[clue_id].position.round())
+	)
+	if dropped_at == _positions[clue_id]:
+		_cards[clue_id].position = Vector2(dropped_at)
+		return
 	var note: ClueNote = ClueNote.from_dict(_simulation.state.intel.note_for(clue_id).to_dict())
-	note.board_position = BoardLayout.clamp_position(Vector2i(_cards[clue_id].position.round()))
+	note.board_position = dropped_at
 	_submit_note(clue_id, note)
 
 
-# Links two cards both ways, so either card's panel shows the link.
+# A link lives on one note, the first card's, so linking is one command. Nothing happens when
+# the two cards are already linked, whichever note holds it.
 func _link(first: StringName, second: StringName) -> void:
+	var intel: IntelState = _simulation.state.intel
+	if intel.note_for(second).links.has(first):
+		return
 	_set_link(first, second, true)
-	_set_link(second, first, true)
 
 
+# Unlinking edits whichever note holds the link: one command.
 func _on_unlink_requested(clue_id: StringName, other_id: StringName) -> void:
 	_set_link(clue_id, other_id, false)
 	_set_link(other_id, clue_id, false)
