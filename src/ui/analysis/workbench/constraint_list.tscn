@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/analysis/workbench/constraint_list.gd" id="1_list"]
+
+[node name="ConstraintList" type="VBoxContainer"]
+size_flags_horizontal = 3
+script = ExtResource("1_list")
+
+[node name="Header" type="Label" parent="."]
+layout_mode = 2
+text = "WORKBENCH_CONSTRAINTS_HEADER"
+autowrap_mode = 3
+
+[node name="Empty" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "WORKBENCH_CONSTRAINTS_EMPTY"
+autowrap_mode = 3
+
+[node name="Rows" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ClearAll" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "WORKBENCH_CLEAR_ALL"
+autowrap_mode = 3
+
+[node name="ClearDialog" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 2
+dialog_autowrap = true

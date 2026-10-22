@@ -1,6 +1,12 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/ui/analysis/workbench/workbench.gd" id="1_workbench"]
+[ext_resource type="PackedScene" path="res://src/ui/analysis/workbench/count_display.tscn" id="2_count"]
+[ext_resource type="PackedScene" path="res://src/ui/analysis/workbench/seal_row.tscn" id="3_seals"]
+[ext_resource type="PackedScene" path="res://src/ui/analysis/workbench/action_bar.tscn" id="4_actions"]
+[ext_resource type="PackedScene" path="res://src/ui/analysis/workbench/glyph_palette.tscn" id="5_palette"]
+[ext_resource type="PackedScene" path="res://src/ui/analysis/workbench/constraint_list.tscn" id="6_constraints"]
+[ext_resource type="PackedScene" path="res://src/ui/analysis/workbench/candidate_list.tscn" id="7_candidates"]
 
 [node name="Workbench" type="Control"]
 layout_mode = 3
@@ -12,13 +18,64 @@ grow_vertical = 2
 focus_mode = 2
 script = ExtResource("1_workbench")
 
-[node name="Title" type="Label" parent="."]
+[node name="Scroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = -16.0
-offset_bottom = 56.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
 grow_horizontal = 2
+grow_vertical = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Scroll/Content"]
+layout_mode = 2
 text = "WORKBENCH_TITLE"
+autowrap_mode = 3
+
+[node name="Count" parent="Scroll/Content" instance=ExtResource("2_count")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SealRow" parent="Scroll/Content" instance=ExtResource("3_seals")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Hint" type="Label" parent="Scroll/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+auto_translate_mode = 2
+autowrap_mode = 3
+
+[node name="ActionBar" parent="Scroll/Content" instance=ExtResource("4_actions")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EditMessage" type="Label" parent="Scroll/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+auto_translate_mode = 2
+autowrap_mode = 3
+
+[node name="Palette" parent="Scroll/Content" instance=ExtResource("5_palette")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Constraints" parent="Scroll/Content" instance=ExtResource("6_constraints")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Candidates" parent="Scroll/Content" instance=ExtResource("7_candidates")]
+unique_name_in_owner = true
+layout_mode = 2

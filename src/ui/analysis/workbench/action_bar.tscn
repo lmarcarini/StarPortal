@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/analysis/workbench/action_bar.gd" id="1_bar"]
+
+[node name="ActionBar" type="HFlowContainer"]
+size_flags_horizontal = 3
+script = ExtResource("1_bar")
+
+[node name="RuleOut" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "WORKBENCH_ACTION_RULE_OUT"
+
+[node name="NotAt" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "WORKBENCH_ACTION_NOT_AT"
+
+[node name="Include" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "WORKBENCH_ACTION_INCLUDE"
+
+[node name="Nearer" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "WORKBENCH_ACTION_NEARER"
+
+[node name="Group" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "WORKBENCH_ACTION_GROUP"
+
+[node name="Cancel" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "WORKBENCH_ACTION_CANCEL"
