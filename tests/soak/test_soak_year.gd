@@ -2,6 +2,9 @@
 ## Simulation.advance_tick() directly. One run is uninterrupted; the other saves at every
 ## month close, loads the save into a new Simulation and carries on with the loaded copy.
 ## Both must end with the same to_dict(), which catches any state to_dict() forgets.
+## Both runs are built by GameSetup from the real data/ content, so PowerSystem and
+## GateSystem tick all year (and are rebuilt with the galaxy after every load); stored power
+## must stay within 0..capacity on every tick.
 ## Run with scripts/soak.sh; scripts/test.sh skips this folder.
 ## Bible: technical-architecture.md#testing-and-tooling (Soak test),
 ## technical-architecture.md#save-system
@@ -24,6 +27,7 @@ const SLOT: StringName = &"soak_month"
 const BUDGET_MSEC: int = 60000
 
 var _service: SaveServiceScript
+var _defs: GameDefs
 var _uninterrupted: SoakRun
 var _reloaded: SoakRun
 
@@ -46,10 +50,21 @@ class SoakRun:
 	var switches: int = 0
 	## True from a month_closed event until the run handles it after the tick.
 	var month_close_pending: bool = false
+	## Ticks after which stored power was below 0 or above the capacity.
+	var power_out_of_bounds: int = 0
 
-	## Starts a run on a new game seeded with [param base_seed].
-	func _init(base_seed: int) -> void:
-		attach(Simulation.new(GameState.new_game(base_seed)))
+	## Starts a run on a new game seeded with [param base_seed], built by GameSetup from
+	## [param defs].
+	func _init(base_seed: int, defs: GameDefs) -> void:
+		var built: Result = GameSetup.build(GameState.new_game(base_seed, defs.balance), defs)
+		var first: Simulation = built.value
+		attach(first)
+
+	## Counts the tick just run when stored power left 0..capacity.
+	func check_power() -> void:
+		var power: PowerState = simulation.state.power
+		if power.stored_mwh < 0.0 or power.stored_mwh > power.capacity_mwh:
+			power_out_of_bounds += 1
 
 	## Makes [param next] the simulation this run plays and listens to its signals.
 	func attach(next: Simulation) -> void:
@@ -72,6 +87,7 @@ class SoakRun:
 func before_test() -> void:
 	_service = SaveServiceScript.new()
 	_service.saves_dir = "user://soak_saves_%d_%d" % [Time.get_ticks_usec(), get_instance_id()]
+	_defs = GameDefs.from_registry(Registry)
 
 
 func after_test() -> void:
@@ -116,9 +132,9 @@ func _summary(elapsed_msec: int) -> String:
 
 
 func _play_both_runs() -> void:
-	_uninterrupted = SoakRun.new(SEED)
+	_uninterrupted = SoakRun.new(SEED, _defs)
 	_play(_uninterrupted, false)
-	_reloaded = SoakRun.new(SEED)
+	_reloaded = SoakRun.new(SEED, _defs)
 	_play(_reloaded, true)
 
 
@@ -132,6 +148,7 @@ func _play(run: SoakRun, reload_each_month: bool) -> void:
 		if run.simulation.state.clock.is_paused:
 			continue
 		run.simulation.advance_tick()
+		run.check_power()
 		if not run.month_close_pending:
 			continue
 		run.month_close_pending = false
@@ -150,7 +167,9 @@ func _reload(run: SoakRun) -> void:
 	var original: Simulation = run.simulation
 	var loaded_state: GameState = loaded.value
 	assert_bool(loaded_state == run.simulation.state).is_false()
-	var copy := Simulation.new(loaded_state)
+	var built: Result = GameSetup.build(loaded_state, _defs)
+	assert_bool(built.is_ok).override_failure_message(str(built.error_code)).is_true()
+	var copy: Simulation = built.value
 	assert_dict(copy.state.to_dict()).is_equal(before)
 	run.attach(copy)
 	assert_object(run.simulation).is_same(copy)
@@ -169,6 +188,10 @@ func _assert_run_events(
 	assert_array(run.months_closed).is_equal(expected_closes)
 	assert_array(run.rejections).is_empty()
 	assert_int(run.simulation.state.clock.tick).is_equal(YEAR_TICKS)
+	assert_int(run.power_out_of_bounds).is_equal(0)
+	var power: PowerState = run.simulation.state.power
+	assert_float(power.stored_mwh).is_equal(power.capacity_mwh)
+	assert_float(power.capacity_mwh).is_equal(_defs.balance.starting_capacity_mwh)
 	var commands: int = run.bot.commands_submitted
 	assert_int(commands).is_between(15 * YEAR_DAYS, 25 * YEAR_DAYS)
 	assert_int(run.bot.commands_while_paused).is_greater(0)

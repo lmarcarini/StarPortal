@@ -45,7 +45,7 @@ func _ready() -> void:
 	_quick_load_button.pressed.connect(quick_load)
 	_toast_timer.timeout.connect(_toast.hide)
 	_setup_debug_tools()
-	_start(GameState.new_game(_choose_seed()))
+	_start(GameState.new_game(_choose_seed(), Registry.balance()))
 	SimClock.pause()
 	_bind_views(_simulation)
 	var buttons: Array[Button] = get_focus_order()
@@ -96,7 +96,9 @@ func quick_load() -> void:
 		_show_toast(&"UI_LOAD_FAILED")
 		return
 	var state: GameState = result.value
-	_start(state)
+	if not _start(state):
+		_show_toast(&"UI_LOAD_FAILED")
+		return
 	_bind_views(_simulation)
 	_show_toast(&"UI_LOADED")
 
@@ -130,11 +132,18 @@ func _choose_seed() -> int:
 	return int(Time.get_unix_time_from_system() * 1000.0)
 
 
-## Wraps [param state] in a Simulation with no systems and binds it to SimClock.
-func _start(state: GameState) -> void:
-	_simulation = Simulation.new(state)
+## Builds the Simulation for [param state] through GameSetup, from the Registry's content,
+## and binds it to SimClock. Returns false, keeping the running game, when the state cannot
+## be set up (e.g. a save from another galaxy generator version).
+func _start(state: GameState) -> bool:
+	var built: Result = GameSetup.build(state, GameDefs.from_registry(Registry))
+	if not built.is_ok:
+		push_warning("Shell: cannot set up the game: %s %s" % [built.error_code, built.detail])
+		return false
+	_simulation = built.value
 	SimClock.start(_simulation)
 	time_bar.refresh()
+	return true
 
 
 ## Adds the debug overlay and keeps the flag button in debug builds; removes the button in
