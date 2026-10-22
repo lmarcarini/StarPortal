@@ -16,8 +16,18 @@ signal pause_requested(reason: StringName)
 
 ## The state every system and command reads and mutates.
 var state: GameState
-## Commands waiting for the next tick.
-var commands: CommandQueue = CommandQueue.new()
+## Commands waiting for the next tick. Safe to replace: the old queue's
+## command_rejected is disconnected and the new one's forwarded. Assigning the same queue
+## again is a no-op; null fails an assert and the old queue is kept.
+var commands: CommandQueue = CommandQueue.new():
+	set(value):
+		assert(value != null, "Simulation.commands cannot be null")
+		if value == null or value == commands:
+			return
+		if commands.command_rejected.is_connected(_on_command_rejected):
+			commands.command_rejected.disconnect(_on_command_rejected)
+		commands = value
+		commands.command_rejected.connect(_on_command_rejected)
 
 var _systems: Array[SimSystem] = []
 

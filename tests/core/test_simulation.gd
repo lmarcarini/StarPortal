@@ -197,3 +197,31 @@ func test_submitted_command_applies_once() -> void:
 	simulation.advance_tick()
 	assert_int(_log.count("command@0")).is_equal(1)
 	assert_int(_log.count("command@1")).is_equal(0)
+
+
+## Replacing the command queue forwards rejections from the new queue only; the old queue
+## is disconnected.
+func test_replaced_queue_keeps_forwarding_rejections() -> void:
+	var simulation := Simulation.new(GameState.new_game(1))
+	simulation.command_rejected.connect(_on_command_rejected)
+	var old_queue := simulation.commands
+	var new_queue := CommandQueue.new()
+	simulation.commands = new_queue
+	assert_object(simulation.commands).is_same(new_queue)
+	old_queue.command_rejected.emit(&"old", &"ignored")
+	new_queue.command_rejected.emit(&"new", &"forwarded")
+	simulation.submit(SetFlagCommand.create(&"", true))
+	assert_array(_log).contains_exactly(
+		["command_rejected(new,forwarded)", "command_rejected(set_flag,empty_key)"]
+	)
+
+
+## Assigning the same queue again is a no-op: each rejection is still forwarded once.
+func test_reassigning_same_queue_forwards_once() -> void:
+	var simulation := Simulation.new(GameState.new_game(1))
+	simulation.command_rejected.connect(_on_command_rejected)
+	var queue := simulation.commands
+	simulation.commands = queue
+	simulation.commands = queue
+	queue.command_rejected.emit(&"fake", &"once")
+	assert_array(_log).contains_exactly(["command_rejected(fake,once)"])

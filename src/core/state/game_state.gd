@@ -4,9 +4,6 @@ extends RefCounted
 ## classes that convert to and from JSON-safe dictionaries.
 ## Bible: technical-architecture.md#data-model
 
-## Largest whole number a JSON number (a double) holds exactly: 2^53.
-const _MAX_EXACT_JSON_INT: float = 9007199254740992.0
-
 ## The simulation clock.
 var clock: ClockState = ClockState.new()
 ## Seeds and stream states for every random generator.
@@ -50,7 +47,9 @@ static func from_dict(data: Dictionary) -> GameState:
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock",
 ## "random" and "flags" must be objects, the sub-states must pass their own validate_dict(),
-## and every flag must be a bool, a String or a whole number. Errors from a sub-state are
+## and every flag must be a bool, a String or a whole number with absolute value at most
+## [constant JsonLimits.MAX_EXACT_INT] (larger numbers do not survive JSON, whether they
+## arrive as ints or as floats). Errors from a sub-state are
 ## prefixed with its key, e.g. "clock: 'tick' is not a whole number ...".
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
@@ -75,12 +74,9 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 
 
 static func _is_flag_value(value: Variant) -> bool:
-	if value is bool or value is int or value is String:
+	if value is bool or value is String:
 		return true
-	if not value is float:
-		return false
-	var number: float = value
-	return number == floorf(number) and absf(number) <= _MAX_EXACT_JSON_INT
+	return JsonLimits.is_exact_int(value)
 
 
 static func _dict_or_empty(value: Variant) -> Dictionary:
