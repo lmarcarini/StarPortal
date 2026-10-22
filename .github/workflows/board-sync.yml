@@ -1,0 +1,170 @@
+# Board sync: moves an issue's card on the owner's GitHub Project when its stage label changes
+# or it closes (labels -> board, one way). Setup and manual testing: docs/board.md
+# Bible: roadmap.md#the-board
+name: board-sync
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled, closed, reopened]
+  # Manual run for one issue, to test the setup (issue events only run from the default branch).
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Number of the issue to sync to the board
+        required: true
+        type: number
+
+# The script talks to GitHub with PROJECT_TOKEN only, so the job token needs no permissions.
+permissions: {}
+
+# One group per issue, so quick label changes are applied in order. A run is never cancelled;
+# the script reads the issue's current labels, so a run that was replaced while pending loses
+# nothing.
+concurrency:
+  group: board-sync-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: sync
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Move the card
+        env:
+          # The token is only ever passed to `gh` through GH_TOKEN; the script never prints it.
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          PROJECT_OWNER: ${{ vars.PROJECT_OWNER }}
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
+        run: |
+          set -euo pipefail
+
+          fail() { echo "::error::$*"; exit 1; }
+          # GraphQL JSON (data and/or errors) on stdout; callers check what they need.
+          gql() { gh api graphql "$@" 2>/dev/null || true; }
+          errs() { jq -r '[.errors[]?.message] | join("; ")' <<<"$1" 2>/dev/null || true; }
+
+          # 1. Configuration. Anything missing is a notice and a clean exit, never a failure.
+          missing=()
+          [ -n "${GH_TOKEN:-}" ] || missing+=("secret PROJECT_TOKEN")
+          [ -n "${PROJECT_OWNER:-}" ] || missing+=("variable PROJECT_OWNER")
+          [ -n "${PROJECT_NUMBER:-}" ] || missing+=("variable PROJECT_NUMBER")
+          if [ "${#missing[@]}" -gt 0 ]; then
+            list=$(printf '%s, ' "${missing[@]}")
+            echo "::notice::Board sync skipped: set ${list%, } (see docs/board.md)."
+            exit 0
+          fi
+          [[ "$PROJECT_NUMBER" =~ ^[0-9]+$ ]] || fail "PROJECT_NUMBER must be a number"
+          [[ "$ISSUE_NUMBER" =~ ^[0-9]+$ ]] || fail "issue number must be a number"
+
+          # 2. The issue: its state, labels, node id, and its item on this project (if any).
+          # shellcheck disable=SC2016  # $names inside the GraphQL text are GraphQL variables
+          response=$(gql -f query='
+            query($owner: String!, $repo: String!, $number: Int!) {
+              repository(owner: $owner, name: $repo) {
+                issue(number: $number) {
+                  id
+                  state
+                  labels(first: 100) { nodes { name } }
+                  projectItems(first: 20) {
+                    nodes {
+                      id
+                      project { number owner { ... on User { login } ... on Organization { login } } }
+                    }
+                  }
+                }
+              }
+            }' -f owner="${GITHUB_REPOSITORY%%/*}" -f repo="${GITHUB_REPOSITORY#*/}" \
+            -F number="$ISSUE_NUMBER")
+          issue=$(jq -ce '.data.repository.issue // empty' <<<"$response") \
+            || fail "cannot read issue #$ISSUE_NUMBER: $(errs "$response")"
+          issue_id=$(jq -r '.id' <<<"$issue")
+          state=$(jq -r '.state' <<<"$issue")
+          labels=$(jq -c '[.labels.nodes[].name]' <<<"$issue")
+          item_id=$(jq -r --arg owner "$PROJECT_OWNER" --argjson number "$PROJECT_NUMBER" '
+            first(.projectItems.nodes[]
+              | select(.project.number == $number
+                  and ((.project.owner.login // "") | ascii_downcase) == ($owner | ascii_downcase))
+              | .id)' <<<"$issue")
+
+          # 3. The Status the labels ask for: first match wins, options tried in order.
+          has_label() {
+            jq -e --arg l "$1" 'any(.[]; ascii_downcase | gsub("\\s+"; "") == $l)' \
+              <<<"$labels" >/dev/null
+          }
+          if [ "$state" = CLOSED ]; then want='["Done"]'
+          elif has_label needs-owner; then want='["Needs owner"]'
+          elif has_label changes-requested; then want='["Changes requested"]'
+          elif has_label in-review; then want='["In review", "On Review", "Review"]'
+          elif has_label in-progress; then want='["In progress"]'
+          elif has_label ready; then want='["Ready", "Todo"]'
+          else want='["Backlog"]'
+          fi
+
+          # Milestone labels are M0, M0.5, M1, ... (the size labels M and S do not count).
+          if [ -z "$item_id" ] && ! jq -e 'any(.[]; test("^M[0-9]"))' <<<"$labels" >/dev/null; then
+            echo "::notice::#$ISSUE_NUMBER has no milestone label (M0, M1, ...) and is not on the board; nothing to do."
+            exit 0
+          fi
+
+          # 4. The project and its Status field: a user's project, else an organisation's.
+          find_project() {
+            # shellcheck disable=SC2016  # $names inside the GraphQL text are GraphQL variables
+            gql -f query='
+              query($login: String!, $number: Int!) {
+                '"$1"'(login: $login) {
+                  projectV2(number: $number) {
+                    id
+                    field(name: "Status") {
+                      ... on ProjectV2SingleSelectField { id options { id name } }
+                    }
+                  }
+                }
+              }' -f login="$PROJECT_OWNER" -F number="$PROJECT_NUMBER" \
+              | jq -c --arg kind "$1" '.data[$kind].projectV2 // empty'
+          }
+          project=$(find_project user)
+          [ -n "$project" ] || project=$(find_project organization)
+          [ -n "$project" ] \
+            || fail "project $PROJECT_OWNER/$PROJECT_NUMBER not found, or PROJECT_TOKEN cannot read it"
+          project_id=$(jq -r '.id' <<<"$project")
+          field_id=$(jq -r '.field.id // empty' <<<"$project")
+
+          # Options match by name, ignoring case and spaces.
+          option=$(jq -c --argjson want "$want" '
+            def norm: ascii_downcase | gsub("\\s+"; "");
+            (.field.options // []) as $options
+            | first($want[] | norm as $w | $options[] | select(.name | norm == $w))' <<<"$project")
+          if [ -z "$option" ]; then
+            found=$(jq -r '[(.field.options // [])[].name] | join(", ")' <<<"$project")
+            echo "::warning::#$ISSUE_NUMBER: no Status option matches $(jq -r 'join(" / ")' <<<"$want"); options found: ${found:-none}. Left alone."
+            exit 0
+          fi
+
+          # 5. Add the issue to the project if it is not there yet, then set its Status.
+          if [ -z "$item_id" ]; then
+            # shellcheck disable=SC2016  # $names inside the GraphQL text are GraphQL variables
+            response=$(gql -f query='
+              mutation($project: ID!, $content: ID!) {
+                addProjectV2ItemById(input: {projectId: $project, contentId: $content}) {
+                  item { id }
+                }
+              }' -f project="$project_id" -f content="$issue_id")
+            item_id=$(jq -r '.data.addProjectV2ItemById.item.id // empty' <<<"$response")
+            [ -n "$item_id" ] || fail "cannot add #$ISSUE_NUMBER to the project: $(errs "$response")"
+            echo "Added #$ISSUE_NUMBER to project $PROJECT_OWNER/$PROJECT_NUMBER."
+          fi
+
+          # shellcheck disable=SC2016  # $names inside the GraphQL text are GraphQL variables
+          response=$(gql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $project, itemId: $item, fieldId: $field,
+                value: {singleSelectOptionId: $option}
+              }) { projectV2Item { id } }
+            }' -f project="$project_id" -f item="$item_id" -f field="$field_id" \
+            -f option="$(jq -r '.id' <<<"$option")")
+          jq -e '.data.updateProjectV2ItemFieldValue.projectV2Item.id' <<<"$response" >/dev/null \
+            || fail "cannot set Status of #$ISSUE_NUMBER: $(errs "$response")"
+          echo "#$ISSUE_NUMBER -> $(jq -r '.name' <<<"$option")"

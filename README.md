@@ -89,3 +89,7 @@ each table into `.translation` files (generated, not committed) that are listed 
 ```sh
 GODOT_BIN=/path/to/godot scripts/pseudo.sh
 ```
+
+## Project board
+
+The GitHub Project board follows the cards through a workflow; see [docs/board.md](docs/board.md).
