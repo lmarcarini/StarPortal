@@ -1,2 +1,24 @@
 keys,en,pt_BR
 BOARD_TITLE,Analysis Board,Quadro de Análise
+BOARD_EMPTY,No clues received yet.,Nenhuma pista recebida ainda.
+BOARD_SUSPECT_MARK,SUSPECT,SUSPEITA
+BOARD_FILTER_ALL,All tags,Todas as etiquetas
+BOARD_FILTER_TOOLTIP,Show only cards with this tag,Mostrar só os cartões com esta etiqueta
+BOARD_ZOOM_OUT,Zoom out,Reduzir
+BOARD_ZOOM_IN,Zoom in,Ampliar
+BOARD_MODE_MOVE,"Moving: arrows move the card, Accept drops it, Cancel puts it back.","Movendo: as setas movem o cartão, Aceitar o solta, Cancelar o devolve."
+BOARD_MODE_LINK,"Linking: pick the card to link to, or pick the same card to stop.","Ligando: escolha o cartão a ligar, ou o mesmo cartão para parar."
+BOARD_CARD_GRADE,Grade {grade},Nota {grade}
+BOARD_DETAIL_SOURCE,Source: {source},Fonte: {source}
+BOARD_DETAIL_DATE,Received {date},Recebida em {date}
+BOARD_DETAIL_TAGS,Tags,Etiquetas
+BOARD_DETAIL_LINKS,Links,Ligações
+BOARD_TAG_PLACEHOLDER,New tag,Nova etiqueta
+BOARD_TAG_ADD,Add tag,Adicionar etiqueta
+BOARD_TAG_REMOVE,Remove this tag,Remover esta etiqueta
+BOARD_UNLINK,Unlink,Desligar
+BOARD_ACTION_LINK,Link to another card,Ligar a outro cartão
+BOARD_ACTION_MOVE,Move card,Mover cartão
+BOARD_SUSPECT_SET,Mark as suspect,Marcar como suspeita
+BOARD_SUSPECT_CLEAR,Clear suspect mark,Tirar a marca de suspeita
+BOARD_CLOSE,Close,Fechar

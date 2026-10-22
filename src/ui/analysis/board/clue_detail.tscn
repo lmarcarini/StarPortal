@@ -1,0 +1,96 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/analysis/board/clue_detail.gd" id="1_detail"]
+
+[node name="ClueDetail" type="PanelContainer"]
+custom_minimum_size = Vector2(320, 0)
+visible = false
+script = ExtResource("1_detail")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Scroll" type="ScrollContainer" parent="Margin"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Body" type="VBoxContainer" parent="Margin/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Body"]
+layout_mode = 2
+
+[node name="GradeLabel" type="Label" parent="Margin/Scroll/Body/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SourceLabel" type="Label" parent="Margin/Scroll/Body/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="DateLabel" type="Label" parent="Margin/Scroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TextLabel" type="Label" parent="Margin/Scroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="TagsTitle" type="Label" parent="Margin/Scroll/Body"]
+layout_mode = 2
+text = "BOARD_DETAIL_TAGS"
+
+[node name="TagsBox" type="HFlowContainer" parent="Margin/Scroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TagRow" type="HBoxContainer" parent="Margin/Scroll/Body"]
+layout_mode = 2
+
+[node name="TagEdit" type="LineEdit" parent="Margin/Scroll/Body/TagRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "BOARD_TAG_PLACEHOLDER"
+
+[node name="TagAddButton" type="Button" parent="Margin/Scroll/Body/TagRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BOARD_TAG_ADD"
+
+[node name="LinksTitle" type="Label" parent="Margin/Scroll/Body"]
+layout_mode = 2
+text = "BOARD_DETAIL_LINKS"
+
+[node name="LinksBox" type="VBoxContainer" parent="Margin/Scroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SuspectButton" type="Button" parent="Margin/Scroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BOARD_SUSPECT_SET"
+
+[node name="MoveButton" type="Button" parent="Margin/Scroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BOARD_ACTION_MOVE"
+
+[node name="LinkButton" type="Button" parent="Margin/Scroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BOARD_ACTION_LINK"
+
+[node name="CloseButton" type="Button" parent="Margin/Scroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BOARD_CLOSE"
