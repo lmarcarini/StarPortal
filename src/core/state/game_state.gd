@@ -28,6 +28,11 @@ var workbench: WorkbenchState = WorkbenchState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
+## Tunable numbers, read only. Transient: not in to_dict(); GameSetup.build() sets it.
+var balance: BalanceConfig = null
+## The generated galaxy, read only. Transient: not in to_dict(); GameSetup.build() sets it
+## from the saved galaxy seed and generator version.
+var galaxy: GalaxyCatalogue = null
 
 
 ## Returns a fresh campaign state seeded with [param base_seed]. The galaxy seed is

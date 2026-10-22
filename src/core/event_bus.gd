@@ -40,6 +40,21 @@ signal clue_note_changed(clue_id: StringName)
 ## Emitted when the Address Workbench draft changes (posted through the outbox).
 @warning_ignore("unused_signal")
 signal workbench_changed
+## Emitted when the Ring starts dialing, with the dialed address's key (GateAddress.key())
+## (posted through the outbox).
+@warning_ignore("unused_signal")
+signal dial_started(address_key: String)
+## Emitted when a dial resolves, with its DialOutcome.Kind and the address key; nothing else,
+## so a failure never tells which seal was wrong (posted through the outbox).
+@warning_ignore("unused_signal")
+signal dial_resolved(outcome: int, address_key: String)
+## Emitted when the open wormhole closes: &"player", &"timeout" or &"power" (posted through
+## the outbox).
+@warning_ignore("unused_signal")
+signal wormhole_closed(reason: StringName)
+## Emitted when the dialing queue changes (posted through the outbox).
+@warning_ignore("unused_signal")
+signal dial_queue_changed
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared
