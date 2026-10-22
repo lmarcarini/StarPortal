@@ -10,6 +10,9 @@ var clock: ClockState = ClockState.new()
 var random: RandomState = RandomState.new()
 ## Story and progress flags: StringName -> bool | int | String.
 var flags: Dictionary = {}
+## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
+## new_game() and from_dict() start with an empty outbox.
+var events: EventOutbox = EventOutbox.new()
 
 
 ## Returns a fresh campaign state seeded with [param base_seed].
