@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WorldDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/world_def.gd" id="1_world"]
+
+[resource]
+script = ExtResource("1_world")
+name_key = &"WORLD_CAIRN_NAME"
+position_ly = Vector3i(-990, -1264, 187)
+origin_glyph = 2
+is_home = true
+id = &"world_cairn"

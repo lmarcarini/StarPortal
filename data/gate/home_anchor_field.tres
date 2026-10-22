@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AnchorFieldDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/anchor_field_def.gd" id="1_anchr"]
+
+[resource]
+script = ExtResource("1_anchr")
+domain_id = &"home"
+positions_ly = Array[Vector3i]([Vector3i(14128, 13103, -621), Vector3i(7024, 2754, -1274), Vector3i(-13551, 8778, 481), Vector3i(-10383, 396, -70), Vector3i(-1713, -11816, 1039), Vector3i(-5751, -4810, 420), Vector3i(1504, -10954, -359), Vector3i(-13466, -1729, 0), Vector3i(3539, 5539, 463), Vector3i(-12742, 6102, -178), Vector3i(1827, 795, -1042), Vector3i(4402, -11433, -57), Vector3i(-4365, 13955, 389), Vector3i(12690, -1356, -649), Vector3i(-10144, -7018, -815), Vector3i(4822, -1798, -1002), Vector3i(11599, 11105, 878), Vector3i(-7777, -10534, 840), Vector3i(-14135, 14613, 259), Vector3i(-4273, -2225, 161), Vector3i(-13240, -14426, -472), Vector3i(12641, 7995, -1267), Vector3i(-4837, 7305, -133), Vector3i(9129, 4770, -364), Vector3i(-599, 4842, -1350), Vector3i(13805, -3616, -342), Vector3i(-10598, 11051, -393), Vector3i(10371, -9771, -169), Vector3i(-4742, -13657, -761), Vector3i(-1235, 6590, 1149), Vector3i(8908, -1029, -829), Vector3i(-6693, 10432, 17), Vector3i(8583, -14770, 1015), Vector3i(7149, 997, 1434), Vector3i(-10419, 7297, 33), Vector3i(-2518, -14, -830)])
+id = &"anchors_home"
