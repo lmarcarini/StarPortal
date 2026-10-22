@@ -38,7 +38,10 @@ func after_test() -> void:
 func test_starts_paused_with_new_game_and_minimum_window_size() -> void:
 	var simulation: Simulation = SimClock.simulation
 	assert_object(simulation).is_not_null()
-	assert_dict(simulation.state.to_dict()).is_equal(GameState.new_game(TEST_SEED).to_dict())
+	var expected: GameState = GameState.new_game(TEST_SEED, Registry.balance())
+	assert_dict(simulation.state.to_dict()).is_equal(expected.to_dict())
+	assert_object(simulation.state.balance).is_same(Registry.balance())
+	assert_str(String(simulation.state.galaxy.home().id)).is_equal("world_cairn")
 	assert_bool(simulation.state.clock.is_paused).is_true()
 	assert_bool(SimClock.is_running()).is_false()
 	assert_str(_label("DateLabel").text).is_equal("2026-01-01 00:00")
@@ -116,6 +119,7 @@ func test_quick_save_then_load_restores_date() -> void:
 	assert_str(_shell.get_toast_text()).is_equal(tr("UI_SAVED"))
 	assert_bool(FileAccess.file_exists(SaveService.slot_path(&"quick"))).is_true()
 	var before_load: Simulation = SimClock.simulation
+	assert_float(before_load.state.power.stored_mwh).is_equal_approx(45.0, 1e-9)
 	SimClock.step_ticks(500)
 	assert_str(_label("DateLabel").text).is_equal("2026-01-01 09:50")
 	await _runner.simulate_key_pressed(KEY_F9)
@@ -123,6 +127,7 @@ func test_quick_save_then_load_restores_date() -> void:
 	assert_int(SimClock.simulation.state.clock.tick).is_equal(90)
 	assert_str(_label("DateLabel").text).is_equal("2026-01-01 01:30")
 	assert_str(_shell.get_toast_text()).is_equal(tr("UI_LOADED"))
+	_assert_same_galaxy(before_load.state.galaxy, SimClock.simulation.state.galaxy)
 	SimClock.step_ticks(1)
 	assert_str(_label("DateLabel").text).is_equal("2026-01-01 01:31")
 
@@ -279,6 +284,17 @@ func test_leaving_the_tree_releases_the_clock_and_event_bus() -> void:
 	_shell.get_parent().remove_child(_shell)
 	assert_object(SimClock.simulation).is_null()
 	assert_int(_event_bus_connections_into(_shell)).is_equal(0)
+
+
+## Checks [param loaded] is a new galaxy that finds every world of [param original] at the
+## same home address.
+func _assert_same_galaxy(original: GalaxyCatalogue, loaded: GalaxyCatalogue) -> void:
+	assert_object(loaded).is_not_same(original)
+	var origin: int = original.home().origin_glyph
+	for world: WorldRecord in original.all_worlds():
+		var address: GateAddress = original.address_of(world.id, origin)
+		var found: WorldRecord = loaded.find_by_coordinates(address.coordinates, origin)
+		assert_str(String(found.id)).is_equal(String(world.id))
 
 
 func _press_action(action: StringName) -> void:
