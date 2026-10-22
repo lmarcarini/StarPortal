@@ -1,2 +1,18 @@
 keys,en,pt_BR
 CLUES_SECTION_TITLE,Clues,Pistas
+CLUE_SOURCE_DIRECTORATE,Directorate dossier,Dossiê da Diretoria
+CLUE_SOURCE_ARCHIVE_1961,1961 archive,Arquivo de 1961
+CLUE_SOURCE_SIGINT,Signals intelligence,Inteligência de sinais
+CLUE_SOURCE_ACADEMIC,Academic survey,Levantamento acadêmico
+CLUE_FRAGMENT_ONE_A,Recovered fragment: seal {seal} reads {glyph}.,Fragmento recuperado: o selo {seal} corresponde a {glyph}.
+CLUE_FRAGMENT_ONE_B,Partial transcript. Seal {seal}: {glyph}. Remaining seals illegible.,Transcrição parcial. Selo {seal}: {glyph}. Demais selos ilegíveis.
+CLUE_FRAGMENT_TWO_A,"Fragment, two seals legible. Seal {seal_a}: {glyph_a}. Seal {seal_b}: {glyph_b}.","Fragmento com dois selos legíveis. Selo {seal_a}: {glyph_a}. Selo {seal_b}: {glyph_b}."
+CLUE_FRAGMENT_TWO_B,Operator notes list seal {seal_a} as {glyph_a} and seal {seal_b} as {glyph_b}. Nothing else survives.,As anotações do operador registram o selo {seal_a} como {glyph_a} e o selo {seal_b} como {glyph_b}. Nada mais restou.
+CLUE_PICTORIAL_A,Sketch recovered on site. The marking for seal {seal} resembles {picture}.,Esboço recuperado no local. A marca do selo {seal} lembra {picture}.
+CLUE_PICTORIAL_B,Witness drawing. Seal {seal} was drawn as {picture}. Witness reliability not established.,Desenho de testemunha. O selo {seal} foi desenhado como {picture}. Confiabilidade da testemunha não estabelecida.
+CLUE_SKY_CHART_A,Star chart. Seven reference points are marked. Their order was not recorded.,Carta estelar. Sete pontos de referência marcados. A ordem não foi registrada.
+CLUE_SKY_CHART_B,Survey plate of the destination sky. Seven anchors identified. Sequence unknown.,Placa de levantamento do céu de destino. Sete âncoras identificadas. Sequência desconhecida.
+CLUE_ORDINAL_A,"{glyph_a} appears in the address and lies nearer than {glyph_b}, if {glyph_b} appears at all.","{glyph_a} aparece no endereço e fica mais perto que {glyph_b}, caso {glyph_b} apareça."
+CLUE_ORDINAL_B,Navigation note: {glyph_a} is present and precedes {glyph_b}. {glyph_b} itself may be absent.,Nota de navegação: {glyph_a} está presente e precede {glyph_b}. {glyph_b} pode não constar.
+CLUE_NEIGHBOUR_A,Neighbouring record: the address of {world} is {address}. This destination shares its first {count} seals and differs at the next.,Registro vizinho: o endereço de {world} é {address}. Este destino compartilha os {count} primeiros selos e difere no seguinte.
+CLUE_NEIGHBOUR_B,Cross-reference to {world} ({address}). The first {count} seals match. The following seal does not.,Referência cruzada a {world} ({address}). Os {count} primeiros selos coincidem. O selo seguinte não.
