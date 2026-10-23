@@ -99,14 +99,13 @@ static func from_dict(data: Dictionary) -> GateState:
 	return gate
 
 
-## Returns human-readable errors for saved [param data], empty when it is valid. Types:
-## "mode" a mode name; "current_address" null or a valid address; both ticks -1 or a whole
-## number from 0 to 2^53; "lock_energy_mwh" an ExactFloat string of a finite number of at
-## least 0;
-## "connected_world_id" a string; "is_hostile" a bool; "dial_log" an array of valid DialLogEntry objects. Then the Ring fields must
-## fit the mode: IDLE has no address, ticks, world or hostility; DIALING has an address and
-## a dial tick but no world, lock tick or hostility; LOCKED has all of them, and the lock
-## tick is not before the dial tick.
+## Returns human-readable errors for saved [param data], empty when it is valid. Types: "mode" a
+## mode name; "current_address" null or a valid address; both ticks -1 or a whole number from 0 to
+## 2^53; "lock_energy_mwh" an ExactFloat string of a finite number of at least 0;
+## "connected_world_id" a string; "is_hostile" a bool; "dial_log" an array of valid DialLogEntry
+## objects. Then the Ring fields must fit the mode: IDLE has no address, ticks, world or hostility;
+## DIALING has an address and a dial tick but no world, lock tick or hostility; LOCKED has all of
+## them, and the lock tick is not before the dial tick.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors := _field_errors(data)
 	errors.append_array(_list_errors(data, "dial_log", DialLogEntry.validate_dict))

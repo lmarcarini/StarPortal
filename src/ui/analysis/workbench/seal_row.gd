@@ -35,7 +35,9 @@ func show_glyphs(glyphs: Array[int], translate: Callable) -> void:
 	for slot: SealSlot in _slots:
 		var glyph: int = glyphs[slot.seal - 1] if slot.seal <= glyphs.size() else -1
 		slot.show_glyph(glyph, _slot_tooltip(slot.seal, glyph, translate))
-	var origin: int = glyphs[GateAddress.COORDINATE_COUNT] if glyphs.size() > GateAddress.COORDINATE_COUNT else -1
+	var origin: int = (
+		glyphs[GateAddress.COORDINATE_COUNT] if glyphs.size() > GateAddress.COORDINATE_COUNT else -1
+	)
 	_caption.text = str(translate.call("WORKBENCH_ORIGIN_HOME")).format(
 		{"glyph": _glyph_name(origin, translate)}
 	)

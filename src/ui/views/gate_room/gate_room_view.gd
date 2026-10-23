@@ -11,16 +11,15 @@ extends GameView
 
 const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
 
+## Returns the address to dial, or null: a Callable() -> GateAddress (null for none).
+var _address_source: Callable = Callable()
+
 @onready var _ring: RingDisplay = %RingDisplay
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
 @onready var _controls: DialControls = %DialControls
 @onready var _banner: OutcomeBanner = %OutcomeBanner
 @onready var _wormhole: WormholePanel = %WormholePanel
 @onready var _log: DialLogPanel = %DialLogPanel
-
-
-## Returns the address to dial, or null: a Callable() -> GateAddress (null for none).
-var _address_source: Callable = Callable()
 
 
 func _enter_tree() -> void:

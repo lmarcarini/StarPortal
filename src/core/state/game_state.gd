@@ -79,13 +79,13 @@ static func from_dict(data: Dictionary) -> GameState:
 	return state
 
 
-## Returns human-readable errors for saved [param data], empty when it is valid: "clock",
-## "random", "flags", "gate", "power" and "worlds" must be objects, the sub-states must pass their own validate_dict(), and every flag must be a bool, a
-## String or a whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT]
-## (larger numbers do not survive JSON, whether they arrive as ints or as floats). The
-## Ring's "dial_started_tick" and "lock_started_tick" and every Dial Log entry's "tick" must
-## not be later than the clock's tick. Errors from a
-## sub-state are prefixed with its key, e.g. "clock: 'tick' is not a whole number ...".
+## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
+## "flags", "gate", "power" and "worlds" must be objects, the sub-states must pass their own
+## validate_dict(), and every flag must be a bool, a String or a whole number with absolute value at
+## most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do not survive JSON, whether they arrive
+## as ints or as floats). The Ring's "dial_started_tick" and "lock_started_tick" and every Dial Log
+## entry's "tick" must not be later than the clock's tick. Errors from a sub-state are prefixed with
+## its key, e.g. "clock: 'tick' is not a whole number ...".
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _SECTIONS:
