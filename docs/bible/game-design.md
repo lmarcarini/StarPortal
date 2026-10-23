@@ -78,7 +78,7 @@ The base is a side-on cutaway of levels dug under the salt works; the player gro
 | Containment and Quarantine | Hold dangerous artefacts, prisoners and the exposed |
 | Hangar (late) | Vehicles and, later, alien craft |
 
-**Power** is supply against demand, settled every tick. The player ranks rooms by priority, and during a shortfall the lowest-ranked shut down first. Dialing needs a full charge in the capacitors before the first seal.
+**Power** is supply against demand, settled every tick. The player ranks rooms by priority, and during a shortfall the lowest-ranked shut down first. Dialing needs a full charge in the capacitors before the first seal. The base starts with no capacitors: installing the first bank is the first thing the player does. The console never states what an address will cost until the lock estimator is researched. On every first lock the Gate Room pushes a camera and sampling line through the horizon on a pole (the horizon record): the first, free look at a new world. It stays for the whole game; probes from M3 go further, they do not replace it.
 
 Power plants upgrade through four tiers: diesel, fission, anterite cell, and the Halvane tap from Arc 4. In an emergency the player can tap the national grid. It gives instant energy, but raises Exposure and costs Confidence.
 
