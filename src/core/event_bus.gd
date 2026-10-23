@@ -43,6 +43,14 @@ signal dial_resolved(outcome: int, address_key: String)
 ## the outbox).
 @warning_ignore("unused_signal")
 signal wormhole_closed(reason: StringName)
+## Emitted when a document arrives in the Archive, with its DocumentDef id (posted through
+## the outbox).
+@warning_ignore("unused_signal")
+signal document_received(document_id: StringName)
+## Emitted when the Address Book changes: a dial recorded or a note set (posted through the
+## outbox).
+@warning_ignore("unused_signal")
+signal address_book_changed
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared

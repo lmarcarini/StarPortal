@@ -55,6 +55,9 @@ static func register_defaults() -> void:
 	_types[SetFlagCommand.TYPE] = SetFlagCommand
 	_types[DialCommand.TYPE] = DialCommand
 	_types[CloseWormholeCommand.TYPE] = CloseWormholeCommand
+	_types[DeliverDocumentCommand.TYPE] = DeliverDocumentCommand
+	_types[MarkDocumentReadCommand.TYPE] = MarkDocumentReadCommand
+	_types[NoteAddressCommand.TYPE] = NoteAddressCommand
 
 
 ## Drops every registration, so tests can restore a clean registry. The built-in types are
