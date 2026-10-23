@@ -48,7 +48,7 @@ func test_valid_documents_load_with_every_field() -> void:
 	var dossier: DocumentDef = _registry.get_def(&"doc_dossier")
 	assert_int(dossier.kind).is_equal(DocumentDef.Kind.DOSSIER)
 	assert_array(dossier.get_references()).is_empty()
-	assert_int(_registry.get_all_of(DocumentDef).size()).is_equal(3)
+	assert_int(_registry.get_all_of(DocumentDef).size()).is_equal(6)
 
 
 ## get_references() names the world and the pair when set.
@@ -57,7 +57,8 @@ func test_references_are_world_and_pair() -> void:
 	assert_array(document.get_references()).is_empty()
 	document.world_id = &"world_a"
 	document.pair_id = &"doc_b"
-	assert_array(document.get_references()).is_equal([&"world_a", &"doc_b"])
+	document.arrival_world_id = &"world_c"
+	assert_array(document.get_references()).is_equal([&"world_a", &"doc_b", &"world_c"])
 
 
 ## Every bad document is reported, and only the bad ones; the valid world is not.
@@ -73,6 +74,8 @@ func test_bad_documents_are_rejected() -> void:
 		"bad_answer_origin": "CAIRN's origin glyph 5",
 		"bad_answer_repeat": "repeats glyph 1",
 		"bad_answer_range": "is 36, not a glyph",
+		"bad_arrival_no_world": "needs an arrival_world_id",
+		"bad_arrival_world_missing": 'missing id "ghost_arrival"',
 	}
 	for id: String in expected:
 		var found: Array[String] = _errors_of(errors, id)

@@ -46,8 +46,15 @@ func validate(state: GameState) -> CommandResult:
 
 ## Adds the document at the clock's tick and posts document_received.
 func apply(state: GameState) -> void:
-	state.archive.add(document_id, state.clock.tick)
-	state.events.post(&"document_received", [document_id])
+	deliver(state, document_id)
+
+
+## Adds document [param id] to the Archive at the clock's tick and posts document_received.
+## The one delivery path: a system calls it too, so both stay consistent. The caller checks
+## the Archive does not hold the document yet.
+static func deliver(state: GameState, id: StringName) -> void:
+	state.archive.add(id, state.clock.tick)
+	state.events.post(&"document_received", [id])
 
 
 ## Returns JSON-safe data: type and document_id.
