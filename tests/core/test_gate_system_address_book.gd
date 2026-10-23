@@ -111,3 +111,24 @@ func test_redial_updates_entry() -> void:
 	assert_int(entry.last_dialed_tick).is_greater(first_tick)
 	assert_int(entry.last_dialed_tick).is_equal(_state.gate.dial_log[1].tick)
 	assert_str(entry.note).is_equal("buried")
+
+
+## A world learned through a lock stays known after a later failed dial of the same address,
+## and the state still saves and loads as valid. (The fixture Ring is buried after the lock,
+## so the same address then answers Blocked.)
+func test_world_stays_known_after_a_later_failed_dial() -> void:
+	var address := _address(DialFixture.OPEN_ID)
+	_dial(address)
+	assert_int(_state.gate.mode).is_equal(GateState.RingMode.IDLE)
+	_state.galaxy.get_world(DialFixture.OPEN_ID).ring_status = WorldDef.RingStatus.BURIED
+	_dial(address)
+	assert_int(_state.gate.dial_log[1].outcome).is_equal(DialOutcome.Kind.BLOCKED)
+	var entry: AddressEntry = _state.address_book.find(address.key())
+	assert_int(entry.last_outcome).is_equal(DialOutcome.Kind.BLOCKED)
+	assert_str(String(entry.world_id)).is_equal(String(DialFixture.OPEN_ID))
+	var data: Dictionary = JSON.parse_string(JSON.stringify(_state.to_dict()))
+	assert_array(GameState.validate_dict(data)).is_empty()
+	var loaded := GameState.from_dict(data)
+	assert_str(String(loaded.address_book.find(address.key()).world_id)).is_equal(
+		String(DialFixture.OPEN_ID)
+	)

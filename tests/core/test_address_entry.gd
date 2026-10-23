@@ -122,7 +122,8 @@ func test_validate_rejects_bad_fields() -> void:
 	assert_array(AddressEntry.validate_dict(missing)).is_equal(["missing 'note'"])
 
 
-## A dialed entry has no source id, and knows a world only once it has locked.
+## A dialed entry has no source id, and may know a world once dialed, whatever the last
+## outcome: a world learned through a lock stays known after a later failed dial.
 func test_dialed_entry_rules() -> void:
 	var dialed := AddressEntry.create(KEY, AddressEntry.Source.DIALED, &"")
 	dialed.last_outcome = DialOutcome.Kind.LOCK
@@ -135,8 +136,10 @@ func test_dialed_entry_rules() -> void:
 		DialOutcome.Kind.NO_GATE, DialOutcome.Kind.BLOCKED, DialOutcome.Kind.ORIGIN_REJECTED
 	]:
 		dialed.last_outcome = failed
-		var errors: Array[String] = AddressEntry.validate_dict(dialed.to_dict())
-		assert_str(errors[0]).contains("has not locked")
+		assert_array(AddressEntry.validate_dict(dialed.to_dict())).is_empty()
+	var never := AddressEntry.create(KEY, AddressEntry.Source.DIALED, &"")
+	never.world_id = &"world_open"
+	assert_str(AddressEntry.validate_dict(never.to_dict())[0]).contains("never dialed")
 	dialed.world_id = &""
 	assert_array(AddressEntry.validate_dict(dialed.to_dict())).is_empty()
 	dialed.source_id = &"doc_note"

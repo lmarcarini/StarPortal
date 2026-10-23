@@ -73,6 +73,14 @@ func _repeat_first_entry(book: Dictionary) -> void:
 	entries.append(entries[0])
 
 
+func _world_on_never_dialed_entry(book: Dictionary) -> void:
+	var entries: Array = book["entries"]
+	var entry: Dictionary = entries[1]
+	entry["last_outcome"] = ""
+	entry["last_dialed_tick"] = -1
+	entry["world_id"] = "world_x"
+
+
 ## Hand-edited Archive and Address Book data fails with &"invalid_state".
 func test_hand_edited_sections_fail() -> void:
 	var cases: Array[Array] = [
@@ -81,7 +89,7 @@ func test_hand_edited_sections_fail() -> void:
 		["address_book", _repeat_first_entry],
 		["address_book", func(d: Dictionary) -> void: d["entries"][0]["address_key"] = "1-2"],
 		["address_book", func(d: Dictionary) -> void: d["entries"][1]["note"] = "x".repeat(141)],
-		["address_book", func(d: Dictionary) -> void: d["entries"][1]["world_id"] = "world_x"],
+		["address_book", _world_on_never_dialed_entry],
 		["address_book", func(d: Dictionary) -> void: d["entries"][1]["last_dialed_tick"] = 2001],
 	]
 	for case: Array in cases:

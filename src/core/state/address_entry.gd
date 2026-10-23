@@ -2,7 +2,9 @@ class_name AddressEntry
 extends RefCounted
 ## One address in the Address Book: where it came from, the world's id once known, the last
 ## dial's outcome and tick, and the player's own note. A failed dial never records a world:
-## the world id comes only from a lock or from the document that gave the address.
+## the world id comes only from a lock (GateSystem sets it on nothing else) or from the
+## document that gave the address. Once learned through a lock it stays known, whatever later
+## dials of the address report.
 ## Saved shape: {"address_key": GateAddress.key(), "source": "document" | "console" | "dialed",
 ## "source_id", "world_id", "last_outcome": DialOutcome key or "" when never dialed,
 ## "last_dialed_tick": -1 when never dialed, "note"}.
@@ -86,7 +88,8 @@ static func from_dict(data: Dictionary) -> AddressEntry:
 ## Returns human-readable errors for saved [param data], empty when it is valid: every field
 ## present; "address_key" the key of a well-formed address; "source" a source name;
 ## "source_id" a string, empty exactly for "dialed"; "world_id" a string, and on a "dialed"
-## entry set only after a "lock" or "hostile_lock"; "last_outcome" "" or a DialOutcome key;
+## entry set only once it has been dialed (whatever the last outcome: a world learned through
+## a lock stays known); "last_outcome" "" or a DialOutcome key;
 ## "last_dialed_tick" -1 when never dialed, otherwise a whole number from 0 to 2^53; "note"
 ## valid per note_errors().
 static func validate_dict(data: Dictionary) -> Array[String]:
@@ -173,7 +176,6 @@ static func _dial_errors(data: Dictionary) -> Array[String]:
 	var dialed: bool = kind >= 0
 	if dialed != (tick != NEVER):
 		return ["'last_dialed_tick' and 'last_outcome' disagree on whether it was dialed"]
-	var locked: bool = dialed and DialOutcome.is_lock(kind as DialOutcome.Kind)
-	if data["source"] == "dialed" and not str(data["world_id"]).is_empty() and not locked:
-		return ["'world_id' is set on a \"dialed\" entry that has not locked"]
+	if data["source"] == "dialed" and not str(data["world_id"]).is_empty() and not dialed:
+		return ["'world_id' is set on a \"dialed\" entry that was never dialed"]
 	return []
