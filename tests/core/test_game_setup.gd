@@ -73,7 +73,9 @@ func test_transient_references_are_never_saved() -> void:
 	var state: GameState = GameState.new_game(SEED, defs.balance)
 	GameSetup.build(state, defs)
 	var data: Dictionary = state.to_dict()
-	assert_array(data.keys()).is_equal(["clock", "random", "flags", "gate", "power", "worlds"])
+	assert_array(data.keys()).is_equal(
+		["clock", "random", "flags", "gate", "power", "worlds", "archive", "address_book"]
+	)
 	var text: String = JSON.stringify(data)
 	for word: String in ['galaxy"', "balance", "world_cairn", "anchors"]:
 		assert_bool(text.contains(word)).override_failure_message(word).is_false()
