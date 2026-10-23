@@ -23,7 +23,7 @@ func _entry(outcome: DialOutcome.Kind, world_id: StringName) -> DialLogEntry:
 	return entry
 
 
-## A LOCKED Ring with a two-address queue and a three-entry log.
+## A LOCKED Ring with a three-entry log.
 func _locked_gate() -> GateState:
 	var gate := GateState.new()
 	gate.mode = GateState.RingMode.LOCKED
@@ -33,8 +33,6 @@ func _locked_gate() -> GateState:
 	gate.connected_world_id = &"p3x_118"
 	gate.lock_started_tick = 202
 	gate.is_hostile = true
-	gate.dial_queue.append(_address(1))
-	gate.dial_queue.append(_address(20))
 	gate.dial_log.append(_entry(DialOutcome.Kind.NO_GATE, &""))
 	gate.dial_log.append(_entry(DialOutcome.Kind.BLOCKED, &"abydos"))
 	gate.dial_log.append(_entry(DialOutcome.Kind.HOSTILE_LOCK, &"p3x_118"))
@@ -76,7 +74,6 @@ func test_defaults_and_dict_shape() -> void:
 				"connected_world_id": "",
 				"lock_started_tick": -1,
 				"is_hostile": false,
-				"dial_queue": [],
 				"dial_log": [],
 			}
 		)
@@ -96,7 +93,7 @@ func test_mode_names() -> void:
 	assert_array(names).is_equal(["idle", "dialing", "locked"])
 
 
-## A LOCKED Ring with queue and log survives a full-precision JSON round trip exactly.
+## A LOCKED Ring with its log survives a full-precision JSON round trip exactly.
 func test_locked_gate_json_round_trip() -> void:
 	var data := _locked_gate().to_dict()
 	assert_array(GateState.validate_dict(data)).is_empty()
@@ -108,8 +105,6 @@ func test_locked_gate_json_round_trip() -> void:
 	assert_bool(restored.current_address.equals(_address(10))).is_true()
 	assert_int(typeof(restored.dial_started_tick)).is_equal(TYPE_INT)
 	assert_bool(restored.lock_energy_mwh == 1.0 / 3.0).is_true()
-	assert_int(restored.dial_queue.size()).is_equal(2)
-	assert_bool(restored.dial_queue[1].equals(_address(20))).is_true()
 	assert_int(restored.dial_log[2].outcome).is_equal(DialOutcome.Kind.HOSTILE_LOCK)
 	assert_str(restored.dial_log[1].world_id).is_equal(&"abydos")
 	assert_bool(restored.dial_log[0].energy_spent_mwh == 0.1 + 0.2).is_true()
@@ -170,7 +165,7 @@ func test_dial_log_entry_validate_errors() -> void:
 
 
 ## GateState.validate_dict rejects wrong types, unknown modes, bad energy and malformed
-## addresses in the current dial, the queue and the log.
+## addresses in the current dial and the log.
 func test_gate_validate_type_errors() -> void:
 	_assert_gate_error("mode", "charging", "'mode' is not one of")
 	_assert_gate_error("mode", 2, "'mode' is not one of")
@@ -183,9 +178,6 @@ func test_gate_validate_type_errors() -> void:
 	_assert_gate_error("lock_energy_mwh", 2.5, "lock_energy_mwh")
 	_assert_gate_error("connected_world_id", 4, "connected_world_id")
 	_assert_gate_error("is_hostile", 1, "'is_hostile' is not a bool")
-	_assert_gate_error("dial_queue", {}, "'dial_queue' is not an array")
-	_assert_gate_error("dial_queue", [{"seals": [40]}], "dial_queue 0: ")
-	_assert_gate_error("dial_queue", ["x"], "dial_queue 0 is not an object")
 	_assert_gate_error("dial_log", [{"tick": 1}], "dial_log 0: missing 'outcome'")
 	_assert_gate_error("dial_log", 3, "'dial_log' is not an array")
 	for key: String in GateState.new().to_dict():

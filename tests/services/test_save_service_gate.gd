@@ -39,7 +39,7 @@ func _log_entry(kind: DialOutcome.Kind, energy: float, world_id: StringName) -> 
 	return entry
 
 
-## A LOCKED Ring with a queue of two, a log of three, fractional energy and two world
+## A LOCKED Ring with a log of three, fractional energy and two world
 ## statuses, at clock tick 1000.
 func _sample_state() -> GameState:
 	var state := GameState.new_game(9007199254740993, BalanceConfig.new())
@@ -51,8 +51,6 @@ func _sample_state() -> GameState:
 	state.gate.lock_energy_mwh = 1.0 / 3.0
 	state.gate.connected_world_id = &"abydos"
 	state.gate.is_hostile = true
-	state.gate.dial_queue.append(_address(31))
-	state.gate.dial_queue.append(_address(32))
 	state.gate.dial_log.append(_log_entry(DialOutcome.Kind.NO_GATE, 0.1 + 0.2, &""))
 	state.gate.dial_log.append(_log_entry(DialOutcome.Kind.BLOCKED, 75.0 / 7.0, &"chulak"))
 	state.gate.dial_log.append(_log_entry(DialOutcome.Kind.HOSTILE_LOCK, 1.0 / 3.0, &"abydos"))

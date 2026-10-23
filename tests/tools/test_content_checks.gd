@@ -194,34 +194,6 @@ func test_generated_galaxy_is_checked() -> void:
 	assert_array(ContentCheckGalaxy.check(worlds, anchors, params, balance)).is_not_empty()
 
 
-func test_dossier_key_missing_from_the_table_is_reported() -> void:
-	var clue := ClueRecord.new()
-	clue.id = &"clue_0001"
-	clue.text_key = &"CLUE_GONE"
-	clue.source_key = &"CLUE_SOURCE_X"
-	var keys: Dictionary[String, bool] = {"CLUE_SOURCE_X": true}
-	var clues: Array[ClueRecord] = [clue, clue]
-	assert_array(ContentCheckClues.check_keys(clues, keys)).contains_exactly(
-		["clue clue_0001: key 'CLUE_GONE' is not in clues.csv"]
-	)
-	keys["CLUE_GONE"] = true
-	assert_array(ContentCheckClues.check_keys(clues, keys)).is_empty()
-
-
-func test_candidate_share_must_reach_ninety_five_percent() -> void:
-	var params := ClueSetParams.new()
-	var good: Array[int] = []
-	for _index: int in 57:
-		good.append(7)
-	good.append_array([0, 21, 5000])
-	assert_array(ContentCheckClues.check_candidates(good, params)).is_empty()
-	good[0] = 0
-	var errors: Array[String] = ContentCheckClues.check_candidates(good, params)
-	assert_int(errors.size()).is_equal(1)
-	assert_str(errors[0]).contains("only 56 of 60").contains("[0, 0, 21, 5000]")
-	assert_array(ContentCheckClues.check_candidates([], params)).is_not_empty()
-
-
 func test_real_content_is_valid() -> void:
 	var registry: RegistryScript = auto_free(ContentSource.new_registry())
 	var load_errors: Array[String] = registry.load_all().value

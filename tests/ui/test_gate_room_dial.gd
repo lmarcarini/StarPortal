@@ -2,7 +2,7 @@
 ## with the mouse path and with the gamepad accept button), the reasons it is disabled, the
 ## repeat warning and its second confirmation, and the seal animation following sim time.
 ## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy,
-## gate-and-address-spec.md#player-tools, game-design.md#difficulty-and-accessibility
+## game-design.md#difficulty-and-accessibility
 extends GdUnitTestSuite
 
 const Fixture := preload("res://tests/ui/gate_room_fixture.gd")
@@ -33,9 +33,7 @@ func after_test() -> void:
 
 func _enter(kind: int) -> GateAddress:
 	var address: GateAddress = Fixture.address_for(_simulation.state, kind)
-	var entry: AddressEntry = _view.find_child("AddressEntry", true, false) as AddressEntry
-	entry.set_entered_address(address)
-	entry.get_add_button().pressed.emit()
+	Fixture.select(_view, address)
 	return address
 
 
@@ -67,7 +65,9 @@ func _gamepad_accept(is_pressed: bool) -> void:
 
 func test_disabled_without_a_selection() -> void:
 	assert_bool(_button().disabled).is_true()
-	assert_str(_controls().get_reason_text()).is_equal("Select an address from the queue first.")
+	assert_str(_controls().get_reason_text()).is_equal(
+		"Place seven glyphs in the Address Workbench first."
+	)
 	_enter(DialOutcome.Kind.NO_GATE)
 	assert_bool(_button().disabled).is_false()
 	assert_str(_controls().get_reason_text()).is_empty()
@@ -153,9 +153,7 @@ func test_repeat_confirmation_is_dropped_when_the_selection_changes() -> void:
 	_enter(DialOutcome.Kind.BLOCKED)
 	assert_bool(_controls().is_repeat_armed()).is_false()
 	assert_str(_controls().get_warning_text()).is_empty()
-	var queue: DialQueuePanel = _view.find_child("DialQueuePanel", true, false) as DialQueuePanel
-	queue.get_rows()[0].get_select_button().pressed.emit()
-	assert_str(queue.get_selected().key()).is_equal(first.key())
+	Fixture.select(_view, first)
 	assert_str(_controls().get_warning_text()).is_not_empty()
 	assert_bool(_controls().is_repeat_armed()).is_false()
 

@@ -1,9 +1,5 @@
 keys,en,pt_BR
 GATE_ROOM_TITLE,Gate Room,Sala do Portal
-GATE_QUEUE_TITLE,Dial queue,Fila de discagem
-GATE_QUEUE_EMPTY,The queue is empty. Type an address below to add one.,A fila está vazia. Digite um endereço abaixo para adicionar.
-GATE_QUEUE_REMOVE,Remove,Remover
-GATE_QUEUE_ROW_INFO,{energy} · {ready},{energy} · {ready}
 GATE_READY_NOW,"Charged, ready now","Carga completa, pronto agora"
 GATE_READY_IN,Ready in {time},Pronto em {time}
 GATE_READY_NEVER,Never at current output,Nunca com a saída atual
@@ -32,20 +28,10 @@ GATE_DIAL_HOLD,Hold to dial,Segure para discar
 GATE_DIAL_HOLD_AGAIN,Hold again to dial anyway,Segure de novo para discar mesmo assim
 GATE_DIAL_NEEDS,Needs {energy}. {ready}.,Requer {energy}. {ready}.
 GATE_REPEAT_WARNING,Dialed on {date}: {outcome}. Dialing it again will spend the energy again.,Discado em {date}: {outcome}. Discar de novo vai gastar a energia outra vez.
-GATE_REASON_NONE_SELECTED,Select an address from the queue first.,Selecione antes um endereço da fila.
+GATE_REASON_NONE_SELECTED,Place seven glyphs in the Address Workbench first.,Coloque antes sete glifos na Bancada de Endereços.
 GATE_REASON_BUSY,The Ring is busy: it is dialing or has a wormhole open.,O Anel está ocupado: está discando ou há um buraco de minhoca aberto.
 GATE_REASON_CHARGE,"Not enough charge: needs {needed}, the capacitors hold {stored}.","Carga insuficiente: requer {needed}, os capacitores têm {stored}."
 GATE_REASON_REJECTED,The dial was refused.,A discagem foi recusada.
-GATE_ENTRY_TITLE,Enter an address,Digitar um endereço
-GATE_ENTRY_UNSET,Choose a glyph,Escolha um glifo
-GATE_ENTRY_SEAL,Seal {number},Selo {number}
-GATE_ENTRY_ORIGIN,Seal {number} (origin),Selo {number} (origem)
-GATE_ENTRY_HINT,Choose a glyph for each of the eight seals.,Escolha um glifo para cada um dos oito selos.
-GATE_ENTRY_DUPLICATE,A glyph cannot appear twice in an address.,Um glifo não pode aparecer duas vezes num endereço.
-GATE_ENTRY_ADD,Add to queue,Adicionar à fila
-GATE_ENTRY_ALREADY_QUEUED,That address is already in the queue.,Esse endereço já está na fila.
-GATE_ENTRY_QUEUE_FULL,The queue is full. Remove an address first.,A fila está cheia. Remova um endereço antes.
-GATE_ENTRY_REJECTED,The address could not be added.,Não foi possível adicionar o endereço.
 GATE_GAUGE_TITLE,Capacitors,Capacitores
 GATE_GAUGE_VALUES,{stored} of {capacity},{stored} de {capacity}
 GATE_GAUGE_NEEDED,The marker shows the {energy} the selected dial needs.,O marcador mostra os {energy} que a discagem selecionada requer.

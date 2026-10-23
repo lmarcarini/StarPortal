@@ -3,8 +3,6 @@
 ## Bible: technical-architecture.md#simulation-clock-and-commands
 extends GdUnitTestSuite
 
-const IntelFixture := preload("res://tests/core/intel_fixture.gd")
-
 
 ## A test-only command type, registered and then removed by reset().
 class PingCommand:
@@ -36,11 +34,7 @@ func _samples() -> Array[Command]:
 		SetFlagCommand.create(&"met_kessler", true),
 		SetFlagCommand.create(&"dial_attempts", 7),
 		SetFlagCommand.create(&"last_world", "P3X-118"),
-		SetWorkbenchCommand.create(30, IntelFixture.five_constraints()),
-		AnnotateClueCommand.create(&"clue_0001", IntelFixture.note([&"clue_0002"], ["Heron?"])),
 		DialCommand.create(GateAddress.create([3, 17, 0, 22, 9, 14, 30], 5)),
-		QueueAddressCommand.create(GateAddress.create([1, 2, 3, 4, 5, 6, 7], 8)),
-		UnqueueAddressCommand.create(GateAddress.create([1, 2, 3, 4, 5, 6, 7], 8)),
 		CloseWormholeCommand.new(),
 	]
 
@@ -135,13 +129,9 @@ func test_defaults_are_registered_lazily() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
-				&"annotate_clue",
 				&"close_wormhole",
 				&"dial",
-				&"queue_address",
 				&"set_flag",
-				&"set_workbench",
-				&"unqueue_address",
 			]
 		)
 	)
@@ -158,14 +148,10 @@ func test_register_type_adds_a_type() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
-				&"annotate_clue",
 				&"close_wormhole",
 				&"dial",
 				&"ping",
-				&"queue_address",
 				&"set_flag",
-				&"set_workbench",
-				&"unqueue_address",
 			]
 		)
 	)
@@ -184,13 +170,9 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
-				&"annotate_clue",
 				&"close_wormhole",
 				&"dial",
-				&"queue_address",
 				&"set_flag",
-				&"set_workbench",
-				&"unqueue_address",
 			]
 		)
 	)

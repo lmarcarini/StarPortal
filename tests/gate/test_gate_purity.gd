@@ -1,6 +1,6 @@
 ## Scans the code under src/gate/ for what pure rules must not use: autoloads, global or
 ## reseeded randomness, wall-clock time and Nodes; and checks GateAddress depends on no content.
-## A local, seeded RandomNumberGenerator is allowed (the world and clue generators take one).
+## A local, seeded RandomNumberGenerator is allowed (the world generator takes one).
 ## Bible: technical-architecture.md#code-standards,
 ## technical-architecture.md#determinism-and-numbers
 extends GdUnitTestSuite

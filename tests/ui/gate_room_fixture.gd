@@ -41,6 +41,12 @@ static func address_for(state: GameState, outcome: int) -> GateAddress:
 	return DialFixture.address_of(state.galaxy, DialFixture.OPEN_ID)
 
 
+## Makes [param address] the one [param view]'s Dial button dials, as the Workbench bridge
+## does in the game.
+static func select(view: GateRoomView, address: GateAddress) -> void:
+	view.set_address_source(func() -> GateAddress: return address)
+
+
 ## Returns a Control of [constant VIEW_SIZE] that holds a new Gate Room view, as the shell's
 ## view area does. The caller adds the holder to the tree and frees it.
 static func mount_view() -> Control:
