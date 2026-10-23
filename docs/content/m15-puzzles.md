@@ -1,6 +1,6 @@
-# The First Three Puzzles
+# The First Four Puzzles
 
-The Prologue's three address puzzles: the documents the player reads, the images they see, how
+The Prologue's four address puzzles: the documents the player reads, the images they see, how
 each puzzle is solved, the hints, the answer, the world behind it and that world's position.
 
 Bible: [gate-and-address-spec.md#where-addresses-come-from](../bible/gate-and-address-spec.md#where-addresses-come-from),
@@ -8,7 +8,9 @@ Bible: [gate-and-address-spec.md#where-addresses-come-from](../bible/gate-and-ad
 [#puzzle-design-rules](../bible/gate-and-address-spec.md#puzzle-design-rules),
 [lore-and-arcs.md](../bible/lore-and-arcs.md) (Prologue: "Can the Ring be dialed safely?"),
 [overview.md](../bible/overview.md), [art-and-audio.md](../bible/art-and-audio.md).
-Status: draft for the owner's approval. Every invented name is listed at the end.
+Status: draft for the owner's approval. The owner approved the names of LINTEL, MILESTONE,
+STILLWATER and the people around them; the names new in this revision are marked in the list at
+the end.
 
 **To solve cold:** read only the "Document" and "Image" sections of a puzzle, try it, then read
 its "Solution". The answers appear nowhere above a puzzle's Solution section.
@@ -17,34 +19,200 @@ its "Solution". The answers appear nowhere above a puzzle's Solution section.
 
 | # | Delivered | Holds | Trick |
 | --- | --- | --- | --- |
-| 1 | New game | Field note, rubbing | The note gives the order but describes the carvings loosely or by marks only the rubbing shows; the rubbing shows the carvings but not their order |
-| 2 | First lock of world 1 | Letter, two horizon-camera frames, horizon record | A ring of carvings: find where it starts and which way it runs, and put back the piece that fell |
-| 3 | First lock of world 2 | Field note, song transcript | Seven sung actions name seven objects; two nights disagree on the order, so dial to settle |
+| 1 | New game | Commission order, sketch | A tutorial: the order describes each carving plainly and gives the order; match each to the palette, enter seven, leave the eighth to the console, dial. It also orders the capacitor bank installed first |
+| 2 | First lock of world 1 | Field note, rubbing | The note gives the order but describes the carvings loosely or by marks only the rubbing shows; the rubbing shows the carvings but not their order |
+| 3 | First lock of world 2 | Letter, two horizon-camera frames, horizon record | A ring of carvings: find where it starts and which way it runs, and put back the piece that fell |
+| 4 | First lock of world 3 | Field note, song transcript | Seven sung actions name seven objects; two nights disagree on the order, so dial to settle |
 
-The three share one thread. In 1958 the survey found a carved lintel over the way into the
-Ring's chamber and guessed that someone who came after the builders left it as a sign. Puzzle 1
-reads that sign. Puzzle 2 finds the same hand's sign on the far side. Puzzle 3 comes from a man
-who never saw the lintel and sang its kind of address in his sleep.
+The four share one thread. In 1958 the survey found carved stones by the Ring, a sill at its foot
+and a lintel over the way into its chamber, and guessed that someone who came after the builders
+left them as signs. In 1961 a commission ordered the sill's address dialed first; the order was
+never carried out. Puzzle 1 carries it out. Puzzle 2 reads the lintel. Puzzle 3 finds the same
+hand's sign on the far side. Puzzle 4 comes from a man who never saw the lintel and sang its kind
+of address in his sleep.
 
 **Delivery in M1.5.** There are no probes until M3, so every document in this file arrives on
-a lock or at the start: puzzle 2's documents and world 1's dossier on world 1's first lock,
-puzzle 3's documents and world 2's dossier on world 2's first lock, world 3's dossier on world 3's
-first lock. In the fiction, the Gate Room's first-lock routine pushes a camera and a sampling
-line through the horizon on a pole (the "horizon record"); that is where the far-side frames and
-the dossiers' readings come from. When the MOTH arrives in M3 it can take over this role without
-changing any text the player needs.
+a lock or at the start: puzzle 1's documents at the start; puzzle 2's documents and world 1's
+dossier on world 1's first lock; puzzle 3's documents and world 2's dossier on world 2's first
+lock; puzzle 4's documents and world 3's dossier on world 3's first lock; world 4's dossier on
+world 4's first lock. In the fiction, the Gate Room's first-lock routine pushes a camera and a
+sampling line through the horizon on a pole (the "horizon record"); that is where the far-side
+frames and the dossiers' readings come from. The pole camera is a permanent fixture of the Gate
+Room and makes a horizon record on every first lock. When probes arrive in M3 (the MOTH first),
+they add to it; they do not replace it.
 
 ---
 
-## Puzzle 1: The Lintel
+## Puzzle 1: The Sill Stone
 
-**Delivered:** at the start of a new game, in the Archive, as the first two items of the Object 58
-file. The Gate Room's dial console is open beside them.
+**Delivered:** at the start of a new game, in the Archive, as the only two items there. The Gate
+Room's dial console is open beside them. The base has no capacitors yet, so the console cannot
+dial until the bank is installed from the Gate Room's capacitor gauge (6 in-game hours, card #94).
 
-**Teaches:** read two things together; find each carving on the console's palette; drag the
-glyphs into the slots in order; dial.
+**Teaches:** install the capacitor bank; find each carving on the console's palette; drag the
+glyphs into the slots in order; leave seal 8 to the console; dial. Nothing is deduced: the order
+hands over the address, and the player performs each step once.
 
-### Document 1A: Field Note 14
+### Document 1A: Commission Order No. 1
+
+- **Kind:** note
+- **Title:** Gallow Commission, Order No. 1
+- **Source:** the 1961 Gallow Commission, signed by its secretary, Mr. C. Dunmore; a Records
+  Section slip is clipped to the top
+
+> RECORDS SECTION. RELEASE SLIP.
+> Released to the Director on the reopening of the site, under Standing Order 61/4. The bank
+> fitted in 1961 was removed when the works were closed. The order stands.
+>
+> ---
+>
+> GALLOW COMMISSION. ORDER No. 1.
+> 6 March 1961. For the officer in charge at Gallow.
+>
+> 1. No attempt is to be made on the Ring until the capacitor bank is installed in the Gate Room
+> and holds its charge. Installation is six hours' work.
+>
+> 2. The first attempt shall be the proving address: the carvings cut on the sill stone at the
+> foot of the Ring, recorded by the 1958 survey and drawn by Mr. Pell (attached). Enter them in
+> this order and in no other:
+>
+> First, the line that climbs in square steps.
+> Second, the two pairs of pointed wings either side of a short body, the upper pair the larger.
+> Third, the thin triangle lying flat, its square corner at the lower right.
+> Fourth, the tall pole with a triangle standing out from its upper part.
+> Fifth, the upright with two short arms, one each side, bent upward.
+> Sixth, the tall frame with a slab swung half open inside it and a dot near the slab's edge.
+> Seventh, the trunk that splits and splits again as it climbs.
+>
+> 3. The eighth carving, the round-bellied pot with a spout, is this Ring's own mark. The
+> console sets it at every attempt. It is not to be entered.
+>
+> 4. The result is to be reported to this office before any second attempt.
+>
+> C. Dunmore, Secretary to the Commission.
+
+**How it looks:** a typed foolscap sheet, the release slip a smaller, newer slip held on with a
+paper clip. Across the foot of the order, at an angle, a red rubber stamp: **NOT ACTIONED**, with
+a date, 11 March 1961, and illegible initials.
+
+### Image 1B: The sill stone
+
+- **Kind:** image
+- **Title:** Sill stone, from above
+- **Source:** T. Pell, pencil on squared paper, 1958, attached to Order No. 1
+
+**What it shows.** A low, flat slab drawn from above in firm pencil, about twice as wide as it is
+deep, with the squares of the paper showing through. Eight carvings sit on its face in two rows
+of four, each drawn as its palette picture, clean and whole. Nothing on the sheet is damaged,
+numbered or arrowed.
+
+| | Column 1 | Column 2 | Column 3 | Column 4 |
+| --- | --- | --- | --- | --- |
+| Top row | Stairs | Wedge | Cactus | Tree |
+| Bottom row | Butterfly | Flag | Doorway | Kettle |
+
+Along the bottom edge, in Pell's hand: *Sill stone, Gallow, from above. T.P.*
+
+### Solution
+
+1. Install the capacitor bank from the Gate Room's gauge, as item 1 orders. The console cannot
+   dial until it is in and charged.
+2. Match each line of item 2 to a carving on the sketch and on the palette, in the order's order:
+   - First, the line that climbs in square steps: the **Stairs**.
+   - Second, two pairs of pointed wings, the upper pair larger: the **Butterfly**.
+   - Third, the thin triangle lying flat with its square corner at lower right: the **Wedge**.
+   - Fourth, the tall pole with a triangle from its upper part: the **Flag**.
+   - Fifth, the upright with two short arms bent upward: the **Cactus**.
+   - Sixth, the frame with a slab half open and a dot: the **Doorway**.
+   - Seventh, the trunk that splits again and again: the **Tree**.
+3. The eighth carving, the pot with the spout, is already in seal 8 (CAIRN's mark, the Kettle).
+   The player does not enter it.
+4. The player dials. The full bank is enough, and the Ring locks.
+
+The one "read it carefully" moment is the sketch's layout: the order runs down each column in
+turn, so a player who copies the drawing row by row gets a different sequence (Stairs, Wedge,
+Cactus, Tree, Butterfly, Flag, Doorway), which no world has. The order says to enter the carvings
+in its own order, "and in no other".
+
+Expected time for a first-time player: one to three minutes of reading and dragging, plus the
+six in-game hours of installation (which the player can speed through).
+
+### How the carvings were checked
+
+Each description in Order No. 1 was compared with all 36 picture descriptions in
+`localization/glyphs.csv`. For each, the table names the glyphs that come closest and the words
+in the description that rule them out. No description fits more than one glyph.
+
+| Order's words | Glyph | Closest others, and what rules them out |
+| --- | --- | --- |
+| A line that climbs in square steps | Stairs | Ladder (two rails and crossbars, no steps), Mountain (a jagged line to two peaks, not square), Arrow (one straight slanting line) |
+| Two pairs of pointed wings either side of a short body, the upper pair larger | Butterfly | Spider (four limbs bent like knees, not pairs of wings), Kite (one diamond), Heron (a bird, no paired wings) |
+| A thin triangle lying flat, square corner at the lower right | Wedge | Tent (a tall upright triangle with a line from its peak), Flag (a triangle on a pole), Hourglass (two triangles), Boomerang (two arms at a wide bend) |
+| A tall pole with a triangle standing out from its upper part | Flag | Sailboat (two triangles over a boat), Arrow (a V at the end of a slanting line), Anchor (a crossbar, no triangle), Kite (a diamond) |
+| An upright with two short arms, one each side, bent upward | Cactus | Anchor (a crossbar near the top and long arms sweeping from the foot), Hand (five lines and a stem), Fork (three prongs on a curved base), Tree (a trunk that splits again and again) |
+| A tall frame with a slab swung half open inside it and a dot near the slab's edge | Doorway | Chair (a back and seat on two supports, no frame), Bridge (two posts and a sagging line) |
+| A trunk that splits and splits again as it climbs | Tree | Fork (three prongs on one base, splitting once), Hand (five lines from one point), Cactus (two arms, no further splitting) |
+| A round-bellied pot with a spout | Kettle | Goblet (an open top on a stem), Bell (a dome with a dot inside), Candle (a narrow block) |
+
+The sketch shows each carving as its palette picture too, so a player who trusts the drawing over
+the words reaches the same glyphs.
+
+### Where players get stuck, and the analyst's hints
+
+| Stuck on | Gentle hint | Direct hint |
+| --- | --- | --- |
+| Dial disabled: no capacitors | "Order No. 1, item 1: nothing before the capacitor bank is in." | "Install the capacitor bank from the gauge in the Gate Room. It takes six hours." |
+| Matching a line of the order to a carving | "Each line of item 2 describes one carving on Pell's sketch." | "Find the carving the line describes on the sketch, then the same picture on the palette." |
+| Copying the sketch row by row | "The order gives its own sequence: 'in this order and in no other'." | "Follow item 2 line by line: Stairs, then the Butterfly, then the Wedge." |
+| Trying to enter the pot with the spout | "Item 3 says what to do with the eighth carving." | "The pot is this Ring's own mark. It is already in seal 8; enter only seven." |
+
+### Answer
+
+**Seals 1 to 7:** Stairs, Butterfly, Wedge, Flag, Cactus, Doorway, Tree (glyphs 35, 24, 29, 10,
+19, 22, 8). Seal 8: CAIRN's mark (Kettle, glyph 2).
+
+**World: SILL.** A dark, airless world of red rock under a dim sun, and the Prologue's first
+answer: the Ring can be dialed, and nothing comes back. **Safe:** yes.
+
+**World dossier (arrives on SILL's first lock):**
+
+> WORLD DOSSIER: SILL (PRELIMINARY)
+> Source of address: the sill stone at the foot of the Ring (Gallow Commission, Order No. 1;
+> Pell drawing, 1958).
+> Compiled from the horizon record of the first lock.
+> Status: Dead. Safe.
+>
+> The far Ring stands on a shelf of dark red rock at the foot of a cliff. The sky is a deep
+> violet even in daylight, and a dim orange sun sits low over the cliff's edge. The sampling line
+> drew almost nothing: a trace of nitrogen at a pressure too low to measure well. Temperature at
+> the horizon is about minus twenty degrees. There is no water, no wind and no life of any kind
+> on the camera's frames.
+>
+> A flat slab is set in the rock before the far Ring, where the sill stone lies before ours. Its
+> face is bare. The dust on it is unmarked.
+>
+> The Ring was dialed, held its lock, and nothing came through from the far side. The
+> Committee's first question has its answer. The Ring can be dialed safely, at least to here.
+>
+> Analyst's note: the order that named this address was signed in March 1961 and stamped as not
+> carried out five days later. Whatever was dialed at Gallow that year, it was not this.
+
+**Position:** (-2065, 2433, 1107) light years, 3,959 ly from CAIRN. Seal 1's anchor (35) is
+2,221.6 ly from CAIRN, so the lock needs 366.6 MWh, inside one 400 MWh bank.
+
+---
+
+## Puzzle 2: The Lintel
+
+**Delivered:** on SILL's first lock, Folder 1 of the Object 58 file arrives in the Archive, with a
+notification on the wormhole screen. It holds documents 2A and 2B and a Records Section slip:
+"Released to the Director on the first confirmed lock, under Standing Order 61/4. Folder 2 is held
+until the second."
+
+**Teaches:** read two things together; a description can name a carving by a mark that only the
+other source shows.
+
+### Document 2A: Field Note 14
 
 - **Kind:** note
 - **Title:** Gallow Survey, Field Note 14
@@ -79,7 +247,7 @@ glyphs into the slots in order; dial.
 > Each of the seven is also cut among the marks on the Ring itself. I do not think that is
 > chance. I would like to know what they say before anyone tries them.
 
-### Image 1B: The rubbing
+### Image 2B: The rubbing
 
 - **Kind:** image
 - **Title:** Lintel rubbing, as laid
@@ -143,8 +311,8 @@ Hints go from gentle to direct; the difficulty setting decides how soon the next
 **Seals 1 to 7:** Stairs, Cactus, Flag, Anchor, Crown, Sailboat, Key (glyphs 35, 19, 10, 15,
 5, 6, 4). Seal 8: CAIRN's mark (Kettle, glyph 2).
 
-**World: LINTEL.** A dead world of grey grit under a black sky, and the Prologue's first answer:
-the Ring can be dialed, and nothing comes back. **Safe:** yes.
+**World: LINTEL.** A dead world of grey grit under a black sky, where someone who came after the
+builders left a stone facing the Ring. **Safe:** yes.
 
 **World dossier (arrives on LINTEL's first lock):**
 
@@ -161,8 +329,8 @@ the Ring can be dialed, and nothing comes back. **Safe:** yes.
 > Thirty metres in front of the Ring stands a disc of worked stone, set on edge to face it. See
 > the horizon record and frames 1 and 2.
 >
-> The Ring was dialed, held its lock and nothing came through from the far side. The
-> Committee's first question has its answer. The Ring can be dialed safely, at least to here.
+> The Ring was dialed, held its lock and, as at SILL, nothing came through from the far side.
+> Two locks, two quiet worlds.
 >
 > Analyst's note: the disc is cut from the local rock with metal tools. Its tool marks are worn
 > but clear; the Ring beside it shows no tool marks at all. The Gallow lintel was also cut long
@@ -174,23 +342,23 @@ the Ring can be dialed, and nothing comes back. **Safe:** yes.
 
 ---
 
-## Puzzle 2: The Milestone
+## Puzzle 3: The Milestone
 
 **Delivered:** on LINTEL's first lock, all four documents arrive in the Archive together, with
-a notification on the wormhole screen: Folder 2 of the Object 58 file (2A) and the lock's
-horizon record (2B, 2C, 2D).
+a notification on the wormhole screen: Folder 2 of the Object 58 file (3A) and the lock's
+horizon record (3B, 3C, 3D).
 
 **Teaches:** the far side holds clues; a puzzle can say where its missing piece is.
 
-### Document 2A: Object 58, Folder 2
+### Document 3A: Object 58, Folder 2
 
 - **Kind:** dossier
 - **Title:** Object 58, Folder 2: Correspondence, 1959
 - **Source:** Directorate Records Section; a letter from Dr. A. Ellery to the Directorate liaison
 
 > RECORDS SECTION. RELEASE SLIP.
-> Released to the Director on the first confirmed lock, under Standing Order 61/4.
-> Folder 3 is held until the second.
+> Released to the Director on the second confirmed lock, under Standing Order 61/4.
+> Folder 3 is held until the third.
 >
 > ---
 >
@@ -223,7 +391,7 @@ horizon record (2B, 2C, 2D).
 > Yours sincerely,
 > A. Ellery
 
-### Image 2B: Horizon camera, frame 1
+### Image 3B: Horizon camera, frame 1
 
 - **Kind:** image
 - **Title:** LINTEL, first lock, horizon camera frame 1
@@ -250,7 +418,7 @@ place on the rim).
 Below the empty recess, at the foot of the disc, a small pale shape lies on the grit, too small
 to read at this distance.
 
-### Image 2C: Horizon camera, frame 2
+### Image 3C: Horizon camera, frame 2
 
 - **Kind:** image
 - **Title:** LINTEL, first lock, horizon camera frame 2 (long lens)
@@ -262,7 +430,7 @@ pale stone, roughly a tall rectangle with one corner snapped off, face up. It ho
 **upside down** as it lies: the Candle rotated 180 degrees, so its narrow block is at the top
 and the short line runs down from the block's middle to end in the dot.
 
-### Document 2D: Horizon record
+### Document 3D: Horizon record
 
 - **Kind:** log
 - **Title:** Horizon record, LINTEL, first lock
@@ -350,15 +518,15 @@ lock needs 366.6 MWh.
 
 ---
 
-## Puzzle 3: The Night Watchman's Song
+## Puzzle 4: The Night Watchman's Song
 
 **Delivered:** on MILESTONE's first lock, Folder 3 of the Object 58 file arrives in the Archive,
-as the Folder 2 release slip promised. It holds documents 3A and 3B.
+as the Folder 2 release slip promised. It holds documents 4A and 4B.
 
 **Teaches:** a clue can be a text whose meaning is not on its surface; two sources can disagree,
 and the Ring can settle what reading cannot (puzzle rule 5).
 
-### Document 3A: Field Note 31
+### Document 4A: Field Note 31
 
 - **Kind:** note
 - **Title:** Gallow Survey, Field Note 31
@@ -386,7 +554,7 @@ and the Ring can settle what reading cannot (puzzle rule 5).
 > record show that I do not believe in dreams. Let it also show that Haskett has never seen the
 > lintel's face.
 
-### Document 3B: The two nights
+### Document 4B: The two nights
 
 - **Kind:** log
 - **Title:** Haskett transcript, 19 and 21 June 1958
@@ -489,38 +657,44 @@ lock needs 366.6 MWh.
 ### Neighbours look alike
 
 Every address reachable with the starting bank has the climbing mark (Stairs) first, and in
-every sizeable region sampled the Cactus is somewhere in seals 2 to 7. The three answers were
+every sizeable region sampled the Cactus is somewhere in seals 2 to 7. The four answers were
 chosen to share as little else as the region allows (see the table below), but they cannot share
-nothing. The documents lean into this: the lintel begins with the climbing mark, the letter
-says to begin with it, and the song begins with it. Seeing familiar carvings in a new order is
-the bible's first consequence of the address rule, and a clue the player will use later.
+nothing. The documents lean into this: the sill stone and the lintel begin with the climbing
+mark, the letter says to begin with it, and the song begins with it. Seeing familiar carvings in
+a new order is the bible's first consequence of the address rule, and a clue the player will use
+later.
 
 ### Positions and addresses
 
-Computed with a throwaway Godot script (kept outside the repository) that loads
-`data/gate/home_anchor_field.tres`, `data/gate/worlds/cairn.tres` and
-`data/balance/balance_config.tres` and calls `AddressRule` and `EnergyMath`. Each position is
-the integer point near its answer's region (with |z| at most 1,500 ly, the thickness of the
-anchor field) with the widest gap between consecutive anchor distances, so small anchor edits
-are unlikely to change the address.
+LINTEL, MILESTONE and STILLWATER were placed with a throwaway Godot script (kept outside the
+repository) that loads `data/gate/home_anchor_field.tres`, `data/gate/worlds/cairn.tres` and
+`data/balance/balance_config.tres` and calls `AddressRule` and `EnergyMath`. SILL was placed with
+a throwaway Python search using the same rule (exact integer squared distance, ties to the lower
+glyph, CAIRN's origin glyph 2 excluded), then checked with the same Godot script. Each position is
+the integer point in its answer's region (with |z| at most 1,500 ly, the thickness of the anchor
+field) with the widest gap between consecutive anchor distances, so small anchor edits are
+unlikely to change the address.
 
 | World | Position (ly) | Address from CAIRN (seals 1 to 8) | Lock energy | Distance from CAIRN | Smallest gap between anchor distances |
 | --- | --- | --- | --- | --- | --- |
+| SILL | (-2065, 2433, 1107) | 35, 24, 29, 10, 19, 22, 8, 2 | 366.6 MWh | 3,959 ly | 499 ly |
 | LINTEL | (-68, -3864, -1500) | 35, 19, 10, 15, 5, 6, 4, 2 | 366.6 MWh | 3,234 ly | 197 ly |
 | MILESTONE | (-5568, 2636, 200) | 35, 22, 19, 3, 24, 29, 34, 2 | 366.6 MWh | 6,014 ly | 287 ly |
 | STILLWATER | (-918, 1286, 370) | 35, 10, 24, 19, 29, 8, 15, 2 | 366.6 MWh | 2,558 ly | 498 ly |
 
 - **Dialable:** each has seal 1 = glyph 35, whose anchor is 2,221.6 ly from CAIRN, so each lock
-  needs 366.6 MWh, inside the 400 MWh starting bank.
-- **Unique:** for every origin glyph 0 to 35, the addresses of CAIRN, LINTEL, MILESTONE and
+  needs 366.6 MWh, inside one 400 MWh bank. Glyph 35 is the only seal-1 anchor within one bank.
+- **Unique:** for every origin glyph 0 to 35, the addresses of CAIRN, SILL, LINTEL, MILESTONE and
   STILLWATER are all different. None is CAIRN's own address (35, 19, 10, 5, 15, 24, 29).
 - **Different seal by seal:** every pair of answers differs in all six of seals 2 to 7.
-- **Shared glyphs:** across all reachable regions (a 50 ly grid with |z| at most 1,500 ly), this
-  trio shares the fewest glyphs of any trio of sizeable regions that also differs seal by seal: LINTEL and MILESTONE
-  share only the Cactus; LINTEL and STILLWATER share the Cactus, Flag and Anchor; MILESTONE and
-  STILLWATER share the Cactus, Butterfly and Wedge. The Cactus is in all three because it is in
-  every sizeable reachable region. The earlier draft shared eleven glyphs pairwise; this one
-  shares seven.
+- **Shared glyphs:** across all reachable regions (a 50 ly grid with |z| at most 1,500 ly),
+  LINTEL, MILESTONE and STILLWATER share the fewest glyphs of any trio of sizeable regions that
+  also differs seal by seal: LINTEL and MILESTONE share only the Cactus; LINTEL and STILLWATER
+  share the Cactus, Flag and Anchor; MILESTONE and STILLWATER share the Cactus, Butterfly and
+  Wedge. SILL was chosen among the sizeable regions that differ seal by seal from all three; it
+  shares the Flag and Cactus with LINTEL (the next puzzle), the Butterfly, Wedge, Cactus and
+  Doorway with MILESTONE, and the Butterfly, Wedge, Flag, Cactus and Tree with STILLWATER. Its
+  seven are also the easiest of the reachable glyphs to describe without a look-alike.
 
 **A constraint for the content card.** The stone on LINTEL gives MILESTONE's address as CAIRN
 dials it. That is only true if LINTEL's own origin glyph is not one of MILESTONE's seven
@@ -532,57 +706,75 @@ rule should hold for any later far-side inscription.
 
 The wrong readings a player is most likely to dial. None may ever be a real address; the
 content card's validator should check them alongside the answers, because an anchor edit could
-make one real (the closest call is puzzle 3's first night). Each was checked against a 40 ly
-grid over the whole region where seal 1 is glyph 35, and none occurs there.
+make one real (the closest call is puzzle 4's first night). Each was checked exactly, with a
+linear-programming test over the whole anchor slab (|x|, |y| at most 15,000 ly, |z| at most
+1,500 ly): no point there has any of these addresses. None equals an answer.
 
 | Puzzle | Wrong reading | Seals 1 to 7 |
 | --- | --- | --- |
-| 1 | Hand for Cactus | 35, 23, 10, 15, 5, 6, 4 |
-| 1 | Tree for Cactus | 35, 8, 10, 15, 5, 6, 4 |
-| 1 | Mountain for Crown | 35, 19, 10, 15, 27, 6, 4 |
-| 1 | Fork for Crown | 35, 19, 10, 15, 26, 6, 4 |
-| 1 | Doorway for Key | 35, 19, 10, 15, 5, 6, 22 |
-| 1 | Sailboat and Anchor swapped | 35, 19, 10, 6, 5, 15, 4 |
-| 2 | Read clockwise | 35, 34, 29, 24, 3, 19, 22 |
-| 3 | First night | 35, 10, 24, 19, 8, 29, 15 |
-| 3 | Candle for Butterfly | 35, 10, 34, 19, 29, 8, 15 |
-| 3 | Hand for Cactus | 35, 10, 24, 23, 29, 8, 15 |
-| 3 | Doorway for Wedge | 35, 10, 24, 19, 22, 8, 15 |
-| 3 | Fork for Tree | 35, 10, 24, 19, 29, 26, 15 |
-| 3 | Fish for Anchor | 35, 10, 24, 19, 29, 8, 13 |
+| 1 | Sketch copied row by row | 35, 29, 19, 8, 24, 10, 22 |
+| 1 | Spider for Butterfly | 35, 17, 29, 10, 19, 22, 8 |
+| 1 | Tent for Wedge | 35, 24, 18, 10, 19, 22, 8 |
+| 1 | Kite for Flag | 35, 24, 29, 28, 19, 22, 8 |
+| 1 | Hand for Cactus | 35, 24, 29, 10, 23, 22, 8 |
+| 1 | Chair for Doorway | 35, 24, 29, 10, 19, 33, 8 |
+| 1 | Fork for Tree | 35, 24, 29, 10, 19, 22, 26 |
+| 2 | Hand for Cactus | 35, 23, 10, 15, 5, 6, 4 |
+| 2 | Tree for Cactus | 35, 8, 10, 15, 5, 6, 4 |
+| 2 | Mountain for Crown | 35, 19, 10, 15, 27, 6, 4 |
+| 2 | Fork for Crown | 35, 19, 10, 15, 26, 6, 4 |
+| 2 | Doorway for Key | 35, 19, 10, 15, 5, 6, 22 |
+| 2 | Sailboat and Anchor swapped | 35, 19, 10, 6, 5, 15, 4 |
+| 3 | Read clockwise | 35, 34, 29, 24, 3, 19, 22 |
+| 4 | First night | 35, 10, 24, 19, 8, 29, 15 |
+| 4 | Candle for Butterfly | 35, 10, 34, 19, 29, 8, 15 |
+| 4 | Hand for Cactus | 35, 10, 24, 23, 29, 8, 15 |
+| 4 | Doorway for Wedge | 35, 10, 24, 19, 22, 8, 15 |
+| 4 | Fork for Tree | 35, 10, 24, 19, 29, 26, 15 |
+| 4 | Fish for Anchor | 35, 10, 24, 19, 29, 8, 13 |
 
-Readings that do not start with the Stairs (for example puzzle 1 in Pell's numbered order,
+Readings that do not start with the Stairs (for example puzzle 2 in Pell's numbered order,
 which starts with the Key) need far more than 400 MWh, so they cannot be dialed in the Prologue
-at all.
+at all. Entering the Kettle in a slot (puzzle 1, item 3 misread) puts CAIRN's own mark among the
+coordinates, which no address can have.
 
 ---
 
-## Invented names for approval
+## Invented names
 
-| Name | What it is | Where it appears |
-| --- | --- | --- |
-| Dr. Agnes Ellery | Geologist, leader of the 1958 survey; writes as "A. Ellery" | 1A, 2A, 3A, 3B |
-| Thomas Pell | The survey's draughtsman, ex-Navy; takes the rubbing | 1A, 1B |
-| Walter Haskett | Night watchman at the Gallow salt works; sings the song | 2A, 3A, 3B |
-| Mr. C. Dunmore | Directorate liaison to the survey in 1959 | 2A |
-| Gallow Survey | The 1958 survey team's name (Gallow is from the bible) | 1A, 3A |
-| Records Section | The Directorate office that releases the Object 58 folders | 2A |
-| Standing Order 61/4 | The 1961 order that sets when each folder is released | 2A |
-| The climbing mark | Ellery's name for the Stairs carving | 1A, 2A, 2D, 3A |
-| The horizon record | The Gate Room's first-lock routine: a pole camera and sampling line pushed through the horizon | 2B, 2C, 2D, dossiers |
-| LINTEL | World 1 | Puzzle 1 |
-| MILESTONE | World 2 | Puzzle 2 |
-| STILLWATER | World 3 | Puzzle 3 |
+The owner approved the names marked "Approved" on 2026-10-23. The names marked "New" come with
+puzzle 1 and need the owner's approval.
 
-World names follow one convention for the owner to approve: the Directorate names a world after
+| Name | What it is | Where it appears | Status |
+| --- | --- | --- | --- |
+| Dr. Agnes Ellery | Geologist, leader of the 1958 survey; writes as "A. Ellery" | 2A, 3A, 4A, 4B | Approved |
+| Thomas Pell | The survey's draughtsman, ex-Navy; takes the rubbing and draws the sill stone | 1A, 1B, 2A, 2B | Approved |
+| Walter Haskett | Night watchman at the Gallow salt works; sings the song | 3A, 4A, 4B | Approved |
+| Mr. C. Dunmore | Directorate liaison to the survey in 1959; secretary to the Gallow Commission in 1961 | 1A, 3A | Approved (the 1961 role is new) |
+| Gallow Survey | The 1958 survey team's name (Gallow is from the bible) | 2A, 4A | Approved |
+| Records Section | The Directorate office that releases the Object 58 folders | 1A, the Folder 1 slip (puzzle 2), 3A | Approved |
+| Standing Order 61/4 | The 1961 order that sets when each folder is released | 1A, the Folder 1 slip (puzzle 2), 3A | Approved |
+| The climbing mark | Ellery's name for the Stairs carving | 2A, 3A, 3D, 4A | Approved |
+| The horizon record | The Gate Room's permanent pole camera and sampling line, pushed through the horizon on every first lock | 3B, 3C, 3D, dossiers | Approved |
+| LINTEL | World 2 | Puzzle 2 | Approved |
+| MILESTONE | World 3 | Puzzle 3 | Approved |
+| STILLWATER | World 4 | Puzzle 4 | Approved |
+| Gallow Commission | The 1961 body that ran the first attempt on the Ring | 1A | New |
+| Order No. 1 | The Commission's first order: install the bank, then dial the proving address | 1A | New |
+| The sill stone | A carved slab set in the floor at the foot of CAIRN's Ring | 1A, 1B, SILL dossier | New |
+| The proving address | The Commission's name for the sill stone's address | 1A | New |
+| SILL | World 1 | Puzzle 1 | New |
+
+World names follow one convention, approved by the owner: the Directorate names a world after
 the source of its address.
 
 ## Lore threads and questions for the owner
 
-1. **Who cut the stones.** The lintel and the LINTEL disc are younger than the Ring and cut by
-   the same hand; MILESTONE's bronze-coloured pegs are a second party. Both are meant as early
-   traces of the Ossar (bronze is their palette) and of whoever they kept waiting. Nothing names
-   them. Confirm this fits the canon file.
+1. **Who cut the stones.** The sill stone, the lintel and the LINTEL disc are younger than the
+   Ring and cut by the same hand; MILESTONE's bronze-coloured pegs are a second party. Both are
+   meant as early traces of the Ossar (bronze is their palette) and of whoever they kept waiting.
+   Nothing names them. The bare slab before SILL's Ring may be theirs, never carved. Confirm this
+   fits the canon file.
 2. **Haskett's song.** A man near a buried, still-powered Ring dreams an address, uses Ellery's
    words without having read them, and sings "the far side keeps the time" in 1958. This is
    meant as the Murmur's first, deniable trace, and as the source of the words the 1961 file
@@ -591,19 +783,26 @@ the source of its address.
    lock, as if they knew what each lock would lead to. Meant as an early Continuity thread for
    Arc 2.
 4. **The footprints on STILLWATER** are a hook for Arc 1 ("Who is out there?") and the Kindred.
-5. **The horizon record** stands in for probes until M3: a pole camera and sampling line on
-   every first lock. Confirm it as a fixture of the Gate Room, or treat it as M1.5 scaffolding
-   that the MOTH replaces.
+5. **The horizon record.** Resolved by the owner: the pole camera and sampling line are a
+   permanent fixture of the Gate Room and make a horizon record on every first lock. Probes (the
+   MOTH, M3) arrive as an addition, not a replacement.
 6. **Far Ring consoles** are left to the console card (#86); nothing here depends on them.
 7. **Bible text.** This document follows the current bible export ("Where addresses come from",
    "The opening puzzle", "Puzzle design rules"). The repository's copy of
    `gate-and-address-spec.md` still has the older sections and should be updated before the
-   content card links to these anchors.
-8. **Translation (for the content card).** In pt_BR the Butterfly glyph is *Borboleta*, but a
-   moth is *mariposa*. Field Note 14 no longer mentions a moth, but puzzle 3's "Let the moth go
+   content card links to these anchors. The bible's opening-puzzle sketch (a note and a rubbing
+   read together) now describes puzzle 2; puzzle 1, the tutorial, comes before it.
+8. **Order No. 1, NOT ACTIONED.** The Commission ordered the proving address dialed first and
+   reported before anything else; the stamp says that never happened. Meant to sit beside the
+   bible's Gallow Incident: in 1961 the team dialed an address copied from the Ring's own
+   inscriptions instead, and 14 people died. Who overrode the order is left open for Arc 2.
+   Confirm.
+9. **Translation (for the content card).** In pt_BR the Butterfly glyph is *Borboleta*, but a
+   moth is *mariposa*. Field Note 14 no longer mentions a moth, but puzzle 4's "Let the moth go
    from the lamp" must still point at the Borboleta: translate it with *borboleta*, or with a
    wording that plainly means the winged insect on the palette, never one that leads to another
    glyph. Likewise "Drop the hook where the water lies still" must stay an anchoring phrase in
    Portuguese (for example *lançar o ferro* or *largar a âncora*), so it points at the Âncora,
-   not the Fish. The other verses and Field Note 14's descriptions need the same check: each must
-   still fit only its own carving among the seven on the rubbing or in the song.
+   not the Fish. The other verses, Field Note 14's descriptions and Order No. 1's seven lines need
+   the same check: each must still fit only its own carving (for Order No. 1, among all 36; see
+   "How the carvings were checked").
