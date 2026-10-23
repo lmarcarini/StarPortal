@@ -1,9 +1,9 @@
 class_name PaletteGlyph
 extends Button
-## One glyph of the Address Workbench palette: its constellation, its name and a status mark.
-## Pressing it picks the glyph (the button shows pressed while picked); dragging it carries
-## the glyph to a seal slot. Shows a status; never edits the draft.
-## Bible: gate-and-address-spec.md#player-tools,
+## One glyph of the Address Workbench palette: its constellation and its name. Pressing it
+## picks the glyph (the button shows pressed while picked); dragging it carries the glyph to a
+## seal slot.
+## Bible: gate-and-address-spec.md#glyphs-and-the-hidden-address-math,
 ## game-design.md#difficulty-and-accessibility (click-to-pick, dragging, gamepad)
 
 ## The player pressed this glyph.
@@ -15,20 +15,15 @@ const DRAG_KEY: String = "workbench_glyph"
 const PADDING: Vector2 = Vector2(4, 4)
 ## Narrowest the button gets, in pixels.
 const MIN_WIDTH: float = 56.0
-## Opacity of a ruled-out glyph's drawing.
-const DIMMED_ALPHA: float = 0.4
 ## Size of the drag preview, in pixels.
 const PREVIEW_SIZE: Vector2 = Vector2(48, 48)
 
 ## The glyph shown, 0..35.
 var glyph: int = -1
 
-var _status: WorkbenchEdits.GlyphStatus = WorkbenchEdits.GlyphStatus.NEUTRAL
-
 @onready var _content: VBoxContainer = %Content
 @onready var _icon: GlyphIcon = %Icon
 @onready var _name: Label = %GlyphName
-@onready var _mark: StatusMark = %Mark
 
 
 func _ready() -> void:
@@ -77,21 +72,21 @@ func set_glyph(index: int) -> void:
 		_apply_glyph()
 
 
-## Shows [param status], whether the glyph is [param picked], and [param tooltip].
-func show_status(status: WorkbenchEdits.GlyphStatus, picked: bool, tooltip: String) -> void:
-	_status = status
-	_mark.status = status
-	var is_ruled_out: bool = status == WorkbenchEdits.GlyphStatus.RULED_OUT
-	_icon.modulate.a = DIMMED_ALPHA if is_ruled_out else 1.0
+## Shows whether the glyph is [param picked], and [param tooltip].
+func show_picked(picked: bool, tooltip: String) -> void:
 	set_pressed_no_signal(picked)
 	tooltip_text = tooltip
 
 
-## Returns the status shown.
-func get_status() -> WorkbenchEdits.GlyphStatus:
-	return _status
+## Returns glyph [param index]'s translation key for its name (GlyphDef.name_key), or &""
+## for no glyph.
+static func name_key_of(index: int) -> StringName:
+	if index < 0 or index >= GateAddress.GLYPH_COUNT:
+		return &""
+	var def: GlyphDef = Registry.get_def(StringName(GlyphIcon.GLYPH_ID_FORMAT % index)) as GlyphDef
+	return def.name_key if def != null else &""
 
 
 func _apply_glyph() -> void:
 	_icon.glyph_index = glyph
-	_name.text = WorkbenchText.glyph_name_key(glyph)
+	_name.text = name_key_of(glyph)

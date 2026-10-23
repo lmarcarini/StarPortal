@@ -53,11 +53,7 @@ static func registered_types() -> Array[StringName]:
 static func register_defaults() -> void:
 	_defaults_registered = true
 	_types[SetFlagCommand.TYPE] = SetFlagCommand
-	_types[SetWorkbenchCommand.TYPE] = SetWorkbenchCommand
-	_types[AnnotateClueCommand.TYPE] = AnnotateClueCommand
 	_types[DialCommand.TYPE] = DialCommand
-	_types[QueueAddressCommand.TYPE] = QueueAddressCommand
-	_types[UnqueueAddressCommand.TYPE] = UnqueueAddressCommand
 	_types[CloseWormholeCommand.TYPE] = CloseWormholeCommand
 
 

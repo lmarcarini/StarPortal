@@ -2,14 +2,13 @@ class_name GameSetup
 extends RefCounted
 ## Builds a runnable Simulation around a new or loaded GameState: regenerates the galaxy from
 ## the state's saved seed and generator version, sets the state's transient balance and
-## galaxy, and adds the systems in the bible's fixed tick order (power, gate, then intel).
-## A new game also plans the M1 opening (build_new()); a loaded one never does.
+## galaxy, and adds the systems in the bible's fixed tick order (power, then gate).
 ## Bible: technical-architecture.md#simulation-clock-and-commands,
 ## technical-architecture.md#save-system, technical-architecture.md#data-model
 
 
 ## Returns a Result whose value is a Simulation over [param state] with
-## [PowerSystem, GateSystem, IntelSystem], after setting [code]state.balance[/code] and
+## [PowerSystem, GateSystem], after setting [code]state.balance[/code] and
 ## [code]state.galaxy[/code] from [param defs]. Fails, leaving the state unchanged, with
 ## &"missing_content" when [param defs] lacks the balance, 36 anchors or exactly one home
 ## world, and with &"galaxy_version_mismatch" when the state's generator version is not
@@ -29,19 +28,14 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 		)
 	state.balance = defs.balance
 	state.galaxy = build_galaxy(state.worlds.galaxy_seed, defs)
-	var systems: Array[SimSystem] = [
-		PowerSystem.new(defs.balance), GateSystem.new(), IntelSystem.new()
-	]
+	var systems: Array[SimSystem] = [PowerSystem.new(defs.balance), GateSystem.new()]
 	return Result.ok(Simulation.new(state, systems))
 
 
-## Like build(), for a new game: on success also plans the opening scenario
-## (OpeningScenario.plan()), scheduling its three dossiers. Never use it for a loaded game.
+## Like build(), for a new game. A new game has no opening scenario yet, so this is build();
+## it stays the entry point for new games so their later setup has one place to go.
 static func build_new(state: GameState, defs: GameDefs) -> Result:
-	var built: Result = build(state, defs)
-	if built.is_ok:
-		OpeningScenario.plan(state)
-	return built
+	return build(state, defs)
 
 
 ## Returns the galaxy generated from [param galaxy_seed] over [param defs]' anchors and

@@ -1,16 +1,12 @@
 class_name GlyphPalette
 extends GridContainer
-## All 36 glyphs of the Address Workbench, each with its name and its status in the draft
-## (undecided, ruled out, in the address). Reports picks; never edits the draft.
-## Bible: gate-and-address-spec.md#player-tools
+## All 36 glyphs of the Address Workbench, each with its name. Reports picks and shows which
+## glyph is picked; changes nothing else.
+## Bible: gate-and-address-spec.md#glyphs-and-the-hidden-address-math,
+## game-design.md#difficulty-and-accessibility (click-to-pick, dragging)
 
 ## The player pressed glyph [param glyph].
 signal glyph_chosen(glyph: int)
-
-## Status key per WorkbenchEdits.GlyphStatus, in enum order.
-const STATUS_KEYS: Array[StringName] = [
-	&"WORKBENCH_STATUS_NEUTRAL", &"WORKBENCH_STATUS_RULED_OUT", &"WORKBENCH_STATUS_IN_ADDRESS"
-]
 
 const _GLYPH_SCENE: PackedScene = preload("res://src/ui/analysis/workbench/palette_glyph.tscn")
 
@@ -27,24 +23,12 @@ func _ready() -> void:
 		_buttons.append(button)
 
 
-## Shows each glyph's status in [param constraints] and marks [param picked] (-1 for none) as
-## pressed. [param translate] is the caller's tr.
-func show_draft(constraints: Array[AddressConstraint], picked: int, translate: Callable) -> void:
-	var template: String = str(translate.call("WORKBENCH_PALETTE_TOOLTIP"))
+## Marks [param picked] (-1 for none) as pressed and names each glyph in its tooltip.
+## [param translate] is the caller's tr.
+func show_picked(picked: int, translate: Callable) -> void:
 	for button: PaletteGlyph in _buttons:
-		var status: WorkbenchEdits.GlyphStatus = WorkbenchEdits.glyph_status(
-			constraints, button.glyph
-		)
-		var tooltip: String = (
-			template
-			. format(
-				{
-					"glyph": WorkbenchText.glyph_name(button.glyph, translate),
-					"status": str(translate.call(STATUS_KEYS[status])),
-				}
-			)
-		)
-		button.show_status(status, button.glyph == picked, tooltip)
+		var tooltip: String = str(translate.call(PaletteGlyph.name_key_of(button.glyph)))
+		button.show_picked(button.glyph == picked, tooltip)
 
 
 ## Returns the button of [param glyph], 0..35, or null.

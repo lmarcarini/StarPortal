@@ -133,7 +133,7 @@ func _choose_seed() -> int:
 
 
 ## Builds the Simulation for [param state] through GameSetup, from the Registry's content,
-## and binds it to SimClock; a [param is_new_game] also plans the opening dossiers. Returns
+## and binds it to SimClock; a [param is_new_game] goes through GameSetup.build_new(). Returns
 ## false, keeping the running game, when the state cannot be set up (e.g. a save from another
 ## galaxy generator version).
 func _start(state: GameState, is_new_game: bool = false) -> bool:

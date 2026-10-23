@@ -11,18 +11,8 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="OriginRow" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="OriginCaption" type="Label" parent="OriginRow"]
+[node name="OriginCaption" type="Label" parent="."]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-autowrap_mode = 3
-
-[node name="ResetOrigin" type="Button" parent="OriginRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "WORKBENCH_ORIGIN_RESET"
+auto_translate_mode = 2
 autowrap_mode = 3
