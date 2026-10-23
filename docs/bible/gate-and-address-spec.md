@@ -60,7 +60,7 @@ E_{lock} = E_{base} \times \left(1 + \frac{d}{d_{ref}}\right) \times M_{seals}
 | M\_seals | 1 for 8 seals, 25 for 9, 400 for 10 |
 | Open drain | 20 MW (8 seals), 200 MW (9), set by the story for 10 |
 | Starting plant | Diesel, 30 MW output |
-| Starting storage | One capacitor bank, 400 MWh |
+| Starting storage | None. The first capacitor bank (400 MWh) is installed from the Gate Room, taking 6 in-game hours, before the first dial |
 
 At these values an early dial needs most of a day's spare output to charge. An open wormhole can outrun the plant, which forces the player to shed rooms. Dialing nine seals before the Halvane tap means tapping the national grid, which causes a regional blackout and an Exposure spike. Incoming wormholes cost the dialing side, never CAIRN.
 
@@ -85,13 +85,13 @@ Every story address comes from a hand-made puzzle: a document or object, usually
 
 ## The opening puzzle
 
-The first address is the tutorial: a field note and a rubbing that only make sense together.
+The first address is a tutorial in disguise; the second is the first real puzzle. Full text and solutions: docs/content/m15-puzzles.md (approved 2026-10-23).
 
-- **The note** (1958, the survey team that found the Ring under the salt works) describes seven carvings on a buried lintel beside the Ring and the order the builders seem to have walked them, in words: "the bird first, then the one that holds fire" and so on.
-- **The rubbing** shows the same seven carvings, smudged and out of order.
-- Matching each description to a carving gives seven glyphs in order. The player drags them onto the dial console and dials. The world on the other side is dead, safe and quiet: the Prologue's answer to "can the Ring be dialed safely?"
+- **SILL, the tutorial.** The Gallow Commission's Order No. 1 (1961) says to install the capacitor bank before any attempt, then lists the seven carvings of the sill stone in order; the eighth is the Ring's own mark, which the console sets. Pell's 1958 sketch shows the stone. The one thing to notice is that the order runs down the sketch's columns.
+- **LINTEL, the opening puzzle.** Ellery's 1958 survey note and a rubbing of the buried lintel's carvings arrive on SILL's first lock. Neither alone gives the address; read together they do.
+- Both worlds are dead, safe and quiet: SILL answers the Prologue's question, "can the Ring be dialed safely?" MILESTONE and STILLWATER follow as puzzles 3 and 4.
 
-Names, dates and the exact wording are drafts for the owner to approve.
+On every first lock the pole camera brings back the horizon record, which carries the next puzzle's pieces.
 
 ## The dial console
 
@@ -99,7 +99,7 @@ The dial console is where the player builds and dials an address; it replaces th
 
 - **Palette and slots.** The 36 glyphs sit on a palette; the player drags a glyph to a slot, or clicks it then clicks the slot (gamepad: pick, then place). Seven slots take the address; seal 8 shows CAIRN's mark and cannot be changed.
 - **Highlight.** A glyph already placed is highlighted on the palette. There are no other aids: no counters, no rule-outs, no candidate lists.
-- **Charge.** The console shows the charge the address needs and how long until the capacitors hold it. The Dial button is a hold-to-confirm.
+- **Charge.** The console shows only the stored charge, never what an address needs. If the bank holds too little, the Ring will not turn and the console says so, without numbers. Knowing the cost before dialing is a later upgrade (the lock estimator). The Dial button is a hold-to-confirm.
 - **Address Book.** Every address the player has found or dialed, with its source document, the world's name once known, the last outcome and the player's own note. It can be searched by glyphs (pick some glyphs to see the addresses that contain them), by world or by source, and one click loads an address into the slots. Dialing an address that has already failed asks for confirmation.
 
 ## The dialing sequence and an open wormhole
