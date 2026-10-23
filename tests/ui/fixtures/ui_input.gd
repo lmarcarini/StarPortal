@@ -1,8 +1,8 @@
 extends RefCounted
-## Test helpers that drive controls through real GUI input: mouse clicks and drags pushed into
-## the control's viewport (in its own coordinates, since the headless window's screen transform
-## is not the identity), Enter and Escape on the keyboard, and gamepad buttons. Each waits two
-## process frames so the GUI and any deferred work settle.
+## Test helpers that drive controls through real GUI input: mouse clicks (left and right) and
+## drags pushed into the control's viewport (in its own coordinates, since the headless window's
+## screen transform is not the identity), keys on the keyboard, and gamepad buttons. Each waits
+## two process frames so the GUI and any deferred work settle.
 ## Bible: game-design.md#difficulty-and-accessibility,
 ## technical-architecture.md#input-accessibility-and-localisation
 
@@ -16,6 +16,15 @@ static func click(control: Control) -> void:
 	_mouse_motion(control, at, Vector2.ZERO, 0)
 	for pressed: bool in [true, false]:
 		_mouse_button(control, at, pressed)
+	await settle(control)
+
+
+## Clicks the right mouse button at the centre of [param control].
+static func right_click(control: Control) -> void:
+	var at: Vector2 = control.get_global_rect().get_center()
+	_mouse_motion(control, at, Vector2.ZERO, 0)
+	for pressed: bool in [true, false]:
+		_mouse_button(control, at, pressed, MOUSE_BUTTON_RIGHT)
 	await settle(control)
 
 
@@ -69,11 +78,13 @@ static func settle(_node: Node) -> void:
 	await tree.process_frame
 
 
-static func _mouse_button(control: Control, at: Vector2, pressed: bool) -> void:
+static func _mouse_button(
+	control: Control, at: Vector2, pressed: bool, button: MouseButton = MOUSE_BUTTON_LEFT
+) -> void:
 	var event: InputEventMouseButton = InputEventMouseButton.new()
-	event.button_index = MOUSE_BUTTON_LEFT
+	event.button_index = button
 	event.pressed = pressed
-	event.button_mask = MOUSE_BUTTON_MASK_LEFT if pressed else 0
+	event.button_mask = (1 << (button - 1)) if pressed else 0
 	event.position = at
 	event.global_position = at
 	control.get_viewport().push_input(event, true)

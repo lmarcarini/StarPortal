@@ -5,9 +5,19 @@
 [node name="CapacitorGauge" type="VBoxContainer"]
 script = ExtResource("1_gauge")
 
-[node name="Heading" type="Label" parent="."]
+[node name="HeaderRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Heading" type="Label" parent="HeaderRow"]
 layout_mode = 2
 text = "GATE_GAUGE_TITLE"
+
+[node name="Values" type="Label" parent="HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
 
 [node name="BarArea" type="Control" parent="."]
 custom_minimum_size = Vector2(0, 28)
@@ -22,23 +32,3 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 show_percentage = false
-
-[node name="Marker" type="Control" parent="BarArea"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="Values" type="Label" parent="."]
-unique_name_in_owner = true
-layout_mode = 2
-autowrap_mode = 3
-
-[node name="Needed" type="Label" parent="."]
-unique_name_in_owner = true
-layout_mode = 2
-autowrap_mode = 3

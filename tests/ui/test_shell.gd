@@ -199,7 +199,10 @@ func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_down")
 	assert_object(_focus_owner()).is_same(switcher.get_view(&"gate_room").get_default_focus())
-	await _press_action(&"ui_up")
+	# The console's palette sits under its seal slots: up goes through the slots to the tabs.
+	for _step: int in 3:
+		if _focus_owner() != tabs:
+			await _press_action(&"ui_up")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_right")
 	assert_str(String(switcher.current_view_id())).is_equal("analysis")

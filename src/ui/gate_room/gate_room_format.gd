@@ -59,16 +59,6 @@ static func energy(mwh: float) -> String:
 	return translate(&"GATE_ENERGY").format({"value": String.num(mwh, 1)})
 
 
-## Returns the "ready in" text for [param ticks] as GateQueries.ticks_until_ready() reports
-## it: 0 is "ready now", -1 is "never at the current output".
-static func ready_in(ticks: int) -> String:
-	if ticks < 0:
-		return translate(&"GATE_READY_NEVER")
-	if ticks == 0:
-		return translate(&"GATE_READY_NOW")
-	return translate(&"GATE_READY_IN").format({"time": duration(ticks)})
-
-
 ## Returns the translated name of outcome [param kind]; empty for a value outside the enum.
 static func outcome_name(kind: int) -> String:
 	return _translate_at(_NAME_KEYS, kind)

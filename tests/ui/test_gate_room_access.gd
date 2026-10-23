@@ -66,7 +66,7 @@ func test_no_view_reveals_the_world_behind_a_failed_dial(
 ) -> void:
 	_dial(Fixture.address_for(_simulation.state, kind))
 	assert_int(_simulation.state.gate.dial_log[0].outcome).is_equal(kind)
-	assert_array(Fixture.visible_texts(_view)).contains(["Dial Log"])
+	assert_array(Fixture.visible_texts(_view)).contains([GateRoomFormat.outcome_name(kind)])
 	assert_array(_leaks()).is_empty()
 
 
@@ -80,7 +80,7 @@ func test_a_shielded_world_is_not_revealed_either() -> void:
 
 
 @warning_ignore("unused_parameter")
-func test_a_lock_names_the_world_in_the_wormhole_panel_and_the_log(
+func test_a_lock_names_the_world_in_the_wormhole_panel_and_the_address_book(
 	kind: int,
 	designation: String,
 	test_parameters: Array = [  # gdlint: ignore=unused-argument
@@ -96,17 +96,18 @@ func test_a_lock_names_the_world_in_the_wormhole_panel_and_the_log(
 	assert_int(found).is_equal(2)
 
 
-func test_the_default_focus_is_the_dial_button_or_the_log() -> void:
+func test_the_default_focus_is_the_dial_button_or_the_first_free_glyph() -> void:
 	var button: HoldButton = _view.find_child("DialButton", true, false) as HoldButton
+	var palette: GlyphPalette = _view.find_child("Palette", true, false) as GlyphPalette
 	var first: Control = _view.get_default_focus()
-	assert_object(first).is_same(button)
+	assert_object(first).is_same(palette.get_first_focus())
 	assert_int(first.focus_mode).is_equal(Control.FOCUS_ALL)
+	assert_bool((first as PaletteGlyph).is_locked()).is_false()
 	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.NO_GATE))
 	assert_bool(button.disabled).is_false()
 	assert_object(_view.get_default_focus()).is_same(button)
-	_view.set_address_source(func() -> GateAddress: return null)
-	var log_panel: DialLogPanel = _view.find_child("DialLogPanel", true, false) as DialLogPanel
-	assert_object(_view.get_default_focus()).is_same(log_panel.get_first_focus())
+	_view.get_console().clear_all()
+	assert_object(_view.get_default_focus()).is_same(palette.get_first_focus())
 
 
 func test_every_control_is_reachable_by_focus_alone() -> void:
@@ -140,7 +141,7 @@ func test_the_dial_button_is_a_focusable_hold_button_with_a_reason_when_disabled
 	var button: HoldButton = _view.find_child("DialButton", true, false) as HoldButton
 	assert_int(button.focus_mode).is_equal(Control.FOCUS_ALL)
 	assert_bool(button.disabled).is_true()
-	assert_str(button.tooltip_text).is_equal("Place seven glyphs in the Address Workbench first.")
+	assert_str(button.tooltip_text).is_equal("Place a glyph in each of the seven seals first.")
 
 
 func test_focus_moves_to_the_view_when_the_focused_button_goes_away() -> void:

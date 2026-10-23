@@ -153,16 +153,16 @@ func test_view_action_on_an_axis_fires_once_per_pull() -> void:
 ## Hiding and showing a view restores its root's own modes and leaves a descendant that is
 ## disabled on purpose disabled.
 func test_showing_a_view_restores_only_what_hiding_changed() -> void:
-	var view: GameView = _view(&"analysis")
+	var view: GameView = _view(&"gate_room")
 	var seal: Control = view.find_child("Seal1", true, false) as Control
-	_switcher.show_view(&"analysis")
+	_switcher.show_view(&"gate_room")
 	view.process_mode = Node.PROCESS_MODE_ALWAYS
 	view.mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_DISABLED
 	seal.focus_behavior_recursive = Control.FOCUS_BEHAVIOR_DISABLED
-	_switcher.show_view(&"gate_room")
-	_assert_active(&"analysis", false)
-	_switcher.show_view(&"gate_room")
 	_switcher.show_view(&"analysis")
+	_assert_active(&"gate_room", false)
+	_switcher.show_view(&"analysis")
+	_switcher.show_view(&"gate_room")
 	assert_int(view.process_mode).is_equal(Node.PROCESS_MODE_ALWAYS)
 	assert_int(view.mouse_behavior_recursive).is_equal(Control.MOUSE_BEHAVIOR_DISABLED)
 	assert_int(view.focus_behavior_recursive).is_equal(Control.FOCUS_BEHAVIOR_INHERITED)
@@ -172,10 +172,10 @@ func test_showing_a_view_restores_only_what_hiding_changed() -> void:
 
 
 func test_hidden_view_keeps_its_nodes() -> void:
-	var workbench: Control = _view(&"analysis").find_child("Workbench", true, false) as Control
+	var console: Control = _view(&"gate_room").find_child("DialConsole", true, false) as Control
 	_switcher.show_view(&"analysis")
 	_switcher.show_view(&"gate_room")
-	assert_object(_view(&"analysis").find_child("Workbench", true, false)).is_same(workbench)
+	assert_object(_view(&"gate_room").find_child("DialConsole", true, false)).is_same(console)
 
 
 func test_unknown_view_changes_nothing() -> void:
@@ -204,17 +204,14 @@ func test_setup_reaches_every_view_again_and_again() -> void:
 	assert_object(_focus_owner()).is_same(spy.get_default_focus())
 
 
-func test_analysis_view_puts_workbench_beside_a_wider_placeholder() -> void:
+func test_analysis_view_holds_only_the_archive_placeholder() -> void:
 	_switcher.show_view(&"analysis")
 	await _runner.simulate_frames(2)
 	var view: GameView = _view(&"analysis")
-	var workbench: Control = view.find_child("Workbench", true, false) as Control
 	var placeholder: Control = view.find_child("ArchivePlaceholder", true, false) as Control
-	assert_object(workbench).is_instanceof(Workbench)
 	assert_object(placeholder).is_instanceof(Label)
-	var share: float = workbench.size.x / (workbench.size.x + placeholder.size.x)
-	assert_float(share).is_equal_approx(0.4, 0.01)
-	assert_float(workbench.position.x).is_less(placeholder.position.x)
+	assert_object(view.find_child("DialConsole", true, false)).is_null()
+	assert_object(view.get_default_focus()).is_same(placeholder)
 
 
 func _make_switcher() -> ViewSwitcher:

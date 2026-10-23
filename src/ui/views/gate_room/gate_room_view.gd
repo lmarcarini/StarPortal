@@ -1,25 +1,30 @@
 class_name GateRoomView
 extends GameView
-## The Gate Room view: the player sees the charge the address needs, dials it with a
-## hold-to-confirm, watches the seals engage, reads the outcome, closes an open wormhole and
-## checks the Dial Log. The address is the one placed in the Analysis view's Workbench, read
-## from an address source each time the view is shown: a throwaway bridge until the dial
-## console card. The view only composes the panels; every panel reads the simulation and posts
-## its own commands, and nothing here changes state.
-## Bible: game-design.md#core-loop, gate-and-address-spec.md#dialing-outcomes-and-energy,
+## The Gate Room view: the dial console (slots, palette and the hold-to-dial button) over the
+## capacitor gauge (stored charge and capacity only), beside the last outcome, an open wormhole
+## and the records: the Address Book and the Dial Log. Loading an Address Book entry fills the
+## console's slots. The view only composes the panels; every panel reads the simulation and
+## posts its own commands, and nothing here changes state.
+## Bible: gate-and-address-spec.md#the-dial-console, game-design.md#core-loop,
 ## technical-architecture.md#input-accessibility-and-localisation
 
 const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
+## Tab title keys of the records, in tab order.
+const _RECORD_TITLE_KEYS: Array[StringName] = [&"BOOK_TITLE", &"GATE_LOG_TITLE"]
 
-## Returns the address to dial, or null: a Callable() -> GateAddress (null for none).
-var _address_source: Callable = Callable()
-
-@onready var _ring: RingDisplay = %RingDisplay
+@onready var _console: DialConsole = %DialConsole
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
-@onready var _controls: DialControls = %DialControls
 @onready var _banner: OutcomeBanner = %OutcomeBanner
 @onready var _wormhole: WormholePanel = %WormholePanel
+@onready var _records: TabContainer = %Records
+@onready var _book: AddressBookPanel = %AddressBookPanel
 @onready var _log: DialLogPanel = %DialLogPanel
+
+
+func _ready() -> void:
+	for index: int in _RECORD_TITLE_KEYS.size():
+		_records.set_tab_title(index, _RECORD_TITLE_KEYS[index])
+	_book.load_requested.connect(_on_load_requested)
 
 
 func _enter_tree() -> void:
@@ -34,50 +39,29 @@ func _exit_tree() -> void:
 	EventBus.dial_resolved.disconnect(_on_dial_resolved)
 
 
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_VISIBILITY_CHANGED and is_node_ready() and is_visible_in_tree():
-		refresh_address()
-
-
-## Passes [param simulation] to every panel; no address is selected until the view is shown
-## again or refresh_address() runs.
+## Passes [param simulation] to every panel; the console's slots are emptied.
 func setup(simulation: Simulation) -> void:
-	_controls.setup(simulation)
 	_gauge.setup(simulation)
-	_ring.setup(simulation)
+	_console.setup(simulation)
 	_banner.setup(simulation)
 	_wormhole.setup(simulation)
+	_book.setup(simulation)
 	_log.setup(simulation)
-	_gauge.set_marker_address(null)
 
 
-## Sets where the address to dial comes from: [param source] is a Callable() -> GateAddress
-## that returns null for none (the Workbench's address, until the dial console).
-func set_address_source(source: Callable) -> void:
-	_address_source = source
-	if is_node_ready() and is_visible_in_tree():
-		refresh_address()
+## Returns the dial console.
+func get_console() -> DialConsole:
+	return _console
 
 
-## Reads the address source again and selects its address (or none) for the Dial button and
-## the charge marker.
-func refresh_address() -> void:
-	var address: GateAddress = null
-	if _address_source.is_valid():
-		address = _address_source.call()
-	_controls.set_address(address)
-	_gauge.set_marker_address(address)
+## Returns the Address Book panel.
+func get_address_book() -> AddressBookPanel:
+	return _book
 
 
-## Returns the Dial button while it can be pressed, else the first Dial Log row, else the
-## Dial button.
+## Returns the Dial button while it can be pressed, else the first glyph of the palette.
 func get_default_focus() -> Control:
-	var dial: HoldButton = _controls.get_dial_button()
-	if dial.disabled:
-		var first_row: Control = _log.get_first_focus()
-		if first_row != null:
-			return first_row
-	return dial
+	return _console.get_default_focus()
 
 
 ## Returns [code]GATE_ROOM_TITLE[/code].
@@ -99,6 +83,11 @@ func _ensure_focus() -> void:
 		if not is_stuck:
 			return
 	get_default_focus().grab_focus()
+
+
+func _on_load_requested(address: GateAddress) -> void:
+	_console.load_address(address)
+	_ensure_focus.call_deferred()
 
 
 func _on_focus_may_be_lost(_reason: StringName) -> void:

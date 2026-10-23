@@ -1,7 +1,8 @@
-## Tests for the Gate Room view: selecting an address through the address source (the
-## Workbench bridge), holding dial, advancing two ticks and reading the outcome banner, the
-## capacitor gauge and the Dial Log, for each of the five outcomes, plus the wormhole panel.
-## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy, game-design.md#core-loop
+## Tests for the Gate Room view: loading an address into the dial console, holding dial,
+## advancing two ticks and reading the outcome banner, the capacitor gauge and the Dial Log,
+## for each of the five outcomes, plus the wormhole panel.
+## Bible: gate-and-address-spec.md#the-dial-console,
+## gate-and-address-spec.md#dialing-outcomes-and-energy, game-design.md#core-loop
 extends GdUnitTestSuite
 
 const Fixture := preload("res://tests/ui/gate_room_fixture.gd")
@@ -93,24 +94,28 @@ func test_banner_icon_shape_differs_per_outcome() -> void:
 	assert_str(String(OutcomeIcon.shape_of(5))).is_empty()
 
 
-func test_dial_needs_an_address_from_the_source() -> void:
+## The Dial button needs all seven slots filled. Nothing in the view shows the energy the
+## address needs: no text mentions it, at any step.
+func test_dial_needs_seven_glyphs_and_never_shows_the_needed_charge() -> void:
 	var controls: DialControls = _panel("DialControls") as DialControls
+	var console: DialConsole = _view.get_console()
 	assert_bool(controls.get_dial_button().disabled).is_true()
-	assert_str(controls.get_reason_text()).is_equal(tr(&"GATE_REASON_NONE_SELECTED"))
+	assert_str(controls.get_reason_text()).is_equal(tr(&"GATE_REASON_INCOMPLETE"))
 	var address: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK)
-	var picked: Array[GateAddress] = [null]
-	_view.set_address_source(func() -> GateAddress: return picked[0])
+	for index: int in GateAddress.COORDINATE_COUNT - 1:
+		console.place(index + 1, address.coordinates[index])
 	assert_bool(controls.get_dial_button().disabled).is_true()
-	picked[0] = address
-	assert_bool(controls.get_dial_button().disabled).is_true()
-	_view.visible = false
-	_view.visible = true
+	assert_str(controls.get_reason_text()).is_equal(tr(&"GATE_REASON_INCOMPLETE"))
+	console.place(GateAddress.COORDINATE_COUNT, address.coordinates[6])
 	assert_bool(controls.get_dial_button().disabled).is_false()
-	var gauge: CapacitorGauge = _panel("CapacitorGauge") as CapacitorGauge
-	var needed: float = GateQueries.lock_energy_mwh(_simulation.state, address)
-	assert_float(gauge.get_marker_mwh()).is_equal_approx(needed, 1e-9)
-	picked[0] = GateAddress.create(address.coordinates, address.coordinates[0])
-	_view.refresh_address()
+	var needed: String = GateRoomFormat.energy(
+		GateQueries.lock_energy_mwh(_simulation.state, address)
+	)
+	for text: String in Fixture.visible_texts(_view):
+		assert_str(text).override_failure_message("shows the needed charge: " + text).not_contains(
+			needed
+		)
+	console.clear_seal(3)
 	assert_bool(controls.get_dial_button().disabled).is_true()
 
 

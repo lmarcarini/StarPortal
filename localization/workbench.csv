@@ -1,7 +1,0 @@
-keys,en,pt_BR
-WORKBENCH_TITLE,Address Workbench,Bancada de Endereços
-WORKBENCH_SLOT_EMPTY,Seal {seal}: empty,Selo {seal}: vazio
-WORKBENCH_SLOT_FILLED,Seal {seal}: {glyph},Selo {seal}: {glyph}
-WORKBENCH_ORIGIN_HOME,"Seal 8 is the origin: {glyph}, CAIRN's own","O selo 8 é a origem: {glyph}, a da CAIRN"
-WORKBENCH_HINT_IDLE,"Pick a glyph, then a seal. You can also drag a glyph onto a seal.",Escolha um glifo e depois um selo. Também pode arrastar um glifo até um selo.
-WORKBENCH_HINT_PICKED,{glyph} picked: choose a seal.,{glyph} escolhido: escolha um selo.

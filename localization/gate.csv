@@ -1,8 +1,5 @@
 keys,en,pt_BR
 GATE_ROOM_TITLE,Gate Room,Sala do Portal
-GATE_READY_NOW,"Charged, ready now","Carga completa, pronto agora"
-GATE_READY_IN,Ready in {time},Pronto em {time}
-GATE_READY_NEVER,Never at current output,Nunca com a saída atual
 GATE_DURATION_MINUTES,{minutes} min,{minutes} min
 GATE_DURATION_HOURS,{hours} h {minutes} min,{hours} h {minutes} min
 GATE_ENERGY,{value} MWh,{value} MWh
@@ -26,16 +23,14 @@ GATE_RING_DIALING,Seals engaging: {lit} of {total},Selos engatando: {lit} de {to
 GATE_RING_LOCKED,Wormhole open,Buraco de minhoca aberto
 GATE_DIAL_HOLD,Hold to dial,Segure para discar
 GATE_DIAL_HOLD_AGAIN,Hold again to dial anyway,Segure de novo para discar mesmo assim
-GATE_DIAL_NEEDS,Needs {energy}. {ready}.,Requer {energy}. {ready}.
 GATE_REPEAT_WARNING,Dialed on {date}: {outcome}. Dialing it again will spend the energy again.,Discado em {date}: {outcome}. Discar de novo vai gastar a energia outra vez.
-GATE_REASON_NONE_SELECTED,Place seven glyphs in the Address Workbench first.,Coloque antes sete glifos na Bancada de Endereços.
 GATE_REASON_BUSY,The Ring is busy: it is dialing or has a wormhole open.,O Anel está ocupado: está discando ou há um buraco de minhoca aberto.
-GATE_REASON_CHARGE,"Not enough charge: needs {needed}, the capacitors hold {stored}.","Carga insuficiente: requer {needed}, os capacitores têm {stored}."
 GATE_REASON_REJECTED,The dial was refused.,A discagem foi recusada.
+GATE_DIAL_NO_CAPACITORS,No capacitors installed.,Nenhum capacitor instalado.
+GATE_DIAL_CAPACITORS_EMPTY,Capacitors empty.,Capacitores vazios.
+GATE_DIAL_REJECT_CHARGE,Not enough charge. The Ring would not turn.,Carga insuficiente. O Anel não chegou a girar.
 GATE_GAUGE_TITLE,Capacitors,Capacitores
 GATE_GAUGE_VALUES,{stored} of {capacity},{stored} de {capacity}
-GATE_GAUGE_NEEDED,The marker shows the {energy} the selected dial needs.,O marcador mostra os {energy} que a discagem selecionada requer.
-GATE_GAUGE_OVER_CAPACITY,This is more than the capacitors can hold.,Isso é mais do que os capacitores comportam.
 GATE_BANNER_NONE,No dial yet,Nenhuma discagem ainda
 GATE_BANNER_NONE_MEANING,Select an address and hold the dial button.,Selecione um endereço e segure o botão de discar.
 GATE_BANNER_DIALING,Seals engaging,Selos engatando
@@ -54,3 +49,37 @@ GATE_LOG_TITLE,Dial Log,Registro de discagens
 GATE_LOG_EMPTY,No dial has been made yet.,Nenhuma discagem foi feita ainda.
 GATE_LOG_ENERGY,Energy spent: {energy},Energia gasta: {energy}
 GATE_LOG_DESTINATION,Destination: {designation},Destino: {designation}
+GATE_REASON_INCOMPLETE,Place a glyph in each of the seven seals first.,Coloque antes um glifo em cada um dos sete selos.
+GATE_REASON_DIALING,The Ring is dialing.,O Anel está discando.
+GATE_REASON_WORMHOLE_OPEN,A wormhole is open: close it before dialing again.,Há um buraco de minhoca aberto: feche-o antes de discar de novo.
+CONSOLE_SLOT_EMPTY,Seal {seal}: empty,Selo {seal}: vazio
+CONSOLE_SLOT_FILLED,Seal {seal}: {glyph}. Right-click or Delete clears it.,Selo {seal}: {glyph}. Clique direito ou Delete o esvazia.
+CONSOLE_ORIGIN_HOME,Seal 8 is CAIRN's mark: {glyph}. It never changes.,O selo 8 é a marca da CAIRN: {glyph}. Ele nunca muda.
+CONSOLE_HINT_IDLE,"Drag a glyph onto a seal, or pick a glyph and then a seal.","Arraste um glifo até um selo, ou escolha um glifo e depois um selo."
+CONSOLE_HINT_PICKED,{glyph} picked: choose a seal.,{glyph} escolhido: escolha um selo.
+CONSOLE_CLEAR_ALL,Clear all,Limpar tudo
+CONSOLE_GLYPH_PLACED,{glyph}: placed,{glyph}: colocado
+CONSOLE_GLYPH_ORIGIN_LOCKED,"{glyph} is CAIRN's origin glyph. It is always seal 8, so it can never be one of seals 1 to 7.","{glyph} é o glifo de origem da CAIRN. Ele é sempre o selo 8, então nunca pode ser um dos selos 1 a 7."
+BOOK_TITLE,Address Book,Livro de Endereços
+BOOK_SEARCH_PLACEHOLDER,Search notes and worlds,Buscar em notas e mundos
+BOOK_FILTER_SOURCE_TOOLTIP,Show addresses from one source only,Mostrar endereços de uma só origem
+BOOK_FILTER_ALL_SOURCES,All sources,Todas as origens
+BOOK_FILTER_DOCUMENTS,Documents,Documentos
+BOOK_FILTER_CONSOLES,Consoles,Consoles
+BOOK_FILTER_DIALED,Dialed,Discados
+BOOK_FILTER_GLYPH,Show only addresses with {glyph},Mostrar só endereços com {glyph}
+BOOK_FILTER_GLYPH_ON,{glyph} is in the filter: press to remove it,{glyph} está no filtro: pressione para removê-lo
+BOOK_CLEAR_FILTERS,Clear filters,Limpar filtros
+BOOK_COUNT,{count} addresses,{count} endereços
+BOOK_COUNT_ONE,1 address,1 endereço
+BOOK_EMPTY,No addresses yet. Addresses from documents and every address you dial appear here.,Nenhum endereço ainda. Endereços de documentos e todo endereço discado aparecem aqui.
+BOOK_EMPTY_FILTERED,No address matches these filters.,Nenhum endereço corresponde a estes filtros.
+BOOK_SOURCE_DOCUMENT,Document,Documento
+BOOK_SOURCE_CONSOLE,Console of {world},Console de {world}
+BOOK_SOURCE_DIALED,Dialed,Discado
+BOOK_WORLD_UNKNOWN,world unknown,mundo desconhecido
+BOOK_ROW_DETAILS,{source} · {world},{source} · {world}
+BOOK_NOT_DIALED,Not dialed yet,Ainda não discado
+BOOK_NOTE_PLACEHOLDER,Your note on the selected address,Sua nota sobre o endereço selecionado
+BOOK_SAVE_NOTE,Save note,Salvar nota
+BOOK_LOAD,Load,Carregar

@@ -1,16 +1,18 @@
 class_name SealRow
 extends VBoxContainer
-## The Address Workbench's eight seal slots, seven coordinates then the origin, with a caption
-## naming the origin. Shows glyphs; never changes them.
-## Bible: gate-and-address-spec.md#glyphs-and-the-hidden-address-math (seal 8 is the origin),
+## The dial console's eight seal slots, seven coordinates then CAIRN's origin (locked), with a
+## caption naming the origin. Shows glyphs; never changes them.
+## Bible: gate-and-address-spec.md#the-dial-console (seal 8 is CAIRN's mark),
 ## game-design.md#difficulty-and-accessibility (click-to-pick and click-to-place)
 
 ## The player clicked or accepted slot [param seal] (8 is the origin).
 signal slot_chosen(seal: int)
 ## The player dropped [param glyph] on slot [param seal].
 signal glyph_dropped(seal: int, glyph: int)
+## The player asked to empty slot [param seal].
+signal clear_requested(seal: int)
 
-const _SLOT_SCENE: PackedScene = preload("res://src/ui/analysis/workbench/seal_slot.tscn")
+const _SLOT_SCENE: PackedScene = preload("res://src/ui/gate_room/console/seal_slot.tscn")
 
 var _slots: Array[SealSlot] = []
 
@@ -25,6 +27,8 @@ func _ready() -> void:
 		slot.set_seal(seal)
 		slot.chosen.connect(slot_chosen.emit)
 		slot.glyph_dropped.connect(glyph_dropped.emit)
+		slot.clear_requested.connect(clear_requested.emit)
+		slot.set_locked(seal > GateAddress.COORDINATE_COUNT)
 		_slot_box.add_child(slot)
 		_slots.append(slot)
 
@@ -38,7 +42,7 @@ func show_glyphs(glyphs: Array[int], translate: Callable) -> void:
 	var origin: int = (
 		glyphs[GateAddress.COORDINATE_COUNT] if glyphs.size() > GateAddress.COORDINATE_COUNT else -1
 	)
-	_caption.text = str(translate.call("WORKBENCH_ORIGIN_HOME")).format(
+	_caption.text = str(translate.call("CONSOLE_ORIGIN_HOME")).format(
 		{"glyph": _glyph_name(origin, translate)}
 	)
 
@@ -51,9 +55,12 @@ func get_slot(seal: int) -> SealSlot:
 
 
 func _slot_tooltip(seal: int, glyph: int, translate: Callable) -> String:
+	if seal > GateAddress.COORDINATE_COUNT:
+		var origin_text: String = str(translate.call("CONSOLE_ORIGIN_HOME"))
+		return origin_text.format({"glyph": _glyph_name(glyph, translate)})
 	if glyph < 0:
-		return str(translate.call("WORKBENCH_SLOT_EMPTY")).format({"seal": seal})
-	var template: String = str(translate.call("WORKBENCH_SLOT_FILLED"))
+		return str(translate.call("CONSOLE_SLOT_EMPTY")).format({"seal": seal})
+	var template: String = str(translate.call("CONSOLE_SLOT_FILLED"))
 	return template.format({"seal": seal, "glyph": _glyph_name(glyph, translate)})
 
 

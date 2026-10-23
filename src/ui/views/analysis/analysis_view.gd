@@ -1,36 +1,30 @@
 class_name AnalysisView
 extends GameView
-## The Analysis view: the Address Workbench (about 40% of the width) beside a placeholder
-## where the Archive will go. It passes the simulation down to the Workbench, and lends the
-## Workbench's address to the Gate Room's Dial button until the dial console replaces both.
+## The Analysis view: a placeholder where the Archive will go. The address is built and dialed
+## in the Gate Room's dial console.
 ## Bible: game-design.md#core-loop,
 ## technical-architecture.md#input-accessibility-and-localisation
 
 const _TITLE_KEY: StringName = &"ANALYSIS_TITLE"
 
-@onready var _workbench: Workbench = %Workbench
+@onready var _placeholder: Label = %ArchivePlaceholder
 
 
 func _ready() -> void:
-	var own: NodePath = _workbench.get_path_to(_workbench)
-	_workbench.focus_neighbor_left = own
-	_workbench.focus_neighbor_right = own
-	_workbench.focus_neighbor_bottom = own
+	var own: NodePath = _placeholder.get_path_to(_placeholder)
+	_placeholder.focus_neighbor_left = own
+	_placeholder.focus_neighbor_right = own
+	_placeholder.focus_neighbor_bottom = own
 
 
-## Passes [param simulation] to the Workbench.
-func setup(simulation: Simulation) -> void:
-	_workbench.setup(simulation)
+## Nothing to pass on yet: the Archive is not built.
+func setup(_simulation: Simulation) -> void:
+	pass
 
 
-## Returns the address placed in the Workbench's slots, or null until all seven are filled.
-func get_address() -> GateAddress:
-	return _workbench.get_address()
-
-
-## Returns the Workbench, where an address is built.
+## Returns the Archive placeholder, focusable so the view has a focus target.
 func get_default_focus() -> Control:
-	return _workbench
+	return _placeholder
 
 
 ## Returns [code]ANALYSIS_TITLE[/code].

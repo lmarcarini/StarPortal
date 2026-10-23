@@ -1,11 +1,13 @@
-## Tests for the Gate Room's dial controls and Ring display: the hold-to-confirm button (held
-## with the mouse path and with the gamepad accept button), the reasons it is disabled, the
-## repeat warning and its second confirmation, and the seal animation following sim time.
-## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy,
+## Tests for the dial console's dial controls and the Ring display: the hold-to-confirm button
+## (held with the mouse path and with the gamepad accept button), the reasons it is disabled,
+## the repeat warning and its second confirmation, and the seal animation following sim time.
+## Bible: gate-and-address-spec.md#the-dial-console,
+## gate-and-address-spec.md#dialing-outcomes-and-energy,
 ## game-design.md#difficulty-and-accessibility
 extends GdUnitTestSuite
 
 const Fixture := preload("res://tests/ui/gate_room_fixture.gd")
+const RING_SCENE: String = "res://src/ui/gate_room/ring_display.tscn"
 
 var _simulation: Simulation = null
 var _holder: Control = null
@@ -45,8 +47,15 @@ func _button() -> HoldButton:
 	return _controls().get_dial_button()
 
 
+## The Ring display, mounted on its own beside the view (the console does not show it; the
+## dialing sequence card replaces it).
 func _ring() -> RingDisplay:
-	return _view.find_child("RingDisplay", true, false) as RingDisplay
+	var ring: RingDisplay = _holder.find_child("RingDisplay", true, false) as RingDisplay
+	if ring == null:
+		ring = (load(RING_SCENE) as PackedScene).instantiate() as RingDisplay
+		_holder.add_child(ring)
+		ring.setup(_simulation)
+	return ring
 
 
 func _hold_fully() -> void:
@@ -63,37 +72,93 @@ func _gamepad_accept(is_pressed: bool) -> void:
 	Input.flush_buffered_events()
 
 
-func test_disabled_without_a_selection() -> void:
+func test_disabled_until_seven_glyphs_are_placed() -> void:
 	assert_bool(_button().disabled).is_true()
 	assert_str(_controls().get_reason_text()).is_equal(
-		"Place seven glyphs in the Address Workbench first."
+		"Place a glyph in each of the seven seals first."
 	)
+	assert_str(_button().tooltip_text).is_equal(_controls().get_reason_text())
 	_enter(DialOutcome.Kind.NO_GATE)
 	assert_bool(_button().disabled).is_false()
 	assert_str(_controls().get_reason_text()).is_empty()
+	TranslationServer.set_locale("pt_BR")
+	_view.get_console().clear_seal(1)
+	assert_str(_controls().get_reason_text()).is_equal(
+		"Coloque antes um glifo em cada um dos sete selos."
+	)
 
 
-func test_disabled_while_the_ring_is_busy() -> void:
+func test_disabled_while_the_ring_is_dialing() -> void:
 	_enter(DialOutcome.Kind.NO_GATE)
 	_hold_fully()
 	assert_bool(_button().disabled).is_true()
-	assert_str(_controls().get_reason_text()).starts_with("The Ring is busy")
+	assert_str(_controls().get_reason_text()).is_equal("The Ring is dialing.")
 	SimClock.step_ticks(2)
 	assert_bool(_button().disabled).is_false()
 
 
-func test_disabled_with_the_translated_reason_when_the_charge_is_short() -> void:
-	var address: GateAddress = _enter(DialOutcome.Kind.NO_GATE)
-	_simulation.state.power.stored_mwh = 0.0
-	SimClock.step_ticks(1)
-	var needed: String = GateRoomFormat.energy(
-		GateQueries.lock_energy_mwh(_simulation.state, address)
-	)
+func test_disabled_while_a_wormhole_is_open_even_with_an_empty_console() -> void:
+	_enter(DialOutcome.Kind.LOCK)
+	_hold_fully()
+	SimClock.step_ticks(2)
 	assert_bool(_button().disabled).is_true()
-	assert_str(_controls().get_reason_text()).starts_with("Not enough charge")
-	assert_str(_controls().get_reason_text()).contains(needed)
+	assert_str(_controls().get_reason_text()).starts_with("A wormhole is open")
+	_view.get_console().clear_all()
+	assert_str(_controls().get_reason_text()).starts_with("A wormhole is open")
+	(_view.find_child("CloseButton", true, false) as Button).pressed.emit()
+	assert_str(_controls().get_reason_text()).is_equal(
+		"Place a glyph in each of the seven seals first."
+	)
+
+
+func test_a_dial_submits_exactly_one_command_with_the_console_address() -> void:
+	var address: GateAddress = _enter(DialOutcome.Kind.BLOCKED)
+	var dials: Array[String] = []
+	var record: Callable = func(key: String) -> void: dials.append(key)
+	EventBus.dial_started.connect(record)
+	_hold_fully()
+	_hold_fully()
+	EventBus.dial_started.disconnect(record)
+	assert_array(dials).is_equal([address.key()])
+	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.DIALING)
+	assert_str(_simulation.state.gate.current_address.key()).is_equal(address.key())
+	assert_int(_simulation.state.gate.current_address.origin).is_equal(
+		_simulation.state.galaxy.home().origin_glyph
+	)
+
+
+func test_disabled_with_no_capacitors_or_an_empty_bank() -> void:
+	_enter(DialOutcome.Kind.NO_GATE)
+	_simulation.state.power.stored_mwh = 0.0
+	_controls().set_address(_view.get_console().get_address())
+	assert_bool(_button().disabled).is_true()
+	assert_str(_controls().get_reason_text()).is_equal("Capacitors empty.")
+	_simulation.state.power.capacity_mwh = 0.0
+	_controls().set_address(_view.get_console().get_address())
+	assert_str(_controls().get_reason_text()).is_equal("No capacitors installed.")
 	TranslationServer.set_locale("pt_BR")
-	assert_str(_controls().get_reason_text()).starts_with("Carga insuficiente")
+	assert_str(_controls().get_reason_text()).is_equal("Nenhum capacitor instalado.")
+
+
+## A bank holding some charge, but less than the address needs, still lets the player hold
+## Dial; DialCommand refuses it and the panel says so without numbers.
+func test_a_dial_short_of_charge_is_refused_with_a_line_and_no_numbers() -> void:
+	var address: GateAddress = _enter(DialOutcome.Kind.NO_GATE)
+	var needed: float = GateQueries.lock_energy_mwh(_simulation.state, address)
+	_simulation.state.power.stored_mwh = needed / 2.0
+	_controls().set_address(address)
+	assert_bool(_button().disabled).is_false()
+	assert_str(_controls().get_reason_text()).is_empty()
+	_hold_fully()
+	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.IDLE)
+	assert_str(_controls().get_reason_text()).is_equal(
+		"Not enough charge. The Ring would not turn."
+	)
+	assert_str(_controls().get_reason_text()).not_contains("MWh")
+	_view.get_console().clear_seal(1)
+	assert_str(_controls().get_reason_text()).is_equal(
+		"Place a glyph in each of the seven seals first."
+	)
 
 
 func test_release_before_the_hold_time_does_not_dial() -> void:
