@@ -15,11 +15,13 @@ var balance: BalanceConfig = null
 var anchors: AnchorFieldDef = null
 ## Every authored world, CAIRN included, in Registry load order (sorted by path).
 var authored_worlds: Array[WorldDef] = []
+## Every document, in Registry load order (sorted by path).
+var documents: Array[DocumentDef] = []
 
 
 ## Returns the definitions loaded by [param registry], the Registry autoload passed in: the
-## balance, the home anchor field (&"anchors_home") and every WorldDef. Missing ones stay
-## null or empty; GameSetup.build() reports them.
+## balance, the home anchor field (&"anchors_home"), every WorldDef and every DocumentDef.
+## Missing ones stay null or empty; GameSetup.build() reports them.
 static func from_registry(registry: Node) -> GameDefs:
 	var defs := GameDefs.new()
 	var balance_def: Variant = registry.call(&"balance")
@@ -32,4 +34,8 @@ static func from_registry(registry: Node) -> GameDefs:
 	for def: Variant in worlds:
 		if def is WorldDef:
 			defs.authored_worlds.append(def)
+	var documents: Array = registry.call(&"get_all_of", DocumentDef)
+	for def: Variant in documents:
+		if def is DocumentDef:
+			defs.documents.append(def)
 	return defs

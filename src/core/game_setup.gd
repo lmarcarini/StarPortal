@@ -2,13 +2,13 @@ class_name GameSetup
 extends RefCounted
 ## Builds a runnable Simulation around a new or loaded GameState: regenerates the galaxy from
 ## the state's saved seed and generator version, sets the state's transient balance and
-## galaxy, and adds the systems in the bible's fixed tick order (power, then gate).
+## galaxy, and adds the systems in the bible's fixed tick order (power, gate, documents).
 ## Bible: technical-architecture.md#simulation-clock-and-commands,
 ## technical-architecture.md#save-system, technical-architecture.md#data-model
 
 
 ## Returns a Result whose value is a Simulation over [param state] with
-## [PowerSystem, GateSystem], after setting [code]state.balance[/code] and
+## [PowerSystem, GateSystem, DocumentSystem], after setting [code]state.balance[/code] and
 ## [code]state.galaxy[/code] from [param defs]. Fails, leaving the state unchanged, with
 ## &"missing_content" when [param defs] lacks the balance, 36 anchors or exactly one home
 ## world, and with &"galaxy_version_mismatch" when the state's generator version is not
@@ -28,14 +28,20 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 		)
 	state.balance = defs.balance
 	state.galaxy = build_galaxy(state.worlds.galaxy_seed, defs)
-	var systems: Array[SimSystem] = [PowerSystem.new(defs.balance), GateSystem.new()]
+	var systems: Array[SimSystem] = [
+		PowerSystem.new(defs.balance), GateSystem.new(), DocumentSystem.new(defs.documents)
+	]
 	return Result.ok(Simulation.new(state, systems))
 
 
-## Like build(), for a new game. A new game has no opening scenario yet, so this is build();
-## it stays the entry point for new games so their later setup has one place to go.
+## Like build(), for a new game: also delivers every AT_START document to the Archive at the
+## clock's tick, in id order, posting document_received for each (emitted with the next
+## tick's events). Only new games go through here, so a loaded game never re-delivers.
 static func build_new(state: GameState, defs: GameDefs) -> Result:
-	return build(state, defs)
+	var built: Result = build(state, defs)
+	if built.is_ok:
+		DocumentSystem.deliver_start_documents(state, defs.documents)
+	return built
 
 
 ## Returns the galaxy generated from [param galaxy_seed] over [param defs]' anchors and

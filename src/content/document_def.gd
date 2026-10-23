@@ -12,6 +12,11 @@ extends DefBase
 ## markings on something brought back through the Ring.
 enum Kind { NOTE, IMAGE, DOSSIER, LOG, GIFT, ARTEFACT }
 
+## When the document reaches the Archive. NEVER: only a scenario or command delivers it.
+## AT_START: at tick 0 of a new game. ON_FIRST_LOCK: the first time [member arrival_world_id]
+## is locked.
+enum Arrival { NEVER, AT_START, ON_FIRST_LOCK }
+
 ## Number of glyphs in an answer: the seven coordinate seals. Content depends on nothing, so
 ## this repeats GateAddress.COORDINATE_COUNT.
 const ANSWER_SIZE: int = 7
@@ -35,16 +40,22 @@ const GLYPH_COUNT: int = 36
 @export var answer_glyphs: PackedInt32Array
 ## Id of another DocumentDef read together with this one, or &"" for none.
 @export var pair_id: StringName = &""
+## When the document arrives in the Archive.
+@export var arrival: Arrival = Arrival.NEVER
+## Id of the WorldDef whose first lock delivers the document; used by ON_FIRST_LOCK only.
+@export var arrival_world_id: StringName = &""
 
 
-## Returns [member world_id] and [member pair_id] when set, so the Registry reports either
-## when it names no loaded definition.
+## Returns [member world_id], [member pair_id] and [member arrival_world_id] when set, so the
+## Registry reports any of them that names no loaded definition.
 func get_references() -> Array[StringName]:
 	var references: Array[StringName] = []
 	if not world_id.is_empty():
 		references.append(world_id)
 	if not pair_id.is_empty():
 		references.append(pair_id)
+	if not arrival_world_id.is_empty():
+		references.append(arrival_world_id)
 	return references
 
 
@@ -60,8 +71,22 @@ func get_content_errors(defs: Dictionary[StringName, DefBase]) -> Array[String]:
 		errors.append("pair_id names the document itself")
 	elif defs.has(pair_id) and not defs[pair_id] is DocumentDef:
 		errors.append('pair_id "%s" is not a DocumentDef' % pair_id)
+	errors.append_array(_arrival_errors(defs))
 	if not answer_glyphs.is_empty():
 		errors.append_array(answer_errors(answer_glyphs, _home_origin(defs)))
+	return errors
+
+
+## Errors for [member arrival] against [param defs]: ON_FIRST_LOCK needs an
+## [member arrival_world_id] naming a WorldDef (a missing id is reported as a reference).
+func _arrival_errors(defs: Dictionary[StringName, DefBase]) -> Array[String]:
+	var errors: Array[String] = []
+	if arrival != Arrival.ON_FIRST_LOCK:
+		return errors
+	if arrival_world_id.is_empty():
+		errors.append("arrival ON_FIRST_LOCK needs an arrival_world_id")
+	elif defs.has(arrival_world_id) and not defs[arrival_world_id] is WorldDef:
+		errors.append('arrival_world_id "%s" is not a WorldDef' % arrival_world_id)
 	return errors
 
 
