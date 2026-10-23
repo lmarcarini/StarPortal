@@ -2,13 +2,14 @@ extends RefCounted
 ## Seeded stand-in player for the soak test. It sets random flags through SetFlagCommand
 ## about 20 times per in-game day, pauses and resumes the clock at random, and adds and
 ## releases named system holds through TimeControl (a dozen or so per month). It also works
-## the Ring on every call with no command waiting: with the Ring idle and the queue empty it
-## queues an address (mostly a random well-formed one whose seal 1 the bank can reach, a
-## delivered target's true address sometimes); once the bank
-## holds the front address's lock energy it dials it and unqueues it (an address the bank can
-## never charge is just unqueued); and it closes any lock a few ticks after it opens. Every random
-## draw comes from the run's own GameState stream &"soak_bot", so two runs from the same
-## seed act identically, and a saved and reloaded state carries the stream on.
+## the Ring on every call with no command waiting: with the Ring idle and no address picked it
+## picks one (mostly a random well-formed one whose seal 1 the bank can reach, a real world's
+## true address sometimes); once the bank holds that address's lock energy it dials it
+## directly (an address the bank can never charge is just dropped); and it closes any lock a
+## few ticks after it opens. Every random draw comes from the run's own GameState stream
+## &"soak_bot", so two runs from the same seed act identically, and a saved and reloaded state
+## carries the stream on. The picked address is the bot's own, not game state: it carries on
+## across reloads with the bot.
 ## Bible: technical-architecture.md#testing-and-tooling (Soak test)
 
 ## RandomState stream the bot draws from.
@@ -36,7 +37,7 @@ const HOLD_REASONS: Array[StringName] = [&"soak_hold_a", &"soak_hold_b", &"soak_
 const FLAG_KEY_COUNT: int = 16
 ## Largest magnitude of a random int flag value.
 const MAX_INT_VALUE: int = 1000000
-## Chance that a newly queued address is a delivered target's true address.
+## Chance that a newly picked address is a real world's true address.
 const TARGET_CHANCE: float = 0.2
 ## Ticks an open wormhole stays open before the bot closes it.
 const CLOSE_AFTER_TICKS: int = 5
@@ -53,16 +54,20 @@ var resumes: int = 0
 var holds_added: int = 0
 ## Holds the bot released.
 var holds_released: int = 0
-## Addresses the bot queued, of them true target addresses, and those it dropped unreachable.
-var addresses_queued: int = 0
-var targets_queued: int = 0
+## Addresses the bot picked, of them real worlds' addresses, and those it dropped unreachable.
+var addresses_picked: int = 0
+var targets_picked: int = 0
 var addresses_dropped: int = 0
+## Every world whose true address the bot picked, in pick order, without repeats.
+var targets: Array[StringName] = []
 ## Dials the bot started.
 var dials: int = 0
 ## Wormholes the bot closed.
 var closes: int = 0
 
 var _next_action_tick: int = 0
+## The address the bot will dial next, or null.
+var _picked: GateAddress = null
 
 
 ## Acts once on [param simulation] before its next tick. While running, the bot waits for
@@ -94,7 +99,7 @@ func act(simulation: Simulation) -> void:
 	_submit_random_flag(simulation, rng)
 
 
-## Closes a lock open CLOSE_AFTER_TICKS, or, with the Ring idle, queues, drops or dials.
+## Closes a lock open CLOSE_AFTER_TICKS, or, with the Ring idle, picks, drops or dials.
 func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	var state: GameState = simulation.state
 	var gate: GateState = state.gate
@@ -105,43 +110,46 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 		return
 	if gate.mode != GateState.RingMode.IDLE:
 		return
-	if gate.dial_queue.is_empty():
-		_queue_address(simulation, rng)
+	if _picked == null:
+		_pick_address(state, rng)
 		return
-	var front: GateAddress = gate.dial_queue[0]
-	var ready_in: int = GateQueries.ticks_until_ready(state, front)
+	var ready_in: int = GateQueries.ticks_until_ready(state, _picked)
 	if ready_in < 0:
-		simulation.submit(UnqueueAddressCommand.create(front))
+		_picked = null
 		addresses_dropped += 1
 	elif ready_in == 0:
-		simulation.submit(DialCommand.create(front))
-		simulation.submit(UnqueueAddressCommand.create(front))
+		simulation.submit(DialCommand.create(_picked))
+		_picked = null
 		dials += 1
 
 
-func _queue_address(simulation: Simulation, rng: RandomNumberGenerator) -> void:
-	var state: GameState = simulation.state
+func _pick_address(state: GameState, rng: RandomNumberGenerator) -> void:
 	var origin: int = state.galaxy.home().origin_glyph
-	var targets: Array[StringName] = _delivered_targets(state.intel)
-	var address: GateAddress = null
-	if not targets.is_empty() and rng.randf() < TARGET_CHANCE:
-		var target: StringName = targets[rng.randi_range(0, targets.size() - 1)]
-		address = state.galaxy.address_of(target, origin)
-		targets_queued += 1
+	var first_glyphs: Array[int] = _reachable_first_glyphs(state)
+	if rng.randf() < TARGET_CHANCE:
+		var worlds: Array[StringName] = _reachable_worlds(state, first_glyphs)
+		var target: StringName = worlds[rng.randi_range(0, worlds.size() - 1)]
+		_picked = state.galaxy.address_of(target, origin)
+		targets_picked += 1
+		if not targets.has(target):
+			targets.append(target)
 	else:
-		address = random_address(rng, origin, _reachable_first_glyphs(state))
-	simulation.submit(QueueAddressCommand.create(address))
-	addresses_queued += 1
+		_picked = random_address(rng, origin, first_glyphs)
+	addresses_picked += 1
 
 
-## Distinct target worlds of the clues delivered so far, in arrival order. The bot cheats on
-## purpose: it plays the soak, not the puzzle.
-static func _delivered_targets(intel: IntelState) -> Array[StringName]:
-	var targets: Array[StringName] = []
-	for clue: ClueRecord in intel.clues:
-		if not targets.has(clue.target_world_id):
-			targets.append(clue.target_world_id)
-	return targets
+## Worlds other than CAIRN whose true address starts with one of [param first_glyphs], in
+## catalogue order. The bot cheats on purpose: it plays the soak, not the puzzle.
+static func _reachable_worlds(state: GameState, first_glyphs: Array[int]) -> Array[StringName]:
+	var home: WorldRecord = state.galaxy.home()
+	var found: Array[StringName] = []
+	for world: WorldRecord in state.galaxy.all_worlds():
+		if world.id == home.id:
+			continue
+		var address: GateAddress = state.galaxy.address_of(world.id, home.origin_glyph)
+		if first_glyphs.has(address.coordinates[0]):
+			found.append(world.id)
+	return found
 
 
 ## Glyphs other than the home origin whose anchor, as seal 1, needs no more lock energy than

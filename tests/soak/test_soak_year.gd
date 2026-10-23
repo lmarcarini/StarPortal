@@ -4,9 +4,8 @@
 ## Both must end with the same to_dict(), which catches any state to_dict() forgets.
 ## Both runs are built by GameSetup from the real data/ content, so PowerSystem and
 ## GateSystem tick all year (and are rebuilt with the galaxy after every load); stored power
-## must stay within 0..capacity, and never NaN, on every tick. The new game plans the opening
-## (GameSetup.build_new()), so IntelSystem delivers its three dossiers, and the bot dials all
-## year: random addresses mostly, the delivered targets' true addresses sometimes.
+## must stay within 0..capacity, and never NaN, on every tick. The bot dials directly all
+## year: random addresses mostly, real worlds' true addresses sometimes.
 ## Run with scripts/soak.sh; scripts/test.sh skips this folder.
 ## Bible: technical-architecture.md#testing-and-tooling (Soak test),
 ## technical-architecture.md#save-system
@@ -120,7 +119,7 @@ func test_year_with_monthly_save_and_load_matches_uninterrupted_run() -> void:
 func _summary(elapsed_msec: int) -> String:
 	var template := "soak: %d ticks x 2 runs in %.2f s; %d day_started, %d month_closed, "
 	template += "%d reloads, %d commands (%d while paused), %d pauses; %d dials (%d locks), "
-	template += "%d closes, %d queued (%d targets, %d dropped), %d clues"
+	template += "%d closes, %d picked (%d targets, %d dropped)"
 	var bot: SoakBot = _reloaded.bot
 	var values: Array = [
 		YEAR_TICKS,
@@ -134,10 +133,9 @@ func _summary(elapsed_msec: int) -> String:
 		bot.dials,
 		_locks(_reloaded),
 		bot.closes,
-		bot.addresses_queued,
-		bot.targets_queued,
+		bot.addresses_picked,
+		bot.targets_picked,
 		bot.addresses_dropped,
-		_reloaded.simulation.state.intel.clues.size(),
 	]
 	return template % values
 
@@ -218,21 +216,18 @@ func _assert_run_events(
 		)
 
 
-## Checks [param run] got the three dossiers and worked the Ring all year: it dialed, locked
-## (a true target address, at least), closed, and the Dial Log holds every dial.
+## Checks [param run] worked the Ring all year: it dialed, locked (a true target address, at
+## least), closed, and the Dial Log holds every dial; only dialed targets have a status.
 func _assert_run_ring(run: SoakRun) -> void:
 	var state: GameState = run.simulation.state
 	var bot: SoakBot = run.bot
-	assert_dict(state.intel.scheduled_dossiers).is_empty()
-	assert_int(state.intel.next_dossier_number).is_equal(OpeningScenario.TARGET_COUNT + 1)
-	assert_bool(state.intel.clues.is_empty()).is_false()
 	assert_int(bot.dials).is_greater(YEAR_DAYS)
 	assert_int(state.gate.dial_log.size()).is_between(bot.dials - 1, bot.dials)
-	assert_int(bot.targets_queued).is_greater(0)
+	assert_int(bot.targets_picked).is_greater(0)
 	assert_int(_locks(run)).is_greater(0)
 	assert_int(bot.closes).is_greater(0)
 	for world_id: StringName in state.worlds.statuses:
-		assert_bool(_is_target(state, world_id)).override_failure_message(world_id).is_true()
+		assert_bool(bot.targets.has(world_id)).override_failure_message(world_id).is_true()
 
 
 ## Locks and hostile locks in [param run]'s Dial Log.
@@ -242,14 +237,6 @@ func _locks(run: SoakRun) -> int:
 		if DialOutcome.is_lock(entry.outcome):
 			count += 1
 	return count
-
-
-## True when some delivered clue points at [param world_id].
-func _is_target(state: GameState, world_id: StringName) -> bool:
-	for clue: ClueRecord in state.intel.clues:
-		if clue.target_world_id == world_id:
-			return true
-	return false
 
 
 ## Counts the ticks in 1..YEAR_TICKS that TimeMath says start a day.
