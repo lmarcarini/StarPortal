@@ -50,8 +50,18 @@ func _ready() -> void:
 	var own: NodePath = _tabs.get_path_to(_tabs)
 	_tabs.focus_neighbor_left = own
 	_tabs.focus_neighbor_right = own
+	_bridge_address()
 	if not _ids.is_empty():
 		_activate(_ids[0])
+
+
+## Throwaway bridge until the dial console: the Gate Room's Dial button dials the address
+## placed in the Analysis view's Workbench.
+func _bridge_address() -> void:
+	var analysis: AnalysisView = get_view(ANALYSIS) as AnalysisView
+	var gate_room: GateRoomView = get_view(GATE_ROOM) as GateRoomView
+	if analysis != null and gate_room != null:
+		gate_room.set_address_source(analysis.get_address)
 
 
 func _notification(what: int) -> void:

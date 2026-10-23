@@ -1,5 +1,5 @@
 ## Layout checks for the Address Workbench at its share of a 1280 x 720 screen (two fifths of
-## the width, beside the Analysis Board): nothing is wider than the column in English,
+## the width, beside the Archive placeholder): nothing is wider than the column in English,
 ## Brazilian Portuguese or the expanded pseudo-locale, so no text is clipped sideways; labels
 ## wrap and grow downwards inside the scroll area instead.
 ## Bible: technical-architecture.md#input-accessibility-and-localisation,
@@ -27,14 +27,6 @@ func before_test() -> void:
 	_workbench.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	_workbench.size = COLUMN_SIZE
 	_workbench.setup(_simulation)
-	var target: GateAddress = Fixture.target_address(_simulation.state)
-	var c: Array[int] = target.coordinates
-	var constraints: Array[AddressConstraint] = [AddressConstraint.exact_set(c)]
-	for index: int in 5:
-		constraints.append(AddressConstraint.nearer_than(c[index], c[index + 1]))
-	constraints.append(AddressConstraint.glyph_not_at(7, c[0]))
-	_simulation.submit(SetWorkbenchCommand.create(WorkbenchState.HOME_ORIGIN, constraints))
-	_simulation.submit(QueueAddressCommand.create(target))
 
 
 func after_test() -> void:
@@ -61,15 +53,21 @@ func test_fits_the_column_in_the_pseudo_locale() -> void:
 	await _assert_fits()
 
 
-## Every visible control lies within the scroll area's width, and every label that does not
-## wrap is at least as wide as its text.
+## With every seal filled and a glyph picked, every visible control lies within the scroll
+## area's width, and every label that does not wrap is at least as wide as its text.
 func _assert_fits() -> void:
 	_workbench.setup(_simulation)
+	var seals: SealRow = _workbench.get_node("%SealRow") as SealRow
+	var target: GateAddress = Fixture.target_address(_simulation.state)
+	for index: int in GateAddress.COORDINATE_COUNT:
+		seals.glyph_dropped.emit(index + 1, target.coordinates[index])
+	var palette: GlyphPalette = _workbench.get_node("%Palette") as GlyphPalette
+	palette.glyph_chosen.emit(target.coordinates[0])
 	await UiInput.settle(_workbench)
 	await UiInput.settle(_workbench)
 	var scroll: ScrollContainer = _workbench.get_node("%Scroll") as ScrollContainer
 	var right_edge: float = scroll.get_global_rect().end.x
-	assert_array(_candidates_rows()).is_not_empty()
+	assert_object(_workbench.get_address()).is_not_null()
 	for control: Control in _visible_controls(scroll):
 		var rect: Rect2 = control.get_global_rect()
 		var message: String = (
@@ -83,10 +81,6 @@ func _assert_fits() -> void:
 				. override_failure_message(str(control.get_path()))
 				. is_greater_equal(needed)
 			)
-
-
-func _candidates_rows() -> Array[CandidateRow]:
-	return (_workbench.get_node("%Candidates") as CandidateList).get_rows()
 
 
 func _visible_controls(root: Node) -> Array[Control]:

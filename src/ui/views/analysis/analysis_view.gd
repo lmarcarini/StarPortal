@@ -1,30 +1,31 @@
 class_name AnalysisView
 extends GameView
-## The Analysis view: the Address Workbench (about 40% of the width) beside the Analysis
-## Board. It passes the simulation down to both and links focus between them; their own
-## cards fill them in.
+## The Analysis view: the Address Workbench (about 40% of the width) beside a placeholder
+## where the Archive will go. It passes the simulation down to the Workbench, and lends the
+## Workbench's address to the Gate Room's Dial button until the dial console replaces both.
 ## Bible: game-design.md#core-loop,
 ## technical-architecture.md#input-accessibility-and-localisation
 
 const _TITLE_KEY: StringName = &"ANALYSIS_TITLE"
 
 @onready var _workbench: Workbench = %Workbench
-@onready var _board: AnalysisBoard = %Board
 
 
 func _ready() -> void:
-	_workbench.focus_neighbor_left = _workbench.get_path_to(_workbench)
-	_workbench.focus_neighbor_right = _workbench.get_path_to(_board)
-	_workbench.focus_neighbor_bottom = _workbench.get_path_to(_workbench)
-	_board.focus_neighbor_left = _board.get_path_to(_workbench)
-	_board.focus_neighbor_right = _board.get_path_to(_board)
-	_board.focus_neighbor_bottom = _board.get_path_to(_board)
+	var own: NodePath = _workbench.get_path_to(_workbench)
+	_workbench.focus_neighbor_left = own
+	_workbench.focus_neighbor_right = own
+	_workbench.focus_neighbor_bottom = own
 
 
-## Passes [param simulation] to the Workbench and the Board.
+## Passes [param simulation] to the Workbench.
 func setup(simulation: Simulation) -> void:
 	_workbench.setup(simulation)
-	_board.setup(simulation)
+
+
+## Returns the address placed in the Workbench's slots, or null until all seven are filled.
+func get_address() -> GateAddress:
+	return _workbench.get_address()
 
 
 ## Returns the Workbench, where an address is built.

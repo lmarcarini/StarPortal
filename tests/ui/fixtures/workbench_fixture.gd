@@ -1,7 +1,7 @@
 extends RefCounted
 ## Test fixture for the Address Workbench: a paused Simulation over the real content (Registry)
-## and a sky-chart puzzle taken from a generated world's real address.
-## Bible: gate-and-address-spec.md#player-tools
+## and a generated world's real address.
+## Bible: gate-and-address-spec.md#glyphs-and-the-hidden-address-math
 
 const TEST_SEED: int = 20_261_022
 const SCENE_PATH: String = "res://src/ui/analysis/workbench/workbench.tscn"

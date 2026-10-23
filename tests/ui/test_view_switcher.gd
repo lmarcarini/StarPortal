@@ -116,7 +116,7 @@ func test_moving_along_the_focused_tabs_keeps_focus_on_them() -> void:
 	await _press_action(&"ui_down")
 	assert_object(_focus_owner()).is_same(_view(&"analysis").get_default_focus())
 	await _press_action(&"ui_right")
-	assert_object(_focus_owner()).is_same(_view(&"analysis").find_child("Board", true, false))
+	assert_object(_focus_owner()).is_same(_view(&"analysis").get_default_focus())
 	await _press_action(&"ui_up")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_left")
@@ -154,11 +154,11 @@ func test_view_action_on_an_axis_fires_once_per_pull() -> void:
 ## disabled on purpose disabled.
 func test_showing_a_view_restores_only_what_hiding_changed() -> void:
 	var view: GameView = _view(&"analysis")
-	var board: Control = view.find_child("Board", true, false) as Control
+	var seal: Control = view.find_child("Seal1", true, false) as Control
 	_switcher.show_view(&"analysis")
 	view.process_mode = Node.PROCESS_MODE_ALWAYS
 	view.mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_DISABLED
-	board.focus_behavior_recursive = Control.FOCUS_BEHAVIOR_DISABLED
+	seal.focus_behavior_recursive = Control.FOCUS_BEHAVIOR_DISABLED
 	_switcher.show_view(&"gate_room")
 	_assert_active(&"analysis", false)
 	_switcher.show_view(&"gate_room")
@@ -166,16 +166,16 @@ func test_showing_a_view_restores_only_what_hiding_changed() -> void:
 	assert_int(view.process_mode).is_equal(Node.PROCESS_MODE_ALWAYS)
 	assert_int(view.mouse_behavior_recursive).is_equal(Control.MOUSE_BEHAVIOR_DISABLED)
 	assert_int(view.focus_behavior_recursive).is_equal(Control.FOCUS_BEHAVIOR_INHERITED)
-	assert_int(board.focus_behavior_recursive).is_equal(Control.FOCUS_BEHAVIOR_DISABLED)
-	assert_int(board.get_focus_mode_with_override()).is_equal(Control.FOCUS_NONE)
+	assert_int(seal.focus_behavior_recursive).is_equal(Control.FOCUS_BEHAVIOR_DISABLED)
+	assert_int(seal.get_focus_mode_with_override()).is_equal(Control.FOCUS_NONE)
 	assert_int(view.get_default_focus().get_focus_mode_with_override()).is_equal(Control.FOCUS_ALL)
 
 
 func test_hidden_view_keeps_its_nodes() -> void:
-	var board: Control = _view(&"analysis").find_child("Board", true, false) as Control
+	var workbench: Control = _view(&"analysis").find_child("Workbench", true, false) as Control
 	_switcher.show_view(&"analysis")
 	_switcher.show_view(&"gate_room")
-	assert_object(_view(&"analysis").find_child("Board", true, false)).is_same(board)
+	assert_object(_view(&"analysis").find_child("Workbench", true, false)).is_same(workbench)
 
 
 func test_unknown_view_changes_nothing() -> void:
@@ -204,17 +204,17 @@ func test_setup_reaches_every_view_again_and_again() -> void:
 	assert_object(_focus_owner()).is_same(spy.get_default_focus())
 
 
-func test_analysis_view_puts_workbench_beside_a_wider_board() -> void:
+func test_analysis_view_puts_workbench_beside_a_wider_placeholder() -> void:
 	_switcher.show_view(&"analysis")
 	await _runner.simulate_frames(2)
 	var view: GameView = _view(&"analysis")
 	var workbench: Control = view.find_child("Workbench", true, false) as Control
-	var board: Control = view.find_child("Board", true, false) as Control
+	var placeholder: Control = view.find_child("ArchivePlaceholder", true, false) as Control
 	assert_object(workbench).is_instanceof(Workbench)
-	assert_object(board).is_instanceof(AnalysisBoard)
-	var share: float = workbench.size.x / (workbench.size.x + board.size.x)
+	assert_object(placeholder).is_instanceof(Label)
+	var share: float = workbench.size.x / (workbench.size.x + placeholder.size.x)
 	assert_float(share).is_equal_approx(0.4, 0.01)
-	assert_float(workbench.position.x).is_less(board.position.x)
+	assert_float(workbench.position.x).is_less(placeholder.position.x)
 
 
 func _make_switcher() -> ViewSwitcher:

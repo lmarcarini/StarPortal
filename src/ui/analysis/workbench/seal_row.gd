@@ -1,16 +1,14 @@
 class_name SealRow
 extends VBoxContainer
 ## The Address Workbench's eight seal slots, seven coordinates then the origin, with a caption
-## naming the origin and a button to go back to CAIRN's own. Shows a draft; never edits it.
-## Bible: gate-and-address-spec.md#player-tools,
-## gate-and-address-spec.md#glyphs-and-the-hidden-address-math (seal 8 is the origin)
+## naming the origin. Shows glyphs; never changes them.
+## Bible: gate-and-address-spec.md#glyphs-and-the-hidden-address-math (seal 8 is the origin),
+## game-design.md#difficulty-and-accessibility (click-to-pick and click-to-place)
 
 ## The player clicked or accepted slot [param seal] (8 is the origin).
 signal slot_chosen(seal: int)
 ## The player dropped [param glyph] on slot [param seal].
 signal glyph_dropped(seal: int, glyph: int)
-## The player asked to use CAIRN's origin glyph again.
-signal origin_reset
 
 const _SLOT_SCENE: PackedScene = preload("res://src/ui/analysis/workbench/seal_slot.tscn")
 
@@ -18,7 +16,6 @@ var _slots: Array[SealSlot] = []
 
 @onready var _slot_box: HBoxContainer = %Slots
 @onready var _caption: Label = %OriginCaption
-@onready var _reset_button: Button = %ResetOrigin
 
 
 func _ready() -> void:
@@ -30,24 +27,20 @@ func _ready() -> void:
 		slot.glyph_dropped.connect(glyph_dropped.emit)
 		_slot_box.add_child(slot)
 		_slots.append(slot)
-	_reset_button.pressed.connect(origin_reset.emit)
 
 
-## Shows [param constraints]' placed glyphs, and [param origin] in the last slot;
-## [param is_home] says the origin is CAIRN's own. [param translate] is the caller's tr.
-func show_draft(
-	constraints: Array[AddressConstraint], origin: int, is_home: bool, translate: Callable
-) -> void:
+## Shows [param glyphs], one per seal 1..8 (-1 for an empty seal); the last is CAIRN's
+## origin. [param translate] is the caller's tr.
+func show_glyphs(glyphs: Array[int], translate: Callable) -> void:
 	for slot: SealSlot in _slots:
-		var glyph: int = origin
-		if slot.seal <= GateAddress.COORDINATE_COUNT:
-			glyph = WorkbenchEdits.glyph_at_seal(constraints, slot.seal)
+		var glyph: int = glyphs[slot.seal - 1] if slot.seal <= glyphs.size() else -1
 		slot.show_glyph(glyph, _slot_tooltip(slot.seal, glyph, translate))
-	var caption_key: String = "WORKBENCH_ORIGIN_HOME" if is_home else "WORKBENCH_ORIGIN_SET"
-	_caption.text = str(translate.call(caption_key)).format(
-		{"glyph": WorkbenchText.glyph_name(origin, translate)}
+	var origin: int = (
+		glyphs[GateAddress.COORDINATE_COUNT] if glyphs.size() > GateAddress.COORDINATE_COUNT else -1
 	)
-	_reset_button.disabled = is_home
+	_caption.text = str(translate.call("WORKBENCH_ORIGIN_HOME")).format(
+		{"glyph": _glyph_name(origin, translate)}
+	)
 
 
 ## Returns the slot for [param seal], 1..8, or null.
@@ -57,13 +50,12 @@ func get_slot(seal: int) -> SealSlot:
 	return _slots[seal - 1]
 
 
-## Returns the "use CAIRN's origin" button.
-func get_reset_button() -> Button:
-	return _reset_button
-
-
 func _slot_tooltip(seal: int, glyph: int, translate: Callable) -> String:
 	if glyph < 0:
 		return str(translate.call("WORKBENCH_SLOT_EMPTY")).format({"seal": seal})
 	var template: String = str(translate.call("WORKBENCH_SLOT_FILLED"))
-	return template.format({"seal": seal, "glyph": WorkbenchText.glyph_name(glyph, translate)})
+	return template.format({"seal": seal, "glyph": _glyph_name(glyph, translate)})
+
+
+static func _glyph_name(glyph: int, translate: Callable) -> String:
+	return str(translate.call(PaletteGlyph.name_key_of(glyph)))

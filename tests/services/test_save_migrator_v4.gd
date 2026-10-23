@@ -1,6 +1,7 @@
 ## Tests for the v3 -> v4 SaveMigrator step: it adds empty "intel" (both counters 1, nothing
-## scheduled) and "workbench" (origin -1) sections, and a real v3 save file written by the
-## v3 SaveService (tests/services/fixtures/save_v3.json) loads into them.
+## scheduled) and "workbench" (origin -1) sections; and a real v3 save file written by the
+## v3 SaveService (tests/services/fixtures/save_v3.json) loads through v4 into v5, which
+## drops those sections and the dial queue again.
 ## Bible: technical-architecture.md#save-system
 extends GdUnitTestSuite
 
@@ -14,6 +15,11 @@ const EMPTY_INTEL: Dictionary = {
 	"scheduled_dossiers": {},
 }
 const EMPTY_WORKBENCH: Dictionary = {"origin_glyph": -1, "constraints": []}
+
+
+## Runs the built-in steps on [param data] up to v4 only.
+func _migrate_to_v4(data: Dictionary) -> Result:
+	return SaveMigrator.migrate_with_steps(data, SaveMigrator.built_in_steps(), 4)
 
 
 func _v3_fixture() -> Dictionary:
@@ -33,7 +39,7 @@ func test_fixture_is_v3() -> void:
 ## and the result is a valid state.
 func test_v3_adds_intel_and_workbench() -> void:
 	var data := _v3_fixture()
-	var result := SaveMigrator.migrate(data)
+	var result := _migrate_to_v4(data)
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
 	assert_int(migrated["format_version"]).is_equal(4)
@@ -48,14 +54,14 @@ func test_v3_adds_intel_and_workbench() -> void:
 
 ## v3 data with no state object passes through the step untouched.
 func test_v3_without_state_is_left_for_validation() -> void:
-	var result := SaveMigrator.migrate({"format_version": 3, "state": 5})
+	var result := _migrate_to_v4({"format_version": 3, "state": 5})
 	assert_bool(result.is_ok).is_true()
 	assert_dict(result.value).is_equal({"format_version": 4, "state": 5})
 
 
-## The real v3 file loads through the SaveService with empty intel and an empty Workbench,
-## and keeps its v3 state.
-func test_v3_save_file_loads_into_v4_defaults() -> void:
+## The real v3 file loads through the SaveService and keeps its v3 state, less the dial
+## queue that v4 -> v5 drops.
+func test_v3_save_file_loads_into_v5() -> void:
 	var service: SaveServiceScript = SaveServiceScript.new()
 	var dir := "user://test_migrator_v3_%d_%d" % [Time.get_ticks_usec(), get_instance_id()]
 	service.saves_dir = dir
@@ -70,17 +76,9 @@ func test_v3_save_file_loads_into_v4_defaults() -> void:
 	service.free()
 	assert_bool(result.is_ok).override_failure_message(str(result.detail)).is_true()
 	var loaded: GameState = result.value
-	assert_array(loaded.intel.clues).is_empty()
-	assert_dict(loaded.intel.notes).is_empty()
-	assert_int(loaded.intel.next_clue_number).is_equal(1)
-	assert_int(loaded.intel.next_dossier_number).is_equal(1)
-	assert_dict(loaded.intel.scheduled_dossiers).is_empty()
-	assert_int(loaded.workbench.origin_glyph).is_equal(-1)
-	assert_array(loaded.workbench.constraints).is_empty()
 	assert_int(loaded.clock.tick).is_equal(2400)
 	assert_int(loaded.random.base_seed).is_equal(20261022)
 	assert_bool(loaded.flags[&"met_director"]).is_true()
-	assert_array(loaded.gate.dial_queue).has_size(1)
 	assert_array(loaded.gate.dial_log).has_size(1)
 	assert_bool(loaded.gate.dial_log[0].energy_spent_mwh == 0.1 + 0.2).is_true()
 	assert_bool(loaded.power.stored_mwh == 1.0 / 3.0).is_true()

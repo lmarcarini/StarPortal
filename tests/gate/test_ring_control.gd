@@ -187,9 +187,8 @@ func test_transition_log_is_debug_only_print() -> void:
 	assert_bool(source.contains("\tassert(_log_transition(from, to))")).is_true()
 
 
-## The expected to_dict() of an IDLE Ring that keeps [param gate]'s queue and log.
+## The expected to_dict() of an IDLE Ring that keeps [param gate]'s log.
 func _idle_with_log(gate: GateState) -> Dictionary:
 	var idle := GateState.new()
 	idle.dial_log = gate.dial_log
-	idle.dial_queue = gate.dial_queue
 	return idle.to_dict()

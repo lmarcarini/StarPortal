@@ -1,12 +1,12 @@
 class_name GateState
 extends RefCounted
-## Saved state of CAIRN's Ring: its mode, the dial in progress or the open wormhole, the
-## dialing queue and the Dial Log. The fields of the current dial are set only in the modes
+## Saved state of CAIRN's Ring: its mode, the dial in progress or the open wormhole, and the
+## Dial Log. The fields of the current dial are set only in the modes
 ## that have one; validate_dict() rejects any other combination.
 ## Saved shape: {"mode": "idle" | "dialing" | "locked", "current_address": address or null,
 ## "dial_started_tick", "lock_energy_mwh": ExactFloat string, "connected_world_id",
 ## "lock_started_tick",
-## "is_hostile", "dial_queue": [address], "dial_log": [DialLogEntry]}. Unset ticks are -1.
+## "is_hostile", "dial_log": [DialLogEntry]}. Unset ticks are -1.
 ## Bible: technical-architecture.md#data-model, technical-architecture.md#state-machines,
 ## gate-and-address-spec.md#dialing-outcomes-and-energy, gate-and-address-spec.md#player-tools
 
@@ -51,17 +51,12 @@ var connected_world_id: StringName = &""
 var lock_started_tick: int = -1
 ## While LOCKED: true when the lock was a hostile lock.
 var is_hostile: bool = false
-## Addresses waiting to be dialed, first in line first.
-var dial_queue: Array[GateAddress] = []
 ## Every dial attempt, oldest first.
 var dial_log: Array[DialLogEntry] = []
 
 
 ## Returns JSON-safe data for saving. The mode is a lowercase name; a missing address is null.
 func to_dict() -> Dictionary:
-	var queue_data: Array[Dictionary] = []
-	for address: GateAddress in dial_queue:
-		queue_data.append(address.to_dict())
 	var log_data: Array[Dictionary] = []
 	for entry: DialLogEntry in dial_log:
 		log_data.append(entry.to_dict())
@@ -74,7 +69,6 @@ func to_dict() -> Dictionary:
 		"connected_world_id": String(connected_world_id),
 		"lock_started_tick": lock_started_tick,
 		"is_hostile": is_hostile,
-		"dial_queue": queue_data,
 		"dial_log": log_data,
 	}
 
@@ -100,32 +94,27 @@ static func from_dict(data: Dictionary) -> GateState:
 	var hostile: Variant = data.get("is_hostile")
 	if hostile is bool:
 		gate.is_hostile = hostile
-	for item: Dictionary in _dicts_in(data.get("dial_queue")):
-		gate.dial_queue.append(GateAddress.from_dict(item))
 	for item: Dictionary in _dicts_in(data.get("dial_log")):
 		gate.dial_log.append(DialLogEntry.from_dict(item))
 	return gate
 
 
-## Returns human-readable errors for saved [param data], empty when it is valid. Types:
-## "mode" a mode name; "current_address" null or a valid address; both ticks -1 or a whole
-## number from 0 to 2^53; "lock_energy_mwh" an ExactFloat string of a finite number of at
-## least 0;
-## "connected_world_id" a string; "is_hostile" a bool; "dial_queue" an array of valid
-## addresses; "dial_log" an array of valid DialLogEntry objects. Then the Ring fields must
-## fit the mode: IDLE has no address, ticks, world or hostility; DIALING has an address and
-## a dial tick but no world, lock tick or hostility; LOCKED has all of them, and the lock
-## tick is not before the dial tick.
+## Returns human-readable errors for saved [param data], empty when it is valid. Types: "mode" a
+## mode name; "current_address" null or a valid address; both ticks -1 or a whole number from 0 to
+## 2^53; "lock_energy_mwh" an ExactFloat string of a finite number of at least 0;
+## "connected_world_id" a string; "is_hostile" a bool; "dial_log" an array of valid DialLogEntry
+## objects. Then the Ring fields must fit the mode: IDLE has no address, ticks, world or hostility;
+## DIALING has an address and a dial tick but no world, lock tick or hostility; LOCKED has all of
+## them, and the lock tick is not before the dial tick.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors := _field_errors(data)
-	errors.append_array(_list_errors(data, "dial_queue", _address_errors))
 	errors.append_array(_list_errors(data, "dial_log", DialLogEntry.validate_dict))
 	if not errors.is_empty():
 		return errors
 	return _mode_errors(data)
 
 
-## Type errors of every field except the two lists.
+## Type errors of every field except the Dial Log.
 static func _field_errors(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _field_rules:
@@ -220,10 +209,6 @@ static func _is_string(value: Variant) -> bool:
 
 static func _is_bool(value: Variant) -> bool:
 	return value is bool
-
-
-static func _address_errors(data: Dictionary) -> Array[String]:
-	return GateAddress.validate_dict(data)
 
 
 ## Returns the Dictionaries in [param value] when it is an Array; other items are skipped.

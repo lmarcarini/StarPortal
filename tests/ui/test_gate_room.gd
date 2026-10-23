@@ -1,8 +1,7 @@
-## Tests for the Gate Room view: queueing an address, holding dial, advancing two ticks and
-## reading the outcome banner, the capacitor gauge and the Dial Log, for each of the five
-## outcomes, plus the wormhole panel and the queue panel.
-## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy,
-## gate-and-address-spec.md#player-tools, game-design.md#core-loop
+## Tests for the Gate Room view: selecting an address through the address source (the
+## Workbench bridge), holding dial, advancing two ticks and reading the outcome banner, the
+## capacitor gauge and the Dial Log, for each of the five outcomes, plus the wormhole panel.
+## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy, game-design.md#core-loop
 extends GdUnitTestSuite
 
 const Fixture := preload("res://tests/ui/gate_room_fixture.gd")
@@ -32,11 +31,9 @@ func after_test() -> void:
 	TranslationServer.set_locale(_real_locale)
 
 
-## Types [param address] into the pickers and presses "add to queue".
+## Makes [param address] the address to dial.
 func _enter(address: GateAddress) -> void:
-	var entry: AddressEntry = _view.find_child("AddressEntry", true, false) as AddressEntry
-	entry.set_entered_address(address)
-	entry.get_add_button().pressed.emit()
+	Fixture.select(_view, address)
 
 
 ## Holds the dial button for the whole confirmation time.
@@ -63,9 +60,6 @@ func test_each_outcome_shows_banner_gauge_drop_and_log_row(
 ) -> void:
 	var address: GateAddress = Fixture.address_for(_simulation.state, outcome)
 	_enter(address)
-	var queue: DialQueuePanel = _panel("DialQueuePanel") as DialQueuePanel
-	assert_int(queue.get_rows().size()).is_equal(1)
-	assert_str(queue.get_selected().key()).is_equal(address.key())
 	_hold_dial()
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.DIALING)
 	var banner: OutcomeBanner = _panel("OutcomeBanner") as OutcomeBanner
@@ -99,60 +93,25 @@ func test_banner_icon_shape_differs_per_outcome() -> void:
 	assert_str(String(OutcomeIcon.shape_of(5))).is_empty()
 
 
-func test_queue_rows_show_energy_and_ready_time() -> void:
+func test_dial_needs_an_address_from_the_source() -> void:
+	var controls: DialControls = _panel("DialControls") as DialControls
+	assert_bool(controls.get_dial_button().disabled).is_true()
+	assert_str(controls.get_reason_text()).is_equal(tr(&"GATE_REASON_NONE_SELECTED"))
 	var address: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK)
-	_enter(address)
-	var row: QueueRow = (_panel("DialQueuePanel") as DialQueuePanel).get_rows()[0]
+	var picked: Array[GateAddress] = [null]
+	_view.set_address_source(func() -> GateAddress: return picked[0])
+	assert_bool(controls.get_dial_button().disabled).is_true()
+	picked[0] = address
+	assert_bool(controls.get_dial_button().disabled).is_true()
+	_view.visible = false
+	_view.visible = true
+	assert_bool(controls.get_dial_button().disabled).is_false()
+	var gauge: CapacitorGauge = _panel("CapacitorGauge") as CapacitorGauge
 	var needed: float = GateQueries.lock_energy_mwh(_simulation.state, address)
-	assert_str(row.get_info_label().text).contains(GateRoomFormat.energy(needed))
-	assert_str(row.get_info_label().text).contains("Charged, ready now")
-	assert_array((row.get_node("%Strip") as AddressStrip).get_glyph_indices()).is_equal(
-		address.seals()
-	)
-	_simulation.state.power.stored_mwh = 0.0
-	_simulation.state.power.plant_output_mw = 30.0
-	SimClock.step_ticks(1)
-	assert_str(row.get_info_label().text).contains("Ready in")
-	_simulation.state.power.plant_output_mw = 0.0
-	SimClock.step_ticks(1)
-	assert_str(row.get_info_label().text).contains("Never at current output")
-
-
-func test_remove_deletes_the_row_and_keeps_a_selection() -> void:
-	var first: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK)
-	var second: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.BLOCKED)
-	_enter(first)
-	_enter(second)
-	var queue: DialQueuePanel = _panel("DialQueuePanel") as DialQueuePanel
-	assert_int(queue.get_rows().size()).is_equal(2)
-	assert_str(queue.get_selected().key()).is_equal(second.key())
-	queue.get_rows()[1].get_remove_button().pressed.emit()
-	assert_int(_simulation.state.gate.dial_queue.size()).is_equal(1)
-	assert_int(queue.get_rows().size()).is_equal(1)
-	assert_str(queue.get_selected().key()).is_equal(first.key())
-	queue.get_rows()[0].get_remove_button().pressed.emit()
-	assert_object(queue.get_selected()).is_null()
-	assert_bool((_panel("DialQueuePanel").get_node("%EmptyLabel") as Label).visible).is_true()
-
-
-func test_entry_rejects_incomplete_duplicate_and_queued_addresses() -> void:
-	var entry: AddressEntry = _panel("AddressEntry") as AddressEntry
-	assert_bool(entry.get_add_button().disabled).is_true()
-	assert_str(entry.get_message_text()).is_equal("Choose a glyph for each of the eight seals.")
-	var address: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK)
-	var repeated: GateAddress = GateAddress.create(address.coordinates, address.coordinates[0])
-	entry.set_entered_address(repeated)
-	assert_bool(entry.get_add_button().disabled).is_true()
-	assert_str(entry.get_message_text()).is_equal("A glyph cannot appear twice in an address.")
-	_enter(address)
-	(
-		assert_array(entry.get_pickers().map(func(p: GlyphPicker) -> int: return p.get_glyph()))
-		. is_equal([-1, -1, -1, -1, -1, -1, -1, -1])
-	)
-	entry.set_entered_address(address)
-	entry.get_add_button().pressed.emit()
-	assert_str(entry.get_message_text()).is_equal("That address is already in the queue.")
-	assert_int(_simulation.state.gate.dial_queue.size()).is_equal(1)
+	assert_float(gauge.get_marker_mwh()).is_equal_approx(needed, 1e-9)
+	picked[0] = GateAddress.create(address.coordinates, address.coordinates[0])
+	_view.refresh_address()
+	assert_bool(controls.get_dial_button().disabled).is_true()
 
 
 func test_wormhole_panel_shows_a_lock_and_closes_it() -> void:
@@ -204,13 +163,6 @@ func test_log_lists_newest_first_and_names_the_world_for_locks_only() -> void:
 	var kinds: Array[int] = [DialOutcome.Kind.NO_GATE, DialOutcome.Kind.LOCK]
 	for kind: int in kinds:
 		_enter(Fixture.address_for(_simulation.state, kind))
-		(
-			(_panel("DialQueuePanel") as DialQueuePanel)
-			. get_rows()[-1]
-			. get_select_button()
-			. pressed
-			. emit()
-		)
 		_hold_dial()
 		SimClock.step_ticks(2)
 		if kind == DialOutcome.Kind.LOCK:

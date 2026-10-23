@@ -23,7 +23,7 @@ func after_test() -> void:
 	TranslationServer.set_locale(_real_locale)
 
 
-## Builds a busy Gate Room: two queued addresses, a failed dial and a lock still open.
+## Builds a busy Gate Room: a failed dial, a lock still open and another address selected.
 func _build(locale: String, is_pseudo: bool) -> void:
 	_real_locale = TranslationServer.get_locale()
 	TranslationServer.set_locale(locale)
@@ -37,16 +37,13 @@ func _build(locale: String, is_pseudo: bool) -> void:
 	_view.setup(_simulation)
 	_dial(DialOutcome.Kind.NO_GATE)
 	_dial(DialOutcome.Kind.LOCK)
-	var entry: AddressEntry = _view.find_child("AddressEntry", true, false) as AddressEntry
-	entry.set_entered_address(Fixture.address_for(_simulation.state, DialOutcome.Kind.BLOCKED))
+	Fixture.select(_view, Fixture.address_for(_simulation.state, DialOutcome.Kind.BLOCKED))
 	await get_tree().process_frame
 	await get_tree().process_frame
 
 
 func _dial(kind: int) -> void:
-	var entry: AddressEntry = _view.find_child("AddressEntry", true, false) as AddressEntry
-	entry.set_entered_address(Fixture.address_for(_simulation.state, kind))
-	entry.get_add_button().pressed.emit()
+	Fixture.select(_view, Fixture.address_for(_simulation.state, kind))
 	var button: HoldButton = _view.find_child("DialButton", true, false) as HoldButton
 	button.begin_hold()
 	button.advance(HoldButton.HOLD_SECONDS)

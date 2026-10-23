@@ -1,5 +1,5 @@
 ## Tests for GameDefs and GameSetup: gathering the real data/ content from the Registry,
-## building a Simulation with PowerSystem, GateSystem then IntelSystem, regenerating the same
+## building a Simulation with PowerSystem then GateSystem, regenerating the same
 ## galaxy after a JSON round trip, the transient balance and galaxy never being saved, and the
 ## failures.
 ## Bible: technical-architecture.md#simulation-clock-and-commands,
@@ -27,7 +27,7 @@ func test_defs_from_the_registry() -> void:
 	assert_str(String(homes[0].id)).is_equal("world_cairn")
 
 
-## build() sets the transient references and ticks PowerSystem, GateSystem, then IntelSystem.
+## build() sets the transient references and ticks PowerSystem, then GateSystem.
 func test_build_from_real_content_runs_both_systems() -> void:
 	var defs: GameDefs = _defs()
 	var state: GameState = GameState.new_game(SEED, defs.balance)
@@ -40,7 +40,7 @@ func test_build_from_real_content_runs_both_systems() -> void:
 	var ids: Array[StringName] = []
 	for system: SimSystem in simulation._systems:
 		ids.append(system.get_id())
-	assert_array(ids).is_equal([&"power", &"gate", &"intel"])
+	assert_array(ids).is_equal([&"power", &"gate"])
 	for index: int in 60:
 		simulation.advance_tick()
 	assert_float(state.power.stored_mwh).is_equal_approx(30.0, 1e-9)
@@ -73,9 +73,7 @@ func test_transient_references_are_never_saved() -> void:
 	var state: GameState = GameState.new_game(SEED, defs.balance)
 	GameSetup.build(state, defs)
 	var data: Dictionary = state.to_dict()
-	assert_array(data.keys()).is_equal(
-		["clock", "random", "flags", "gate", "power", "worlds", "intel", "workbench"]
-	)
+	assert_array(data.keys()).is_equal(["clock", "random", "flags", "gate", "power", "worlds"])
 	var text: String = JSON.stringify(data)
 	for word: String in ['galaxy"', "balance", "world_cairn", "anchors"]:
 		assert_bool(text.contains(word)).override_failure_message(word).is_false()

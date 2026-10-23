@@ -3,8 +3,6 @@
 ## Bible: technical-architecture.md#data-model
 extends GdUnitTestSuite
 
-const IntelFixture := preload("res://tests/core/intel_fixture.gd")
-
 
 func _sample_state() -> GameState:
 	var state := GameState.new_game(123456789)
@@ -123,7 +121,7 @@ func test_validate_rejects_flags_beyond_two_pow_53() -> void:
 		)
 
 
-## A state with a LOCKED Ring, a queue of two, a log of three, fractional energy and two
+## A state with a LOCKED Ring, a log of three, fractional energy and two
 ## world statuses, at clock tick 500.
 func _gate_power_worlds_state() -> GameState:
 	var state := GameState.new_game(987654321, BalanceConfig.new())
@@ -136,8 +134,6 @@ func _gate_power_worlds_state() -> GameState:
 	state.gate.lock_started_tick = 402
 	state.gate.lock_energy_mwh = 1.0 / 3.0
 	state.gate.connected_world_id = &"abydos"
-	state.gate.dial_queue.append(address)
-	state.gate.dial_queue.append(GateAddress.create(coordinates, 31))
 	for kind: DialOutcome.Kind in [
 		DialOutcome.Kind.NO_GATE, DialOutcome.Kind.ORIGIN_REJECTED, DialOutcome.Kind.LOCK
 	]:
@@ -177,7 +173,7 @@ func test_new_game_with_balance_starts_power() -> void:
 func test_to_dict_sections() -> void:
 	var data := _gate_power_worlds_state().to_dict()
 	assert_array(data.keys()).contains_exactly_in_any_order(
-		["clock", "random", "flags", "gate", "power", "worlds", "intel", "workbench"]
+		["clock", "random", "flags", "gate", "power", "worlds"]
 	)
 	assert_bool(_is_json_safe(data)).is_true()
 
@@ -230,55 +226,11 @@ func test_validate_rejects_dial_log_tick_after_clock() -> void:
 	assert_array(GameState.validate_dict(data)).is_empty()
 
 
-## new_game() starts with no clues, notes or scheduled dossiers, both counters at 1, and an
-## empty Workbench draft at the home origin.
-func test_new_game_intel_workbench_defaults() -> void:
-	var data := GameState.new_game(42).to_dict()
-	assert_dict(data["intel"]).is_equal(IntelState.new().to_dict())
-	(
-		assert_dict(data["intel"])
-		. is_equal(
-			{
-				"clues": [],
-				"notes": {},
-				"next_clue_number": 1,
-				"next_dossier_number": 1,
-				"scheduled_dossiers": {},
-			}
-		)
-	)
-	assert_dict(data["workbench"]).is_equal({"origin_glyph": -1, "constraints": []})
-
-
-## Clues, notes and the draft survive a JSON round trip with an equal dictionary.
-func test_intel_workbench_json_round_trip() -> void:
-	var data := IntelFixture.state().to_dict()
-	assert_array(GameState.validate_dict(data)).is_empty()
-	var parsed: Dictionary = JSON.parse_string(JSON.stringify(data))
-	assert_array(GameState.validate_dict(parsed)).is_empty()
-	assert_dict(GameState.from_dict(parsed).to_dict()).is_equal(data)
-
-
-## validate_dict requires "intel" and "workbench", prefixes their errors, and rejects clues
-## received later than the clock tick.
-func test_validate_intel_workbench() -> void:
-	var good := IntelFixture.state().to_dict()
-	for key: String in ["intel", "workbench"]:
-		var missing := good.duplicate(true)
-		missing.erase(key)
-		assert_array(GameState.validate_dict(missing)).is_equal(["missing '%s'" % key])
-		var wrong := good.duplicate(true)
-		wrong[key] = []
-		assert_array(GameState.validate_dict(wrong)).is_equal(["'%s' is not an object" % key])
-	var bad_origin := good.duplicate(true)
-	bad_origin["workbench"]["origin_glyph"] = 36
-	assert_array(GameState.validate_dict(bad_origin)).is_equal(
-		["workbench: 'origin_glyph' is not a whole number from -1 to 35"]
-	)
-	var late := good.duplicate(true)
-	late["intel"]["clues"][1]["received_tick"] = IntelFixture.CLOCK_TICK + 1
-	assert_array(GameState.validate_dict(late)).is_equal(
-		["intel: clue 1 'received_tick' is later than the clock tick"]
-	)
-	late["intel"]["clues"][1]["received_tick"] = IntelFixture.CLOCK_TICK
-	assert_array(GameState.validate_dict(late)).is_empty()
+## A v4-style state with "intel" and "workbench" still validates, and from_dict() drops them.
+func test_old_intel_and_workbench_sections_are_ignored() -> void:
+	var data := _gate_power_worlds_state().to_dict()
+	var old := data.duplicate(true)
+	old["intel"] = {"clues": []}
+	old["workbench"] = {"origin_glyph": -1, "constraints": []}
+	assert_array(GameState.validate_dict(old)).is_empty()
+	assert_dict(GameState.from_dict(old).to_dict()).is_equal(data)

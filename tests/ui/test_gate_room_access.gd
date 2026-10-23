@@ -32,9 +32,7 @@ func after_test() -> void:
 
 
 func _enter(address: GateAddress) -> void:
-	var entry: AddressEntry = _view.find_child("AddressEntry", true, false) as AddressEntry
-	entry.set_entered_address(address)
-	entry.get_add_button().pressed.emit()
+	Fixture.select(_view, address)
 
 
 func _dial(address: GateAddress) -> void:
@@ -98,14 +96,17 @@ func test_a_lock_names_the_world_in_the_wormhole_panel_and_the_log(
 	assert_int(found).is_equal(2)
 
 
-func test_the_default_focus_is_set_and_follows_the_queue() -> void:
+func test_the_default_focus_is_the_dial_button_or_the_log() -> void:
+	var button: HoldButton = _view.find_child("DialButton", true, false) as HoldButton
 	var first: Control = _view.get_default_focus()
-	assert_object(first).is_not_null()
+	assert_object(first).is_same(button)
 	assert_int(first.focus_mode).is_equal(Control.FOCUS_ALL)
-	assert_bool(first is OptionButton).is_true()
-	_enter(Fixture.address_for(_simulation.state, DialOutcome.Kind.NO_GATE))
-	var queue: DialQueuePanel = _view.find_child("DialQueuePanel", true, false) as DialQueuePanel
-	assert_object(_view.get_default_focus()).is_same(queue.get_rows()[0].get_select_button())
+	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.NO_GATE))
+	assert_bool(button.disabled).is_false()
+	assert_object(_view.get_default_focus()).is_same(button)
+	_view.set_address_source(func() -> GateAddress: return null)
+	var log_panel: DialLogPanel = _view.find_child("DialLogPanel", true, false) as DialLogPanel
+	assert_object(_view.get_default_focus()).is_same(log_panel.get_first_focus())
 
 
 func test_every_control_is_reachable_by_focus_alone() -> void:
@@ -118,7 +119,7 @@ func test_every_control_is_reachable_by_focus_alone() -> void:
 	for control: Control in Fixture.focusable(_view):
 		if not (control is BaseButton and (control as BaseButton).disabled):
 			expected.append(control)
-	assert_int(expected.size()).is_greater(15)
+	assert_int(expected.size()).is_greater_equal(3)
 	var reached: Array[Control] = _reach_by_directions(_view.get_default_focus())
 	for control: Control in expected:
 		(
@@ -139,7 +140,7 @@ func test_the_dial_button_is_a_focusable_hold_button_with_a_reason_when_disabled
 	var button: HoldButton = _view.find_child("DialButton", true, false) as HoldButton
 	assert_int(button.focus_mode).is_equal(Control.FOCUS_ALL)
 	assert_bool(button.disabled).is_true()
-	assert_str(button.tooltip_text).is_equal("Select an address from the queue first.")
+	assert_str(button.tooltip_text).is_equal("Place seven glyphs in the Address Workbench first.")
 
 
 func test_focus_moves_to_the_view_when_the_focused_button_goes_away() -> void:
