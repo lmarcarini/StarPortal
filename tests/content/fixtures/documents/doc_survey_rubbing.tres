@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DocumentDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_rub"]
+size = Vector2(64, 32)
+
+[resource]
+script = ExtResource("1_doc")
+kind = 1
+title_key = &"DOC_SURVEY_RUBBING_TITLE"
+image = SubResource("PlaceholderTexture2D_rub")
+source_key = &"DOC_SOURCE_SURVEY_1958"
+pair_id = &"doc_survey_note"
+id = &"doc_survey_rubbing"

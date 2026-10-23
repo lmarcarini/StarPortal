@@ -13,3 +13,10 @@ extends Resource
 ## The Registry reports every returned id that no loaded definition has.
 func get_references() -> Array[StringName]:
 	return []
+
+
+## Returns content errors that need the other loaded definitions [param _defs] (keyed by
+## id), beyond missing references; empty by default. The Registry reports each one with this
+## definition's file and id.
+func get_content_errors(_defs: Dictionary[StringName, DefBase]) -> Array[String]:
+	return []
