@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Validates the game content headless: the Registry, the 36 glyphs, the anchor field, the authored
-# worlds, the balance tunables, and the generated galaxies and clue dossiers of seeds 1..20.
+# worlds, the balance tunables, and the generated galaxies of seeds 1..20.
 # Prints one line per problem. Exit code: 0 when the content is valid, non-zero otherwise.
 #
 # Usage: scripts/validate.sh

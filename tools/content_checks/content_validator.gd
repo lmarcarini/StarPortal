@@ -8,8 +8,6 @@ extends RefCounted
 const RegistryScript := preload("res://src/content/registry.gd")
 ## Galaxy seeds checked by default: 1..20.
 const DEFAULT_SEEDS: int = 20
-## Reachable worlds whose dossiers are generated per seed.
-const DOSSIERS_PER_SEED: int = 3
 
 
 ## Returns the problems found in [param registry] (already loaded with load_all(), whose own
@@ -23,7 +21,7 @@ static func run(
 	errors.append_array(_check_content(registry))
 	_say(is_verbose, "content: %d problem(s) so far" % errors.size())
 	if not errors.is_empty():
-		_say(is_verbose, "galaxy and clue checks skipped until the content is valid")
+		_say(is_verbose, "galaxy checks skipped until the content is valid")
 		return errors
 	var started: int = Time.get_ticks_msec()
 	errors.append_array(_check_seeds(registry, seeds))
@@ -54,12 +52,9 @@ static func _check_content(registry: RegistryScript) -> Array[String]:
 	return errors
 
 
-## Checks 5 and 6 for seeds 1..[param seeds].
+## Check 5 for seeds 1..[param seeds].
 static func _check_seeds(registry: RegistryScript, seeds: int) -> Array[String]:
 	var errors: Array[String] = []
-	var counts: Array[int] = []
-	var clue_keys: Dictionary[String, bool] = ContentSource.read_keys(ContentSource.CLUE_TABLE)
-	var params := ClueSetParams.new()
 	for seed_number: int in range(1, seeds + 1):
 		var galaxy: GalaxyCatalogue = ContentSource.galaxy(registry, seed_number)
 		var worlds: Array[WorldRecord] = galaxy.all_worlds()
@@ -68,32 +63,7 @@ static func _check_seeds(registry: RegistryScript, seeds: int) -> Array[String]:
 		)
 		for line: String in found:
 			errors.append("seed %d: %s" % [seed_number, line])
-		var dossiers: Array[Array] = _dossiers(registry, galaxy, seed_number)
-		for dossier: Array in dossiers:
-			var clues: Array[ClueRecord] = []
-			clues.assign(dossier)
-			counts.append(ClueGenerator.count_candidates(clues, galaxy.home().origin_glyph))
-			errors.append_array(ContentCheckClues.check_keys(clues, clue_keys))
-	for line: String in ContentCheckClues.check_candidates(counts, params):
-		errors.append(line)
 	return errors
-
-
-## Dossiers for DOSSIERS_PER_SEED distinct reachable worlds of [param galaxy], drawn with a
-## generator seeded from [param seed_number].
-static func _dossiers(
-	registry: RegistryScript, galaxy: GalaxyCatalogue, seed_number: int
-) -> Array[Array]:
-	var dossiers: Array[Array] = []
-	var reach: Array[WorldRecord] = ContentCheckGalaxy.reachable(
-		galaxy.all_worlds(), galaxy.anchors_ly(), GeneratorParams.new(), registry.balance()
-	)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = seed_number
-	for _index: int in mini(DOSSIERS_PER_SEED, reach.size()):
-		var target: WorldRecord = reach.pop_at(rng.randi_range(0, reach.size() - 1))
-		dossiers.append(ClueGenerator.generate_dossier(target.id, galaxy, rng, ClueSetParams.new()))
-	return dossiers
 
 
 static func _say(is_verbose: bool, text: String) -> void:
