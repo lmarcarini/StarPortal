@@ -2,7 +2,7 @@
 
 ## Core loop
 
-The core loop is: gather clues, deduce an address, dial, probe, send a team, bring back artefacts and clues, research, then spend the results. Base, power, money and politics are the pressure around that loop.
+The core loop is: find a document or object, solve the address it hides, dial, probe, send a team, bring back artefacts, documents and new addresses, research, then spend the results. Base, power, money and politics are the pressure around that loop.
 
 *Diagram (see the live design doc): core loop · 6 steps inside the pressure of the base*
 
@@ -13,8 +13,8 @@ The player moves between six views that share one clock:
 | View | What the player does |
 | --- | --- |
 | Base | Dig levels, build rooms, route power, assign staff, defend during incursions |
-| Gate Room | Dial, watch seals engage, work the Shutter, monitor an open wormhole |
-| Analysis | Pin clues on the Analysis Board, build addresses in the Address Workbench, use the Star Atlas |
+| Gate Room | Build an address on the dial console, dial, watch the sequence, act through an open wormhole, work the Shutter |
+| Analysis | Read the Archive's documents and objects, solve their puzzles, keep the Address Book |
 | Expeditions | Choose teams and loadouts, watch the drone feed, make field decisions |
 | Research | Analyse artefacts, run the tech tree, decide what each technology becomes |
 | Command | Budget, Committee, faction relations, requests, news |
@@ -128,7 +128,7 @@ The same idea, a thing moving through states, runs through the whole game:
 
 | Thing | States |
 | --- | --- |
-| Clue | Found, read, applied as constraints, verified or exposed as false |
+| Clue | Found, read, solved |
 | World | Unknown, locked, probed, surveyed, contacted, then allied, outpost, hostile or quarantined |
 | Technology | Secret, military, public |
 | Person | Recruit, veteran, specialist; injured, changed by alien exposure, or turned |
@@ -142,7 +142,7 @@ Every faction, the government included, wants something from the player, and hel
 - **Standing** runs from −100 to +100 per faction. Thresholds unlock trade, gifts and joint operations, or trigger incursions and sabotage.
 - **Requests** come from the Directorate, the Committee and every faction. Each has a deadline, a reward, a cost and ripples to other factions. The ripples are shown before the player accepts, but hidden ones exist.
 - **Committee reviews** happen each quarter. The player chooses which results to present. Overstating them buys Confidence now and risks a scandal later.
-- **Dossiers** are the government's main output and the main source of clues. Each is a set of claims, and some are planted. Catching a lie gives the player leverage over whoever planted it.
+- **Dossiers** are the government's main output and the main source of clues. Each is a written document about a world or a faction: its history, its dangers, what it is good for, sometimes part of an address. A dossier can lie about motives or about what waits on the far side, never about an address; catching a lie gives the player leverage over whoever told it.
 
 | Example request | From | Reward | Ripple |
 | --- | --- | --- | --- |
@@ -182,7 +182,7 @@ The campaign gives the game its spine; the sandbox elements keep the space betwe
 
 - **Campaign.** A prologue and seven arcs, detailed in the Lore & Arcs tab. Each arc has goals, a rule change and an exit condition. Arcs begin when milestones are met; the player can linger, but faction clocks keep running.
 - **Faction arcs** advance on their own triggers and timers, alongside the main arc. They can collide with it.
-- **Procedural worlds** fill the network between authored story worlds. They come with generated clue sets, so exploration never runs dry.
+- **Procedural worlds** fill the network between authored story worlds. Their addresses are found on far Ring consoles, so exploration never runs dry.
 - **Side mysteries** are optional chains of clues with lore and technology rewards.
 - **After the ending,** play continues in the same save with the arcs closed.
 - **Sandbox mode** is a separate start with arcs switched off, a chosen seed and adjustable rules.
@@ -198,20 +198,18 @@ Difficulty changes how forgiving the base is, never how the puzzle works; access
 | Budget allocation | 130% | 100% | 80% |
 | Power and dialing costs | 75% | 100% | 120% |
 | Failed-dial energy cost | 5% | 10% | 20% |
-| Clue redundancy | Extra clue per address | Standard | Standard |
 | Analyst hints | Frequent | On request | Off |
-| Planted clues | Fewer, easier to catch | Standard | More frequent |
 | Incursion strength | 70% | 100% | 130% |
 | Research speed | 125% | 100% | 85% |
 
-The address rule and the puzzle tuning rules never change with difficulty.
+The address rule and the address puzzles never change with difficulty.
 
 **Input.** The whole game plays with keyboard and mouse or with a gamepad, and the player can switch at any moment.
 
 - Every action is remappable, with two bindings per action per device.
 - Hold or toggle can be chosen for every held action.
 - On a gamepad, menus use focus navigation and on-screen prompts follow the last device used.
-- The Workbench and Analysis Board support click-to-pick and click-to-place as well as dragging.
+- The dial console supports click-to-pick and click-to-place as well as dragging.
 - Drone piloting has adjustable sensitivity, dead zones and axis inversion.
 - Hold-to-confirm durations are adjustable.
 

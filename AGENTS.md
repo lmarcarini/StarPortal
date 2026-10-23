@@ -62,6 +62,7 @@ Summary only. The full rules win on any doubt:
 ## 5. Branches, commits and pull requests
 
 - **One card per PR.** One card, one branch, one pull request.
+- **Card types:** `contract`, `feature`, `tooling`, `content`, `test`, `design`.
 - **Branch:** `card/<issue>-<slug>`, e.g. `card/7-command-queue`.
 - **PR body:** says `Closes #<issue>`.
 - **Commits:** each change covers one feature, includes its tests, and names the bible section
@@ -69,6 +70,10 @@ Summary only. The full rules win on any doubt:
 - **Merge:** squash merge, after review approval.
 - **Scope:** only the files in the card's Touches list. Extra work found mid-card is reported,
   not done.
+
+A `design` card (progression, lore, puzzle writing) produces a document under `docs/content/`,
+not code. Write it in plain, specific English. The owner approves it before any content card
+builds on it.
 
 Process details: [roadmap.md#working-process](docs/bible/roadmap.md#working-process).
 

@@ -47,7 +47,7 @@ Three senators hold the votes. Chair Ruth Adeyemi is a pragmatist, Sen. Graham V
 
 ### Continuity: "The Gallow File"
 
-Deputy Director Simon Ashby runs it. Its dossiers are mostly true, with key lies. The player finds a planted seal, then the 1961 file, then the hidden acolyte. Continuity tries to take the base (Arc 2 setback). It ends exposed, absorbed, or quietly allied.
+Deputy Director Simon Ashby runs it. Its dossiers are mostly true, with key lies. The player finds a doctored dossier that hides what a world really is, then the 1961 file, then the hidden acolyte. Continuity tries to take the base (Arc 2 setback). It ends exposed, absorbed, or quietly allied.
 
 ### Halcyon Dynamics: "Private Sector"
 
@@ -83,7 +83,7 @@ Each arc asks one question, changes at least one rule, and most take something a
 
 | Arc | Question | Gameplay added or changed | Setback | Ends when |
 | --- | --- | --- | --- | --- |
-| Prologue: Cold Ring | Can the Ring be dialed safely? | Tutorial: one dossier, the Workbench, power, dialing, the MOTH | None | The first Threshold team returns |
+| Prologue: Cold Ring | Can the Ring be dialed safely? | Tutorial: the 1958 field note and carving rubbing, the dial console, power, dialing, the MOTH | None | The first Threshold team returns |
 | 1: First Light | Who is out there? | Expeditions, research, Kindred contact, the first incursion | No Shutter yet: every incoming wormhole is dangerous | The Shutter is online and five worlds are surveyed |
 | 2: The Gallow File | Who is lying? | Source grades, plants among staff, lie detection, Halcyon contracts | The Continuity audit freezes the official budget; the base runs on black funds and Halcyon money | Continuity is exposed, absorbed or bargained with |
 | 3: The Toll | What does the network cost? | Outposts, defence, request ripples, the Unbound | The Ossar seize a Kindred world that supplies anterite; the Shutter can now be breached | The Ossar push is broken, or a truce holds |

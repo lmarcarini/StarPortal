@@ -2,13 +2,14 @@
 
 ## Milestones
 
-The Ring is built first, because if deducing and dialing an address is not fun, nothing else matters. Everything after that is built around it.
+The Ring is built first, because if finding and dialing an address is not fun, nothing else matters. Everything after that is built around it.
 
 | Milestone | Builds | Done when |
 | --- | --- | --- |
 | M0 Foundations | Project setup, layers, `SimClock`, `EventBus`, `Registry`, save skeleton, input actions and remapping, CI | An empty game ticks, saves, loads and passes tests headless |
 | M0.5 Hardening | Time controls as an explicit state machine (Running, Paused, Held), save and state robustness, CI hardening, housekeeping from M0 reviews | System holds never override the player's pause; old saves migrate to the new format; CI and soak stay green |
 | M1 The Ring | Address rule, world generator, Workbench, Analysis Board, dialing, outcomes, energy | A tester deduces three addresses from clues alone, using placeholder art |
+| M1.5 The Ring, revised | After the M1 playtest: the dial console with drag-and-drop and the Address Book, the skippable dialing sequence and the wormhole screen, hand-made documents and the opening puzzle, Ring-console addresses; the constraint tools, candidate counter, clue generator and false clues are removed | A first-time player solves the opening puzzle from the note and the rubbing alone, dials it, and knows what to do with the open wormhole |
 | M2 The Base | Base cutaway, rooms, power and priorities, staff, budget, time controls | A 30-day run balances power and money with real trade-offs |
 | M3 Beyond the Ring | Probes, drone feed, World Reports, expeditions, check-ins | A full dial, probe, expedition and return loop works |
 | M4 Consequences | Research, artefacts, tech tree, factions, requests, incursions, failure states | Every failure state can be triggered and every transformation completed |
@@ -103,7 +104,9 @@ What a reasonable implementer might be tempted to add, and must not.
 What to look at closely.
 ```
 
-Every card carries three labels: its milestone (`M0` to `M8`), its type (`contract`, `feature`, `tooling`, `content`, `test`) and its size (`S` or `M`).
+Every card carries three labels: its milestone (`M0` to `M8`), its type (`contract`, `feature`, `tooling`, `content`, `test`, design) and its size (`S` or `M`).
+
+**Design cards** hold progression, lore and puzzle writing. Their output is a document under `docs/content/`; after review the owner approves it before any content card builds on it.
 
 ## M0 cards
 

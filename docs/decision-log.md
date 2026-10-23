@@ -74,3 +74,103 @@ Each entry has four fields:
   pause, which a set of booleans cannot guarantee. The bible's code standards already require
   an explicit state machine for anything with modes, the time controls included.
 - **Bible section:** [technical-architecture.md#state-machines](bible/technical-architecture.md#state-machines)
+
+## 2026-10-22 — Translation tables are one CSV per area
+
+- **Date:** 2026-10-22
+- **Decision:** Translation tables are one CSV per area, not one shared file. Each file starts with a real title key.
+- **Reason:** Parallel cards edited one CSV and collided, so each area gets its own table. Godot does not
+  import a header-only CSV and boot prints errors, so each table starts with one real title
+  key.
+- **Bible section:** [technical-architecture.md#input-accessibility-and-localisation](bible/technical-architecture.md#input-accessibility-and-localisation)
+
+## 2026-10-22 — Domain events go through a state outbox
+
+- **Date:** 2026-10-22
+- **Decision:** Systems put domain events in an outbox kept in the state, and the tick emits them last, one at a time and never nested. Some event names are reserved for the engine.
+- **Reason:** Systems and commands cannot touch Nodes, so they need a way to report events. Emitting last
+  in the tick matches the bible's fixed tick order. No nesting and reserved names came from
+  review: nested emission reordered events, and systems could have faked clock or save
+  signals.
+- **Bible section:** [technical-architecture.md#simulation-clock-and-commands](bible/technical-architecture.md#simulation-clock-and-commands)
+
+## 2026-10-22 — Floats in saves are exact hex strings
+
+- **Date:** 2026-10-22
+- **Decision:** Floats in save files are stored as exact IEEE-754 hex strings instead of JSON numbers.
+- **Reason:** Review found that Godot 4.7.2's JSON parser drops digits (1/300 did not round-trip, and -0.0
+  lost its sign). Exact hex bits make saves reload bit for bit, so a reloaded game does not
+  drift.
+- **Bible section:** [technical-architecture.md#save-system](bible/technical-architecture.md#save-system)
+
+## 2026-10-22 — The galaxy is derived, not saved
+
+- **Date:** 2026-10-22
+- **Decision:** The galaxy is derived from a seed and a generator version, and is not written into saves.
+- **Reason:** Regenerating from the seed keeps saves small and avoids saving the positions of 300 worlds.
+  A generator version guards against changes to the generator.
+- **Bible section:** [technical-architecture.md#save-system](bible/technical-architecture.md#save-system)
+
+## 2026-10-22 — Gamepad shoulders switch views; triggers change speed
+
+- **Date:** 2026-10-22
+- **Decision:** On the gamepad, the shoulder buttons switch views and the triggers change the time speed.
+- **Reason:** The shoulders were already bound to time speed, and tabs on the shoulders is the common
+  convention, so the shoulders switch views. The triggers then needed edge detection, so each
+  pull makes one step.
+- **Bible section:** [technical-architecture.md#input-accessibility-and-localisation](bible/technical-architecture.md#input-accessibility-and-localisation)
+
+## 2026-10-22 — Lock energy uses the distance to seal 1's anchor
+
+- **Date:** 2026-10-22
+- **Decision:** Lock energy is computed from the distance to the anchor of seal 1.
+- **Reason:** The player must know the charge before dialing a guess, and seal 1's anchor exists for any
+  address.
+- **Bible section:** [gate-and-address-spec.md#dialing-outcomes-and-energy](bible/gate-and-address-spec.md#dialing-outcomes-and-energy)
+
+## 2026-10-22 — M1 starting reach is a single anchor region
+
+- **Date:** 2026-10-22
+- **Decision:** The M1 start is a single anchor region, paid for by the 400 MWh starting bank. This is kept for now and revisited when M2 adds capacitor banks.
+- **Reason:** The opening scenario found that only anchor 35 is within 400 MWh of CAIRN. The owner kept
+  the bible's 400 MWh; M2's banks widen the reach.
+- **Bible section:** [gate-and-address-spec.md#dialing-outcomes-and-energy](bible/gate-and-address-spec.md#dialing-outcomes-and-energy)
+
+## 2026-10-23 — Addresses come from hand-made puzzles
+
+- **Date:** 2026-10-23
+- **Decision:** After the M1 playtest, every story address comes from a hand-made puzzle. The constraint tools, candidate counter, clue generator and false clues are removed. Procedural worlds are found through addresses on far Ring consoles.
+- **Reason:** The owner playtested M1 and wanted less deduction and more discovery, with a unique hand-
+  made source for each address, citing Inscryption and Blue Prince. He disliked false clues
+  and the constraint helpers.
+- **Bible section:** [gate-and-address-spec.md#where-addresses-come-from](bible/gate-and-address-spec.md#where-addresses-come-from)
+
+## 2026-10-23 — The origin glyph is hidden
+
+- **Date:** 2026-10-23
+- **Decision:** The origin glyph is hidden from the player: the console fills seal 8 with CAIRN's mark and it cannot be changed.
+- **Reason:** The owner did not understand the origin glyph's purpose in the playtest.
+- **Bible section:** [gate-and-address-spec.md#glyphs-and-the-hidden-address-math](bible/gate-and-address-spec.md#glyphs-and-the-hidden-address-math)
+
+## 2026-10-23 — The Workbench becomes the dial console
+
+- **Date:** 2026-10-23
+- **Decision:** The Workbench becomes the dial console, and the Address Book replaces the dial queue.
+- **Reason:** The owner found dragging glyphs the best input and the dropdown entry painful, and wanted
+  the Workbench to become the dial itself.
+- **Bible section:** [gate-and-address-spec.md#the-dial-console](bible/gate-and-address-spec.md#the-dial-console)
+
+## 2026-10-23 — Dialing is skippable; an open wormhole has its own screen
+
+- **Date:** 2026-10-23
+- **Decision:** Dialing is a skippable sequence under a time hold, an open wormhole has its own screen, and the Ring holds one wormhole at a time.
+- **Reason:** In the playtest it was not clear what happened after a lock, or whether a drone could be
+  sent. The owner asked for a skippable sequence and easier interaction with an open wormhole.
+- **Bible section:** [gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole](bible/gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole)
+
+## 2026-10-23 — Design cards for progression, lore and puzzle writing
+
+- **Date:** 2026-10-23
+- **Decision:** Progression, lore and puzzle writing get their own `design` cards. The owner approves their output before content cards build on it.
+- **Reason:** The owner expects progression, lore and puzzles to need their own cards, apart from code.
+- **Bible section:** [roadmap.md#working-process](bible/roadmap.md#working-process)

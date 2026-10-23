@@ -30,11 +30,9 @@ ignoring case and spaces, trying the names in the order shown.
 
 ## One-time setup (owner)
 
-1. Create a fine-grained personal access token (GitHub: Settings, Developer settings,
-   Personal access tokens, Fine-grained tokens):
-   - Resource owner: your account (`lmarcarini`).
-   - Repository access: only `lmarcarini/StarPortal`, permission **Issues: Read**.
-   - Account permissions: **Projects: Read and write**.
+1. Create a classic personal access token (GitHub: Settings, Developer settings,
+   Personal access tokens, Tokens (classic)) with the scopes `repo` and `project`.
+   Fine-grained tokens cannot reach projects owned by a user account, so they do not work here.
 2. In the repository, open Settings, Secrets and variables, Actions. Add the token as the
    repository secret `PROJECT_TOKEN`.
 3. On the same page, add two repository variables:
