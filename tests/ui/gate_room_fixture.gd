@@ -41,10 +41,15 @@ static func address_for(state: GameState, outcome: int) -> GateAddress:
 	return DialFixture.address_of(state.galaxy, DialFixture.OPEN_ID)
 
 
-## Makes [param address] the one [param view]'s Dial button dials, as the Workbench bridge
-## does in the game.
+## Makes [param address] the one [param view]'s Dial button dials: loaded into the console's
+## slots when its origin is CAIRN's. The console cannot build an address with another origin
+## (seal 8 is fixed), so for Origin rejected the address goes straight to the dial controls.
 static func select(view: GateRoomView, address: GateAddress) -> void:
-	view.set_address_source(func() -> GateAddress: return address)
+	var console: DialConsole = view.get_console()
+	if address.origin == console.get_address_origin():
+		console.load_address(address)
+	else:
+		console.get_dial_controls().set_address(address)
 
 
 ## Returns a Control of [constant VIEW_SIZE] that holds a new Gate Room view, as the shell's

@@ -1,10 +1,11 @@
 class_name CapacitorGauge
 extends VBoxContainer
 ## The capacitor bank: a bar of the stored energy against the capacity, the two numbers, and a
-## marker at the lock energy of the selected address, so the player sees at a glance whether
-## the bank holds enough. The marker is a vertical line with a triangular head, never colour
-## alone.
-## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy, game-design.md#core-loop
+## marker at the lock energy of the dial console's address, so the player sees at a glance
+## whether the bank holds enough. The marker is a vertical line with a triangular head, never
+## colour alone; the console's charge line says the energy in words.
+## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy,
+## gate-and-address-spec.md#the-dial-console, game-design.md#core-loop
 
 const _MARKER_WIDTH: float = 3.0
 const _HEAD_SIZE: float = 7.0
@@ -15,7 +16,6 @@ var _address: GateAddress = null
 @onready var _bar: ProgressBar = %Bar
 @onready var _marker: Control = %Marker
 @onready var _values: Label = %Values
-@onready var _needed: Label = %Needed
 
 
 func _ready() -> void:
@@ -84,7 +84,6 @@ func _refresh() -> void:
 	if _simulation == null:
 		_bar.value = 0.0
 		_values.text = ""
-		_needed.text = ""
 		_marker.queue_redraw()
 		return
 	var power: PowerState = _simulation.state.power
@@ -99,18 +98,7 @@ func _refresh() -> void:
 			}
 		)
 	)
-	_needed.text = _needed_text(power)
 	_marker.queue_redraw()
-
-
-func _needed_text(power: PowerState) -> String:
-	var needed: float = get_marker_mwh()
-	if needed < 0.0:
-		return ""
-	var text: String = tr("GATE_GAUGE_NEEDED").format({"energy": GateRoomFormat.energy(needed)})
-	if needed > power.capacity_mwh:
-		text += " " + tr("GATE_GAUGE_OVER_CAPACITY")
-	return text
 
 
 func _draw_marker() -> void:

@@ -1,7 +1,6 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/ui/views/analysis/analysis_view.gd" id="1_analysis_view"]
-[ext_resource type="PackedScene" path="res://src/ui/analysis/workbench/workbench.tscn" id="2_workbench"]
 
 [node name="AnalysisView" type="Control"]
 layout_mode = 3
@@ -23,17 +22,11 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_constants/separation = 0
 
-[node name="Workbench" parent="Columns" instance=ExtResource("2_workbench")]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 2.0
-
 [node name="ArchivePlaceholder" type="Label" parent="Columns"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 3.0
+focus_mode = 2
 text = "BOARD_ARCHIVE_PLACEHOLDER"
 horizontal_alignment = 1
 vertical_alignment = 1

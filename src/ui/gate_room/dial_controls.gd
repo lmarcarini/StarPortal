@@ -1,17 +1,18 @@
 class_name DialControls
 extends VBoxContainer
-## The dial button of the selected address and everything that decides whether it may be
-## pressed: the charge it needs, the repeat warning and the reason it is disabled. Dialing is a
-## hold-to-confirm; an address that already failed needs a second hold. The panel posts a
-## DialCommand and never changes state itself.
-## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy,
-## gate-and-address-spec.md#player-tools, game-design.md#difficulty-and-accessibility
+## The dial button of the dial console's address and everything that decides whether it may be
+## pressed: the charge line (the lock energy and the time until the bank holds it), the repeat
+## warning and the reason it is disabled. Dialing is a hold-to-confirm; an address that already
+## failed needs a second hold. The panel posts a DialCommand and never changes state itself.
+## Bible: gate-and-address-spec.md#the-dial-console,
+## gate-and-address-spec.md#dialing-outcomes-and-energy,
+## game-design.md#difficulty-and-accessibility
 
 ## Translation key of the disabled reason for each rejected command code.
 const _REJECTION_KEYS: Dictionary[StringName, StringName] = {
 	&"ring_busy": &"GATE_REASON_BUSY",
 	&"insufficient_charge": &"GATE_REASON_CHARGE",
-	&"bad_address": &"GATE_REASON_NONE_SELECTED",
+	&"bad_address": &"GATE_REASON_INCOMPLETE",
 }
 
 var _simulation: Simulation = null
@@ -48,14 +49,14 @@ func _notification(what: int) -> void:
 		_refresh()
 
 
-## Connects the controls to [param simulation]; nothing is selected.
+## Connects the controls to [param simulation]; no address is set.
 func setup(simulation: Simulation) -> void:
 	_simulation = simulation
 	set_address(null)
 
 
-## Selects [param address] (null for none) as the address to dial and drops a half-done
-## repeat confirmation.
+## Sets [param address] (null while the console's slots are not all filled) as the address to
+## dial and drops a half-done repeat confirmation.
 func set_address(address: GateAddress) -> void:
 	_address = address
 	_is_repeat_armed = false
@@ -85,11 +86,15 @@ func is_repeat_armed() -> bool:
 
 ## Returns the translation key of the reason the dial is not possible now, or &"" when it is.
 func disabled_reason_key() -> StringName:
-	if _simulation == null or _address == null or not _address.is_well_formed():
-		return &"GATE_REASON_NONE_SELECTED"
+	if _simulation == null:
+		return &"GATE_REASON_INCOMPLETE"
 	var state: GameState = _simulation.state
-	if state.gate.mode != GateState.RingMode.IDLE:
-		return &"GATE_REASON_BUSY"
+	if state.gate.mode == GateState.RingMode.DIALING:
+		return &"GATE_REASON_DIALING"
+	if state.gate.mode == GateState.RingMode.LOCKED:
+		return &"GATE_REASON_WORMHOLE_OPEN"
+	if _address == null or not _address.is_well_formed():
+		return &"GATE_REASON_INCOMPLETE"
 	if state.power.stored_mwh < GateQueries.lock_energy_mwh(state, _address):
 		return &"GATE_REASON_CHARGE"
 	return &""
@@ -110,7 +115,7 @@ func _refresh() -> void:
 
 
 func _refresh_needs() -> void:
-	_needs_label.visible = _address != null and _simulation != null
+	_needs_label.visible = _address != null and _simulation != null and _address.is_well_formed()
 	if not _needs_label.visible:
 		return
 	var state: GameState = _simulation.state

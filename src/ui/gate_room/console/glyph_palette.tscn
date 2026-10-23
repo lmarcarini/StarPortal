@@ -4,7 +4,7 @@
 
 [node name="GlyphPalette" type="GridContainer"]
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 4
+theme_override_constants/h_separation = 3
 theme_override_constants/v_separation = 4
-columns = 6
+columns = 12
 script = ExtResource("1_palette")

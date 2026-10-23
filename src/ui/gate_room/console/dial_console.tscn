@@ -1,54 +1,39 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/ui/gate_room/console/dial_console.gd" id="1_workbench"]
-[ext_resource type="PackedScene" path="res://src/ui/gate_room/console/seal_row.tscn" id="3_seals"]
-[ext_resource type="PackedScene" path="res://src/ui/gate_room/console/glyph_palette.tscn" id="5_palette"]
+[ext_resource type="Script" path="res://src/ui/gate_room/console/dial_console.gd" id="1_console"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/console/seal_row.tscn" id="2_seals"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/console/glyph_palette.tscn" id="3_palette"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/dial_controls.tscn" id="4_controls"]
 
-[node name="Workbench" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-focus_mode = 2
-script = ExtResource("1_workbench")
+[node name="DialConsole" type="VBoxContainer"]
+theme_override_constants/separation = 6
+script = ExtResource("1_console")
 
-[node name="Scroll" type="ScrollContainer" parent="."]
+[node name="SealRow" parent="." instance=ExtResource("2_seals")]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = -8.0
-grow_horizontal = 2
-grow_vertical = 2
-follow_focus = true
-horizontal_scroll_mode = 0
+layout_mode = 2
 
-[node name="Content" type="VBoxContainer" parent="Scroll"]
+[node name="HintRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Hint" type="Label" parent="HintRow"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 10
-
-[node name="Title" type="Label" parent="Scroll/Content"]
-layout_mode = 2
-text = "WORKBENCH_TITLE"
-autowrap_mode = 3
-
-[node name="SealRow" parent="Scroll/Content" instance=ExtResource("3_seals")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Hint" type="Label" parent="Scroll/Content"]
-unique_name_in_owner = true
-layout_mode = 2
 auto_translate_mode = 2
 autowrap_mode = 3
 
-[node name="Palette" parent="Scroll/Content" instance=ExtResource("5_palette")]
+[node name="ClearAllButton" type="Button" parent="HintRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+text = "CONSOLE_CLEAR_ALL"
+
+[node name="Palette" parent="." instance=ExtResource("3_palette")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DialControls" parent="." instance=ExtResource("4_controls")]
 unique_name_in_owner = true
 layout_mode = 2
