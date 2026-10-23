@@ -506,7 +506,7 @@ in cold-weather equipment.
 > Along the wall beside the steps, scratches in groups of seven run as far as the camera can
 > see. The frames show more than two thousand groups. New ice has grown over the lowest.
 >
-> Ellery's rule held on the far side, and it led to a second world. Whoever set the stones
+> Ellery's rule held on the far side, and it led on to another world. Whoever set the stones
 > travelled this way.
 >
 > Analyst's note: if each scratch is a day, someone kept count here for close to forty
