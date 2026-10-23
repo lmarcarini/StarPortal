@@ -104,7 +104,9 @@ What a reasonable implementer might be tempted to add, and must not.
 What to look at closely.
 ```
 
-Every card carries three labels: its milestone (`M0` to `M8`), its type (`contract`, `feature`, `tooling`, `content`, `test`) and its size (`S` or `M`).
+Every card carries three labels: its milestone (`M0` to `M8`), its type (`contract`, `feature`, `tooling`, `content`, `test`, design) and its size (`S` or `M`).
+
+**Design cards** hold progression, lore and puzzle writing. Their output is a document under `docs/content/`; after review the owner approves it before any content card builds on it.
 
 ## M0 cards
 
