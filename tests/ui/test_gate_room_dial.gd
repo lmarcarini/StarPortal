@@ -127,18 +127,38 @@ func test_a_dial_submits_exactly_one_command_with_the_console_address() -> void:
 	)
 
 
-func test_disabled_with_the_translated_reason_when_the_charge_is_short() -> void:
-	var address: GateAddress = _enter(DialOutcome.Kind.NO_GATE)
+func test_disabled_with_no_capacitors_or_an_empty_bank() -> void:
+	_enter(DialOutcome.Kind.NO_GATE)
 	_simulation.state.power.stored_mwh = 0.0
-	SimClock.step_ticks(1)
-	var needed: String = GateRoomFormat.energy(
-		GateQueries.lock_energy_mwh(_simulation.state, address)
-	)
+	_controls().set_address(_view.get_console().get_address())
 	assert_bool(_button().disabled).is_true()
-	assert_str(_controls().get_reason_text()).starts_with("Not enough charge")
-	assert_str(_controls().get_reason_text()).contains(needed)
+	assert_str(_controls().get_reason_text()).is_equal("Capacitors empty.")
+	_simulation.state.power.capacity_mwh = 0.0
+	_controls().set_address(_view.get_console().get_address())
+	assert_str(_controls().get_reason_text()).is_equal("No capacitors installed.")
 	TranslationServer.set_locale("pt_BR")
-	assert_str(_controls().get_reason_text()).starts_with("Carga insuficiente")
+	assert_str(_controls().get_reason_text()).is_equal("Nenhum capacitor instalado.")
+
+
+## A bank holding some charge, but less than the address needs, still lets the player hold
+## Dial; DialCommand refuses it and the panel says so without numbers.
+func test_a_dial_short_of_charge_is_refused_with_a_line_and_no_numbers() -> void:
+	var address: GateAddress = _enter(DialOutcome.Kind.NO_GATE)
+	var needed: float = GateQueries.lock_energy_mwh(_simulation.state, address)
+	_simulation.state.power.stored_mwh = needed / 2.0
+	_controls().set_address(address)
+	assert_bool(_button().disabled).is_false()
+	assert_str(_controls().get_reason_text()).is_empty()
+	_hold_fully()
+	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.IDLE)
+	assert_str(_controls().get_reason_text()).is_equal(
+		"Not enough charge. The Ring would not turn."
+	)
+	assert_str(_controls().get_reason_text()).not_contains("MWh")
+	_view.get_console().clear_seal(1)
+	assert_str(_controls().get_reason_text()).is_equal(
+		"Place a glyph in each of the seven seals first."
+	)
 
 
 func test_release_before_the_hold_time_does_not_dial() -> void:

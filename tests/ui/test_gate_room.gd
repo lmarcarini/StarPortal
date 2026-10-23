@@ -94,14 +94,13 @@ func test_banner_icon_shape_differs_per_outcome() -> void:
 	assert_str(String(OutcomeIcon.shape_of(5))).is_empty()
 
 
-## The Dial button needs all seven slots filled; the gauge marks the console's address.
-func test_dial_needs_seven_glyphs_in_the_console() -> void:
+## The Dial button needs all seven slots filled. Nothing in the view shows the energy the
+## address needs: no text mentions it, at any step.
+func test_dial_needs_seven_glyphs_and_never_shows_the_needed_charge() -> void:
 	var controls: DialControls = _panel("DialControls") as DialControls
 	var console: DialConsole = _view.get_console()
-	var gauge: CapacitorGauge = _panel("CapacitorGauge") as CapacitorGauge
 	assert_bool(controls.get_dial_button().disabled).is_true()
 	assert_str(controls.get_reason_text()).is_equal(tr(&"GATE_REASON_INCOMPLETE"))
-	assert_float(gauge.get_marker_mwh()).is_equal(-1.0)
 	var address: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK)
 	for index: int in GateAddress.COORDINATE_COUNT - 1:
 		console.place(index + 1, address.coordinates[index])
@@ -109,11 +108,15 @@ func test_dial_needs_seven_glyphs_in_the_console() -> void:
 	assert_str(controls.get_reason_text()).is_equal(tr(&"GATE_REASON_INCOMPLETE"))
 	console.place(GateAddress.COORDINATE_COUNT, address.coordinates[6])
 	assert_bool(controls.get_dial_button().disabled).is_false()
-	var needed: float = GateQueries.lock_energy_mwh(_simulation.state, address)
-	assert_float(gauge.get_marker_mwh()).is_equal_approx(needed, 1e-9)
+	var needed: String = GateRoomFormat.energy(
+		GateQueries.lock_energy_mwh(_simulation.state, address)
+	)
+	for text: String in Fixture.visible_texts(_view):
+		assert_str(text).override_failure_message("shows the needed charge: " + text).not_contains(
+			needed
+		)
 	console.clear_seal(3)
 	assert_bool(controls.get_dial_button().disabled).is_true()
-	assert_float(gauge.get_marker_mwh()).is_equal(-1.0)
 
 
 func test_wormhole_panel_shows_a_lock_and_closes_it() -> void:

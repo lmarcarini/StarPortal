@@ -1,10 +1,10 @@
 class_name GateRoomView
 extends GameView
-## The Gate Room view: the dial console (slots, palette, charge line and the hold-to-dial
-## button) beside the capacitor gauge, the last outcome, an open wormhole and the records: the
-## Address Book and the Dial Log. Loading an Address Book entry fills the console's slots, and
-## the gauge marks the charge the console's address needs. The view only composes the panels;
-## every panel reads the simulation and posts its own commands, and nothing here changes state.
+## The Gate Room view: the dial console (slots, palette and the hold-to-dial button) over the
+## capacitor gauge (stored charge and capacity only), beside the last outcome, an open wormhole
+## and the records: the Address Book and the Dial Log. Loading an Address Book entry fills the
+## console's slots. The view only composes the panels; every panel reads the simulation and
+## posts its own commands, and nothing here changes state.
 ## Bible: gate-and-address-spec.md#the-dial-console, game-design.md#core-loop,
 ## technical-architecture.md#input-accessibility-and-localisation
 
@@ -24,7 +24,6 @@ const _RECORD_TITLE_KEYS: Array[StringName] = [&"BOOK_TITLE", &"GATE_LOG_TITLE"]
 func _ready() -> void:
 	for index: int in _RECORD_TITLE_KEYS.size():
 		_records.set_tab_title(index, _RECORD_TITLE_KEYS[index])
-	_console.address_changed.connect(_gauge.set_marker_address)
 	_book.load_requested.connect(_on_load_requested)
 
 
@@ -48,7 +47,6 @@ func setup(simulation: Simulation) -> void:
 	_wormhole.setup(simulation)
 	_book.setup(simulation)
 	_log.setup(simulation)
-	_gauge.set_marker_address(_console.get_address())
 
 
 ## Returns the dial console.

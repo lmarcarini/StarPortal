@@ -1,8 +1,5 @@
 keys,en,pt_BR
 GATE_ROOM_TITLE,Gate Room,Sala do Portal
-GATE_READY_NOW,"Charged, ready now","Carga completa, pronto agora"
-GATE_READY_IN,Ready in {time},Pronto em {time}
-GATE_READY_NEVER,Never at current output,Nunca com a saída atual
 GATE_DURATION_MINUTES,{minutes} min,{minutes} min
 GATE_DURATION_HOURS,{hours} h {minutes} min,{hours} h {minutes} min
 GATE_ENERGY,{value} MWh,{value} MWh
@@ -26,11 +23,12 @@ GATE_RING_DIALING,Seals engaging: {lit} of {total},Selos engatando: {lit} de {to
 GATE_RING_LOCKED,Wormhole open,Buraco de minhoca aberto
 GATE_DIAL_HOLD,Hold to dial,Segure para discar
 GATE_DIAL_HOLD_AGAIN,Hold again to dial anyway,Segure de novo para discar mesmo assim
-GATE_DIAL_NEEDS,Needs {energy}. {ready}.,Requer {energy}. {ready}.
 GATE_REPEAT_WARNING,Dialed on {date}: {outcome}. Dialing it again will spend the energy again.,Discado em {date}: {outcome}. Discar de novo vai gastar a energia outra vez.
 GATE_REASON_BUSY,The Ring is busy: it is dialing or has a wormhole open.,O Anel está ocupado: está discando ou há um buraco de minhoca aberto.
-GATE_REASON_CHARGE,"Not enough charge: needs {needed}, the capacitors hold {stored}.","Carga insuficiente: requer {needed}, os capacitores têm {stored}."
 GATE_REASON_REJECTED,The dial was refused.,A discagem foi recusada.
+GATE_DIAL_NO_CAPACITORS,No capacitors installed.,Nenhum capacitor instalado.
+GATE_DIAL_CAPACITORS_EMPTY,Capacitors empty.,Capacitores vazios.
+GATE_DIAL_REJECT_CHARGE,Not enough charge. The Ring would not turn.,Carga insuficiente. O Anel não chegou a girar.
 GATE_GAUGE_TITLE,Capacitors,Capacitores
 GATE_GAUGE_VALUES,{stored} of {capacity},{stored} de {capacity}
 GATE_BANNER_NONE,No dial yet,Nenhuma discagem ainda
