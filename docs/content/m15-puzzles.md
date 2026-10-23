@@ -34,13 +34,6 @@ line through the horizon on a pole (the "horizon record"); that is where the far
 the dossiers' readings come from. When the MOTH arrives in M3 it can take over this role without
 changing any text the player needs.
 
-**Neighbours look alike.** Every address reachable with the starting bank has the climbing mark
-(Stairs) first, and in every sizeable region sampled the Cactus is somewhere in seals 2 to 7. The three
-answers were chosen to share as little else as the region allows (see "Checks"), but they cannot
-share nothing. The documents lean into this: the lintel begins with the climbing mark, the letter
-says to begin with it, and the song begins with it. Seeing familiar carvings in a new order is
-the bible's first consequence of the address rule, and a clue the player will use later.
-
 ---
 
 ## Puzzle 1: The Lintel
@@ -493,6 +486,17 @@ lock needs 366.6 MWh.
 
 ## Checks
 
+### Neighbours look alike
+
+Every address reachable with the starting bank has the climbing mark (Stairs) first, and in
+every sizeable region sampled the Cactus is somewhere in seals 2 to 7. The three answers were
+chosen to share as little else as the region allows (see the table below), but they cannot share
+nothing. The documents lean into this: the lintel begins with the climbing mark, the letter
+says to begin with it, and the song begins with it. Seeing familiar carvings in a new order is
+the bible's first consequence of the address rule, and a clue the player will use later.
+
+### Positions and addresses
+
 Computed with a throwaway Godot script (kept outside the repository) that loads
 `data/gate/home_anchor_field.tres`, `data/gate/worlds/cairn.tres` and
 `data/balance/balance_config.tres` and calls `AddressRule` and `EnergyMath`. Each position is
@@ -595,3 +599,11 @@ the source of its address.
    "The opening puzzle", "Puzzle design rules"). The repository's copy of
    `gate-and-address-spec.md` still has the older sections and should be updated before the
    content card links to these anchors.
+8. **Translation (for the content card).** In pt_BR the Butterfly glyph is *Borboleta*, but a
+   moth is *mariposa*. Field Note 14 no longer mentions a moth, but puzzle 3's "Let the moth go
+   from the lamp" must still point at the Borboleta: translate it with *borboleta*, or with a
+   wording that plainly means the winged insect on the palette, never one that leads to another
+   glyph. Likewise "Drop the hook where the water lies still" must stay an anchoring phrase in
+   Portuguese (for example *lançar o ferro* or *largar a âncora*), so it points at the Âncora,
+   not the Fish. The other verses and Field Note 14's descriptions need the same check: each must
+   still fit only its own carving among the seven on the rubbing or in the song.
