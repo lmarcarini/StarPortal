@@ -5,7 +5,9 @@ extends RefCounted
 ## Bible: technical-architecture.md#data-model
 
 ## Saved sections, in to_dict() order.
-const _SECTIONS: Array[String] = ["clock", "random", "flags", "gate", "power", "worlds"]
+const _SECTIONS: Array[String] = [
+	"clock", "random", "flags", "gate", "power", "worlds", "archive", "address_book"
+]
 
 ## The simulation clock.
 var clock: ClockState = ClockState.new()
@@ -19,6 +21,10 @@ var gate: GateState = GateState.new()
 var power: PowerState = PowerState.new()
 ## Galaxy seed, generator version and world statuses.
 var worlds: WorldsState = WorldsState.new()
+## Documents the player holds and has read.
+var archive: ArchiveState = ArchiveState.new()
+## Every address found or dialed.
+var address_book: AddressBookState = AddressBookState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -55,6 +61,8 @@ func to_dict() -> Dictionary:
 		"gate": gate.to_dict(),
 		"power": power.to_dict(),
 		"worlds": worlds.to_dict(),
+		"archive": archive.to_dict(),
+		"address_book": address_book.to_dict(),
 	}
 
 
@@ -68,6 +76,8 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.gate = GateState.from_dict(_dict_or_empty(data.get("gate")))
 	state.power = PowerState.from_dict(_dict_or_empty(data.get("power")))
 	state.worlds = WorldsState.from_dict(_dict_or_empty(data.get("worlds")))
+	state.archive = ArchiveState.from_dict(_dict_or_empty(data.get("archive")))
+	state.address_book = AddressBookState.from_dict(_dict_or_empty(data.get("address_book")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -80,12 +90,13 @@ static func from_dict(data: Dictionary) -> GameState:
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
-## "flags", "gate", "power" and "worlds" must be objects, the sub-states must pass their own
-## validate_dict(), and every flag must be a bool, a String or a whole number with absolute value at
-## most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do not survive JSON, whether they arrive
-## as ints or as floats). The Ring's "dial_started_tick" and "lock_started_tick" and every Dial Log
-## entry's "tick" must not be later than the clock's tick. Errors from a sub-state are prefixed with
-## its key, e.g. "clock: 'tick' is not a whole number ...".
+## "flags", "gate", "power", "worlds", "archive" and "address_book" must be objects, the
+## sub-states must pass their own validate_dict(), and every flag must be a bool, a String or a
+## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
+## not survive JSON, whether they arrive as ints or as floats). The Ring's "dial_started_tick" and
+## "lock_started_tick", every Dial Log entry's "tick", every document's "received_tick" and every
+## Address Book entry's "last_dialed_tick" must not be later than the clock's tick. Errors from a
+## sub-state are prefixed with its key, e.g. "clock: 'tick' is not a whole number ...".
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _SECTIONS:
@@ -107,6 +118,8 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		var clock_data: Dictionary = data["clock"]
 		var gate_data: Dictionary = data["gate"]
 		errors.append_array(_ring_tick_errors(clock_data, gate_data))
+		var now: float = clock_data["tick"]
+		errors.append_array(_record_tick_errors(now, data))
 	return errors
 
 
@@ -123,6 +136,10 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return PowerState.validate_dict(section)
 		"worlds":
 			return WorldsState.validate_dict(section)
+		"archive":
+			return ArchiveState.validate_dict(section)
+		"address_book":
+			return AddressBookState.validate_dict(section)
 	return []
 
 
@@ -141,6 +158,30 @@ static func _ring_tick_errors(clock_data: Dictionary, gate_data: Dictionary) -> 
 		var entry_tick: float = entry["tick"]
 		if entry_tick > now:
 			errors.append("gate: dial_log %d 'tick' is later than the clock tick" % index)
+	return errors
+
+
+## Errors for Archive and Address Book ticks later than the clock tick [param now], in valid
+## [param data].
+static func _record_tick_errors(now: float, data: Dictionary) -> Array[String]:
+	var errors: Array[String] = []
+	var archive_data: Dictionary = data["archive"]
+	var ticks: Dictionary = archive_data["received_tick"]
+	for document_id: Variant in ticks:
+		var tick: float = ticks[document_id]
+		if tick > now:
+			errors.append(
+				"archive: received_tick of '%s' is later than the clock tick" % document_id
+			)
+	var book_data: Dictionary = data["address_book"]
+	var entries: Array = book_data["entries"]
+	for index: int in entries.size():
+		var entry: Dictionary = entries[index]
+		var dialed_tick: float = entry["last_dialed_tick"]
+		if dialed_tick > now:
+			errors.append(
+				"address_book: entries %d 'last_dialed_tick' is later than the clock tick" % index
+			)
 	return errors
 
 

@@ -36,7 +36,7 @@ func test_fixture_is_v3() -> void:
 
 
 ## v3 -> v4 adds the empty intel and Workbench sections, leaves every v3 section untouched,
-## and the result is a valid state.
+## and the result migrates on to a valid state.
 func test_v3_adds_intel_and_workbench() -> void:
 	var data := _v3_fixture()
 	var result := _migrate_to_v4(data)
@@ -48,8 +48,9 @@ func test_v3_adds_intel_and_workbench() -> void:
 	expected["intel"] = EMPTY_INTEL
 	expected["workbench"] = EMPTY_WORKBENCH
 	assert_dict(migrated["state"]).is_equal(expected)
-	var migrated_state: Dictionary = migrated["state"]
-	assert_array(GameState.validate_dict(migrated_state)).is_empty()
+	var current: Dictionary = SaveMigrator.migrate(data).value
+	var current_state: Dictionary = current["state"]
+	assert_array(GameState.validate_dict(current_state)).is_empty()
 
 
 ## v3 data with no state object passes through the step untouched.

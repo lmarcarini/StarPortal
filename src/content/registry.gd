@@ -1,8 +1,9 @@
 extends Node
 ## Autoload that loads every content definition ([DefBase]) under `data/` at start-up into one
 ## dictionary keyed by id and validates it, so broken content is caught before the game runs.
-## It reports empty ids, duplicate ids (naming both files), references to missing ids and files
-## that are not definitions; invalid files are skipped and everything else stays available.
+## It reports empty ids, duplicate ids (naming both files), references to missing ids, each
+## definition's own content errors (DefBase.get_content_errors()) and files that are not
+## definitions; invalid files are skipped and everything else stays available.
 ##
 ## Definitions are read-only at runtime. A loaded Resource is shared by everything that loads
 ## the same path, so the Registry never writes to a loaded definition, and neither may callers.
@@ -124,3 +125,5 @@ func _check_references(errors: Array[String]) -> void:
 				errors.append(
 					'%s: "%s" references missing id "%s"' % [_sources[def_id], def_id, reference]
 				)
+		for error: String in _defs[def_id].get_content_errors(_defs):
+			errors.append('%s: "%s" %s' % [_sources[def_id], def_id, error])

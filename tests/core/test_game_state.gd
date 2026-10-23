@@ -173,7 +173,7 @@ func test_new_game_with_balance_starts_power() -> void:
 func test_to_dict_sections() -> void:
 	var data := _gate_power_worlds_state().to_dict()
 	assert_array(data.keys()).contains_exactly_in_any_order(
-		["clock", "random", "flags", "gate", "power", "worlds"]
+		["clock", "random", "flags", "gate", "power", "worlds", "archive", "address_book"]
 	)
 	assert_bool(_is_json_safe(data)).is_true()
 
@@ -234,3 +234,37 @@ func test_old_intel_and_workbench_sections_are_ignored() -> void:
 	old["workbench"] = {"origin_glyph": -1, "constraints": []}
 	assert_array(GameState.validate_dict(old)).is_empty()
 	assert_dict(GameState.from_dict(old).to_dict()).is_equal(data)
+
+
+## Archive and Address Book ticks may not be later than the clock, and both sections are
+## required and checked with their own validate_dict().
+func test_validate_archive_and_address_book() -> void:
+	var state := GameState.new_game(3)
+	state.clock.tick = 100
+	state.archive.add(&"doc_note", 100)
+	var entry := AddressEntry.create("3-17-0-22-9-14-30-5", AddressEntry.Source.DIALED, &"")
+	entry.last_outcome = DialOutcome.Kind.NO_GATE
+	entry.last_dialed_tick = 100
+	state.address_book.entries.append(entry)
+	var good := state.to_dict()
+	assert_array(GameState.validate_dict(good)).is_empty()
+	assert_dict(GameState.from_dict(good).to_dict()).is_equal(good)
+	for key: String in ["archive", "address_book"]:
+		var missing := good.duplicate(true)
+		missing.erase(key)
+		assert_array(GameState.validate_dict(missing)).is_equal(["missing '%s'" % key])
+	var late := good.duplicate(true)
+	late["archive"]["received_tick"]["doc_note"] = 101
+	late["address_book"]["entries"][0]["last_dialed_tick"] = 101
+	(
+		assert_array(GameState.validate_dict(late))
+		. is_equal(
+			[
+				"archive: received_tick of 'doc_note' is later than the clock tick",
+				"address_book: entries 0 'last_dialed_tick' is later than the clock tick",
+			]
+		)
+	)
+	var bad := good.duplicate(true)
+	bad["archive"]["read"]["doc_other"] = true
+	assert_str(GameState.validate_dict(bad)[0]).starts_with("archive: read names 'doc_other'")

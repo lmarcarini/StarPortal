@@ -6,7 +6,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 5
+const TARGET_VERSION: int = 6
 
 ## v3 defaults as ExactFloat strings, frozen here: 0.0, 400.0 and 30.0.
 const _EXACT_ZERO: String = "0000000000000000"
@@ -18,7 +18,7 @@ const _EXACT_30: String = "403e000000000000"
 ## first format. (A function, not a constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
 	var built_in: Dictionary[int, Callable] = {
-		1: _v1_to_v2, 2: _v2_to_v3, 3: _v3_to_v4, 4: _v4_to_v5
+		1: _v1_to_v2, 2: _v2_to_v3, 3: _v3_to_v4, 4: _v4_to_v5, 5: _v5_to_v6
 	}
 	return built_in
 
@@ -179,4 +179,19 @@ static func _v4_to_v5(data: Dictionary) -> Dictionary:
 	if gate is Dictionary:
 		var gate_data: Dictionary = gate
 		gate_data.erase("dial_queue")
+	return data
+
+
+## v5 -> v6: adds the empty "archive" (no documents received or read) and "address_book" (no
+## entries) sections, written here as literals so later changes to the game's defaults never
+## change this step. The Address Book is not filled from the Dial Log: a v5 save predates it.
+## Every other section is kept as it is. Data with no state object is left as is, for
+## validation to reject.
+static func _v5_to_v6(data: Dictionary) -> Dictionary:
+	var state: Variant = data.get("state")
+	if not state is Dictionary:
+		return data
+	var state_data: Dictionary = state
+	state_data["archive"] = {"received": [], "read": {}, "received_tick": {}}
+	state_data["address_book"] = {"entries": []}
 	return data

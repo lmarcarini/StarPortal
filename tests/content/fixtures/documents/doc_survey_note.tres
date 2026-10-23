@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DocumentDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+kind = 0
+title_key = &"DOC_SURVEY_NOTE_TITLE"
+body_key = &"DOC_SURVEY_NOTE_BODY"
+source_key = &"DOC_SOURCE_SURVEY_1958"
+world_id = &"world_cairn"
+answer_glyphs = PackedInt32Array(0, 13, 7, 21, 30, 2, 18)
+pair_id = &"doc_survey_rubbing"
+id = &"doc_survey_note"

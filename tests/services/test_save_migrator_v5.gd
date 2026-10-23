@@ -14,14 +14,17 @@ func _v4_fixture() -> Dictionary:
 	return JSON.parse_string(FileAccess.get_file_as_string(V4_FIXTURE))
 
 
-## The v4 state of the fixture without what v4 -> v5 drops.
-func _expected_v5_state() -> Dictionary:
+## The v4 state of the fixture without what v4 -> v5 drops, plus the empty sections v5 -> v6
+## adds.
+func _expected_v6_state() -> Dictionary:
 	var v4_state: Dictionary = _v4_fixture()["state"]
 	var expected := v4_state.duplicate(true)
 	expected.erase("intel")
 	expected.erase("workbench")
 	var gate: Dictionary = expected["gate"]
 	gate.erase("dial_queue")
+	expected["archive"] = {"received": [], "read": {}, "received_tick": {}}
+	expected["address_book"] = {"entries": []}
 	return expected
 
 
@@ -42,13 +45,13 @@ func test_fixture_is_v4() -> void:
 
 
 ## v4 -> v5 drops intel, the Workbench and the dial queue, keeps every other section as it
-## is, and the result is a valid state.
+## is, and after v5 -> v6 the result is a valid state.
 func test_v4_drops_intel_workbench_and_queue() -> void:
 	var result := SaveMigrator.migrate(_v4_fixture())
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(5)
-	assert_dict(migrated["state"]).is_equal(_expected_v5_state())
+	assert_int(migrated["format_version"]).is_equal(6)
+	assert_dict(migrated["state"]).is_equal(_expected_v6_state())
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
 
@@ -57,9 +60,14 @@ func test_v4_drops_intel_workbench_and_queue() -> void:
 ## validation to reject.
 func test_v4_without_state_or_gate_is_left_for_validation() -> void:
 	var no_state := SaveMigrator.migrate({"format_version": 4, "state": 5})
-	assert_dict(no_state.value).is_equal({"format_version": 5, "state": 5})
+	assert_dict(no_state.value).is_equal({"format_version": 6, "state": 5})
 	var bad_gate := SaveMigrator.migrate({"format_version": 4, "state": {"gate": 3, "intel": {}}})
-	assert_dict(bad_gate.value).is_equal({"format_version": 5, "state": {"gate": 3}})
+	var empty_sections := {
+		"gate": 3,
+		"archive": {"received": [], "read": {}, "received_tick": {}},
+		"address_book": {"entries": []},
+	}
+	assert_dict(bad_gate.value).is_equal({"format_version": 6, "state": empty_sections})
 
 
 ## The real v4 file loads through the SaveService with its gate, power, worlds and clock
@@ -79,7 +87,7 @@ func test_v4_save_file_loads_into_v5() -> void:
 	service.free()
 	assert_bool(result.is_ok).override_failure_message(str(result.detail)).is_true()
 	var loaded: GameState = result.value
-	var expected: Dictionary = GameState.from_dict(_expected_v5_state()).to_dict()
+	var expected: Dictionary = GameState.from_dict(_expected_v6_state()).to_dict()
 	for key: String in ["clock", "random", "flags", "gate", "power", "worlds"]:
 		assert_dict(loaded.to_dict()[key]).override_failure_message(key).is_equal(expected[key])
 	assert_int(loaded.clock.tick).is_equal(1548)

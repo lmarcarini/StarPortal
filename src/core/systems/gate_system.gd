@@ -10,9 +10,11 @@ extends SimSystem
 ## opened at tick L drains through ticks L .. L + max_open_ticks - 1 and closes at
 ## L + max_open_ticks. Every outcome takes the same time, so timing reveals nothing.
 ## [br][br]
-## Posts dial_resolved(outcome, address key) and wormhole_closed(reason), reason &"timeout"
-## or &"power"; a dial_resolved event carries nothing but the outcome and the address key.
+## Posts dial_resolved(outcome, address key), address_book_changed() and
+## wormhole_closed(reason), reason &"timeout" or &"power"; a dial_resolved event carries
+## nothing but the outcome and the address key.
 ## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy,
+## gate-and-address-spec.md#the-dial-console (Address Book),
 ## game-design.md#time-real-time-with-pause,
 ## technical-architecture.md#simulation-clock-and-commands
 
@@ -46,7 +48,8 @@ func tick(state: GameState) -> void:
 
 
 ## Resolves the dial in progress at [param end_tick]: spends the outcome's cost, logs the
-## attempt, marks a reached world LOCKED and posts dial_resolved.
+## attempt, marks a reached world LOCKED, posts dial_resolved, then records the dial in the
+## Address Book (the world only on a lock) and posts address_book_changed.
 func _resolve(state: GameState, end_tick: int) -> void:
 	var gate: GateState = state.gate
 	var answer: Dictionary = DialResolver.resolve(gate.current_address, state.galaxy)
@@ -63,6 +66,8 @@ func _resolve(state: GameState, end_tick: int) -> void:
 	if DialOutcome.is_lock(outcome):
 		state.worlds.statuses[entry.world_id] = WorldsState.WorldStatus.LOCKED
 	state.events.post(&"dial_resolved", [outcome as int, entry.address.key()])
+	state.address_book.record_dial(entry)
+	state.events.post(&"address_book_changed", [])
 
 
 ## Returns why the open wormhole closes as [param end_tick] begins, or &"" when it stays open.

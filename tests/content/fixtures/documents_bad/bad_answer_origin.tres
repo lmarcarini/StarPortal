@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DocumentDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+title_key = &"DOC_BAD_TITLE"
+source_key = &"DOC_SOURCE_BAD"
+answer_glyphs = PackedInt32Array(0, 1, 2, 3, 4, 5, 6)
+id = &"bad_answer_origin"

@@ -36,6 +36,9 @@ func _samples() -> Array[Command]:
 		SetFlagCommand.create(&"last_world", "P3X-118"),
 		DialCommand.create(GateAddress.create([3, 17, 0, 22, 9, 14, 30], 5)),
 		CloseWormholeCommand.new(),
+		DeliverDocumentCommand.create(&"doc_survey_note_1958"),
+		MarkDocumentReadCommand.create(&"doc_survey_note_1958"),
+		NoteAddressCommand.create("3-17-0-22-9-14-30-5", "dead world, safe"),
 	]
 
 
@@ -130,7 +133,10 @@ func test_defaults_are_registered_lazily() -> void:
 		. contains_exactly(
 			[
 				&"close_wormhole",
+				&"deliver_document",
 				&"dial",
+				&"mark_document_read",
+				&"note_address",
 				&"set_flag",
 			]
 		)
@@ -149,7 +155,10 @@ func test_register_type_adds_a_type() -> void:
 		. contains_exactly(
 			[
 				&"close_wormhole",
+				&"deliver_document",
 				&"dial",
+				&"mark_document_read",
+				&"note_address",
 				&"ping",
 				&"set_flag",
 			]
@@ -171,7 +180,10 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 		. contains_exactly(
 			[
 				&"close_wormhole",
+				&"deliver_document",
 				&"dial",
+				&"mark_document_read",
+				&"note_address",
 				&"set_flag",
 			]
 		)
