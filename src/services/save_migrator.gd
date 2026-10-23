@@ -6,7 +6,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 4
+const TARGET_VERSION: int = 5
 
 ## v3 defaults as ExactFloat strings, frozen here: 0.0, 400.0 and 30.0.
 const _EXACT_ZERO: String = "0000000000000000"
@@ -17,7 +17,9 @@ const _EXACT_30: String = "403e000000000000"
 ## Returns the built-in steps, keyed by the version they migrate from. Version 1 is the
 ## first format. (A function, not a constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
-	var built_in: Dictionary[int, Callable] = {1: _v1_to_v2, 2: _v2_to_v3, 3: _v3_to_v4}
+	var built_in: Dictionary[int, Callable] = {
+		1: _v1_to_v2, 2: _v2_to_v3, 3: _v3_to_v4, 4: _v4_to_v5
+	}
 	return built_in
 
 
@@ -159,4 +161,22 @@ static func _v3_to_v4(data: Dictionary) -> Dictionary:
 		"scheduled_dossiers": {},
 	}
 	state_data["workbench"] = {"origin_glyph": -1, "constraints": []}
+	return data
+
+
+## v4 -> v5: drops what the M1 deduction tools saved, rejected after the M1 playtest: the
+## "intel" section (clues, notes, scheduled dossiers), the "workbench" draft and the Ring's
+## "dial_queue". Every other section is kept as it is. Data with no state object is left as
+## is, for validation to reject; a "gate" that is not an object is left for validation too.
+static func _v4_to_v5(data: Dictionary) -> Dictionary:
+	var state: Variant = data.get("state")
+	if not state is Dictionary:
+		return data
+	var state_data: Dictionary = state
+	state_data.erase("intel")
+	state_data.erase("workbench")
+	var gate: Variant = state_data.get("gate")
+	if gate is Dictionary:
+		var gate_data: Dictionary = gate
+		gate_data.erase("dial_queue")
 	return data
