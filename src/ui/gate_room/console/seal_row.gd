@@ -10,7 +10,7 @@ signal slot_chosen(seal: int)
 ## The player dropped [param glyph] on slot [param seal].
 signal glyph_dropped(seal: int, glyph: int)
 
-const _SLOT_SCENE: PackedScene = preload("res://src/ui/analysis/workbench/seal_slot.tscn")
+const _SLOT_SCENE: PackedScene = preload("res://src/ui/gate_room/console/seal_slot.tscn")
 
 var _slots: Array[SealSlot] = []
 

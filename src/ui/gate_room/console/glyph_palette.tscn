@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/ui/analysis/workbench/glyph_palette.gd" id="1_palette"]
+[ext_resource type="Script" path="res://src/ui/gate_room/console/glyph_palette.gd" id="1_palette"]
 
 [node name="GlyphPalette" type="GridContainer"]
 size_flags_horizontal = 3

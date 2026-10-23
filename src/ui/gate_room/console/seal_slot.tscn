@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/ui/analysis/workbench/seal_slot.gd" id="1_slot"]
+[ext_resource type="Script" path="res://src/ui/gate_room/console/seal_slot.gd" id="1_slot"]
 [ext_resource type="PackedScene" path="res://src/ui/widgets/glyph_icon.tscn" id="2_icon"]
 
 [node name="SealSlot" type="Button"]

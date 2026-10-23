@@ -8,7 +8,7 @@ extends GridContainer
 ## The player pressed glyph [param glyph].
 signal glyph_chosen(glyph: int)
 
-const _GLYPH_SCENE: PackedScene = preload("res://src/ui/analysis/workbench/palette_glyph.tscn")
+const _GLYPH_SCENE: PackedScene = preload("res://src/ui/gate_room/console/palette_glyph.tscn")
 
 var _buttons: Array[PaletteGlyph] = []
 

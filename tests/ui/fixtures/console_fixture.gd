@@ -4,7 +4,7 @@ extends RefCounted
 ## Bible: gate-and-address-spec.md#glyphs-and-the-hidden-address-math
 
 const TEST_SEED: int = 20_261_022
-const SCENE_PATH: String = "res://src/ui/analysis/workbench/workbench.tscn"
+const SCENE_PATH: String = "res://src/ui/gate_room/console/dial_console.tscn"
 
 
 ## Returns a paused simulation of a new game, with its galaxy and balance set.

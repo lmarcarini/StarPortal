@@ -1,8 +1,8 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/ui/analysis/workbench/workbench.gd" id="1_workbench"]
-[ext_resource type="PackedScene" path="res://src/ui/analysis/workbench/seal_row.tscn" id="3_seals"]
-[ext_resource type="PackedScene" path="res://src/ui/analysis/workbench/glyph_palette.tscn" id="5_palette"]
+[ext_resource type="Script" path="res://src/ui/gate_room/console/dial_console.gd" id="1_workbench"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/console/seal_row.tscn" id="3_seals"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/console/glyph_palette.tscn" id="5_palette"]
 
 [node name="Workbench" type="Control"]
 layout_mode = 3
