@@ -59,7 +59,7 @@ Definitions describe what can exist and never change at runtime; state records w
 | --- | --- |
 | `GlyphDef`, `AnchorFieldDef`, `DomainDef` | The address system |
 | `WorldDef` | A story world, or the rules for generating procedural ones |
-| `ClueDef`, `DossierDef` | Clues, their constraints, sources and truth flags |
+| `ClueDef`, `DossierDef` | Hand-made documents and objects: their text, images, source, the world they describe and the address puzzle they hold (its answer, checked by the validator) |
 | `ArtefactDef`, `TechDef` | The research pipeline and tech tree |
 | `RoomDef`, `RoleDef`, `TraitDef` | Base and personnel |
 | `FactionDef`, `RequestDef` | Politics |
@@ -120,7 +120,7 @@ res://
     scenes/        base cutaway, gate room, drone feed, cutscenes
   art/  audio/  video/  localization/
   tests/           unit and soak tests
-  tools/           editor plugins: validator, galaxy preview, clue solver
+  tools/           editor plugins and scripts: validator, galaxy preview
   addons/          third-party add-ons (gdUnit4 only, to start)
   docs/            lore canon, decision log, this bible exported
 ```
@@ -186,7 +186,7 @@ GDScript has no exceptions, so the code separates two kinds of failure.
 ```gdscript
 class_name DialCommand
 extends Command
-## Dials an address from the Workbench. Validates, then applies.
+## Dials an address from the dial console. Validates, then applies.
 
 var address: GateAddress
 
@@ -280,7 +280,7 @@ The simulation is tested headless on every change, and the puzzle content is che
 - **Unit tests (gdUnit4):** the address rule, address uniqueness, origin conversion, the energy formula, power shortfalls, month-end economy, every command, and save round-trips.
 - **Soak test:** a scripted bot plays 365 in-game days headless. It must finish with no errors, no NaN values and every resource within bounds.
 - **Continuous integration:** Godot runs headless on GitHub Actions for tests and the content validator on every push.
-- **Content Validator:** missing ids, broken references, duplicate addresses, and story clue sets that break the puzzle tuning rules.
+- **Content Validator:** missing ids, broken references, duplicate addresses, and authored puzzles whose answer is not their world's real address.
 - **Galaxy Preview:** an editor plugin that plots anchors and worlds in 3D.
-- **Clue Solver:** counts the candidates left by any set of clues. Used for tuning; never shipped.
+- **Address tool:** prints any world's address and the addresses its Ring console would reveal, for writing and testing puzzles. Never shipped.
 - **Debug overlay:** speed, tick time, a state inspector and cheat commands, stripped from release builds.

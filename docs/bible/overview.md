@@ -4,9 +4,9 @@ Oct 21, 2026 · @Leonardo Marcarini Borges
 
 ## Pitch
 
-FAR SIDE PROTOCOL is a real-time-with-pause base management and deduction game. You direct Site CAIRN, a secret base built around an alien ring that opens wormholes to other worlds.
+FAR SIDE PROTOCOL is a real-time-with-pause base management and discovery game. You direct Site CAIRN, a secret base built around an alien ring that opens wormholes to other worlds.
 
-Every address must be deduced from clues: government dossiers, expedition finds and alien gifts. Each dial burns power, opens a door both ways, and may lead nowhere, somewhere, or somewhere hostile. Across a prologue and seven arcs you go from 8-seal addresses to the 9-seal and finally the 10-seal address that reveals what the Ring was built for.
+Every address is hidden in something you find: an explorer's note, a carving, a faction's gift, an artefact, a captured log. Each one is its own small puzzle. Each dial burns power, opens a door both ways, and may lead nowhere, somewhere, or somewhere hostile. Across a prologue and seven arcs you go from 8-seal addresses to the 9-seal and finally the 10-seal address that reveals what the Ring was built for.
 
 - **Fantasy:** you decide which door humanity opens next, and you pay for it.
 - **Inspiration:** Stargate SG-1 (premise), XCOM (base plus a wider world), Papers, Please (aesthetic only), Frostpunk (pressure and setbacks).
@@ -18,7 +18,7 @@ Every address must be deduced from clues: government dossiers, expedition finds 
 
 Every feature must serve at least one of these six pillars; a feature that serves none gets cut.
 
-1. **Deduction, not guessing.** Addresses are earned by reading evidence. Brute force exists but is ruinously expensive.
+1. **Discovery, not guessing.** Addresses are earned by reading and noticing, each from a hand-made puzzle with its own story. Brute force exists but is ruinously expensive.
 2. **Trust is a resource.** Every source has an agenda. The government lies sometimes, and so do allies.
 3. **Every door opens both ways.** Dialing exposes the base. Power, risk and reward all run through the Ring.
 4. **Everything transforms.** Clues become addresses, worlds become allies or outposts, artefacts become technology, technology becomes money or secrecy.
@@ -55,7 +55,7 @@ These are settled; changing one means editing this table first, then every tab t
 | Glyph | One of the 36 symbols on the Ring |
 | Seal | One position in an address. "Seal seven engaged." |
 | Lock | A successful connection to another Ring |
-| Origin glyph | The glyph that identifies the dialing Ring; always the last seal |
+| Origin glyph | The glyph that identifies the dialing Ring; always the last seal. The console fills it in, so players rarely meet it |
 | Domain | A region of space with its own 36 anchor points, usually a galaxy |
 | Keystone | The tenth glyph. It is not on any Ring and must be made |
 | Site CAIRN | The player's base, under the decommissioned Gallow salt works |
@@ -84,7 +84,7 @@ This bible is the source of truth for implementation; code follows it, and desig
 | --- | --- | --- |
 | Overview | Pitch, pillars, locked decisions, names | Names and locked decisions |
 | Game Design | What the player does; every system | Rules of play |
-| Gate & Address Spec | Address math, dialing, clues, puzzle tools | Anything about the Ring |
+| Gate & Address Spec | Address math, where addresses come from, the dial console, dialing, puzzle rules | Anything about the Ring |
 | Lore & Arcs | History, factions, campaign arcs, endings | Story and canon |
 | Technical Architecture | Godot 4 structure and conventions | Code |
 | Art & Audio | Look, pipeline, sound | Presentation |
