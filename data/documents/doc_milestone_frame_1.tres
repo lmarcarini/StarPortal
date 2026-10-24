@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DocumentDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+[ext_resource type="Texture2D" uid="uid://co7cbw3ibhy3d" path="res://art/documents/lintel_frame_1.png" id="2_image"]
+
+[resource]
+script = ExtResource("1_doc")
+kind = 1
+title_key = &"DOC_MILESTONE_FRAME_1_TITLE"
+image = ExtResource("2_image")
+source_key = &"DOC_MILESTONE_FRAME_1_SOURCE"
+world_id = &"world_milestone"
+answer_glyphs = PackedInt32Array(35, 22, 19, 3, 24, 29, 34)
+pair_id = &"doc_milestone_letter"
+arrival = 2
+arrival_world_id = &"world_lintel"
+id = &"doc_milestone_frame_1"

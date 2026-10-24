@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DocumentDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+kind = 0
+title_key = &"DOC_SILL_ORDER_TITLE"
+body_key = &"DOC_SILL_ORDER_BODY"
+source_key = &"DOC_SILL_ORDER_SOURCE"
+world_id = &"world_sill"
+answer_glyphs = PackedInt32Array(35, 24, 29, 10, 19, 22, 8)
+pair_id = &"doc_sill_sketch"
+arrival = 1
+id = &"doc_sill_order"

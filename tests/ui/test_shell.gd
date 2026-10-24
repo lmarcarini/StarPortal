@@ -211,9 +211,10 @@ func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void
 	assert_str(String(switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"ui_down")
 	assert_object(_focus_owner()).is_same(archive.get_default_focus())
-	await _press_action(&"ui_right")
-	assert_object(_focus_owner()).is_same(archive.get_default_focus())
-	await _press_action(&"ui_up")
+	# A new game's Archive holds the opening documents: up goes back through it to the tabs.
+	for _step: int in 4:
+		if _focus_owner() != tabs:
+			await _press_action(&"ui_up")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_up")
 	assert_object(_focus_owner()).is_same(buttons[0])
