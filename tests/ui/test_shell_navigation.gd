@@ -56,8 +56,8 @@ func test_view_actions_switch_views_in_the_shell() -> void:
 	var switcher: ViewSwitcher = _shell.view_switcher
 	assert_str(String(switcher.current_view_id())).is_equal("gate_room")
 	await _press_action(&"view_next")
-	assert_str(String(switcher.current_view_id())).is_equal("analysis")
-	assert_object(_focus_owner()).is_same(switcher.get_view(&"analysis").get_default_focus())
+	assert_str(String(switcher.current_view_id())).is_equal("archive")
+	assert_object(_focus_owner()).is_same(switcher.get_view(&"archive").get_default_focus())
 	await _press_action(&"time_toggle_pause")
 	assert_bool(SimClock.simulation.state.clock.is_paused).is_false()
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)

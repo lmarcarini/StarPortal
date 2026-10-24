@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DocumentDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+kind = 0
+title_key = &"ARCHIVE_TEST_NOTE_TITLE"
+body_key = &"ARCHIVE_TEST_NOTE_BODY"
+source_key = &"ARCHIVE_TEST_SOURCE"
+world_id = &"world_home"
+answer_glyphs = PackedInt32Array(0, 13, 7, 21, 30, 2, 18)
+pair_id = &"doc_rubbing"
+arrival = 1
+id = &"doc_note"

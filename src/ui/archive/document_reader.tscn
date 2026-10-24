@@ -1,0 +1,97 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/archive/document_reader.gd" id="1_reader"]
+[ext_resource type="Script" path="res://src/ui/archive/scroll_pane.gd" id="2_scroll"]
+
+[node name="DocumentReader" type="PanelContainer"]
+size_flags_horizontal = 3
+script = ExtResource("1_reader")
+
+[node name="Layout" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="Layout"]
+layout_mode = 2
+
+[node name="Heading" type="VBoxContainer" parent="Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Layout/Header/Heading"]
+unique_name_in_owner = true
+layout_mode = 2
+auto_translate_mode = 2
+theme_override_font_sizes/font_size = 20
+autowrap_mode = 3
+
+[node name="Source" type="Label" parent="Layout/Header/Heading"]
+unique_name_in_owner = true
+layout_mode = 2
+auto_translate_mode = 2
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="Received" type="Label" parent="Layout/Header/Heading"]
+unique_name_in_owner = true
+layout_mode = 2
+auto_translate_mode = 2
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="Actions" type="VBoxContainer" parent="Layout/Header"]
+layout_mode = 2
+
+[node name="ReadWithButton" type="Button" parent="Layout/Header/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "ARCHIVE_READ_WITH"
+
+[node name="CloseButton" type="Button" parent="Layout/Header/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ARCHIVE_CLOSE_SIDE"
+
+[node name="EmptyLabel" type="Label" parent="Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "ARCHIVE_READER_EMPTY"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="ScrollPane" type="ScrollContainer" parent="Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 2
+horizontal_scroll_mode = 0
+script = ExtResource("2_scroll")
+
+[node name="Content" type="VBoxContainer" parent="Layout/ScrollPane"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ImageButton" type="Button" parent="Layout/ScrollPane/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+tooltip_text = "ARCHIVE_VIEW_IMAGE"
+text = "ARCHIVE_VIEW_IMAGE"
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+
+[node name="Body" type="RichTextLabel" parent="Layout/ScrollPane/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+auto_translate_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false

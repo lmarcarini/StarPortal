@@ -34,62 +34,62 @@ func after_test() -> void:
 
 
 func test_starts_on_the_gate_room_with_translated_tabs() -> void:
-	assert_array(_switcher.get_view_ids()).is_equal([&"gate_room", &"analysis"])
+	assert_array(_switcher.get_view_ids()).is_equal([&"gate_room", &"archive"])
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	var tabs: TabBar = _switcher.get_tab_bar()
 	assert_int(tabs.tab_count).is_equal(2)
 	assert_str(tabs.get_tab_title(0)).is_equal("Gate Room")
-	assert_str(tabs.get_tab_title(1)).is_equal("Analysis")
+	assert_str(tabs.get_tab_title(1)).is_equal("Archive")
 	TranslationServer.set_locale("pt_BR")
 	await _runner.simulate_frames(2)
 	assert_str(tabs.get_tab_title(0)).is_equal("Sala do Portal")
-	assert_str(tabs.get_tab_title(1)).is_equal("Análise")
+	assert_str(tabs.get_tab_title(1)).is_equal("Arquivo")
 	assert_str(_view(&"gate_room").get_title_key()).is_equal("GATE_ROOM_TITLE")
-	assert_str(_view(&"analysis").get_title_key()).is_equal("ANALYSIS_TITLE")
+	assert_str(_view(&"archive").get_title_key()).is_equal("ARCHIVE_TITLE")
 
 
 func test_view_actions_switch_and_wrap() -> void:
 	await _press_action(&"view_next")
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"view_next")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	await _press_action(&"view_previous")
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"view_previous")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
-	await _press_action(&"view_analysis")
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
-	await _press_action(&"view_analysis")
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
+	await _press_action(&"view_archive")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
+	await _press_action(&"view_archive")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"view_gate_room")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
-	var expected: Array[StringName] = [&"gate_room", &"analysis", &"gate_room", &"analysis"]
-	expected.append_array([&"gate_room", &"analysis", &"gate_room"])
+	var expected: Array[StringName] = [&"gate_room", &"archive", &"gate_room", &"archive"]
+	expected.append_array([&"gate_room", &"archive", &"gate_room"])
 	assert_array(_changes).is_equal(expected)
 
 
 func test_default_keys_and_gamepad_shoulders_switch_views() -> void:
 	await _runner.simulate_key_pressed(KEY_E)
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _runner.simulate_key_pressed(KEY_F1)
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	await _runner.simulate_key_pressed(KEY_F2)
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _runner.simulate_key_pressed(KEY_Q)
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	await _press_joypad(JOY_BUTTON_LEFT_SHOULDER)
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 
 
 func test_switching_focuses_the_new_views_default_control() -> void:
 	await _press_action(&"view_next")
-	assert_object(_focus_owner()).is_same(_view(&"analysis").get_default_focus())
+	assert_object(_focus_owner()).is_same(_view(&"archive").get_default_focus())
 	await _press_action(&"view_gate_room")
 	assert_object(_focus_owner()).is_same(_view(&"gate_room").get_default_focus())
-	_switcher.show_view(&"analysis")
-	assert_object(_focus_owner()).is_same(_view(&"analysis").get_default_focus())
+	_switcher.show_view(&"archive")
+	assert_object(_focus_owner()).is_same(_view(&"archive").get_default_focus())
 
 
 func test_clicking_a_tab_switches_and_focuses_the_view() -> void:
@@ -103,20 +103,20 @@ func test_clicking_a_tab_switches_and_focuses_the_view() -> void:
 		click.global_position = target
 		_root.get_viewport().push_input(click, true)
 	await _runner.await_input_processed()
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
-	assert_object(_focus_owner()).is_same(_view(&"analysis").get_default_focus())
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
+	assert_object(_focus_owner()).is_same(_view(&"archive").get_default_focus())
 
 
 func test_moving_along_the_focused_tabs_keeps_focus_on_them() -> void:
 	var tabs: TabBar = _switcher.get_tab_bar()
 	tabs.grab_focus()
 	await _press_action(&"ui_right")
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_down")
-	assert_object(_focus_owner()).is_same(_view(&"analysis").get_default_focus())
+	assert_object(_focus_owner()).is_same(_view(&"archive").get_default_focus())
 	await _press_action(&"ui_right")
-	assert_object(_focus_owner()).is_same(_view(&"analysis").get_default_focus())
+	assert_object(_focus_owner()).is_same(_view(&"archive").get_default_focus())
 	await _press_action(&"ui_up")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_left")
@@ -127,10 +127,10 @@ func test_moving_along_the_focused_tabs_keeps_focus_on_them() -> void:
 
 func test_only_the_shown_view_is_visible_focusable_and_processing() -> void:
 	_assert_active(&"gate_room", true)
-	_assert_active(&"analysis", false)
-	_switcher.show_view(&"analysis")
+	_assert_active(&"archive", false)
+	_switcher.show_view(&"archive")
 	_assert_active(&"gate_room", false)
-	_assert_active(&"analysis", true)
+	_assert_active(&"archive", true)
 
 
 ## A view action rebound to an axis switches once per pull, however many motion events the
@@ -143,7 +143,7 @@ func test_view_action_on_an_axis_fires_once_per_pull() -> void:
 	_extra_event = stick
 	InputMap.action_add_event(&"view_next", stick)
 	await _move_axis(JOY_AXIS_RIGHT_X, [0.1, 0.4, 0.8, 1.0, 1.0, 0.6, 0.3, 0.0])
-	assert_str(String(_switcher.current_view_id())).is_equal("analysis")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _move_axis(JOY_AXIS_RIGHT_X, [0.9, 1.0, 0.0])
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	await _move_axis(JOY_AXIS_RIGHT_X, [-0.9, -1.0, 0.0])
@@ -159,9 +159,9 @@ func test_showing_a_view_restores_only_what_hiding_changed() -> void:
 	view.process_mode = Node.PROCESS_MODE_ALWAYS
 	view.mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_DISABLED
 	seal.focus_behavior_recursive = Control.FOCUS_BEHAVIOR_DISABLED
-	_switcher.show_view(&"analysis")
+	_switcher.show_view(&"archive")
 	_assert_active(&"gate_room", false)
-	_switcher.show_view(&"analysis")
+	_switcher.show_view(&"archive")
 	_switcher.show_view(&"gate_room")
 	assert_int(view.process_mode).is_equal(Node.PROCESS_MODE_ALWAYS)
 	assert_int(view.mouse_behavior_recursive).is_equal(Control.MOUSE_BEHAVIOR_DISABLED)
@@ -173,7 +173,7 @@ func test_showing_a_view_restores_only_what_hiding_changed() -> void:
 
 func test_hidden_view_keeps_its_nodes() -> void:
 	var console: Control = _view(&"gate_room").find_child("DialConsole", true, false) as Control
-	_switcher.show_view(&"analysis")
+	_switcher.show_view(&"archive")
 	_switcher.show_view(&"gate_room")
 	assert_object(_view(&"gate_room").find_child("DialConsole", true, false)).is_same(console)
 
@@ -191,7 +191,7 @@ func test_setup_reaches_every_view_again_and_again() -> void:
 	spy.name = "Spy"
 	switcher.get_node("%Views").add_child(spy)
 	await _run(switcher)
-	assert_array(_switcher.get_view_ids()).is_equal([&"gate_room", &"analysis", &"spy"])
+	assert_array(_switcher.get_view_ids()).is_equal([&"gate_room", &"archive", &"spy"])
 	assert_bool(spy.visible).is_false()
 	var first := Simulation.new(GameState.new_game(1))
 	var second := Simulation.new(GameState.new_game(2))
@@ -204,14 +204,18 @@ func test_setup_reaches_every_view_again_and_again() -> void:
 	assert_object(_focus_owner()).is_same(spy.get_default_focus())
 
 
-func test_analysis_view_holds_only_the_archive_placeholder() -> void:
-	_switcher.show_view(&"analysis")
+## The Archive view holds the document list and the reader, not the dial console; with no
+## simulation its list is empty and the kind filter takes focus.
+func test_archive_view_holds_the_list_and_the_reader() -> void:
+	_switcher.show_view(&"archive")
 	await _runner.simulate_frames(2)
-	var view: GameView = _view(&"analysis")
-	var placeholder: Control = view.find_child("ArchivePlaceholder", true, false) as Control
-	assert_object(placeholder).is_instanceof(Label)
+	var view: ArchiveView = _view(&"archive") as ArchiveView
+	assert_object(view).is_not_null()
 	assert_object(view.find_child("DialConsole", true, false)).is_null()
-	assert_object(view.get_default_focus()).is_same(placeholder)
+	assert_object(view.get_reader()).is_instanceof(DocumentReader)
+	assert_array(view.get_list().get_rows()).is_empty()
+	assert_object(view.get_default_focus()).is_same(view.get_list().get_filter_button())
+	assert_object(_focus_owner()).is_same(view.get_default_focus())
 
 
 func _make_switcher() -> ViewSwitcher:

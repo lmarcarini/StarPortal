@@ -1,0 +1,203 @@
+class_name ArchiveView
+extends GameView
+## The Archive view: every document the player holds in a list beside a reader. Opening a
+## document reads it (a MarkDocumentReadCommand clears its unread mark); its image opens large
+## in the image viewer; "Read with…" opens a second document beside the first, offering the
+## document's pair first, so a note and a rubbing can be read together. The view only composes
+## the parts and submits the read command; nothing here changes state.
+## Bible: game-design.md#core-loop, gate-and-address-spec.md#the-opening-puzzle,
+## technical-architecture.md#input-accessibility-and-localisation
+
+const _TITLE_KEY: StringName = &"ARCHIVE_TITLE"
+
+var _simulation: Simulation = null
+## Documents offered by the open "Read with…" menu, by item index.
+var _menu_ids: Array[StringName] = []
+## The control that opened the image viewer, given focus back when it closes.
+var _image_return: Control = null
+
+@onready var _columns: Control = %Columns
+@onready var _list: DocumentList = %DocumentList
+@onready var _primary: DocumentReader = %PrimaryReader
+@onready var _secondary: DocumentReader = %SecondaryReader
+@onready var _viewer: ImageViewer = %ImageViewer
+@onready var _menu: PopupMenu = %ReadWithMenu
+
+
+func _ready() -> void:
+	_secondary.set_secondary(true)
+	_secondary.hide()
+	_list.document_chosen.connect(open_document)
+	_primary.read_with_pressed.connect(open_read_with_menu)
+	_secondary.close_pressed.connect(close_beside)
+	_primary.image_requested.connect(_on_image_requested.bind(_primary))
+	_secondary.image_requested.connect(_on_image_requested.bind(_secondary))
+	_viewer.closed.connect(_on_viewer_closed)
+	_menu.id_pressed.connect(_on_menu_id_pressed)
+	_link_filter()
+
+
+func _enter_tree() -> void:
+	EventBus.document_received.connect(_on_document_received)
+
+
+func _exit_tree() -> void:
+	EventBus.document_received.disconnect(_on_document_received)
+
+
+## Connects the view to [param simulation]: the list is rebuilt from its Archive, and the
+## readers and the image viewer are closed.
+func setup(simulation: Simulation) -> void:
+	_simulation = simulation
+	_list.setup(simulation)
+	_viewer.close()
+	_menu.hide()
+	close_beside()
+	_primary.clear()
+	_link_filter()
+
+
+## Opens document [param document_id] in the first reader and marks it read. A document not in
+## the Archive is ignored.
+func open_document(document_id: StringName) -> void:
+	if not _holds(document_id):
+		return
+	_show_in(_primary, document_id)
+	_list.set_selected(document_id)
+	if _secondary.get_document_id() == document_id:
+		close_beside()
+	_update_read_with()
+
+
+## Opens document [param document_id] in a second reader beside the first and marks it read.
+func open_beside(document_id: StringName) -> void:
+	if not _holds(document_id) or document_id == _primary.get_document_id():
+		return
+	_show_in(_secondary, document_id)
+	_secondary.show()
+	_secondary.get_default_focus().grab_focus()
+
+
+## Closes the second reader, giving focus back to the first when the second had it.
+func close_beside() -> void:
+	var focused: Control = get_viewport().gui_get_focus_owner() if is_inside_tree() else null
+	var had_focus: bool = focused != null and _secondary.is_ancestor_of(focused)
+	_secondary.hide()
+	_secondary.clear()
+	if had_focus:
+		_primary.get_default_focus().grab_focus()
+
+
+## Lists the documents to read beside the first one, its pair first, and focuses the first.
+func open_read_with_menu() -> void:
+	_menu_ids = _read_with_ids()
+	if _menu_ids.is_empty():
+		return
+	_menu.clear()
+	var def: DocumentDef = _def_of(_primary.get_document_id())
+	var pair_id: StringName = def.pair_id if def != null else &""
+	for index: int in _menu_ids.size():
+		var title: String = DocumentText.title(_def_of(_menu_ids[index]))
+		if _menu_ids[index] == pair_id:
+			title = tr(&"ARCHIVE_READ_WITH_PAIR").format({"title": title})
+		_menu.add_item(title, index)
+	var button: Button = _primary.get_read_with_button()
+	var corner: Vector2 = button.get_screen_position() + Vector2(0, button.size.y)
+	_menu.popup(Rect2i(Vector2i(corner), Vector2i.ZERO))
+	_menu.set_focused_item(0)
+
+
+## Returns the document list.
+func get_list() -> DocumentList:
+	return _list
+
+
+## Returns the first reader ([param secondary] false) or the second.
+func get_reader(secondary: bool = false) -> DocumentReader:
+	return _secondary if secondary else _primary
+
+
+## Returns the image viewer.
+func get_image_viewer() -> ImageViewer:
+	return _viewer
+
+
+## Returns the "Read with…" menu.
+func get_read_with_menu() -> PopupMenu:
+	return _menu
+
+
+## Returns the selected document's row, else the first row, else the kind filter.
+func get_default_focus() -> Control:
+	return _list.get_first_focus()
+
+
+## Returns [code]ARCHIVE_TITLE[/code].
+func get_title_key() -> StringName:
+	return _TITLE_KEY
+
+
+func _holds(document_id: StringName) -> bool:
+	return _simulation != null and _simulation.state.archive.has_document(document_id)
+
+
+func _def_of(document_id: StringName) -> DocumentDef:
+	return Registry.get_def(document_id) as DocumentDef
+
+
+## Shows [param document_id] in [param reader] and submits its read command when unread.
+func _show_in(reader: DocumentReader, document_id: StringName) -> void:
+	var archive: ArchiveState = _simulation.state.archive
+	var tick: int = archive.received_tick.get(document_id, 0)
+	reader.show_document(document_id, _def_of(document_id), tick)
+	if archive.is_read(document_id):
+		return
+	if _simulation.submit(MarkDocumentReadCommand.create(document_id)).is_ok:
+		_list.mark_read(document_id)
+
+
+func _read_with_ids() -> Array[StringName]:
+	var shown: StringName = _primary.get_document_id()
+	if _simulation == null or shown.is_empty():
+		return []
+	var def: DocumentDef = _def_of(shown)
+	var pair_id: StringName = def.pair_id if def != null else &""
+	return DocumentText.read_with_order(shown, pair_id, _simulation.state.archive.received)
+
+
+func _update_read_with() -> void:
+	_primary.set_read_with_enabled(not _read_with_ids().is_empty())
+	_link_filter()
+
+
+## Right from the kind filter goes into the open document, else stays put: the nearest
+## control to its right is otherwise the view tab bar above it.
+func _link_filter() -> void:
+	var filter: OptionButton = _list.get_filter_button()
+	var target: Control = filter
+	if not _primary.get_document_id().is_empty():
+		target = _primary.get_default_focus()
+	filter.focus_neighbor_right = filter.get_path_to(target)
+
+
+func _on_menu_id_pressed(index: int) -> void:
+	if index >= 0 and index < _menu_ids.size():
+		open_beside(_menu_ids[index])
+
+
+func _on_image_requested(texture: Texture2D, reader: DocumentReader) -> void:
+	_image_return = reader.get_image_button()
+	_columns.focus_behavior_recursive = FOCUS_BEHAVIOR_DISABLED
+	_viewer.open(texture)
+
+
+## The list and readers under the viewer take focus again; the image's button gets it back.
+func _on_viewer_closed() -> void:
+	_columns.focus_behavior_recursive = FOCUS_BEHAVIOR_INHERITED
+	if is_instance_valid(_image_return) and _image_return.is_visible_in_tree():
+		_image_return.grab_focus()
+	_image_return = null
+
+
+func _on_document_received(_document_id: StringName) -> void:
+	_update_read_with()
