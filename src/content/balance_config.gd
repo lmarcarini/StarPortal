@@ -3,7 +3,7 @@ extends DefBase
 ## Every tunable number of the game in one definition, always with the id &"balance".
 ## Fields are added by the cards that need them; defaults are the bible's starting values.
 ## Bible: technical-architecture.md#data-model,
-## gate-and-address-spec.md#dialing-outcomes-and-energy
+## gate-and-address-spec.md#dialing-outcomes-and-energy, gate-and-address-spec.md#the-dial-console
 
 ## The id every BalanceConfig has.
 const BALANCE_ID: StringName = &"balance"
@@ -27,8 +27,16 @@ const BALANCE_ID: StringName = &"balance"
 @export_group("Starting power")
 ## Output of the starting diesel plant, in MW.
 @export var starting_plant_output_mw: float = 30.0
-## Storage of the starting capacitor bank, in MWh.
-@export var starting_capacity_mwh: float = 400.0
+## Capacitor storage a new game starts with, in MWh: none, the player installs the first bank.
+@export var starting_capacity_mwh: float = 0.0
+
+@export_group("Capacitor banks")
+## Storage one installed capacitor bank adds, in MWh.
+@export var capacitor_bank_capacity_mwh: float = 400.0
+## Ticks installing one capacitor bank takes: six in-game hours.
+@export var capacitor_bank_install_ticks: int = 360
+## Capacitor banks the base has room for.
+@export var max_capacitor_banks: int = 1
 
 @export_group("Dial outcomes")
 ## Fraction of the lock energy spent on a No gate outcome.

@@ -40,12 +40,14 @@ static func galaxy() -> GalaxyCatalogue:
 
 
 ## Returns a new game wired to the fixture galaxy and [param balance] (a default one when
-## null), with a full CAPACITY_MWH bank, and paused or running as [param paused] says.
+## null), with one installed bank of CAPACITY_MWH, full, and paused or running as
+## [param paused] says.
 static func state(balance: BalanceConfig = null, paused: bool = true) -> GameState:
 	var config: BalanceConfig = balance if balance != null else BalanceConfig.new()
 	var game: GameState = GameState.new_game(1, config)
 	game.balance = config
 	game.galaxy = galaxy()
+	game.power.banks_installed = 1
 	game.power.capacity_mwh = CAPACITY_MWH
 	game.power.stored_mwh = CAPACITY_MWH
 	game.clock.is_paused = paused

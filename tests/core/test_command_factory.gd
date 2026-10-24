@@ -39,6 +39,7 @@ func _samples() -> Array[Command]:
 		DeliverDocumentCommand.create(&"doc_survey_note_1958"),
 		MarkDocumentReadCommand.create(&"doc_survey_note_1958"),
 		NoteAddressCommand.create("3-17-0-22-9-14-30-5", "dead world, safe"),
+		InstallCapacitorsCommand.new(),
 	]
 
 
@@ -135,6 +136,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"close_wormhole",
 				&"deliver_document",
 				&"dial",
+				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
 				&"set_flag",
@@ -157,6 +159,7 @@ func test_register_type_adds_a_type() -> void:
 				&"close_wormhole",
 				&"deliver_document",
 				&"dial",
+				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
 				&"ping",
@@ -182,6 +185,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"close_wormhole",
 				&"deliver_document",
 				&"dial",
+				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
 				&"set_flag",

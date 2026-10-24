@@ -51,6 +51,10 @@ signal document_received(document_id: StringName)
 ## outbox).
 @warning_ignore("unused_signal")
 signal address_book_changed
+## Emitted when a capacitor bank finishes installing, with the new capacity in MWh (posted
+## through the outbox).
+@warning_ignore("unused_signal")
+signal capacitors_installed(capacity_mwh: float)
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared

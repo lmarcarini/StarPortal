@@ -31,6 +31,8 @@ func test_defs_from_the_registry() -> void:
 func test_build_from_real_content_runs_both_systems() -> void:
 	var defs: GameDefs = _defs()
 	var state: GameState = GameState.new_game(SEED, defs.balance)
+	state.power.banks_installed = 1
+	state.power.capacity_mwh = defs.balance.capacitor_bank_capacity_mwh
 	var result: Result = GameSetup.build(state, defs)
 	assert_bool(result.is_ok).is_true()
 	var simulation: Simulation = result.value
