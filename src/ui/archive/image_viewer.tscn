@@ -1,0 +1,84 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/archive/image_viewer.gd" id="1_viewer"]
+
+[node name="ImageViewer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_viewer")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.07, 0.06, 0.96)
+
+[node name="Layout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Toolbar" type="HBoxContainer" parent="Layout"]
+layout_mode = 2
+
+[node name="ZoomOutButton" type="Button" parent="Layout/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ARCHIVE_IMAGE_ZOOM_OUT"
+
+[node name="ZoomLabel" type="Label" parent="Layout/Toolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+auto_translate_mode = 2
+horizontal_alignment = 1
+
+[node name="ZoomInButton" type="Button" parent="Layout/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ARCHIVE_IMAGE_ZOOM_IN"
+
+[node name="FitButton" type="Button" parent="Layout/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ARCHIVE_IMAGE_FIT"
+
+[node name="Hint" type="Label" parent="Layout/Toolbar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ARCHIVE_IMAGE_HINT"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="CloseButton" type="Button" parent="Layout/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ARCHIVE_IMAGE_CLOSE"
+
+[node name="Frame" type="Control" parent="Layout"]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 2
+
+[node name="Picture" type="TextureRect" parent="Layout/Frame"]
+unique_name_in_owner = true
+layout_mode = 0
+mouse_filter = 2
+expand_mode = 1
+texture_filter = 1

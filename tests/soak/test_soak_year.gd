@@ -4,11 +4,12 @@
 ## Both must end with the same to_dict(), which catches any state to_dict() forgets.
 ## Both runs are built by GameSetup from the real data/ content, so PowerSystem and
 ## GateSystem tick all year (and are rebuilt with the galaxy after every load); stored power
-## must stay within 0..capacity, and never NaN, on every tick. The bot dials directly all
-## year: random addresses mostly, real worlds' true addresses sometimes.
+## must stay within 0..capacity, and never NaN, on every tick. The bot installs the first
+## capacitor bank, then dials directly all year: random addresses mostly, real worlds' true
+## addresses sometimes.
 ## Run with scripts/soak.sh; scripts/test.sh skips this folder.
 ## Bible: technical-architecture.md#testing-and-tooling (Soak test),
-## technical-architecture.md#save-system
+## technical-architecture.md#save-system, gate-and-address-spec.md#the-dial-console
 extends GdUnitTestSuite
 
 const SaveServiceScript := preload("res://src/services/save_service.gd")
@@ -200,7 +201,9 @@ func _assert_run_events(
 	assert_int(run.power_out_of_bounds).is_equal(0)
 	var power: PowerState = run.simulation.state.power
 	assert_float(power.stored_mwh).is_between(0.0, power.capacity_mwh)
-	assert_float(power.capacity_mwh).is_equal(_defs.balance.starting_capacity_mwh)
+	assert_float(power.capacity_mwh).is_equal(_defs.balance.capacitor_bank_capacity_mwh)
+	assert_int(power.banks_installed).is_equal(1)
+	assert_int(run.bot.installs).is_equal(1)
 	_assert_run_ring(run)
 	var commands: int = run.bot.commands_submitted
 	assert_int(commands).is_between(15 * YEAR_DAYS, 25 * YEAR_DAYS)

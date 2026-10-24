@@ -61,7 +61,7 @@ func test_default_bindings() -> void:
 	_assert_keys(service, &"view_next", [KEY_E])
 	_assert_keys(service, &"view_previous", [KEY_Q])
 	_assert_keys(service, &"view_gate_room", [KEY_F1])
-	_assert_keys(service, &"view_analysis", [KEY_F2])
+	_assert_keys(service, &"view_archive", [KEY_F2])
 	_assert_pad(service, &"time_toggle_pause", [JOY_BUTTON_START])
 	_assert_trigger(service, &"time_faster", JOY_AXIS_TRIGGER_RIGHT)
 	_assert_trigger(service, &"time_slower", JOY_AXIS_TRIGGER_LEFT)
@@ -71,7 +71,7 @@ func test_default_bindings() -> void:
 	_assert_pad(service, &"view_next", [JOY_BUTTON_RIGHT_SHOULDER])
 	_assert_pad(service, &"view_previous", [JOY_BUTTON_LEFT_SHOULDER])
 	_assert_pad(service, &"view_gate_room", [])
-	_assert_pad(service, &"view_analysis", [])
+	_assert_pad(service, &"view_archive", [])
 
 
 ## No two default bindings of one device kind are the same event, so the defaults pass the
@@ -128,9 +128,9 @@ func test_is_new_press_for_keys_and_buttons() -> void:
 	shoulder.pressed = true
 	assert_bool(InputActions.is_new_press(shoulder, &"view_previous")).is_true()
 	var action := InputEventAction.new()
-	action.action = &"view_analysis"
+	action.action = &"view_archive"
 	action.pressed = true
-	assert_bool(InputActions.is_new_press(action, &"view_analysis")).is_true()
+	assert_bool(InputActions.is_new_press(action, &"view_archive")).is_true()
 
 
 ## Returns an InputService on a fresh Settings instance at TEST_PATH, added to the tree.

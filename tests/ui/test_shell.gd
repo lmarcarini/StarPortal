@@ -115,6 +115,9 @@ func test_date_label_follows_ticks() -> void:
 
 
 func test_quick_save_then_load_restores_date() -> void:
+	var power: PowerState = SimClock.simulation.state.power
+	power.banks_installed = 1
+	power.capacity_mwh = 400.0
 	SimClock.step_ticks(90)
 	await _runner.simulate_key_pressed(KEY_F5)
 	assert_str(_shell.get_toast_text()).is_equal(tr("UI_SAVED"))
@@ -194,7 +197,7 @@ func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void
 	assert_object(_focus_owner()).is_same(buttons[buttons.size() - 1])
 	var switcher: ViewSwitcher = _shell.view_switcher
 	var tabs: TabBar = switcher.get_tab_bar()
-	var analysis: GameView = switcher.get_view(&"analysis")
+	var archive: GameView = switcher.get_view(&"archive")
 	await _press_action(&"ui_down")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_down")
@@ -205,11 +208,11 @@ func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void
 			await _press_action(&"ui_up")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_right")
-	assert_str(String(switcher.current_view_id())).is_equal("analysis")
+	assert_str(String(switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"ui_down")
-	assert_object(_focus_owner()).is_same(analysis.get_default_focus())
+	assert_object(_focus_owner()).is_same(archive.get_default_focus())
 	await _press_action(&"ui_right")
-	assert_object(_focus_owner()).is_same(analysis.get_default_focus())
+	assert_object(_focus_owner()).is_same(archive.get_default_focus())
 	await _press_action(&"ui_up")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_up")

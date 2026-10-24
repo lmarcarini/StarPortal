@@ -144,6 +144,8 @@ func _gate_power_worlds_state() -> GameState:
 		entry.energy_spent_mwh = 0.1 + 0.2
 		entry.world_id = &"" if kind == DialOutcome.Kind.NO_GATE else &"abydos"
 		state.gate.dial_log.append(entry)
+	state.power.banks_installed = 1
+	state.power.capacity_mwh = 400.0
 	state.power.stored_mwh = 0.1 + 0.2
 	state.worlds.statuses[&"abydos"] = WorldsState.WorldStatus.LOCKED
 	state.worlds.statuses[&"chulak"] = WorldsState.WorldStatus.LOCKED

@@ -27,18 +27,22 @@ func test_fixture_is_v5() -> void:
 	assert_int(dial_log.size()).is_equal(3)
 
 
-## v5 -> v6 adds the two empty sections, leaves every v5 section untouched, and the result is
-## a valid state.
+## v5 -> v6 adds the two empty sections and leaves every v5 section untouched (v6 -> v7 then
+## adds the bank count: the v5 bank of 100 000 MWh is one installed bank), and the result is a
+## valid state.
 func test_v5_adds_archive_and_address_book() -> void:
 	var data := _v5_fixture()
 	var result := SaveMigrator.migrate(data)
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(6)
+	assert_int(migrated["format_version"]).is_equal(7)
 	var v5_state: Dictionary = data["state"]
 	var expected := v5_state.duplicate(true)
 	expected["archive"] = EMPTY_ARCHIVE
 	expected["address_book"] = EMPTY_BOOK
+	var power: Dictionary = expected["power"]
+	power["banks_installed"] = 1
+	power["install_ticks_left"] = 0
 	assert_dict(migrated["state"]).is_equal(expected)
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -47,11 +51,11 @@ func test_v5_adds_archive_and_address_book() -> void:
 ## v5 data with no state object passes through the step untouched.
 func test_v5_without_state_is_left_for_validation() -> void:
 	var result := SaveMigrator.migrate({"format_version": 5, "state": 5})
-	assert_dict(result.value).is_equal({"format_version": 6, "state": 5})
+	assert_dict(result.value).is_equal({"format_version": 7, "state": 5})
 
 
-## The real v5 file loads through the SaveService with its other sections intact and empty
-## new ones, and sets up against the real content.
+## The real v5 file loads through the SaveService with its other sections intact (its bank
+## counted as installed by v6 -> v7) and empty new ones, and sets up against the real content.
 func test_v5_save_file_loads_into_v6() -> void:
 	var service: SaveServiceScript = SaveServiceScript.new()
 	var dir := "user://test_migrator_v5_%d_%d" % [Time.get_ticks_usec(), get_instance_id()]
@@ -68,7 +72,9 @@ func test_v5_save_file_loads_into_v6() -> void:
 	assert_bool(result.is_ok).override_failure_message(str(result.detail)).is_true()
 	var loaded: GameState = result.value
 	var v5_state: Dictionary = _v5_fixture()["state"]
-	var expected: Dictionary = GameState.from_dict(v5_state).to_dict()
+	var expected_state: GameState = GameState.from_dict(v5_state)
+	expected_state.power.banks_installed = 1
+	var expected: Dictionary = expected_state.to_dict()
 	for key: String in ["clock", "random", "flags", "gate", "power", "worlds"]:
 		assert_dict(loaded.to_dict()[key]).override_failure_message(key).is_equal(expected[key])
 	assert_array(loaded.gate.dial_log).has_size(3)

@@ -26,7 +26,7 @@ func before_test() -> void:
 	_root.add_child(_switcher)
 	add_child(_root)
 	_switcher.setup(_simulation)
-	_view = _switcher.get_view(&"gate_room") as GateRoomView
+	_view = _switcher.get_view(ViewSwitcher.GATE_ROOM) as GateRoomView
 
 
 func after_test() -> void:
@@ -52,13 +52,13 @@ func _start_dial(kind: int) -> void:
 
 func test_switching_view_mid_sequence_releases_the_hold_and_resolves_the_dial() -> void:
 	_start_dial(DialOutcome.Kind.NO_GATE)
-	_switcher.show_view(&"analysis")
+	_switcher.show_view(ViewSwitcher.ARCHIVE)
 	assert_bool(_overlays().get_sequence().is_open()).is_false()
 	assert_array(_simulation.state.clock.holds).is_empty()
 	assert_int(_simulation.state.clock.mode).is_equal(ClockState.Mode.PAUSED)
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.IDLE)
 	assert_int(_simulation.state.gate.dial_log.size()).is_equal(1)
-	_switcher.show_view(&"gate_room")
+	_switcher.show_view(ViewSwitcher.GATE_ROOM)
 	var card: ResultCard = _overlays().get_result_card()
 	assert_bool(card.is_visible_in_tree()).is_true()
 	assert_int(card.get_shown_kind()).is_equal(DialOutcome.Kind.NO_GATE)
@@ -66,10 +66,10 @@ func test_switching_view_mid_sequence_releases_the_hold_and_resolves_the_dial() 
 
 func test_a_lock_reached_while_away_shows_the_wormhole_screen_on_return() -> void:
 	_start_dial(DialOutcome.Kind.LOCK)
-	_switcher.show_view(&"analysis")
+	_switcher.show_view(ViewSwitcher.ARCHIVE)
 	assert_array(_simulation.state.clock.holds).is_empty()
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.LOCKED)
-	_switcher.show_view(&"gate_room")
+	_switcher.show_view(ViewSwitcher.GATE_ROOM)
 	assert_bool(_overlays().get_wormhole_screen().is_showing_open()).is_true()
 
 

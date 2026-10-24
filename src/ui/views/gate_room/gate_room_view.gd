@@ -27,6 +27,7 @@ func _ready() -> void:
 		_records.set_tab_title(index, _RECORD_TITLE_KEYS[index])
 	_book.load_requested.connect(_on_load_requested)
 	_overlays.changed.connect(_on_overlays_changed)
+	_gauge.install_started.connect(_on_install_started)
 
 
 func _enter_tree() -> void:
@@ -106,6 +107,10 @@ func _on_overlays_changed() -> void:
 
 
 func _on_focus_may_be_lost(_reason: StringName) -> void:
+	_ensure_focus.call_deferred()
+
+
+func _on_install_started() -> void:
 	_ensure_focus.call_deferred()
 
 
