@@ -80,7 +80,7 @@ func test_a_shielded_world_is_not_revealed_either() -> void:
 
 
 @warning_ignore("unused_parameter")
-func test_a_lock_names_the_world_in_the_wormhole_panel_and_the_address_book(
+func test_a_lock_names_the_world_in_the_wormhole_screen_and_the_address_book(
 	kind: int,
 	designation: String,
 	test_parameters: Array = [  # gdlint: ignore=unused-argument
@@ -104,6 +104,9 @@ func test_the_default_focus_is_the_dial_button_or_the_first_free_glyph() -> void
 	assert_int(first.focus_mode).is_equal(Control.FOCUS_ALL)
 	assert_bool((first as PaletteGlyph).is_locked()).is_false()
 	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.NO_GATE))
+	var card: ResultCard = _view.get_overlays().get_result_card()
+	assert_object(_view.get_default_focus()).is_same(card.get_ok_button())
+	card.get_ok_button().pressed.emit()
 	assert_bool(button.disabled).is_false()
 	assert_object(_view.get_default_focus()).is_same(button)
 	_view.get_console().clear_all()
@@ -111,9 +114,14 @@ func test_the_default_focus_is_the_dial_button_or_the_first_free_glyph() -> void
 
 
 func test_every_control_is_reachable_by_focus_alone() -> void:
+	var overlays: GateOverlays = _view.get_overlays()
 	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.NO_GATE))
-	_enter(Fixture.address_for(_simulation.state, DialOutcome.Kind.BLOCKED))
+	overlays.get_result_card().get_ok_button().pressed.emit()
 	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK))
+	overlays.get_wormhole_screen().get_close_button().pressed.emit()
+	overlays.get_wormhole_screen().get_back_button().pressed.emit()
+	_enter(Fixture.address_for(_simulation.state, DialOutcome.Kind.BLOCKED))
+	assert_bool(overlays.is_open()).is_false()
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var expected: Array[Control] = []
@@ -146,11 +154,42 @@ func test_the_dial_button_is_a_focusable_hold_button_with_a_reason_when_disabled
 
 func test_focus_moves_to_the_view_when_the_focused_button_goes_away() -> void:
 	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK))
-	var close: Button = _view.find_child("CloseButton", true, false) as Button
-	close.grab_focus()
+	var screen: WormholeScreen = _view.get_overlays().get_wormhole_screen()
+	var close: Button = screen.get_close_button()
+	await get_tree().process_frame
+	assert_object(_holder.get_viewport().gui_get_focus_owner()).is_same(close)
 	close.pressed.emit()
 	await get_tree().process_frame
+	assert_object(_holder.get_viewport().gui_get_focus_owner()).is_same(screen.get_back_button())
+	screen.get_back_button().pressed.emit()
+	await get_tree().process_frame
 	assert_object(_holder.get_viewport().gui_get_focus_owner()).is_same(_view.get_default_focus())
+	assert_bool(_view.get_console().is_ancestor_of(_view.get_default_focus())).is_true()
+
+
+## While an overlay is open, focus cannot leave it by direction or tab: the console behind
+## stays out of reach until it closes.
+func test_an_open_overlay_keeps_focus_inside_it() -> void:
+	var overlays: GateOverlays = _view.get_overlays()
+	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.NO_GATE))
+	_assert_trapped(overlays.get_default_focus(), overlays)
+	overlays.get_result_card().get_ok_button().pressed.emit()
+	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK))
+	_assert_trapped(overlays.get_default_focus(), overlays)
+	var palette_glyph: Control = (
+		(_view.find_child("Palette", true, false) as GlyphPalette).get_first_focus()
+	)
+	palette_glyph.grab_focus()
+	_view._ensure_focus()
+	assert_object(_holder.get_viewport().gui_get_focus_owner()).is_same(
+		overlays.get_default_focus()
+	)
+
+
+func _assert_trapped(start: Control, overlays: GateOverlays) -> void:
+	assert_object(start).is_not_null()
+	for control: Control in _reach_by_directions(start) + _reach_by_tab(start):
+		assert_bool(overlays.is_ancestor_of(control)).is_true()
 
 
 ## Controls reached from [param start] by repeatedly moving focus up, down, left and right.

@@ -132,3 +132,31 @@ func test_the_view_fits_the_minimum_window_and_no_text_is_clipped(
 	assert_int(book.get_rows().size()).is_greater(0)
 	var scroll: Control = book.get_node("Scroll") as Control
 	assert_float(scroll.size.y).is_greater_equal(book.get_rows()[0].size.y)
+
+
+## The overlays (wormhole screen, result card, dialing sequence) fit the view area too, with
+## no clipped text.
+@warning_ignore("unused_parameter")
+func test_the_overlays_fit_the_minimum_window(
+	locale: String,
+	is_pseudo: bool,
+	test_parameters: Array = [  # gdlint: ignore=unused-argument
+		["en", false],
+		["pt_BR", true],
+	]
+) -> void:
+	await _build(locale, is_pseudo)
+	var overlays: GateOverlays = _view.get_overlays()
+	assert_bool(overlays.get_wormhole_screen().is_showing_open()).is_true()
+	overlays.get_result_card().show_entry(_simulation.state.gate.dial_log[0])
+	await get_tree().process_frame
+	var screens: Array[Control] = [
+		overlays.get_wormhole_screen(), overlays.get_result_card(), overlays.get_sequence()
+	]
+	for screen: Control in screens:
+		var needed: Vector2 = (
+			(screen.get_node("Center/Panel") as Control).get_combined_minimum_size()
+		)
+		assert_float(needed.x).is_less_equal(Fixture.VIEW_SIZE.x)
+		assert_float(needed.y).is_less_equal(Fixture.VIEW_SIZE.y)
+	assert_array(_clipped(overlays)).is_empty()
