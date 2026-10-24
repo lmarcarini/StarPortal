@@ -27,6 +27,7 @@ func _ready() -> void:
 		_records.set_tab_title(index, _RECORD_TITLE_KEYS[index])
 	_book.load_requested.connect(_on_load_requested)
 	_overlays.changed.connect(_on_overlays_changed)
+	_overlays.address_book_requested.connect(_on_address_book_requested)
 	_gauge.install_started.connect(_on_install_started)
 
 
@@ -100,6 +101,12 @@ func _ensure_focus() -> void:
 func _on_load_requested(address: GateAddress) -> void:
 	_console.load_address(address)
 	_ensure_focus.call_deferred()
+
+
+## The wormhole screen stepped aside: show the Address Book tab and focus it.
+func _on_address_book_requested() -> void:
+	_records.current_tab = _RECORD_TITLE_KEYS.find(&"BOOK_TITLE")
+	_book.get_first_focus().grab_focus()
 
 
 func _on_overlays_changed() -> void:

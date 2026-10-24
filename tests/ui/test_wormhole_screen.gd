@@ -70,7 +70,7 @@ func test_a_lock_shows_the_destination_time_drain_bank_and_actions() -> void:
 				"What you can do now",
 				"Close wormhole",
 				"Read the far Ring's console",
-				"Not available yet.",
+				tr(&"GATE_CONSOLE_HINT"),
 				"Send the MOTH probe",
 				"Probes are not ready yet.",
 			]
@@ -78,10 +78,10 @@ func test_a_lock_shows_the_destination_time_drain_bank_and_actions() -> void:
 	)
 	assert_array(texts).not_contains([tr(&"GATE_MEANING_HOSTILE_LOCK")])
 	assert_bool(_screen().get_close_button().disabled).is_false()
-	for button_name: String in ["ConsoleButton", "MothButton"]:
-		var later: Button = _screen().find_child(button_name, true, false) as Button
-		assert_bool(later.disabled).is_true()
-		assert_int(later.focus_mode).is_equal(Control.FOCUS_NONE)
+	assert_bool(_screen().get_console().get_read_button().disabled).is_false()
+	var later: Button = _screen().find_child("MothButton", true, false) as Button
+	assert_bool(later.disabled).is_true()
+	assert_int(later.focus_mode).is_equal(Control.FOCUS_NONE)
 
 
 func test_a_hostile_lock_warns_that_the_far_side_is_guarded() -> void:

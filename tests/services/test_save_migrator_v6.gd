@@ -35,7 +35,7 @@ func test_v5_adds_archive_and_address_book() -> void:
 	var result := SaveMigrator.migrate(data)
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(7)
+	assert_int(migrated["format_version"]).is_equal(8)
 	var v5_state: Dictionary = data["state"]
 	var expected := v5_state.duplicate(true)
 	expected["archive"] = EMPTY_ARCHIVE
@@ -43,6 +43,8 @@ func test_v5_adds_archive_and_address_book() -> void:
 	var power: Dictionary = expected["power"]
 	power["banks_installed"] = 1
 	power["install_ticks_left"] = 0
+	var worlds: Dictionary = expected["worlds"]
+	worlds["consoles_read"] = {}
 	assert_dict(migrated["state"]).is_equal(expected)
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -51,7 +53,7 @@ func test_v5_adds_archive_and_address_book() -> void:
 ## v5 data with no state object passes through the step untouched.
 func test_v5_without_state_is_left_for_validation() -> void:
 	var result := SaveMigrator.migrate({"format_version": 5, "state": 5})
-	assert_dict(result.value).is_equal({"format_version": 7, "state": 5})
+	assert_dict(result.value).is_equal({"format_version": 8, "state": 5})
 
 
 ## The real v5 file loads through the SaveService with its other sections intact (its bank

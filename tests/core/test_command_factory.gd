@@ -40,6 +40,7 @@ func _samples() -> Array[Command]:
 		MarkDocumentReadCommand.create(&"doc_survey_note_1958"),
 		NoteAddressCommand.create("3-17-0-22-9-14-30-5", "dead world, safe"),
 		InstallCapacitorsCommand.new(),
+		ReadConsoleCommand.new(),
 	]
 
 
@@ -139,6 +140,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
+				&"read_console",
 				&"set_flag",
 			]
 		)
@@ -163,6 +165,7 @@ func test_register_type_adds_a_type() -> void:
 				&"mark_document_read",
 				&"note_address",
 				&"ping",
+				&"read_console",
 				&"set_flag",
 			]
 		)
@@ -188,6 +191,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
+				&"read_console",
 				&"set_flag",
 			]
 		)
