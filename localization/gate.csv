@@ -46,12 +46,17 @@ GATE_SEQ_TITLE,Dialing,Discando
 GATE_SEQ_ADDRESS,Address: {address},Endereço: {address}
 GATE_SEQ_SKIP,Skip,Pular
 GATE_RESULT_OK,OK,OK
-GATE_WORMHOLE_SUMMARY,"The wormhole is open, and it is the only one: the Ring cannot dial another address until this one closes. Right now you can only close it, or leave it open until the time or the capacitors run out. Probes cannot go through yet.","O buraco de minhoca está aberto, e é o único: o Anel não pode discar outro endereço até este fechar. Por enquanto você só pode fechá-lo, ou deixá-lo aberto até o tempo ou os capacitores acabarem. Sondas ainda não podem atravessar."
+GATE_WORMHOLE_SUMMARY,"The wormhole is open, and it is the only one: the Ring cannot dial another address until this one closes. Right now you can read the far Ring's console, close the wormhole, or leave it open until the time or the capacitors run out. Probes cannot go through yet.","O buraco de minhoca está aberto, e é o único: o Anel não pode discar outro endereço até este fechar. Por enquanto você pode ler o console do Anel distante, fechar o buraco de minhoca, ou deixá-lo aberto até o tempo ou os capacitores acabarem. Sondas ainda não podem atravessar."
 GATE_WORMHOLE_BANK_STEADY,Capacitors: {stored} of {capacity}. The plant covers the drain.,Capacitores: {stored} de {capacity}. A usina cobre o consumo.
 GATE_WORMHOLE_BANK_FALLING,"Capacitors: {stored} of {capacity}, falling. They run dry in {time}, and then the wormhole collapses.","Capacitores: {stored} de {capacity}, caindo. Eles secam em {time}, e então o buraco de minhoca colapsa."
 GATE_WORMHOLE_ACTIONS,What you can do now,O que você pode fazer agora
 GATE_WORMHOLE_READ_CONSOLE,Read the far Ring's console,Ler o console do Anel distante
-GATE_WORMHOLE_READ_CONSOLE_LATER,Not available yet.,Ainda não disponível.
+GATE_CONSOLE_HINT,"Copies the far Ring's log of recent dials into the Address Book: two to four nearby addresses, already written for CAIRN.","Copia o registro de discagens recentes do Anel distante para o Livro de Endereços: de dois a quatro endereços próximos, já escritos para a CAIRN."
+GATE_CONSOLE_ADDED,"Console read: {count} new addresses in the Address Book, written for CAIRN. Their worlds stay unknown until you lock them.","Console lido: {count} endereços novos no Livro de Endereços, escritos para a CAIRN. Seus mundos continuam desconhecidos até você abrir uma conexão com eles."
+GATE_CONSOLE_ADDED_ONE,"Console read: 1 new address in the Address Book, written for CAIRN. Its world stays unknown until you lock it.","Console lido: 1 endereço novo no Livro de Endereços, escrito para a CAIRN. Seu mundo continua desconhecido até você abrir uma conexão com ele."
+GATE_CONSOLE_NOTHING_NEW,Console read: every address in its log is already in the Address Book.,Console lido: todos os endereços do registro já estão no Livro de Endereços.
+GATE_WORMHOLE_OPEN_BOOK,Open the Address Book,Abrir o Livro de Endereços
+GATE_WORMHOLE_RETURN,Wormhole open ({left} left): back to it,Buraco de minhoca aberto (faltam {left}): voltar a ele
 GATE_WORMHOLE_SEND_MOTH,Send the MOTH probe,Enviar a sonda MOTH
 GATE_WORMHOLE_SEND_MOTH_LATER,Probes are not ready yet.,As sondas ainda não estão prontas.
 GATE_WORMHOLE_CLOSED_TITLE,Wormhole closed,Buraco de minhoca fechado

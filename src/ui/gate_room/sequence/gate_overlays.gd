@@ -4,12 +4,15 @@ extends Control
 ## sequence while it dials, then the result card for No gate, Blocked and Origin rejected, or
 ## the wormhole screen for a lock or hostile lock, until the wormhole closes. At most one
 ## overlay shows at a time. After a load it shows what the loaded Ring is doing. Changes no
-## state itself: only the sequence's hold and clock steps and the wormhole screen's Close.
+## state itself: only the sequence's hold and clock steps and the wormhole screen's Close and
+## Read console. When the wormhole screen steps aside for the Address Book, it says so.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## technical-architecture.md#state-machines (presentation machines mirror simulation state)
 
 ## An overlay opened or closed; the view moves focus.
 signal changed
+## The wormhole screen stepped aside so the player can see the Address Book.
+signal address_book_requested
 
 var _simulation: Simulation = null
 
@@ -22,6 +25,7 @@ func _ready() -> void:
 	_sequence.finished.connect(_on_sequence_finished)
 	_result.dismissed.connect(_on_dismissed)
 	_wormhole.dismissed.connect(_on_dismissed)
+	_wormhole.address_book_requested.connect(address_book_requested.emit)
 
 
 func _enter_tree() -> void:

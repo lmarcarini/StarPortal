@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/ui/gate_room/sequence/wormhole_screen.gd" id="1_screen"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/sequence/console_finds.tscn" id="2_finds"]
 
 [node name="WormholeScreen" type="Control"]
 visible = false
@@ -10,6 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_screen")
 
 [node name="Dim" type="ColorRect" parent="."]
@@ -88,17 +90,9 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "GATE_WORMHOLE_CLOSE"
 
-[node name="ConsoleButton" type="Button" parent="Center/Panel/Box/OpenBox"]
+[node name="ConsoleFinds" parent="Center/Panel/Box/OpenBox" instance=ExtResource("2_finds")]
 unique_name_in_owner = true
 layout_mode = 2
-focus_mode = 0
-disabled = true
-text = "GATE_WORMHOLE_READ_CONSOLE"
-
-[node name="ConsoleNote" type="Label" parent="Center/Panel/Box/OpenBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "GATE_WORMHOLE_READ_CONSOLE_LATER"
 
 [node name="MothButton" type="Button" parent="Center/Panel/Box/OpenBox"]
 unique_name_in_owner = true
@@ -128,3 +122,21 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 text = "GATE_WORMHOLE_BACK"
+
+[node name="ReturnBar" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_top = -52.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ReturnButton" type="Button" parent="ReturnBar"]
+unique_name_in_owner = true
+layout_mode = 2
