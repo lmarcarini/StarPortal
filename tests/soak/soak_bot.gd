@@ -1,8 +1,10 @@
 extends RefCounted
 ## Seeded stand-in player for the soak test. It sets random flags through SetFlagCommand
 ## about 20 times per in-game day, pauses and resumes the clock at random, and adds and
-## releases named system holds through TimeControl (a dozen or so per month). It also works
-## the Ring on every call with no command waiting: with the Ring idle and no address picked it
+## releases named system holds through TimeControl (a dozen or so per month). Before anything
+## else on the Ring it installs the first capacitor bank (InstallCapacitorsCommand) and leaves
+## the Ring alone until the bank is in. It then works the Ring on every call with no command
+## waiting: with the Ring idle and no address picked it
 ## picks one (mostly a random well-formed one whose seal 1 the bank can reach, a real world's
 ## true address sometimes); once the bank holds that address's lock energy it dials it
 ## directly (an address the bank can never charge is just dropped); and it closes any lock a
@@ -64,6 +66,8 @@ var targets: Array[StringName] = []
 var dials: int = 0
 ## Wormholes the bot closed.
 var closes: int = 0
+## Capacitor bank installs the bot started.
+var installs: int = 0
 
 var _next_action_tick: int = 0
 ## The address the bot will dial next, or null.
@@ -99,9 +103,15 @@ func act(simulation: Simulation) -> void:
 	_submit_random_flag(simulation, rng)
 
 
-## Closes a lock open CLOSE_AFTER_TICKS, or, with the Ring idle, picks, drops or dials.
+## Installs the first capacitor bank and waits for it; then closes a lock open
+## CLOSE_AFTER_TICKS, or, with the Ring idle, picks, drops or dials.
 func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	var state: GameState = simulation.state
+	if state.power.banks_installed == 0:
+		if state.power.install_ticks_left == 0:
+			simulation.submit(InstallCapacitorsCommand.new())
+			installs += 1
+		return
 	var gate: GateState = state.gate
 	if gate.mode == GateState.RingMode.LOCKED:
 		if state.clock.tick - gate.lock_started_tick >= CLOSE_AFTER_TICKS:
