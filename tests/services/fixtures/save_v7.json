@@ -1,0 +1,92 @@
+{
+	"format_version": 7,
+	"game_version": "0.0.0",
+	"saved_at_unix": 1792878632,
+	"state": {
+		"address_book": {
+			"entries": [
+				{
+					"address_key": "35-10-19-24-15-29-5-2",
+					"last_dialed_tick": 1095,
+					"last_outcome": "lock",
+					"note": "console here?",
+					"source": "dialed",
+					"source_id": "",
+					"world_id": "world_0007"
+				}
+			]
+		},
+		"archive": {
+			"read": {},
+			"received": [],
+			"received_tick": {}
+		},
+		"clock": {
+			"holds": [],
+			"mode": "paused",
+			"mode_after_hold": "paused",
+			"speed_index": 1,
+			"tick": 1098
+		},
+		"flags": {},
+		"gate": {
+			"connected_world_id": "world_0007",
+			"current_address": {
+				"seals": [
+					35,
+					10,
+					19,
+					24,
+					15,
+					29,
+					5,
+					2
+				]
+			},
+			"dial_log": [
+				{
+					"address": {
+						"seals": [
+							35,
+							10,
+							19,
+							24,
+							15,
+							29,
+							5,
+							2
+						]
+					},
+					"energy_spent_mwh": "4076e9f1669a1f72",
+					"outcome": "lock",
+					"tick": 1095,
+					"world_id": "world_0007"
+				}
+			],
+			"dial_started_tick": 1093,
+			"is_hostile": false,
+			"lock_energy_mwh": "4076e9f1669a1f72",
+			"lock_started_tick": 1095,
+			"mode": "locked"
+		},
+		"power": {
+			"banks_installed": 1,
+			"capacity_mwh": "4079000000000000",
+			"install_ticks_left": 0,
+			"plant_output_mw": "403e000000000000",
+			"stored_mwh": "3ffe0e9965e08e01"
+		},
+		"random": {
+			"base_seed": "20261024",
+			"streams": {}
+		},
+		"worlds": {
+			"galaxy_seed": "-6662447915182348605",
+			"generator_version": 1,
+			"statuses": {
+				"world_0007": "locked"
+			}
+		}
+	},
+	"tick": 1098
+}
