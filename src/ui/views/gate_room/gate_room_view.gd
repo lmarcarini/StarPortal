@@ -25,6 +25,7 @@ func _ready() -> void:
 	for index: int in _RECORD_TITLE_KEYS.size():
 		_records.set_tab_title(index, _RECORD_TITLE_KEYS[index])
 	_book.load_requested.connect(_on_load_requested)
+	_gauge.install_started.connect(_on_install_started)
 
 
 func _enter_tree() -> void:
@@ -91,6 +92,10 @@ func _on_load_requested(address: GateAddress) -> void:
 
 
 func _on_focus_may_be_lost(_reason: StringName) -> void:
+	_ensure_focus.call_deferred()
+
+
+func _on_install_started() -> void:
 	_ensure_focus.call_deferred()
 
 
