@@ -115,6 +115,9 @@ func test_date_label_follows_ticks() -> void:
 
 
 func test_quick_save_then_load_restores_date() -> void:
+	var power: PowerState = SimClock.simulation.state.power
+	power.banks_installed = 1
+	power.capacity_mwh = 400.0
 	SimClock.step_ticks(90)
 	await _runner.simulate_key_pressed(KEY_F5)
 	assert_str(_shell.get_toast_text()).is_equal(tr("UI_SAVED"))

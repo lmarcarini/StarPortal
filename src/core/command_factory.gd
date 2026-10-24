@@ -58,6 +58,7 @@ static func register_defaults() -> void:
 	_types[DeliverDocumentCommand.TYPE] = DeliverDocumentCommand
 	_types[MarkDocumentReadCommand.TYPE] = MarkDocumentReadCommand
 	_types[NoteAddressCommand.TYPE] = NoteAddressCommand
+	_types[InstallCapacitorsCommand.TYPE] = InstallCapacitorsCommand
 
 
 ## Drops every registration, so tests can restore a clean registry. The built-in types are

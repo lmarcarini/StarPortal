@@ -6,7 +6,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 6
+const TARGET_VERSION: int = 7
 
 ## v3 defaults as ExactFloat strings, frozen here: 0.0, 400.0 and 30.0.
 const _EXACT_ZERO: String = "0000000000000000"
@@ -18,7 +18,12 @@ const _EXACT_30: String = "403e000000000000"
 ## first format. (A function, not a constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
 	var built_in: Dictionary[int, Callable] = {
-		1: _v1_to_v2, 2: _v2_to_v3, 3: _v3_to_v4, 4: _v4_to_v5, 5: _v5_to_v6
+		1: _v1_to_v2,
+		2: _v2_to_v3,
+		3: _v3_to_v4,
+		4: _v4_to_v5,
+		5: _v5_to_v6,
+		6: _v6_to_v7,
 	}
 	return built_in
 
@@ -194,4 +199,28 @@ static func _v5_to_v6(data: Dictionary) -> Dictionary:
 	var state_data: Dictionary = state
 	state_data["archive"] = {"received": [], "read": {}, "received_tick": {}}
 	state_data["address_book"] = {"entries": []}
+	return data
+
+
+## v6 -> v7: adds the capacitor bank fields to "power": "banks_installed" is 1 when the v6
+## capacity is above 0 (every v6 game started with its bank installed) and 0 otherwise, and
+## "install_ticks_left" is 0 (no install running). Charge, capacity and plant output are kept
+## as they are. Data with no state object or no power object is left as is, for validation to
+## reject; an unreadable capacity counts as 0 and validation rejects it.
+static func _v6_to_v7(data: Dictionary) -> Dictionary:
+	var state: Variant = data.get("state")
+	if not state is Dictionary:
+		return data
+	var state_data: Dictionary = state
+	var power: Variant = state_data.get("power")
+	if not power is Dictionary:
+		return data
+	var power_data: Dictionary = power
+	var capacity: Variant = power_data.get("capacity_mwh")
+	var has_bank: bool = false
+	if ExactFloat.is_encoded(capacity):
+		var capacity_text: String = capacity
+		has_bank = ExactFloat.decode(capacity_text) > 0.0
+	power_data["banks_installed"] = 1 if has_bank else 0
+	power_data["install_ticks_left"] = 0
 	return data

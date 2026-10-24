@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/ui/gate_room/capacitor_gauge.gd" id="1_gauge"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/hold_button.tscn" id="2_hold"]
 
 [node name="CapacitorGauge" type="VBoxContainer"]
 script = ExtResource("1_gauge")
@@ -20,6 +21,7 @@ size_flags_horizontal = 3
 autowrap_mode = 3
 
 [node name="BarArea" type="Control" parent="."]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 
@@ -32,3 +34,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 show_percentage = false
+
+[node name="InstallButton" parent="." instance=ExtResource("2_hold")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
