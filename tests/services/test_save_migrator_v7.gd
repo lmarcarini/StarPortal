@@ -41,12 +41,14 @@ func test_v6_with_capacity_has_one_bank() -> void:
 	var result := SaveMigrator.migrate(data)
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(7)
+	assert_int(migrated["format_version"]).is_equal(8)
 	var v6_state: Dictionary = data["state"]
 	var expected := v6_state.duplicate(true)
 	var power: Dictionary = expected["power"]
 	power["banks_installed"] = 1
 	power["install_ticks_left"] = 0
+	var worlds: Dictionary = expected["worlds"]
+	worlds["consoles_read"] = {}
 	assert_dict(migrated["state"]).is_equal(expected)
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -63,16 +65,16 @@ func test_v6_without_capacity_has_no_bank() -> void:
 	var expected := power.duplicate()
 	expected["banks_installed"] = 0
 	expected["install_ticks_left"] = 0
-	assert_dict(result.value).is_equal({"format_version": 7, "state": {"power": expected}})
+	assert_dict(result.value).is_equal({"format_version": 8, "state": {"power": expected}})
 
 
 ## Data with no state, or no power object, passes through for validation to reject; an
 ## unreadable capacity counts as no bank.
 func test_v6_without_state_or_power_is_left_for_validation() -> void:
 	var no_state := SaveMigrator.migrate({"format_version": 6, "state": 5})
-	assert_dict(no_state.value).is_equal({"format_version": 7, "state": 5})
+	assert_dict(no_state.value).is_equal({"format_version": 8, "state": 5})
 	var no_power := SaveMigrator.migrate(_v6_with_power(3))
-	assert_dict(no_power.value).is_equal({"format_version": 7, "state": {"power": 3}})
+	assert_dict(no_power.value).is_equal({"format_version": 8, "state": {"power": 3}})
 	var bad := SaveMigrator.migrate(_v6_with_power({"capacity_mwh": 400.0}))
 	var bad_power: Dictionary = bad.value["state"]["power"]
 	assert_int(bad_power["banks_installed"]).is_equal(0)

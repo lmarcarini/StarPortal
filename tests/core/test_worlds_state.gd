@@ -13,6 +13,7 @@ func _sample() -> WorldsState:
 	worlds.generator_version = 1
 	worlds.statuses[&"abydos"] = WorldsState.WorldStatus.LOCKED
 	worlds.statuses[&"p3x_118"] = WorldsState.WorldStatus.LOCKED
+	worlds.consoles_read[&"abydos"] = true
 	return worlds
 
 
@@ -33,6 +34,7 @@ func test_dict_shape() -> void:
 				"galaxy_seed": "-7230724724541804083",
 				"generator_version": 1,
 				"statuses": {"abydos": "locked", "p3x_118": "locked"},
+				"consoles_read": {"abydos": true},
 			}
 		)
 	)
@@ -65,6 +67,10 @@ func test_validate_errors() -> void:
 		["statuses", {"abydos": "probed"}, "status of 'abydos'"],
 		["statuses", {"abydos": 1}, "status of 'abydos'"],
 		["statuses", {"": "locked"}, "empty world id"],
+		["consoles_read", [], "'consoles_read' is not an object"],
+		["consoles_read", {"abydos": false}, "consoles_read of 'abydos'"],
+		["consoles_read", {"abydos": 1}, "consoles_read of 'abydos'"],
+		["consoles_read", {"": true}, "empty world id"],
 	]
 	for case: Array in cases:
 		var data := good.duplicate(true)

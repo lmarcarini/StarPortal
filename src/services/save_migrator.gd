@@ -6,7 +6,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 7
+const TARGET_VERSION: int = 8
 
 ## v3 defaults as ExactFloat strings, frozen here: 0.0, 400.0 and 30.0.
 const _EXACT_ZERO: String = "0000000000000000"
@@ -24,6 +24,7 @@ static func built_in_steps() -> Dictionary[int, Callable]:
 		4: _v4_to_v5,
 		5: _v5_to_v6,
 		6: _v6_to_v7,
+		7: _v7_to_v8,
 	}
 	return built_in
 
@@ -223,4 +224,21 @@ static func _v6_to_v7(data: Dictionary) -> Dictionary:
 		has_bank = ExactFloat.decode(capacity_text) > 0.0
 	power_data["banks_installed"] = 1 if has_bank else 0
 	power_data["install_ticks_left"] = 0
+	return data
+
+
+## v7 -> v8: adds "consoles_read" to "worlds", empty (no far Ring's console read yet), written
+## here as a literal so later changes to the game's defaults never change this step. Every
+## other value is kept. Data with no state object or no worlds object is left as is, for
+## validation to reject.
+static func _v7_to_v8(data: Dictionary) -> Dictionary:
+	var state: Variant = data.get("state")
+	if not state is Dictionary:
+		return data
+	var state_data: Dictionary = state
+	var worlds: Variant = state_data.get("worlds")
+	if not worlds is Dictionary:
+		return data
+	var worlds_data: Dictionary = worlds
+	worlds_data["consoles_read"] = {}
 	return data
