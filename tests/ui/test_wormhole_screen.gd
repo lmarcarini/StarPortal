@@ -70,9 +70,9 @@ func test_a_lock_shows_the_destination_time_drain_bank_and_actions() -> void:
 				"What you can do now",
 				"Close wormhole",
 				"Read the far Ring's console",
-				"Not available yet: arrives with the next card.",
+				"Not available yet.",
 				"Send the MOTH probe",
-				"Not available yet: arrives in M3.",
+				"Probes are not ready yet.",
 			]
 		)
 	)

@@ -7,7 +7,9 @@ extends Control
 ## It then releases the hold (time returns to the player's own Running or Paused) and emits
 ## [signal finished] with the outcome. Skip (the button, ui_cancel, gamepad B) jumps straight
 ## to the stepping, so skipping gives the same result as watching. A dial resolved by someone
-## else's ticks (tools, tests) ends the sequence at once. Mirrors the Ring; never changes it.
+## else's ticks (tools, tests) ends the sequence at once. Leaving the Gate Room mid-sequence
+## (hidden, processing stopped or leaving the tree) acts as Skip, so the hold never outlives
+## the screen; the result waits for the player's return. Mirrors the Ring; never changes it.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## technical-architecture.md#state-machines, game-design.md#time-real-time-with-pause
 
@@ -48,6 +50,7 @@ func _enter_tree() -> void:
 
 
 func _exit_tree() -> void:
+	skip()
 	EventBus.dial_resolved.disconnect(_on_dial_resolved)
 	if _phase != Phase.CLOSED:
 		SimClock.release(HOLD_REASON)
@@ -58,8 +61,15 @@ func _process(delta: float) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
-		_render()
+	match what:
+		NOTIFICATION_TRANSLATION_CHANGED:
+			if is_node_ready():
+				_render()
+		NOTIFICATION_VISIBILITY_CHANGED:
+			if is_inside_tree() and not is_visible_in_tree():
+				skip()
+		NOTIFICATION_DISABLED:
+			skip()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -70,8 +80,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		skip()
 
 
-## Connects the sequence to [param simulation] and closes it without emitting.
+## Connects the sequence to [param simulation] and closes it without emitting, releasing
+## the hold if a sequence was playing.
 func setup(simulation: Simulation) -> void:
+	if _phase != Phase.CLOSED:
+		SimClock.release(HOLD_REASON)
 	_simulation = simulation
 	_phase = Phase.CLOSED
 	_outcome = -1
@@ -80,7 +93,8 @@ func setup(simulation: Simulation) -> void:
 
 
 ## Opens the sequence for the dial in progress and holds time. Does nothing unless the Ring
-## is DIALING or while the sequence already plays.
+## is DIALING or while the sequence already plays. Off screen (the Gate Room hidden) it skips
+## at once.
 func begin() -> void:
 	if _phase != Phase.CLOSED or not _is_dialing():
 		return
@@ -91,7 +105,9 @@ func begin() -> void:
 	show()
 	set_process(true)
 	_render()
-	if is_visible_in_tree():
+	if is_inside_tree() and (not is_visible_in_tree() or not can_process()):
+		skip()
+	elif is_visible_in_tree():
 		_skip.grab_focus()
 
 
