@@ -1,0 +1,27 @@
+keys,en,pt_BR
+ARCHIVE_FILTER_ALL,All kinds,Todos os tipos
+ARCHIVE_KIND_NOTE,Note,Nota
+ARCHIVE_KIND_IMAGE,Image,Imagem
+ARCHIVE_KIND_DOSSIER,Dossier,Dossiê
+ARCHIVE_KIND_LOG,Log,Registro
+ARCHIVE_KIND_GIFT,Gift,Presente
+ARCHIVE_KIND_ARTEFACT,Artefact,Artefato
+ARCHIVE_UNREAD,New,Novo
+ARCHIVE_UNTITLED,Untitled document,Documento sem título
+ARCHIVE_COUNT,{count} documents,{count} documentos
+ARCHIVE_COUNT_ONE,1 document,1 documento
+ARCHIVE_EMPTY,The Archive holds no documents yet.,O Arquivo ainda não tem documentos.
+ARCHIVE_EMPTY_FILTERED,No document of this kind.,Nenhum documento deste tipo.
+ARCHIVE_READER_EMPTY,Choose a document to read it.,Escolha um documento para lê-lo.
+ARCHIVE_SOURCE,Source: {source},Origem: {source}
+ARCHIVE_RECEIVED,"Received {date}","Recebido em {date}"
+ARCHIVE_READ_WITH,Read with…,Ler com…
+ARCHIVE_READ_WITH_PAIR,{title} (read together),{title} (ler junto)
+ARCHIVE_CLOSE_SIDE,Close,Fechar
+ARCHIVE_VIEW_IMAGE,View image,Ver imagem
+ARCHIVE_IMAGE_ZOOM_IN,Zoom in,Ampliar
+ARCHIVE_IMAGE_ZOOM_OUT,Zoom out,Reduzir
+ARCHIVE_IMAGE_FIT,Fit,Ajustar
+ARCHIVE_IMAGE_CLOSE,Close,Fechar
+ARCHIVE_IMAGE_ZOOM,{percent}%,{percent}%
+ARCHIVE_IMAGE_HINT,Drag or use the arrows to move; the wheel zooms.,Arraste ou use as setas para mover; a roda amplia.

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DocumentDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+kind = 2
+title_key = &"ARCHIVE_TEST_DOSSIER_TITLE"
+body_key = &"ARCHIVE_TEST_DOSSIER_BODY"
+source_key = &"ARCHIVE_TEST_DIRECTORATE"
+id = &"doc_dossier"
