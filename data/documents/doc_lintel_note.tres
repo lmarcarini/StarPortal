@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DocumentDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+kind = 0
+title_key = &"DOC_LINTEL_NOTE_TITLE"
+body_key = &"DOC_LINTEL_NOTE_BODY"
+source_key = &"DOC_LINTEL_NOTE_SOURCE"
+world_id = &"world_lintel"
+answer_glyphs = PackedInt32Array(35, 19, 10, 15, 5, 6, 4)
+pair_id = &"doc_lintel_rubbing"
+arrival = 2
+arrival_world_id = &"world_sill"
+id = &"doc_lintel_note"

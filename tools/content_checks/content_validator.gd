@@ -29,7 +29,8 @@ static func run(
 	return errors
 
 
-## Checks 2, 3, 4 and the balance tunables: everything that needs no generated galaxy.
+## Checks 2, 3, 4, the balance tunables and the documents: everything that needs no generated
+## galaxy.
 static func _check_content(registry: RegistryScript) -> Array[String]:
 	var errors: Array[String] = []
 	var glyphs: Array[GlyphDef] = []
@@ -49,10 +50,39 @@ static func _check_content(registry: RegistryScript) -> Array[String]:
 	var worlds: Array[WorldDef] = ContentSource.authored_worlds(registry)
 	errors.append_array(ContentCheckWorlds.check_worlds(worlds, field.positions_ly))
 	errors.append_array(ContentCheckWorlds.check_unique_addresses(worlds, field.positions_ly))
+	errors.append_array(_check_documents(registry, worlds, field.positions_ly))
 	return errors
 
 
-## Check 5 for seeds 1..[param seeds].
+## The document checks: answers, reach, keys in both locales, pairs, far-side readings, decoys.
+static func _check_documents(
+	registry: RegistryScript, worlds: Array[WorldDef], anchors_ly: Array[Vector3i]
+) -> Array[String]:
+	var documents: Array[DocumentDef] = []
+	for def: DefBase in registry.get_all_of(DocumentDef):
+		documents.append(def as DocumentDef)
+	var table: Dictionary[String, PackedStringArray] = ContentCheckDocuments.read_table(
+		ContentCheckDocuments.TABLE
+	)
+	var errors: Array[String] = []
+	errors.append_array(ContentCheckDocuments.check_answers(documents, worlds, anchors_ly))
+	errors.append_array(ContentCheckDocuments.check_reach(worlds, anchors_ly, registry.balance()))
+	errors.append_array(ContentCheckDocuments.check_keys(documents, table))
+	errors.append_array(ContentCheckDocuments.check_pairs(documents))
+	errors.append_array(
+		ContentCheckDocuments.check_far_side(
+			documents, worlds, anchors_ly, ContentCheckDocuments.far_side_readings()
+		)
+	)
+	errors.append_array(
+		ContentCheckDocuments.check_decoys(
+			ContentCheckDocuments.decoys(), worlds, anchors_ly, documents
+		)
+	)
+	return errors
+
+
+## Check 5, and that no decoy is a real address, for seeds 1..[param seeds].
 static func _check_seeds(registry: RegistryScript, seeds: int) -> Array[String]:
 	var errors: Array[String] = []
 	for seed_number: int in range(1, seeds + 1):
@@ -60,6 +90,9 @@ static func _check_seeds(registry: RegistryScript, seeds: int) -> Array[String]:
 		var worlds: Array[WorldRecord] = galaxy.all_worlds()
 		var found: Array[String] = ContentCheckGalaxy.check(
 			worlds, galaxy.anchors_ly(), GeneratorParams.new(), registry.balance()
+		)
+		found.append_array(
+			ContentCheckDocuments.check_galaxy_decoys(ContentCheckDocuments.decoys(), galaxy)
 		)
 		for line: String in found:
 			errors.append("seed %d: %s" % [seed_number, line])

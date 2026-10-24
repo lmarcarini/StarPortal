@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DocumentDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+[ext_resource type="Texture2D" uid="uid://cjeh6n52to415" path="res://art/documents/lintel_rubbing.png" id="2_image"]
+
+[resource]
+script = ExtResource("1_doc")
+kind = 1
+title_key = &"DOC_LINTEL_RUBBING_TITLE"
+image = ExtResource("2_image")
+source_key = &"DOC_LINTEL_RUBBING_SOURCE"
+world_id = &"world_lintel"
+answer_glyphs = PackedInt32Array(35, 19, 10, 15, 5, 6, 4)
+pair_id = &"doc_lintel_note"
+arrival = 2
+arrival_world_id = &"world_sill"
+id = &"doc_lintel_rubbing"
