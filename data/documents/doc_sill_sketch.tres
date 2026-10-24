@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DocumentDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/document_def.gd" id="1_doc"]
+[ext_resource type="Texture2D" uid="uid://btl3cf27q656q" path="res://art/documents/sill_stone.png" id="2_image"]
+
+[resource]
+script = ExtResource("1_doc")
+kind = 1
+title_key = &"DOC_SILL_SKETCH_TITLE"
+image = ExtResource("2_image")
+source_key = &"DOC_SILL_SKETCH_SOURCE"
+world_id = &"world_sill"
+answer_glyphs = PackedInt32Array(35, 24, 29, 10, 19, 22, 8)
+pair_id = &"doc_sill_order"
+arrival = 1
+id = &"doc_sill_sketch"
