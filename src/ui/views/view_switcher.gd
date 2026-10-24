@@ -8,6 +8,9 @@ extends Control
 ## but are invisible, do not process and cannot take focus or the mouse. Only the view root's
 ## own process, focus and mouse modes are changed, and showing the view restores the values
 ## it had before it was hidden; descendants inherit and keep their own settings.
+## The Archive's tab counts its unread documents ("Archive (2)"), as the Archive view
+## reports them. When the Gate Room asks for a document (Read in the Archive on the wormhole
+## screen), the switcher opens the Archive with that document selected.
 ## The switcher holds no game state: it passes the simulation down and forgets it.
 ## Bible: game-design.md#core-loop, technical-architecture.md#signals-and-scenes,
 ## technical-architecture.md#input-accessibility-and-localisation
@@ -119,6 +122,16 @@ func _collect_views() -> void:
 		_ids.append(id)
 		_views[id] = view
 		_set_active(id, false)
+		_connect_view(view)
+
+
+## Listens to the requests of the views that make any: the Archive's unread count and the
+## Gate Room's request to read a document.
+func _connect_view(view: GameView) -> void:
+	if view is ArchiveView:
+		(view as ArchiveView).unread_changed.connect(_refresh_titles)
+	elif view is GateRoomView:
+		(view as GateRoomView).archive_requested.connect(_on_archive_requested)
 
 
 ## Shows [param view_id] and hides the others, without moving focus.
@@ -155,7 +168,10 @@ func _neighbour(offset: int) -> StringName:
 
 func _refresh_titles() -> void:
 	for index: int in _ids.size():
-		_tabs.set_tab_title(index, tr(_views[_ids[index]].get_title_key()))
+		var view: GameView = _views[_ids[index]]
+		var archive: ArchiveView = view as ArchiveView
+		var title: String = archive.get_tab_title() if archive != null else tr(view.get_title_key())
+		_tabs.set_tab_title(index, title)
 
 
 ## Shows or hides the view [param view_id].
@@ -207,3 +223,14 @@ func _on_tab_clicked(index: int) -> void:
 	if index < 0 or index >= _ids.size():
 		return
 	show_view(_ids[index])
+
+
+## Opens the Archive with [param document_id] selected and read, and focuses its row.
+func _on_archive_requested(document_id: StringName) -> void:
+	if not _views.has(ARCHIVE):
+		return
+	var archive: ArchiveView = _views[ARCHIVE] as ArchiveView
+	if archive == null:
+		return
+	archive.open_document(document_id)
+	show_view(ARCHIVE)
