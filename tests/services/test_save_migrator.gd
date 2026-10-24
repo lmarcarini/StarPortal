@@ -32,10 +32,10 @@ func test_current_version_is_pass_through() -> void:
 	assert_dict(result.value).is_equal(data)
 
 
-## The target version is 6, with built-in steps from v1, v2, v3, v4 and v5.
-func test_target_version_is_six() -> void:
-	assert_int(SaveMigrator.TARGET_VERSION).is_equal(6)
-	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([1, 2, 3, 4, 5])
+## The target version is 7, with built-in steps from v1, v2, v3, v4, v5 and v6.
+func test_target_version_is_seven() -> void:
+	assert_int(SaveMigrator.TARGET_VERSION).is_equal(7)
+	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([1, 2, 3, 4, 5, 6])
 
 
 ## Runs only the built-in v1 -> v2 step on [param data].
@@ -268,11 +268,14 @@ func test_v2_adds_gate_power_and_worlds() -> void:
 	var result := SaveMigrator.migrate({"format_version": 2.0, "tick": 9.0, "state": state})
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(6)
+	assert_int(migrated["format_version"]).is_equal(7)
 	var expected := state.duplicate(true)
 	expected.merge(_v3_sections(base_seed))
 	expected["archive"] = {"received": [], "read": {}, "received_tick": {}}
 	expected["address_book"] = {"entries": []}
+	var expected_power: Dictionary = expected["power"]
+	expected_power["banks_installed"] = 1
+	expected_power["install_ticks_left"] = 0
 	var expected_gate: Dictionary = expected["gate"]
 	expected_gate.erase("dial_queue")
 	assert_dict(migrated["state"]).is_equal(expected)
@@ -284,7 +287,7 @@ func test_v2_adds_gate_power_and_worlds() -> void:
 func test_v2_without_state_is_left_for_validation() -> void:
 	var result := SaveMigrator.migrate({"format_version": 2})
 	assert_bool(result.is_ok).is_true()
-	assert_dict(result.value).is_equal({"format_version": 6})
+	assert_dict(result.value).is_equal({"format_version": 7})
 
 
 ## A real v2 file, written by the v2 SaveService (tests/services/fixtures/save_v2.json),

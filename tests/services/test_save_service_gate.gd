@@ -54,6 +54,8 @@ func _sample_state() -> GameState:
 	state.gate.dial_log.append(_log_entry(DialOutcome.Kind.NO_GATE, 0.1 + 0.2, &""))
 	state.gate.dial_log.append(_log_entry(DialOutcome.Kind.BLOCKED, 75.0 / 7.0, &"chulak"))
 	state.gate.dial_log.append(_log_entry(DialOutcome.Kind.HOSTILE_LOCK, 1.0 / 3.0, &"abydos"))
+	state.power.banks_installed = 1
+	state.power.capacity_mwh = 400.0
 	state.power.stored_mwh = 0.1 + 0.2
 	state.worlds.statuses[&"abydos"] = WorldsState.WorldStatus.LOCKED
 	state.worlds.statuses[&"chulak"] = WorldsState.WorldStatus.LOCKED
