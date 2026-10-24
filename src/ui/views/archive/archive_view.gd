@@ -5,16 +5,25 @@ extends GameView
 ## in the image viewer; "Read with…" opens a second document beside the first, offering the
 ## document's pair first, so a note and a rubbing can be read together. The view only composes
 ## the parts and submits the read command; nothing here changes state.
+## The tab title counts the unread documents, read from the Archive in the state.
 ## Bible: game-design.md#core-loop, gate-and-address-spec.md#the-opening-puzzle,
 ## technical-architecture.md#input-accessibility-and-localisation
 
+## The number of unread documents may have changed (a document arrived or was read, or a new
+## simulation was bound); [method get_tab_title] has the new title.
+signal unread_changed
+
 const _TITLE_KEY: StringName = &"ARCHIVE_TITLE"
+const _TITLE_UNREAD_KEY: StringName = &"ARCHIVE_TITLE_UNREAD"
 
 var _simulation: Simulation = null
 ## Documents offered by the open "Read with…" menu, by item index.
 var _menu_ids: Array[StringName] = []
 ## The control that opened the image viewer, given focus back when it closes.
 var _image_return: Control = null
+## A read command was queued while the clock ran: it applies with the next tick, after which
+## the unread count changes.
+var _unread_on_tick: bool = false
 
 @onready var _columns: Control = %Columns
 @onready var _list: DocumentList = %DocumentList
@@ -39,22 +48,26 @@ func _ready() -> void:
 
 func _enter_tree() -> void:
 	EventBus.document_received.connect(_on_document_received)
+	EventBus.tick_advanced.connect(_on_tick_advanced)
 
 
 func _exit_tree() -> void:
 	EventBus.document_received.disconnect(_on_document_received)
+	EventBus.tick_advanced.disconnect(_on_tick_advanced)
 
 
 ## Connects the view to [param simulation]: the list is rebuilt from its Archive, and the
 ## readers and the image viewer are closed.
 func setup(simulation: Simulation) -> void:
 	_simulation = simulation
+	_unread_on_tick = false
 	_list.setup(simulation)
 	_viewer.close()
 	_menu.hide()
 	close_beside()
 	_primary.clear()
 	_link_filter()
+	unread_changed.emit()
 
 
 ## Opens document [param document_id] in the first reader and marks it read. A document not in
@@ -137,6 +150,24 @@ func get_title_key() -> StringName:
 	return _TITLE_KEY
 
 
+## Returns the number of documents in the Archive not read yet; 0 before setup.
+func get_unread_count() -> int:
+	if _simulation == null:
+		return 0
+	var archive: ArchiveState = _simulation.state.archive
+	return (
+		archive.received.filter(func(id: StringName) -> bool: return not archive.is_read(id)).size()
+	)
+
+
+## Returns the translated tab title: "Archive (2)" with unread documents, "Archive" with none.
+func get_tab_title() -> String:
+	var count: int = get_unread_count()
+	if count == 0:
+		return tr(_TITLE_KEY)
+	return tr(_TITLE_UNREAD_KEY).format({"count": count})
+
+
 func _holds(document_id: StringName) -> bool:
 	return _simulation != null and _simulation.state.archive.has_document(document_id)
 
@@ -152,8 +183,11 @@ func _show_in(reader: DocumentReader, document_id: StringName) -> void:
 	reader.show_document(document_id, _def_of(document_id), tick)
 	if archive.is_read(document_id):
 		return
-	if _simulation.submit(MarkDocumentReadCommand.create(document_id)).is_ok:
-		_list.mark_read(document_id)
+	if not _simulation.submit(MarkDocumentReadCommand.create(document_id)).is_ok:
+		return
+	_list.mark_read(document_id)
+	_unread_on_tick = _unread_on_tick or not archive.is_read(document_id)
+	unread_changed.emit()
 
 
 func _read_with_ids() -> Array[StringName]:
@@ -201,3 +235,10 @@ func _on_viewer_closed() -> void:
 
 func _on_document_received(_document_id: StringName) -> void:
 	_update_read_with()
+	unread_changed.emit()
+
+
+func _on_tick_advanced(_tick: int) -> void:
+	if _unread_on_tick:
+		_unread_on_tick = false
+		unread_changed.emit()

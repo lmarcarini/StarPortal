@@ -2,13 +2,15 @@ class_name WormholeScreen
 extends Control
 ## The open wormhole, on top of the Gate Room until it closes: the destination, a plain line
 ## on what is going on, a hostile warning when the far side is guarded, the time left of the
-## maximum open time (live with sim time), the drain and the bank's state, then what the
-## player can do now: Close wormhole (posts CloseWormholeCommand), Read the far Ring's console
-## (ConsoleFinds: what it added, and Open the Address Book) and Send MOTH (shown, disabled, with
-## when it arrives). Open the Address Book steps AWAY: the screen hides behind a return bar,
-## Back to the wormhole (or Cancel) shows it again, and it comes back by itself when the
-## wormhole closes or is about to (time or charge running out). When the wormhole closes, for
-## any reason, the screen says why until the player goes back to the console.
+## maximum open time (live with sim time), the drain, the bank's state and the documents this
+## lock delivered ("New in the Archive: …"), then what the player can do now: Read in the
+## Archive (only with such documents), Close wormhole (posts CloseWormholeCommand), Read the far
+## Ring's console (ConsoleFinds: what it added, and Open the Address Book) and Send MOTH (shown,
+## disabled, with when it arrives). Open the Address Book and Read in the Archive step AWAY: the
+## screen hides behind a return bar, Back to the wormhole (or Cancel) shows it again, and it
+## comes back by itself when the wormhole closes or is about to (time or charge running out).
+## When the wormhole closes, for any reason, the screen says why until the player goes back to
+## the console.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## gate-and-address-spec.md#where-addresses-come-from (Ring consoles),
 ## technical-architecture.md#state-machines
@@ -17,6 +19,9 @@ extends Control
 signal dismissed
 ## The player asked to see the Address Book; the screen has stepped AWAY.
 signal address_book_requested
+## The player asked to read [param document_id], the first document this lock delivered, in
+## the Archive; the screen has stepped AWAY.
+signal archive_requested(document_id: StringName)
 
 ## Phases: HIDDEN, OPEN (a wormhole is open), AWAY (it is open but the screen is set aside
 ## behind the return bar), CLOSED (it closed; the reason is shown).
@@ -37,6 +42,8 @@ var _closed_reason: StringName = &""
 @onready var _time_left: Label = %TimeLeft
 @onready var _drain: Label = %Drain
 @onready var _bank: Label = %Bank
+@onready var _new_documents: Label = %NewDocuments
+@onready var _archive_button: Button = %ArchiveButton
 @onready var _close_button: Button = %CloseButton
 @onready var _console: ConsoleFinds = %ConsoleFinds
 @onready var _return_bar: Control = %ReturnBar
@@ -48,6 +55,7 @@ var _closed_reason: StringName = &""
 
 func _ready() -> void:
 	_close_button.pressed.connect(_on_close_pressed)
+	_archive_button.pressed.connect(_on_archive_pressed)
 	_back_button.pressed.connect(dismiss)
 	_console.book_requested.connect(step_away)
 	_console.focus_changed.connect(_on_console_focus_changed)
@@ -160,6 +168,12 @@ func get_return_button() -> Button:
 	return _return_button
 
 
+## Returns the Read in the Archive button; it shows only while open with documents from this
+## lock, below the line that names them.
+func get_archive_button() -> Button:
+	return _archive_button
+
+
 ## Returns the Close wormhole button.
 func get_close_button() -> Button:
 	return _close_button
@@ -228,6 +242,7 @@ func _show_open(state: GameState) -> void:
 	_time_left.text = WormholeText.time_left(state)
 	_drain.text = WormholeText.drain(state)
 	_bank.text = WormholeText.bank(state)
+	_show_new_documents(state)
 	_return_button.text = tr(&"GATE_WORMHOLE_RETURN").format(
 		{"left": GateRoomFormat.duration(GateQueries.open_ticks_left(state))}
 	)
@@ -235,9 +250,22 @@ func _show_open(state: GameState) -> void:
 	_trap_open_buttons()
 
 
+## Names the documents this lock delivered and offers Read in the Archive; hides both when
+## it delivered none.
+func _show_new_documents(state: GameState) -> void:
+	var defs: Array[DocumentDef] = []
+	for id: StringName in WormholeText.new_documents(state):
+		defs.append(Registry.get_def(id) as DocumentDef)
+	_new_documents.text = WormholeText.new_documents_line(defs)
+	_new_documents.visible = not defs.is_empty()
+	_archive_button.visible = not defs.is_empty()
+
+
 ## Links the open screen's buttons in a focus loop.
 func _trap_open_buttons() -> void:
 	var buttons: Array[Control] = [_close_button]
+	if _archive_button.visible:
+		buttons.push_front(_archive_button)
 	buttons.append_array(_console.get_focusables())
 	OverlayFocus.trap_all(buttons)
 
@@ -256,6 +284,18 @@ func _is_ending_soon(state: GameState) -> bool:
 func _on_close_pressed() -> void:
 	if _simulation != null and _phase == Phase.OPEN:
 		_simulation.submit(CloseWormholeCommand.new())
+
+
+## Read in the Archive steps AWAY, as Open the Address Book does, and asks for the first
+## document this lock delivered. Only while open and when the lock delivered any.
+func _on_archive_pressed() -> void:
+	if _phase != Phase.OPEN:
+		return
+	var document_ids: Array[StringName] = WormholeText.new_documents(_simulation.state)
+	if document_ids.is_empty():
+		return
+	_set_phase(Phase.AWAY)
+	archive_requested.emit(document_ids[0])
 
 
 func _on_console_focus_changed() -> void:

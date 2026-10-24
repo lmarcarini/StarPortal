@@ -50,6 +50,8 @@ GATE_WORMHOLE_SUMMARY,"The wormhole is open, and it is the only one: the Ring ca
 GATE_WORMHOLE_BANK_STEADY,Capacitors: {stored} of {capacity}. The plant covers the drain.,Capacitores: {stored} de {capacity}. A usina cobre o consumo.
 GATE_WORMHOLE_BANK_FALLING,"Capacitors: {stored} of {capacity}, falling. They run dry in {time}, and then the wormhole collapses.","Capacitores: {stored} de {capacity}, caindo. Eles secam em {time}, e então o buraco de minhoca colapsa."
 GATE_WORMHOLE_ACTIONS,What you can do now,O que você pode fazer agora
+GATE_WORMHOLE_NEW_DOCUMENTS,New in the Archive: {titles},Novo no Arquivo: {titles}
+GATE_WORMHOLE_READ_ARCHIVE,Read in the Archive,Ler no Arquivo
 GATE_WORMHOLE_READ_CONSOLE,Read the far Ring's console,Ler o console do Anel distante
 GATE_CONSOLE_HINT,"Copies the far Ring's log of recent dials into the Address Book: two to four nearby addresses, already written for CAIRN.","Copia o registro de discagens recentes do Anel distante para o Livro de Endereços: de dois a quatro endereços próximos, já escritos para a CAIRN."
 GATE_CONSOLE_ADDED,"Console read: {count} new addresses in the Address Book, written for CAIRN. Their worlds stay unknown until you lock them.","Console lido: {count} endereços novos no Livro de Endereços, escritos para a CAIRN. Seus mundos continuam desconhecidos até você abrir uma conexão com eles."
