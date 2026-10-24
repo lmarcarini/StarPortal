@@ -4,8 +4,7 @@
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/console/dial_console.tscn" id="2_console"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/console/address_book_panel.tscn" id="3_book"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/capacitor_gauge.tscn" id="5_gauge"]
-[ext_resource type="PackedScene" path="res://src/ui/gate_room/outcome_banner.tscn" id="7_banner"]
-[ext_resource type="PackedScene" path="res://src/ui/gate_room/wormhole_panel.tscn" id="8_wormhole"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/sequence/gate_overlays.tscn" id="7_overlays"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/dial_log_panel.tscn" id="9_log"]
 
 [node name="GateRoomView" type="Control"]
@@ -52,14 +51,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.0
 
-[node name="OutcomeBanner" parent="Margin/Columns/Right" instance=ExtResource("7_banner")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="WormholePanel" parent="Margin/Columns/Right" instance=ExtResource("8_wormhole")]
-unique_name_in_owner = true
-layout_mode = 2
-
 [node name="Records" type="TabContainer" parent="Margin/Columns/Right"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -76,3 +67,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
+
+[node name="GateOverlays" parent="." instance=ExtResource("7_overlays")]
+unique_name_in_owner = true
+layout_mode = 1

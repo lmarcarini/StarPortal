@@ -19,7 +19,6 @@ GATE_CAPTION_BLOCKED,"[The Ring answers, then shuts out the call.]","[O Anel res
 GATE_CAPTION_ORIGIN_REJECTED,[The last seal fails to engage.],[O último selo não se encaixa.]
 GATE_CAPTION_LOCK,[A low surge. The wormhole opens.],[Um pulso grave. O buraco de minhoca se abre.]
 GATE_CAPTION_HOSTILE_LOCK,[A low surge. The wormhole opens. Something stirs beyond it.],[Um pulso grave. O buraco de minhoca se abre. Algo se move do outro lado.]
-GATE_RING_IDLE,Ring idle,Anel inativo
 GATE_RING_DIALING,Seals engaging: {lit} of {total},Selos engatando: {lit} de {total}
 GATE_RING_LOCKED,Wormhole open,Buraco de minhoca aberto
 GATE_DIAL_HOLD,Hold to dial,Segure para discar
@@ -34,11 +33,6 @@ GATE_GAUGE_TITLE,Capacitors,Capacitores
 GATE_GAUGE_VALUES,{stored} of {capacity},{stored} de {capacity}
 GATE_GAUGE_INSTALL,Install capacitor bank ({duration}),Instalar banco de capacitores ({duration})
 GATE_GAUGE_INSTALLING,Installing: {left} left,Instalando: faltam {left}
-GATE_BANNER_NONE,No dial yet,Nenhuma discagem ainda
-GATE_BANNER_NONE_MEANING,Select an address and hold the dial button.,Selecione um endereço e segure o botão de discar.
-GATE_BANNER_DIALING,Seals engaging,Selos engatando
-GATE_BANNER_DIALING_MEANING,The Ring is dialing. The result comes in two minutes.,O Anel está discando. O resultado sai em dois minutos.
-GATE_WORMHOLE_TITLE,Wormhole,Buraco de minhoca
 GATE_WORMHOLE_DESTINATION,Destination: {designation},Destino: {designation}
 GATE_WORMHOLE_TIME_LEFT,Time left: {left} of {total},Tempo restante: {left} de {total}
 GATE_WORMHOLE_DRAIN,Power drain: {power} MW,Consumo de energia: {power} MW
@@ -48,6 +42,20 @@ GATE_CLOSED_PLAYER,Wormhole closed on your order.,Buraco de minhoca fechado por 
 GATE_CLOSED_TIMEOUT,Wormhole closed: the maximum open time ran out.,Buraco de minhoca fechado: o tempo máximo aberto acabou.
 GATE_CLOSED_POWER,Wormhole collapsed: the capacitors ran dry.,Buraco de minhoca colapsou: os capacitores secaram.
 GATE_CLOSED_OTHER,Wormhole closed.,Buraco de minhoca fechado.
+GATE_SEQ_TITLE,Dialing,Discando
+GATE_SEQ_ADDRESS,Address: {address},Endereço: {address}
+GATE_SEQ_SKIP,Skip,Pular
+GATE_RESULT_OK,OK,OK
+GATE_WORMHOLE_SUMMARY,"The wormhole is open, and it is the only one: the Ring cannot dial another address until this one closes. Right now you can only close it, or leave it open until the time or the capacitors run out. Probes cannot go through yet.","O buraco de minhoca está aberto, e é o único: o Anel não pode discar outro endereço até este fechar. Por enquanto você só pode fechá-lo, ou deixá-lo aberto até o tempo ou os capacitores acabarem. Sondas ainda não podem atravessar."
+GATE_WORMHOLE_BANK_STEADY,Capacitors: {stored} of {capacity}. The plant covers the drain.,Capacitores: {stored} de {capacity}. A usina cobre o consumo.
+GATE_WORMHOLE_BANK_FALLING,"Capacitors: {stored} of {capacity}, falling. They run dry in {time}, and then the wormhole collapses.","Capacitores: {stored} de {capacity}, caindo. Eles secam em {time}, e então o buraco de minhoca colapsa."
+GATE_WORMHOLE_ACTIONS,What you can do now,O que você pode fazer agora
+GATE_WORMHOLE_READ_CONSOLE,Read the far Ring's console,Ler o console do Anel distante
+GATE_WORMHOLE_READ_CONSOLE_LATER,Not available yet.,Ainda não disponível.
+GATE_WORMHOLE_SEND_MOTH,Send the MOTH probe,Enviar a sonda MOTH
+GATE_WORMHOLE_SEND_MOTH_LATER,Probes are not ready yet.,As sondas ainda não estão prontas.
+GATE_WORMHOLE_CLOSED_TITLE,Wormhole closed,Buraco de minhoca fechado
+GATE_WORMHOLE_BACK,Back to the console,Voltar ao console
 GATE_LOG_TITLE,Dial Log,Registro de discagens
 GATE_LOG_EMPTY,No dial has been made yet.,Nenhuma discagem foi feita ainda.
 GATE_LOG_ENERGY,Energy spent: {energy},Energia gasta: {energy}

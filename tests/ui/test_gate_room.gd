@@ -1,6 +1,6 @@
 ## Tests for the Gate Room view: loading an address into the dial console, holding dial,
-## advancing two ticks and reading the outcome banner, the capacitor gauge and the Dial Log,
-## for each of the five outcomes, plus the wormhole panel.
+## letting the dialing sequence resolve it and reading the result card or wormhole screen, the
+## capacitor gauge and the Dial Log, for each of the five outcomes.
 ## Bible: gate-and-address-spec.md#the-dial-console,
 ## gate-and-address-spec.md#dialing-outcomes-and-energy, game-design.md#core-loop
 extends GdUnitTestSuite
@@ -49,7 +49,7 @@ func _panel(node_name: String) -> Node:
 
 
 @warning_ignore("unused_parameter")
-func test_each_outcome_shows_banner_gauge_drop_and_log_row(
+func test_each_outcome_ends_on_its_card_or_screen_with_gauge_drop_and_log_row(
 	outcome: int,
 	test_parameters: Array = [  # gdlint: ignore=unused-argument
 		[DialOutcome.Kind.NO_GATE],
@@ -63,15 +63,24 @@ func test_each_outcome_shows_banner_gauge_drop_and_log_row(
 	_enter(address)
 	_hold_dial()
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.DIALING)
-	var banner: OutcomeBanner = _panel("OutcomeBanner") as OutcomeBanner
-	assert_str(banner.get_name_text()).is_equal("Seals engaging")
-	SimClock.step_ticks(2)
-	assert_int(banner.get_shown_kind()).is_equal(outcome)
-	assert_str(banner.get_name_text()).is_equal(GateRoomFormat.outcome_name(outcome))
-	assert_str(banner.get_meaning_text()).is_equal(GateRoomFormat.outcome_meaning(outcome))
-	assert_str(banner.get_caption_text()).is_equal(GateRoomFormat.outcome_caption(outcome))
+	var overlays: GateOverlays = _view.get_overlays()
+	assert_bool(overlays.get_sequence().is_open()).is_true()
+	assert_str(overlays.get_sequence().get_status_text()).is_equal("Seals engaging: 0 of 8")
+	overlays.get_sequence().skip()
 	var entry: DialLogEntry = _simulation.state.gate.dial_log[0]
 	assert_int(entry.outcome).is_equal(outcome)
+	var card: ResultCard = overlays.get_result_card()
+	var is_lock: bool = DialOutcome.is_lock(outcome)
+	assert_bool(overlays.get_wormhole_screen().is_showing_open()).is_equal(is_lock)
+	assert_bool(card.is_open()).is_equal(not is_lock)
+	if not is_lock:
+		assert_int(card.get_shown_kind()).is_equal(outcome)
+		assert_str(card.get_name_text()).is_equal(GateRoomFormat.outcome_name(outcome))
+		assert_str(card.get_meaning_text()).is_equal(GateRoomFormat.outcome_meaning(outcome))
+		assert_str(card.get_caption_text()).is_equal(GateRoomFormat.outcome_caption(outcome))
+		assert_str(card.get_energy_text()).is_equal(
+			"Energy spent: " + GateRoomFormat.energy(entry.energy_spent_mwh)
+		)
 	var gauge: CapacitorGauge = _panel("CapacitorGauge") as CapacitorGauge
 	assert_float(entry.energy_spent_mwh).is_greater(0.0)
 	assert_float(gauge.get_bar_value()).is_equal_approx(
@@ -84,7 +93,7 @@ func test_each_outcome_shows_banner_gauge_drop_and_log_row(
 	assert_str(GateRoomFormat.date_time(entry.tick)).is_equal("2026-01-01 00:02")
 
 
-func test_banner_icon_shape_differs_per_outcome() -> void:
+func test_outcome_icon_shape_differs_per_outcome() -> void:
 	var shapes: Dictionary[StringName, bool] = {}
 	for kind: int in 5:
 		shapes[OutcomeIcon.shape_of(kind)] = true
@@ -119,49 +128,6 @@ func test_dial_needs_seven_glyphs_and_never_shows_the_needed_charge() -> void:
 	assert_bool(controls.get_dial_button().disabled).is_true()
 
 
-func test_wormhole_panel_shows_a_lock_and_closes_it() -> void:
-	var wormhole: WormholePanel = _panel("WormholePanel") as WormholePanel
-	assert_bool(wormhole.visible).is_false()
-	_enter(Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK))
-	_hold_dial()
-	SimClock.step_ticks(2)
-	assert_bool(wormhole.visible).is_true()
-	assert_str(wormhole.get_destination_text()).is_equal("Destination: P3X-111")
-	assert_str(wormhole.get_time_left_text()).is_equal("Time left: 1 h 0 min of 1 h 0 min")
-	assert_str(wormhole.get_drain_text()).contains("20.0")
-	SimClock.step_ticks(10)
-	assert_str(wormhole.get_time_left_text()).is_equal("Time left: 50 min of 1 h 0 min")
-	wormhole.get_close_button().pressed.emit()
-	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.IDLE)
-	assert_str(wormhole.get_closed_text()).is_equal("Wormhole closed on your order.")
-	assert_str(wormhole.get_destination_text()).is_empty()
-
-
-@warning_ignore("unused_parameter")
-func test_wormhole_panel_says_why_it_closed(
-	reason: StringName,
-	expected: String,
-	test_parameters: Array = [  # gdlint: ignore=unused-argument
-		[&"timeout", "Wormhole closed: the maximum open time ran out."],
-		[&"power", "Wormhole collapsed: the capacitors ran dry."],
-	]
-) -> void:
-	var wormhole: WormholePanel = _panel("WormholePanel") as WormholePanel
-	EventBus.wormhole_closed.emit(reason)
-	assert_str(wormhole.get_closed_text()).is_equal(expected)
-	EventBus.dial_started.emit("0")
-	assert_bool(wormhole.visible).is_false()
-
-
-func test_timeout_closes_the_wormhole_and_the_panel_says_so() -> void:
-	_enter(Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK))
-	_hold_dial()
-	SimClock.step_ticks(2 + _simulation.state.balance.max_open_ticks)
-	var wormhole: WormholePanel = _panel("WormholePanel") as WormholePanel
-	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.IDLE)
-	assert_str(wormhole.get_closed_text()).contains("maximum open time")
-
-
 func test_log_lists_newest_first_and_names_the_world_for_locks_only() -> void:
 	var log_panel: DialLogPanel = _panel("DialLogPanel") as DialLogPanel
 	assert_bool((_panel("DialLogPanel").get_node("%EmptyLabel") as Label).visible).is_true()
@@ -171,7 +137,7 @@ func test_log_lists_newest_first_and_names_the_world_for_locks_only() -> void:
 		_hold_dial()
 		SimClock.step_ticks(2)
 		if kind == DialOutcome.Kind.LOCK:
-			(_panel("WormholePanel") as WormholePanel).get_close_button().pressed.emit()
+			_view.get_overlays().get_wormhole_screen().get_close_button().pressed.emit()
 	var rows: Array[LogRow] = log_panel.get_rows()
 	assert_int(rows.size()).is_equal(2)
 	assert_int(rows[0].get_entry().outcome).is_equal(DialOutcome.Kind.LOCK)

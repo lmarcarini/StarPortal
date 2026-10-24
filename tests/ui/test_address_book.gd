@@ -51,6 +51,8 @@ func _dial(address: GateAddress) -> void:
 	SimClock.step_ticks(2)
 	if _simulation.state.gate.mode == GateState.RingMode.LOCKED:
 		(_view.find_child("CloseButton", true, false) as Button).pressed.emit()
+	_view.get_overlays().get_result_card().dismiss()
+	_view.get_overlays().get_wormhole_screen().dismiss()
 
 
 func _keys() -> Array[String]:

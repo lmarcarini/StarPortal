@@ -1,13 +1,12 @@
-## Tests for the dial console's dial controls and the Ring display: the hold-to-confirm button
-## (held with the mouse path and with the gamepad accept button), the reasons it is disabled,
-## the repeat warning and its second confirmation, and the seal animation following sim time.
+## Tests for the dial console's dial controls: the hold-to-confirm button (held with the mouse
+## path and with the gamepad accept button), the reasons it is disabled, and the repeat
+## warning and its second confirmation. The seal animation is tested in test_dial_sequence.
 ## Bible: gate-and-address-spec.md#the-dial-console,
 ## gate-and-address-spec.md#dialing-outcomes-and-energy,
 ## game-design.md#difficulty-and-accessibility
 extends GdUnitTestSuite
 
 const Fixture := preload("res://tests/ui/gate_room_fixture.gd")
-const RING_SCENE: String = "res://src/ui/gate_room/ring_display.tscn"
 
 var _simulation: Simulation = null
 var _holder: Control = null
@@ -45,17 +44,6 @@ func _controls() -> DialControls:
 
 func _button() -> HoldButton:
 	return _controls().get_dial_button()
-
-
-## The Ring display, mounted on its own beside the view (the console does not show it; the
-## dialing sequence card replaces it).
-func _ring() -> RingDisplay:
-	var ring: RingDisplay = _holder.find_child("RingDisplay", true, false) as RingDisplay
-	if ring == null:
-		ring = (load(RING_SCENE) as PackedScene).instantiate() as RingDisplay
-		_holder.add_child(ring)
-		ring.setup(_simulation)
-	return ring
 
 
 func _hold_fully() -> void:
@@ -231,51 +219,3 @@ func test_a_lock_is_not_a_failed_attempt() -> void:
 	assert_str(_controls().get_warning_text()).is_empty()
 	_hold_fully()
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.DIALING)
-
-
-func test_lit_seals_spread_eight_seals_over_the_dial_duration() -> void:
-	assert_int(RingDisplay.lit_seals(0.0, 2)).is_equal(0)
-	assert_int(RingDisplay.lit_seals(0.5, 2)).is_equal(2)
-	assert_int(RingDisplay.lit_seals(1.0, 2)).is_equal(4)
-	assert_int(RingDisplay.lit_seals(1.5, 2)).is_equal(6)
-	assert_int(RingDisplay.lit_seals(2.0, 2)).is_equal(8)
-	assert_int(RingDisplay.lit_seals(9.0, 2)).is_equal(8)
-	assert_int(RingDisplay.lit_seals(1.0, 0)).is_equal(8)
-
-
-func test_seals_light_per_tick_and_hold_while_paused() -> void:
-	_enter(DialOutcome.Kind.LOCK)
-	assert_int(_ring().get_lit_seals()).is_equal(0)
-	_hold_fully()
-	assert_int(_ring().get_lit_seals()).is_equal(0)
-	assert_str(_ring().get_status_text()).is_equal("Seals engaging: 0 of 8")
-	_ring()._process(5.0)
-	assert_int(_ring().get_lit_seals()).is_equal(0)
-	SimClock.step_ticks(1)
-	assert_int(_ring().get_lit_seals()).is_equal(4)
-	_ring()._process(5.0)
-	assert_int(_ring().get_lit_seals()).is_equal(4)
-	SimClock.step_ticks(1)
-	assert_int(_ring().get_lit_seals()).is_equal(8)
-	assert_str(_ring().get_status_text()).is_equal("Wormhole open")
-
-
-func test_seals_follow_real_time_times_speed_while_running_and_hold_when_held() -> void:
-	_enter(DialOutcome.Kind.LOCK)
-	_hold_fully()
-	_simulation.state.clock.is_paused = false
-	_ring()._process(0.5)
-	assert_int(_ring().get_lit_seals()).is_equal(2)
-	SimClock.hold(&"test")
-	_ring()._process(5.0)
-	assert_int(_ring().get_lit_seals()).is_equal(2)
-	SimClock.release(&"test")
-	_simulation.state.clock.is_paused = true
-	_ring()._process(5.0)
-	assert_int(_ring().get_lit_seals()).is_equal(2)
-	_simulation.state.clock.is_paused = false
-	_simulation.state.clock.speed_index = 3
-	_ring()._process(0.05)
-	assert_int(_ring().get_lit_seals()).is_equal(3)
-	_ring()._process(5.0)
-	assert_int(_ring().get_lit_seals()).is_less(5)
