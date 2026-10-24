@@ -5,10 +5,15 @@ extends GameView
 ## the Dial Log. Loading an Address Book entry fills the console's slots. On top, the overlays
 ## (dialing sequence, result card, wormhole screen) cover the view while one is open and take
 ## focus. The view only composes the panels; every panel reads the simulation and posts its
-## own commands, and nothing here changes state.
+## own commands, and nothing here changes state. When the wormhole screen asks to read a new
+## document in the Archive, the view passes the request on to the switcher.
 ## Bible: gate-and-address-spec.md#the-dial-console,
 ## gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole, game-design.md#core-loop,
 ## technical-architecture.md#input-accessibility-and-localisation
+
+## The wormhole screen stepped aside so the player can read [param document_id] in the
+## Archive.
+signal archive_requested(document_id: StringName)
 
 const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
 ## Tab title keys of the records, in tab order.
@@ -28,6 +33,7 @@ func _ready() -> void:
 	_book.load_requested.connect(_on_load_requested)
 	_overlays.changed.connect(_on_overlays_changed)
 	_overlays.address_book_requested.connect(_on_address_book_requested)
+	_overlays.archive_requested.connect(archive_requested.emit)
 	_gauge.install_started.connect(_on_install_started)
 
 
@@ -67,12 +73,14 @@ func get_overlays() -> GateOverlays:
 	return _overlays
 
 
-## Returns the open overlay's button; else the Dial button while it can be pressed, else the
-## first glyph of the palette.
+## Returns the open overlay's button; else the wormhole's return bar while the wormhole is set
+## aside; else the Dial button while it can be pressed, else the first glyph of the palette.
 func get_default_focus() -> Control:
 	var overlay_focus: Control = _overlays.get_default_focus()
 	if overlay_focus != null:
 		return overlay_focus
+	if _overlays.get_wormhole_screen().is_away():
+		return _overlays.get_wormhole_screen().get_return_button()
 	return _console.get_default_focus()
 
 

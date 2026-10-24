@@ -1,7 +1,8 @@
 class_name WormholeText
 extends RefCounted
 ## Pure text of the wormhole screen over a GameState whose Ring is LOCKED: the destination,
-## the time left, the drain and the bank's state. It never shows an address's lock energy.
+## the time left, the drain, the bank's state and the documents this lock delivered. It never
+## shows an address's lock energy.
 ## Translates with the TranslationServer so it can stay static.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## gate-and-address-spec.md#dialing-outcomes-and-energy
@@ -63,6 +64,30 @@ static func ticks_until_empty(stored_mwh: float, loss_mw: float) -> int:
 	if loss_mw <= 0.0:
 		return -1
 	return maxi(ceili(stored_mwh * PowerMath.TICKS_PER_HOUR / loss_mw), 0)
+
+
+## Returns the documents this lock delivered, in arrival order, read from the Archive: those
+## received on the tick the lock happened. DocumentSystem delivers on the tick a lock is logged,
+## stamped with the clock's tick, one before the lock's own tick (the tick that tick ends at).
+static func new_documents(state: GameState) -> Array[StringName]:
+	var lock_tick: int = state.gate.lock_started_tick
+	var archive: ArchiveState = state.archive
+	if state.gate.mode != GateState.RingMode.LOCKED or lock_tick < 1:
+		return []
+	return archive.received.filter(
+		func(id: StringName) -> bool: return archive.received_tick.get(id, -1) == lock_tick - 1
+	)
+
+
+## Returns "New in the Archive: <title>, <title>" for the documents [param defs] (a null def
+## reads "Untitled document"), or "" for none.
+static func new_documents_line(defs: Array[DocumentDef]) -> String:
+	if defs.is_empty():
+		return ""
+	var titles: PackedStringArray = []
+	for def: DocumentDef in defs:
+		titles.append(DocumentText.title(def))
+	return _format(&"GATE_WORMHOLE_NEW_DOCUMENTS", {"titles": ", ".join(titles)})
 
 
 ## Returns the message for close [param reason].
