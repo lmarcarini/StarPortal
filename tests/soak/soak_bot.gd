@@ -4,15 +4,17 @@ extends RefCounted
 ## releases named system holds through TimeControl (a dozen or so per month). Before anything
 ## else on the Ring it installs the first capacitor bank (InstallCapacitorsCommand) and leaves
 ## the Ring alone until the bank is in. It then works the Ring on every call with no command
-## waiting: with the Ring idle and no address picked it
-## picks one (mostly a random well-formed one whose seal 1 the bank can reach, a real world's
-## true address sometimes); once the bank holds that address's lock energy it dials it
-## directly (an address the bank can never charge is just dropped); and it closes any lock a
-## few ticks after it opens. Every random draw comes from the run's own GameState stream
-## &"soak_bot", so two runs from the same seed act identically, and a saved and reloaded state
-## carries the stream on. The picked address is the bot's own, not game state: it carries on
-## across reloads with the bot.
-## Bible: technical-architecture.md#testing-and-tooling (Soak test)
+## waiting: with the Ring idle and no address picked it picks one (a console's Address Book
+## entry the bank can power sometimes, a real world's true address now and then, otherwise a random
+## well-formed one whose seal 1 the bank can reach); once the bank holds that address's lock
+## energy it dials it directly (an address the bank can never charge is just dropped). When a
+## wormhole opens it reads the far Ring's console (ReadConsoleCommand) if that console is
+## unread, which fills the Address Book, and closes the wormhole a few ticks after it opened.
+## Every random draw comes from the run's own GameState stream &"soak_bot", so two runs from
+## the same seed act identically, and a saved and reloaded state carries the stream on. The
+## picked address is the bot's own, not game state: it carries on across reloads with the bot.
+## Bible: technical-architecture.md#testing-and-tooling (Soak test),
+## gate-and-address-spec.md#where-addresses-come-from (Ring consoles)
 
 ## RandomState stream the bot draws from.
 const STREAM_ID: StringName = &"soak_bot"
@@ -39,8 +41,11 @@ const HOLD_REASONS: Array[StringName] = [&"soak_hold_a", &"soak_hold_b", &"soak_
 const FLAG_KEY_COUNT: int = 16
 ## Largest magnitude of a random int flag value.
 const MAX_INT_VALUE: int = 1000000
+## Chance that a newly picked address is an Address Book entry the bank can power (when the
+## book holds one).
+const BOOK_CHANCE: float = 0.3
 ## Chance that a newly picked address is a real world's true address.
-const TARGET_CHANCE: float = 0.2
+const TARGET_CHANCE: float = 0.1
 ## Ticks an open wormhole stays open before the bot closes it.
 const CLOSE_AFTER_TICKS: int = 5
 
@@ -56,8 +61,10 @@ var resumes: int = 0
 var holds_added: int = 0
 ## Holds the bot released.
 var holds_released: int = 0
-## Addresses the bot picked, of them real worlds' addresses, and those it dropped unreachable.
+## Addresses the bot picked; of them Address Book entries and real worlds' addresses; and
+## those it dropped unreachable.
 var addresses_picked: int = 0
+var book_picked: int = 0
 var targets_picked: int = 0
 var addresses_dropped: int = 0
 ## Every world whose true address the bot picked, in pick order, without repeats.
@@ -66,6 +73,8 @@ var targets: Array[StringName] = []
 var dials: int = 0
 ## Wormholes the bot closed.
 var closes: int = 0
+## Far Ring consoles the bot read.
+var consoles_read: int = 0
 ## Capacitor bank installs the bot started.
 var installs: int = 0
 
@@ -103,8 +112,9 @@ func act(simulation: Simulation) -> void:
 	_submit_random_flag(simulation, rng)
 
 
-## Installs the first capacitor bank and waits for it; then closes a lock open
-## CLOSE_AFTER_TICKS, or, with the Ring idle, picks, drops or dials.
+## Installs the first capacitor bank and waits for it; then, on a lock, reads an unread console
+## or closes the wormhole once it has been open CLOSE_AFTER_TICKS; with the Ring idle, picks,
+## drops or dials.
 func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	var state: GameState = simulation.state
 	if state.power.banks_installed == 0:
@@ -114,7 +124,10 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 		return
 	var gate: GateState = state.gate
 	if gate.mode == GateState.RingMode.LOCKED:
-		if state.clock.tick - gate.lock_started_tick >= CLOSE_AFTER_TICKS:
+		if not state.worlds.is_console_read(gate.connected_world_id):
+			simulation.submit(ReadConsoleCommand.new())
+			consoles_read += 1
+		elif state.clock.tick - gate.lock_started_tick >= CLOSE_AFTER_TICKS:
 			simulation.submit(CloseWormholeCommand.new())
 			closes += 1
 		return
@@ -136,7 +149,13 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 func _pick_address(state: GameState, rng: RandomNumberGenerator) -> void:
 	var origin: int = state.galaxy.home().origin_glyph
 	var first_glyphs: Array[int] = _reachable_first_glyphs(state)
-	if rng.randf() < TARGET_CHANCE:
+	var roll: float = rng.randf()
+	var book: Array[AddressEntry] = _reachable_book_entries(state, first_glyphs)
+	if roll < BOOK_CHANCE and not book.is_empty():
+		var entry: AddressEntry = book[rng.randi_range(0, book.size() - 1)]
+		_picked = _address_from_key(entry.address_key)
+		book_picked += 1
+	elif roll < BOOK_CHANCE + TARGET_CHANCE:
 		var worlds: Array[StringName] = _reachable_worlds(state, first_glyphs)
 		var target: StringName = worlds[rng.randi_range(0, worlds.size() - 1)]
 		_picked = state.galaxy.address_of(target, origin)
@@ -146,6 +165,33 @@ func _pick_address(state: GameState, rng: RandomNumberGenerator) -> void:
 	else:
 		_picked = random_address(rng, origin, first_glyphs)
 	addresses_picked += 1
+
+
+## The Address Book's console entries, in book order, whose seal 1 is one of
+## [param first_glyphs] and whose seal 8 is CAIRN's origin: what a player could dial from the
+## book with this bank. Entries the bot dialed itself are left out: the book keeps every dial,
+## so they would crowd out what the consoles found.
+static func _reachable_book_entries(
+	state: GameState, first_glyphs: Array[int]
+) -> Array[AddressEntry]:
+	var origin: int = state.galaxy.home().origin_glyph
+	var found: Array[AddressEntry] = []
+	for entry: AddressEntry in state.address_book.entries:
+		if entry.source != AddressEntry.Source.CONSOLE:
+			continue
+		var address: GateAddress = _address_from_key(entry.address_key)
+		if address.origin == origin and first_glyphs.has(address.coordinates[0]):
+			found.append(entry)
+	return found
+
+
+## The GateAddress whose key() is [param key].
+static func _address_from_key(key: String) -> GateAddress:
+	var seals: Array[int] = []
+	for part: String in key.split("-"):
+		seals.append(int(part))
+	var origin: int = seals.pop_back()
+	return GateAddress.create(seals, origin)
 
 
 ## Worlds other than CAIRN whose true address starts with one of [param first_glyphs], in

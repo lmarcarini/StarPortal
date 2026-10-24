@@ -5,8 +5,9 @@
 ## Both runs are built by GameSetup from the real data/ content, so PowerSystem and
 ## GateSystem tick all year (and are rebuilt with the galaxy after every load); stored power
 ## must stay within 0..capacity, and never NaN, on every tick. The bot installs the first
-## capacitor bank, then dials directly all year: random addresses mostly, real worlds' true
-## addresses sometimes.
+## capacitor bank, then dials directly all year: Address Book entries, random addresses and
+## now and then a real world's true address; it reads each new far Ring's console when a
+## wormhole opens, which fills the book, and closes the wormhole.
 ## Run with scripts/soak.sh; scripts/test.sh skips this folder.
 ## Bible: technical-architecture.md#testing-and-tooling (Soak test),
 ## technical-architecture.md#save-system, gate-and-address-spec.md#the-dial-console
@@ -120,7 +121,8 @@ func test_year_with_monthly_save_and_load_matches_uninterrupted_run() -> void:
 func _summary(elapsed_msec: int) -> String:
 	var template := "soak: %d ticks x 2 runs in %.2f s; %d day_started, %d month_closed, "
 	template += "%d reloads, %d commands (%d while paused), %d pauses; %d dials (%d locks), "
-	template += "%d closes, %d picked (%d targets, %d dropped)"
+	template += "%d closes, %d consoles read, %d book entries; "
+	template += "%d picked (%d from the book, %d targets, %d dropped)"
 	var bot: SoakBot = _reloaded.bot
 	var values: Array = [
 		YEAR_TICKS,
@@ -134,7 +136,10 @@ func _summary(elapsed_msec: int) -> String:
 		bot.dials,
 		_locks(_reloaded),
 		bot.closes,
+		bot.consoles_read,
+		_reloaded.simulation.state.address_book.entries.size(),
 		bot.addresses_picked,
+		bot.book_picked,
 		bot.targets_picked,
 		bot.addresses_dropped,
 	]
@@ -220,7 +225,9 @@ func _assert_run_events(
 
 
 ## Checks [param run] worked the Ring all year: it dialed, locked (a true target address, at
-## least), closed, and the Dial Log holds every dial; only dialed targets have a status.
+## least), read consoles, dialed from the Address Book, closed, and the Dial Log holds every
+## dial; every world with a status is named by the Address Book entry that locked it, and every
+## console the bot read is marked read.
 func _assert_run_ring(run: SoakRun) -> void:
 	var state: GameState = run.simulation.state
 	var bot: SoakBot = run.bot
@@ -229,8 +236,14 @@ func _assert_run_ring(run: SoakRun) -> void:
 	assert_int(bot.targets_picked).is_greater(0)
 	assert_int(_locks(run)).is_greater(0)
 	assert_int(bot.closes).is_greater(0)
+	assert_int(bot.consoles_read).is_greater(0)
+	assert_int(state.worlds.consoles_read.size()).is_equal(bot.consoles_read)
+	assert_int(bot.book_picked).is_greater(0)
+	var named: Array[StringName] = []
+	for entry: AddressEntry in state.address_book.entries:
+		named.append(entry.world_id)
 	for world_id: StringName in state.worlds.statuses:
-		assert_bool(bot.targets.has(world_id)).override_failure_message(world_id).is_true()
+		assert_bool(named.has(world_id)).override_failure_message(world_id).is_true()
 
 
 ## Locks and hostile locks in [param run]'s Dial Log.

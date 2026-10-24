@@ -174,3 +174,10 @@ Each entry has four fields:
 - **Decision:** Progression, lore and puzzle writing get their own `design` cards. The owner approves their output before content cards build on it.
 - **Reason:** The owner expects progression, lore and puzzles to need their own cards, apart from code.
 - **Bible section:** [roadmap.md#working-process](bible/roadmap.md#working-process)
+
+## 2026-10-24 — Galaxy generator version stays 1 until the first public build
+
+- **Date:** 2026-10-24
+- **Decision:** `WorldGenerator.GENERATOR_VERSION` stays 1 until the first public build; pre-release saves are not guaranteed galaxy-stable across content changes.
+- **Reason:** Content changes (new authored worlds, anchor edits) change the galaxy a seed gives. Bumping the version for every one before release would only lock testers out of saves nobody has promised to keep; testers start a new game on each build instead.
+- **Bible section:** [technical-architecture.md#save-system](bible/technical-architecture.md#save-system)
