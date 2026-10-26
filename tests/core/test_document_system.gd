@@ -1,8 +1,10 @@
 ## Tests for DocumentSystem and the AT_START delivery of GameSetup.build_new(): start documents
-## in id order and only for a new game, ON_FIRST_LOCK documents delivered on the tick their
-## world locks and never twice (relock, save and reload), one pause request per delivery tick.
+## in id order and only for a new game; ON_FIRST_LOCK documents delivered only when the pole
+## camera takes the world's horizon record (never on the lock alone), once per world (relock,
+## save and reload), nothing when the wormhole closes first, one pause request per delivery tick.
 ## Bible: technical-architecture.md#narrative-and-event-scripting,
-## gate-and-address-spec.md#where-addresses-come-from
+## gate-and-address-spec.md#where-addresses-come-from,
+## game-design.md#base-building-and-power (the pole camera, horizon record)
 extends GdUnitTestSuite
 
 const DialFixture := preload("res://tests/gate/dial_fixture.gd")
@@ -49,17 +51,26 @@ func _simulation_over(game: GameState) -> Simulation:
 	return simulation
 
 
-## Dials world [param id] and runs until the dial resolves, then closes any wormhole.
+## Dials world [param id] and runs until the dial resolves, leaving any wormhole open, with
+## the clock paused.
 func _dial(id: StringName) -> void:
-	_state.clock.is_paused = true
-	var address: GateAddress = DialFixture.address_of(_state.galaxy, id)
-	assert_bool(_simulation.submit(DialCommand.create(address)).is_ok).is_true()
-	_state.clock.is_paused = false
-	_simulation.advance_tick()
-	_simulation.advance_tick()
 	_state.clock.is_paused = true
 	if _state.gate.mode == GateState.RingMode.LOCKED:
 		_simulation.submit(CloseWormholeCommand.new())
+	var address: GateAddress = DialFixture.address_of(_state.galaxy, id)
+	assert_bool(_simulation.submit(DialCommand.create(address)).is_ok).is_true()
+	_run(2)
+
+
+## Runs [param ticks] ticks; the clock stays paused between them, so commands apply at once.
+func _run(ticks: int) -> void:
+	for _tick: int in ticks:
+		_simulation.advance_tick()
+
+
+## Extends the pole camera; returns the result.
+func _extend() -> CommandResult:
+	return _simulation.submit(ExtendPoleCameraCommand.new())
 
 
 ## Saves [member _state] to JSON, loads it, and rebuilds the simulation around the copy.
@@ -69,28 +80,47 @@ func _reload() -> void:
 	var loaded: GameState = GameState.from_dict(data)
 	loaded.balance = _state.balance
 	loaded.galaxy = _state.galaxy
-	loaded.power.capacity_mwh = DialFixture.CAPACITY_MWH
-	loaded.power.stored_mwh = DialFixture.CAPACITY_MWH
 	loaded.clock.is_paused = true
 	_state = loaded
 	_simulation = _simulation_over(loaded)
 
 
-## Both of a world's documents arrive on the lock tick, in id order, each posted once, with
-## one pause request.
-func test_lock_delivers_the_worlds_documents_with_one_pause() -> void:
+## A lock alone delivers nothing, however long the wormhole stays open.
+func test_lock_alone_delivers_nothing() -> void:
 	_dial(DialFixture.OPEN_ID)
+	assert_int(_state.gate.mode).is_equal(GateState.RingMode.LOCKED)
+	_run(20)
+	assert_array(_state.archive.received).is_empty()
+	assert_array(_pauses).is_empty()
+
+
+## Extending delivers both of the world's documents in id order on the camera's fifth tick, after
+## horizon_record_taken, each posted once, with one pause request; the record is marked taken.
+func test_extending_delivers_the_worlds_documents_once() -> void:
+	_dial(DialFixture.OPEN_ID)
+	_events.clear()
+	assert_bool(_extend().is_ok).is_true()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS - 1)
+	assert_array(_state.archive.received).is_empty()
+	assert_bool(_state.worlds.is_pole_camera_out()).is_true()
+	var record_tick: int = _state.clock.tick
+	_run(1)
 	assert_array(_state.archive.received).is_equal([&"doc_a_open", &"doc_b_open"])
-	assert_int(_events.count(&"document_received")).is_equal(2)
+	assert_array(_events).is_equal(
+		[&"horizon_record_taken", &"document_received", &"document_received"]
+	)
 	assert_array(_pauses).is_equal([&"document_received"])
-	var lock_tick: int = _state.gate.dial_log[0].tick
-	assert_int(_state.archive.received_tick[&"doc_a_open"]).is_equal(lock_tick - 1)
+	assert_int(_state.archive.received_tick[&"doc_a_open"]).is_equal(record_tick)
+	assert_bool(_state.worlds.is_horizon_record_taken(DialFixture.OPEN_ID)).is_true()
+	assert_bool(_state.worlds.is_pole_camera_out()).is_false()
 	assert_array(GameState.validate_dict(_state.to_dict())).is_empty()
 
 
 ## A document of another world, or with NEVER, does not arrive.
 func test_other_worlds_and_never_do_not_arrive() -> void:
 	_dial(DialFixture.OPEN_ID)
+	_extend()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
 	assert_bool(_state.archive.has_document(&"doc_guarded")).is_false()
 	assert_bool(_state.archive.has_document(&"doc_never")).is_false()
 
@@ -98,76 +128,98 @@ func test_other_worlds_and_never_do_not_arrive() -> void:
 ## A hostile lock is a lock.
 func test_hostile_lock_delivers() -> void:
 	_dial(DialFixture.GUARDED_ID)
+	_extend()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
 	assert_array(_state.archive.received).is_equal([&"doc_guarded"])
 
 
-## A failed dial delivers nothing and requests no pause.
-func test_failed_dial_delivers_nothing() -> void:
-	_dial(DialFixture.BURIED_ID)
-	assert_array(_state.archive.received).is_empty()
+## A world with no documents still gives its record, with no pause.
+func test_world_without_documents_gives_a_record_and_no_pause() -> void:
+	_documents = []
+	_simulation = _simulation_over(_state)
+	_dial(DialFixture.OPEN_ID)
+	_extend()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
+	assert_bool(_state.worlds.is_horizon_record_taken(DialFixture.OPEN_ID)).is_true()
+	assert_int(_events.count(&"horizon_record_taken")).is_equal(1)
 	assert_array(_pauses).is_empty()
 
 
-## Locking the world again delivers nothing new and requests no pause.
-func test_relock_delivers_nothing() -> void:
+## A second lock of the world refuses the camera with already_taken and delivers nothing new.
+func test_second_lock_is_already_taken() -> void:
 	_dial(DialFixture.OPEN_ID)
+	_extend()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
 	_events.clear()
 	_pauses.clear()
 	_dial(DialFixture.OPEN_ID)
+	assert_str(_extend().error_code).is_equal(&"already_taken")
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
 	assert_array(_state.archive.received).is_equal([&"doc_a_open", &"doc_b_open"])
 	assert_int(_events.count(&"document_received")).is_equal(0)
 	assert_array(_pauses).is_empty()
 
 
-## Lock, save, reload, lock again, and reload before the first lock: each document arrives
-## exactly once.
-func test_reload_between_locks_never_redelivers() -> void:
+## The player closing the wormhole mid-extension pulls the camera back with nothing taken; a
+## later lock can complete it.
+func test_close_mid_extension_delivers_nothing_and_a_later_lock_completes() -> void:
 	_dial(DialFixture.OPEN_ID)
-	_reload()
-	assert_int(_events.count(&"document_received")).is_equal(0)
-	_simulation.advance_tick()
-	_simulation.advance_tick()
-	assert_int(_events.count(&"document_received")).is_equal(0)
-	_dial(DialFixture.OPEN_ID)
-	assert_array(_state.archive.received).is_equal([&"doc_a_open", &"doc_b_open"])
-	assert_int(_events.count(&"document_received")).is_equal(0)
-	assert_array(_pauses).is_empty()
-	_dial(DialFixture.GUARDED_ID)
-	_reload()
-	_dial(DialFixture.GUARDED_ID)
-	(
-		assert_array(
-			_state.archive.received.filter(
-				func(id: StringName) -> bool: return id == &"doc_guarded"
-			)
-		)
-		. has_size(1)
-	)
-
-
-## A reload that happens after the lock but before the next tick (statuses saved as LOCKED,
-## Dial Log holding the lock) delivers nothing more: only the lock tick itself delivers.
-func test_reload_with_a_lock_in_the_log_and_no_archive_entry_waits_for_a_new_lock() -> void:
-	_dial(DialFixture.OPEN_ID)
-	_state.archive = ArchiveState.new()
-	_reload()
-	_simulation.advance_tick()
+	_extend()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS - 1)
+	_simulation.submit(CloseWormholeCommand.new())
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
 	assert_array(_state.archive.received).is_empty()
+	assert_bool(_state.worlds.is_pole_camera_out()).is_false()
+	assert_bool(_state.worlds.is_horizon_record_taken(DialFixture.OPEN_ID)).is_false()
+	assert_int(_events.count(&"horizon_record_taken")).is_equal(0)
+	_dial(DialFixture.OPEN_ID)
+	assert_bool(_extend().is_ok).is_true()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
+	assert_array(_state.archive.received).is_equal([&"doc_a_open", &"doc_b_open"])
 
 
-## The delivery posts the pause on the lock tick of a running clock, which pauses it.
+## A time-out on the camera's last tick closes the wormhole first: nothing is taken.
+func test_timeout_on_the_last_tick_delivers_nothing() -> void:
+	_dial(DialFixture.OPEN_ID)
+	var open_left: int = GateQueries.open_ticks_left(_state)
+	_run(open_left - ExtendPoleCameraCommand.EXTEND_TICKS)
+	assert_bool(_extend().is_ok).is_true()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
+	assert_int(_state.gate.mode).is_equal(GateState.RingMode.IDLE)
+	assert_array(_state.archive.received).is_empty()
+	assert_bool(_state.worlds.is_pole_camera_out()).is_false()
+
+
+## A save and reload mid-extension keeps the camera's progress: the record comes on time, once.
+func test_reload_mid_extension_keeps_progress() -> void:
+	_dial(DialFixture.OPEN_ID)
+	_extend()
+	_run(2)
+	_reload()
+	assert_int(_state.worlds.pole_camera_ticks_left).is_equal(
+		ExtendPoleCameraCommand.EXTEND_TICKS - 2
+	)
+	assert_str(_extend().error_code).is_equal(&"camera_busy")
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS - 3)
+	assert_array(_state.archive.received).is_empty()
+	_run(1)
+	assert_array(_state.archive.received).is_equal([&"doc_a_open", &"doc_b_open"])
+	_reload()
+	_dial(DialFixture.OPEN_ID)
+	assert_str(_extend().error_code).is_equal(&"already_taken")
+
+
+## The delivery pauses a running clock on the record's tick.
 func test_running_clock_pauses_on_delivery() -> void:
-	var previous_clock: ClockState = _state.clock
-	_state.clock.is_paused = true
-	var address: GateAddress = DialFixture.address_of(_state.galaxy, DialFixture.OPEN_ID)
-	_simulation.submit(DialCommand.create(address))
-	assert_int(previous_clock.tick).is_equal(0)
+	_dial(DialFixture.OPEN_ID)
+	_extend()
+	_state.clock.is_paused = false
 	var ticks: int = 0
 	while _pauses.is_empty() and ticks < 10:
 		_simulation.advance_tick()
 		ticks += 1
 	assert_array(_pauses).is_equal([&"document_received"])
-	assert_int(ticks).is_equal(2)
+	assert_int(ticks).is_equal(ExtendPoleCameraCommand.EXTEND_TICKS)
 
 
 # --- GameSetup -------------------------------------------------------------

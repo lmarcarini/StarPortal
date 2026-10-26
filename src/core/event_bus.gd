@@ -55,6 +55,10 @@ signal address_book_changed
 ## through the outbox).
 @warning_ignore("unused_signal")
 signal capacitors_installed(capacity_mwh: float)
+## Emitted when the pole camera takes a world's horizon record, with the world id (posted
+## through the outbox).
+@warning_ignore("unused_signal")
+signal horizon_record_taken(world_id: StringName)
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared

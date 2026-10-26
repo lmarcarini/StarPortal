@@ -60,6 +60,7 @@ static func register_defaults() -> void:
 	_types[NoteAddressCommand.TYPE] = NoteAddressCommand
 	_types[InstallCapacitorsCommand.TYPE] = InstallCapacitorsCommand
 	_types[ReadConsoleCommand.TYPE] = ReadConsoleCommand
+	_types[ExtendPoleCameraCommand.TYPE] = ExtendPoleCameraCommand
 
 
 ## Drops every registration, so tests can restore a clean registry. The built-in types are

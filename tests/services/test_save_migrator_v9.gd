@@ -75,6 +75,21 @@ func test_v8_save_file_loads_into_v9() -> void:
 	assert_bool(loaded.worlds.is_pole_camera_out()).is_false()
 
 
+## After loading the v8 file, the open wormhole to SILL refuses the pole camera with
+## already_taken, and running on delivers nothing: SILL's documents never come twice.
+func test_v8_save_never_redelivers() -> void:
+	var loaded: GameState = _load_fixture()
+	var received: Array[StringName] = loaded.archive.received.duplicate()
+	var built: Result = GameSetup.build(loaded, GameDefs.from_registry(Registry))
+	assert_bool(built.is_ok).is_true()
+	var simulation: Simulation = built.value
+	var result: CommandResult = simulation.submit(ExtendPoleCameraCommand.new())
+	assert_str(result.error_code).is_equal(&"already_taken")
+	for _tick: int in 10:
+		simulation.advance_tick()
+	assert_array(loaded.archive.received).is_equal(received)
+
+
 ## Loads the fixture through a SaveService with a temporary saves_dir.
 func _load_fixture() -> GameState:
 	var service: SaveServiceScript = SaveServiceScript.new()
