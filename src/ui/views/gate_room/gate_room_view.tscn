@@ -3,9 +3,27 @@
 [ext_resource type="Script" path="res://src/ui/views/gate_room/gate_room_view.gd" id="1_gate_room_view"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/console/dial_console.tscn" id="2_console"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/console/address_book_panel.tscn" id="3_book"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/ring/ring_view.tscn" id="4_ring"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/capacitor_gauge.tscn" id="5_gauge"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/sequence/dial_sequence.tscn" id="6_sequence"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/sequence/gate_overlays.tscn" id="7_overlays"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/dial_log_panel.tscn" id="9_log"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_window"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0.05, 0.06, 0.08, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.2, 0.22, 0.24, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="GateRoomView" type="Control"]
 layout_mode = 3
@@ -29,40 +47,65 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 4
 
-[node name="Columns" type="HBoxContainer" parent="Margin"]
+[node name="Rows" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Window" type="PanelContainer" parent="Margin/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_window")
+
+[node name="Stage" type="HBoxContainer" parent="Margin/Rows/Window"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LeftWing" type="CenterContainer" parent="Margin/Rows/Window/Stage"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DialSequence" parent="Margin/Rows/Window/Stage/LeftWing" instance=ExtResource("6_sequence")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RingView" parent="Margin/Rows/Window/Stage" instance=ExtResource("4_ring")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 72)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightWing" type="VBoxContainer" parent="Margin/Rows/Window/Stage"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="CapacitorGauge" parent="Margin/Rows/Window/Stage/RightWing" instance=ExtResource("5_gauge")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Desk" type="HBoxContainer" parent="Margin/Rows"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Left" type="VBoxContainer" parent="Margin/Columns"]
+[node name="DialConsole" parent="Margin/Rows/Desk" instance=ExtResource("2_console")]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 
-[node name="DialConsole" parent="Margin/Columns/Left" instance=ExtResource("2_console")]
+[node name="Records" type="TabContainer" parent="Margin/Rows/Desk"]
 unique_name_in_owner = true
-layout_mode = 2
-
-[node name="CapacitorGauge" parent="Margin/Columns/Left" instance=ExtResource("5_gauge")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Right" type="VBoxContainer" parent="Margin/Columns"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 1.0
-
-[node name="Records" type="TabContainer" parent="Margin/Columns/Right"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
 current_tab = 0
 
-[node name="AddressBookPanel" parent="Margin/Columns/Right/Records" instance=ExtResource("3_book")]
+[node name="AddressBookPanel" parent="Margin/Rows/Desk/Records" instance=ExtResource("3_book")]
 unique_name_in_owner = true
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="DialLogPanel" parent="Margin/Columns/Right/Records" instance=ExtResource("9_log")]
+[node name="DialLogPanel" parent="Margin/Rows/Desk/Records" instance=ExtResource("9_log")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

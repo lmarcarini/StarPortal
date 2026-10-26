@@ -181,7 +181,7 @@ func test_escape_and_gamepad_b_skip() -> void:
 ## stays lit; nothing blinks.
 func test_each_seal_lights_once_and_stays_lit() -> void:
 	_hold_dial(DialOutcome.Kind.LOCK)
-	var ring: SealRing = _sequence().find_child("SealRing", true, false) as SealRing
+	var ring: SealRing = _view.find_child("SealRing", true, false) as SealRing
 	var previous: int = 0
 	while _sequence().is_open():
 		_sequence().advance(0.07)

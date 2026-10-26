@@ -42,7 +42,6 @@ GATE_CLOSED_PLAYER,Wormhole closed on your order.,Buraco de minhoca fechado por 
 GATE_CLOSED_TIMEOUT,Wormhole closed: the maximum open time ran out.,Buraco de minhoca fechado: o tempo máximo aberto acabou.
 GATE_CLOSED_POWER,Wormhole collapsed: the capacitors ran dry.,Buraco de minhoca colapsou: os capacitores secaram.
 GATE_CLOSED_OTHER,Wormhole closed.,Buraco de minhoca fechado.
-GATE_SEQ_TITLE,Dialing,Discando
 GATE_SEQ_ADDRESS,Address: {address},Endereço: {address}
 GATE_SEQ_SKIP,Skip,Pular
 GATE_RESULT_OK,OK,OK

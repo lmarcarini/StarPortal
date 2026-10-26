@@ -1,10 +1,12 @@
 class_name GateRoomView
 extends GameView
-## The Gate Room view: the dial console (slots, palette and the hold-to-dial button) over the
-## capacitor gauge (stored charge and capacity only), beside the records: the Address Book and
-## the Dial Log. Loading an Address Book entry fills the console's slots. On top, the overlays
-## (dialing sequence, result card, wormhole screen) cover the view while one is open and take
-## focus. The view only composes the panels; every panel reads the simulation and posts its
+## The Gate Room view, in the hybrid layout: at the top, the window onto the Gate Room floor
+## with the Ring view in the centre (the dialing sequence's caption to its left, the capacitor
+## gauge to its right); below it the desk: the dial console (slots, palette and the hold-to-dial
+## button) beside the records, the Address Book and the Dial Log. Loading an Address Book entry
+## fills the console's slots. The dialing sequence plays on the Ring; the result card covers
+## the view and the wormhole screen covers the desk below the Ring while one is open, and they
+## take focus. The view only composes the panels; every panel reads the simulation and posts its
 ## own commands, and nothing here changes state. When the wormhole screen asks to read a new
 ## document in the Archive, the view passes the request on to the switcher.
 ## Bible: gate-and-address-spec.md#the-dial-console,
@@ -25,9 +27,15 @@ const _RECORD_TITLE_KEYS: Array[StringName] = [&"BOOK_TITLE", &"GATE_LOG_TITLE"]
 @onready var _book: AddressBookPanel = %AddressBookPanel
 @onready var _log: DialLogPanel = %DialLogPanel
 @onready var _overlays: GateOverlays = %GateOverlays
+@onready var _window: Control = %Window
+@onready var _ring: RingView = %RingView
+@onready var _sequence: DialSequence = %DialSequence
 
 
 func _ready() -> void:
+	_overlays.attach(_sequence, _ring)
+	_window.resized.connect(_on_window_resized)
+	_on_window_resized.call_deferred()
 	for index: int in _RECORD_TITLE_KEYS.size():
 		_records.set_tab_title(index, _RECORD_TITLE_KEYS[index])
 	_book.load_requested.connect(_on_load_requested)
@@ -55,6 +63,7 @@ func setup(simulation: Simulation) -> void:
 	_console.setup(simulation)
 	_book.setup(simulation)
 	_log.setup(simulation)
+	_ring.setup(simulation.state.gate.mode)
 	_overlays.setup(simulation)
 
 
@@ -66,6 +75,11 @@ func get_console() -> DialConsole:
 ## Returns the Address Book panel.
 func get_address_book() -> AddressBookPanel:
 	return _book
+
+
+## Returns the Ring view.
+func get_ring_view() -> RingView:
+	return _ring
 
 
 ## Returns the overlays (dialing sequence, result card, wormhole screen).
@@ -100,10 +114,14 @@ func _ensure_focus() -> void:
 	if focused != null:
 		var is_stuck: bool = focused is BaseButton and (focused as BaseButton).disabled
 		if _overlays.is_open():
-			is_stuck = not _overlays.is_ancestor_of(focused)
+			is_stuck = not _overlays.holds(focused)
 		if not is_ancestor_of(focused) or not is_stuck:
 			return
 	get_default_focus().grab_focus()
+
+
+func _on_window_resized() -> void:
+	_overlays.keep_clear_above(_window.get_global_rect().end.y - get_global_rect().position.y)
 
 
 func _on_load_requested(address: GateAddress) -> void:
