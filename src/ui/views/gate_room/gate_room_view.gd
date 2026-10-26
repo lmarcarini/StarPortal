@@ -1,8 +1,9 @@
 class_name GateRoomView
 extends GameView
 ## The Gate Room view: the dial console (slots, palette and the hold-to-dial button) over the
-## capacitor gauge (stored charge and capacity only), beside the records: the Address Book and
-## the Dial Log. Loading an Address Book entry fills the console's slots. On top, the overlays
+## capacitor gauge (stored charge and capacity only), beside the records: the Address Book (dials
+## and their outcomes are in the Archive's operations log). Loading an Address Book entry fills
+## the console's slots. On top, the overlays
 ## (dialing sequence, result card, wormhole screen) cover the view while one is open and take
 ## focus. The view only composes the panels; every panel reads the simulation and posts its
 ## own commands, and nothing here changes state. When the wormhole screen asks to read a new
@@ -17,13 +18,12 @@ signal archive_requested(document_id: StringName)
 
 const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
 ## Tab title keys of the records, in tab order.
-const _RECORD_TITLE_KEYS: Array[StringName] = [&"BOOK_TITLE", &"GATE_LOG_TITLE"]
+const _RECORD_TITLE_KEYS: Array[StringName] = [&"BOOK_TITLE"]
 
 @onready var _console: DialConsole = %DialConsole
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
 @onready var _records: TabContainer = %Records
 @onready var _book: AddressBookPanel = %AddressBookPanel
-@onready var _log: DialLogPanel = %DialLogPanel
 @onready var _overlays: GateOverlays = %GateOverlays
 
 
@@ -54,7 +54,6 @@ func setup(simulation: Simulation) -> void:
 	_gauge.setup(simulation)
 	_console.setup(simulation)
 	_book.setup(simulation)
-	_log.setup(simulation)
 	_overlays.setup(simulation)
 
 
