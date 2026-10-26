@@ -1,6 +1,7 @@
 class_name ArchiveView
 extends GameView
-## The Archive view: every document the player holds in a list beside a reader. Opening a
+## The Archive view, in two sections: Documents and the operations Log (LogList). Documents:
+## every document the player holds in a list beside a reader. Opening a
 ## document reads it (a MarkDocumentReadCommand clears its unread mark); its image opens large
 ## in the image viewer; "Read with…" opens a second document beside the first, offering the
 ## document's pair first, so a note and a rubbing can be read together. The view only composes
@@ -15,6 +16,8 @@ signal unread_changed
 
 const _TITLE_KEY: StringName = &"ARCHIVE_TITLE"
 const _TITLE_UNREAD_KEY: StringName = &"ARCHIVE_TITLE_UNREAD"
+## Section tab title keys, in tab order.
+const _SECTION_KEYS: Array[StringName] = [&"ARCHIVE_SECTION_DOCUMENTS", &"ARCHIVE_SECTION_LOG"]
 
 var _simulation: Simulation = null
 ## Documents offered by the open "Read with…" menu, by item index.
@@ -25,7 +28,9 @@ var _image_return: Control = null
 ## the unread count changes.
 var _unread_on_tick: bool = false
 
+@onready var _sections: TabContainer = %Sections
 @onready var _columns: Control = %Columns
+@onready var _log: LogList = %LogList
 @onready var _list: DocumentList = %DocumentList
 @onready var _primary: DocumentReader = %PrimaryReader
 @onready var _secondary: DocumentReader = %SecondaryReader
@@ -34,6 +39,8 @@ var _unread_on_tick: bool = false
 
 
 func _ready() -> void:
+	for index: int in _SECTION_KEYS.size():
+		_sections.set_tab_title(index, _SECTION_KEYS[index])
 	_secondary.set_secondary(true)
 	_secondary.hide()
 	_list.document_chosen.connect(open_document)
@@ -62,6 +69,7 @@ func setup(simulation: Simulation) -> void:
 	_simulation = simulation
 	_unread_on_tick = false
 	_list.setup(simulation)
+	_log.setup(simulation)
 	_viewer.close()
 	_menu.hide()
 	close_beside()
@@ -75,6 +83,7 @@ func setup(simulation: Simulation) -> void:
 func open_document(document_id: StringName) -> void:
 	if not _holds(document_id):
 		return
+	show_section(false)
 	_show_in(_primary, document_id)
 	_list.set_selected(document_id)
 	if _secondary.get_document_id() == document_id:
@@ -120,6 +129,16 @@ func open_read_with_menu() -> void:
 	_menu.set_focused_item(0)
 
 
+## Shows the Documents section ([param show_log] false) or the Log.
+func show_section(show_log: bool) -> void:
+	_sections.current_tab = 1 if show_log else 0
+
+
+## Returns the operations log list.
+func get_log_list() -> LogList:
+	return _log
+
+
 ## Returns the document list.
 func get_list() -> DocumentList:
 	return _list
@@ -140,8 +159,11 @@ func get_read_with_menu() -> PopupMenu:
 	return _menu
 
 
-## Returns the selected document's row, else the first row, else the kind filter.
+## In Documents, the selected document's row, else the first row, else the kind filter; in the
+## Log, its first row shown, else its kind filter.
 func get_default_focus() -> Control:
+	if _sections.current_tab == 1:
+		return _log.get_first_focus()
 	return _list.get_first_focus()
 
 

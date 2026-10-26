@@ -105,7 +105,7 @@ func test_the_archive_fits_the_minimum_window_and_no_text_is_clipped(
 	]
 ) -> void:
 	await _build(locale, is_pseudo)
-	_assert_fits(_view.get_node("Columns") as Control)
+	_assert_fits(_view.get_node("%Columns") as Control)
 	assert_array(_clipped(_view)).is_empty()
 	var reader: DocumentReader = _view.get_reader()
 	assert_float(reader.get_scroll().size.y).is_greater(200.0)

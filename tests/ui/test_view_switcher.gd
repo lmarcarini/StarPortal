@@ -118,6 +118,9 @@ func test_moving_along_the_focused_tabs_keeps_focus_on_them() -> void:
 	await _press_action(&"ui_right")
 	assert_object(_focus_owner()).is_same(_view(&"archive").get_default_focus())
 	await _press_action(&"ui_up")
+	var sections: TabContainer = _view(&"archive").get_node("%Sections") as TabContainer
+	assert_object(_focus_owner()).is_same(sections.get_tab_bar())
+	await _press_action(&"ui_up")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_left")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")

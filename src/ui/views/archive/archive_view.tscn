@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://src/ui/archive/document_list.tscn" id="2_list"]
 [ext_resource type="PackedScene" path="res://src/ui/archive/document_reader.tscn" id="3_reader"]
 [ext_resource type="PackedScene" path="res://src/ui/archive/image_viewer.tscn" id="4_viewer"]
+[ext_resource type="PackedScene" path="res://src/ui/archive/log_list.tscn" id="5_log"]
 
 [node name="ArchiveView" type="Control"]
 layout_mode = 3
@@ -15,34 +16,46 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_archive_view")
 
-[node name="Columns" type="HBoxContainer" parent="."]
+[node name="Sections" type="TabContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 8.0
-offset_top = 8.0
+offset_top = 4.0
 offset_right = -8.0
 offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
+current_tab = 0
+
+[node name="Columns" type="HBoxContainer" parent="Sections"]
+unique_name_in_owner = true
+layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 8
+metadata/_tab_index = 0
 
-[node name="DocumentList" parent="Columns" instance=ExtResource("2_list")]
+[node name="DocumentList" parent="Sections/Columns" instance=ExtResource("2_list")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
-[node name="PrimaryReader" parent="Columns" instance=ExtResource("3_reader")]
+[node name="PrimaryReader" parent="Sections/Columns" instance=ExtResource("3_reader")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="SecondaryReader" parent="Columns" instance=ExtResource("3_reader")]
+[node name="SecondaryReader" parent="Sections/Columns" instance=ExtResource("3_reader")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+
+[node name="LogList" parent="Sections" instance=ExtResource("5_log")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
 
 [node name="ImageViewer" parent="." instance=ExtResource("4_viewer")]
 unique_name_in_owner = true
