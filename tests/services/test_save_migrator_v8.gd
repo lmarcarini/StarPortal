@@ -34,11 +34,12 @@ func test_v7_adds_empty_consoles_read() -> void:
 	var result := SaveMigrator.migrate(data)
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(8)
+	assert_int(migrated["format_version"]).is_equal(9)
 	var v7_state: Dictionary = data["state"]
 	var expected := v7_state.duplicate(true)
 	var worlds: Dictionary = expected["worlds"]
 	worlds["consoles_read"] = {}
+	_add_v9_worlds(worlds)
 	assert_dict(migrated["state"]).is_equal(expected)
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -47,9 +48,9 @@ func test_v7_adds_empty_consoles_read() -> void:
 ## Data with no state, or no worlds object, passes through for validation to reject.
 func test_v7_without_state_or_worlds_is_left_for_validation() -> void:
 	var no_state := SaveMigrator.migrate({"format_version": 7, "state": 5})
-	assert_dict(no_state.value).is_equal({"format_version": 8, "state": 5})
+	assert_dict(no_state.value).is_equal({"format_version": 9, "state": 5})
 	var no_worlds := SaveMigrator.migrate({"format_version": 7, "state": {"worlds": 3}})
-	assert_dict(no_worlds.value).is_equal({"format_version": 8, "state": {"worlds": 3}})
+	assert_dict(no_worlds.value).is_equal({"format_version": 9, "state": {"worlds": 3}})
 
 
 ## The real v7 file loads through the SaveService with every section intact and no console
@@ -79,3 +80,16 @@ func test_v7_save_file_loads_into_v8() -> void:
 	var simulation: Simulation = built.value
 	assert_bool(simulation.submit(ReadConsoleCommand.new()).is_ok).is_true()
 	assert_int(loaded.address_book.entries.size()).is_greater(1)
+
+
+## Adds what v8 -> v9 gives [param worlds]: a horizon record for each locked world, the pole
+## camera in.
+func _add_v9_worlds(worlds: Dictionary) -> void:
+	var records: Dictionary = {}
+	var statuses: Dictionary = worlds["statuses"]
+	for world_id: String in statuses:
+		if statuses[world_id] == "locked":
+			records[world_id] = true
+	worlds["horizon_records"] = records
+	worlds["pole_camera_world_id"] = ""
+	worlds["pole_camera_ticks_left"] = 0

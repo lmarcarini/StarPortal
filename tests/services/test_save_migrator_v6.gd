@@ -35,7 +35,7 @@ func test_v5_adds_archive_and_address_book() -> void:
 	var result := SaveMigrator.migrate(data)
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(8)
+	assert_int(migrated["format_version"]).is_equal(9)
 	var v5_state: Dictionary = data["state"]
 	var expected := v5_state.duplicate(true)
 	expected["archive"] = EMPTY_ARCHIVE
@@ -45,6 +45,7 @@ func test_v5_adds_archive_and_address_book() -> void:
 	power["install_ticks_left"] = 0
 	var worlds: Dictionary = expected["worlds"]
 	worlds["consoles_read"] = {}
+	_add_v9_worlds(worlds)
 	assert_dict(migrated["state"]).is_equal(expected)
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -53,11 +54,12 @@ func test_v5_adds_archive_and_address_book() -> void:
 ## v5 data with no state object passes through the step untouched.
 func test_v5_without_state_is_left_for_validation() -> void:
 	var result := SaveMigrator.migrate({"format_version": 5, "state": 5})
-	assert_dict(result.value).is_equal({"format_version": 8, "state": 5})
+	assert_dict(result.value).is_equal({"format_version": 9, "state": 5})
 
 
 ## The real v5 file loads through the SaveService with its other sections intact (its bank
-## counted as installed by v6 -> v7) and empty new ones, and sets up against the real content.
+## counted as installed by v6 -> v7, its locked worlds' horizon records taken by v8 -> v9) and
+## empty new ones, and sets up against the real content.
 func test_v5_save_file_loads_into_v6() -> void:
 	var service: SaveServiceScript = SaveServiceScript.new()
 	var dir := "user://test_migrator_v5_%d_%d" % [Time.get_ticks_usec(), get_instance_id()]
@@ -76,6 +78,8 @@ func test_v5_save_file_loads_into_v6() -> void:
 	var v5_state: Dictionary = _v5_fixture()["state"]
 	var expected_state: GameState = GameState.from_dict(v5_state)
 	expected_state.power.banks_installed = 1
+	for world_id: StringName in expected_state.worlds.statuses:
+		expected_state.worlds.horizon_records[world_id] = true
 	var expected: Dictionary = expected_state.to_dict()
 	for key: String in ["clock", "random", "flags", "gate", "power", "worlds"]:
 		assert_dict(loaded.to_dict()[key]).override_failure_message(key).is_equal(expected[key])
@@ -83,3 +87,16 @@ func test_v5_save_file_loads_into_v6() -> void:
 	assert_array(loaded.archive.received).is_empty()
 	assert_array(loaded.address_book.entries).is_empty()
 	assert_bool(GameSetup.build(loaded, GameDefs.from_registry(Registry)).is_ok).is_true()
+
+
+## Adds what v8 -> v9 gives [param worlds]: a horizon record for each locked world, the pole
+## camera in.
+func _add_v9_worlds(worlds: Dictionary) -> void:
+	var records: Dictionary = {}
+	var statuses: Dictionary = worlds["statuses"]
+	for world_id: String in statuses:
+		if statuses[world_id] == "locked":
+			records[world_id] = true
+	worlds["horizon_records"] = records
+	worlds["pole_camera_world_id"] = ""
+	worlds["pole_camera_ticks_left"] = 0

@@ -41,7 +41,7 @@ func test_v6_with_capacity_has_one_bank() -> void:
 	var result := SaveMigrator.migrate(data)
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(8)
+	assert_int(migrated["format_version"]).is_equal(9)
 	var v6_state: Dictionary = data["state"]
 	var expected := v6_state.duplicate(true)
 	var power: Dictionary = expected["power"]
@@ -49,6 +49,7 @@ func test_v6_with_capacity_has_one_bank() -> void:
 	power["install_ticks_left"] = 0
 	var worlds: Dictionary = expected["worlds"]
 	worlds["consoles_read"] = {}
+	_add_v9_worlds(worlds)
 	assert_dict(migrated["state"]).is_equal(expected)
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -65,16 +66,16 @@ func test_v6_without_capacity_has_no_bank() -> void:
 	var expected := power.duplicate()
 	expected["banks_installed"] = 0
 	expected["install_ticks_left"] = 0
-	assert_dict(result.value).is_equal({"format_version": 8, "state": {"power": expected}})
+	assert_dict(result.value).is_equal({"format_version": 9, "state": {"power": expected}})
 
 
 ## Data with no state, or no power object, passes through for validation to reject; an
 ## unreadable capacity counts as no bank.
 func test_v6_without_state_or_power_is_left_for_validation() -> void:
 	var no_state := SaveMigrator.migrate({"format_version": 6, "state": 5})
-	assert_dict(no_state.value).is_equal({"format_version": 8, "state": 5})
+	assert_dict(no_state.value).is_equal({"format_version": 9, "state": 5})
 	var no_power := SaveMigrator.migrate(_v6_with_power(3))
-	assert_dict(no_power.value).is_equal({"format_version": 8, "state": {"power": 3}})
+	assert_dict(no_power.value).is_equal({"format_version": 9, "state": {"power": 3}})
 	var bad := SaveMigrator.migrate(_v6_with_power({"capacity_mwh": 400.0}))
 	var bad_power: Dictionary = bad.value["state"]["power"]
 	assert_int(bad_power["banks_installed"]).is_equal(0)
@@ -99,6 +100,8 @@ func test_v6_save_file_loads_into_v7() -> void:
 	var loaded: GameState = result.value
 	var v6_state: Dictionary = _v6_fixture()["state"]
 	var expected: Dictionary = GameState.from_dict(v6_state).to_dict()
+	var expected_worlds: Dictionary = expected["worlds"]
+	_add_v9_worlds(expected_worlds)
 	for key: String in ["clock", "random", "flags", "gate", "worlds", "archive", "address_book"]:
 		assert_dict(loaded.to_dict()[key]).override_failure_message(key).is_equal(expected[key])
 	var v6_power: Dictionary = v6_state["power"]
@@ -108,3 +111,16 @@ func test_v6_save_file_loads_into_v7() -> void:
 	assert_int(loaded.power.banks_installed).is_equal(1)
 	assert_int(loaded.power.install_ticks_left).is_equal(0)
 	assert_bool(GameSetup.build(loaded, GameDefs.from_registry(Registry)).is_ok).is_true()
+
+
+## Adds what v8 -> v9 gives [param worlds]: a horizon record for each locked world, the pole
+## camera in.
+func _add_v9_worlds(worlds: Dictionary) -> void:
+	var records: Dictionary = {}
+	var statuses: Dictionary = worlds["statuses"]
+	for world_id: String in statuses:
+		if statuses[world_id] == "locked":
+			records[world_id] = true
+	worlds["horizon_records"] = records
+	worlds["pole_camera_world_id"] = ""
+	worlds["pole_camera_ticks_left"] = 0
