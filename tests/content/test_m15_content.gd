@@ -2,7 +2,8 @@
 ## approved positions with the approved addresses, every document and image loads and reads in
 ## both locales, the validator passes and fails clearly on a broken answer, and a new game played
 ## through dials each answer (waiting for the charge), locks the right world and, with the pole
-## camera's horizon record, receives the next puzzle, while no other ordering of those glyphs within reach locks anything.
+## camera's horizon record, receives the next puzzle, while no other ordering of those glyphs
+## within reach locks anything.
 ## Bible: docs/content/m15-puzzles.md, gate-and-address-spec.md#puzzle-design-rules,
 ## technical-architecture.md#data-model
 extends GdUnitTestSuite
