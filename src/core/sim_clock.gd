@@ -164,9 +164,15 @@ func _run_due_ticks(due: int) -> int:
 	return ran
 
 
+## Runs one tick and emits tick_advanced, then speed_changed when the tick itself changed
+## the speed (a lock drops it to 1×), so views redraw through the usual signal.
 func _run_tick() -> void:
+	var speed_before: int = simulation.state.clock.speed_index
 	simulation.advance_tick()
 	EventBus.tick_advanced.emit(simulation.state.clock.tick)
+	var speed_after: int = simulation.state.clock.speed_index
+	if speed_after != speed_before:
+		EventBus.speed_changed.emit(speed_after)
 
 
 func _ticks_per_second() -> float:
