@@ -1,8 +1,8 @@
 ## Tests for the M1.5 puzzle content over the real data: the four authored worlds sit at the
 ## approved positions with the approved addresses, every document and image loads and reads in
 ## both locales, the validator passes and fails clearly on a broken answer, and a new game played
-## through dials each answer (waiting for the charge), locks the right world and receives the
-## next puzzle, while no other ordering of those glyphs within reach locks anything.
+## through dials each answer (waiting for the charge), locks the right world and, with the pole
+## camera's horizon record, receives the next puzzle, while no other ordering of those glyphs within reach locks anything.
 ## Bible: docs/content/m15-puzzles.md, gate-and-address-spec.md#puzzle-design-rules,
 ## technical-architecture.md#data-model
 extends GdUnitTestSuite
@@ -25,7 +25,7 @@ const ANSWERS: Array[Array] = [
 	[35, 22, 19, 3, 24, 29, 34],
 	[35, 10, 24, 19, 29, 8, 15],
 ]
-## Documents at the start, then those each world's first lock delivers, in id order.
+## Documents at the start, then those each world's first horizon record delivers, in id order.
 const AT_START: Array[StringName] = [&"doc_sill_order", &"doc_sill_sketch"]
 const ON_LOCK: Array[Array] = [
 	[&"doc_lintel_note", &"doc_lintel_rubbing", &"doc_sill_dossier"],
@@ -139,7 +139,8 @@ func test_each_document_arrives_as_the_chain_says() -> void:
 
 
 ## A new game: install the bank, then for each puzzle wait for the charge, dial the answer, lock
-## the right world and receive exactly the next documents; close and go on.
+## the right world, extend the pole camera and receive exactly the next documents; close and go
+## on.
 func test_dialing_each_answer_from_a_new_game_locks_its_world_and_delivers_the_next() -> void:
 	var defs: GameDefs = _defs()
 	var built: Result = GameSetup.build_new(GameState.new_game(TEST_SEED, defs.balance), defs)
@@ -162,6 +163,10 @@ func test_dialing_each_answer_from_a_new_game_locks_its_world_and_delivers_the_n
 		var entry: DialLogEntry = state.gate.dial_log.back()
 		assert_int(entry.outcome).is_equal(DialOutcome.Kind.LOCK)
 		assert_str(String(entry.world_id)).is_equal(String(WORLDS[index]))
+		assert_int(state.archive.received.size()).is_equal(held)
+		assert_bool(simulation.submit(ExtendPoleCameraCommand.new()).is_ok).is_true()
+		for _tick: int in ExtendPoleCameraCommand.EXTEND_TICKS:
+			simulation.advance_tick()
 		assert_array(state.archive.received.slice(held)).is_equal(ON_LOCK[index])
 		assert_bool(simulation.submit(CloseWormholeCommand.new()).is_ok).is_true()
 

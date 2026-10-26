@@ -1,7 +1,8 @@
 ## M1.5 end to end, headless, over the real data/ content: a scripted player who knows the
 ## approved answers starts a new game, finds the opening documents in the Archive, cannot dial
 ## until the capacitor bank is installed, then dials SILL, LINTEL, MILESTONE and STILLWATER in
-## turn, each lock delivering the next documents, reads each console (2 to 4 addresses) and
+## turn, extending the pole camera after each lock for the next documents (the lock alone
+## delivers none), reads each console (2 to 4 addresses) and
 ## closes the wormhole; then it dials console addresses the bank can power until one locks. A
 ## few other seeds check every new galaxy gives such an address; 2,000 random addresses give
 ## no lock.
@@ -85,8 +86,9 @@ func _assert_dial_refused(player: M15Player, target: GateAddress) -> void:
 	assert_int(player.state().gate.mode).is_equal(GateState.RingMode.IDLE)
 
 
-## Puzzle [param index]: charge, dial the answer, lock its world, receive exactly the next
-## documents, read the console (2 to 4 addresses, all now in the book) and close.
+## Puzzle [param index]: charge, dial the answer, lock its world (nothing arrives yet), extend
+## the pole camera and receive exactly the next documents (a second extension is
+## already_taken), read the console (2 to 4 addresses, all now in the book) and close.
 func _play_puzzle(player: M15Player, index: int) -> void:
 	var puzzle: Dictionary = M15Player.PUZZLES[index]
 	var world_id: StringName = puzzle["world"]
@@ -99,7 +101,11 @@ func _play_puzzle(player: M15Player, index: int) -> void:
 	assert_int(entry.outcome).override_failure_message(world_id).is_equal(DialOutcome.Kind.LOCK)
 	assert_str(String(entry.world_id)).is_equal(String(world_id))
 	assert_int(player.state().gate.mode).is_equal(GateState.RingMode.LOCKED)
-	var arrived: Array[StringName] = player.state().archive.received.slice(held_before.size())
+	assert_array(player.state().archive.received).is_equal(held_before)
+	var arrived: Array[StringName] = player.extend_pole_camera()
+	assert_bool(player.state().worlds.is_horizon_record_taken(world_id)).is_true()
+	var again: CommandResult = ExtendPoleCameraCommand.new().validate(player.state())
+	assert_str(String(again.error_code)).is_equal("already_taken")
 	var delivers: Array = puzzle["delivers"]
 	var expected: Array[StringName] = []
 	expected.assign(delivers)

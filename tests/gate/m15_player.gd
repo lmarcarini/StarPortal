@@ -3,11 +3,12 @@ extends RefCounted
 ## the way the Gate Room does, one command at a time with the clock paused (a command then
 ## applies at once) and ticks run by hand. It knows the approved answers of the four puzzles
 ## (docs/content/m15-puzzles.md) and nothing else about the galaxy; it learns console
-## addresses only from the Address Book.
+## addresses only from the Address Book. After each lock it extends the pole camera for the
+## world's horizon record.
 ## Bible: roadmap.md (M1.5 check), technical-architecture.md#testing-and-tooling
 
 ## The four puzzles in play order: world id, seals 1 to 7 of the approved answer, and the
-## documents its first lock delivers (the next puzzle's documents and the world's dossier).
+## documents its horizon record delivers (the next puzzle's documents and the world's dossier).
 const PUZZLES: Array[Dictionary] = [
 	{
 		"world": &"world_sill",
@@ -125,6 +126,20 @@ func read_console() -> Array[AddressEntry]:
 	var after: int = state().address_book.entries.size()
 	added.assign(state().address_book.entries.slice(0, after - before))
 	return added
+
+
+## Extends the pole camera through the open wormhole and runs the clock until it takes the
+## horizon record; returns the documents that arrived, in arrival order, or an empty array when
+## refused or the camera came back with nothing.
+func extend_pole_camera() -> Array[StringName]:
+	var arrived: Array[StringName] = []
+	var before: int = state().archive.received.size()
+	if not simulation.submit(ExtendPoleCameraCommand.new()).is_ok:
+		return arrived
+	while state().worlds.is_pole_camera_out():
+		step()
+	arrived.assign(state().archive.received.slice(before))
+	return arrived
 
 
 ## Closes the open wormhole; false when refused.
