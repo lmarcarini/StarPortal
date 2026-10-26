@@ -121,7 +121,7 @@ func test_year_with_monthly_save_and_load_matches_uninterrupted_run() -> void:
 func _summary(elapsed_msec: int) -> String:
 	var template := "soak: %d ticks x 2 runs in %.2f s; %d day_started, %d month_closed, "
 	template += "%d reloads, %d commands (%d while paused), %d pauses; %d dials (%d locks), "
-	template += "%d closes, %d consoles read, %d book entries; "
+	template += "%d closes, %d consoles read, %d pole cameras, %d book entries; "
 	template += "%d picked (%d from the book, %d targets, %d dropped)"
 	var bot: SoakBot = _reloaded.bot
 	var values: Array = [
@@ -137,6 +137,7 @@ func _summary(elapsed_msec: int) -> String:
 		_locks(_reloaded),
 		bot.closes,
 		bot.consoles_read,
+		bot.cameras_extended,
 		_reloaded.simulation.state.address_book.entries.size(),
 		bot.addresses_picked,
 		bot.book_picked,
@@ -238,6 +239,7 @@ func _assert_run_ring(run: SoakRun) -> void:
 	assert_int(bot.closes).is_greater(0)
 	assert_int(bot.consoles_read).is_greater(0)
 	assert_int(state.worlds.consoles_read.size()).is_equal(bot.consoles_read)
+	assert_int(state.worlds.horizon_records.size()).is_between(1, bot.cameras_extended)
 	assert_int(bot.book_picked).is_greater(0)
 	var named: Array[StringName] = []
 	for entry: AddressEntry in state.address_book.entries:

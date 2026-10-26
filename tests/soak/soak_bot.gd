@@ -9,7 +9,9 @@ extends RefCounted
 ## well-formed one whose seal 1 the bank can reach); once the bank holds that address's lock
 ## energy it dials it directly (an address the bank can never charge is just dropped). When a
 ## wormhole opens it reads the far Ring's console (ReadConsoleCommand) if that console is
-## unread, which fills the Address Book, and closes the wormhole a few ticks after it opened.
+## unread, which fills the Address Book, then extends the pole camera (ExtendPoleCameraCommand)
+## if the world's horizon record is not taken, and closes the wormhole once the camera is back
+## and the wormhole has been open a few ticks.
 ## Every random draw comes from the run's own GameState stream &"soak_bot", so two runs from
 ## the same seed act identically, and a saved and reloaded state carries the stream on. The
 ## picked address is the bot's own, not game state: it carries on across reloads with the bot.
@@ -75,6 +77,8 @@ var dials: int = 0
 var closes: int = 0
 ## Far Ring consoles the bot read.
 var consoles_read: int = 0
+## Times the bot extended the pole camera.
+var cameras_extended: int = 0
 ## Capacitor bank installs the bot started.
 var installs: int = 0
 
@@ -112,9 +116,8 @@ func act(simulation: Simulation) -> void:
 	_submit_random_flag(simulation, rng)
 
 
-## Installs the first capacitor bank and waits for it; then, on a lock, reads an unread console
-## or closes the wormhole once it has been open CLOSE_AFTER_TICKS; with the Ring idle, picks,
-## drops or dials.
+## Installs the first capacitor bank and waits for it; then, on a lock, works the wormhole;
+## with the Ring idle, picks, drops or dials.
 func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	var state: GameState = simulation.state
 	if state.power.banks_installed == 0:
@@ -124,12 +127,7 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 		return
 	var gate: GateState = state.gate
 	if gate.mode == GateState.RingMode.LOCKED:
-		if not state.worlds.is_console_read(gate.connected_world_id):
-			simulation.submit(ReadConsoleCommand.new())
-			consoles_read += 1
-		elif state.clock.tick - gate.lock_started_tick >= CLOSE_AFTER_TICKS:
-			simulation.submit(CloseWormholeCommand.new())
-			closes += 1
+		_work_wormhole(simulation)
 		return
 	if gate.mode != GateState.RingMode.IDLE:
 		return
@@ -144,6 +142,26 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 		simulation.submit(DialCommand.create(_picked))
 		_picked = null
 		dials += 1
+
+
+## On an open wormhole: reads an unread console, else extends the pole camera for a record not
+## taken yet, else, with the camera in, closes the wormhole once it has been open
+## CLOSE_AFTER_TICKS.
+func _work_wormhole(simulation: Simulation) -> void:
+	var state: GameState = simulation.state
+	var gate: GateState = state.gate
+	var worlds: WorldsState = state.worlds
+	if not worlds.is_console_read(gate.connected_world_id):
+		simulation.submit(ReadConsoleCommand.new())
+		consoles_read += 1
+	elif worlds.is_pole_camera_out():
+		return
+	elif not worlds.is_horizon_record_taken(gate.connected_world_id):
+		simulation.submit(ExtendPoleCameraCommand.new())
+		cameras_extended += 1
+	elif state.clock.tick - gate.lock_started_tick >= CLOSE_AFTER_TICKS:
+		simulation.submit(CloseWormholeCommand.new())
+		closes += 1
 
 
 func _pick_address(state: GameState, rng: RandomNumberGenerator) -> void:
