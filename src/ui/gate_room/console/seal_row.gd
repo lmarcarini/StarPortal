@@ -3,7 +3,7 @@ extends VBoxContainer
 ## The dial console's eight seal slots, seven coordinates then CAIRN's origin (locked), with a
 ## caption naming the origin. Shows glyphs; never changes them.
 ## Bible: gate-and-address-spec.md#the-dial-console (seal 8 is CAIRN's mark),
-## game-design.md#difficulty-and-accessibility (click-to-pick and click-to-place)
+## game-design.md#difficulty-and-accessibility (one-click clearing, dragging)
 
 ## The player clicked or accepted slot [param seal] (8 is the origin).
 signal slot_chosen(seal: int)

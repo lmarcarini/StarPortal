@@ -5,7 +5,6 @@
 
 [node name="PaletteGlyph" type="Button"]
 size_flags_horizontal = 3
-toggle_mode = true
 script = ExtResource("1_glyph")
 
 [node name="Content" type="VBoxContainer" parent="."]

@@ -27,7 +27,7 @@ func after_test() -> void:
 
 
 ## Builds a busy Gate Room: a failed dial, a lock still open, the failed address loaded again
-## (so the repeat warning shows), a glyph picked and the book filtered by one glyph.
+## (so the repeat warning shows), a glyph clicked and the book filtered by one glyph.
 func _build(locale: String, is_pseudo: bool) -> void:
 	_real_locale = TranslationServer.get_locale()
 	TranslationServer.set_locale(locale)

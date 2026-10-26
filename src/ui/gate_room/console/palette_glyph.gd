@@ -1,12 +1,12 @@
 class_name PaletteGlyph
 extends Button
-## One glyph of the dial console's palette: its constellation and its name. Pressing it picks
-## the glyph (the button shows pressed while picked); dragging it carries the glyph to a seal
-## slot. A glyph placed in a slot is highlighted by a frame and a corner dot, so it reads by
-## shape as well as colour. CAIRN's origin glyph is locked: greyed out, marked with a padlock
-## and never picked or dragged, since seal 8 already holds it.
+## One glyph of the dial console's palette: its constellation and its name. Pressing it asks
+## to place the glyph in the next empty seal; dragging it carries the glyph to a seal slot. A
+## glyph placed in a slot is highlighted by a frame and a corner dot, so it reads by shape as
+## well as colour. CAIRN's origin glyph is locked: greyed out, marked with a padlock
+## and never placed or dragged, since seal 8 already holds it.
 ## Bible: gate-and-address-spec.md#the-dial-console,
-## game-design.md#difficulty-and-accessibility (click-to-pick, dragging, gamepad, shapes)
+## game-design.md#difficulty-and-accessibility (one-click placing, dragging, gamepad, shapes)
 
 ## The player pressed this glyph.
 signal chosen(glyph: int)
@@ -107,10 +107,8 @@ func set_glyph(index: int) -> void:
 		_apply_glyph()
 
 
-## Shows whether the glyph is [param picked] and [param placed] in a slot, with
-## [param tooltip].
-func show_state(picked: bool, placed: bool, tooltip: String) -> void:
-	set_pressed_no_signal(picked and not _is_locked)
+## Shows whether the glyph is [param placed] in a slot, with [param tooltip].
+func show_state(placed: bool, tooltip: String) -> void:
 	_is_placed = placed
 	tooltip_text = tooltip
 	queue_redraw()
@@ -122,8 +120,6 @@ func set_locked(locked: bool) -> void:
 	_is_locked = locked
 	disabled = locked
 	modulate.a = LOCKED_ALPHA if locked else 1.0
-	if locked:
-		set_pressed_no_signal(false)
 	queue_redraw()
 
 

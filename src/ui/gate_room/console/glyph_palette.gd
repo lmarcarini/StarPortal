@@ -1,12 +1,12 @@
 class_name GlyphPalette
 extends GridContainer
-## All 36 glyphs of the dial console, each with its name. Reports picks; shows which glyph is
-## picked, which are placed in a slot and which is CAIRN's locked origin. Nothing else: no
-## counts, no rule-outs.
+## All 36 glyphs of the dial console, each with its name. Reports clicks; shows which glyphs
+## are placed in a slot and which is CAIRN's locked origin. Nothing else: no counts, no
+## rule-outs.
 ## Bible: gate-and-address-spec.md#the-dial-console,
-## game-design.md#difficulty-and-accessibility (click-to-pick, dragging)
+## game-design.md#difficulty-and-accessibility (one-click placing, dragging)
 
-## The player pressed glyph [param glyph].
+## The player clicked or accepted glyph [param glyph].
 signal glyph_chosen(glyph: int)
 
 const _GLYPH_SCENE: PackedScene = preload("res://src/ui/gate_room/console/palette_glyph.tscn")
@@ -24,10 +24,9 @@ func _ready() -> void:
 		_buttons.append(button)
 
 
-## Shows [param picked] (-1 for none) as pressed, highlights every glyph in [param placed] and
-## locks [param origin] (-1 for none), naming each glyph in its tooltip. [param translate] is
-## the caller's tr.
-func show_state(picked: int, placed: Array[int], origin: int, translate: Callable) -> void:
+## Highlights every glyph in [param placed] and locks [param origin] (-1 for none), naming each
+## glyph in its tooltip. [param translate] is the caller's tr.
+func show_state(placed: Array[int], origin: int, translate: Callable) -> void:
 	for button: PaletteGlyph in _buttons:
 		var glyph_name: String = str(translate.call(PaletteGlyph.name_key_of(button.glyph)))
 		var locked: bool = button.glyph == origin
@@ -39,7 +38,7 @@ func show_state(picked: int, placed: Array[int], origin: int, translate: Callabl
 			)
 		elif placed.has(button.glyph):
 			tooltip = str(translate.call(&"CONSOLE_GLYPH_PLACED")).format({"glyph": glyph_name})
-		button.show_state(button.glyph == picked, placed.has(button.glyph), tooltip)
+		button.show_state(placed.has(button.glyph), tooltip)
 
 
 ## Returns the button of [param glyph], 0..35, or null.
