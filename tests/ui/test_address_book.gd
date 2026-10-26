@@ -225,7 +225,8 @@ func test_a_note_saves_and_survives_save_and_load() -> void:
 	assert_str(_book().get_rows()[0].get_note_text()).is_equal("Nothing there. Recheck seal 3?")
 
 
-## Drive it like a player: place seven glyphs three different ways, dial, load the address
+## Drive it like a player: place seven glyphs three different ways (drag onto the slot, click
+## or gamepad accept to fill the next empty seal), dial, load the address
 ## back from the book and dial it again, confirming the repeat.
 func test_place_three_ways_dial_load_and_dial_again() -> void:
 	var address: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.NO_GATE)
@@ -239,10 +240,8 @@ func test_place_three_ways_dial_load_and_dial_again() -> void:
 				await UiInput.drag(glyph, slot)
 			1:
 				await UiInput.click(glyph)
-				await UiInput.click(slot)
 			_:
 				await UiInput.pad(glyph, JOY_BUTTON_A)
-				await UiInput.pad(slot, JOY_BUTTON_A)
 	assert_bool(_view.get_console().get_address().equals(address)).is_true()
 	var button: HoldButton = _view.find_child("DialButton", true, false) as HoldButton
 	button.begin_hold()

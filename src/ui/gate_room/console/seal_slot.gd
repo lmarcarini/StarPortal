@@ -1,11 +1,11 @@
 class_name SealSlot
 extends Button
 ## One seal of the dial console: shows the glyph placed there (or CAIRN's origin glyph, locked,
-## for seal 8) and takes a glyph by drag and drop or by click after a pick. A right-click or
-## the Delete or Backspace key asks to clear it. Never edits the slots itself: it reports what
-## the player did.
+## for seal 8) and takes a glyph by drag and drop. A click or accept, a right-click or the
+## Delete or Backspace key asks to clear it (a click clears only a filled slot). Never edits
+## the slots itself: it reports what the player did.
 ## Bible: gate-and-address-spec.md#the-dial-console,
-## game-design.md#difficulty-and-accessibility (click-to-pick and click-to-place)
+## game-design.md#difficulty-and-accessibility (one-click clearing, dragging)
 
 ## The player clicked or accepted this slot.
 signal chosen(seal: int)
@@ -83,7 +83,7 @@ func show_glyph(glyph: int, tooltip: String) -> void:
 	tooltip_text = tooltip
 
 
-## Locks the slot ([param locked] true): it shows its glyph but takes no pick, drop or clear.
+## Locks the slot ([param locked] true): it shows its glyph but takes no drop or clear.
 func set_locked(locked: bool) -> void:
 	_is_locked = locked
 	disabled = locked

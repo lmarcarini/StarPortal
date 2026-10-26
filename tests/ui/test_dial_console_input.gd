@@ -37,16 +37,61 @@ func after_test() -> void:
 	TranslationServer.set_locale(_real_locale)
 
 
-## Mouse: click a glyph to pick it, then click a seal slot to place it.
-func test_click_to_pick_and_click_to_place() -> void:
-	await UiInput.click(_palette().get_button(_first))
-	assert_int(_console.get_picker().glyph).is_equal(_first)
-	assert_bool(_palette().get_button(_first).button_pressed).is_true()
+## Mouse: seven glyph clicks fill seals 1 to 7 in order; an eighth changes nothing and says
+## all seven are set.
+func test_clicks_fill_the_seals_in_order() -> void:
+	var free: Array[int] = _free_glyphs()
+	for index: int in GateAddress.COORDINATE_COUNT:
+		await UiInput.click(_palette().get_button(free[index]))
+		assert_int(_console.get_placed(index + 1)).is_equal(free[index])
+		assert_int(_seals().get_slot(index + 1).get_glyph()).is_equal(free[index])
+	assert_str(_hint().text).is_equal(tr(DialConsole.HINT_IDLE))
+	var before: Array[int] = _all_placed()
+	await UiInput.click(_palette().get_button(free[GateAddress.COORDINATE_COUNT]))
+	assert_array(_all_placed()).is_equal(before)
+	assert_str(_console.get_notice()).is_equal("All seven seals are set.")
+	assert_str(_hint().text).is_equal("All seven seals are set.")
+	_assert_highlights_match()
+
+
+## Mouse: clicking a filled slot clears it, and the next glyph click fills that slot.
+func test_click_on_a_slot_clears_it_and_the_next_click_refills_it() -> void:
+	var free: Array[int] = _free_glyphs()
+	for index: int in GateAddress.COORDINATE_COUNT:
+		await UiInput.click(_palette().get_button(free[index]))
+	await UiInput.click(_seals().get_slot(3))
+	assert_int(_console.get_placed(3)).is_equal(-1)
+	assert_int(_seals().get_slot(3).get_glyph()).is_equal(-1)
+	await UiInput.click(_palette().get_button(free[10]))
+	assert_int(_console.get_placed(3)).is_equal(free[10])
+	assert_int(_console.get_placed(4)).is_equal(free[3])
+	_assert_highlights_match()
+
+
+## A click on an empty slot does nothing; a click on a glyph already placed changes nothing and
+## names the seal it is in, so a glyph is never in two seals.
+func test_click_on_an_empty_slot_or_a_placed_glyph_changes_nothing() -> void:
 	await UiInput.click(_seals().get_slot(2))
-	assert_int(_console.get_placed(2)).is_equal(_first)
-	assert_int(_seals().get_slot(2).get_glyph()).is_equal(_first)
-	assert_bool(_palette().get_button(_first).button_pressed).is_false()
-	assert_bool(_console.get_picker().has_glyph()).is_false()
+	assert_array(_all_placed()).is_equal([-1, -1, -1, -1, -1, -1, -1])
+	await UiInput.click(_palette().get_button(_first))
+	await UiInput.click(_palette().get_button(_first))
+	assert_array(_all_placed()).is_equal([_first, -1, -1, -1, -1, -1, -1])
+	assert_str(_console.get_notice()).contains("seal 1")
+	await UiInput.click(_palette().get_button(_second))
+	assert_str(_console.get_notice()).is_empty()
+	assert_str(_hint().text).is_equal(tr(DialConsole.HINT_IDLE))
+
+
+## The notice goes back to the hint on its own after a short while.
+func test_the_notice_fades_back_to_the_hint() -> void:
+	for glyph: int in _free_glyphs().slice(0, GateAddress.COORDINATE_COUNT + 1):
+		_palette().glyph_chosen.emit(glyph)
+	assert_str(_console.get_notice()).is_not_empty()
+	var timer: Timer = _find_timer()
+	timer.stop()
+	timer.timeout.emit()
+	assert_str(_console.get_notice()).is_empty()
+	assert_str(_hint().text).is_equal(tr(DialConsole.HINT_IDLE))
 
 
 ## Mouse: drag a glyph from the palette and drop it on a seal slot.
@@ -56,20 +101,37 @@ func test_drag_and_drop_places_a_glyph() -> void:
 	assert_int(_seals().get_slot(5).get_glyph()).is_equal(_second)
 
 
-## Keyboard and gamepad: pick with Enter, place with the gamepad's accept button.
-func test_keyboard_and_gamepad_place_a_glyph() -> void:
+## Keyboard: Enter on a glyph places it in the next empty seal; Enter on the slot clears it.
+func test_keyboard_places_and_clears_a_glyph() -> void:
 	await UiInput.key(_palette().get_button(_second), KEY_ENTER)
-	await UiInput.pad(_seals().get_slot(3), JOY_BUTTON_A)
-	assert_int(_console.get_placed(3)).is_equal(_second)
+	assert_int(_console.get_placed(1)).is_equal(_second)
+	await UiInput.key(_seals().get_slot(1), KEY_ENTER)
+	assert_int(_console.get_placed(1)).is_equal(-1)
 
 
-## Gamepad alone fills all seven slots: accept on a glyph, accept on a slot.
-func test_gamepad_alone_fills_the_address() -> void:
+## Gamepad alone fills all seven slots with accept on each glyph, clears one with accept on
+## its slot and refills it; the highlights match the slots throughout.
+func test_gamepad_alone_fills_and_clears_the_address() -> void:
 	var target: GateAddress = Fixture.target_address(_simulation.state)
 	for index: int in GateAddress.COORDINATE_COUNT:
 		await UiInput.pad(_palette().get_button(target.coordinates[index]), JOY_BUTTON_A)
-		await UiInput.pad(_seals().get_slot(index + 1), JOY_BUTTON_A)
+		_assert_highlights_match()
 	assert_bool(_console.get_address().equals(target)).is_true()
+	await UiInput.pad(_seals().get_slot(5), JOY_BUTTON_A)
+	assert_int(_console.get_placed(5)).is_equal(-1)
+	_assert_highlights_match()
+	await UiInput.pad(_palette().get_button(target.coordinates[4]), JOY_BUTTON_A)
+	assert_bool(_console.get_address().equals(target)).is_true()
+	_assert_highlights_match()
+
+
+## A drag never counts as a click: it places the glyph only where it is dropped.
+func test_a_drag_is_not_a_click() -> void:
+	var clicks: Array[int] = []
+	_palette().glyph_chosen.connect(func(glyph: int) -> void: clicks.append(glyph))
+	await UiInput.drag(_palette().get_button(_second), _seals().get_slot(5))
+	assert_array(clicks).is_empty()
+	assert_array(_all_placed()).is_equal([-1, -1, -1, -1, _second, -1, -1])
 
 
 ## A glyph placed again moves out of its old seal; another glyph overwrites a placed one.
@@ -97,12 +159,10 @@ func test_clearing_a_slot_by_mouse_keyboard_and_gamepad() -> void:
 	assert_array(_palette().get_highlighted()).is_empty()
 
 
-## Cancel first drops a pick; only a second cancel clears the focused slot.
-func test_cancel_drops_the_pick_before_clearing() -> void:
+## Cancel clears the focused filled slot, and does nothing on a palette glyph.
+func test_cancel_clears_the_focused_slot() -> void:
 	_console.place(1, _first)
-	await UiInput.key(_palette().get_button(_second), KEY_ENTER)
-	await UiInput.key(_seals().get_slot(1), KEY_ESCAPE)
-	assert_bool(_console.get_picker().has_glyph()).is_false()
+	await UiInput.key(_palette().get_button(_first), KEY_ESCAPE)
 	assert_int(_console.get_placed(1)).is_equal(_first)
 	await UiInput.key(_seals().get_slot(1), KEY_ESCAPE)
 	assert_int(_console.get_placed(1)).is_equal(-1)
@@ -121,7 +181,7 @@ func test_clear_all_empties_every_slot() -> void:
 	assert_bool(clear.has_focus()).is_false()
 
 
-## Seal 8 always shows CAIRN's origin and takes no glyph, pick, drop or clear.
+## Seal 8 always shows CAIRN's origin and takes no glyph, click, drop or clear.
 func test_the_origin_seal_is_fixed() -> void:
 	var origin: int = _origin()
 	var eighth: SealSlot = _seals().get_slot(8)
@@ -144,7 +204,8 @@ func test_the_origin_glyph_cannot_be_placed() -> void:
 	assert_float(button.modulate.a).is_less(1.0)
 	assert_str(button.tooltip_text).contains("CAIRN's origin glyph")
 	await UiInput.click(button)
-	assert_bool(_console.get_picker().has_glyph()).is_false()
+	_palette().glyph_chosen.emit(_origin())
+	_console.place_next(_origin())
 	await UiInput.drag(button, _seals().get_slot(1))
 	_console.place(2, _origin())
 	assert_int(_console.get_placed(1)).is_equal(-1)
@@ -156,8 +217,8 @@ func test_the_origin_glyph_cannot_be_placed() -> void:
 	assert_int(_console.get_placed(2)).is_equal(coordinates[1])
 
 
-## After a random sequence of placements, moves and clears, the highlighted glyphs are exactly
-## the placed ones; nothing else on the palette changes.
+## After a random sequence of clicks, drops, placements, moves and clears, the highlighted
+## glyphs are exactly the placed ones; nothing else on the palette changes.
 func test_highlights_follow_the_slots_exactly() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 80
@@ -173,7 +234,8 @@ func test_highlights_follow_the_slots_exactly() -> void:
 				_seals().glyph_dropped.emit(seal, free[rng.randi_range(0, free.size() - 1)])
 			3:
 				_palette().glyph_chosen.emit(free[rng.randi_range(0, free.size() - 1)])
-				_seals().slot_chosen.emit(seal)
+				if rng.randi_range(0, 1) == 0:
+					_seals().slot_chosen.emit(seal)
 			_:
 				_console.place(seal, free[rng.randi_range(0, free.size() - 1)])
 		if step % 50 == 49:
@@ -214,6 +276,24 @@ func _assert_highlights_match() -> void:
 		assert_int(_seals().get_slot(seal).get_glyph()).is_equal(_console.get_placed(seal))
 	placed.sort()
 	assert_array(_palette().get_highlighted()).is_equal(placed)
+
+
+func _all_placed() -> Array[int]:
+	var placed: Array[int] = []
+	for seal: int in range(1, GateAddress.COORDINATE_COUNT + 1):
+		placed.append(_console.get_placed(seal))
+	return placed
+
+
+func _find_timer() -> Timer:
+	for child: Node in _console.get_children():
+		if child is Timer:
+			return child as Timer
+	return null
+
+
+func _hint() -> Label:
+	return _console.get_node("%Hint") as Label
 
 
 func _origin() -> int:
