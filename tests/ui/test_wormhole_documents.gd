@@ -1,10 +1,12 @@
-## Tests for the documents a lock delivers, on the wormhole screen: a first lock that delivers
-## documents names them by title and offers Read in the Archive, which opens the Archive with the
+## Tests for the documents a wormhole brings, on the wormhole screen: a first lock alone shows
+## nothing; the temporary Extend the pole camera button sends the camera, says so while it goes
+## through, and once the horizon record is taken the screen names the documents by title and
+## offers Read in the Archive, which opens the Archive with the
 ## first one selected; the way back to the wormhole is the return bar, as from the Address
 ## Book, with Dial still disabled; a lock that delivers nothing shows no line; the gamepad
 ## reaches the button; the screen fits the minimum window in en and pt_BR.
 ## Runs the whole view switcher over the dialing fixture galaxy, with a DocumentSystem that
-## delivers two fixture documents on the first lock of the open world.
+## delivers two fixture documents with the open world's horizon record.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## game-design.md#core-loop
 extends GdUnitTestSuite
@@ -13,7 +15,7 @@ const Fixture := preload("res://tests/ui/gate_room_fixture.gd")
 const ArchiveFixture := preload("res://tests/ui/archive_fixture.gd")
 const DialFixture := preload("res://tests/gate/dial_fixture.gd")
 const SWITCHER_SCENE: String = "res://src/ui/views/view_switcher.tscn"
-## Delivered on the first lock of the open world, in id order.
+## Delivered with the open world's horizon record, in id order.
 const LOCK_DOCUMENTS: Array[StringName] = [ArchiveFixture.DOSSIER, ArchiveFixture.NOTE]
 
 var _root: Control = null
@@ -50,8 +52,8 @@ func after_test() -> void:
 	ArchiveFixture.restore()
 
 
-## The gate fixture's simulation, plus a DocumentSystem: the dossier and the note arrive on the
-## first lock of the open world; the Archive starts with the rubbing, read.
+## The gate fixture's simulation, plus a DocumentSystem: the dossier and the note arrive with the
+## open world's horizon record; the Archive starts with the rubbing, read.
 func _make_simulation() -> Simulation:
 	var state: GameState = Fixture.simulation().state
 	state.archive.add(ArchiveFixture.RUBBING, 0)
@@ -102,15 +104,42 @@ func _dial(kind: int) -> void:
 	await get_tree().process_frame
 
 
+func _camera_button() -> Button:
+	return _screen().get_node("%PoleCameraButton") as Button
+
+
+## Presses Extend the pole camera and runs the clock until the record is taken.
+func _take_record() -> void:
+	_camera_button().pressed.emit()
+	SimClock.step_ticks(ExtendPoleCameraCommand.EXTEND_TICKS)
+	await get_tree().process_frame
+
+
 func _close_wormhole() -> void:
 	_screen().get_close_button().pressed.emit()
 	_screen().dismiss()
 	await get_tree().process_frame
 
 
-func test_a_first_lock_names_the_documents_it_delivered() -> void:
+## The lock alone names nothing; the camera button sends the camera, is disabled while it goes
+## through, and the record names the documents it delivered.
+func test_the_horizon_record_names_the_documents_it_delivered() -> void:
 	await _dial(DialOutcome.Kind.LOCK)
 	assert_bool(_screen().is_showing_open()).is_true()
+	assert_bool(_line().visible).is_false()
+	var camera: Button = _camera_button()
+	assert_bool(camera.is_visible_in_tree()).is_true()
+	assert_bool(camera.disabled).is_false()
+	assert_str(camera.tr(camera.text)).is_equal("Extend the pole camera")
+	camera.pressed.emit()
+	await get_tree().process_frame
+	assert_bool(camera.disabled).is_true()
+	assert_str(camera.tr(camera.text)).is_equal("The pole camera is going through…")
+	assert_bool(_line().visible).is_false()
+	SimClock.step_ticks(ExtendPoleCameraCommand.EXTEND_TICKS)
+	await get_tree().process_frame
+	assert_bool(camera.disabled).is_true()
+	assert_str(camera.tr(camera.text)).is_equal("Horizon record taken")
 	assert_bool(_line().is_visible_in_tree()).is_true()
 	assert_str(_line().text).is_equal(
 		"New in the Archive: Directorate file 61-B, Field note, lintel"
@@ -125,6 +154,7 @@ func test_a_first_lock_names_the_documents_it_delivered() -> void:
 ## Gate Room keeps the wormhole aside, and its return bar brings the wormhole back.
 func test_read_in_the_archive_and_back_to_the_wormhole() -> void:
 	await _dial(DialOutcome.Kind.LOCK)
+	await _take_record()
 	_screen().get_archive_button().pressed.emit()
 	await get_tree().process_frame
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
@@ -149,13 +179,16 @@ func test_read_in_the_archive_and_back_to_the_wormhole() -> void:
 ## world with no documents shows none either.
 func test_a_lock_that_delivers_nothing_shows_no_line() -> void:
 	await _dial(DialOutcome.Kind.LOCK)
+	await _take_record()
 	await _close_wormhole()
 	await _dial(DialOutcome.Kind.LOCK)
+	assert_bool(_camera_button().disabled).is_true()
 	assert_bool(_screen().is_showing_open()).is_true()
 	assert_bool(_line().visible).is_false()
 	assert_bool(_screen().get_archive_button().visible).is_false()
 	await _close_wormhole()
 	await _dial(DialOutcome.Kind.HOSTILE_LOCK)
+	await _take_record()
 	assert_bool(_screen().is_showing_open()).is_true()
 	assert_bool(_line().visible).is_false()
 	assert_bool(_screen().get_archive_button().visible).is_false()
@@ -163,6 +196,7 @@ func test_a_lock_that_delivers_nothing_shows_no_line() -> void:
 
 func test_the_gamepad_reaches_read_in_the_archive() -> void:
 	await _dial(DialOutcome.Kind.LOCK)
+	await _take_record()
 	assert_object(_focus_owner()).is_same(_screen().get_close_button())
 	await ArchiveFixture.pad(JOY_BUTTON_DPAD_UP)
 	assert_object(_focus_owner()).is_same(_screen().get_archive_button())
@@ -177,6 +211,7 @@ func test_the_screen_with_new_documents_fits_the_minimum_window(
 ) -> void:
 	TranslationServer.set_locale(locale)
 	await _dial(DialOutcome.Kind.LOCK)
+	await _take_record()
 	await get_tree().process_frame
 	var panel: Control = _screen().get_node("Center/Panel") as Control
 	var needed: Vector2 = panel.get_combined_minimum_size()

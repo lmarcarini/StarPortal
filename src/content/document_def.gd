@@ -13,8 +13,9 @@ extends DefBase
 enum Kind { NOTE, IMAGE, DOSSIER, LOG, GIFT, ARTEFACT }
 
 ## When the document reaches the Archive. NEVER: only a scenario or command delivers it.
-## AT_START: at tick 0 of a new game. ON_FIRST_LOCK: the first time [member arrival_world_id]
-## is locked.
+## AT_START: at tick 0 of a new game. ON_FIRST_LOCK: with the first horizon record of
+## [member arrival_world_id], taken when the player extends the pole camera through a wormhole
+## open to it (the name is kept so content is unchanged).
 enum Arrival { NEVER, AT_START, ON_FIRST_LOCK }
 
 ## Number of glyphs in an answer: the seven coordinate seals. Content depends on nothing, so
@@ -42,7 +43,8 @@ const GLYPH_COUNT: int = 36
 @export var pair_id: StringName = &""
 ## When the document arrives in the Archive.
 @export var arrival: Arrival = Arrival.NEVER
-## Id of the WorldDef whose first lock delivers the document; used by ON_FIRST_LOCK only.
+## Id of the WorldDef whose first horizon record delivers the document; used by ON_FIRST_LOCK
+## only.
 @export var arrival_world_id: StringName = &""
 
 

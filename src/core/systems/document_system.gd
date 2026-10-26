@@ -1,19 +1,23 @@
 class_name DocumentSystem
 extends SimSystem
-## Delivers documents to the Archive when the story says so, after GateSystem. A document
-## with Arrival.ON_FIRST_LOCK arrives on the tick its world is locked, unless the Archive
-## already holds it, so locking the world again later, or after a save and reload, never
-## delivers it twice. AT_START documents are delivered once by GameSetup.build_new(), through
+## Delivers documents to the Archive when the story says so, after GateSystem, and moves the
+## pole camera. A document with Arrival.ON_FIRST_LOCK arrives with the first horizon record of
+## its world: when the pole camera (ExtendPoleCameraCommand) finishes extending into that world
+## through the open wormhole. The record is taken once per world (WorldsState.horizon_records),
+## and a document the Archive already holds is skipped, so nothing is ever delivered twice.
+## AT_START documents are delivered once by GameSetup.build_new(), through
 ## [method deliver_start_documents].
 ## [br][br]
-## "Locked this tick" is read from the Dial Log: GateSystem stamps its entry with the tick
-## the tick being run ends at (clock tick + 1), and logs a lock only on that tick, so the
-## newest entry is the one to look at. Nothing is remembered between ticks.
+## The camera: each tick it is out, it is pulled back with nothing taken when the Ring no longer
+## holds a wormhole to its world (closed this tick or earlier, by the player, a time-out or the
+## power); otherwise one tick of its extension passes, and on the last one the record is taken.
+## A camera sent at the start of tick T takes the record on tick T + EXTEND_TICKS - 1.
 ## [br][br]
-## Posts document_received(document id) for each delivery, and one
-## pause_requested(&"document_received") on a tick with any.
+## Posts horizon_record_taken(world id) for each record, then document_received(document id)
+## for each delivery, and one pause_requested(&"document_received") on a tick with any.
 ## Bible: technical-architecture.md#narrative-and-event-scripting,
-## gate-and-address-spec.md#where-addresses-come-from
+## gate-and-address-spec.md#where-addresses-come-from,
+## game-design.md#base-building-and-power (the pole camera, horizon record)
 
 ## Reason of the pause request a delivery posts.
 const PAUSE_REASON: StringName = &"document_received"
@@ -34,21 +38,25 @@ func get_id() -> StringName:
 	return &"documents"
 
 
-## Delivers the ON_FIRST_LOCK documents of the world locked this tick, in id order, that the
-## Archive does not hold yet, and requests one pause when any arrived.
+## Moves the pole camera when it is out; when it reaches the horizon, takes the record and
+## delivers the world's ON_FIRST_LOCK documents in id order that the Archive does not hold yet,
+## requesting one pause when any arrived.
 func tick(state: GameState) -> void:
-	var world_id: StringName = _world_locked_this_tick(state)
-	if world_id.is_empty():
+	var worlds: WorldsState = state.worlds
+	if not worlds.is_pole_camera_out():
 		return
-	var delivered: bool = false
-	for def: DocumentDef in _documents:
-		if def.arrival != DocumentDef.Arrival.ON_FIRST_LOCK or def.arrival_world_id != world_id:
-			continue
-		if state.archive.has_document(def.id):
-			continue
-		DeliverDocumentCommand.deliver(state, def.id)
-		delivered = true
-	if delivered:
+	var world_id: StringName = worlds.pole_camera_world_id
+	var gate: GateState = state.gate
+	if gate.mode != GateState.RingMode.LOCKED or gate.connected_world_id != world_id:
+		worlds.retract_pole_camera()
+		return
+	worlds.pole_camera_ticks_left -= 1
+	if worlds.pole_camera_ticks_left > 0:
+		return
+	worlds.retract_pole_camera()
+	worlds.horizon_records[world_id] = true
+	state.events.post(&"horizon_record_taken", [world_id])
+	if _deliver_first_lock_documents(state, world_id):
 		state.events.post(&"pause_requested", [PAUSE_REASON])
 
 
@@ -67,11 +75,15 @@ static func deliver_start_documents(state: GameState, documents: Array[DocumentD
 			DeliverDocumentCommand.deliver(state, def.id)
 
 
-## The world a dial locked on the tick being run, or &"" when none did.
-func _world_locked_this_tick(state: GameState) -> StringName:
-	if state.gate.dial_log.is_empty():
-		return &""
-	var entry: DialLogEntry = state.gate.dial_log.back()
-	if entry.tick != state.clock.tick + 1 or not DialOutcome.is_lock(entry.outcome):
-		return &""
-	return entry.world_id
+## Delivers the ON_FIRST_LOCK documents of [param world_id] that the Archive does not hold, in
+## id order; true when any arrived.
+func _deliver_first_lock_documents(state: GameState, world_id: StringName) -> bool:
+	var delivered: bool = false
+	for def: DocumentDef in _documents:
+		if def.arrival != DocumentDef.Arrival.ON_FIRST_LOCK or def.arrival_world_id != world_id:
+			continue
+		if state.archive.has_document(def.id):
+			continue
+		DeliverDocumentCommand.deliver(state, def.id)
+		delivered = true
+	return delivered
