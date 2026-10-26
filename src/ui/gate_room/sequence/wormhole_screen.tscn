@@ -117,6 +117,11 @@ text = "GATE_WORMHOLE_CLOSE"
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="PoleCameraButton" type="Button" parent="Center/Panel/Box/OpenBox/Columns/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "GATE_WORMHOLE_EXTEND_CAMERA"
+
 [node name="MothButton" type="Button" parent="Center/Panel/Box/OpenBox/Columns/Actions"]
 unique_name_in_owner = true
 layout_mode = 2

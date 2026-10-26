@@ -66,16 +66,17 @@ static func ticks_until_empty(stored_mwh: float, loss_mw: float) -> int:
 	return maxi(ceili(stored_mwh * PowerMath.TICKS_PER_HOUR / loss_mw), 0)
 
 
-## Returns the documents this lock delivered, in arrival order, read from the Archive: those
-## received on the tick the lock happened. DocumentSystem delivers on the tick a lock is logged,
-## stamped with the clock's tick, one before the lock's own tick (the tick that tick ends at).
+## Returns the documents this wormhole brought, in arrival order, read from the Archive: those
+## received while it has been open. DocumentSystem delivers them with the horizon record the
+## pole camera takes through it, stamped with the clock's tick, which is never before the tick
+## the lock was resolved on (one before the lock's own tick, the tick that tick ends at).
 static func new_documents(state: GameState) -> Array[StringName]:
 	var lock_tick: int = state.gate.lock_started_tick
 	var archive: ArchiveState = state.archive
 	if state.gate.mode != GateState.RingMode.LOCKED or lock_tick < 1:
 		return []
 	return archive.received.filter(
-		func(id: StringName) -> bool: return archive.received_tick.get(id, -1) == lock_tick - 1
+		func(id: StringName) -> bool: return archive.received_tick.get(id, -1) >= lock_tick - 1
 	)
 
 
