@@ -10,12 +10,17 @@ extends SimSystem
 ## opened at tick L drains through ticks L .. L + max_open_ticks - 1 and closes at
 ## L + max_open_ticks. Every outcome takes the same time, so timing reveals nothing.
 ## [br][br]
+## A dial that resolves into a lock (or hostile lock) drops a clock faster than 1× to 1×, so
+## an open wormhole never burns out unseen at high speed; 0.5×, pause and holds are left
+## alone, and the player may speed up again while it is open.
+## [br][br]
 ## Posts dial_resolved(outcome, address key), address_book_changed() and
 ## wormhole_closed(reason), reason &"timeout" or &"power"; a dial_resolved event carries
 ## nothing but the outcome and the address key.
 ## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy,
 ## gate-and-address-spec.md#the-dial-console (Address Book),
-## game-design.md#time-real-time-with-pause,
+## game-design.md#time-real-time-with-pause (a lock drops the clock to 1×),
+## gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## technical-architecture.md#simulation-clock-and-commands
 
 ## Close reason when the wormhole reached its maximum open time.
@@ -49,7 +54,8 @@ func tick(state: GameState) -> void:
 
 ## Resolves the dial in progress at [param end_tick]: spends the outcome's cost, logs the
 ## attempt, marks a reached world LOCKED, posts dial_resolved, then records the dial in the
-## Address Book (the world only on a lock) and posts address_book_changed.
+## Address Book (the world only on a lock) and posts address_book_changed. A lock also drops
+## the clock to 1× when it runs faster.
 func _resolve(state: GameState, end_tick: int) -> void:
 	var gate: GateState = state.gate
 	var answer: Dictionary = DialResolver.resolve(gate.current_address, state.galaxy)
@@ -65,6 +71,7 @@ func _resolve(state: GameState, end_tick: int) -> void:
 	RingControl.finish_dial(gate, entry)
 	if DialOutcome.is_lock(outcome):
 		state.worlds.statuses[entry.world_id] = WorldsState.WorldStatus.LOCKED
+		_drop_to_normal_speed(state.clock)
 	state.events.post(&"dial_resolved", [outcome as int, entry.address.key()])
 	state.address_book.record_dial(entry)
 	state.events.post(&"address_book_changed", [])
@@ -79,3 +86,9 @@ func _close_reason(state: GameState, end_tick: int) -> StringName:
 	if end_tick - state.gate.lock_started_tick >= state.balance.max_open_ticks:
 		return REASON_TIMEOUT
 	return &""
+
+
+## Sets [param clock] to 1× when it runs faster; slower speeds, pause and holds are unchanged.
+func _drop_to_normal_speed(clock: ClockState) -> void:
+	if clock.speed_index > ClockState.NORMAL_SPEED_INDEX:
+		clock.speed_index = ClockState.NORMAL_SPEED_INDEX
