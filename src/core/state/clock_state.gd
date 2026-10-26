@@ -13,13 +13,15 @@ enum Mode { RUNNING, PAUSED, HELD }
 
 ## Number of clock speeds; must equal SimClock.SPEEDS.size().
 const SPEED_COUNT: int = 4
+## Index of the 1× speed in SimClock.SPEEDS; a lock drops any faster speed to it.
+const NORMAL_SPEED_INDEX: int = 1
 ## Saved names of the modes, indexed by Mode value.
 const _MODE_NAMES: Array[String] = ["running", "paused", "held"]
 
 ## Ticks elapsed since the campaign start; one tick is one in-game minute.
 var tick: int = 0
 ## Index into SimClock.SPEEDS.
-var speed_index: int = 1
+var speed_index: int = NORMAL_SPEED_INDEX
 ## Current time-control mode. Change it only through TimeControl.
 var mode: Mode = Mode.PAUSED
 ## Active hold reasons, in the order they were added; non-empty exactly while HELD.
