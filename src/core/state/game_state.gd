@@ -6,7 +6,15 @@ extends RefCounted
 
 ## Saved sections, in to_dict() order.
 const _SECTIONS: Array[String] = [
-	"clock", "random", "flags", "gate", "power", "worlds", "archive", "address_book"
+	"clock",
+	"random",
+	"flags",
+	"gate",
+	"power",
+	"worlds",
+	"archive",
+	"address_book",
+	"operations_log"
 ]
 
 ## The simulation clock.
@@ -25,6 +33,8 @@ var worlds: WorldsState = WorldsState.new()
 var archive: ArchiveState = ArchiveState.new()
 ## Every address found or dialed.
 var address_book: AddressBookState = AddressBookState.new()
+## The operations log: what happened, oldest first.
+var operations_log: LogState = LogState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -63,6 +73,7 @@ func to_dict() -> Dictionary:
 		"worlds": worlds.to_dict(),
 		"archive": archive.to_dict(),
 		"address_book": address_book.to_dict(),
+		"operations_log": operations_log.to_dict(),
 	}
 
 
@@ -78,6 +89,7 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.worlds = WorldsState.from_dict(_dict_or_empty(data.get("worlds")))
 	state.archive = ArchiveState.from_dict(_dict_or_empty(data.get("archive")))
 	state.address_book = AddressBookState.from_dict(_dict_or_empty(data.get("address_book")))
+	state.operations_log = LogState.from_dict(_dict_or_empty(data.get("operations_log")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -90,12 +102,14 @@ static func from_dict(data: Dictionary) -> GameState:
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
-## "flags", "gate", "power", "worlds", "archive" and "address_book" must be objects, the
+## "flags", "gate", "power", "worlds", "archive", "address_book" and "operations_log" must be
+## objects, the
 ## sub-states must pass their own validate_dict(), and every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
 ## not survive JSON, whether they arrive as ints or as floats). The Ring's "dial_started_tick" and
 ## "lock_started_tick", every Dial Log entry's "tick", every document's "received_tick" and every
-## Address Book entry's "last_dialed_tick" must not be later than the clock's tick. Errors from a
+## Address Book entry's "last_dialed_tick" and every operations log entry's "tick" must not be
+## later than the clock's tick. Errors from a
 ## sub-state are prefixed with its key, e.g. "clock: 'tick' is not a whole number ...".
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
@@ -140,6 +154,8 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return ArchiveState.validate_dict(section)
 		"address_book":
 			return AddressBookState.validate_dict(section)
+		"operations_log":
+			return LogState.validate_dict(section)
 	return []
 
 
@@ -182,6 +198,9 @@ static func _record_tick_errors(now: float, data: Dictionary) -> Array[String]:
 			errors.append(
 				"address_book: entries %d 'last_dialed_tick' is later than the clock tick" % index
 			)
+	var log_data: Dictionary = data["operations_log"]
+	if LogState.from_dict(log_data).last_tick() > now:
+		errors.append("operations_log: the newest entry's 'tick' is later than the clock tick")
 	return errors
 
 

@@ -36,13 +36,14 @@ func test_v8_marks_locked_worlds_taken() -> void:
 	var result := SaveMigrator.migrate(data)
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(9)
+	assert_int(migrated["format_version"]).is_equal(SaveMigrator.TARGET_VERSION)
 	var v8_state: Dictionary = data["state"]
 	var expected := v8_state.duplicate(true)
 	var worlds: Dictionary = expected["worlds"]
 	worlds["horizon_records"] = {"world_sill": true}
 	worlds["pole_camera_world_id"] = ""
 	worlds["pole_camera_ticks_left"] = 0
+	expected["operations_log"] = {"entries": []}
 	assert_dict(migrated["state"]).is_equal(expected)
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -55,9 +56,18 @@ func test_v8_edge_cases() -> void:
 	var empty_state: Dictionary = empty.value["state"]
 	assert_dict(empty_state["worlds"]["horizon_records"]).is_empty()
 	var no_state := SaveMigrator.migrate({"format_version": 8, "state": 5})
-	assert_dict(no_state.value).is_equal({"format_version": 9, "state": 5})
-	var no_worlds := SaveMigrator.migrate({"format_version": 8, "state": {"worlds": 3}})
-	assert_dict(no_worlds.value).is_equal({"format_version": 9, "state": {"worlds": 3}})
+	assert_dict(no_state.value).is_equal(
+		{"format_version": SaveMigrator.TARGET_VERSION, "state": 5}
+	)
+	var no_worlds := SaveMigrator.migrate(
+		{"format_version": 8, "state": {"worlds": 3, "operations_log": {"entries": []}}}
+	)
+	assert_dict(no_worlds.value).is_equal(
+		{
+			"format_version": SaveMigrator.TARGET_VERSION,
+			"state": {"worlds": 3, "operations_log": {"entries": []}}
+		}
+	)
 	var bad := SaveMigrator.migrate({"format_version": 8, "state": {"worlds": {"statuses": 1}}})
 	var bad_state: Dictionary = bad.value["state"]
 	assert_dict(bad_state["worlds"]["horizon_records"]).is_empty()
