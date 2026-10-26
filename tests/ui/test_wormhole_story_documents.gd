@@ -1,7 +1,8 @@
 ## The wormhole screen's new-documents line over the real data/ content: after each story
 ## lock of the M1.5 flow and its pole camera's horizon record it names exactly the documents the
-## record delivered (none before the camera goes out), a second lock of a story world names none, and the screen still fits the minimum window with the longest list
-## (the second lock's five documents) and the console read, in en and pt_BR.
+## record delivered (none before the camera goes out), a second lock of a story world names
+## none, and the screen still fits the minimum window with the longest list (the second lock's
+## five documents) and the console read, in en and pt_BR.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## technical-architecture.md#input-accessibility-and-localisation
 extends GdUnitTestSuite
