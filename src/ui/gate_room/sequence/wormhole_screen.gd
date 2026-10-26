@@ -3,12 +3,15 @@ extends Control
 ## The open wormhole, on top of the Gate Room until it closes: the destination, a plain line
 ## on what is going on, a hostile warning when the far side is guarded, the time left of the
 ## maximum open time (live with sim time), the drain, the bank's state and the documents this
-## lock delivered ("New in the Archive: …"), then what the player can do now: Read in the
+## wormhole brought ("New in the Archive: …"), then what the player can do now: Read in the
 ## Archive (only with such documents), Close wormhole (posts CloseWormholeCommand), Read the far
-## Ring's console (ConsoleFinds: what it added, and Open the Address Book) and Send MOTH (shown,
-## disabled, with when it arrives). Open the Address Book and Read in the Archive step AWAY: the
-## screen hides behind a return bar, Back to the wormhole (or Cancel) shows it again, and it
-## comes back by itself when the wormhole closes or is about to (time or charge running out).
+## Ring's console (ConsoleFinds: what it added, and Open the Address Book), Extend the pole
+## camera (posts ExtendPoleCameraCommand; disabled while it goes through and once the world's
+## horizon record is taken; a temporary button until the wormhole actions of card #109) and
+## Send MOTH (shown, disabled, with when it arrives). Open the Address Book and Read in the
+## Archive step AWAY: the screen hides behind a return bar, Back to the wormhole (or Cancel)
+## shows it again, and it comes back by itself when the wormhole closes or is about to (time or
+## charge running out).
 ## When the wormhole closes, for any reason, the screen says why until the player goes back to
 ## the console.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
@@ -46,6 +49,7 @@ var _closed_reason: StringName = &""
 @onready var _archive_button: Button = %ArchiveButton
 @onready var _close_button: Button = %CloseButton
 @onready var _console: ConsoleFinds = %ConsoleFinds
+@onready var _camera_button: Button = %PoleCameraButton
 @onready var _return_bar: Control = %ReturnBar
 @onready var _return_button: Button = %ReturnButton
 @onready var _closed_box: VBoxContainer = %ClosedBox
@@ -56,6 +60,7 @@ var _closed_reason: StringName = &""
 func _ready() -> void:
 	_close_button.pressed.connect(_on_close_pressed)
 	_archive_button.pressed.connect(_on_archive_pressed)
+	_camera_button.pressed.connect(_on_camera_pressed)
 	_back_button.pressed.connect(dismiss)
 	_console.book_requested.connect(step_away)
 	_console.focus_changed.connect(_on_console_focus_changed)
@@ -243,6 +248,7 @@ func _show_open(state: GameState) -> void:
 	_drain.text = WormholeText.drain(state)
 	_bank.text = WormholeText.bank(state)
 	_show_new_documents(state)
+	_show_camera(state.worlds, state.gate.connected_world_id)
 	_return_button.text = tr(&"GATE_WORMHOLE_RETURN").format(
 		{"left": GateRoomFormat.duration(GateQueries.open_ticks_left(state))}
 	)
@@ -261,12 +267,25 @@ func _show_new_documents(state: GameState) -> void:
 	_archive_button.visible = not defs.is_empty()
 
 
+## Shows the pole camera button for [param world_id]: enabled while the camera is in and the
+## record not taken, otherwise disabled and saying why.
+func _show_camera(worlds: WorldsState, world_id: StringName) -> void:
+	var key: StringName = &"GATE_WORMHOLE_EXTEND_CAMERA"
+	if worlds.is_pole_camera_out():
+		key = &"GATE_WORMHOLE_CAMERA_OUT"
+	elif worlds.is_horizon_record_taken(world_id):
+		key = &"GATE_WORMHOLE_CAMERA_DONE"
+	_camera_button.text = key
+	_camera_button.disabled = key != &"GATE_WORMHOLE_EXTEND_CAMERA"
+
+
 ## Links the open screen's buttons in a focus loop.
 func _trap_open_buttons() -> void:
 	var buttons: Array[Control] = [_close_button]
 	if _archive_button.visible:
 		buttons.push_front(_archive_button)
 	buttons.append_array(_console.get_focusables())
+	buttons.append(_camera_button)
 	OverlayFocus.trap_all(buttons)
 
 
@@ -284,6 +303,12 @@ func _is_ending_soon(state: GameState) -> bool:
 func _on_close_pressed() -> void:
 	if _simulation != null and _phase == Phase.OPEN:
 		_simulation.submit(CloseWormholeCommand.new())
+
+
+func _on_camera_pressed() -> void:
+	if _simulation != null and _phase == Phase.OPEN:
+		_simulation.submit(ExtendPoleCameraCommand.new())
+		_render()
 
 
 ## Read in the Archive steps AWAY, as Open the Address Book does, and asks for the first

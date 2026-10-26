@@ -6,7 +6,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 8
+const TARGET_VERSION: int = 9
 
 ## v3 defaults as ExactFloat strings, frozen here: 0.0, 400.0 and 30.0.
 const _EXACT_ZERO: String = "0000000000000000"
@@ -25,6 +25,7 @@ static func built_in_steps() -> Dictionary[int, Callable]:
 		5: _v5_to_v6,
 		6: _v6_to_v7,
 		7: _v7_to_v8,
+		8: _v8_to_v9,
 	}
 	return built_in
 
@@ -241,4 +242,33 @@ static func _v7_to_v8(data: Dictionary) -> Dictionary:
 		return data
 	var worlds_data: Dictionary = worlds
 	worlds_data["consoles_read"] = {}
+	return data
+
+
+## v8 -> v9: adds the pole camera to "worlds": "horizon_records" holds every world whose v8
+## status is "locked" (a v8 game delivered a world's documents on its first lock, so they never
+## come twice), and the camera is in ("pole_camera_world_id" "", "pole_camera_ticks_left" 0),
+## written here as literals so later changes to the game's defaults never change this step.
+## Every other value is kept. Data with no state object or no worlds object is left as is, for
+## validation to reject; a "statuses" that is not an object gives no records and is left for
+## validation too.
+static func _v8_to_v9(data: Dictionary) -> Dictionary:
+	var state: Variant = data.get("state")
+	if not state is Dictionary:
+		return data
+	var state_data: Dictionary = state
+	var worlds: Variant = state_data.get("worlds")
+	if not worlds is Dictionary:
+		return data
+	var worlds_data: Dictionary = worlds
+	var records: Dictionary = {}
+	var statuses: Variant = worlds_data.get("statuses")
+	if statuses is Dictionary:
+		var status_dict: Dictionary = statuses
+		for world_id: Variant in status_dict:
+			if str(status_dict[world_id]) == "locked":
+				records[str(world_id)] = true
+	worlds_data["horizon_records"] = records
+	worlds_data["pole_camera_world_id"] = ""
+	worlds_data["pole_camera_ticks_left"] = 0
 	return data

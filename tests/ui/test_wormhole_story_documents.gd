@@ -1,7 +1,8 @@
 ## The wormhole screen's new-documents line over the real data/ content: after each story
-## lock of the M1.5 flow it names exactly the documents that lock delivered, a second lock of a
-## story world names none, and the screen still fits the minimum window with the longest list
-## (the second lock's five documents) and the console read, in en and pt_BR.
+## lock of the M1.5 flow and its pole camera's horizon record it names exactly the documents the
+## record delivered (none before the camera goes out), a second lock of a story world names
+## none, and the screen still fits the minimum window with the longest list (the second lock's
+## five documents) and the console read, in en and pt_BR.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## technical-architecture.md#input-accessibility-and-localisation
 extends GdUnitTestSuite
@@ -35,7 +36,8 @@ func _new_player() -> M15Player:
 	return player
 
 
-## Dials puzzle [param index]'s answer and returns the documents that lock delivered.
+## Dials puzzle [param index]'s answer, checks nothing arrived with the lock alone, extends the
+## pole camera and returns the documents its horizon record delivered.
 func _lock(player: M15Player, index: int) -> Array[StringName]:
 	var puzzle: Dictionary = M15Player.PUZZLES[index]
 	var glyphs: Array = puzzle["glyphs"]
@@ -44,6 +46,9 @@ func _lock(player: M15Player, index: int) -> Array[StringName]:
 	assert_bool(player.wait_for_charge(target)).is_true()
 	assert_object(player.dial(target)).is_not_null()
 	assert_int(player.state().gate.mode).is_equal(GateState.RingMode.LOCKED)
+	assert_int(player.state().archive.received.size()).is_equal(held)
+	assert_array(WormholeText.new_documents(player.state())).is_empty()
+	player.extend_pole_camera()
 	return player.state().archive.received.slice(held)
 
 

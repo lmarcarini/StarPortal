@@ -53,6 +53,9 @@ GATE_WORMHOLE_ACTIONS,What you can do now,O que você pode fazer agora
 GATE_WORMHOLE_NEW_DOCUMENTS,New in the Archive: {titles},Novo no Arquivo: {titles}
 GATE_WORMHOLE_READ_ARCHIVE,Read in the Archive,Ler no Arquivo
 GATE_WORMHOLE_READ_CONSOLE,Read the far Ring's console,Ler o console do Anel distante
+GATE_WORMHOLE_EXTEND_CAMERA,Extend the pole camera,Estender a câmera de haste
+GATE_WORMHOLE_CAMERA_OUT,The pole camera is going through…,A câmera de haste está atravessando…
+GATE_WORMHOLE_CAMERA_DONE,Horizon record taken,Registro do horizonte obtido
 GATE_CONSOLE_HINT,"Copies the far Ring's log of recent dials into the Address Book: two to four nearby addresses, already written for CAIRN.","Copia o registro de discagens recentes do Anel distante para o Livro de Endereços: de dois a quatro endereços próximos, já escritos para a CAIRN."
 GATE_CONSOLE_ADDED,"Console read: {count} new addresses in the Address Book, written for CAIRN. Their worlds stay unknown until you lock them.","Console lido: {count} endereços novos no Livro de Endereços, escritos para a CAIRN. Seus mundos continuam desconhecidos até você abrir uma conexão com eles."
 GATE_CONSOLE_ADDED_ONE,"Console read: 1 new address in the Address Book, written for CAIRN. Its world stays unknown until you lock it.","Console lido: 1 endereço novo no Livro de Endereços, escrito para a CAIRN. Seu mundo continua desconhecido até você abrir uma conexão com ele."

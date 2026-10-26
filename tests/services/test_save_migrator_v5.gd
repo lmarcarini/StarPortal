@@ -30,6 +30,7 @@ func _expected_v7_state() -> Dictionary:
 	power["install_ticks_left"] = 0
 	var worlds: Dictionary = expected["worlds"]
 	worlds["consoles_read"] = {}
+	_add_v9_worlds(worlds)
 	return expected
 
 
@@ -55,7 +56,7 @@ func test_v4_drops_intel_workbench_and_queue() -> void:
 	var result := SaveMigrator.migrate(_v4_fixture())
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(8)
+	assert_int(migrated["format_version"]).is_equal(9)
 	assert_dict(migrated["state"]).is_equal(_expected_v7_state())
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -65,14 +66,14 @@ func test_v4_drops_intel_workbench_and_queue() -> void:
 ## validation to reject.
 func test_v4_without_state_or_gate_is_left_for_validation() -> void:
 	var no_state := SaveMigrator.migrate({"format_version": 4, "state": 5})
-	assert_dict(no_state.value).is_equal({"format_version": 8, "state": 5})
+	assert_dict(no_state.value).is_equal({"format_version": 9, "state": 5})
 	var bad_gate := SaveMigrator.migrate({"format_version": 4, "state": {"gate": 3, "intel": {}}})
 	var empty_sections := {
 		"gate": 3,
 		"archive": {"received": [], "read": {}, "received_tick": {}},
 		"address_book": {"entries": []},
 	}
-	assert_dict(bad_gate.value).is_equal({"format_version": 8, "state": empty_sections})
+	assert_dict(bad_gate.value).is_equal({"format_version": 9, "state": empty_sections})
 
 
 ## The real v4 file loads through the SaveService with its gate, power, worlds and clock
@@ -99,3 +100,16 @@ func test_v4_save_file_loads_into_v5() -> void:
 	assert_array(loaded.gate.dial_log).has_size(3)
 	assert_int(loaded.gate.mode).is_equal(GateState.RingMode.IDLE)
 	assert_bool(GameSetup.build(loaded, GameDefs.from_registry(Registry)).is_ok).is_true()
+
+
+## Adds what v8 -> v9 gives [param worlds]: a horizon record for each locked world, the pole
+## camera in.
+func _add_v9_worlds(worlds: Dictionary) -> void:
+	var records: Dictionary = {}
+	var statuses: Dictionary = worlds["statuses"]
+	for world_id: String in statuses:
+		if statuses[world_id] == "locked":
+			records[world_id] = true
+	worlds["horizon_records"] = records
+	worlds["pole_camera_world_id"] = ""
+	worlds["pole_camera_ticks_left"] = 0

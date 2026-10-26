@@ -1,12 +1,17 @@
 class_name WorldsState
 extends RefCounted
 ## Saved progress over the galaxy: the seed and generator version the galaxy is regenerated
-## from, and the status of every world the player has learned something about.
+## from, the status of every world the player has learned something about, the far consoles
+## read, the worlds whose horizon record the pole camera has taken, and the pole camera on its
+## way through the open wormhole.
 ## Saved shape: {"galaxy_seed": decimal string, "generator_version", "statuses":
-## {world id: status name}, "consoles_read": {world id: true}}. The seed is a string because it
-## can exceed 2^53.
+## {world id: status name}, "consoles_read": {world id: true}, "horizon_records":
+## {world id: true}, "pole_camera_world_id": world id or "", "pole_camera_ticks_left"}. The seed
+## is a string because it can exceed 2^53. The pole camera is out exactly when both its fields
+## are set (a world id and at least 1 tick left); otherwise "" and 0.
 ## Bible: technical-architecture.md#data-model, technical-architecture.md#save-system,
-## gate-and-address-spec.md#where-addresses-come-from (Ring consoles)
+## gate-and-address-spec.md#where-addresses-come-from (Ring consoles),
+## game-design.md#base-building-and-power (the pole camera, horizon record)
 
 ## What the base knows about a world. UNKNOWN is never stored; more statuses arrive with
 ## probing (M3).
@@ -23,6 +28,12 @@ var generator_version: int = 0
 var statuses: Dictionary[StringName, WorldStatus] = {}
 ## Worlds whose far Ring's console the player has read, by world id; always true.
 var consoles_read: Dictionary[StringName, bool] = {}
+## Worlds whose horizon record the pole camera has taken, by world id; always true.
+var horizon_records: Dictionary[StringName, bool] = {}
+## The world the pole camera is extending into, or &"" while it is in.
+var pole_camera_world_id: StringName = &""
+## Ticks until the extending pole camera takes the horizon record; 0 while it is in.
+var pole_camera_ticks_left: int = 0
 
 
 ## Returns the status of [param world_id]; UNKNOWN when none is stored.
@@ -35,20 +46,36 @@ func is_console_read(world_id: StringName) -> bool:
 	return consoles_read.has(world_id)
 
 
+## True when the horizon record of [param world_id] has been taken.
+func is_horizon_record_taken(world_id: StringName) -> bool:
+	return horizon_records.has(world_id)
+
+
+## True while the pole camera is extending through the wormhole.
+func is_pole_camera_out() -> bool:
+	return not pole_camera_world_id.is_empty()
+
+
+## Pulls the pole camera back in, with nothing taken.
+func retract_pole_camera() -> void:
+	pole_camera_world_id = &""
+	pole_camera_ticks_left = 0
+
+
 ## Returns JSON-safe data for saving: the seed as a decimal string, statuses as lowercase
 ## names keyed by world id strings.
 func to_dict() -> Dictionary:
 	var status_data: Dictionary = {}
 	for world_id: StringName in statuses:
 		status_data[String(world_id)] = _STATUS_NAMES[statuses[world_id]]
-	var console_data: Dictionary = {}
-	for world_id: StringName in consoles_read:
-		console_data[String(world_id)] = true
 	return {
 		"galaxy_seed": str(galaxy_seed),
 		"generator_version": generator_version,
 		"statuses": status_data,
-		"consoles_read": console_data,
+		"consoles_read": _id_set_to_dict(consoles_read),
+		"horizon_records": _id_set_to_dict(horizon_records),
+		"pole_camera_world_id": String(pole_camera_world_id),
+		"pole_camera_ticks_left": pole_camera_ticks_left,
 	}
 
 
@@ -59,12 +86,10 @@ static func from_dict(data: Dictionary) -> WorldsState:
 	var worlds := WorldsState.new()
 	worlds.galaxy_seed = _to_int64(data.get("galaxy_seed", 0))
 	worlds.generator_version = type_convert(data.get("generator_version", 0), TYPE_INT)
-	var console_data: Variant = data.get("consoles_read", {})
-	if console_data is Dictionary:
-		var console_dict: Dictionary = console_data
-		for world_id: Variant in console_dict:
-			if _is_true(console_dict[world_id]):
-				worlds.consoles_read[StringName(str(world_id))] = true
+	worlds.consoles_read = _id_set_from(data.get("consoles_read"))
+	worlds.horizon_records = _id_set_from(data.get("horizon_records"))
+	worlds.pole_camera_world_id = StringName(str(data.get("pole_camera_world_id", "")))
+	worlds.pole_camera_ticks_left = type_convert(data.get("pole_camera_ticks_left", 0), TYPE_INT)
 	var status_data: Variant = data.get("statuses", {})
 	if not status_data is Dictionary:
 		return worlds
@@ -79,8 +104,9 @@ static func from_dict(data: Dictionary) -> WorldsState:
 ## Returns human-readable errors for saved [param data], empty when it is valid:
 ## "galaxy_seed" a 64-bit integer written as a canonical decimal string; "generator_version"
 ## a whole number from 0 to 2^53; "statuses" an object mapping non-empty world ids to a
-## status name other than "unknown"; "consoles_read" an object mapping non-empty world ids to
-## true.
+## status name other than "unknown"; "consoles_read" and "horizon_records" objects mapping
+## non-empty world ids to true; "pole_camera_world_id" a string and "pole_camera_ticks_left" a
+## whole number from 0 to 2^53, both set or both unset ("" and 0).
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	if not data.has("galaxy_seed"):
@@ -98,23 +124,49 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	else:
 		var status_dict: Dictionary = data["statuses"]
 		errors.append_array(_validate_statuses(status_dict))
-	errors.append_array(_validate_consoles(data))
+	errors.append_array(_validate_id_set(data, "consoles_read"))
+	errors.append_array(_validate_id_set(data, "horizon_records"))
+	errors.append_array(_validate_pole_camera(data))
 	return errors
 
 
-## Errors for "consoles_read" of [param data].
-static func _validate_consoles(data: Dictionary) -> Array[String]:
-	if not data.has("consoles_read"):
-		return ["missing 'consoles_read'"]
-	if not data["consoles_read"] is Dictionary:
-		return ["'consoles_read' is not an object"]
+## Errors for the set of world ids at [param key] of [param data]: an object mapping non-empty
+## world ids to true.
+static func _validate_id_set(data: Dictionary, key: String) -> Array[String]:
+	if not data.has(key):
+		return ["missing '%s'" % key]
+	if not data[key] is Dictionary:
+		return ["'%s' is not an object" % key]
 	var errors: Array[String] = []
-	var console_dict: Dictionary = data["consoles_read"]
-	for world_id: Variant in console_dict:
+	var id_dict: Dictionary = data[key]
+	for world_id: Variant in id_dict:
 		if str(world_id).is_empty():
-			errors.append("a read console has an empty world id")
-		elif not _is_true(console_dict[world_id]):
-			errors.append("consoles_read of '%s' is not true" % world_id)
+			errors.append("'%s' has an empty world id" % key)
+		elif not _is_true(id_dict[world_id]):
+			errors.append("%s of '%s' is not true" % [key, world_id])
+	return errors
+
+
+## Errors for the pole camera fields of [param data].
+static func _validate_pole_camera(data: Dictionary) -> Array[String]:
+	var errors: Array[String] = []
+	for key: String in ["pole_camera_world_id", "pole_camera_ticks_left"]:
+		if not data.has(key):
+			errors.append("missing '%s'" % key)
+	if not errors.is_empty():
+		return errors
+	var world_id: Variant = data["pole_camera_world_id"]
+	var ticks_left: Variant = data["pole_camera_ticks_left"]
+	if not world_id is String:
+		errors.append("'pole_camera_world_id' is not a string")
+	if not _is_count(ticks_left):
+		errors.append("'pole_camera_ticks_left' is not a whole number from 0 to 2^53")
+	if not errors.is_empty():
+		return errors
+	var is_out: bool = not str(world_id).is_empty()
+	var ticks: float = ticks_left
+	if is_out != (ticks > 0.0):
+		errors.append("'pole_camera_world_id' and 'pole_camera_ticks_left' are not both set")
 	return errors
 
 
@@ -128,6 +180,26 @@ static func _validate_statuses(status_dict: Dictionary) -> Array[String]:
 		elif not status is String or _STATUS_NAMES.find(status) <= WorldStatus.UNKNOWN:
 			errors.append("status of '%s' is not one of %s" % [world_id, _STATUS_NAMES.slice(1)])
 	return errors
+
+
+## Returns the ids of [param ids] as a JSON-safe {world id: true} object.
+static func _id_set_to_dict(ids: Dictionary[StringName, bool]) -> Dictionary:
+	var data: Dictionary = {}
+	for world_id: StringName in ids:
+		data[String(world_id)] = true
+	return data
+
+
+## Returns the ids mapped to true in [param value] when it is a Dictionary; others are dropped.
+static func _id_set_from(value: Variant) -> Dictionary[StringName, bool]:
+	var ids: Dictionary[StringName, bool] = {}
+	if not value is Dictionary:
+		return ids
+	var id_dict: Dictionary = value
+	for world_id: Variant in id_dict:
+		if _is_true(id_dict[world_id]):
+			ids[StringName(str(world_id))] = true
+	return ids
 
 
 ## True only for the bool true.

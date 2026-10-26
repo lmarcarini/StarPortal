@@ -32,10 +32,10 @@ func test_current_version_is_pass_through() -> void:
 	assert_dict(result.value).is_equal(data)
 
 
-## The target version is 8, with built-in steps from v1, v2, v3, v4, v5, v6 and v7.
-func test_target_version_is_eight() -> void:
-	assert_int(SaveMigrator.TARGET_VERSION).is_equal(8)
-	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([1, 2, 3, 4, 5, 6, 7])
+## The target version is 9, with built-in steps from v1 to v8.
+func test_target_version_is_nine() -> void:
+	assert_int(SaveMigrator.TARGET_VERSION).is_equal(9)
+	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([1, 2, 3, 4, 5, 6, 7, 8])
 
 
 ## Runs only the built-in v1 -> v2 step on [param data].
@@ -268,7 +268,7 @@ func test_v2_adds_gate_power_and_worlds() -> void:
 	var result := SaveMigrator.migrate({"format_version": 2.0, "tick": 9.0, "state": state})
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(8)
+	assert_int(migrated["format_version"]).is_equal(9)
 	var expected := state.duplicate(true)
 	expected.merge(_v3_sections(base_seed))
 	expected["archive"] = {"received": [], "read": {}, "received_tick": {}}
@@ -280,6 +280,7 @@ func test_v2_adds_gate_power_and_worlds() -> void:
 	expected_gate.erase("dial_queue")
 	var expected_worlds: Dictionary = expected["worlds"]
 	expected_worlds["consoles_read"] = {}
+	_add_v9_worlds(expected_worlds)
 	assert_dict(migrated["state"]).is_equal(expected)
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -289,7 +290,7 @@ func test_v2_adds_gate_power_and_worlds() -> void:
 func test_v2_without_state_is_left_for_validation() -> void:
 	var result := SaveMigrator.migrate({"format_version": 2})
 	assert_bool(result.is_ok).is_true()
-	assert_dict(result.value).is_equal({"format_version": 8})
+	assert_dict(result.value).is_equal({"format_version": 9})
 
 
 ## A real v2 file, written by the v2 SaveService (tests/services/fixtures/save_v2.json),
@@ -322,3 +323,16 @@ func test_v2_save_file_loads_into_v3_defaults() -> void:
 	assert_int(loaded.worlds.galaxy_seed).is_equal(GameState.new_game(20260101).worlds.galaxy_seed)
 	assert_int(loaded.worlds.generator_version).is_equal(1)
 	assert_dict(loaded.worlds.statuses).is_empty()
+
+
+## Adds what v8 -> v9 gives [param worlds]: a horizon record for each locked world, the pole
+## camera in.
+func _add_v9_worlds(worlds: Dictionary) -> void:
+	var records: Dictionary = {}
+	var statuses: Dictionary = worlds["statuses"]
+	for world_id: String in statuses:
+		if statuses[world_id] == "locked":
+			records[world_id] = true
+	worlds["horizon_records"] = records
+	worlds["pole_camera_world_id"] = ""
+	worlds["pole_camera_ticks_left"] = 0

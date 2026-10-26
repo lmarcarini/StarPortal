@@ -1,5 +1,5 @@
-## Tests for WorldsState: status lookup, the galaxy seed as a decimal string, round trips
-## and validate_dict() errors.
+## Tests for WorldsState: status lookup, the galaxy seed as a decimal string, the pole camera
+## and horizon records, round trips and validate_dict() errors.
 ## Bible: technical-architecture.md#data-model, technical-architecture.md#save-system
 extends GdUnitTestSuite
 
@@ -14,6 +14,9 @@ func _sample() -> WorldsState:
 	worlds.statuses[&"abydos"] = WorldsState.WorldStatus.LOCKED
 	worlds.statuses[&"p3x_118"] = WorldsState.WorldStatus.LOCKED
 	worlds.consoles_read[&"abydos"] = true
+	worlds.horizon_records[&"abydos"] = true
+	worlds.pole_camera_world_id = &"p3x_118"
+	worlds.pole_camera_ticks_left = 3
 	return worlds
 
 
@@ -35,6 +38,9 @@ func test_dict_shape() -> void:
 				"generator_version": 1,
 				"statuses": {"abydos": "locked", "p3x_118": "locked"},
 				"consoles_read": {"abydos": true},
+				"horizon_records": {"abydos": true},
+				"pole_camera_world_id": "p3x_118",
+				"pole_camera_ticks_left": 3,
 			}
 		)
 	)
@@ -49,7 +55,24 @@ func test_json_round_trip() -> void:
 	assert_int(restored.galaxy_seed).is_equal(BIG_SEED)
 	assert_int(typeof(restored.generator_version)).is_equal(TYPE_INT)
 	assert_int(typeof(restored.statuses.keys()[0])).is_equal(TYPE_STRING_NAME)
+	assert_int(typeof(restored.pole_camera_ticks_left)).is_equal(TYPE_INT)
 	assert_dict(restored.to_dict()).is_equal(data)
+
+
+## The pole camera is out while it has a world; retracting clears both fields. A new state has
+## it in and no horizon record taken.
+func test_pole_camera_and_horizon_records() -> void:
+	var worlds := _sample()
+	assert_bool(worlds.is_pole_camera_out()).is_true()
+	assert_bool(worlds.is_horizon_record_taken(&"abydos")).is_true()
+	assert_bool(worlds.is_horizon_record_taken(&"p3x_118")).is_false()
+	worlds.retract_pole_camera()
+	assert_bool(worlds.is_pole_camera_out()).is_false()
+	assert_int(worlds.pole_camera_ticks_left).is_equal(0)
+	var fresh := WorldsState.new()
+	assert_bool(fresh.is_pole_camera_out()).is_false()
+	assert_dict(fresh.horizon_records).is_empty()
+	assert_array(WorldsState.validate_dict(worlds.to_dict())).is_empty()
 
 
 ## validate_dict rejects bad seeds, versions and statuses, including a stored "unknown".
@@ -71,6 +94,14 @@ func test_validate_errors() -> void:
 		["consoles_read", {"abydos": false}, "consoles_read of 'abydos'"],
 		["consoles_read", {"abydos": 1}, "consoles_read of 'abydos'"],
 		["consoles_read", {"": true}, "empty world id"],
+		["horizon_records", [], "'horizon_records' is not an object"],
+		["horizon_records", {"abydos": false}, "horizon_records of 'abydos'"],
+		["horizon_records", {"": true}, "empty world id"],
+		["pole_camera_world_id", 5, "'pole_camera_world_id' is not a string"],
+		["pole_camera_world_id", "", "not both set"],
+		["pole_camera_ticks_left", 0, "not both set"],
+		["pole_camera_ticks_left", -1, "'pole_camera_ticks_left' is not a whole number"],
+		["pole_camera_ticks_left", 1.5, "'pole_camera_ticks_left' is not a whole number"],
 	]
 	for case: Array in cases:
 		var data := good.duplicate(true)
