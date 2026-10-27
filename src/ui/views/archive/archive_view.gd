@@ -50,6 +50,9 @@ func _ready() -> void:
 	_secondary.image_requested.connect(_on_image_requested.bind(_secondary))
 	_viewer.closed.connect(_on_viewer_closed)
 	_menu.id_pressed.connect(_on_menu_id_pressed)
+	_sections.tab_changed.connect(_link_sections.unbind(1))
+	_log.link_up(_sections.get_tab_bar())
+	_link_sections()
 	_link_filter()
 
 
@@ -234,6 +237,15 @@ func _link_filter() -> void:
 	if not _primary.get_document_id().is_empty():
 		target = _primary.get_default_focus()
 	filter.focus_neighbor_right = filter.get_path_to(target)
+
+
+## In the Log, Down from the section tabs goes to its kind filter; in Documents, the nearest.
+func _link_sections() -> void:
+	var tabs: TabBar = _sections.get_tab_bar()
+	var down: NodePath = NodePath()
+	if _sections.current_tab == 1:
+		down = tabs.get_path_to(_log.get_filter_button())
+	tabs.focus_neighbor_bottom = down
 
 
 func _on_menu_id_pressed(index: int) -> void:

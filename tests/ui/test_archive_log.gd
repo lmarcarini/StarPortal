@@ -136,24 +136,39 @@ func test_new_entries_appear_at_the_top() -> void:
 	assert_str(_list().get_rows()[0].get_line_text()).starts_with("Received: ")
 
 
-## Gamepad: from the section tabs, Right opens the Log and Down reaches its rows.
+## Gamepad: Right from the section tabs opens the Log; Down reaches the kind filter, Right the
+## search, Down the rows; Up and Left lead back the same way.
 func test_gamepad_reaches_the_log() -> void:
 	_view.show_section(false)
 	await UiInput.settle(_view)
 	var tabs: TabBar = (_view.get_node("%Sections") as TabContainer).get_tab_bar()
 	await UiInput.pad(tabs, JOY_BUTTON_DPAD_RIGHT)
 	assert_bool(_list().is_visible_in_tree()).is_true()
-	var focused: Control = _holder.get_viewport().gui_get_focus_owner()
-	for _step: int in 3:
-		if focused is ArchiveLogRow:
-			break
-		await UiInput.pad(focused, JOY_BUTTON_DPAD_DOWN)
-		focused = _holder.get_viewport().gui_get_focus_owner()
-	assert_object(focused).is_instanceof(ArchiveLogRow)
-	await UiInput.pad(focused, JOY_BUTTON_DPAD_DOWN)
-	var next: Control = _holder.get_viewport().gui_get_focus_owner()
-	assert_object(next).is_instanceof(ArchiveLogRow)
-	assert_object(next).is_not_same(focused)
+	var filter: Control = _list().get_filter_button()
+	var search: Control = _list().get_search_field()
+	await _expect(tabs, JOY_BUTTON_DPAD_DOWN, filter)
+	await _expect(filter, JOY_BUTTON_DPAD_RIGHT, search)
+	await _expect(search, JOY_BUTTON_DPAD_DOWN, _list().get_visible_rows()[0])
+	var first: Control = _focused()
+	await UiInput.pad(first, JOY_BUTTON_DPAD_DOWN)
+	assert_object(_focused()).is_instanceof(ArchiveLogRow)
+	assert_object(_focused()).is_not_same(first)
+	await _expect(_focused(), JOY_BUTTON_DPAD_UP, first)
+	await _expect(first, JOY_BUTTON_DPAD_UP, search)
+	await _expect(search, JOY_BUTTON_DPAD_LEFT, filter)
+	await _expect(filter, JOY_BUTTON_DPAD_DOWN, first)
+	await _expect(filter, JOY_BUTTON_DPAD_UP, tabs)
+	await _expect(search, JOY_BUTTON_DPAD_UP, tabs)
+
+
+func _focused() -> Control:
+	return _holder.get_viewport().gui_get_focus_owner()
+
+
+func _expect(from: Control, button: JoyButton, to: Control) -> void:
+	from.grab_focus()
+	await UiInput.pad(from, button)
+	assert_object(_focused()).is_same(to)
 
 
 ## The Log fits the minimum window and no single-line text is clipped, in en and pt_BR.

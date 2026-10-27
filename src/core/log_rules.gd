@@ -1,15 +1,15 @@
 class_name LogRules
 extends RefCounted
 ## Pure rules of the operations log: which entries a domain event writes. They read the state
-## only to name the world an event concerns (the Ring's last lock) and never change it.
+## only to name the world of a close (the Ring's last lock) and never change it.
 ## Bible: game-design.md#core-loop (Archive: the operations log)
 
 
 ## Returns the entries domain event [param event_name] with [param args] writes at
 ## [param tick], in order; empty for events the log ignores. A dial writes a "dial" entry
 ## (address key and outcome key; the world only on a lock, so a failure never names it), and a
-## lock also writes a "lock" entry. Closes, horizon records and console reads name the world of
-## the Ring's last lock in [param state].
+## lock also writes a "lock" entry. A close names the world of the Ring's last lock in
+## [param state]; horizon records and console reads name the world given in the event.
 static func entries_for(
 	event_name: StringName, args: Array, state: GameState, tick: int
 ) -> Array[LogEntry]:
