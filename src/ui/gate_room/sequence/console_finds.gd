@@ -1,14 +1,13 @@
 class_name ConsoleFinds
 extends VBoxContainer
-## The far Ring's console on the wormhole screen: Read the far Ring's console (posts a
-## ReadConsoleCommand) while it is unread; once read, what it added to the Address Book as glyph
-## rows (never a world's name: those stay unknown until locked) and Open the Address Book.
+## The far Ring's console among the open wormhole's actions: Read the far Ring's console (posts
+## a ReadConsoleCommand) while it is unread; once read, what it added to the Address Book as
+## glyph rows (never a world's name: those stay unknown until locked). Open the Address Book is
+## an action of its own beside it.
 ## Changes no state itself beyond submitting the command.
 ## Bible: gate-and-address-spec.md#where-addresses-come-from (Ring consoles),
 ## gate-and-address-spec.md#probing-the-unknown
 
-## The player asked to see the Address Book.
-signal book_requested
 ## The buttons that can take focus changed (the console was read).
 signal focus_changed
 
@@ -20,12 +19,10 @@ var _simulation: Simulation = null
 @onready var _read_button: Button = %ReadButton
 @onready var _note: Label = %ConsoleNote
 @onready var _found: VBoxContainer = %Found
-@onready var _book_button: Button = %BookButton
 
 
 func _ready() -> void:
 	_read_button.pressed.connect(read)
-	_book_button.pressed.connect(func() -> void: book_requested.emit())
 	render()
 
 
@@ -62,19 +59,12 @@ func get_focusables() -> Array[Control]:
 	var found: Array[Control] = []
 	if not _read_button.disabled:
 		found.append(_read_button)
-	if _book_button.visible:
-		found.append(_book_button)
 	return found
 
 
 ## Returns the Read the far Ring's console button.
 func get_read_button() -> Button:
 	return _read_button
-
-
-## Returns the Open the Address Book button.
-func get_book_button() -> Button:
-	return _book_button
 
 
 ## Returns the note under the button.
@@ -98,7 +88,6 @@ func render() -> void:
 	var read_done: bool = is_read()
 	_read_button.disabled = _simulation == null or read_done
 	_read_button.focus_mode = Control.FOCUS_NONE if _read_button.disabled else Control.FOCUS_ALL
-	_book_button.visible = read_done
 	var added: Array[String] = []
 	if read_done:
 		added = _added_keys()

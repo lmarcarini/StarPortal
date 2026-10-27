@@ -1,38 +1,29 @@
 class_name WormholeScreen
 extends Control
-## The open wormhole, on top of the Gate Room until it closes: the destination, a plain line
-## on what is going on, a hostile warning when the far side is guarded, the time left of the
-## maximum open time (live with sim time), the drain, the bank's state and the documents this
-## wormhole brought ("New in the Archive: …"), then what the player can do now: Read in the
-## Archive (only with such documents), Close wormhole (posts CloseWormholeCommand), Read the far
-## Ring's console (ConsoleFinds: what it added, and Open the Address Book), Extend the pole
-## camera (posts ExtendPoleCameraCommand; disabled while it goes through and once the world's
-## horizon record is taken; a temporary button until the wormhole actions of card #109) and
-## Send MOTH (shown, disabled, with when it arrives). Open the Address Book and Read in the
-## Archive step AWAY: the screen hides behind a return bar, Back to the wormhole (or Cancel)
-## shows it again, and it comes back by itself when the wormhole closes or is about to (time or
-## charge running out).
-## When the wormhole closes, for any reason, the screen says why until the player goes back to
-## the console.
+## The open wormhole, beside the Ring and never over it, and never a modal. A status strip
+## shows, the whole time a wormhole is open, the destination (or "Unknown world"), a hostile
+## warning when the far side is guarded, the time left (live with sim time), the drain, the
+## bank's state and the documents this wormhole brought ("New in the Archive: …"). Clicking the
+## portal on the Ring (or A with it focused) shows or hides the action panel under the strip
+## (WormholeActions); B / Escape hides it. Open the Address Book and Read in the Archive hide
+## it and pass the request on. When the wormhole closes, for any reason, the strip says why
+## until the player dismisses it or dials again. Below the strip the screen lets clicks through.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
-## gate-and-address-spec.md#where-addresses-come-from (Ring consoles),
 ## technical-architecture.md#state-machines
 
-## The player went back to the console after the wormhole closed.
+## The player dismissed the closed message.
 signal dismissed
-## The player asked to see the Address Book; the screen has stepped AWAY.
+## The player asked to see the Address Book; the actions are hidden.
 signal address_book_requested
 ## The player asked to read [param document_id], the first document this lock delivered, in
-## the Archive; the screen has stepped AWAY.
+## the Archive; the actions are hidden.
 signal archive_requested(document_id: StringName)
+## The action panel was hidden by the player; the view gives focus back to the Ring.
+signal actions_hidden
 
-## Phases: HIDDEN, OPEN (a wormhole is open), AWAY (it is open but the screen is set aside
-## behind the return bar), CLOSED (it closed; the reason is shown).
-enum Phase { HIDDEN, OPEN, AWAY, CLOSED }
-
-## While AWAY, the screen comes back by itself once the wormhole has this many ticks or fewer
-## left, of open time or of charge.
-const RETURN_WARNING_TICKS: int = 5
+## Phases: HIDDEN, STATUS (open, strip only), ACTIONS (open, strip and action panel), CLOSED
+## (it closed; the strip says why).
+enum Phase { HIDDEN, STATUS, ACTIONS, CLOSED }
 
 var _simulation: Simulation = null
 var _phase: Phase = Phase.HIDDEN
@@ -46,26 +37,19 @@ var _closed_reason: StringName = &""
 @onready var _drain: Label = %Drain
 @onready var _bank: Label = %Bank
 @onready var _new_documents: Label = %NewDocuments
-@onready var _archive_button: Button = %ArchiveButton
-@onready var _close_button: Button = %CloseButton
-@onready var _console: ConsoleFinds = %ConsoleFinds
-@onready var _camera_button: Button = %PoleCameraButton
-@onready var _return_bar: Control = %ReturnBar
-@onready var _return_button: Button = %ReturnButton
-@onready var _closed_box: VBoxContainer = %ClosedBox
+@onready var _hint: Label = %RingHint
+@onready var _actions_panel: Control = %ActionsPanel
+@onready var _actions: WormholeActions = %WormholeActions
+@onready var _closed_box: Container = %ClosedBox
 @onready var _closed_label: Label = %ClosedLabel
 @onready var _back_button: Button = %BackButton
 
 
 func _ready() -> void:
-	_close_button.pressed.connect(_on_close_pressed)
-	_archive_button.pressed.connect(_on_archive_pressed)
-	_camera_button.pressed.connect(_on_camera_pressed)
 	_back_button.pressed.connect(dismiss)
-	_console.book_requested.connect(step_away)
-	_console.focus_changed.connect(_on_console_focus_changed)
-	_return_button.pressed.connect(come_back)
-	OverlayFocus.trap(_back_button)
+	_actions.book_requested.connect(_on_book_requested)
+	_actions.archive_requested.connect(_on_archive_requested)
+	_actions.focus_changed.connect(_on_actions_focus_changed)
 	_render()
 
 
@@ -85,43 +69,40 @@ func _notification(what: int) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_visible_in_tree() or not event.is_action_pressed(&"ui_cancel"):
+	if _phase != Phase.ACTIONS or not event.is_action_pressed(&"ui_cancel"):
 		return
-	if _phase == Phase.CLOSED:
-		get_viewport().set_input_as_handled()
-		dismiss()
-	elif _phase == Phase.AWAY:
-		get_viewport().set_input_as_handled()
-		come_back()
+	get_viewport().set_input_as_handled()
+	hide_actions()
 
 
 ## Connects the screen to [param simulation] and hides it.
 func setup(simulation: Simulation) -> void:
 	_simulation = simulation
-	_console.setup(simulation)
+	_actions.setup(simulation)
 	_set_phase(Phase.HIDDEN)
 
 
-## Shows the open wormhole and focuses Close. Does nothing unless the Ring is LOCKED.
+## Shows the status strip of the open wormhole, actions hidden. Does nothing unless the Ring is
+## LOCKED.
 func open() -> void:
-	if _simulation == null or _simulation.state.gate.mode != GateState.RingMode.LOCKED:
+	if _is_locked():
+		_set_phase(Phase.STATUS)
+
+
+## Shows the action panel if hidden, hides it if shown. Only while a wormhole is open.
+func toggle_actions() -> void:
+	if _phase == Phase.ACTIONS:
+		hide_actions()
+	elif _phase == Phase.STATUS and _is_locked():
+		_set_phase(Phase.ACTIONS)
+
+
+## Hides the action panel and emits [signal actions_hidden]. Only while it shows.
+func hide_actions() -> void:
+	if _phase != Phase.ACTIONS:
 		return
-	_set_phase(Phase.OPEN)
-
-
-## Sets the open wormhole aside behind the return bar and emits [signal address_book_requested].
-## Only while open.
-func step_away() -> void:
-	if _phase != Phase.OPEN:
-		return
-	_set_phase(Phase.AWAY)
-	address_book_requested.emit()
-
-
-## Shows the open wormhole again after [method step_away]. Only while AWAY.
-func come_back() -> void:
-	if _phase == Phase.AWAY:
-		_set_phase(Phase.OPEN)
+	_set_phase(Phase.STATUS)
+	actions_hidden.emit()
 
 
 ## Hides the closed message and emits [signal dismissed]. Only after the wormhole closed.
@@ -137,61 +118,51 @@ func close() -> void:
 	_set_phase(Phase.HIDDEN)
 
 
-## True while the screen covers the view, open or closed; false while hidden or AWAY.
+## True while the action panel shows (it holds focus).
 func is_open() -> bool:
-	return _phase == Phase.OPEN or _phase == Phase.CLOSED
+	return _phase == Phase.ACTIONS
 
 
-## True while the open wormhole is set aside behind the return bar.
-func is_away() -> bool:
-	return _phase == Phase.AWAY
-
-
-## True while the wormhole is shown open.
+## True while the wormhole is shown open, with or without its actions.
 func is_showing_open() -> bool:
-	return _phase == Phase.OPEN
+	return _phase == Phase.STATUS or _phase == Phase.ACTIONS
 
 
-## Returns the button to focus: Close while open, Back after the wormhole closed; null while
-## hidden.
+## True while the action panel shows.
+func are_actions_shown() -> bool:
+	return _phase == Phase.ACTIONS
+
+
+## True while the strip says why the wormhole closed.
+func is_showing_closed() -> bool:
+	return _phase == Phase.CLOSED
+
+
+## Returns the first action while the panel shows, else null.
 func get_default_focus() -> Control:
-	match _phase:
-		Phase.OPEN:
-			return _close_button
-		Phase.CLOSED:
-			return _back_button
-	return null
+	if _phase != Phase.ACTIONS:
+		return null
+	return _actions.get_focusables()[0]
+
+
+## Returns the action panel.
+func get_actions() -> WormholeActions:
+	return _actions
 
 
 ## Returns the far Ring's console panel.
 func get_console() -> ConsoleFinds:
-	return _console
+	return _actions.get_console()
 
 
-## Returns the Back to the wormhole button of the return bar.
-func get_return_button() -> Button:
-	return _return_button
-
-
-## Returns the Read in the Archive button; it shows only while open with documents from this
-## lock, below the line that names them.
-func get_archive_button() -> Button:
-	return _archive_button
-
-
-## Returns the Close wormhole button.
-func get_close_button() -> Button:
-	return _close_button
-
-
-## Returns the Back to the console button.
+## Returns the strip's dismiss button for the closed message.
 func get_back_button() -> Button:
 	return _back_button
 
 
 ## Returns the destination line; empty unless open.
 func get_destination_text() -> String:
-	return _destination.text if _phase == Phase.OPEN else ""
+	return _destination.text if is_showing_open() else ""
 
 
 ## Returns the time-left line.
@@ -209,9 +180,18 @@ func get_bank_text() -> String:
 	return _bank.text
 
 
+## Returns the "New in the Archive" line; empty when this lock delivered none.
+func get_new_documents_text() -> String:
+	return _new_documents.text if _new_documents.visible else ""
+
+
 ## Returns why the wormhole closed; empty unless the closed message is shown.
 func get_closed_text() -> String:
 	return _closed_label.text if _phase == Phase.CLOSED else ""
+
+
+func _is_locked() -> bool:
+	return _simulation != null and _simulation.state.gate.mode == GateState.RingMode.LOCKED
 
 
 func _set_phase(phase: Phase) -> void:
@@ -228,16 +208,13 @@ func _render() -> void:
 	if not is_node_ready():
 		return
 	visible = _phase != Phase.HIDDEN
-	var is_away_now: bool = _phase == Phase.AWAY
-	($Dim as Control).visible = not is_away_now
-	($Center as Control).visible = not is_away_now
-	_return_bar.visible = is_away_now
-	_open_box.visible = _phase == Phase.OPEN
+	_open_box.visible = is_showing_open()
+	_actions_panel.visible = _phase == Phase.ACTIONS
 	_closed_box.visible = _phase == Phase.CLOSED
 	_title.text = tr("GATE_WORMHOLE_CLOSED_TITLE" if _phase == Phase.CLOSED else "GATE_RING_LOCKED")
 	if _phase == Phase.CLOSED:
 		_closed_label.text = WormholeText.closed(_closed_reason)
-	elif _phase != Phase.HIDDEN and _simulation.state.gate.mode == GateState.RingMode.LOCKED:
+	elif is_showing_open() and _is_locked():
 		_show_open(_simulation.state)
 
 
@@ -247,98 +224,57 @@ func _show_open(state: GameState) -> void:
 	_time_left.text = WormholeText.time_left(state)
 	_drain.text = WormholeText.drain(state)
 	_bank.text = WormholeText.bank(state)
-	_show_new_documents(state)
-	_show_camera(state.worlds, state.gate.connected_world_id)
-	_return_button.text = tr(&"GATE_WORMHOLE_RETURN").format(
-		{"left": GateRoomFormat.duration(GateQueries.open_ticks_left(state))}
+	_hint.text = tr(
+		&"GATE_WORMHOLE_HIDE_HINT" if _phase == Phase.ACTIONS else &"GATE_WORMHOLE_RING_HINT"
 	)
-	_console.render()
-	_trap_open_buttons()
+	_show_new_documents(state)
+	_actions.render(state)
+	if _phase == Phase.ACTIONS:
+		OverlayFocus.trap_all(_actions.get_focusables())
 
 
-## Names the documents this lock delivered and offers Read in the Archive; hides both when
-## it delivered none.
+## Names the documents this lock delivered; hides the line when it delivered none.
 func _show_new_documents(state: GameState) -> void:
 	var defs: Array[DocumentDef] = []
 	for id: StringName in WormholeText.new_documents(state):
 		defs.append(Registry.get_def(id) as DocumentDef)
 	_new_documents.text = WormholeText.new_documents_line(defs)
 	_new_documents.visible = not defs.is_empty()
-	_archive_button.visible = not defs.is_empty()
 
 
-## Shows the pole camera button for [param world_id]: enabled while the camera is in and the
-## record not taken, otherwise disabled and saying why.
-func _show_camera(worlds: WorldsState, world_id: StringName) -> void:
-	var key: StringName = &"GATE_WORMHOLE_EXTEND_CAMERA"
-	if worlds.is_pole_camera_out():
-		key = &"GATE_WORMHOLE_CAMERA_OUT"
-	elif worlds.is_horizon_record_taken(world_id):
-		key = &"GATE_WORMHOLE_CAMERA_DONE"
-	_camera_button.text = key
-	_camera_button.disabled = key != &"GATE_WORMHOLE_EXTEND_CAMERA"
-
-
-## Links the open screen's buttons in a focus loop.
-func _trap_open_buttons() -> void:
-	var buttons: Array[Control] = [_close_button]
-	if _archive_button.visible:
-		buttons.push_front(_archive_button)
-	buttons.append_array(_console.get_focusables())
-	buttons.append(_camera_button)
-	OverlayFocus.trap_all(buttons)
-
-
-## True when the wormhole has RETURN_WARNING_TICKS or fewer left, of open time or of charge.
-func _is_ending_soon(state: GameState) -> bool:
-	if GateQueries.open_ticks_left(state) <= RETURN_WARNING_TICKS:
-		return true
-	var power: PowerState = state.power
-	var drain: float = PowerMath.drain_mw(state.gate, state.balance)
-	var loss: float = -PowerMath.net_flow_mw(power.plant_output_mw, drain)
-	var until_empty: int = WormholeText.ticks_until_empty(power.stored_mwh, loss)
-	return until_empty >= 0 and until_empty <= RETURN_WARNING_TICKS
-
-
-func _on_close_pressed() -> void:
-	if _simulation != null and _phase == Phase.OPEN:
-		_simulation.submit(CloseWormholeCommand.new())
-
-
-func _on_camera_pressed() -> void:
-	if _simulation != null and _phase == Phase.OPEN:
-		_simulation.submit(ExtendPoleCameraCommand.new())
-		_render()
-
-
-## Read in the Archive steps AWAY, as Open the Address Book does, and asks for the first
-## document this lock delivered. Only while open and when the lock delivered any.
-func _on_archive_pressed() -> void:
-	if _phase != Phase.OPEN:
+func _on_book_requested() -> void:
+	if _phase != Phase.ACTIONS:
 		return
-	var document_ids: Array[StringName] = WormholeText.new_documents(_simulation.state)
-	if document_ids.is_empty():
+	_set_phase(Phase.STATUS)
+	address_book_requested.emit()
+
+
+func _on_archive_requested(document_id: StringName) -> void:
+	if _phase != Phase.ACTIONS:
 		return
-	_set_phase(Phase.AWAY)
-	archive_requested.emit(document_ids[0])
+	_set_phase(Phase.STATUS)
+	archive_requested.emit(document_id)
 
 
-func _on_console_focus_changed() -> void:
-	var buttons: Array[Control] = _console.get_focusables()
-	var target: Control = buttons.back() if not buttons.is_empty() else _close_button
-	if is_visible_in_tree():
-		target.grab_focus()
+## The focusable actions changed (the console was read, the camera went out): keep focus on
+## the panel, on its last action of the same kind or its first.
+func _on_actions_focus_changed() -> void:
+	if _phase != Phase.ACTIONS:
+		return
+	_render()
+	var focused: Control = get_viewport().gui_get_focus_owner()
+	var buttons: Array[Control] = _actions.get_focusables()
+	if is_visible_in_tree() and not buttons.has(focused):
+		buttons[0].grab_focus()
 
 
 func _on_tick_advanced(_tick: int) -> void:
-	if _phase == Phase.AWAY and _is_ending_soon(_simulation.state):
-		_set_phase(Phase.OPEN)
-	elif _phase == Phase.OPEN or _phase == Phase.AWAY:
+	if is_showing_open():
 		_render()
 
 
 func _on_wormhole_closed(reason: StringName) -> void:
-	if _phase != Phase.OPEN and _phase != Phase.AWAY:
+	if not is_showing_open():
 		return
 	_closed_reason = reason
 	_set_phase(Phase.CLOSED)

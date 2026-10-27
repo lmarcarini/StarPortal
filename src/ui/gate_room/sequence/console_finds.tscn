@@ -12,7 +12,7 @@ text = "GATE_WORMHOLE_READ_CONSOLE"
 
 [node name="ConsoleNote" type="Label" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(540, 0)
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 autowrap_mode = 3
@@ -23,8 +23,3 @@ visible = false
 layout_mode = 2
 mouse_filter = 2
 
-[node name="BookButton" type="Button" parent="."]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-text = "GATE_WORMHOLE_OPEN_BOOK"
