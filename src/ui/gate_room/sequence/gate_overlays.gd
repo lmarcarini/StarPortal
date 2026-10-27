@@ -4,7 +4,8 @@ extends Control
 ## sequence while it dials (it plays on the Ring view, beside the overlays: see [method attach]),
 ## then the result card for No gate, Blocked and Origin rejected, or the wormhole screen for a
 ## lock or hostile lock, until the wormhole closes. The wormhole screen opens to the right of
-## the Ring view, never over it ([method keep_clear_left_of]), so the open horizon stays in sight. At most
+## the Ring view, never over it ([method keep_clear_left_of]), so the open horizon stays in
+## sight. At most
 ## one overlay shows at a time. After a load it shows what the loaded Ring is doing. Changes no
 ## state itself: only the sequence's hold and clock steps and the wormhole screen's Close and
 ## Read console. When the wormhole screen steps aside for the Address Book or the Archive, it

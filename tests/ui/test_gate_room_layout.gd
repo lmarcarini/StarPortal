@@ -184,4 +184,5 @@ func test_the_ring_window_takes_half_the_view(
 	await get_tree().process_frame
 	var window: Control = _view.find_child("Window", true, false) as Control
 	assert_float(window.size.y).is_greater_equal(Fixture.VIEW_SIZE.y * 0.5)
-	assert_float(_view.get_ring_view().size.y).is_greater_equal(Fixture.VIEW_SIZE.y * 0.45)
+	var ring: Vector2 = _view.get_ring_view().size
+	assert_float(minf(ring.x, ring.y)).is_greater_equal(Fixture.VIEW_SIZE.y * 0.5)

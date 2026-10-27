@@ -23,7 +23,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.75)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Center" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,121 +31,124 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
 [node name="Panel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(560, 0)
 layout_mode = 2
 
-[node name="Box" type="VBoxContainer" parent="Center/Panel"]
+[node name="Scroll" type="ScrollContainer" parent="Center/Panel"]
 layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Box" type="VBoxContainer" parent="Center/Panel/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Center/Panel/Box"]
+[node name="Title" type="Label" parent="Center/Panel/Scroll/Box"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 
-[node name="OpenBox" type="VBoxContainer" parent="Center/Panel/Box"]
+[node name="OpenBox" type="VBoxContainer" parent="Center/Panel/Scroll/Box"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Columns" type="HBoxContainer" parent="Center/Panel/Box/OpenBox"]
+[node name="Columns" type="VBoxContainer" parent="Center/Panel/Scroll/Box/OpenBox"]
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 12
 
-[node name="Status" type="VBoxContainer" parent="Center/Panel/Box/OpenBox/Columns"]
-layout_mode = 2
-
-[node name="Actions" type="VBoxContainer" parent="Center/Panel/Box/OpenBox/Columns"]
+[node name="Status" type="VBoxContainer" parent="Center/Panel/Scroll/Box/OpenBox/Columns"]
 layout_mode = 2
 
-[node name="Destination" type="Label" parent="Center/Panel/Box/OpenBox/Columns/Status"]
+[node name="Actions" type="VBoxContainer" parent="Center/Panel/Scroll/Box/OpenBox/Columns"]
+layout_mode = 2
+
+[node name="Destination" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="Summary" type="Label" parent="Center/Panel/Box/OpenBox/Columns/Status"]
-custom_minimum_size = Vector2(540, 0)
+[node name="Summary" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
 layout_mode = 2
 text = "GATE_WORMHOLE_SUMMARY"
 autowrap_mode = 3
 
-[node name="Hostile" type="Label" parent="Center/Panel/Box/OpenBox/Columns/Status"]
+[node name="Hostile" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(540, 0)
 layout_mode = 2
 text = "GATE_MEANING_HOSTILE_LOCK"
 autowrap_mode = 3
 
-[node name="TimeLeft" type="Label" parent="Center/Panel/Box/OpenBox/Columns/Status"]
+[node name="TimeLeft" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Drain" type="Label" parent="Center/Panel/Box/OpenBox/Columns/Status"]
+[node name="Drain" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Bank" type="Label" parent="Center/Panel/Box/OpenBox/Columns/Status"]
+[node name="Bank" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(540, 0)
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="NewDocuments" type="Label" parent="Center/Panel/Box/OpenBox/Columns/Status"]
+[node name="NewDocuments" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(540, 0)
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="ActionsTitle" type="Label" parent="Center/Panel/Box/OpenBox/Columns/Actions"]
+[node name="ActionsTitle" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
 layout_mode = 2
 text = "GATE_WORMHOLE_ACTIONS"
 
-[node name="ArchiveButton" type="Button" parent="Center/Panel/Box/OpenBox/Columns/Actions"]
+[node name="ArchiveButton" type="Button" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "GATE_WORMHOLE_READ_ARCHIVE"
 
-[node name="CloseButton" type="Button" parent="Center/Panel/Box/OpenBox/Columns/Actions"]
+[node name="CloseButton" type="Button" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "GATE_WORMHOLE_CLOSE"
 
-[node name="ConsoleFinds" parent="Center/Panel/Box/OpenBox/Columns/Actions" instance=ExtResource("2_finds")]
+[node name="ConsoleFinds" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions" instance=ExtResource("2_finds")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="PoleCameraButton" type="Button" parent="Center/Panel/Box/OpenBox/Columns/Actions"]
+[node name="PoleCameraButton" type="Button" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "GATE_WORMHOLE_EXTEND_CAMERA"
 
-[node name="MothButton" type="Button" parent="Center/Panel/Box/OpenBox/Columns/Actions"]
+[node name="MothButton" type="Button" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 disabled = true
 text = "GATE_WORMHOLE_SEND_MOTH"
 
-[node name="MothNote" type="Label" parent="Center/Panel/Box/OpenBox/Columns/Actions"]
+[node name="MothNote" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "GATE_WORMHOLE_SEND_MOTH_LATER"
 
-[node name="ClosedBox" type="VBoxContainer" parent="Center/Panel/Box"]
+[node name="ClosedBox" type="VBoxContainer" parent="Center/Panel/Scroll/Box"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="ClosedLabel" type="Label" parent="Center/Panel/Box/ClosedBox"]
+[node name="ClosedLabel" type="Label" parent="Center/Panel/Scroll/Box/ClosedBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(540, 0)
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="BackButton" type="Button" parent="Center/Panel/Box/ClosedBox"]
+[node name="BackButton" type="Button" parent="Center/Panel/Scroll/Box/ClosedBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
