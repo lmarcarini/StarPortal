@@ -127,6 +127,7 @@ func test_the_view_fits_the_minimum_window_and_no_text_is_clipped(
 	var needed: Vector2 = content.get_combined_minimum_size()
 	assert_float(needed.x).is_less_equal(Fixture.VIEW_SIZE.x)
 	assert_float(needed.y).is_less_equal(Fixture.VIEW_SIZE.y)
+	print("MEASURE busy %s %s ring=%s console=%s seals=%s pal=%s right=%s ctl=%s hint=%s" % [locale, is_pseudo, _view.get_ring_view().size, _view.get_console().size, (_view.find_child("SealRow",true,false) as Control).size, (_view.find_child("Palette",true,false) as Control).size, (_view.find_child("Right",true,false) as Control).get_combined_minimum_size(), (_view.find_child("DialControls",true,false) as Control).get_combined_minimum_size(), (_view.find_child("Hint",true,false) as Control).size])
 	assert_array(_clipped(_view)).is_empty()
 	var book: AddressBookPanel = _view.get_address_book()
 	assert_int(book.get_rows().size()).is_greater(0)
@@ -163,3 +164,26 @@ func test_the_overlays_fit_the_minimum_window(
 	var wing: Control = _view.find_child("LeftWing", true, false) as Control
 	var caption: Vector2 = overlays.get_sequence().get_combined_minimum_size()
 	assert_float(caption.x).is_less_equal(wing.size.x)
+
+
+## Ruling (PR #119): the Ring is the centrepiece. With the console in its usual state (no
+## warning showing), the window with the Ring takes at least half the view's height in English
+## and Brazilian Portuguese.
+@warning_ignore("unused_parameter")
+func test_the_ring_window_takes_half_the_view(
+	locale: String, test_parameters: Array = [["en"], ["pt_BR"]]  # gdlint: ignore=unused-argument
+) -> void:
+	_real_locale = TranslationServer.get_locale()
+	TranslationServer.set_locale(locale)
+	_simulation = Fixture.simulation()
+	SimClock.start(_simulation)
+	_holder = Fixture.mount_view()
+	add_child(_holder)
+	_view = Fixture.view_of(_holder)
+	_view.setup(_simulation)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var window: Control = _view.find_child("Window", true, false) as Control
+	print("MEASURE %s window=%s ring=%s console=%s" % [locale, window.size, _view.get_ring_view().size, _view.get_console().size])
+	assert_float(window.size.y).is_greater_equal(Fixture.VIEW_SIZE.y * 0.5)
+	assert_float(_view.get_ring_view().size.y).is_greater_equal(Fixture.VIEW_SIZE.y * 0.45)

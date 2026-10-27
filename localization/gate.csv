@@ -74,8 +74,8 @@ GATE_REASON_DIALING,The Ring is dialing.,O Anel está discando.
 GATE_REASON_WORMHOLE_OPEN,A wormhole is open: close it before dialing again.,Há um buraco de minhoca aberto: feche-o antes de discar de novo.
 CONSOLE_SLOT_EMPTY,Seal {seal}: empty,Selo {seal}: vazio
 CONSOLE_SLOT_FILLED,"Seal {seal}: {glyph}. Click, right-click or Delete clears it.","Selo {seal}: {glyph}. Clique, clique direito ou Delete o esvazia."
-CONSOLE_ORIGIN_HOME,Seal 8 is CAIRN's mark: {glyph}. It never changes.,O selo 8 é a marca da CAIRN: {glyph}. Ele nunca muda.
-CONSOLE_HINT_IDLE,"Click a glyph to set the next empty seal, or drag it onto a seal. Click a set seal to clear it.","Clique em um glifo para preencher o próximo selo vazio, ou arraste-o até um selo. Clique em um selo preenchido para esvaziá-lo."
+CONSOLE_ORIGIN_HOME,Seal 8 is CAIRN's mark: {glyph}. It never changes.,"Selo 8, marca da CAIRN: {glyph}. Nunca muda."
+CONSOLE_HINT_IDLE,"Click a glyph to set the next empty seal, or drag it onto a seal. Click a set seal to clear it.","Clique num glifo para o próximo selo vazio, ou arraste-o até um selo. Clique num selo preenchido para esvaziá-lo."
 CONSOLE_ALL_SET,All seven seals are set.,Os sete selos estão preenchidos.
 CONSOLE_GLYPH_ALREADY_SET,{glyph} is already in seal {seal}.,{glyph} já está no selo {seal}.
 CONSOLE_CLEAR_ALL,Clear all,Limpar tudo
