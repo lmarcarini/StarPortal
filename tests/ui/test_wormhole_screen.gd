@@ -1,7 +1,7 @@
-## Tests for the wormhole screen in the Gate Room: what it shows for a lock (destination, time
-## left counting with sim time, drain, bank, the actions now and later), Close by mouse,
-## keyboard and gamepad, the close reasons and the way back to the console, and that no second
-## dial can start while a wormhole is open, from the UI or as a command.
+## Tests for the open wormhole in the Gate Room, with no modal: the status strip (destination,
+## time left counting with sim time, drain, bank), the portal that shows and hides the actions
+## by mouse, keyboard and gamepad, Close (hold) by each of them, the close reasons on the strip,
+## and that no second dial can start while a wormhole is open, from the UI or as a command.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## gate-and-address-spec.md#dialing-outcomes-and-energy
 extends GdUnitTestSuite
@@ -56,6 +56,9 @@ func _press(event_for_state: Callable) -> void:
 func test_a_lock_shows_the_destination_time_drain_bank_and_actions() -> void:
 	_dial(DialOutcome.Kind.LOCK)
 	assert_bool(_screen().is_showing_open()).is_true()
+	assert_bool(_screen().are_actions_shown()).is_false()
+	assert_array(Fixture.visible_texts(_screen())).contains(["Click the Ring for its actions."])
+	Fixture.open_actions(_view)
 	assert_str(_screen().get_destination_text()).is_equal("Destination: P3X-111")
 	assert_str(_screen().get_time_left_text()).is_equal("Time left: 1 h 0 min of 1 h 0 min")
 	assert_str(_screen().get_drain_text()).is_equal("Power drain: 20.0 MW")
@@ -66,20 +69,21 @@ func test_a_lock_shows_the_destination_time_drain_bank_and_actions() -> void:
 		. contains(
 			[
 				"Wormhole open",
-				tr(&"GATE_WORMHOLE_SUMMARY"),
 				"What you can do now",
-				"Close wormhole",
+				"Extend the pole camera",
+				"Close the wormhole (hold)",
 				"Read the far Ring's console",
 				tr(&"GATE_CONSOLE_HINT"),
-				"Send the MOTH probe",
+				"Open the Address Book",
+				"Send a probe",
 				"Probes are not ready yet.",
 			]
 		)
 	)
 	assert_array(texts).not_contains([tr(&"GATE_MEANING_HOSTILE_LOCK")])
-	assert_bool(_screen().get_close_button().disabled).is_false()
+	assert_bool(_screen().get_actions().get_close_button().disabled).is_false()
 	assert_bool(_screen().get_console().get_read_button().disabled).is_false()
-	var later: Button = _screen().find_child("MothButton", true, false) as Button
+	var later: Button = _screen().find_child("ProbeButton", true, false) as Button
 	assert_bool(later.disabled).is_true()
 	assert_int(later.focus_mode).is_equal(Control.FOCUS_NONE)
 
@@ -137,7 +141,9 @@ func test_the_timer_counts_with_sim_time_and_closes_at_sixty_minutes() -> void:
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.LOCKED)
 	SimClock.step_ticks(1)
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.IDLE)
-	assert_bool(_screen().is_open()).is_true()
+	assert_bool(_screen().is_showing_closed()).is_true()
+	assert_bool(_view.get_overlays().is_open()).is_false()
+	assert_int(_view.get_ring_view().get_horizon_state()).is_equal(RingView.Horizon.CLOSING)
 	assert_str(_screen().get_closed_text()).is_equal(
 		"Wormhole closed: the maximum open time ran out."
 	)
@@ -145,27 +151,74 @@ func test_the_timer_counts_with_sim_time_and_closes_at_sixty_minutes() -> void:
 
 
 @warning_ignore("unused_parameter")
-func test_close_works_by_mouse_keyboard_and_gamepad(
+func test_the_portal_and_close_work_by_mouse_keyboard_and_gamepad(
 	device: String, test_parameters: Array = [["mouse"], ["keyboard"], ["gamepad"]]  # gdlint: ignore=unused-argument,max-line-length
 ) -> void:
 	_dial(DialOutcome.Kind.LOCK)
 	await get_tree().process_frame
-	var close: Button = _screen().get_close_button()
-	assert_object(_holder.get_viewport().gui_get_focus_owner()).is_same(close)
+	await get_tree().process_frame
+	var ring: RingView = _view.get_ring_view()
+	assert_object(_focus_owner()).is_same(ring)
+	_activate(device, ring)
+	await get_tree().process_frame
+	assert_bool(_screen().are_actions_shown()).is_true()
+	var first: Control = _screen().get_actions().get_camera_button()
+	assert_object(_focus_owner()).is_same(first)
+	# Cancel hides the actions and gives focus back to the Ring; the Ring shows them again.
+	_press(_cancel_event.bind(device))
+	await get_tree().process_frame
+	assert_bool(_screen().are_actions_shown()).is_false()
+	assert_object(_focus_owner()).is_same(ring)
+	_activate(device, ring)
+	await get_tree().process_frame
+	var close: HoldButton = _screen().get_actions().get_close_button()
+	close.grab_focus()
 	match device:
 		"mouse":
-			close.pressed.emit()
+			close.button_down.emit()
+		"keyboard":
+			Input.parse_input_event(_key_event(true, KEY_ENTER))
+			Input.flush_buffered_events()
+		"gamepad":
+			Input.parse_input_event(_joypad_event(true, JOY_BUTTON_A))
+			Input.flush_buffered_events()
+	assert_bool(close.is_holding()).is_true()
+	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.LOCKED)
+	close.advance(HoldButton.HOLD_SECONDS)
+	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.IDLE)
+	assert_str(_screen().get_closed_text()).is_equal("Wormhole closed on your order.")
+	ring.advance(RingView.CLOSE_SECONDS)
+	assert_int(ring.get_horizon_state()).is_equal(RingView.Horizon.DARK)
+	await get_tree().process_frame
+	assert_object(_focus_owner()).is_same(_view.get_console().get_default_focus())
+	_screen().get_back_button().pressed.emit()
+	assert_bool(_screen().visible).is_false()
+
+
+func _activate(device: String, ring: RingView) -> void:
+	match device:
+		"mouse":
+			for is_pressed: bool in [true, false]:
+				var click := InputEventMouseButton.new()
+				click.button_index = MOUSE_BUTTON_LEFT
+				click.pressed = is_pressed
+				click.position = ring.get_global_rect().get_center()
+				click.global_position = click.position
+				_holder.get_viewport().push_input(click, true)
 		"keyboard":
 			_press(_key_event.bind(KEY_ENTER))
 		"gamepad":
 			_press(_joypad_event.bind(JOY_BUTTON_A))
-	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.IDLE)
-	assert_str(_screen().get_closed_text()).is_equal("Wormhole closed on your order.")
-	await get_tree().process_frame
-	var back: Button = _screen().get_back_button()
-	assert_object(_holder.get_viewport().gui_get_focus_owner()).is_same(back)
-	_press(_joypad_event.bind(JOY_BUTTON_B))
-	assert_bool(_view.get_overlays().is_open()).is_false()
+
+
+func _cancel_event(is_pressed: bool, device: String) -> InputEvent:
+	if device == "gamepad":
+		return _joypad_event(is_pressed, JOY_BUTTON_B)
+	return _key_event(is_pressed, KEY_ESCAPE)
+
+
+func _focus_owner() -> Control:
+	return _holder.get_viewport().gui_get_focus_owner()
 
 
 func test_a_power_collapse_says_so() -> void:
@@ -196,19 +249,17 @@ func test_no_second_dial_while_a_wormhole_is_open() -> void:
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.LOCKED)
 	assert_str(String(_simulation.state.gate.connected_world_id)).is_equal(String(world))
 	assert_int(_simulation.state.gate.dial_log.size()).is_equal(1)
+	Fixture.open_actions(_view)
 	await get_tree().process_frame
-	var dim: Control = _screen().get_node("Dim") as Control
-	assert_int(dim.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
-	# Ruling (PR #119): the screen sits beside the Ring, over the Address Book; the console
-	# stays in view, its Dial button disabled.
-	(
-		assert_bool(dim.get_global_rect().encloses(_view.get_address_book().get_global_rect()))
-		. is_true()
-	)
-	(
-		assert_bool(dim.get_global_rect().intersects(_view.get_ring_view().get_global_rect()))
-		. is_false()
-	)
+	# Ruling (PR #119, card #109): no modal; the strip and actions sit beside the Ring, never
+	# over it, and the console stays in view, its Dial button disabled.
+	var column: Control = _screen().get_node("Column") as Control
+	assert_int(column.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int(_screen().mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_object(_screen().find_child("Dim", true, false)).is_null()
+	var ring_rect: Rect2 = _view.get_ring_view().get_global_rect()
+	assert_bool(column.get_global_rect().intersects(ring_rect)).is_false()
+	assert_bool(_view.get_console().is_visible_in_tree()).is_true()
 
 
 func test_a_game_loaded_with_a_wormhole_open_shows_the_screen() -> void:

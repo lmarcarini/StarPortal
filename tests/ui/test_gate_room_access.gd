@@ -118,7 +118,7 @@ func test_every_control_is_reachable_by_focus_alone() -> void:
 	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.NO_GATE))
 	overlays.get_result_card().get_ok_button().pressed.emit()
 	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK))
-	overlays.get_wormhole_screen().get_close_button().pressed.emit()
+	Fixture.close_wormhole(_view)
 	overlays.get_wormhole_screen().get_back_button().pressed.emit()
 	_enter(Fixture.address_for(_simulation.state, DialOutcome.Kind.BLOCKED))
 	assert_bool(overlays.is_open()).is_false()
@@ -155,13 +155,12 @@ func test_the_dial_button_is_a_focusable_hold_button_with_a_reason_when_disabled
 func test_focus_moves_to_the_view_when_the_focused_button_goes_away() -> void:
 	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK))
 	var screen: WormholeScreen = _view.get_overlays().get_wormhole_screen()
-	var close: Button = screen.get_close_button()
+	Fixture.open_actions(_view)
+	var close: Button = screen.get_actions().get_close_button()
+	close.grab_focus()
 	await get_tree().process_frame
 	assert_object(_holder.get_viewport().gui_get_focus_owner()).is_same(close)
-	close.pressed.emit()
-	await get_tree().process_frame
-	assert_object(_holder.get_viewport().gui_get_focus_owner()).is_same(screen.get_back_button())
-	screen.get_back_button().pressed.emit()
+	Fixture.close_wormhole(_view)
 	await get_tree().process_frame
 	assert_object(_holder.get_viewport().gui_get_focus_owner()).is_same(_view.get_default_focus())
 	assert_bool(_view.get_console().is_ancestor_of(_view.get_default_focus())).is_true()
@@ -175,6 +174,7 @@ func test_an_open_overlay_keeps_focus_inside_it() -> void:
 	_assert_trapped(overlays.get_default_focus(), overlays)
 	overlays.get_result_card().get_ok_button().pressed.emit()
 	_dial(Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK))
+	Fixture.open_actions(_view)
 	_assert_trapped(overlays.get_default_focus(), overlays)
 	var palette_glyph: Control = (
 		(_view.find_child("Palette", true, false) as GlyphPalette).get_first_focus()

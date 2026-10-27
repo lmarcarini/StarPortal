@@ -5,12 +5,15 @@ extends Control
 ## horizon inside it (EventHorizon). The horizon mirrors the Ring: DARK (idle), DIALING (seals
 ## lighting, set by the dialing sequence), OPEN (a wormhole: a shimmer, after a short opening
 ## burst on a fresh lock) and CLOSING (a short fade back to DARK once the wormhole closes, for
-## any reason). Draws only; never changes state.
+## any reason). While OPEN the portal is clickable and focusable: a left click, or accept (Enter,
+## gamepad A) with it focused, emits [signal portal_pressed]. Draws only; never changes state.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## overview.md#locked-decisions (Presentation: hybrid), technical-architecture.md#state-machines
 
 ## The horizon state changed to [param state] (a [enum Horizon]).
 signal horizon_changed(state: int)
+## The player clicked the open portal, or pressed accept with it focused.
+signal portal_pressed
 
 ## What the Ring's centre shows.
 enum Horizon { DARK, DIALING, OPEN, CLOSING }
@@ -33,6 +36,7 @@ const _MARGIN: float = 14.0
 const _ARC_POINTS: int = 72
 const _EDGE_WIDTH: float = 2.0
 const _MARK_SHARE: float = 0.6
+const _FOCUS_COLOR: Color = Color(0.55, 0.8, 1.0)
 
 var _state: Horizon = Horizon.DARK
 var _burst_seconds: float = BURST_SECONDS
@@ -63,11 +67,21 @@ func _get_minimum_size() -> Vector2:
 
 func _notification(what: int) -> void:
 	match what:
-		NOTIFICATION_RESIZED:
+		NOTIFICATION_RESIZED, NOTIFICATION_FOCUS_ENTER, NOTIFICATION_FOCUS_EXIT:
 			queue_redraw()
 		NOTIFICATION_VISIBILITY_CHANGED:
 			if is_node_ready() and not is_visible_in_tree():
 				_settle()
+
+
+func _gui_input(event: InputEvent) -> void:
+	if _state != Horizon.OPEN:
+		return
+	var mouse: InputEventMouseButton = event as InputEventMouseButton
+	var is_click: bool = mouse != null and mouse.pressed and mouse.button_index == MOUSE_BUTTON_LEFT
+	if is_click or event.is_action_pressed(&"ui_accept"):
+		accept_event()
+		portal_pressed.emit()
 
 
 func _process(delta: float) -> void:
@@ -172,10 +186,23 @@ func _set_state(state: Horizon) -> void:
 	if state == Horizon.DARK:
 		_seals.lit = 0
 	set_process(state == Horizon.OPEN or state == Horizon.CLOSING)
+	_set_clickable(state == Horizon.OPEN)
 	if state == _state:
 		return
 	_state = state
 	horizon_changed.emit(state)
+
+
+## Only the open portal takes clicks and focus; otherwise clicks pass through.
+func _set_clickable(is_clickable: bool) -> void:
+	focus_mode = Control.FOCUS_ALL if is_clickable else Control.FOCUS_NONE
+	mouse_filter = Control.MOUSE_FILTER_STOP if is_clickable else Control.MOUSE_FILTER_IGNORE
+	mouse_default_cursor_shape = (
+		Control.CURSOR_POINTING_HAND if is_clickable else Control.CURSOR_ARROW
+	)
+	if not is_clickable and has_focus():
+		release_focus()
+	queue_redraw()
 
 
 func _on_wormhole_closed(_reason: StringName) -> void:
@@ -200,6 +227,8 @@ func _draw() -> void:
 		var angle: float = -PI / 2.0 + TAU * float(index) / float(_marks.size())
 		var spot: Vector2 = center + Vector2.from_angle(angle) * (outer - band / 2.0)
 		_draw_mark(_marks[index], spot, side * _MARK_SHARE)
+	if has_focus():
+		draw_arc(center, outer + _EDGE_WIDTH * 2.0, 0.0, TAU, _ARC_POINTS, _FOCUS_COLOR, 2.0)
 
 
 ## Draws [param glyph]'s constellation in a square of [param side] centred on [param spot].

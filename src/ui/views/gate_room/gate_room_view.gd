@@ -6,17 +6,17 @@ extends GameView
 ## palette, then hint, charge and the hold-to-dial button). On the right, full height, the
 ## records: the Address Book (dials and their outcomes are in the Archive's operations log).
 ## Loading an Address Book entry fills the console's slots. The dialing sequence plays on the
-## Ring; the result card covers the view and the wormhole screen covers everything right of the
-## Ring while one is open, and they take focus. The view only composes the panels; every panel
-## reads the simulation and posts its
-## own commands, and nothing here changes state. When the wormhole screen asks to read a new
-## document in the Archive, the view passes the request on to the switcher.
+## Ring; the result card covers the view and takes focus. While a wormhole is open its status
+## strip sits right of the Ring, over the top of the records, and clicking the portal (or A with
+## the Ring focused) opens the action panel below the strip, which takes focus; hiding it gives
+## focus back to the Ring. The view only composes the panels; every panel reads the simulation
+## and posts its own commands, and nothing here changes state. When the wormhole actions ask to
+## read a new document in the Archive, the view passes the request on to the switcher.
 ## Bible: gate-and-address-spec.md#the-dial-console,
 ## gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole, game-design.md#core-loop,
 ## technical-architecture.md#input-accessibility-and-localisation
 
-## The wormhole screen stepped aside so the player can read [param document_id] in the
-## Archive.
+## The wormhole actions asked to read [param document_id] in the Archive.
 signal archive_requested(document_id: StringName)
 
 const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
@@ -86,14 +86,14 @@ func get_overlays() -> GateOverlays:
 	return _overlays
 
 
-## Returns the open overlay's button; else the wormhole's return bar while the wormhole is set
-## aside; else the Dial button while it can be pressed, else the first glyph of the palette.
+## Returns the open overlay's button; else the Ring while a wormhole is open; else the Dial
+## button while it can be pressed, else the first glyph of the palette.
 func get_default_focus() -> Control:
 	var overlay_focus: Control = _overlays.get_default_focus()
 	if overlay_focus != null:
 		return overlay_focus
-	if _overlays.get_wormhole_screen().is_away():
-		return _overlays.get_wormhole_screen().get_return_button()
+	if _overlays.get_wormhole_screen().is_showing_open():
+		return _ring
 	return _console.get_default_focus()
 
 
@@ -103,7 +103,8 @@ func get_title_key() -> StringName:
 
 
 ## The focused control may have been removed or disabled (a closed wormhole's button, a dial
-## button that locks while the Ring is busy) or be left behind an overlay: move focus to the
+## button that locks while the Ring is busy, a hidden wormhole action, the Ring gone dark) or be
+## left behind an overlay: move focus to the
 ## default control. Focus on anything outside this view (the tab bar, the time bar) is left
 ## alone.
 func _ensure_focus() -> void:
@@ -112,6 +113,8 @@ func _ensure_focus() -> void:
 	var focused: Control = get_viewport().gui_get_focus_owner()
 	if focused != null:
 		var is_stuck: bool = focused is BaseButton and (focused as BaseButton).disabled
+		is_stuck = is_stuck or not focused.is_visible_in_tree()
+		is_stuck = is_stuck or focused.focus_mode == Control.FOCUS_NONE
 		if _overlays.is_open():
 			is_stuck = not _overlays.holds(focused)
 		if not is_ancestor_of(focused) or not is_stuck:
@@ -128,7 +131,7 @@ func _on_load_requested(address: GateAddress) -> void:
 	_ensure_focus.call_deferred()
 
 
-## The wormhole screen stepped aside: show the Address Book tab and focus it.
+## The wormhole actions asked for the Address Book: show its tab and focus it.
 func _on_address_book_requested() -> void:
 	_records.current_tab = _RECORD_TITLE_KEYS.find(&"BOOK_TITLE")
 	_book.get_first_focus().grab_focus()

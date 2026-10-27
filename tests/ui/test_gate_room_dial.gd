@@ -93,7 +93,7 @@ func test_disabled_while_a_wormhole_is_open_even_with_an_empty_console() -> void
 	assert_str(_controls().get_reason_text()).starts_with("A wormhole is open")
 	_view.get_console().clear_all()
 	assert_str(_controls().get_reason_text()).starts_with("A wormhole is open")
-	(_view.find_child("CloseButton", true, false) as Button).pressed.emit()
+	Fixture.close_wormhole(_view)
 	assert_str(_controls().get_reason_text()).is_equal(
 		"Place a glyph in each of the seven seals first."
 	)
@@ -215,7 +215,7 @@ func test_a_lock_is_not_a_failed_attempt() -> void:
 	_enter(DialOutcome.Kind.LOCK)
 	_hold_fully()
 	SimClock.step_ticks(2)
-	(_view.find_child("CloseButton", true, false) as Button).pressed.emit()
+	Fixture.close_wormhole(_view)
 	assert_str(_controls().get_warning_text()).is_empty()
 	_hold_fully()
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.DIALING)

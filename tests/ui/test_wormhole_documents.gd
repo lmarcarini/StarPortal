@@ -1,10 +1,11 @@
-## Tests for the documents a wormhole brings, on the wormhole screen: a first lock alone shows
-## nothing; the temporary Extend the pole camera button sends the camera, says so while it goes
-## through, and once the horizon record is taken the screen names the documents by title and
-## offers Read in the Archive, which opens the Archive with the
-## first one selected; the way back to the wormhole is the return bar, as from the Address
-## Book, with Dial still disabled; a lock that delivers nothing shows no line; the gamepad
-## reaches the button; the screen fits the minimum window in en and pt_BR.
+## Tests for the documents a wormhole brings, on the wormhole strip and actions: a first lock
+## alone shows nothing; Extend the pole camera sends the camera and shows its progress while it
+## goes through, and once the horizon record is taken ("Horizon record taken") the strip names
+## the documents by title and the actions offer Read in the Archive, which opens the Archive
+## with the first one selected; back in the Gate Room the strip still shows, focus is on the
+## Ring and a click on it brings the actions back, with Dial still disabled; a lock that
+## delivers nothing shows no line; the gamepad reaches the button; the strip and actions fit
+## the minimum window in en and pt_BR with five new documents and the console's finds.
 ## Runs the whole view switcher over the dialing fixture galaxy, with a DocumentSystem that
 ## delivers two fixture documents with the open world's horizon record.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
@@ -101,11 +102,12 @@ func _dial(kind: int) -> void:
 	button.begin_hold()
 	button.advance(HoldButton.HOLD_SECONDS)
 	_gate().get_overlays().get_sequence().skip()
+	Fixture.open_actions(_gate())
 	await get_tree().process_frame
 
 
 func _camera_button() -> Button:
-	return _screen().get_node("%PoleCameraButton") as Button
+	return _screen().get_actions().get_camera_button()
 
 
 ## Presses Extend the pole camera and runs the clock until the record is taken.
@@ -116,7 +118,7 @@ func _take_record() -> void:
 
 
 func _close_wormhole() -> void:
-	_screen().get_close_button().pressed.emit()
+	Fixture.close_wormhole(_gate())
 	_screen().dismiss()
 	await get_tree().process_frame
 
@@ -135,43 +137,50 @@ func test_the_horizon_record_names_the_documents_it_delivered() -> void:
 	await get_tree().process_frame
 	assert_bool(camera.disabled).is_true()
 	assert_str(camera.tr(camera.text)).is_equal("The pole camera is going through…")
+	assert_str(_screen().get_actions().get_camera_note()).is_equal("Horizon record in 5 min")
+	var progress: ProgressBar = _screen().find_child("CameraProgress", true, false) as ProgressBar
+	assert_bool(progress.is_visible_in_tree()).is_true()
+	SimClock.step_ticks(2)
+	assert_float(progress.value).is_equal(2.0)
+	assert_str(_screen().get_actions().get_camera_note()).is_equal("Horizon record in 3 min")
 	assert_bool(_line().visible).is_false()
-	SimClock.step_ticks(ExtendPoleCameraCommand.EXTEND_TICKS)
+	SimClock.step_ticks(ExtendPoleCameraCommand.EXTEND_TICKS - 2)
 	await get_tree().process_frame
+	assert_bool(progress.visible).is_false()
 	assert_bool(camera.disabled).is_true()
 	assert_str(camera.tr(camera.text)).is_equal("Horizon record taken")
 	assert_bool(_line().is_visible_in_tree()).is_true()
 	assert_str(_line().text).is_equal(
 		"New in the Archive: Directorate file 61-B, Field note, lintel"
 	)
-	var button: Button = _screen().get_archive_button()
+	var button: Button = _screen().get_actions().get_archive_button()
 	assert_bool(button.is_visible_in_tree()).is_true()
 	assert_str(button.tr(button.text)).is_equal("Read in the Archive")
 	assert_str(_switcher.get_tab_bar().get_tab_title(1)).is_equal("Archive (2)")
 
 
-## Read in the Archive opens the Archive with the first new document selected and read; the
-## Gate Room keeps the wormhole aside, and its return bar brings the wormhole back.
+## Read in the Archive opens the Archive with the first new document selected and read; back
+## in the Gate Room the strip still shows, focus is on the Ring, and the portal brings the
+## actions back.
 func test_read_in_the_archive_and_back_to_the_wormhole() -> void:
 	await _dial(DialOutcome.Kind.LOCK)
 	await _take_record()
-	_screen().get_archive_button().pressed.emit()
+	_screen().get_actions().get_archive_button().pressed.emit()
 	await get_tree().process_frame
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	assert_str(String(_archive().get_reader().get_document_id())).is_equal("doc_dossier")
 	assert_object(_focus_owner()).is_same(_archive().get_default_focus())
 	assert_str(_switcher.get_tab_bar().get_tab_title(1)).is_equal("Archive (1)")
-	assert_bool(_screen().is_away()).is_true()
+	assert_bool(_screen().are_actions_shown()).is_false()
 	_switcher.show_view(ViewSwitcher.GATE_ROOM)
 	await get_tree().process_frame
-	var back: Button = _screen().get_return_button()
-	assert_bool(back.is_visible_in_tree()).is_true()
-	assert_object(_focus_owner()).is_same(back)
-	assert_bool(_dial_button().disabled).is_true()
-	back.pressed.emit()
-	await get_tree().process_frame
 	assert_bool(_screen().is_showing_open()).is_true()
-	assert_object(_focus_owner()).is_same(_screen().get_close_button())
+	assert_bool(_line().is_visible_in_tree()).is_true()
+	assert_object(_focus_owner()).is_same(_gate().get_ring_view())
+	assert_bool(_dial_button().disabled).is_true()
+	await ArchiveFixture.pad(JOY_BUTTON_A)
+	assert_bool(_screen().are_actions_shown()).is_true()
+	assert_object(_focus_owner()).is_same(_screen().get_default_focus())
 	assert_bool(_dial_button().disabled).is_true()
 
 
@@ -185,38 +194,65 @@ func test_a_lock_that_delivers_nothing_shows_no_line() -> void:
 	assert_bool(_camera_button().disabled).is_true()
 	assert_bool(_screen().is_showing_open()).is_true()
 	assert_bool(_line().visible).is_false()
-	assert_bool(_screen().get_archive_button().visible).is_false()
+	assert_bool(_screen().get_actions().get_archive_button().visible).is_false()
 	await _close_wormhole()
 	await _dial(DialOutcome.Kind.HOSTILE_LOCK)
 	await _take_record()
 	assert_bool(_screen().is_showing_open()).is_true()
 	assert_bool(_line().visible).is_false()
-	assert_bool(_screen().get_archive_button().visible).is_false()
+	assert_bool(_screen().get_actions().get_archive_button().visible).is_false()
 
 
 func test_the_gamepad_reaches_read_in_the_archive() -> void:
 	await _dial(DialOutcome.Kind.LOCK)
 	await _take_record()
-	assert_object(_focus_owner()).is_same(_screen().get_close_button())
-	await ArchiveFixture.pad(JOY_BUTTON_DPAD_UP)
-	assert_object(_focus_owner()).is_same(_screen().get_archive_button())
+	assert_object(_focus_owner()).is_same(_screen().get_console().get_read_button())
+	await ArchiveFixture.pad(JOY_BUTTON_DPAD_DOWN)
+	assert_object(_focus_owner()).is_same(_screen().get_actions().get_archive_button())
 	await ArchiveFixture.pad(JOY_BUTTON_A)
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	assert_str(String(_archive().get_reader().get_document_id())).is_equal("doc_dossier")
 
 
 @warning_ignore("unused_parameter")
-func test_the_screen_with_new_documents_fits_the_minimum_window(
+func test_the_strip_and_actions_fit_the_minimum_window(
 	locale: String, test_parameters: Array = [["en"], ["pt_BR"]]  # gdlint: ignore=unused-argument
 ) -> void:
 	TranslationServer.set_locale(locale)
 	await _dial(DialOutcome.Kind.LOCK)
 	await _take_record()
+	_screen().get_console().read()
+	_line().text = WormholeText.new_documents_line(_five_documents())
 	await get_tree().process_frame
-	var panel: Control = _screen().get_node("Center/Panel") as Control
-	var needed: Vector2 = panel.get_combined_minimum_size()
-	assert_float(needed.x).is_less_equal(Fixture.VIEW_SIZE.x)
-	assert_float(needed.y).is_less_equal(Fixture.VIEW_SIZE.y)
-	var button: Button = _screen().get_archive_button()
-	assert_float(button.get_combined_minimum_size().x).is_less_equal(button.size.x)
-	assert_float(_line().size.x).is_less_equal(panel.size.x)
+	await get_tree().process_frame
+	var column: Control = _screen().get_node("Column") as Control
+	var strip: Control = _screen().get_node("%Strip") as Control
+	var panel: Control = _screen().get_node("%ActionsPanel") as Control
+	assert_bool(panel.is_visible_in_tree()).is_true()
+	assert_float(column.get_combined_minimum_size().x).is_less_equal(column.size.x)
+	# The strip leaves the actions room for at least a few rows; they scroll beyond that.
+	assert_float(strip.size.y).is_less_equal(column.size.y / 2.0)
+	assert_float(panel.size.y).is_greater_equal(120.0)
+	(
+		assert_bool(column.get_global_rect().intersects(_gate().get_ring_view().get_global_rect()))
+		. is_false()
+	)
+	for button: Button in [
+		_screen().get_actions().get_archive_button(), _screen().get_actions().get_close_button()
+	]:
+		assert_float(button.get_combined_minimum_size().x).is_less_equal(button.size.x)
+	assert_float(_line().size.x).is_less_equal(strip.size.x)
+
+
+## Five documents with long titles: the fixture's three, twice the dossier's.
+func _five_documents() -> Array[DocumentDef]:
+	var defs: Array[DocumentDef] = []
+	for id: StringName in [
+		ArchiveFixture.DOSSIER,
+		ArchiveFixture.NOTE,
+		ArchiveFixture.RUBBING,
+		ArchiveFixture.DOSSIER,
+		ArchiveFixture.NOTE
+	]:
+		defs.append(Registry.get_def(id) as DocumentDef)
+	return defs

@@ -105,7 +105,7 @@ func test_the_horizon_goes_dark_when_the_wormhole_closes(
 	_lock()
 	match how:
 		"order":
-			_view.get_overlays().get_wormhole_screen().get_close_button().pressed.emit()
+			Fixture.close_wormhole(_view)
 		"time":
 			SimClock.step_ticks(_simulation.state.balance.max_open_ticks)
 		"power":
@@ -169,7 +169,7 @@ func test_the_wormhole_screen_leaves_the_ring_in_sight() -> void:
 	assert_bool(screen.is_showing_open()).is_true()
 	var ring: Rect2 = _ring().get_global_rect()
 	assert_bool(screen.get_global_rect().intersects(ring)).is_false()
-	var panel: Control = screen.get_node("Center/Panel") as Control
+	var panel: Control = screen.get_node("Column") as Control
 	assert_float(panel.get_combined_minimum_size().y).is_less_equal(screen.size.y)
 
 

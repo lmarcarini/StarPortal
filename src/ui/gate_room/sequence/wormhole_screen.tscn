@@ -1,7 +1,19 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/ui/gate_room/sequence/wormhole_screen.gd" id="1_screen"]
-[ext_resource type="PackedScene" path="res://src/ui/gate_room/sequence/console_finds.tscn" id="2_finds"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/sequence/wormhole_actions.tscn" id="2_actions"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_strip"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.06, 0.1, 0.16, 0.97)
+border_width_left = 3
+border_color = Color(0.35, 0.6, 0.95, 1)
+
+[sub_resource type="Theme" id="Theme_strip"]
+default_font_size = 13
 
 [node name="WormholeScreen" type="Control"]
 visible = false
@@ -14,160 +26,105 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_screen")
 
-[node name="Dim" type="ColorRect" parent="."]
+[node name="Column" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.75)
-
-[node name="Center" type="MarginContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+theme_override_constants/separation = 4
 
-[node name="Panel" type="PanelContainer" parent="Center"]
-layout_mode = 2
-
-[node name="Scroll" type="ScrollContainer" parent="Center/Panel"]
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="Box" type="VBoxContainer" parent="Center/Panel/Scroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="Title" type="Label" parent="Center/Panel/Scroll/Box"]
+[node name="Strip" type="PanelContainer" parent="Column"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme = SubResource("Theme_strip")
+theme_override_styles/panel = SubResource("StyleBoxFlat_strip")
 
-[node name="OpenBox" type="VBoxContainer" parent="Center/Panel/Scroll/Box"]
+[node name="Box" type="VBoxContainer" parent="Column/Strip"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Column/Strip/Box"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_font_sizes/font_size = 16
 
-[node name="Columns" type="VBoxContainer" parent="Center/Panel/Scroll/Box/OpenBox"]
+[node name="OpenBox" type="VBoxContainer" parent="Column/Strip/Box"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 0
 
-[node name="Status" type="VBoxContainer" parent="Center/Panel/Scroll/Box/OpenBox/Columns"]
-layout_mode = 2
-
-[node name="Actions" type="VBoxContainer" parent="Center/Panel/Scroll/Box/OpenBox/Columns"]
-layout_mode = 2
-
-[node name="Destination" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
+[node name="Destination" type="Label" parent="Column/Strip/Box/OpenBox"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="Summary" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
-layout_mode = 2
-text = "GATE_WORMHOLE_SUMMARY"
-autowrap_mode = 3
-
-[node name="Hostile" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
+[node name="Hostile" type="Label" parent="Column/Strip/Box/OpenBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "GATE_MEANING_HOSTILE_LOCK"
 autowrap_mode = 3
 
-[node name="TimeLeft" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Drain" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Bank" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
+[node name="TimeLeft" type="Label" parent="Column/Strip/Box/OpenBox"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="NewDocuments" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Status"]
+[node name="Drain" type="Label" parent="Column/Strip/Box/OpenBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Bank" type="Label" parent="Column/Strip/Box/OpenBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="NewDocuments" type="Label" parent="Column/Strip/Box/OpenBox"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="ActionsTitle" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
-layout_mode = 2
-text = "GATE_WORMHOLE_ACTIONS"
-
-[node name="ArchiveButton" type="Button" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
+[node name="RingHint" type="Label" parent="Column/Strip/Box/OpenBox"]
 unique_name_in_owner = true
-visible = false
+modulate = Color(0.75, 0.82, 0.9, 1)
 layout_mode = 2
-text = "GATE_WORMHOLE_READ_ARCHIVE"
+autowrap_mode = 3
 
-[node name="CloseButton" type="Button" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "GATE_WORMHOLE_CLOSE"
-
-[node name="ConsoleFinds" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions" instance=ExtResource("2_finds")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="PoleCameraButton" type="Button" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "GATE_WORMHOLE_EXTEND_CAMERA"
-
-[node name="MothButton" type="Button" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-disabled = true
-text = "GATE_WORMHOLE_SEND_MOTH"
-
-[node name="MothNote" type="Label" parent="Center/Panel/Scroll/Box/OpenBox/Columns/Actions"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "GATE_WORMHOLE_SEND_MOTH_LATER"
-
-[node name="ClosedBox" type="VBoxContainer" parent="Center/Panel/Scroll/Box"]
+[node name="ClosedBox" type="VBoxContainer" parent="Column/Strip/Box"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="ClosedLabel" type="Label" parent="Center/Panel/Scroll/Box/ClosedBox"]
+[node name="ClosedLabel" type="Label" parent="Column/Strip/Box/ClosedBox"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="BackButton" type="Button" parent="Center/Panel/Scroll/Box/ClosedBox"]
+[node name="BackButton" type="Button" parent="Column/Strip/Box/ClosedBox"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
 text = "GATE_WORMHOLE_BACK"
 
-[node name="ReturnBar" type="PanelContainer" parent="."]
+[node name="ActionsPanel" type="PanelContainer" parent="Column"]
 unique_name_in_owner = true
 visible = false
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_top = -52.0
-offset_bottom = -12.0
-grow_horizontal = 2
-grow_vertical = 0
+layout_mode = 2
+size_flags_vertical = 3
 
-[node name="ReturnButton" type="Button" parent="ReturnBar"]
+[node name="Scroll" type="ScrollContainer" parent="Column/ActionsPanel"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="WormholeActions" parent="Column/ActionsPanel/Scroll" instance=ExtResource("2_actions")]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3

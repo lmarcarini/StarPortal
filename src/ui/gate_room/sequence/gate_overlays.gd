@@ -3,21 +3,21 @@ extends Control
 ## Hosts the Gate Room's overlays and decides which one shows, mirroring the Ring: the dialing
 ## sequence while it dials (it plays on the Ring view, beside the overlays: see [method attach]),
 ## then the result card for No gate, Blocked and Origin rejected, or the wormhole screen for a
-## lock or hostile lock, until the wormhole closes. The wormhole screen opens to the right of
-## the Ring view, never over it ([method keep_clear_left_of]), so the open horizon stays in
-## sight. At most
-## one overlay shows at a time. After a load it shows what the loaded Ring is doing. Changes no
-## state itself: only the sequence's hold and clock steps and the wormhole screen's Close and
-## Read console. When the wormhole screen steps aside for the Address Book or the Archive, it
-## says so.
+## lock or hostile lock, until the wormhole closes. The wormhole screen (a status strip and the
+## portal's action panel, never a modal) sits to the right of the Ring view, never over it
+## ([method keep_clear_left_of]), so the open horizon stays in sight; clicking the portal on the
+## Ring shows or hides the actions. At most one overlay shows at a time. After a load it shows
+## what the loaded Ring is doing. Changes no state itself: only the sequence's hold and clock
+## steps and the wormhole actions' commands. When the wormhole actions ask for the Address Book
+## or the Archive, it says so.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## technical-architecture.md#state-machines (presentation machines mirror simulation state)
 
 ## An overlay opened or closed; the view moves focus.
 signal changed
-## The wormhole screen stepped aside so the player can see the Address Book.
+## The wormhole actions asked for the Address Book.
 signal address_book_requested
-## The wormhole screen stepped aside so the player can read [param document_id] in the Archive.
+## The wormhole actions asked to read [param document_id] in the Archive.
 signal archive_requested(document_id: StringName)
 
 var _simulation: Simulation = null
@@ -32,6 +32,7 @@ func _ready() -> void:
 	_wormhole.dismissed.connect(_on_dismissed)
 	_wormhole.address_book_requested.connect(address_book_requested.emit)
 	_wormhole.archive_requested.connect(archive_requested.emit)
+	_wormhole.actions_hidden.connect(_on_dismissed)
 
 
 func _enter_tree() -> void:
@@ -48,6 +49,7 @@ func attach(sequence: DialSequence, ring: RingView) -> void:
 	_sequence = sequence
 	_sequence.set_ring_view(ring)
 	_sequence.finished.connect(_on_sequence_finished)
+	ring.portal_pressed.connect(_on_portal_pressed)
 
 
 ## Keeps the wormhole screen right of [param left] pixels from this control's left edge, where
@@ -82,7 +84,8 @@ func is_open() -> bool:
 	return _sequence.is_open() or _result.is_open() or _wormhole.is_open()
 
 
-## Returns the control the open overlay focuses, or null when none shows.
+## Returns the control the open overlay focuses (the first wormhole action while they show),
+## or null when none shows.
 func get_default_focus() -> Control:
 	if _sequence.is_open():
 		return _sequence.get_skip_button()
@@ -119,6 +122,11 @@ func _on_sequence_finished(outcome: int) -> void:
 		_wormhole.open()
 	elif outcome >= 0 and not gate.dial_log.is_empty():
 		_result.show_entry(gate.dial_log[gate.dial_log.size() - 1])
+	changed.emit()
+
+
+func _on_portal_pressed() -> void:
+	_wormhole.toggle_actions()
 	changed.emit()
 
 
