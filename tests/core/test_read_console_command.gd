@@ -85,7 +85,7 @@ func test_read_adds_listed_addresses() -> void:
 			WorldsState.WorldStatus.UNKNOWN
 		)
 	assert_bool(_state().worlds.is_console_read(reader)).is_true()
-	assert_array(_events).contains_exactly([&"address_book_changed"])
+	assert_array(_events).contains_exactly([&"console_read", &"address_book_changed"])
 	assert_array(GameState.validate_dict(_state().to_dict())).is_empty()
 	_simulation.submit(CloseWormholeCommand.new())
 	var target: StringName = _first_open(listed)
@@ -104,6 +104,7 @@ func test_refused_when_not_locked() -> void:
 	_simulation.submit(DialCommand.create(_address_of(_reader_id())))
 	assert_str(String(_read().error_code)).is_equal("not_locked")
 	assert_array(_state().address_book.entries).is_empty()
+	assert_array(_events).not_contains([&"console_read"])
 
 
 ## A second read is refused and adds nothing, also after closing and dialing the world again.
@@ -120,6 +121,7 @@ func test_second_read_is_refused() -> void:
 	var after_entries: Array = after["entries"]
 	var before_entries: Array = before["entries"]
 	assert_int(after_entries.size()).is_equal(before_entries.size())
+	assert_int(_events.count(&"console_read")).is_equal(1)
 
 
 ## An address already in the book keeps its entry; only the others are added.

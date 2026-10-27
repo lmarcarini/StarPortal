@@ -31,6 +31,7 @@ func _expected_v7_state() -> Dictionary:
 	var worlds: Dictionary = expected["worlds"]
 	worlds["consoles_read"] = {}
 	_add_v9_worlds(worlds)
+	expected["operations_log"] = {"entries": []}
 	return expected
 
 
@@ -56,7 +57,7 @@ func test_v4_drops_intel_workbench_and_queue() -> void:
 	var result := SaveMigrator.migrate(_v4_fixture())
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(9)
+	assert_int(migrated["format_version"]).is_equal(SaveMigrator.TARGET_VERSION)
 	assert_dict(migrated["state"]).is_equal(_expected_v7_state())
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -66,14 +67,19 @@ func test_v4_drops_intel_workbench_and_queue() -> void:
 ## validation to reject.
 func test_v4_without_state_or_gate_is_left_for_validation() -> void:
 	var no_state := SaveMigrator.migrate({"format_version": 4, "state": 5})
-	assert_dict(no_state.value).is_equal({"format_version": 9, "state": 5})
+	assert_dict(no_state.value).is_equal(
+		{"format_version": SaveMigrator.TARGET_VERSION, "state": 5}
+	)
 	var bad_gate := SaveMigrator.migrate({"format_version": 4, "state": {"gate": 3, "intel": {}}})
 	var empty_sections := {
 		"gate": 3,
 		"archive": {"received": [], "read": {}, "received_tick": {}},
 		"address_book": {"entries": []},
+		"operations_log": {"entries": []},
 	}
-	assert_dict(bad_gate.value).is_equal({"format_version": 9, "state": empty_sections})
+	assert_dict(bad_gate.value).is_equal(
+		{"format_version": SaveMigrator.TARGET_VERSION, "state": empty_sections}
+	)
 
 
 ## The real v4 file loads through the SaveService with its gate, power, worlds and clock

@@ -33,9 +33,9 @@ func test_current_version_is_pass_through() -> void:
 
 
 ## The target version is 9, with built-in steps from v1 to v8.
-func test_target_version_is_nine() -> void:
-	assert_int(SaveMigrator.TARGET_VERSION).is_equal(9)
-	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([1, 2, 3, 4, 5, 6, 7, 8])
+func test_target_version_is_ten() -> void:
+	assert_int(SaveMigrator.TARGET_VERSION).is_equal(10)
+	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([1, 2, 3, 4, 5, 6, 7, 8, 9])
 
 
 ## Runs only the built-in v1 -> v2 step on [param data].
@@ -268,7 +268,7 @@ func test_v2_adds_gate_power_and_worlds() -> void:
 	var result := SaveMigrator.migrate({"format_version": 2.0, "tick": 9.0, "state": state})
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(9)
+	assert_int(migrated["format_version"]).is_equal(SaveMigrator.TARGET_VERSION)
 	var expected := state.duplicate(true)
 	expected.merge(_v3_sections(base_seed))
 	expected["archive"] = {"received": [], "read": {}, "received_tick": {}}
@@ -281,6 +281,7 @@ func test_v2_adds_gate_power_and_worlds() -> void:
 	var expected_worlds: Dictionary = expected["worlds"]
 	expected_worlds["consoles_read"] = {}
 	_add_v9_worlds(expected_worlds)
+	expected["operations_log"] = {"entries": []}
 	assert_dict(migrated["state"]).is_equal(expected)
 	var migrated_state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(migrated_state)).is_empty()
@@ -290,7 +291,7 @@ func test_v2_adds_gate_power_and_worlds() -> void:
 func test_v2_without_state_is_left_for_validation() -> void:
 	var result := SaveMigrator.migrate({"format_version": 2})
 	assert_bool(result.is_ok).is_true()
-	assert_dict(result.value).is_equal({"format_version": 9})
+	assert_dict(result.value).is_equal({"format_version": SaveMigrator.TARGET_VERSION})
 
 
 ## A real v2 file, written by the v2 SaveService (tests/services/fixtures/save_v2.json),

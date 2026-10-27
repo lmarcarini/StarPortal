@@ -49,7 +49,7 @@ func _panel(node_name: String) -> Node:
 
 
 @warning_ignore("unused_parameter")
-func test_each_outcome_ends_on_its_card_or_screen_with_gauge_drop_and_log_row(
+func test_each_outcome_ends_on_its_card_or_screen_with_gauge_drop(
 	outcome: int,
 	test_parameters: Array = [  # gdlint: ignore=unused-argument
 		[DialOutcome.Kind.NO_GATE],
@@ -86,10 +86,6 @@ func test_each_outcome_ends_on_its_card_or_screen_with_gauge_drop_and_log_row(
 	assert_float(gauge.get_bar_value()).is_equal_approx(
 		DialFixture.CAPACITY_MWH - entry.energy_spent_mwh, 0.01
 	)
-	var log_panel: DialLogPanel = _panel("DialLogPanel") as DialLogPanel
-	assert_int(log_panel.get_rows().size()).is_equal(1)
-	var row: LogRow = log_panel.get_rows()[0]
-	assert_object(row.get_entry()).is_same(entry)
 	assert_str(GateRoomFormat.date_time(entry.tick)).is_equal("2026-01-01 00:02")
 
 
@@ -128,19 +124,10 @@ func test_dial_needs_seven_glyphs_and_never_shows_the_needed_charge() -> void:
 	assert_bool(controls.get_dial_button().disabled).is_true()
 
 
-func test_log_lists_newest_first_and_names_the_world_for_locks_only() -> void:
-	var log_panel: DialLogPanel = _panel("DialLogPanel") as DialLogPanel
-	assert_bool((_panel("DialLogPanel").get_node("%EmptyLabel") as Label).visible).is_true()
-	var kinds: Array[int] = [DialOutcome.Kind.NO_GATE, DialOutcome.Kind.LOCK]
-	for kind: int in kinds:
-		_enter(Fixture.address_for(_simulation.state, kind))
-		_hold_dial()
-		SimClock.step_ticks(2)
-		if kind == DialOutcome.Kind.LOCK:
-			_view.get_overlays().get_wormhole_screen().get_close_button().pressed.emit()
-	var rows: Array[LogRow] = log_panel.get_rows()
-	assert_int(rows.size()).is_equal(2)
-	assert_int(rows[0].get_entry().outcome).is_equal(DialOutcome.Kind.LOCK)
-	assert_int(rows[1].get_entry().outcome).is_equal(DialOutcome.Kind.NO_GATE)
-	assert_str(rows[0].get_designation_text()).is_equal("Destination: P3X-111")
-	assert_str(rows[1].get_designation_text()).is_empty()
+## The Dial Log tab is gone: the records hold only the Address Book (dials are in the Archive's
+## operations log).
+func test_records_hold_only_the_address_book() -> void:
+	assert_object(_panel("DialLogPanel")).is_null()
+	var records: TabContainer = _panel("Records") as TabContainer
+	assert_int(records.get_tab_count()).is_equal(1)
+	assert_str(records.get_tab_title(0)).is_equal("BOOK_TITLE")

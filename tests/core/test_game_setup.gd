@@ -76,7 +76,17 @@ func test_transient_references_are_never_saved() -> void:
 	GameSetup.build(state, defs)
 	var data: Dictionary = state.to_dict()
 	assert_array(data.keys()).is_equal(
-		["clock", "random", "flags", "gate", "power", "worlds", "archive", "address_book"]
+		[
+			"clock",
+			"random",
+			"flags",
+			"gate",
+			"power",
+			"worlds",
+			"archive",
+			"address_book",
+			"operations_log"
+		]
 	)
 	var text: String = JSON.stringify(data)
 	for word: String in ['galaxy"', "balance", "world_cairn", "anchors"]:

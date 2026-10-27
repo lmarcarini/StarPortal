@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/archive/log_row.gd" id="1_row"]
+[ext_resource type="Script" path="res://src/ui/archive/log_kind_icon.gd" id="2_icon"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/address_strip.tscn" id="3_strip"]
+
+[node name="LogRow" type="Button"]
+custom_minimum_size = Vector2(0, 52)
+size_flags_horizontal = 3
+focus_mode = 2
+alignment = 0
+script = ExtResource("1_row")
+
+[node name="Content" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="Control" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("2_icon")
+
+[node name="Text" type="VBoxContainer" parent="Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Line" type="Label" parent="Content/Text"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+auto_translate_mode = 2
+text_overrun_behavior = 3
+
+[node name="Date" type="Label" parent="Content/Text"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+auto_translate_mode = 2
+theme_override_font_sizes/font_size = 13
+text_overrun_behavior = 3
+
+[node name="Strip" parent="Content" instance=ExtResource("3_strip")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+icon_size = 20

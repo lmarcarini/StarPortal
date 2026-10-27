@@ -6,7 +6,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 9
+const TARGET_VERSION: int = 10
 
 ## v3 defaults as ExactFloat strings, frozen here: 0.0, 400.0 and 30.0.
 const _EXACT_ZERO: String = "0000000000000000"
@@ -26,6 +26,7 @@ static func built_in_steps() -> Dictionary[int, Callable]:
 		6: _v6_to_v7,
 		7: _v7_to_v8,
 		8: _v8_to_v9,
+		9: _v9_to_v10,
 	}
 	return built_in
 
@@ -271,4 +272,16 @@ static func _v8_to_v9(data: Dictionary) -> Dictionary:
 	worlds_data["horizon_records"] = records
 	worlds_data["pole_camera_world_id"] = ""
 	worlds_data["pole_camera_ticks_left"] = 0
+	return data
+
+
+## v9 -> v10: adds the "operations_log" section, empty (a v9 game kept no log), written here as a
+## literal so later changes to the game's defaults never change this step. Every other section is
+## kept. Data with no state object is left as is, for validation to reject.
+static func _v9_to_v10(data: Dictionary) -> Dictionary:
+	var state: Variant = data.get("state")
+	if not state is Dictionary:
+		return data
+	var state_data: Dictionary = state
+	state_data["operations_log"] = {"entries": []}
 	return data
