@@ -52,6 +52,22 @@ static func select(view: GateRoomView, address: GateAddress) -> void:
 		console.get_dial_controls().set_address(address)
 
 
+## Shows the open wormhole's action panel, as a click on the portal does; no-op if it shows.
+static func open_actions(view: GateRoomView) -> void:
+	if not view.get_overlays().get_wormhole_screen().are_actions_shown():
+		view.get_ring_view().portal_pressed.emit()
+
+
+## Closes the open wormhole with the action panel's Close the wormhole hold button.
+static func close_wormhole(view: GateRoomView) -> void:
+	open_actions(view)
+	var close: HoldButton = (
+		view.get_overlays().get_wormhole_screen().get_actions().get_close_button()
+	)
+	close.begin_hold()
+	close.advance(HoldButton.HOLD_SECONDS)
+
+
 ## Returns a Control of [constant VIEW_SIZE] that holds a new Gate Room view, as the shell's
 ## view area does. The caller adds the holder to the tree and frees it.
 static func mount_view() -> Control:

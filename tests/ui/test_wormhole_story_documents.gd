@@ -80,6 +80,7 @@ func test_the_longest_list_fits_the_minimum_window(
 	add_child(_holder)
 	var view: GateRoomView = Fixture.view_of(_holder)
 	view.setup(player.simulation)
+	Fixture.open_actions(view)
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var screen: WormholeScreen = view.get_overlays().get_wormhole_screen()
@@ -87,6 +88,9 @@ func test_the_longest_list_fits_the_minimum_window(
 	var line: Label = screen.get_node("%NewDocuments") as Label
 	assert_bool(line.is_visible_in_tree()).is_true()
 	assert_int(line.text.split(", ").size()).is_greater_equal(5)
-	var needed: Vector2 = (screen.get_node("Center/Panel") as Control).get_combined_minimum_size()
-	assert_float(needed.x).is_less_equal(Fixture.VIEW_SIZE.x)
-	assert_float(needed.y).is_less_equal(Fixture.VIEW_SIZE.y)
+	assert_bool(screen.get_console().is_read()).is_true()
+	var column: Control = screen.get_node("Column") as Control
+	var needed: Vector2 = column.get_combined_minimum_size()
+	assert_float(needed.x).is_less_equal(column.size.x)
+	assert_float(needed.y).is_less_equal(column.size.y)
+	assert_float((screen.get_node("%Strip") as Control).size.y).is_less_equal(column.size.y / 2.0)

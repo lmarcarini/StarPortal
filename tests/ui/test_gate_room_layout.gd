@@ -149,15 +149,17 @@ func test_the_overlays_fit_the_minimum_window(
 	await _build(locale, is_pseudo)
 	var overlays: GateOverlays = _view.get_overlays()
 	assert_bool(overlays.get_wormhole_screen().is_showing_open()).is_true()
+	Fixture.open_actions(_view)
 	overlays.get_result_card().show_entry(_simulation.state.gate.dial_log[0])
 	await get_tree().process_frame
-	var screens: Array[Control] = [overlays.get_wormhole_screen(), overlays.get_result_card()]
-	for screen: Control in screens:
-		var needed: Vector2 = (
-			(screen.get_node("Center/Panel") as Control).get_combined_minimum_size()
-		)
-		assert_float(needed.x).is_less_equal(screen.size.x)
-		assert_float(needed.y).is_less_equal(screen.size.y)
+	var panels: Array[Control] = [
+		overlays.get_wormhole_screen().get_node("Column") as Control,
+		overlays.get_result_card().get_node("Center/Panel") as Control,
+	]
+	for panel: Control in panels:
+		var needed: Vector2 = panel.get_combined_minimum_size()
+		assert_float(needed.x).is_less_equal(panel.get_parent_control().size.x)
+		assert_float(needed.y).is_less_equal(panel.get_parent_control().size.y)
 	assert_array(_clipped(overlays)).is_empty()
 	# The dialing sequence's caption fits its side of the Ring view.
 	var wing: Control = _view.find_child("LeftWing", true, false) as Control
