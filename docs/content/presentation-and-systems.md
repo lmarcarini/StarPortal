@@ -1,6 +1,6 @@
 # Presentation and Systems
 
-How the hybrid presentation works screen by screen, the top-down base, the Archive as the
+How the hybrid presentation works screen by screen, the base plan, the Archive as the
 player's database, where documents come from, and the contact system. M2 and M3 cards are
 written from it.
 
@@ -9,7 +9,7 @@ Bible: [overview.md#locked-decisions](../bible/overview.md#locked-decisions),
 requests and politics), [art-and-audio.md](../bible/art-and-audio.md) (pipeline),
 [gate-and-address-spec.md](../bible/gate-and-address-spec.md) (dial console, open wormhole,
 probing), [lore-and-arcs.md#lore-delivery](../bible/lore-and-arcs.md#lore-delivery).
-Status: draft for the owner's approval.
+Status: approved by the owner 2026-10-26, with the decisions in section 7.
 
 Several bible sections still describe the old design; section 8 lists the changes needed.
 
@@ -36,7 +36,7 @@ Real sizes are given in the text.
 | Screen | Key | What it is for | Reached from |
 | --- | --- | --- | --- |
 | Gate Room | F1 | The Ring, the dial console, the radio, the document tray, incoming wormholes | Top bar, any wormhole alert |
-| Base | F2 | Build, power, staff, research labs, incursions | Top bar, any base alert |
+| Base | F2 | Build, dig, lay conduits, power, staff, research labs, incursions | Top bar, any base alert |
 | Archive | F3 | Documents, Worlds, Codex, Log | Top bar, the document tray, any link |
 | Expeditions | F4 | Plan teams, follow the field timeline, read check-ins | Top bar, Ring "Send team" |
 | Command | F5 | Budget, Committee, factions, requests, news | Top bar, the radio, request alerts |
@@ -87,7 +87,8 @@ auto-pauses and appears as a card over the timeline.
 ```
 
 *Command.* A cork board in the Papers, Please palette: budget ledger, the three Committee seats,
-faction standings, requests as pinned cards, a news column. **Request dossier** lives here.
+faction standings, requests as pinned cards, a news column. There is no dossier request:
+dossiers arrive as the player meets new things (section 5).
 
 ```
 +------------------------------------------------------------------------------+
@@ -101,7 +102,7 @@ faction standings, requests as pinned cards, a news column. **Request dossier** 
 +------------------------+----------------------------+------------------------+
 | COMMITTEE review 1 Apr | [Accept] [Decline]         | NEWS                   |
 | Adeyemi  Vosk  Marquez |                            | Grid outage in north   |
-| Confidence 54  Exp 12  | [Request dossier...]       |                        |
+| Confidence 54  Exp 12  |                            |                        |
 +------------------------+----------------------------+------------------------+
 ```
 
@@ -164,7 +165,7 @@ from Arc 1 the Shutter, and technicians as small figures.
 | Phone / radio | Waiting and outgoing calls (section 6); a lamp lights when someone is on the line |
 | Document tray | Newly produced documents, with a count; opens the newest in the Archive (all are already filed) |
 | Capacitor gauge | Stored charge; install or upgrade a bank, as in M1.5 |
-| Pole camera | Push it through an open horizon |
+| Pole camera | Push it through an open horizon (once per lock; risky on hostile locks) |
 | Log strip (teleprinter) | The last five Log lines |
 
 **The open portal, without a modal.** A lock lights the Ring blue and the clock drops to 1×.
@@ -201,34 +202,38 @@ An incoming wormhole's blue is framed in red, so it never looks like the player'
 
 ---
 
-## 3. Top-down base
+## 3. Base plan
 
-One plan per level, seen from above with ceilings removed; a blueprint while building. It
-replaces the side-on cutaway.
+One plan per level, seen from a slight three-quarter angle with ceilings removed: the camera
+looks down about 60 degrees from horizontal, so the south wall of each room shows as a thin
+strip of wall face and furniture and figures read as objects, while the cell grid stays square
+enough to place rooms. It turns to a flat blueprint while building or digging. It replaces the
+side-on cutaway. In the sketch, `"""` marks a visible wall face and `~` a power conduit.
 
 ```
 +------------------------------------------------------------------------------+
 | top bar                                                                      |
 +-----+----------------------------------------------------------+-------------+
-| S   | LEVEL 3 (original)                [Power][Staff]         | ROOM        |
+| S   | LEVEL 3 (original)          [Power][Conduits][Staff]     | ROOM        |
 | 1   |  +-------+  +----+----+   +---------------+              | Physics lab |
 | 2   |  |PLANT  |  |LAB |LAB |   |   GATE ROOM   |              | 3/4 staff   |
-| >3< |  | ###   |==|phys|ling|===|     (Ring)    |              | 4 MW  P2    |
-| +   |  +-------+  +----+----+   |               |              | Research:   |
-|     |   ||   .  .     ||        +-------[]------+              | Seal tele-  |
-| LIFT|  +---+ +-----+  ||  +-----+  +----------+                | metry 61%   |
-|     |  |CAP| |CTRL |==++==|ARCH |  | QUARTERS |                |             |
-|     |  +---+ +-----+      +-----+  +----------+                |             |
+| >3< |  | ###   |~~|phys|ling|~~~|     (Ring)    |              | 4 MW  P2    |
+| +   |  +"""""""+  +""""+""""+   |               |              | conduit: ok |
+|     |   ~   .  .     ||        +"""""""[]""""""+              | Research:   |
+| LIFT|  +---+ +-----+  ||  +-----+  +----------+                | Seal tele-  |
+|     |  |CAP|~|CTRL |==++==|ARCH |~~| QUARTERS |                | metry 61%   |
+|     |  +"""+ +"""""+      +"""""+  +""""""""""+                |             |
 +-----+----------------------------------------------------------+-------------+
-| BUILD: Lab  Analysis  Archive  Workshop  Barracks  Quarters .. | 12 days     |
+| BUILD: Lab Analysis Archive Workshop .. | CONDUIT | DIG LEVEL   | 12 days     |
 +------------------------------------------------------------------------------+
 ```
 
-**Grid.** A cell is a 3 m square, 24 px at 1280 × 720, with zoom; a level is 36 × 20 cells
+**Grid.** Starting values, tuned by playtesting. A cell is a 3 m square, 24 px at 1280 × 720,
+with zoom; a level is 36 × 20 cells
 (864 × 480 px). Rooms are rectangles of cells joined by one-cell corridors; rooms sharing two or
 more cells of wall are neighbours for adjacency bonuses.
 
-| Room | Cells (w × h) | Notes |
+| Room | Cells (w × h, starting values) | Notes |
 | --- | --- | --- |
 | Gate Room | 8 × 8 | Fixed on Level 3, the deepest original level |
 | Control Room | 5 × 3 | Fixed, against the Gate Room's window wall |
@@ -249,7 +254,9 @@ more cells of wall are neighbours for adjacency bonuses.
 | Lift shaft, stairs | 2 × 2, 2 × 1 | |
 
 **Levels and lifts.** The surface and Levels 1 to 3 exist at the start; the left column
-switches level. A new level is dug below the deepest (bible) and arrives empty. A lift shaft
+switches level. A new level is dug whole, below the deepest (bible): **Dig level** in the
+build bar shows the cost and days, engineers dig it as one site, and it arrives as an empty
+36 × 20 grid. There is no cell-by-cell excavation. A lift shaft
 takes the same cells on every level it serves and moves squads fast; stairs are cheaper and
 slower, so lift placement matters in an incursion.
 
@@ -263,11 +270,17 @@ slower, so lift placement matters in an incursion.
 4. A hatched site shows days left. Engineers in its crew slots build it; none, and it stops.
 5. Finished, the room needs staff and power. Demolishing refunds half; rooms are never moved.
 
-**Power on the plan.** One base-wide supply; as in FTL, no cables, only priority. Each room
-shows draw pips and a priority (P1 to P9); the **Power** overlay marks rooms powered (solid) or
-shed (striped, slashed bolt). The side panel lists rooms by priority, reordered by dragging, and
-stripes in advance the rooms the next shortfall would shed. An open wormhole's drain sits above
-P1.
+**Power on the plan: conduits.** Power reaches a room only along conduits the player lays.
+**Conduit** in the build bar drags a run of conduit along corridor cells (cheap, built in hours
+by engineers); a room is connected when a conduit touches one of its cells and runs unbroken back
+to a Power Plant or Capacitor Bank. A conduit passes between levels only through a lift shaft or
+stairs. The **Conduits** overlay draws every run and marks a cut segment red; the room panel
+says "conduit: ok" or "no conduit". Within the connected network, priority still decides who is
+shed in a shortfall: each room shows draw pips and a priority (P1 to P9); the **Power** overlay
+marks rooms powered (solid) or shed (striped, slashed bolt), and the side panel lists rooms by
+priority, reordered by dragging, striping in advance the rooms the next shortfall would shed. An
+open wormhole's drain sits above P1. The Gate Room's own feed from the first capacitor alcove is
+fixed and cannot be cut, so the player can always close the Ring.
 
 **Staff as dots.** Every person is an 8 px dot, coloured and shaped by role (scientist circle,
 engineer square, soldier triangle, medic cross, analyst diamond), walking the corridors. Rooms
@@ -277,7 +290,9 @@ show staff slots as small squares. Drag a dot onto a room to assign; click it fo
 red diamonds from the Gate Room, seen only where staff can see them; elsewhere a fading marker
 shows the last sighting. Click a blast door (on a corridor cell) to seal it. Squads are numbered
 tags: drag one to a cell or level; **Fall back** sends it to the nearest sealed door. The Control
-Room and Power Plant carry a shield icon: enemies path to objectives (bible).
+Room and Power Plant carry a shield icon: enemies path to objectives (bible). Enemies on a
+conduit cell can cut it: everything beyond the cut loses power until an engineer repairs the
+segment, so a second, separate conduit run to vital rooms is worth its cost.
 
 **Research** lives on the plan: clicking a lab shows its project; key T opens the tech tree.
 
@@ -318,15 +333,17 @@ receiving it, unlocks its Codex facts.
 
 **Worlds.** One record per address held: name, address (**Load**), status (the bible's world
 states), visits, reports, photos, threat with confidence, factions seen, linked documents, the
-player's notes. Before a lock: "world unknown" and its source. The Address Book becomes a view of
-this, so addresses live in one store.
+player's notes. Before a lock: "world unknown" and its source. The Address Book is a view of
+Worlds (owner decision 7): the binder on the console desk lists the same records, plus addresses
+held but not yet placed, and **Load** works from either. Addresses live in one store.
 
 **Codex.** Entries of 150 words or fewer (bible): title, category, body, sources. Reading a
 document carrying a fact unlocks or extends its entry. When sources disagree the entry is
 **contested** and shows each version side by side, linked to its source; the game never says
 which is true.
 
-**Log.** Every notable event, one timed line each (dials, documents, staff, construction,
+**Log** (shipped in M1.6; M2 adds the filters and links). Every notable event, one timed line
+each (dials, documents, staff, construction,
 research, standing, requests, check-ins), filtered by Gate, Base, People, Politics, Contact. Each
 line links to its subject.
 
@@ -336,26 +353,34 @@ line links to its subject.
 
 Every document comes from a system. Most come from something the player did (a push, a scan,
 a request, an assignment). The honest exceptions arrive without a player action but still from a
-system: the opening pair (Order No. 1 and Pell's sketch, in the tray at the start), the
-Committee's calendar, faction letters at standing changes, and Infirmary reports. Each
+system: the opening pair (Order No. 1 and Pell's sketch, in the tray at the start), dossiers
+on first encounters, the Committee's calendar, faction letters at standing changes, and
+Infirmary reports. Each
 document's data names its producing system, and the validator rejects one that has none.
 
 | System | Documents it produces | When |
 | --- | --- | --- |
-| Pole camera (Gate Room) | Horizon record (frames, air, temperature, radiation); on a world's first push, the story documents keyed to that world | A push at an open wormhole, 5 in-game minutes, one record per lock |
+| Pole camera (Gate Room) | Horizon record (frames, air, temperature, radiation); on a world's first push, the story documents keyed to that world | One push per lock, 5 in-game minutes, at an open wormhole; on hostile locks the camera may be lost (below) |
 | Far Ring console | Address Book entries; on story worlds, sometimes a console log fragment | **Read far console** from the Ring, once per world; the MOTH's deeper scan in M3 |
 | Probes (M3) | World Report, photos (including sky photos), inscription captures | Scans in flight; the report when the run ends |
 | Expeditions (M3) | Check-in reports, field notes, recovered documents, oral histories | At check-ins and on return |
 | Contact (M3) | Transcripts, built from the lines reached and choices made | When a conversation ends |
 | Analysts | Memos: a hint, a cross-reference, a source grade (Arc 2) | When an analyst assigned to a document finishes |
 | Research labs | Technology reports, artefact notes, translation updates | When a project or artefact state completes |
-| Directorate and Committee | Dossiers; review minutes; budget letters | Dossiers when requested from Command (days) or as rewards; the rest on the calendar |
+| Directorate and Committee | Dossiers; review minutes; budget letters | A dossier when the player first meets something the Directorate has a file on (a faction, a person, an artefact type, a world named in the 1961 file), arriving with the record that met it; the rest on the calendar. Dossiers are never requested |
 | Factions | Letters, gifts, treaty texts | Standing changes (M3); requests and thresholds (M4) |
 | Continuity | True and doctored dossiers, pieces of the 1961 file | Requests, black-fund deals, caught lies (Arc 2) |
 | Captured records | Ossar dial logs, Dravian intelligence | Incursions, expeditions, trade |
 | Infirmary | Staff dream reports (the Murmur, Arc 6) | When a person's state changes |
 
 So M1.5's "on a lock" becomes "on the first pole-camera push": looking spends open time.
+
+**Pole camera risk (PO proposal, needs playtest).** A lock is hostile when the World record's
+threat is HIGH or an enemy faction holds the world. On a hostile lock, the push has a 1 in 4
+chance (seeded) that something notices the camera: it is dragged through and lost. The horizon
+record keeps the frames taken before the loss and ends "(feed lost)", and the far side's
+threat confidence rises one step. A replacement rig costs $0.2M and 3 days, and no push is
+possible until it is installed. On other locks the push carries no risk.
 
 ---
 
@@ -382,10 +407,13 @@ reason if marked "show locked".
 requests, no ripples, no diplomacy. Those stay in M4, which adds `OfferRequest` and the
 threshold effects to the same format. Section 8 lists the roadmap change.
 
-**Timing.** The clock is held while the panel is open, as during the dial sequence. Each line
-costs its minutes as it is reached, so open time and stored energy fall line by line. If a line
-would pass the 60-minute limit or empty the store, the far side is cut off there, the wormhole
-closes and the transcript ends "(signal lost)". The panel covers the right third of the screen
+**Timing (owner decision 10; may change later).** The clock is not held: a conversation runs
+live at 1×, forced down from any faster speed when the panel opens, and the player can still
+pause. Open time and stored energy drain while the player reads and chooses. A line's minutes
+are how long it takes to say: the next line appears once they have passed in game time. The
+60-minute window and the energy drain still apply: when either runs out, the far side is cut
+off mid-conversation, the wormhole closes and the transcript ends "(signal lost)". The panel
+covers the right third of the screen
 and is not modal: tabs, the Archive (to look words up) and **Close wormhole**, which ends the
 conversation, stay usable; other commands apply at once, as when paused.
 
@@ -401,7 +429,8 @@ conversation, stay usable; other commands apply at once, as when paused.
 **Partial translation.** Each alien language is a lexicon; every word has a glyph-script form,
 a gloss and reveal conditions. An unknown word is drawn in script, in the faction's accent
 colour; hovering shows "Unknown word (Kindred). Heard 3 times" with links to every occurrence.
-The player can pencil in a guess, which the game never checks.
+The player can pencil in a guess, which the game never checks; guesses are kept (owner
+decision 11) and shown in pencil wherever the word appears until it is revealed.
 
 - **Translation level** per language, 0 to 5, rises with linguistics lab work, translation
   research (Life and language branch) and transcripts collected. Some words reveal only from a
@@ -461,30 +490,26 @@ request.
 
 ---
 
-## 7. Open questions for the owner
+## 7. Owner decisions (2026-10-26)
 
-1. **Base look:** straight top-down (clearest on a grid) or a slight three-quarter angle?
-2. **Power routing:** no cables, priority only. Or conduits the player lays, which an incursion
-   can cut?
-3. **Excavation:** whole levels (bible), or blocks of cells so the player shapes each level?
-4. **Grid numbers:** 3 m cells, 36 × 20 per level, section 3's room sizes, as starting tunables?
-5. **Tabs and keys.** Five tabs (Gate Room, Base, Archive, Expeditions, Command), F1 to F5, with
-   Research inside the Base. The bible lists six views including Research and Analysis. Agree?
-6. **Archive in which milestone?** Worlds and Log could land in M2 (they need nothing from M3);
-   Codex and transcripts in M3 with contact. Or all in one card set?
-7. **One store for addresses.** The Address Book becomes a view of Worlds plus unplaced
-   addresses. Agree?
-8. **Pole camera limits.** One record per lock, 5 in-game minutes, and story documents only on
-   a world's first push. Should a push cost energy too, or risk something on hostile locks?
-9. **Dossiers on request.** Dossiers come when the player asks the Directorate from Command.
-   Should asking cost Confidence, time only, or depend on standing with the Directorate?
-10. **Conversation clock.** Held time, each line charging its minutes as it is reached, cut off
-    when open time or stored energy runs out (section 6). Or should conversations run live at
-    1×, with the drain ticking while you read?
-11. **Guesses.** Players can pencil guesses over unknown words; the game never checks them.
-    Keep, or leave note-taking to the Archive's notes?
-12. **Names in the example.** "Hearth-keeper" as a Kindred title and "the Buried Ring" as their
-    name for Earth's Ring are new. Approve, or rename?
+1. **Base look:** a slight three-quarter angle, not straight top-down (section 3).
+2. **Power routing:** conduits the player lays; incursions can cut them (section 3).
+3. **Excavation:** new levels are dug whole (section 3).
+4. **Grid numbers:** 3 m cells, 36 × 20 per level and section 3's room sizes are starting
+   values, tuned by playtesting.
+5. **Tabs and keys:** five tabs, F1 to F5, with Research inside the Base: agreed.
+6. **Archive milestones:** Worlds and the Log's filters and links in M2 (the Log itself shipped
+   in M1.6); Codex and transcripts in M3.
+7. **One store for addresses:** the Address Book is a view of the Archive's Worlds.
+8. **Pole camera:** one 5-minute push per lock, with a risk on hostile locks. The concrete risk
+   (camera lost, section 5) is a PO proposal.
+9. **Dossiers:** created as the player encounters new things; no requesting dossiers from
+   Command for now. The request mechanic is removed.
+10. **Conversation clock:** conversations run live at 1× for now; the 60-minute window and
+    energy drain still apply (section 6). May change later.
+11. **Guesses:** keep the player's pencilled guesses over unknown words.
+12. **Names:** "hearth-keeper" and "the Buried Ring" approved. From now on the PO decides
+    names; the owner may revise them later.
 
 ---
 
@@ -493,25 +518,31 @@ request.
 Needed before M2 and M3 cards are written; none is made here.
 
 1. **overview.md, Locked decisions, Presentation:** "Hybrid: pre-rendered places (the Gate
-   Room through the Control Room glass) and instrument screens (top-down base plan, Archive,
+   Room through the Control Room glass) and instrument screens (three-quarter base plan, Archive,
    Expeditions, Command); real-time low-poly drone feed; Papers, Please-inspired look." This
    removes "Not document-based". Add FTL, Blue Prince and Inscryption to the Pitch's
    inspirations.
 2. **game-design.md, Core loop:** the views table becomes five tabs plus the drone feed
    (section 1); Analysis becomes the Archive; Research moves into the Base. The "typical in-game
-   day" paragraph changes: no dossier arrives by itself; the player requests one, or an analyst's
-   memo comes in.
-3. **game-design.md, Time:** add "A lock drops the clock to 1× if it was faster."
+   day" paragraph changes: a dossier arrives when the player first meets something the
+   Directorate has a file on, not on a timer; there is no dossier request.
+3. **game-design.md, Time:** add "A lock drops the clock to 1× if it was faster. A conversation
+   runs live at 1×."
 4. **game-design.md, Base building and power:** the side-on cutaway and "eight room slots"
-   become section 3; the automatic first-lock camera becomes the pole camera as a player action.
-5. **game-design.md, Threats:** incursions play out in the base plan.
-6. **game-design.md, Factions:** add a Contact subsection (section 6); dossiers come on request.
+   become section 3 (three-quarter plan, 3 m grid); priority-only power becomes conduits the
+   player lays, which incursions can cut; levels are dug whole; the automatic first-lock camera
+   becomes the pole camera as a player action, one push per lock, which can be lost on hostile
+   locks.
+5. **game-design.md, Threats:** incursions play out in the base plan and can cut conduits.
+6. **game-design.md, Factions:** add a Contact subsection (section 6); dossiers come from
+   first encounters, never on request.
 7. **gate-and-address-spec.md:** the wormhole screen (dialing sequence, step 3) becomes the
    Ring's action list, no modal; the horizon record comes from a 5-minute pole-camera push
    (opening puzzle, probing table); the far console is read from the Ring, and the MOTH's
    console scan (Probing, Field-found addresses) becomes a deeper scan in M3; the Address Book
-   becomes a view of Worlds (if question 7 is approved).
-8. **art-and-audio.md, Pre-rendered pipeline:** the side camera becomes a top-down camera for
+   becomes a view of Worlds.
+8. **art-and-audio.md, Pre-rendered pipeline:** the side camera becomes a three-quarter camera
+   (about 60 degrees down) for
    the base plus one authored Gate Room shot; staff are dots on the plan, full sprites only in
    the Gate Room and cutscenes.
 9. **technical-architecture.md:** Data model adds `ConversationDef`, `LanguageDef`, `WordDef`,
@@ -520,11 +551,12 @@ Needed before M2 and M3 cards are written; none is made here.
     effects of section 6 (`WordKnown`, `SetFlag`, `AddAddress`, `UnlockCodexEntry`); Localisation
     adds word tokens and gloss keys; the layout's "base cutaway" becomes "base plan"; the
     Content Validator rejects documents no system produces and token mismatches between locales.
-10. **roadmap.md, Milestones:** M2 "Base cutaway" becomes "Base plan (top-down)". M3 adds the
+10. **roadmap.md, Milestones:** M2 "Base cutaway" becomes "Base plan (three-quarter)". M3 adds the
     contact system, partial translation, transcripts and a minimal faction standing (one number
     per faction, −100 to +100, with no thresholds or requests). M4 keeps factions' thresholds,
     requests, ripples and diplomacy, and adds `OfferRequest` to conversations. The Archive
-    database is placed per question 6.
-11. **lore-and-arcs.md, Lore delivery:** add transcripts to the Record layer.
+    database splits: Worlds and Log filters in M2, Codex and transcripts in M3.
+11. **lore-and-arcs.md, Lore delivery:** add transcripts to the Record layer, and the names
+    "hearth-keeper" and "the Buried Ring".
 12. **docs/content/m15-puzzles.md** (approved content, not bible): "Delivery in M1.5" changes to
     "on the first pole-camera push"; needs a new card.
