@@ -38,6 +38,7 @@ var _placed: Array[int] = []
 @onready var _clear_all: Button = %ClearAllButton
 @onready var _palette: GlyphPalette = %Palette
 @onready var _controls: DialControls = %DialControls
+@onready var _side: VBoxContainer = %Side
 
 
 func _init() -> void:
@@ -45,6 +46,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	_move_origin_caption()
 	_notice_timer = Timer.new()
 	_notice_timer.one_shot = true
 	_notice_timer.timeout.connect(_clear_notice)
@@ -55,6 +57,14 @@ func _ready() -> void:
 	_palette.glyph_chosen.connect(_on_glyph_chosen)
 	_clear_all.pressed.connect(clear_all)
 	_render()
+
+
+# The desk keeps the seal row short: the row's origin caption is shown under the hint, in the
+# right-hand column, so the seals and palette on the left take less height.
+func _move_origin_caption() -> void:
+	var caption: Control = _seals.find_child("OriginCaption", true, false) as Control
+	caption.reparent(_side, false)
+	_side.move_child(caption, 1)
 
 
 func _notification(what: int) -> void:

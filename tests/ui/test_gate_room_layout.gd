@@ -134,8 +134,9 @@ func test_the_view_fits_the_minimum_window_and_no_text_is_clipped(
 	assert_float(scroll.size.y).is_greater_equal(book.get_rows()[0].size.y)
 
 
-## The overlays (wormhole screen, result card, dialing sequence) fit the view area too, with
-## no clipped text.
+## The overlays fit the view area too, with no clipped text: the result card over the view,
+## the wormhole screen in the space below the Ring view, and the dialing sequence's caption
+## beside the Ring.
 @warning_ignore("unused_parameter")
 func test_the_overlays_fit_the_minimum_window(
 	locale: String,
@@ -150,13 +151,38 @@ func test_the_overlays_fit_the_minimum_window(
 	assert_bool(overlays.get_wormhole_screen().is_showing_open()).is_true()
 	overlays.get_result_card().show_entry(_simulation.state.gate.dial_log[0])
 	await get_tree().process_frame
-	var screens: Array[Control] = [
-		overlays.get_wormhole_screen(), overlays.get_result_card(), overlays.get_sequence()
-	]
+	var screens: Array[Control] = [overlays.get_wormhole_screen(), overlays.get_result_card()]
 	for screen: Control in screens:
 		var needed: Vector2 = (
 			(screen.get_node("Center/Panel") as Control).get_combined_minimum_size()
 		)
-		assert_float(needed.x).is_less_equal(Fixture.VIEW_SIZE.x)
-		assert_float(needed.y).is_less_equal(Fixture.VIEW_SIZE.y)
+		assert_float(needed.x).is_less_equal(screen.size.x)
+		assert_float(needed.y).is_less_equal(screen.size.y)
 	assert_array(_clipped(overlays)).is_empty()
+	# The dialing sequence's caption fits its side of the Ring view.
+	var wing: Control = _view.find_child("LeftWing", true, false) as Control
+	var caption: Vector2 = overlays.get_sequence().get_combined_minimum_size()
+	assert_float(caption.x).is_less_equal(wing.size.x)
+
+
+## Ruling (PR #119): the Ring is the centrepiece. With the console in its usual state (no
+## warning showing), the window with the Ring takes at least half the view's height in English
+## and Brazilian Portuguese.
+@warning_ignore("unused_parameter")
+func test_the_ring_window_takes_half_the_view(
+	locale: String, test_parameters: Array = [["en"], ["pt_BR"]]  # gdlint: ignore=unused-argument
+) -> void:
+	_real_locale = TranslationServer.get_locale()
+	TranslationServer.set_locale(locale)
+	_simulation = Fixture.simulation()
+	SimClock.start(_simulation)
+	_holder = Fixture.mount_view()
+	add_child(_holder)
+	_view = Fixture.view_of(_holder)
+	_view.setup(_simulation)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var window: Control = _view.find_child("Window", true, false) as Control
+	assert_float(window.size.y).is_greater_equal(Fixture.VIEW_SIZE.y * 0.5)
+	var ring: Vector2 = _view.get_ring_view().size
+	assert_float(minf(ring.x, ring.y)).is_greater_equal(Fixture.VIEW_SIZE.y * 0.5)

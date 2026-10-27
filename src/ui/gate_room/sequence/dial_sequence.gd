@@ -1,15 +1,18 @@
 class_name DialSequence
-extends Control
-## The dialing sequence: a full-screen overlay that opens when the Ring starts dialing. It adds
-## the &"cutscene" time hold, lights the eight seals one by one ([constant SEAL_SECONDS] of
-## real time each, one steady light per seal), then steps the clock itself, one tick at a
-## time, only while the Ring is still DIALING, so the dial resolves and nothing runs past it.
-## It then releases the hold (time returns to the player's own Running or Paused) and emits
-## [signal finished] with the outcome. Skip (the button, ui_cancel, gamepad B) jumps straight
-## to the stepping, so skipping gives the same result as watching. A dial resolved by someone
-## else's ticks (tools, tests) ends the sequence at once. Leaving the Gate Room mid-sequence
-## (hidden, processing stopped or leaving the tree) acts as Skip, so the hold never outlives
-## the screen; the result waits for the player's return. Mirrors the Ring; never changes it.
+extends PanelContainer
+## The dialing sequence, played on the Gate Room's Ring view: a caption beside the Ring (the
+## dialed glyphs, the seals engaged so far and Skip) shows when the Ring starts dialing. It
+## adds the &"cutscene" time hold, lights the Ring's eight seals one by one
+## ([constant SEAL_SECONDS] of real time each, one steady light per seal), then steps the
+## clock itself, one tick at a time, only while the Ring is still DIALING, so the dial
+## resolves and nothing runs past it. It then releases the hold (time returns to the player's
+## own Running or Paused), tells the Ring view how the dial ended (a lock opens its horizon)
+## and emits [signal finished] with the outcome. Skip (the button, ui_cancel, gamepad B) jumps
+## straight to the stepping, so skipping gives the same result as watching. A dial resolved
+## by someone else's ticks (tools, tests) ends the sequence at once. Leaving the Gate Room
+## mid-sequence (hidden, processing stopped or leaving the tree) acts as Skip, so the hold
+## never outlives the screen; the result waits for the player's return. Mirrors the Ring;
+## never changes it.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## technical-architecture.md#state-machines, game-design.md#time-real-time-with-pause
 
@@ -31,8 +34,8 @@ var _simulation: Simulation = null
 var _phase: Phase = Phase.CLOSED
 var _elapsed: float = 0.0
 var _outcome: int = -1
+var _ring: RingView = null
 
-@onready var _ring: SealRing = %SealRing
 @onready var _address: Label = %Address
 @onready var _status: Label = %Status
 @onready var _skip: Button = %SkipButton
@@ -80,6 +83,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		skip()
 
 
+## Makes the sequence light the seals of [param ring].
+func set_ring_view(ring: RingView) -> void:
+	_ring = ring
+
+
 ## Connects the sequence to [param simulation] and closes it without emitting, releasing
 ## the hold if a sequence was playing.
 func setup(simulation: Simulation) -> void:
@@ -102,6 +110,8 @@ func begin() -> void:
 	_elapsed = 0.0
 	_outcome = -1
 	SimClock.hold(HOLD_REASON)
+	if _ring != null:
+		_ring.begin_dialing()
 	show()
 	set_process(true)
 	_render()
@@ -165,6 +175,8 @@ func _resolve() -> void:
 	_phase = Phase.CLOSED
 	hide()
 	SimClock.release(HOLD_REASON)
+	if _ring != null:
+		_ring.end_dialing(_simulation.state.gate.mode == GateState.RingMode.LOCKED)
 	finished.emit(_outcome)
 
 
@@ -185,7 +197,8 @@ func _is_dialing() -> bool:
 
 func _render() -> void:
 	var lit: int = get_lit_seals()
-	_ring.lit = lit
+	if _ring != null and _phase != Phase.CLOSED:
+		_ring.set_lit(lit)
 	_status.text = tr("GATE_RING_DIALING").format({"lit": lit, "total": GateAddress.SEAL_COUNT})
 	var address: GateAddress = null
 	if _simulation != null:

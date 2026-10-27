@@ -199,7 +199,16 @@ func test_no_second_dial_while_a_wormhole_is_open() -> void:
 	await get_tree().process_frame
 	var dim: Control = _screen().get_node("Dim") as Control
 	assert_int(dim.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
-	assert_bool(dim.get_global_rect().encloses(_view.get_console().get_global_rect())).is_true()
+	# Ruling (PR #119): the screen sits beside the Ring, over the Address Book; the console
+	# stays in view, its Dial button disabled.
+	(
+		assert_bool(dim.get_global_rect().encloses(_view.get_address_book().get_global_rect()))
+		. is_true()
+	)
+	(
+		assert_bool(dim.get_global_rect().intersects(_view.get_ring_view().get_global_rect()))
+		. is_false()
+	)
 
 
 func test_a_game_loaded_with_a_wormhole_open_shows_the_screen() -> void:

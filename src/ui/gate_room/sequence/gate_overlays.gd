@@ -1,9 +1,12 @@
 class_name GateOverlays
 extends Control
 ## Hosts the Gate Room's overlays and decides which one shows, mirroring the Ring: the dialing
-## sequence while it dials, then the result card for No gate, Blocked and Origin rejected, or
-## the wormhole screen for a lock or hostile lock, until the wormhole closes. At most one
-## overlay shows at a time. After a load it shows what the loaded Ring is doing. Changes no
+## sequence while it dials (it plays on the Ring view, beside the overlays: see [method attach]),
+## then the result card for No gate, Blocked and Origin rejected, or the wormhole screen for a
+## lock or hostile lock, until the wormhole closes. The wormhole screen opens to the right of
+## the Ring view, never over it ([method keep_clear_left_of]), so the open horizon stays in
+## sight. At most
+## one overlay shows at a time. After a load it shows what the loaded Ring is doing. Changes no
 ## state itself: only the sequence's hold and clock steps and the wormhole screen's Close and
 ## Read console. When the wormhole screen steps aside for the Address Book or the Archive, it
 ## says so.
@@ -18,14 +21,13 @@ signal address_book_requested
 signal archive_requested(document_id: StringName)
 
 var _simulation: Simulation = null
+var _sequence: DialSequence = null
 
-@onready var _sequence: DialSequence = %DialSequence
 @onready var _result: ResultCard = %ResultCard
 @onready var _wormhole: WormholeScreen = %WormholeScreen
 
 
 func _ready() -> void:
-	_sequence.finished.connect(_on_sequence_finished)
 	_result.dismissed.connect(_on_dismissed)
 	_wormhole.dismissed.connect(_on_dismissed)
 	_wormhole.address_book_requested.connect(address_book_requested.emit)
@@ -38,6 +40,25 @@ func _enter_tree() -> void:
 
 func _exit_tree() -> void:
 	EventBus.dial_started.disconnect(_on_dial_started)
+
+
+## Takes [param sequence], which lives on the Ring view, as the dialing sequence and makes it
+## light [param ring]'s seals. Call once, before [method setup].
+func attach(sequence: DialSequence, ring: RingView) -> void:
+	_sequence = sequence
+	_sequence.set_ring_view(ring)
+	_sequence.finished.connect(_on_sequence_finished)
+
+
+## Keeps the wormhole screen right of [param left] pixels from this control's left edge, where
+## the Ring view ends.
+func keep_clear_left_of(left: float) -> void:
+	_wormhole.offset_left = left
+
+
+## True when [param control] is inside an overlay or the dialing sequence.
+func holds(control: Control) -> bool:
+	return is_ancestor_of(control) or (_sequence != null and _sequence.is_ancestor_of(control))
 
 
 ## Connects every overlay to [param simulation] and shows the one its Ring calls for: the

@@ -5,35 +5,59 @@
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/console/glyph_palette.tscn" id="3_palette"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/dial_controls.tscn" id="4_controls"]
 
+[sub_resource type="Theme" id="Theme_compact"]
+default_font_size = 12
+
 [node name="DialConsole" type="VBoxContainer"]
-theme_override_constants/separation = 6
 script = ExtResource("1_console")
 
-[node name="SealRow" parent="." instance=ExtResource("2_seals")]
+[node name="Desk" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Left" type="VBoxContainer" parent="Desk"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_compact")
+theme_override_constants/separation = 2
+
+[node name="SealRow" parent="Desk/Left" instance=ExtResource("2_seals")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HintRow" type="HBoxContainer" parent="."]
+[node name="Palette" parent="Desk/Left" instance=ExtResource("3_palette")]
+unique_name_in_owner = true
 layout_mode = 2
+theme_override_constants/v_separation = 1
+
+[node name="Side" type="VBoxContainer" parent="Desk"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = SubResource("Theme_compact")
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="HintRow" type="HBoxContainer" parent="Desk/Side"]
+layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="Hint" type="Label" parent="HintRow"]
+[node name="Hint" type="Label" parent="Desk/Side/HintRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 13
 auto_translate_mode = 2
 autowrap_mode = 3
 
-[node name="ClearAllButton" type="Button" parent="HintRow"]
+[node name="ClearAllButton" type="Button" parent="Desk/Side/HintRow"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
+size_flags_vertical = 0
 text = "CONSOLE_CLEAR_ALL"
 
-[node name="Palette" parent="." instance=ExtResource("3_palette")]
+[node name="DialControls" parent="Desk/Side" instance=ExtResource("4_controls")]
 unique_name_in_owner = true
 layout_mode = 2
-
-[node name="DialControls" parent="." instance=ExtResource("4_controls")]
-unique_name_in_owner = true
-layout_mode = 2
+size_flags_vertical = 8
