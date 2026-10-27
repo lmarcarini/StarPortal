@@ -1,0 +1,137 @@
+{
+	"format_version": 9,
+	"game_version": "0.0.0",
+	"saved_at_unix": 1792986387,
+	"state": {
+		"address_book": {
+			"entries": [
+				{
+					"address_key": "35-24-29-22-19-10-8-2",
+					"last_dialed_tick": -1,
+					"last_outcome": "",
+					"note": "",
+					"source": "console",
+					"source_id": "world_sill",
+					"world_id": ""
+				},
+				{
+					"address_key": "35-24-19-29-10-22-5-2",
+					"last_dialed_tick": -1,
+					"last_outcome": "",
+					"note": "",
+					"source": "console",
+					"source_id": "world_sill",
+					"world_id": ""
+				},
+				{
+					"address_key": "35-19-24-29-10-22-5-2",
+					"last_dialed_tick": -1,
+					"last_outcome": "",
+					"note": "",
+					"source": "console",
+					"source_id": "world_sill",
+					"world_id": ""
+				},
+				{
+					"address_key": "10-24-35-29-8-19-15-2",
+					"last_dialed_tick": -1,
+					"last_outcome": "",
+					"note": "",
+					"source": "console",
+					"source_id": "world_sill",
+					"world_id": ""
+				},
+				{
+					"address_key": "35-24-29-10-19-22-8-2",
+					"last_dialed_tick": 1096,
+					"last_outcome": "lock",
+					"note": "",
+					"source": "dialed",
+					"source_id": "",
+					"world_id": "world_sill"
+				}
+			]
+		},
+		"archive": {
+			"read": {},
+			"received": [
+				"doc_sill_order",
+				"doc_sill_sketch",
+				"doc_lintel_note",
+				"doc_lintel_rubbing",
+				"doc_sill_dossier"
+			],
+			"received_tick": {
+				"doc_lintel_note": 1100,
+				"doc_lintel_rubbing": 1100,
+				"doc_sill_dossier": 1100,
+				"doc_sill_order": 0,
+				"doc_sill_sketch": 0
+			}
+		},
+		"clock": {
+			"holds": [],
+			"mode": "paused",
+			"mode_after_hold": "paused",
+			"speed_index": 1,
+			"tick": 1102
+		},
+		"flags": {},
+		"gate": {
+			"connected_world_id": "",
+			"current_address": null,
+			"dial_log": [
+				{
+					"address": {
+						"seals": [
+							35,
+							24,
+							29,
+							10,
+							19,
+							22,
+							8,
+							2
+						]
+					},
+					"energy_spent_mwh": "4076e9f1669a1f72",
+					"outcome": "lock",
+					"tick": 1096,
+					"world_id": "world_sill"
+				}
+			],
+			"dial_started_tick": -1,
+			"is_hostile": false,
+			"lock_energy_mwh": "0000000000000000",
+			"lock_started_tick": -1,
+			"mode": "idle"
+		},
+		"power": {
+			"banks_installed": 1,
+			"capacity_mwh": "4079000000000000",
+			"install_ticks_left": 0,
+			"plant_output_mw": "403e000000000000",
+			"stored_mwh": "4005b1f75d9af1ab"
+		},
+		"random": {
+			"base_seed": "20261026",
+			"streams": {}
+		},
+		"worlds": {
+			"consoles_read": {
+				"world_sill": true
+			},
+			"galaxy_seed": "395405726189222177",
+			"generator_version": 1,
+			"horizon_records": {
+				"world_sill": true
+			},
+			"pole_camera_ticks_left": 0,
+			"pole_camera_world_id": "",
+			"statuses": {
+				"world_sill": "locked"
+			}
+		}
+	},
+	"tick": 1102
+}

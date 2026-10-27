@@ -22,3 +22,10 @@ UI_DEBUG_MEAN_TICK_TIME,Mean tick time: {ms} ms,Tempo médio por tick: {ms} ms
 UI_DEBUG_STATE,Game state,Estado do jogo
 ARCHIVE_TITLE,Archive,Arquivo
 ARCHIVE_TITLE_UNREAD,Archive ({count}),Arquivo ({count})
+LOG_KIND_DIAL,Dials,Discagens
+LOG_KIND_LOCK,Locks,Conexões
+LOG_KIND_CLOSE,Closes,Fechamentos
+LOG_KIND_DOCUMENT,Documents,Documentos
+LOG_KIND_CONSOLE,Consoles,Consoles
+LOG_KIND_HORIZON,Horizon records,Registros do horizonte
+LOG_KIND_POWER,Power,Energia

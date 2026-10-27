@@ -25,3 +25,21 @@ ARCHIVE_IMAGE_FIT,Fit,Ajustar
 ARCHIVE_IMAGE_CLOSE,Close,Fechar
 ARCHIVE_IMAGE_ZOOM,{percent}%,{percent}%
 ARCHIVE_IMAGE_HINT,Drag or use the arrows to move; the wheel zooms.,Arraste ou use as setas para mover; a roda amplia.
+ARCHIVE_SECTION_DOCUMENTS,Documents,Documentos
+ARCHIVE_SECTION_LOG,Log,Registro
+LOG_FILTER_ALL,All events,Todos os eventos
+LOG_SEARCH,Search the log,Buscar no registro
+LOG_COUNT,{count} entries,{count} entradas
+LOG_COUNT_ONE,1 entry,1 entrada
+LOG_EMPTY,Nothing has been logged yet.,Nada foi registrado ainda.
+LOG_EMPTY_FILTERED,No entry matches.,Nenhuma entrada corresponde.
+LOG_LINE_DIAL,Dialed: {outcome},Discagem: {outcome}
+LOG_LINE_LOCK,Locked {world},Conexão com {world}
+LOG_LINE_LOCK_HOSTILE,Hostile lock: {world},Conexão hostil: {world}
+LOG_LINE_CLOSE_PLAYER,Closed the wormhole to {world},Fechou o buraco de minhoca para {world}
+LOG_LINE_CLOSE_TIMEOUT,Wormhole to {world} closed: time ran out,Buraco de minhoca para {world} fechado: o tempo acabou
+LOG_LINE_CLOSE_POWER,Wormhole to {world} closed: out of power,Buraco de minhoca para {world} fechado: sem energia
+LOG_LINE_DOCUMENT,Received: {title},Recebido: {title}
+LOG_LINE_CONSOLE,Read the console of {world},Leu o console de {world}
+LOG_LINE_HORIZON,Horizon record taken: {world},Registro do horizonte obtido: {world}
+LOG_LINE_POWER,Capacitor bank installed: {capacity},Banco de capacitores instalado: {capacity}

@@ -59,6 +59,10 @@ signal capacitors_installed(capacity_mwh: float)
 ## through the outbox).
 @warning_ignore("unused_signal")
 signal horizon_record_taken(world_id: StringName)
+## Emitted when the player reads a far Ring's console, with that world's id (posted through
+## the outbox).
+@warning_ignore("unused_signal")
+signal console_read(world_id: StringName)
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared

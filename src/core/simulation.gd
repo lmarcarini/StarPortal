@@ -15,7 +15,9 @@ signal command_rejected(type: StringName, code: StringName)
 signal pause_requested(reason: StringName)
 ## Emitted once per domain event drained from [code]state.events[/code], in posting order:
 ## at the end of each tick, and after a command that applied at once while paused.
-## [constant PAUSE_EVENT] is emitted as [signal pause_requested] instead. Emission never
+## [constant PAUSE_EVENT] is emitted as [signal pause_requested] instead. Just before an
+## event is emitted, the entries LogRules gives for it are added to the operations log at the
+## clock's tick, so the log follows the posting order. Emission never
 ## nests: a handler may submit a command, and that command's events come out after the
 ## events already waiting, from the same emission.
 signal event_posted(name: StringName, args: Array)
@@ -107,6 +109,8 @@ func _emit_events() -> void:
 
 
 func _emit_event(event: SimEvent) -> void:
+	for entry: LogEntry in LogRules.entries_for(event.name, event.args, state, state.clock.tick):
+		state.operations_log.add(entry)
 	if event.name == PAUSE_EVENT:
 		_emit_pause_request(event.args)
 	else:

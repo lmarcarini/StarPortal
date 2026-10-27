@@ -72,7 +72,17 @@ func test_outbox_is_transient() -> void:
 	var data: Dictionary = state.to_dict()
 	assert_dict(data).is_equal(before)
 	assert_array(data.keys()).contains_exactly_in_any_order(
-		["clock", "random", "flags", "gate", "power", "worlds", "archive", "address_book"]
+		[
+			"clock",
+			"random",
+			"flags",
+			"gate",
+			"power",
+			"worlds",
+			"archive",
+			"address_book",
+			"operations_log"
+		]
 	)
 	var parsed: Dictionary = JSON.parse_string(JSON.stringify(data))
 	var loaded := GameState.from_dict(parsed)
