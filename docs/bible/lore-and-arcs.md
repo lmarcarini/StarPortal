@@ -112,7 +112,7 @@ The lore has three layers, and each player goes as deep as they want; the surfac
 | Layer | Who sees it | Delivered by |
 | --- | --- | --- |
 | Surface | Everyone | Arc events, briefings, radio calls, cutscenes |
-| Record | Curious players | Codex entries, full dossiers in the Archive, artefact notes, Kindred oral histories, drone-feed scenes |
+| Record | Curious players | Codex entries, full dossiers in the Archive, artefact notes, Kindred oral histories, conversation transcripts (re-read as translation improves), drone-feed scenes |
 | Truth | Dedicated players | Contradictions between sources, glyph names and their meanings, Anteri inscriptions, the hidden address rule |
 
 - **The Codex** unlocks entries from sources. When sources disagree, an entry is marked contested and shows each version side by side: the government's account beside what the player found.

@@ -9,7 +9,7 @@ FAR SIDE PROTOCOL is a real-time-with-pause base management and discovery game. 
 Every address is hidden in something you find: an explorer's note, a carving, a faction's gift, an artefact, a captured log. Each one is its own small puzzle. Each dial burns power, opens a door both ways, and may lead nowhere, somewhere, or somewhere hostile. Across a prologue and seven arcs you go from 8-seal addresses to the 9-seal and finally the 10-seal address that reveals what the Ring was built for.
 
 - **Fantasy:** you decide which door humanity opens next, and you pay for it.
-- **Inspiration:** Stargate SG-1 (premise), XCOM (base plus a wider world), Papers, Please (aesthetic only), Frostpunk (pressure and setbacks).
+- **Inspiration:** Stargate SG-1 (premise), XCOM (base plus a wider world), Papers, Please (aesthetic only), Frostpunk (pressure and setbacks), FTL (the base plan), Blue Prince and Inscryption (discovery).
 - **Platform:** PC with low requirements; Windows first, Linux and Steam Deck as a stretch.
 - **Length target:** a 20 to 30 hour campaign, with sandbox play after the ending.
 - **Team:** Claude implements; the project owner supervises, reviews and decides.
@@ -35,7 +35,7 @@ These are settled; changing one means editing this table first, then every tab t
 | Time model | Real time with pause. One tick = one in-game minute; at 1× a tick is one real second. Speeds: pause, 1×, 3×, 10×. |
 | Structure | Campaign of a prologue plus seven arcs, with sandbox elements and free play after the ending |
 | Setting | An unnamed Western government. Other governments appear as factions |
-| Presentation | Not document-based. Pre-rendered 2D base cutaway, real-time low-poly drone feed, Papers, Please-inspired look |
+| Presentation | Hybrid (decided 2026-10-26). The Gate Room is one fixed illustrated view through the control room glass: the Ring is the clickable centrepiece, the dial console is the desk below it. The base is a separate three-quarter plan, FTL style; the Archive, Expeditions and Command are instrument screens. The drone feed is the one first-person, real-time low-poly view. Papers, Please-inspired look |
 | Engine | Godot 4 (latest stable 4.x, pinned), statically typed GDScript, Compatibility renderer |
 | Platform and store | PC, low requirements. Steam, considered only once the game proves good enough |
 | Input and accessibility | Fully playable with keyboard and mouse or gamepad; every binding remappable; accessibility options from the first build |

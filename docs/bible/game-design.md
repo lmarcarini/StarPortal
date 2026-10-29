@@ -8,18 +8,18 @@ The core loop is: find a document or object, solve the address it hides, dial, p
 
 Dialing is the one step that spends the scarcest resource, so every other step exists to make a dial worth it.
 
-The player moves between six views that share one clock:
+The player moves between five tabs that share one clock: Gate Room (F1), Base (F2, with Research inside), Archive (F3), Expeditions (F4) and Command (F5), plus the drone feed (decided 2026-10-26; screen map in docs/content/presentation-and-systems.md). What each covers:
 
 | View | What the player does |
 | --- | --- |
 | Base | Dig levels, build rooms, route power, assign staff, defend during incursions |
 | Gate Room | Build an address on the dial console, dial, watch the sequence, act through an open wormhole, work the Shutter |
-| Analysis | Read the Archive's documents and objects, solve their puzzles, keep the Address Book |
+| Analysis | The player's database: documents and objects (and their puzzles), the Worlds database (every world touched and what is known about it), the Codex (factions, people, glyphs, artefacts, contested entries) and the operations log of everything that happened |
 | Expeditions | Choose teams and loadouts, watch the drone feed, make field decisions |
 | Research | Analyse artefacts, run the tech tree, decide what each technology becomes |
 | Command | Budget, Committee, faction relations, requests, news |
 
-A typical in-game day: a new dossier and a Committee request arrive. The player puts analysts on the dossier, charges the capacitors, dials a candidate address and sends the MOTH. A team goes through while research ticks along. Then an unscheduled incoming wormhole forces a decision.
+A typical in-game day: a Committee request arrives, and a dossier appears because the player first met something the Directorate has a file on. The player works a document's puzzle, charges the capacitors, dials, pushes the pole camera and sends the MOTH. A team goes through while research ticks along. Then an unscheduled incoming wormhole forces a decision.
 
 ## Time: real time with pause
 
@@ -27,7 +27,7 @@ The simulation runs on a fixed tick of one in-game minute. At 1× a tick lasts o
 
 Real time earns its place through windows and drains:
 
-- **Open-wormhole drain.** An open connection draws power every minute, so each probe and transit is a race.
+- **Open-wormhole drain.** An open connection draws power every minute, so each probe and transit is a race. A lock always drops the clock to 1× so a high speed never burns the window by accident.
 - **Maximum open time.** A wormhole closes itself after 60 in-game minutes. Teams must reach the far Ring and dial home in time.
 - **Incoming wormholes.** When someone else dials CAIRN, the game auto-pauses. Within 5 in-game minutes the player closes the Shutter, checks for an identification code, or lets it open.
 - **Check-ins.** Teams report on a schedule. A missed check-in opens a rescue window.
@@ -56,9 +56,9 @@ The monthly allocation is a base amount scaled by Confidence. Licences pay month
 
 ## Base building and power
 
-The base is a side-on cutaway of levels dug under the salt works; the player grows it downward, and the Ring sits on the deepest original level.
+The base is a three-quarter plan (about 60 degrees down), FTL style: each level dug under the salt works is a 36 × 20 grid of 3 m cells with rooms as rectangles, and tabs move between levels. Levels are dug whole. Power runs along conduits the player lays (between levels only through lifts and stairs); incursions can cut them and engineers repair them. Full layout: docs/content/presentation-and-systems.md. The player grows it downward, and the Ring sits on the deepest original level.
 
-- **Levels.** The game starts with three levels plus the surface. Each new level costs money, materials and days of excavation. A level holds eight room slots; lifts and stairs connect levels.
+- **Levels.** The game starts with three levels plus the surface. Each new level costs money, materials and days of excavation. Rooms take rectangles of cells sized by type; lifts and stairs connect levels.
 - **Rooms.** Each room has staff slots, a power draw and upkeep. Neighbours give bonuses, such as a lab beside the Archive researching faster.
 - **Blast doors.** Every level has them. Their placement decides chokepoints during incursions.
 
@@ -78,7 +78,7 @@ The base is a side-on cutaway of levels dug under the salt works; the player gro
 | Containment and Quarantine | Hold dangerous artefacts, prisoners and the exposed |
 | Hangar (late) | Vehicles and, later, alien craft |
 
-**Power** is supply against demand, settled every tick. The player ranks rooms by priority, and during a shortfall the lowest-ranked shut down first. Dialing needs a full charge in the capacitors before the first seal. The base starts with no capacitors: installing the first bank is the first thing the player does. The console never states what an address will cost until the lock estimator is researched. On every first lock the Gate Room pushes a camera and sampling line through the horizon on a pole (the horizon record): the first, free look at a new world. It stays for the whole game; probes from M3 go further, they do not replace it.
+**Power** is supply against demand, settled every tick. The player ranks rooms by priority, and during a shortfall the lowest-ranked shut down first. Dialing needs a full charge in the capacitors before the first seal. The base starts with no capacitors: installing the first bank is the first thing the player does. The console never states what an address will cost until the lock estimator is researched. On a lock the player may push a camera and sampling line through the horizon on a pole (one 5-minute push per lock; the horizon record): the first look at a new world. On a hostile lock the camera can be dragged through and lost. It stays for the whole game; probes from M3 go further, they do not replace it.
 
 Power plants upgrade through four tiers: diesel, fission, anterite cell, and the Halvane tap from Arc 4. In an emergency the player can tap the national grid. It gives instant energy, but raises Exposure and costs Confidence.
 
@@ -142,7 +142,8 @@ Every faction, the government included, wants something from the player, and hel
 - **Standing** runs from −100 to +100 per faction. Thresholds unlock trade, gifts and joint operations, or trigger incursions and sabotage.
 - **Requests** come from the Directorate, the Committee and every faction. Each has a deadline, a reward, a cost and ripples to other factions. The ripples are shown before the player accepts, but hidden ones exist.
 - **Committee reviews** happen each quarter. The player chooses which results to present. Overstating them buys Confidence now and risks a scandal later.
-- **Dossiers** are the government's main output and the main source of clues. Each is a written document about a world or a faction: its history, its dangers, what it is good for, sometimes part of an address. A dossier can lie about motives or about what waits on the far side, never about an address; catching a lie gives the player leverage over whoever told it.
+- **Dossiers** are created when the player first meets something the Directorate has a file on, never on request; they are a main source of clues. Each is a written document about a world or a faction: its history, its dangers, what it is good for, sometimes part of an address. A dossier can lie about motives or about what waits on the far side, never about an address; catching a lie gives the player leverage over whoever told it.
+- **Contact** is a conversation system (built in M3, deepened into diplomacy in M4). Conversations happen through an open wormhole, over the radio, or during expeditions; each is a set of choices that changes standing and unlocks requests, trade or clues. Early contact is partly untranslated: the linguistics lab and translation research reveal more of what was said, so understanding a people is itself a discovery.
 
 | Example request | From | Reward | Ripple |
 | --- | --- | --- | --- |
@@ -162,7 +163,7 @@ Threats come through the Ring, from inside the base, and from the surface; each 
 - **Accidents:** reactor faults, and overloads when dialing nine or ten seals.
 - **Contamination** by the Murmur, from Arc 6.
 
-Incursions play out in the base cutaway in real time. The player assigns squads to levels, seals blast doors, falls back, and protects the Control Room and the Power Plant. Enemies path toward objectives, not toward the nearest soldier.
+Incursions play out on the base plan in real time and can cut conduits. The player assigns squads to levels, seals blast doors, falls back, and protects the Control Room and the Power Plant. Enemies path toward objectives, not toward the nearest soldier.
 
 | Failure | Trigger |
 | --- | --- |

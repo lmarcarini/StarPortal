@@ -31,15 +31,14 @@ never carried out. Puzzle 1 carries it out. Puzzle 2 reads the lintel. Puzzle 3 
 hand's sign on the far side. Puzzle 4 comes from a man who never saw the lintel and sang its kind
 of address in his sleep.
 
-**Delivery in M1.5.** There are no probes until M3, so every document in this file arrives on
-a lock or at the start: puzzle 1's documents at the start; puzzle 2's documents and world 1's
-dossier on world 1's first lock; puzzle 3's documents and world 2's dossier on world 2's first
-lock; puzzle 4's documents and world 3's dossier on world 3's first lock; world 4's dossier on
-world 4's first lock. In the fiction, the Gate Room's first-lock routine pushes a camera and a
-sampling line through the horizon on a pole (the "horizon record"); that is where the far-side
-frames and the dossiers' readings come from. The pole camera is a permanent fixture of the Gate
-Room and makes a horizon record on every first lock. When probes arrive in M3 (the MOTH first),
-they add to it; they do not replace it.
+**Delivery (updated in M1.6).** There are no probes until M3. Puzzle 1's documents arrive at the
+start; every other document in this file arrives when the player first pushes the pole camera
+through an open wormhole to that world (one 5-minute push per lock): puzzle 2's documents and
+world 1's dossier from world 1's horizon record; puzzle 3's documents and world 2's dossier from
+world 2's; puzzle 4's documents and world 3's dossier from world 3's; world 4's dossier from
+world 4's. The pole camera and its sampling line (the "horizon record") are where the far-side
+frames and the dossiers' readings come from. It is a permanent fixture of the Gate Room; when
+probes arrive in M3 (the MOTH first), they add to it; they do not replace it.
 
 ---
 

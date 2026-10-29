@@ -79,7 +79,7 @@ Story is data, not code: events are conditions plus effects, and arcs change gam
 - **Conditions and effects** are small typed Resource classes, such as `FlagIs`, `StandingAtLeast`, `AddClue`, `ChangeStanding`, `StartArc` and `UnlockTech`. There is no evaluation of script strings, which keeps events safe, testable and checkable by tools.
 - **`ArcDef`** lists phases, entry and exit conditions, and the feature flags it sets, such as `budget_frozen`, `ring_lockdown` or `exposure_is_public_opinion`. Systems read flags; they never check which arc is running. This is how arcs change the rules.
 - **Flags** live in a typed key-value store in `GameState`.
-- **Dialogue** uses a minimal in-house format: a choice is an `EventDef` with options. A dialogue add-on can be adopted later if writing volume demands it.
+- **Dialogue** uses a minimal in-house format: conversations are `ConversationDef` data (nodes, choices, typed conditions such as `WordKnown`, effects such as `SetFlag`, `AddAddress`, `UnlockCodexEntry`, `ChangeStanding`), with `LanguageDef` and `WordDef` for partial translation and `CodexEntryDef` for the Codex; strings carry word tokens and gloss keys per locale (docs/content/presentation-and-systems.md, section 6). The Content Validator rejects documents no system produces and token mismatches between locales.
 
 ## Save system
 
@@ -117,7 +117,7 @@ res://
     content/       Resource class scripts (*Def)
     services/      save, settings, audio, localisation
     ui/            views, widgets, theme
-    scenes/        base cutaway, gate room, drone feed, cutscenes
+    scenes/        base plan, gate room, drone feed, cutscenes
   art/  audio/  video/  localization/
   tests/           unit and soak tests
   tools/           editor plugins and scripts: validator, galaxy preview
