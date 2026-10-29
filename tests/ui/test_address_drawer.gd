@@ -154,3 +154,28 @@ func test_fifty_entries_fit_the_minimum_window(
 	assert_bool(scroll.get_v_scroll_bar().visible).is_true()
 	var strip: AddressStrip = row.find_child("Strip", true, false) as AddressStrip
 	assert_int(strip.icon_size).is_greater_equal(32)
+
+
+## Review #122: the result card stays above the drawer. With the drawer open, a Blocked dial
+## collapses and hides it; the card holds focus and Escape dismisses the card.
+func test_a_result_card_collapses_the_drawer_and_takes_escape() -> void:
+	_fill(2)
+	_drawer().open()
+	assert_bool(_drawer().is_open()).is_true()
+	Fixture.select(_view, Fixture.address_for(_simulation.state, DialOutcome.Kind.BLOCKED))
+	var button: HoldButton = _view.find_child("DialButton", true, false) as HoldButton
+	button.begin_hold()
+	button.advance(HoldButton.HOLD_SECONDS)
+	assert_bool(_drawer().visible).is_false()
+	SimClock.step_ticks(2)
+	await UiInput.settle(_view)
+	var card: ResultCard = _view.get_overlays().get_result_card()
+	assert_bool(card.is_open()).is_true()
+	assert_bool(_drawer().is_open()).is_false()
+	assert_bool(_drawer().visible).is_false()
+	_drawer().open()
+	assert_bool(_drawer().is_open()).is_false()
+	assert_object(_view.get_viewport().gui_get_focus_owner()).is_same(card.get_ok_button())
+	await _key(card.get_ok_button(), KEY_ESCAPE)
+	assert_bool(card.is_open()).is_false()
+	assert_bool(_drawer().visible).is_true()

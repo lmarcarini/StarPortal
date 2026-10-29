@@ -5,7 +5,9 @@ extends HBoxContainer
 ## about 360 px wide, over the right side of the view; the tab, B or Escape closes it, and so
 ## does Load (the console's slots are filled). The drawer sits above the wormhole status strip,
 ## which stops left of the tab, so the tab is never hidden and the open panel covers the strip
-## and its actions until it closes.
+## and its actions until it closes. The dialing sequence and the result card stay above it: while
+## either shows, the drawer is collapsed and hidden ([method set_blocked]), so it can't be opened
+## and B / Escape go to the card.
 ## Bible: gate-and-address-spec.md#the-dial-console (Address Book)
 
 ## The panel opened or closed.
@@ -59,8 +61,18 @@ func setup(simulation: Simulation) -> void:
 	_render_tab()
 
 
+## Collapses and hides the drawer while [param blocked] (the dialing sequence or the result
+## card shows); shows the tab again otherwise.
+func set_blocked(blocked: bool) -> void:
+	if blocked:
+		close()
+	visible = not blocked
+
+
 ## Opens the panel and focuses its first row (or its search field).
 func open() -> void:
+	if not visible:
+		return
 	if is_open():
 		_panel.get_first_focus().grab_focus()
 		return

@@ -11,7 +11,8 @@ extends GameView
 ## drawer's tab, and clicking the portal (or A with the Ring focused) opens the action panel below
 ## the strip, which takes focus; hiding it gives focus back to the Ring. The drawer lies above the
 ## strip: the tab always shows, and the open Address Book covers the strip and its actions until it
-## is closed. The view only composes the panels; every panel reads the simulation and posts its own
+## is closed. The dialing sequence and the result card stay above the drawer: while either
+## shows, the drawer is collapsed and hidden. The view only composes the panels; every panel reads the simulation and posts its own
 ## commands, and nothing here changes state. When the wormhole actions ask to read a new document in
 ## the Archive, the view passes the request on to the switcher.
 ## Bible: gate-and-address-spec.md#the-dial-console,
@@ -141,6 +142,8 @@ func _on_address_book_requested() -> void:
 
 
 func _on_overlays_changed() -> void:
+	var overlays: GateOverlays = _overlays
+	_drawer.set_blocked(overlays.get_sequence().is_open() or overlays.get_result_card().is_open())
 	_ensure_focus.call_deferred()
 
 

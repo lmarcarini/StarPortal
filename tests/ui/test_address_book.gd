@@ -209,6 +209,8 @@ func test_load_fills_the_console_slots_and_collapses() -> void:
 	await UiInput.click(load_button)
 	assert_bool(_view.get_console().get_address().equals(address)).is_true()
 	assert_bool(_view.get_address_drawer().is_open()).is_false()
+	var dial: Control = _view.find_child("DialButton", true, false) as Control
+	assert_object(_view.get_viewport().gui_get_focus_owner()).is_same(dial)
 
 
 ## A note typed for the selected entry is saved with a NoteAddressCommand and survives a save
