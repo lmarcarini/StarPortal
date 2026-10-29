@@ -55,6 +55,12 @@ func _dial(address: GateAddress) -> void:
 	_view.get_overlays().get_wormhole_screen().dismiss()
 
 
+## Opens the drawer and the filters header with clicks.
+func _show_filters() -> void:
+	await UiInput.click(_view.get_address_drawer().get_tab())
+	await UiInput.click(_book().find_child("FiltersButton", true, false) as Control)
+
+
 func _keys() -> Array[String]:
 	var keys: Array[String] = []
 	for row: AddressBookRow in _book().get_rows():
@@ -122,6 +128,7 @@ func test_glyph_filter_shows_exactly_the_entries_with_every_picked_glyph() -> vo
 	for _index: int in 24:
 		_add_entry(rng, AddressEntry.Source.DIALED)
 	_view.setup(_simulation)
+	await _show_filters()
 	var filter: GlyphFilter = _book().find_child("GlyphFilter", true, false) as GlyphFilter
 	for _round: int in 12:
 		_book().clear_filters()
@@ -187,17 +194,23 @@ func test_text_and_source_filters() -> void:
 	assert_str(_book().get_count_text()).is_equal("1 address")
 
 
-## Select a row and press Load: the console's slots hold the address.
-func test_load_fills_the_console_slots() -> void:
+## Open the drawer, select a row and press Load: the console's slots hold the address and the
+## drawer collapses.
+func test_load_fills_the_console_slots_and_collapses() -> void:
 	var address: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.BLOCKED)
 	_dial(address)
 	_view.get_console().clear_all()
+	await UiInput.click(_view.get_address_drawer().get_tab())
+	assert_bool(_view.get_address_drawer().is_open()).is_true()
 	var load_button: Button = _book().find_child("LoadButton", true, false) as Button
 	assert_bool(load_button.disabled).is_true()
 	await UiInput.click(_book().get_rows()[0])
 	assert_str(_book().get_selected()).is_equal(address.key())
 	await UiInput.click(load_button)
 	assert_bool(_view.get_console().get_address().equals(address)).is_true()
+	assert_bool(_view.get_address_drawer().is_open()).is_false()
+	var dial: Control = _view.find_child("DialButton", true, false) as Control
+	assert_object(_view.get_viewport().gui_get_focus_owner()).is_same(dial)
 
 
 ## A note typed for the selected entry is saved with a NoteAddressCommand and survives a save
@@ -205,12 +218,19 @@ func test_load_fills_the_console_slots() -> void:
 func test_a_note_saves_and_survives_save_and_load() -> void:
 	var address: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.NO_GATE)
 	_dial(address)
+	_view.get_address_drawer().open()
+	await UiInput.settle(_view)
 	_book().select(address.key())
 	var note_edit: LineEdit = _book().find_child("NoteEdit", true, false) as LineEdit
 	note_edit.text = "Nothing there. Recheck seal 3?"
 	await UiInput.click(_book().find_child("SaveNoteButton", true, false) as Button)
 	assert_str(_simulation.state.address_book.find(address.key()).note).is_equal(note_edit.text)
 	assert_str(_book().get_rows()[0].get_note_text()).is_equal(note_edit.text)
+	# The note shows on the selected row only.
+	var note: Label = _book().get_rows()[0].find_child("Note", true, false) as Label
+	assert_bool(note.visible).is_true()
+	_book().select("")
+	assert_bool(note.visible).is_false()
 	var service: SaveServiceScript = SaveServiceScript.new()
 	service.saves_dir = "user://test_saves_book_%d" % Time.get_ticks_usec()
 	assert_bool(service.save_game(_simulation.state, &"book_note").is_ok).is_true()

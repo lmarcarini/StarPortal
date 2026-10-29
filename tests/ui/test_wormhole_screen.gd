@@ -221,6 +221,21 @@ func _focus_owner() -> Control:
 	return _holder.get_viewport().gui_get_focus_owner()
 
 
+## Review nit (#121): B / Escape dismisses the "wormhole closed" message.
+@warning_ignore("unused_parameter")
+func test_cancel_dismisses_the_closed_message(
+	device: String, test_parameters: Array = [["keyboard"], ["gamepad"]]  # gdlint: ignore=unused-argument,max-line-length
+) -> void:
+	_dial(DialOutcome.Kind.LOCK)
+	Fixture.close_wormhole(_view)
+	await get_tree().process_frame
+	assert_bool(_screen().is_showing_closed()).is_true()
+	_press(_cancel_event.bind(device))
+	await get_tree().process_frame
+	assert_bool(_screen().is_showing_closed()).is_false()
+	assert_bool(_screen().visible).is_false()
+
+
 func test_a_power_collapse_says_so() -> void:
 	_dial(DialOutcome.Kind.LOCK)
 	_simulation.state.power.plant_output_mw = 0.0

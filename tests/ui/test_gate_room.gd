@@ -124,10 +124,9 @@ func test_dial_needs_seven_glyphs_and_never_shows_the_needed_charge() -> void:
 	assert_bool(controls.get_dial_button().disabled).is_true()
 
 
-## The Dial Log tab is gone: the records hold only the Address Book (dials are in the Archive's
-## operations log).
-func test_records_hold_only_the_address_book() -> void:
+## The Dial Log is gone (dials are in the Archive's operations log); the Address Book is the
+## only record, in its side drawer.
+func test_the_only_record_is_the_address_book_drawer() -> void:
 	assert_object(_panel("DialLogPanel")).is_null()
-	var records: TabContainer = _panel("Records") as TabContainer
-	assert_int(records.get_tab_count()).is_equal(1)
-	assert_str(records.get_tab_title(0)).is_equal("BOOK_TITLE")
+	assert_object(_panel("Records")).is_null()
+	assert_object(_view.get_address_drawer().get_panel()).is_same(_view.get_address_book())

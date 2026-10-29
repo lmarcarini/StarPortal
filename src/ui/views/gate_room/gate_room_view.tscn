@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/ui/views/gate_room/gate_room_view.gd" id="1_gate_room_view"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/console/dial_console.tscn" id="2_console"]
-[ext_resource type="PackedScene" path="res://src/ui/gate_room/console/address_book_panel.tscn" id="3_book"]
+[ext_resource type="PackedScene" path="res://src/ui/gate_room/console/address_book_drawer.tscn" id="3_book"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/ring/ring_view.tscn" id="4_ring"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/capacitor_gauge.tscn" id="5_gauge"]
 [ext_resource type="PackedScene" path="res://src/ui/gate_room/sequence/dial_sequence.tscn" id="6_sequence"]
@@ -24,9 +24,6 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="Theme" id="Theme_records"]
-default_font_size = 12
-
 [node name="GateRoomView" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -46,7 +43,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 2
-theme_override_constants/margin_right = 8
+theme_override_constants/margin_right = 40
 theme_override_constants/margin_bottom = 2
 
 [node name="Main" type="HBoxContainer" parent="Margin"]
@@ -56,7 +53,6 @@ theme_override_constants/separation = 8
 [node name="Rows" type="VBoxContainer" parent="Margin/Main"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 2.15
 theme_override_constants/separation = 2
 
 [node name="Window" type="PanelContainer" parent="Margin/Main/Rows"]
@@ -98,18 +94,10 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Records" type="TabContainer" parent="Margin/Main"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-current_tab = 0
-theme = SubResource("Theme_records")
-
-[node name="AddressBookPanel" parent="Margin/Main/Records" instance=ExtResource("3_book")]
-unique_name_in_owner = true
-layout_mode = 2
-metadata/_tab_index = 0
-
 [node name="GateOverlays" parent="." instance=ExtResource("7_overlays")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="AddressBookDrawer" parent="." instance=ExtResource("3_book")]
 unique_name_in_owner = true
 layout_mode = 1

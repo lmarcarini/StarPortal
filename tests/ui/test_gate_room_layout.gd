@@ -46,6 +46,8 @@ func _build(locale: String, is_pseudo: bool) -> void:
 	var palette: GlyphPalette = _view.find_child("Palette", true, false) as GlyphPalette
 	palette.glyph_chosen.emit(failed.coordinates[0])
 	_view.get_address_book().toggle_glyph(failed.coordinates[0])
+	_view.get_address_drawer().open()
+	_view.get_address_book().show_filters(true)
 	await get_tree().process_frame
 	await get_tree().process_frame
 
