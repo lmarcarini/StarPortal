@@ -5,7 +5,7 @@ extends Control
 ## warning when the far side is guarded, the time left (live with sim time), the drain, the
 ## bank's state and the documents this wormhole brought ("New in the Archive: …"). Clicking the
 ## portal on the Ring (or A with it focused) shows or hides the action panel under the strip
-## (WormholeActions); B / Escape hides it. Open the Address Book and Read in the Archive hide
+## (WormholeActions); B / Escape hides it, and dismisses the closed message. Open the Address Book and Read in the Archive hide
 ## it and pass the request on. When the wormhole closes, for any reason, the strip says why
 ## until the player dismisses it or dials again. Below the strip the screen lets clicks through.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
@@ -69,10 +69,14 @@ func _notification(what: int) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _phase != Phase.ACTIONS or not event.is_action_pressed(&"ui_cancel"):
+	if not event.is_action_pressed(&"ui_cancel"):
 		return
-	get_viewport().set_input_as_handled()
-	hide_actions()
+	if _phase == Phase.ACTIONS:
+		get_viewport().set_input_as_handled()
+		hide_actions()
+	elif _phase == Phase.CLOSED and is_visible_in_tree():
+		get_viewport().set_input_as_handled()
+		dismiss()
 
 
 ## Connects the screen to [param simulation] and hides it.
