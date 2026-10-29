@@ -77,9 +77,9 @@ Every story address comes from a hand-made puzzle: a document or object, usually
 | Artefacts | Markings on something brought back through the Ring | A tablet whose rim repeats seven glyphs in the order of a ritual it describes |
 | Dossiers | Government files about a world, sometimes with a fragment of its address | A Directorate file on a site glimpsed in 1961 |
 | Captured records | Another power's own logs | A dial log taken from an Ossar device |
-| Ring consoles | The far Ring's log of its recent dials | Scanned by the MOTH on any world reached |
+| Ring consoles | The far Ring's log of its recent dials | Read from the open portal on any lock (deeper MOTH scans in M3) |
 
-**Field-found addresses.** The \~300 procedural worlds have no puzzles. When the MOTH scans a far Ring's console, it copies two to four nearby addresses into the Address Book, already written for CAIRN. Story puzzles open new regions; consoles fill them in.
+**Field-found addresses.** The \~300 procedural worlds have no puzzles. When the player reads a far Ring's console from the open portal, it copies two to four nearby addresses into the Address Book, already written for CAIRN. Story puzzles open new regions; consoles fill them in.
 
 **Every clue is true.** Sources can lie about politics, motives or what waits on the far side, but never about an address.
 
@@ -97,10 +97,10 @@ On every first lock the pole camera brings back the horizon record, which carrie
 
 The dial console is where the player builds and dials an address; it replaces the Workbench and the Gate Room's address entry.
 
-- **Palette and slots.** The 36 glyphs sit on a palette; the player drags a glyph to a slot, or clicks it then clicks the slot (gamepad: pick, then place). Seven slots take the address; seal 8 shows CAIRN's mark and cannot be changed.
+- **Palette and slots.** The 36 glyphs sit on a palette; the player drags a glyph to a slot, or clicks it to drop it into the first empty slot (gamepad: the same with A); clicking a placed glyph removes it. Seven slots take the address; seal 8 shows CAIRN's mark and cannot be changed.
 - **Highlight.** A glyph already placed is highlighted on the palette. There are no other aids: no counters, no rule-outs, no candidate lists.
 - **Charge.** The console shows only the stored charge, never what an address needs. If the bank holds too little, the Ring will not turn and the console says so, without numbers. Knowing the cost before dialing is a later upgrade (the lock estimator). The Dial button is a hold-to-confirm.
-- **Address Book.** Every address the player has found or dialed, with its source document, the world's name once known, the last outcome and the player's own note. It can be searched by glyphs (pick some glyphs to see the addresses that contain them), by world or by source, and one click loads an address into the slots. Dialing an address that has already failed asks for confirmation.
+- **Address Book.** A narrow side panel, collapsed by default (from M2 a view of the Archive's Worlds), listing every address the player has found or dialed, with its source document, the world's name once known, the last outcome and the player's own note. It can be searched by glyphs (pick some glyphs to see the addresses that contain them), by world or by source, and one click loads an address into the slots. Dialing an address that has already failed asks for confirmation.
 
 ## The dialing sequence and an open wormhole
 
@@ -108,7 +108,7 @@ Dialing is a short, skippable sequence; an open wormhole then gets its own clear
 
 1. **Sequence.** The Ring turns and the seals light one by one over two in-game minutes. Time is held while it plays (a `cutscene` hold), so nothing else happens. Skipping jumps to the result.
 2. **Result.** No gate and Blocked show a short result card with what the player learns. A lock opens the wormhole screen.
-3. **Wormhole screen.** It shows the destination, the time left of 60 minutes, the power drain and the actions available now: send a probe (sample canister, MOTH), later a team, or close. It stays on top of the Gate Room until the wormhole closes.
+3. **Wormhole screen.** After the sequence the Ring shows the open wormhole, and it stays visible while open. There is no modal: the player clicks the portal itself, and its actions sit around it (extend the pole camera, read the far console, send a probe, later a team, close), with the destination, the time left of 60 minutes and the power drain beside it. A lock always drops the clock to 1×, so an open wormhole never runs out by accident at high speed; the player may speed up again on purpose.
 4. **One at a time.** The Ring holds one wormhole. While it is open, the console cannot dial and says why.
 
 ## Probing the unknown
@@ -124,7 +124,7 @@ A lock tells the player nothing about the far side; something must go through fi
 
 Flying the MOTH switches to a first-person drone feed: real-time low-poly 3D at 320 × 240 with a camcorder overlay. The player flies it or sets an autopilot scan. While the feed is live, the clock slows to one tick per 6 real seconds, so a full battery gives about 2 real minutes of flight. Scan targets include:
 
-- **The far Ring's console:** copies its log of recent dials into the Address Book: two to four nearby addresses.
+- **The far Ring's console:** read from the open portal's actions on any lock, it copies two to four nearby addresses into the Address Book; the MOTH adds a deeper scan in M3.
 - **The sky:** a photograph for the Archive, which some story puzzles use.
 - **Structures, life signs and inscriptions:** feed the World Report and the Codex.
 
