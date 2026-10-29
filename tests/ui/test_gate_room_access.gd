@@ -89,6 +89,7 @@ func test_a_lock_names_the_world_in_the_wormhole_screen_and_the_address_book(
 	]
 ) -> void:
 	_dial(Fixture.address_for(_simulation.state, kind))
+	_view.get_address_drawer().open()
 	var found: int = 0
 	for text: String in Fixture.visible_texts(_view):
 		if text.contains(designation):
