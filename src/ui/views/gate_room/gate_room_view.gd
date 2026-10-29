@@ -1,17 +1,19 @@
 class_name GateRoomView
 extends GameView
-## The Gate Room view, in the hybrid layout. On the left, the window onto the Gate Room floor
-## with the Ring view, the centrepiece, in the middle (the dialing sequence's caption to its
-## left, the capacitor gauge to its right) and, below it, the dial console desk (seals and
-## palette, then hint, charge and the hold-to-dial button). On the right, full height, the
-## records: the Address Book (dials and their outcomes are in the Archive's operations log).
-## Loading an Address Book entry fills the console's slots. The dialing sequence plays on the
-## Ring; the result card covers the view and takes focus. While a wormhole is open its status
-## strip sits right of the Ring, over the top of the records, and clicking the portal (or A with
-## the Ring focused) opens the action panel below the strip, which takes focus; hiding it gives
-## focus back to the Ring. The view only composes the panels; every panel reads the simulation
-## and posts its own commands, and nothing here changes state. When the wormhole actions ask to
-## read a new document in the Archive, the view passes the request on to the switcher.
+## The Gate Room view, in the hybrid layout. On the left, the window onto the Gate Room floor with
+## the Ring view, the centrepiece, in the middle (the dialing sequence's caption to its left, the
+## capacitor gauge to its right) and, below it, the dial console desk (seals and palette, then hint,
+## charge and the hold-to-dial button), taking the full width. On the right edge, the Address Book
+## drawer, collapsed to a tab by default; opened, it lies over the right side of the view (dials and
+## their outcomes are in the Archive's operations log). Loading an entry fills the console's slots
+## and collapses the drawer. The dialing sequence plays on the Ring; the result card covers the view
+## and takes focus. While a wormhole is open its status strip sits right of the Ring and left of the
+## drawer's tab, and clicking the portal (or A with the Ring focused) opens the action panel below
+## the strip, which takes focus; hiding it gives focus back to the Ring. The drawer lies above the
+## strip: the tab always shows, and the open Address Book covers the strip and its actions until it
+## is closed. The view only composes the panels; every panel reads the simulation and posts its own
+## commands, and nothing here changes state. When the wormhole actions ask to read a new document in
+## the Archive, the view passes the request on to the switcher.
 ## Bible: gate-and-address-spec.md#the-dial-console,
 ## gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole, game-design.md#core-loop,
 ## technical-architecture.md#input-accessibility-and-localisation
@@ -20,13 +22,11 @@ extends GameView
 signal archive_requested(document_id: StringName)
 
 const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
-## Tab title keys of the records, in tab order.
-const _RECORD_TITLE_KEYS: Array[StringName] = [&"BOOK_TITLE"]
 
 @onready var _console: DialConsole = %DialConsole
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
-@onready var _records: TabContainer = %Records
-@onready var _book: AddressBookPanel = %AddressBookPanel
+@onready var _drawer: AddressBookDrawer = %AddressBookDrawer
+@onready var _book: AddressBookPanel = _drawer.get_panel()
 @onready var _overlays: GateOverlays = %GateOverlays
 @onready var _ring: RingView = %RingView
 @onready var _sequence: DialSequence = %DialSequence
@@ -36,8 +36,7 @@ func _ready() -> void:
 	_overlays.attach(_sequence, _ring)
 	_ring.resized.connect(_on_ring_resized)
 	_on_ring_resized.call_deferred()
-	for index: int in _RECORD_TITLE_KEYS.size():
-		_records.set_tab_title(index, _RECORD_TITLE_KEYS[index])
+	_overlays.get_wormhole_screen().offset_right = -AddressBookDrawer.TAB_WIDTH
 	_book.load_requested.connect(_on_load_requested)
 	_overlays.changed.connect(_on_overlays_changed)
 	_overlays.address_book_requested.connect(_on_address_book_requested)
@@ -61,7 +60,7 @@ func _exit_tree() -> void:
 func setup(simulation: Simulation) -> void:
 	_gauge.setup(simulation)
 	_console.setup(simulation)
-	_book.setup(simulation)
+	_drawer.setup(simulation)
 	_ring.setup(simulation.state.gate.mode)
 	_overlays.setup(simulation)
 
@@ -74,6 +73,11 @@ func get_console() -> DialConsole:
 ## Returns the Address Book panel.
 func get_address_book() -> AddressBookPanel:
 	return _book
+
+
+## Returns the Address Book drawer.
+func get_address_drawer() -> AddressBookDrawer:
+	return _drawer
 
 
 ## Returns the Ring view.
@@ -131,10 +135,9 @@ func _on_load_requested(address: GateAddress) -> void:
 	_ensure_focus.call_deferred()
 
 
-## The wormhole actions asked for the Address Book: show its tab and focus it.
+## The wormhole actions asked for the Address Book: open the drawer and focus it.
 func _on_address_book_requested() -> void:
-	_records.current_tab = _RECORD_TITLE_KEYS.find(&"BOOK_TITLE")
-	_book.get_first_focus().grab_focus()
+	_drawer.open()
 
 
 func _on_overlays_changed() -> void:
