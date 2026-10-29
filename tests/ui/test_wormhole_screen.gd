@@ -224,7 +224,7 @@ func _focus_owner() -> Control:
 ## Review nit (#121): B / Escape dismisses the "wormhole closed" message.
 @warning_ignore("unused_parameter")
 func test_cancel_dismisses_the_closed_message(
-	device: String, test_parameters: Array = [["keyboard"], ["gamepad"]]  # gdlint: ignore=unused-argument
+	device: String, test_parameters: Array = [["keyboard"], ["gamepad"]]  # gdlint: ignore=unused-argument,max-line-length
 ) -> void:
 	_dial(DialOutcome.Kind.LOCK)
 	Fixture.close_wormhole(_view)

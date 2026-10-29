@@ -1,13 +1,13 @@
 class_name WormholeScreen
 extends Control
-## The open wormhole, beside the Ring and never over it, and never a modal. A status strip
-## shows, the whole time a wormhole is open, the destination (or "Unknown world"), a hostile
-## warning when the far side is guarded, the time left (live with sim time), the drain, the
-## bank's state and the documents this wormhole brought ("New in the Archive: …"). Clicking the
-## portal on the Ring (or A with it focused) shows or hides the action panel under the strip
-## (WormholeActions); B / Escape hides it, and dismisses the closed message. Open the Address Book and Read in the Archive hide
-## it and pass the request on. When the wormhole closes, for any reason, the strip says why
-## until the player dismisses it or dials again. Below the strip the screen lets clicks through.
+## The open wormhole, beside the Ring and never over it, and never a modal. A status strip shows,
+## the whole time a wormhole is open, the destination (or "Unknown world"), a hostile warning when
+## the far side is guarded, the time left (live with sim time), the drain, the bank's state and the
+## documents this wormhole brought ("New in the Archive: …"). Clicking the portal on the Ring (or A
+## with it focused) shows or hides the action panel under the strip (WormholeActions); B / Escape
+## hides it, and dismisses the closed message. Open the Address Book and Read in the Archive hide it
+## and pass the request on. When the wormhole closes, for any reason, the strip says why until the
+## player dismisses it or dials again. Below the strip the screen lets clicks through.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## technical-architecture.md#state-machines
 
