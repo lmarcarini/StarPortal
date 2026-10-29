@@ -1,11 +1,12 @@
 class_name AddressBookPanel
 extends VBoxContainer
-## The Address Book beside the dial console: every address the player has found or dialed,
-## newest first, filtered by glyphs (a compact 36-glyph palette; an entry must hold every
-## picked glyph), by text in the note or the world's name, and by source. It says how many
-## addresses match, or why none show. Selecting a row and pressing Load asks the console to
-## fill its slots; the selected entry's note is edited below the list and saved with a
-## NoteAddressCommand. The panel never changes state itself.
+## The Address Book, in the Gate Room's side panel (AddressBookDrawer): every address the player has
+## found or dialed, newest first, as rows of large glyphs. The filters sit in a collapsible header
+## (Filters), closed by default; they filter by glyphs (a compact 36-glyph palette; an entry must
+## hold every picked glyph), by text in the note or the world's name, and by source. It says how
+## many addresses match, or why none show. Selecting a row and pressing Load asks the console to
+## fill its slots (the drawer then collapses); the selected entry's note is edited below the list
+## and saved with a NoteAddressCommand. The panel never changes state itself.
 ## Bible: gate-and-address-spec.md#the-dial-console (Address Book),
 ## game-design.md#difficulty-and-accessibility
 
@@ -22,6 +23,8 @@ var _selected: String = ""
 ## Address key whose note the note field holds, so a rebuild keeps a note being typed.
 var _note_key: String = ""
 
+@onready var _filters_button: Button = %FiltersButton
+@onready var _filter_box: Control = %FilterBox
 @onready var _search: LineEdit = %SearchEdit
 @onready var _source: OptionButton = %SourceFilter
 @onready var _glyphs: GlyphFilter = %GlyphFilter
@@ -37,6 +40,7 @@ var _note_key: String = ""
 func _ready() -> void:
 	_note_edit.max_length = AddressEntry.MAX_NOTE_LENGTH
 	_fill_source_choices()
+	_filters_button.toggled.connect(show_filters)
 	_search.text_changed.connect(_on_search_changed)
 	_source.item_selected.connect(_on_source_selected)
 	_glyphs.glyph_toggled.connect(_on_glyph_toggled)
@@ -71,6 +75,17 @@ func setup(simulation: Simulation) -> void:
 		_search.text = ""
 		_source.select(0)
 		_rebuild()
+
+
+## Shows the filters (glyphs, text, source) when [param shown], hides them otherwise.
+func show_filters(shown: bool) -> void:
+	_filters_button.set_pressed_no_signal(shown)
+	_filter_box.visible = shown
+
+
+## True while the filters show.
+func are_filters_shown() -> bool:
+	return _filter_box.visible
 
 
 ## Returns the filter, for tests.
@@ -132,9 +147,12 @@ func save_note() -> void:
 	_simulation.submit(NoteAddressCommand.create(_selected, _note_edit.text))
 
 
-## Returns the first row, the panel's focus target, or the search field when no row shows.
+## Returns the first row, the panel's focus target; with no row, the search field when the
+## filters show, else the Filters button.
 func get_first_focus() -> Control:
-	return _search if _rows.is_empty() else _rows[0]
+	if not _rows.is_empty():
+		return _rows[0]
+	return _search if _filter_box.visible else _filters_button
 
 
 func _fill_source_choices() -> void:
@@ -201,7 +219,7 @@ func _render_selection() -> void:
 	if entry == null:
 		_selected = ""
 	for row: AddressBookRow in _rows:
-		row.set_pressed_no_signal(row.get_address_key() == _selected)
+		row.set_selected(row.get_address_key() == _selected)
 	_note_edit.editable = entry != null
 	if _note_key != _selected:
 		_note_key = _selected

@@ -7,43 +7,56 @@
 theme_override_constants/separation = 4
 script = ExtResource("1_panel")
 
-[node name="SearchRow" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="SearchEdit" type="LineEdit" parent="SearchRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-placeholder_text = "BOOK_SEARCH_PLACEHOLDER"
-clear_button_enabled = true
-
-[node name="SourceFilter" type="OptionButton" parent="SearchRow"]
-unique_name_in_owner = true
-layout_mode = 2
-auto_translate_mode = 2
-tooltip_text = "BOOK_FILTER_SOURCE_TOOLTIP"
-
-[node name="GlyphFilter" type="GridContainer" parent="."]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/h_separation = 2
-theme_override_constants/v_separation = 2
-columns = 12
-script = ExtResource("2_filter")
-
 [node name="CountRow" type="HBoxContainer" parent="."]
 layout_mode = 2
+
+[node name="FiltersButton" type="Button" parent="CountRow"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "BOOK_FILTERS_TOOLTIP"
+toggle_mode = true
+text = "BOOK_FILTERS"
 
 [node name="CountLabel" type="Label" parent="CountRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 auto_translate_mode = 2
+autowrap_mode = 3
 
 [node name="ClearFiltersButton" type="Button" parent="CountRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "BOOK_CLEAR_FILTERS"
+
+[node name="FilterBox" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="SearchRow" type="HBoxContainer" parent="FilterBox"]
+layout_mode = 2
+
+[node name="SearchEdit" type="LineEdit" parent="FilterBox/SearchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "BOOK_SEARCH_PLACEHOLDER"
+clear_button_enabled = true
+
+[node name="SourceFilter" type="OptionButton" parent="FilterBox/SearchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+auto_translate_mode = 2
+tooltip_text = "BOOK_FILTER_SOURCE_TOOLTIP"
+
+[node name="GlyphFilter" type="GridContainer" parent="FilterBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+columns = 9
+script = ExtResource("2_filter")
 
 [node name="Scroll" type="ScrollContainer" parent="."]
 layout_mode = 2
@@ -75,12 +88,16 @@ layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "BOOK_NOTE_PLACEHOLDER"
 
-[node name="SaveNoteButton" type="Button" parent="NoteRow"]
+[node name="ButtonRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+alignment = 2
+
+[node name="SaveNoteButton" type="Button" parent="ButtonRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "BOOK_SAVE_NOTE"
 
-[node name="LoadButton" type="Button" parent="NoteRow"]
+[node name="LoadButton" type="Button" parent="ButtonRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "BOOK_LOAD"

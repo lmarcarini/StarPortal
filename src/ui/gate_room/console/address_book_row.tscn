@@ -26,33 +26,26 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_constants/separation = 2
 
-[node name="Top" type="HBoxContainer" parent="Content"]
+[node name="Strip" parent="Content" instance=ExtResource("2_strip")]
+unique_name_in_owner = true
+layout_mode = 2
+icon_size = 32
+
+[node name="Line" type="HBoxContainer" parent="Content"]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Strip" parent="Content/Top" instance=ExtResource("2_strip")]
-unique_name_in_owner = true
-layout_mode = 2
-icon_size = 18
-
-[node name="Icon" parent="Content/Top" instance=ExtResource("3_icon")]
+[node name="Icon" parent="Content/Line" instance=ExtResource("3_icon")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
 
-[node name="Outcome" type="Label" parent="Content/Top"]
+[node name="Details" type="Label" parent="Content/Line"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
-theme_override_font_sizes/font_size = 13
-text_overrun_behavior = 3
-
-[node name="Details" type="Label" parent="Content"]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 14
 text_overrun_behavior = 3
 
 [node name="Note" type="Label" parent="Content"]
@@ -60,4 +53,4 @@ unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 theme_override_font_sizes/font_size = 13
-text_overrun_behavior = 3
+autowrap_mode = 3

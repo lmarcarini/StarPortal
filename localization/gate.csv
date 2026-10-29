@@ -83,6 +83,10 @@ CONSOLE_CLEAR_ALL,Clear all,Limpar tudo
 CONSOLE_GLYPH_PLACED,{glyph}: placed,{glyph}: colocado
 CONSOLE_GLYPH_ORIGIN_LOCKED,"{glyph} is CAIRN's origin glyph. It is always seal 8, so it can never be one of seals 1 to 7.","{glyph} é o glifo de origem da CAIRN. Ele é sempre o selo 8, então nunca pode ser um dos selos 1 a 7."
 BOOK_TITLE,Address Book,Livro de Endereços
+BOOK_TAB,Address Book ({count}),Livro de Endereços ({count})
+BOOK_TAB_TOOLTIP,Open or close the Address Book,Abrir ou fechar o Livro de Endereços
+BOOK_FILTERS,Filters,Filtros
+BOOK_FILTERS_TOOLTIP,"Show or hide the glyph, text and source filters","Mostrar ou ocultar os filtros de glifos, texto e origem"
 BOOK_SEARCH_PLACEHOLDER,Search notes and worlds,Buscar em notas e mundos
 BOOK_FILTER_SOURCE_TOOLTIP,Show addresses from one source only,Mostrar endereços de uma só origem
 BOOK_FILTER_ALL_SOURCES,All sources,Todas as origens
