@@ -182,30 +182,30 @@ Each entry has four fields:
 - **Reason:** Content changes (new authored worlds, anchor edits) change the galaxy a seed gives. Bumping the version for every one before release would only lock testers out of saves nobody has promised to keep; testers start a new game on each build instead.
 - **Bible section:** [technical-architecture.md#save-system](bible/technical-architecture.md#save-system)
 
-## 2026-10-29 — M1.6: the Gate Room is a hybrid view
+## 2026-10-26 — M1.6: the Gate Room is a hybrid view
 
-- **Date:** 2026-10-29 (recorded with M1.6; decided when M1.6 was planned)
+- **Date:** 2026-10-26
 - **Decision:** The Gate Room shows the Ring large, as if through the control-room glass, with the dial console below it and panels beside it; an open wormhole's actions come from clicking the portal, never from a modal.
 - **Reason:** Playtests of M1.5 found the Gate Room read as a form, not a control room. The Ring is the game's centrepiece and must stay in sight while the player acts on it.
 - **Bible section:** [overview.md#locked-decisions](bible/overview.md#locked-decisions) (Presentation), [gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole](bible/gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole)
 
-## 2026-10-29 — M1.6: a lock drops the clock to 1×
+## 2026-10-26 — M1.6: a lock drops the clock to 1×
 
-- **Date:** 2026-10-29 (recorded with M1.6)
+- **Date:** 2026-10-26
 - **Decision:** When a dial resolves into a lock or hostile lock, a clock faster than 1× drops to 1×. 0.5×, pause and holds are left alone, and the player may speed up again.
 - **Reason:** At 10× an open wormhole could burn out before the player noticed it. Dropping to 1× gives every lock the player's attention without pausing the game.
 - **Bible section:** [game-design.md#time-real-time-with-pause](bible/game-design.md#time-real-time-with-pause)
 
-## 2026-10-29 — M1.6: the pole camera is a player action
+## 2026-10-26 — M1.6: the pole camera is a player action
 
-- **Date:** 2026-10-29 (recorded with M1.6)
+- **Date:** 2026-10-26
 - **Decision:** A lock alone delivers nothing. The player extends the pole camera from the portal's actions; it takes a little sim time and brings back the horizon record and the documents tied to that world, once per world.
 - **Reason:** It turns each lock into a beat the player chooses, and makes the documents a reward for acting rather than a side effect of dialing.
 - **Bible section:** [game-design.md#base-building-and-power](bible/game-design.md#base-building-and-power) (the pole camera, horizon record)
 
-## 2026-10-29 — M1.6: names are delegated to the product owner
+## 2026-10-26 — M1.6: names are delegated to the product owner
 
-- **Date:** 2026-10-29 (recorded with M1.6)
+- **Date:** 2026-10-26
 - **Decision:** The owner delegates in-game names (worlds, documents, UI labels) to the product owner, within the bible's rule of original names; the owner can still overrule any name in review.
 - **Reason:** Naming was holding cards up. The product owner sees every card and can keep names consistent.
 - **Bible section:** [overview.md#locked-decisions](bible/overview.md#locked-decisions) (Intellectual property)
