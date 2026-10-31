@@ -11,6 +11,7 @@ const _SECTIONS: Array[String] = [
 	"flags",
 	"gate",
 	"power",
+	"budget",
 	"base",
 	"worlds",
 	"archive",
@@ -28,6 +29,8 @@ var flags: Dictionary = {}
 var gate: GateState = GateState.new()
 ## Stored energy, capacity and plant output.
 var power: PowerState = PowerState.new()
+## Money, in thousands of dollars.
+var budget: BudgetState = BudgetState.new()
 ## Levels and rooms of the base.
 var base: BaseState = BaseState.new()
 ## Galaxy seed, generator version and world statuses.
@@ -51,7 +54,8 @@ var galaxy: GalaxyCatalogue = null
 ## Returns a fresh campaign state seeded with [param base_seed]. The galaxy seed is
 ## RandomState.derive_seed(base_seed, &"galaxy") and the generator version is
 ## WorldGenerator.GENERATOR_VERSION. With a [param balance], power starts at
-## PowerState.starting(balance); without one it is all zero. The base is BaseState.starting().
+## PowerState.starting(balance) and the budget at BudgetState.starting(balance); without one
+## they are all zero. The base is BaseState.starting().
 static func new_game(base_seed: int, balance: BalanceConfig = null) -> GameState:
 	var state := GameState.new()
 	state.random.base_seed = base_seed
@@ -60,6 +64,7 @@ static func new_game(base_seed: int, balance: BalanceConfig = null) -> GameState
 	state.base = BaseState.starting()
 	if balance != null:
 		state.power = PowerState.starting(balance)
+		state.budget = BudgetState.starting(balance)
 	return state
 
 
@@ -74,6 +79,7 @@ func to_dict() -> Dictionary:
 		"flags": flag_data,
 		"gate": gate.to_dict(),
 		"power": power.to_dict(),
+		"budget": budget.to_dict(),
 		"base": base.to_dict(),
 		"worlds": worlds.to_dict(),
 		"archive": archive.to_dict(),
@@ -91,6 +97,7 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.random = RandomState.from_dict(_dict_or_empty(data.get("random")))
 	state.gate = GateState.from_dict(_dict_or_empty(data.get("gate")))
 	state.power = PowerState.from_dict(_dict_or_empty(data.get("power")))
+	state.budget = BudgetState.from_dict(_dict_or_empty(data.get("budget")))
 	state.base = BaseState.from_dict(_dict_or_empty(data.get("base")))
 	state.worlds = WorldsState.from_dict(_dict_or_empty(data.get("worlds")))
 	state.archive = ArchiveState.from_dict(_dict_or_empty(data.get("archive")))
@@ -108,9 +115,9 @@ static func from_dict(data: Dictionary) -> GameState:
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
-## "flags", "gate", "power", "base", "worlds", "archive", "address_book" and "operations_log"
-## must be objects, the
-## sub-states must pass their own validate_dict(), and every flag must be a bool, a String or a
+## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book" and
+## "operations_log" must be objects, the sub-states must pass their own validate_dict(), and
+## every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
 ## not survive JSON, whether they arrive as ints or as floats). The Ring's "dial_started_tick" and
 ## "lock_started_tick", every Dial Log entry's "tick", every document's "received_tick" and every
@@ -154,6 +161,8 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return GateState.validate_dict(section)
 		"power":
 			return PowerState.validate_dict(section)
+		"budget":
+			return BudgetState.validate_dict(section)
 		"base":
 			return BaseState.validate_dict(section)
 		"worlds":
