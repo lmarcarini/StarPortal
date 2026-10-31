@@ -11,6 +11,10 @@ extends Button
 ## The player pressed this row.
 signal chosen(address_key: String)
 
+## Smallest row height: a 32 px glyph strip, one text line and padding. Rows never shrink
+## below it; the list scrolls instead.
+const MIN_HEIGHT: float = 64.0
+
 var _entry: AddressEntry = null
 var _state: GameState = null
 
