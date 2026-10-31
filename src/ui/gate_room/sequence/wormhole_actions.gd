@@ -2,8 +2,9 @@ class_name WormholeActions
 extends VBoxContainer
 ## The open portal's action panel, beside the Ring: Extend the pole camera (posts an
 ## ExtendPoleCameraCommand; while the camera goes through it shows its progress, then "Horizon
-## record taken"), Read the far Ring's console (ConsoleFinds), Read in the Archive (only when
-## this lock delivered documents), Open the Address Book, Send a probe (disabled: probes are not
+## record taken" and View the horizon photo; it says so at once, the same frame), Read the far
+## Ring's console (ConsoleFinds), Read in the Archive (only when this lock delivered documents),
+## Open the Address Book, Send a probe (disabled: probes are not
 ## ready yet) and Close the wormhole (hold to confirm, posts a CloseWormholeCommand). Changes no
 ## state itself beyond submitting those commands.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
@@ -15,12 +16,17 @@ signal book_requested
 signal archive_requested(document_id: StringName)
 ## The buttons that can take focus changed.
 signal focus_changed
+## The pole camera was just sent through (same frame as the press).
+signal camera_extended
+## The player asked to see the horizon photo enlarged.
+signal photo_requested
 
 var _simulation: Simulation = null
 
 @onready var _camera_button: Button = %PoleCameraButton
 @onready var _camera_progress: ProgressBar = %CameraProgress
 @onready var _camera_note: Label = %CameraNote
+@onready var _photo_button: Button = %PhotoButton
 @onready var _console: ConsoleFinds = %ConsoleFinds
 @onready var _archive_button: Button = %ArchiveButton
 @onready var _book_button: Button = %BookButton
@@ -30,6 +36,7 @@ var _simulation: Simulation = null
 func _ready() -> void:
 	_camera_button.pressed.connect(_on_camera_pressed)
 	_archive_button.pressed.connect(_on_archive_pressed)
+	_photo_button.pressed.connect(photo_requested.emit)
 	_book_button.pressed.connect(book_requested.emit)
 	_close_button.confirmed.connect(_on_close_confirmed)
 	_console.focus_changed.connect(focus_changed.emit)
@@ -55,6 +62,8 @@ func get_focusables() -> Array[Control]:
 	var found: Array[Control] = []
 	if not _camera_button.disabled:
 		found.append(_camera_button)
+	if _photo_button.visible:
+		found.append(_photo_button)
 	found.append_array(_console.get_focusables())
 	if _archive_button.visible:
 		found.append(_archive_button)
@@ -76,6 +85,11 @@ func get_camera_button() -> Button:
 ## Returns the pole camera's progress note; empty unless it is going through.
 func get_camera_note() -> String:
 	return _camera_note.text if _camera_note.visible else ""
+
+
+## Returns the View the horizon photo button.
+func get_photo_button() -> Button:
+	return _photo_button
 
 
 ## Returns the Read in the Archive button.
@@ -105,6 +119,7 @@ func _show_camera(worlds: WorldsState, world_id: StringName) -> void:
 	_camera_button.text = key
 	_camera_button.disabled = key != &"GATE_WORMHOLE_EXTEND_CAMERA"
 	_camera_button.focus_mode = Control.FOCUS_NONE if _camera_button.disabled else Control.FOCUS_ALL
+	_photo_button.visible = key == &"GATE_WORMHOLE_CAMERA_DONE"
 	_camera_progress.visible = is_out
 	_camera_note.visible = is_out
 	if not is_out:
@@ -122,6 +137,7 @@ func _on_camera_pressed() -> void:
 		return
 	_simulation.submit(ExtendPoleCameraCommand.new())
 	render(_simulation.state)
+	camera_extended.emit()
 	focus_changed.emit()
 
 

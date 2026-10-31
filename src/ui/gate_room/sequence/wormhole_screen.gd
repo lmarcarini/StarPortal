@@ -18,6 +18,10 @@ signal address_book_requested
 ## The player asked to read [param document_id], the first document this lock delivered, in
 ## the Archive; the actions are hidden.
 signal archive_requested(document_id: StringName)
+## The pole camera was just sent through (same frame as the press).
+signal camera_extended
+## The player asked to see the horizon photo enlarged.
+signal photo_requested
 ## The action panel was hidden by the player; the view gives focus back to the Ring.
 signal actions_hidden
 
@@ -50,6 +54,8 @@ func _ready() -> void:
 	_actions.book_requested.connect(_on_book_requested)
 	_actions.archive_requested.connect(_on_archive_requested)
 	_actions.focus_changed.connect(_on_actions_focus_changed)
+	_actions.camera_extended.connect(camera_extended.emit)
+	_actions.photo_requested.connect(photo_requested.emit)
 	_render()
 
 

@@ -55,6 +55,8 @@ GATE_WORMHOLE_EXTEND_CAMERA,Extend the pole camera,Estender a câmera de haste
 GATE_WORMHOLE_CAMERA_OUT,The pole camera is going through…,A câmera de haste está atravessando…
 GATE_WORMHOLE_CAMERA_DONE,Horizon record taken,Registro do horizonte obtido
 GATE_WORMHOLE_CAMERA_PROGRESS,Horizon record in {left},Registro do horizonte em {left}
+GATE_HORIZON_PHOTO_CAPTION,Horizon record · {world} · {date},Registro do horizonte · {world} · {date}
+GATE_WORMHOLE_VIEW_PHOTO,View the horizon photo,Ver a foto do horizonte
 GATE_WORMHOLE_SEND_PROBE,Send a probe,Enviar uma sonda
 GATE_WORMHOLE_PROBES_LATER,Probes are not ready yet.,As sondas ainda não estão prontas.
 GATE_WORMHOLE_RING_HINT,Click the Ring for its actions.,Clique no Anel para ver as ações.
