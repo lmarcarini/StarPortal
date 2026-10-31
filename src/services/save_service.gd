@@ -4,9 +4,9 @@ extends Node
 ## Resources, because a .tres loaded from a user folder can run embedded scripts.
 ## File shape: {"format_version", "game_version", "saved_at_unix", "tick", "state"}.
 ## Error codes: &"bad_slot_name", &"missing_file", &"read_failed", &"corrupt_json",
-## &"bad_format_version", &"newer_format_version", &"missing_migration_step",
-## &"migration_failed", &"corrupt_save", &"invalid_state", &"write_failed",
-## &"delete_failed".
+## &"bad_format_version", &"old_format_version", &"newer_format_version",
+## &"missing_migration_step", &"migration_failed", &"corrupt_save", &"invalid_state",
+## &"write_failed", &"delete_failed".
 ## Bible: technical-architecture.md#save-system
 
 ## Version of the file format written by save_game().
