@@ -93,7 +93,7 @@ func _assert_row_layout(row: AddressBookRow) -> void:
 func test_rows_never_overlap(
 	count: int,
 	locale: String,
-	test_parameters: Array = [
+	test_parameters: Array = [  # gdlint: ignore=unused-argument
 		[1, "en"],
 		[10, "en"],
 		[50, "en"],
@@ -103,7 +103,7 @@ func test_rows_never_overlap(
 		[1, "pseudo"],
 		[10, "pseudo"],
 		[50, "pseudo"],
-	]  # gdlint: ignore=unused-argument
+	]
 ) -> void:
 	await _open_with(count, locale)
 	var rows: Array[AddressBookRow] = _book().get_rows()

@@ -14,6 +14,15 @@ signal chosen(address_key: String)
 ## Smallest row height: a 32 px glyph strip, one text line and padding. Rows never shrink
 ## below it; the list scrolls instead.
 const MIN_HEIGHT: float = 64.0
+## Space around the content inside the row, in pixels (left and right, top and bottom).
+const PADDING: Vector2 = Vector2(8, 4)
+## Gap between glyph tiles, in pixels.
+const GLYPH_GAP: int = 4
+## Dark tile drawn behind each glyph so the light strokes read at a glance.
+const TILE_COLOR: Color = Color(0.03, 0.04, 0.06, 1.0)
+## Bar on the left edge marking the selected row.
+const SELECTED_COLOR: Color = Color(0.95, 0.75, 0.3, 1.0)
+const SELECTED_WIDTH: float = 4.0
 
 var _entry: AddressEntry = null
 var _state: GameState = null
@@ -27,8 +36,12 @@ var _state: GameState = null
 
 func _ready() -> void:
 	pressed.connect(func() -> void: chosen.emit(get_address_key()))
-	_content.minimum_size_changed.connect(update_minimum_size)
+	_content.minimum_size_changed.connect(_fit)
+	_strip.add_theme_constant_override(&"separation", GLYPH_GAP)
+	_strip.sort_children.connect(queue_redraw)
+	toggled.connect(func(_on: bool) -> void: queue_redraw())
 	_show()
+	_fit()
 
 
 func _notification(what: int) -> void:
@@ -36,10 +49,22 @@ func _notification(what: int) -> void:
 		_show()
 
 
-func _get_minimum_size() -> Vector2:
-	if _content == null:
-		return Vector2.ZERO
-	return _content.get_combined_minimum_size() + Vector2(16, 8)
+func _draw() -> void:
+	for child: Node in _strip.get_children():
+		if child is GlyphIcon:
+			var icon: Control = child as Control
+			var at: Vector2 = icon.get_global_position() - get_global_position()
+			draw_rect(Rect2(at, icon.size), TILE_COLOR)
+	if button_pressed:
+		draw_rect(Rect2(0, 0, SELECTED_WIDTH, size.y), SELECTED_COLOR)
+
+
+## Button's native minimum size ignores a script override, so the content's size is kept in
+## custom_minimum_size: the row never shrinks below its content or MIN_HEIGHT.
+func _fit() -> void:
+	var needed: Vector2 = _content.get_combined_minimum_size() + PADDING * 2.0
+	custom_minimum_size = Vector2(needed.x, maxf(needed.y, MIN_HEIGHT))
+	queue_redraw()
 
 
 ## Shows [param entry]; [param state] names its source and world.
@@ -63,6 +88,7 @@ func get_address_key() -> String:
 ## Shows the row as selected (pressed, its note shown) or not.
 func set_selected(selected: bool) -> void:
 	set_pressed_no_signal(selected)
+	queue_redraw()
 	_note.visible = selected and not _note.text.is_empty()
 
 
