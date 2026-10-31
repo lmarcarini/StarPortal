@@ -2,13 +2,15 @@ class_name GameSetup
 extends RefCounted
 ## Builds a runnable Simulation around a new or loaded GameState: regenerates the galaxy from
 ## the state's saved seed and generator version, sets the state's transient balance and
-## galaxy, and adds the systems in the bible's fixed tick order (power, gate, documents).
+## galaxy, and adds the systems in the bible's fixed tick order (power, gate, documents,
+## economy).
 ## Bible: technical-architecture.md#simulation-clock-and-commands,
 ## technical-architecture.md#save-system, technical-architecture.md#data-model
 
 
 ## Returns a Result whose value is a Simulation over [param state] with
-## [PowerSystem, GateSystem, DocumentSystem], after setting [code]state.balance[/code] and
+## [PowerSystem, GateSystem, DocumentSystem,
+## EconomySystem], after setting [code]state.balance[/code] and
 ## [code]state.galaxy[/code] from [param defs]. Fails, leaving the state unchanged, with
 ## &"missing_content" when [param defs] lacks the balance, 36 anchors or exactly one home
 ## world, and with &"galaxy_version_mismatch" when the state's generator version is not
@@ -29,7 +31,10 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	state.balance = defs.balance
 	state.galaxy = build_galaxy(state.worlds.galaxy_seed, defs)
 	var systems: Array[SimSystem] = [
-		PowerSystem.new(defs.balance), GateSystem.new(), DocumentSystem.new(defs.documents)
+		PowerSystem.new(defs.balance),
+		GateSystem.new(),
+		DocumentSystem.new(defs.documents),
+		EconomySystem.new(defs.balance, defs.rooms),
 	]
 	return Result.ok(Simulation.new(state, systems))
 

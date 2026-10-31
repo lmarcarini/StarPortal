@@ -65,6 +65,12 @@ const BALANCE_ID: StringName = &"balance"
 ## Longest a wormhole stays open, in ticks.
 @export var max_open_ticks: int = 60
 
+@export_group("Money")
+## Budget a new game starts with, in thousands of dollars (m2-base.md section 5).
+@export var starting_budget_k: int = 12000
+## Fixed allocation paid at each month-end, in thousands of dollars (m2-base.md section 5).
+@export var monthly_allocation_k: int = 3000
+
 
 func _init() -> void:
 	id = BALANCE_ID

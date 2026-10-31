@@ -32,6 +32,8 @@ var _debug_flag_count: int = 0
 @onready var time_bar: TimeBar = %TimeBar
 ## The game views and their tabs, under the top bar.
 @onready var view_switcher: ViewSwitcher = %ViewSwitcher
+## The money display in the top bar.
+@onready var money_label: MoneyLabel = %MoneyLabel
 @onready var _quick_save_button: Button = %QuickSaveButton
 @onready var _quick_load_button: Button = %QuickLoadButton
 @onready var _debug_flag_button: Button = %DebugFlagButton
@@ -184,6 +186,7 @@ static func _link_focus(buttons: Array[Button], below: Control) -> void:
 ## and after a quick load.
 func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
+	money_label.show_budget(simulation.state.budget.funds_k)
 
 
 func _show_toast(key: StringName) -> void:
