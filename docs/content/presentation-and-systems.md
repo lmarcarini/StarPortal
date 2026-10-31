@@ -204,6 +204,13 @@ An incoming wormhole's blue is framed in red, so it never looks like the player'
 
 ## 3. Base plan
 
+> **Superseded in part (owner, 2026-10-31):** the plan is seen **straight top-down** in the
+> lit-diorama look (concept B), not at a three-quarter angle, and there are **no conduits**:
+> power is an energy layer where each room is switched on or off. The paragraphs on the angle,
+> wall faces, conduits, priorities and cut conduits below no longer apply. Rooms, numbers,
+> building, digging and the energy layer for M2: [m2-base.md](m2-base.md). The rest of this
+> section (grid, room sizes, whole-level digging, staff dots, incursions) stays.
+
 One plan per level, seen from a slight three-quarter angle with ceilings removed: the camera
 looks down about 60 degrees from horizontal, so the south wall of each room shows as a thin
 strip of wall face and furniture and figures read as objects, while the cell grid stays square
@@ -493,7 +500,9 @@ request.
 ## 7. Owner decisions (2026-10-26)
 
 1. **Base look:** a slight three-quarter angle, not straight top-down (section 3).
+   *Superseded 2026-10-31: straight top-down, lit diorama (see [m2-base.md](m2-base.md)).*
 2. **Power routing:** conduits the player lays; incursions can cut them (section 3).
+   *Superseded 2026-10-31: no conduits; an energy layer switches rooms on and off.*
 3. **Excavation:** new levels are dug whole (section 3).
 4. **Grid numbers:** 3 m cells, 36 × 20 per level and section 3's room sizes are starting
    values, tuned by playtesting.
