@@ -1,10 +1,11 @@
 class_name PaletteGlyph
 extends Button
 ## One glyph of the dial console's palette: its constellation and its name. Pressing it asks
-## to place the glyph in the next empty seal; dragging it carries the glyph to a seal slot. A
-## glyph placed in a slot is highlighted by a frame and a corner dot, so it reads by shape as
-## well as colour. CAIRN's origin glyph is locked: greyed out, marked with a padlock
-## and never placed or dragged, since seal 8 already holds it.
+## to place the glyph in the next empty seal, or to take it out of its seal when placed;
+## dragging it carries the glyph to a seal slot. A glyph placed in a slot is highlighted by a
+## frame and a corner dot, so it reads by shape as well as colour. CAIRN's origin glyph is
+## locked: greyed out, marked with a padlock and never placed or dragged, since seal 8 already
+## holds it.
 ## Bible: gate-and-address-spec.md#the-dial-console,
 ## game-design.md#difficulty-and-accessibility (one-click placing, dragging, gamepad, shapes)
 
