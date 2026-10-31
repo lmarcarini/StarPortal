@@ -15,6 +15,8 @@ extends GameView
 ## the drawer is collapsed and hidden. The view only composes the panels; every panel reads the
 ## simulation and posts its own commands, and nothing here changes state. When the wormhole actions
 ## ask to read a new document in the Archive, the view passes the request on to the switcher.
+## Left of the Ring (where the dialing caption shows while dialing) it hosts the horizon photo;
+## extending the pole camera plays a short cue on the Ring and refreshes the photo at once.
 ## Bible: gate-and-address-spec.md#the-dial-console,
 ## gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole, game-design.md#core-loop,
 ## technical-architecture.md#input-accessibility-and-localisation
@@ -23,6 +25,9 @@ extends GameView
 signal archive_requested(document_id: StringName)
 
 const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
+
+var _photo := HorizonPhoto.new()
+var _camera_cue := CameraCue.new()
 
 @onready var _console: DialConsole = %DialConsole
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
@@ -43,6 +48,11 @@ func _ready() -> void:
 	_overlays.address_book_requested.connect(_on_address_book_requested)
 	_overlays.archive_requested.connect(archive_requested.emit)
 	_gauge.install_started.connect(_on_install_started)
+	_sequence.get_parent().add_child(_photo)
+	_ring.add_child(_camera_cue)
+	var wormhole: WormholeScreen = _overlays.get_wormhole_screen()
+	wormhole.camera_extended.connect(_on_camera_extended)
+	wormhole.photo_requested.connect(_photo.toggle_enlarged)
 
 
 func _enter_tree() -> void:
@@ -64,6 +74,7 @@ func setup(simulation: Simulation) -> void:
 	_drawer.setup(simulation)
 	_ring.setup(simulation.state.gate.mode)
 	_overlays.setup(simulation)
+	_photo.setup(simulation)
 
 
 ## Returns the dial console.
@@ -84,6 +95,16 @@ func get_address_drawer() -> AddressBookDrawer:
 ## Returns the Ring view.
 func get_ring_view() -> RingView:
 	return _ring
+
+
+## Returns the horizon photo beside the Ring.
+func get_horizon_photo() -> HorizonPhoto:
+	return _photo
+
+
+## Returns the pole camera's cue on the Ring.
+func get_camera_cue() -> CameraCue:
+	return _camera_cue
 
 
 ## Returns the overlays (dialing sequence, result card, wormhole screen).
@@ -149,6 +170,12 @@ func _on_overlays_changed() -> void:
 
 func _on_focus_may_be_lost(_reason: StringName) -> void:
 	_ensure_focus.call_deferred()
+
+
+func _on_camera_extended() -> void:
+	_photo.refresh()
+	_photo.flash()
+	_camera_cue.play()
 
 
 func _on_install_started() -> void:
