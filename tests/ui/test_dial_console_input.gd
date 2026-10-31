@@ -68,18 +68,32 @@ func test_click_on_a_slot_clears_it_and_the_next_click_refills_it() -> void:
 	_assert_highlights_match()
 
 
-## A click on an empty slot does nothing; a click on a glyph already placed changes nothing and
-## names the seal it is in, so a glyph is never in two seals.
-func test_click_on_an_empty_slot_or_a_placed_glyph_changes_nothing() -> void:
+## A click on an empty slot does nothing; a click on a placed glyph takes it out of its seal
+## and the next click on it fills the first empty seal again.
+func test_click_on_a_placed_glyph_toggles_it_off() -> void:
 	await UiInput.click(_seals().get_slot(2))
 	assert_array(_all_placed()).is_equal([-1, -1, -1, -1, -1, -1, -1])
 	await UiInput.click(_palette().get_button(_first))
-	await UiInput.click(_palette().get_button(_first))
-	assert_array(_all_placed()).is_equal([_first, -1, -1, -1, -1, -1, -1])
-	assert_str(_console.get_notice()).contains("seal 1")
 	await UiInput.click(_palette().get_button(_second))
+	await UiInput.click(_palette().get_button(_first))
+	assert_array(_all_placed()).is_equal([-1, _second, -1, -1, -1, -1, -1])
+	assert_bool(_palette().get_button(_first).is_placed()).is_false()
 	assert_str(_console.get_notice()).is_empty()
-	assert_str(_hint().text).is_equal(tr(DialConsole.HINT_IDLE))
+	_assert_highlights_match()
+	await UiInput.click(_palette().get_button(_first))
+	assert_array(_all_placed()).is_equal([_first, _second, -1, -1, -1, -1, -1])
+	_assert_highlights_match()
+
+
+## Gamepad: A on a placed glyph clears its seal; seal 8 never changes.
+func test_gamepad_toggles_a_placed_glyph() -> void:
+	var origin_before: int = _seals().get_slot(8).get_glyph()
+	await UiInput.pad(_palette().get_button(_second), JOY_BUTTON_A)
+	assert_int(_console.get_placed(1)).is_equal(_second)
+	await UiInput.pad(_palette().get_button(_second), JOY_BUTTON_A)
+	assert_int(_console.get_placed(1)).is_equal(-1)
+	assert_int(_seals().get_slot(8).get_glyph()).is_equal(origin_before)
+	_assert_highlights_match()
 
 
 ## The notice goes back to the hint on its own after a short while.

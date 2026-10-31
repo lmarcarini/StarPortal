@@ -22,7 +22,6 @@ const HINT_IDLE: StringName = &"CONSOLE_HINT_IDLE"
 ## Notice key when a glyph is clicked with all seven seals set.
 const NOTICE_ALL_SET: StringName = &"CONSOLE_ALL_SET"
 ## Notice key when a glyph already in a seal is clicked.
-const NOTICE_ALREADY_SET: StringName = &"CONSOLE_GLYPH_ALREADY_SET"
 ## How long a notice replaces the hint, in real seconds.
 const NOTICE_SECONDS: float = 2.5
 
@@ -142,15 +141,14 @@ func place(seal: int, glyph: int) -> void:
 
 
 ## Puts [param glyph] in the lowest-numbered empty seal of 1..7, as a click on the palette
-## does. Changes nothing and shows a notice when all seven are set or the glyph is already in a
-## seal; CAIRN's origin glyph is refused.
+## does; a glyph already in a seal is taken out of it instead (a toggle). Changes nothing and
+## shows a notice when all seven are set; CAIRN's origin glyph is refused.
 func place_next(glyph: int) -> void:
 	if glyph < 0 or glyph >= GateAddress.GLYPH_COUNT or glyph == _origin():
 		return
 	var existing: int = _placed.find(glyph)
 	if existing >= 0:
-		var glyph_name: String = tr(PaletteGlyph.name_key_of(glyph))
-		_show_notice(tr(NOTICE_ALREADY_SET).format({"glyph": glyph_name, "seal": existing + 1}))
+		clear_seal(existing + 1)
 		return
 	var empty: int = _placed.find(-1)
 	if empty < 0:

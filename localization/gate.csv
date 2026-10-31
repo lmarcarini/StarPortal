@@ -76,9 +76,8 @@ GATE_REASON_WORMHOLE_OPEN,A wormhole is open: close it before dialing again.,Há
 CONSOLE_SLOT_EMPTY,Seal {seal}: empty,Selo {seal}: vazio
 CONSOLE_SLOT_FILLED,"Seal {seal}: {glyph}. Click, right-click or Delete clears it.","Selo {seal}: {glyph}. Clique, clique direito ou Delete o esvazia."
 CONSOLE_ORIGIN_HOME,Seal 8 is CAIRN's mark: {glyph}. It never changes.,"Selo 8, marca da CAIRN: {glyph}. Nunca muda."
-CONSOLE_HINT_IDLE,"Click a glyph to set the next empty seal, or drag it onto a seal. Click a set seal to clear it.","Clique num glifo para o próximo selo vazio, ou arraste-o até um selo. Clique num selo preenchido para esvaziá-lo."
+CONSOLE_HINT_IDLE,"Click a glyph to set the next empty seal, or drag it onto a seal. Click a set seal or a placed glyph to clear it.","Clique num glifo para o próximo selo vazio, ou arraste-o até um selo. Clique num selo preenchido ou num glifo colocado para esvaziá-lo."
 CONSOLE_ALL_SET,All seven seals are set.,Os sete selos estão preenchidos.
-CONSOLE_GLYPH_ALREADY_SET,{glyph} is already in seal {seal}.,{glyph} já está no selo {seal}.
 CONSOLE_CLEAR_ALL,Clear all,Limpar tudo
 CONSOLE_GLYPH_PLACED,{glyph}: placed,{glyph}: colocado
 CONSOLE_GLYPH_ORIGIN_LOCKED,"{glyph} is CAIRN's origin glyph. It is always seal 8, so it can never be one of seals 1 to 7.","{glyph} é o glifo de origem da CAIRN. Ele é sempre o selo 8, então nunca pode ser um dos selos 1 a 7."
