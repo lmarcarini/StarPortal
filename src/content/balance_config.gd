@@ -2,7 +2,7 @@ class_name BalanceConfig
 extends DefBase
 ## Every tunable number of the game in one definition, always with the id &"balance".
 ## Fields are added by the cards that need them; defaults are the bible's starting values.
-## Bible: technical-architecture.md#data-model,
+## Bible: technical-architecture.md#data-model, docs/content/m2-base.md,
 ## gate-and-address-spec.md#dialing-outcomes-and-energy, gate-and-address-spec.md#the-dial-console
 
 ## The id every BalanceConfig has.
@@ -37,6 +37,21 @@ const BALANCE_ID: StringName = &"balance"
 @export var capacitor_bank_install_ticks: int = 360
 ## Capacitor banks the base has room for.
 @export var max_capacitor_banks: int = 1
+
+@export_group("Base")
+## Cells of every level (width × height), 3 m each (m2-base.md section 2).
+@export var base_grid_size: Vector2i = Vector2i(36, 20)
+## Underground levels a new game starts with, all dug; the Ring is on the deepest.
+@export var starting_levels: int = 3
+## Level of the capacitor alcove, the marked site for the first Capacitor Bank.
+@export var capacitor_alcove_level: int = 3
+## Top-left cell of the capacitor alcove; its size is the Capacitor Bank's footprint.
+@export var capacitor_alcove_origin: Vector2i = Vector2i(22, 10)
+## Cost of digging each extra level, in $k, in order (Level 4, Level 5); its size is the most
+## extra levels M2 allows (m2-base.md section 4).
+@export var dig_level_costs_k: Array[int] = [3000, 4500]
+## Ticks of digging each extra level, in order: 20 and 30 in-game days.
+@export var dig_level_ticks: Array[int] = [28800, 43200]
 
 @export_group("Dial outcomes")
 ## Fraction of the lock energy spent on a No gate outcome.

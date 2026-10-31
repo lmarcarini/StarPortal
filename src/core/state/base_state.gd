@@ -6,14 +6,6 @@ extends RefCounted
 ## "next_room_number"}.
 ## Bible: game-design.md#base-building-and-power, technical-architecture.md#data-model
 
-## Cells of every level: 36 × 20 cells of 3 m (game-design.md#base-building-and-power).
-const DEFAULT_GRID_SIZE: Vector2i = Vector2i(36, 20)
-## Levels a new campaign starts with, all dug.
-const STARTING_LEVELS: int = 3
-## The Gate Room's def id; the Ring sits on the deepest starting level.
-const GATE_ROOM_DEF: StringName = &"room_gate"
-## Placeholder Gate Room origin until the M2 design card sets the starting layout.
-const GATE_ROOM_ORIGIN: Vector2i = Vector2i(14, 7)
 ## Saved keys, in to_dict() order.
 const _KEYS: Array[String] = ["grid_size", "levels", "rooms", "next_room_number"]
 
@@ -21,24 +13,15 @@ const _KEYS: Array[String] = ["grid_size", "levels", "rooms", "next_room_number"
 var level_count: int:
 	get:
 		return levels.size()
-## Cells of every level (width × height).
-var grid_size: Vector2i = DEFAULT_GRID_SIZE
+## Cells of every level (width × height); a new game takes it from
+## BalanceConfig.base_grid_size (StartingBase.build()).
+var grid_size: Vector2i = Vector2i.ONE
 ## The underground levels; levels[n - 1] is level n, level 1 the top one. No surface level.
 var levels: Array[LevelState] = []
 ## Every room placed, built or under construction.
 var rooms: Array[RoomState] = []
 ## Number used for the next room's id ("room_<n>"); never reused.
 var next_room_number: int = 1
-
-
-## Returns the campaign's starting base: STARTING_LEVELS dug levels with only the Gate Room,
-## built, on the deepest one.
-static func starting() -> BaseState:
-	var base := BaseState.new()
-	for index: int in STARTING_LEVELS:
-		base.levels.append(LevelState.new())
-	base.add_room(GATE_ROOM_DEF, STARTING_LEVELS, GATE_ROOM_ORIGIN)
-	return base
 
 
 ## Places a new built, unturned room of [param def_id] at [param origin] on level
