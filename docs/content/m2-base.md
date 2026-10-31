@@ -11,16 +11,12 @@ Design for the M2 base cards. It follows the owner decisions of 2026-10-31:
 - Still valid: levels are dug whole; a level is 36 × 20 cells of 3 m (starting values, tuned by
   playtesting); five tabs, F1 to F5, with Research inside the Base.
 
-Where this document and the bible or `presentation-and-systems.md` disagree on the base, this
-document wins until the bible is updated. Values marked **PO proposal** are decided here and may
-be revised by the owner. All numbers are starting values for playtesting.
+This document wins over the bible and `presentation-and-systems.md` on the base until the bible
+is updated. Choices beyond the owner decisions are PO proposals; all numbers are starting
+values for playtesting.
 
 Units: money in thousands of dollars ($k, stored as integers, per the code standards). One sim
 tick is one in-game minute. Energy in MWh, power in MW.
-
-Facts from the current code that this design builds on: a new game has no capacitors; one bank
-holds 400 MWh and took 6 in-game hours to install; the diesel plant gives 30 MW; a lock costs
-about 366.6 MWh on the puzzle worlds; an open wormhole drains 20 MW for up to 60 minutes.
 
 ---
 
@@ -57,12 +53,11 @@ half (section 3).
 - **Capacitor Bank.** Each adds 400 MWh of storage. It replaces the M1.5 "Install capacitor
   bank" action. A bank has no switch: storage is always available. Demolishing a bank loses the
   energy above the new capacity.
-- **Quarters, Physics Lab, Workshop, Infirmary.** Built, powered and paid for, but with no
-  effect until staff (M2, second half), research (M4) and prototypes arrive. The room panel says
-  so in one line ("Labs open when research does."). They exist so building has choices and
-  power has demand.
-- **Archive.** The Archive tab (F2) works without it in M2, so that no room can break the
-  documents. PO proposal: the room holds the adjacency bonus below and, later, artefacts.
+- **Quarters, Physics Lab, Workshop, Infirmary.** No effect until staff, research and
+  prototypes arrive; the panel says so ("Labs open when research does."). They give building
+  choices and power demand.
+- **Archive.** The Archive tab (F2) works without it, so no room can break the documents; the
+  room holds the adjacency bonus and, later, artefacts.
 - **Lift and Stairs.** A lift takes the same 2 × 2 cells on every level from the surface down;
   stairs join one level to the one below. In M2 they only satisfy the connection rule
   (section 4); speed matters later for squads.
@@ -70,7 +65,6 @@ half (section 3).
 
 **Adjacency.** Two rooms are neighbours when they share two or more cells of wall. Only one
 bonus in M2, shown but inert until research: **Lab next to the Archive: +10% research speed**.
-PO proposal: no other bonuses until there is something for them to change.
 
 ---
 
@@ -103,14 +97,12 @@ Capacitor Bank room, and stays one short action:
 3. The player resumes the clock. After 6 in-game hours the bank is built and starts charging at
    23 MW: about 16 hours to the 366.6 MWh of a lock (17.4 hours to full).
 
-The alcove only shortens the first build; it is an ordinary Capacitor Bank site and the player
-can build the first bank anywhere valid instead. More banks go anywhere (no conduits). PO
-proposal: keep the Gate Room button only while no bank exists or is being built, so the first
-action never needs the build palette.
+The alcove is an ordinary site; the first bank may go anywhere valid, and more banks anywhere
+(no conduits). The Gate Room button shows only while no bank exists or is being built.
 
 Charging is slower than M1.6 (12.2 hours at 30 MW). That is intended: switching the
-Quarters and Archive off brings it back to about 13.6 hours, the first trade-off the energy
-layer teaches.
+Quarters and Archive off leaves 4 MW of draw, 14.1 hours to the lock and 15.4 hours to full,
+the first trade-off the energy layer teaches.
 
 ---
 
@@ -133,7 +125,13 @@ net      = output - demand
 
 **Always on.** The Gate Room and Control Room have no switch, so the player can always dial,
 see and close the Ring. Capacitor Banks, Lifts, Stairs and Corridors have no switch either
-(storage and passage only). Every other room, including a Power Plant, can be switched off.
+(storage and passage only). Every other room can be switched off, including a Power Plant,
+except the **last running plant**: its switch is locked ("The base's last running plant.").
+
+**Content rule (validator):** the always-on rooms' total draw must not exceed the output of
+the smallest plant (today Gate 2 + Control 1 + Lift 1 = 4 MW against 30 MW). So once a brownout has switched everything else
+off, supply always covers what is left, and the base can never fall below zero with nothing to
+switch.
 
 **An off room** draws nothing, has no effect (no adjacency bonus, no beds or research later)
 and pays **half upkeep**. It goes dark on the plan: the diorama lights inside it go out. Its
@@ -141,20 +139,18 @@ staff, later, idle. Switching on or off is instant and free.
 
 **Before the bank runs dry.** While net is negative, the game works out how long the bank lasts:
 
-1. With **one in-game hour left**, the game auto-pauses and says: "Power deficit: −9 MW. The
+1. With **one in-game hour left**, the game auto-pauses: "Power deficit: −9 MW. The
    capacitors run dry in 1 hour. Switch rooms off on the energy layer (P) or build a plant."
-   The message has an **Open energy layer** button. This pause happens once per deficit; it
-   rearms when net goes back above zero.
-2. **When the bank is empty**, the game auto-pauses again, closes an open wormhole (the M1.6
-   rule: it closes when the charge runs out) and switches off every switchable room except
-   Power Plants, as a brownout: "Capacitors empty. Rooms switched off to match the plant's
-   output." The player switches back on what fits.
-3. With no bank at all, any deficit at once is a brownout (step 2). Before the first bank is
-   built the starting base is in surplus, so this only happens if the player builds heavily
-   first.
+   with an **Open energy layer** button. If a deficit begins with under an hour of charge
+   left, this pause fires at once. It happens once per deficit and rearms when net goes back
+   above zero.
+2. **When the bank is empty** (or at once, with no bank), the game auto-pauses again, closes
+   an open wormhole (the M1.6 rule), and switches off every switchable room **and any
+   digging** (the dig pauses and resumes when switched back on): "Capacitors empty. Rooms
+   switched off to match the plant's output." Only always-on rooms then draw, and the content
+   rule above guarantees the plant covers them. The player switches back on what fits.
 
-PO proposal: no priorities and no automatic shedding order. The player's switches are the
-only order; the brownout is the single safety net.
+No priorities and no automatic shedding order: the player's switches are the only order.
 
 **Dialing and the wormhole.** The open wormhole's 20 MW counts as demand, so it is covered by
 the plant first and the bank only for the rest. With the starting base (7 MW) a wormhole leaves
@@ -184,7 +180,7 @@ There is no power rule (no conduits) and no rule that a level is reachable from 
 the lift is pre-built and corridors join to it.
 
 **Construction.** Hold to confirm pays the full cost and places a hatched site showing time
-left. Time passes only while the clock runs. Up to **three sites** build at once (PO proposal);
+left. Time passes only while the clock runs. Up to **three sites** build at once ;
 a fourth waits in a queue shown on the site ("Queued: 2nd"). A site draws no power. In M2
 first half, sites build at the listed time on their own; when engineers arrive, a site needs
 them, and the listed time is for a full crew. Corridors are drag-placed as a run; the run is one
@@ -224,9 +220,7 @@ later, containment far from the surface).
 - **Below zero:** building and digging are blocked ("Not enough money"); upkeep can push the
   balance negative, and the top bar shows it in red. No other consequence in M2.
 
-With the starting base, about $2,760k a month is free for building: one lab and one workshop a
-month, or a plant every month or so. A 30-day run must choose between more storage, more
-output and placeholder rooms the later cards will make useful.
+About $2,760k a month is free for building: a lab and a workshop, or one plant.
 
 **Deferred:** Committee Confidence and the allocation scaled by it; salaries (with staff);
 materials and delivery delays (the build cost is all money for now); licences, Halcyon
@@ -269,7 +263,7 @@ fittings, corridors darker. A cell is 24 px, so a level is 864 × 480 px at 1× 
   dug shows its days left.
 - **Plan** (864 × 480): rooms with their lights on or off; sites hatched in blueprint style
   (concept C locally) with time left; selection outlined.
-- **Selected-room panel** (right, 280 px): name, draw and on/off switch, upkeep, adjacency,
+- **Selected-room panel** (right, 352 px; 64 + 864 + 352 = 1,280): name, draw and on/off switch, upkeep, adjacency,
   status line, Demolish (hold). For a site: time left, Cancel (hold).
 - **Build palette** (bottom): each room shows cost, draw and build time on hover or focus.
 - **Energy layer** (P, or the button at the end of the meter): the plan dims the scenery and
@@ -277,14 +271,13 @@ fittings, corridors darker. A cell is 24 px, so a level is 864 × 480 px at 1× 
   of a switch; plants show `+30`. Clicking a room toggles it. The meter grows to show the bank
   time to full or dry. The instrument-panel styling of concept A is used for the switches and
   meter.
-- **Messages** (bottom strip): the latest event, also written to the Log.
+- **Messages** (bottom strip): the latest event, also in the Log.
 
-**Gamepad.** The shoulder buttons switch tabs as today; the triggers keep time speed. In the
-Base tab the D-pad moves a cell cursor over the plan and the left stick pans; Y and X
-change level up and down; A selects the room under the cursor (or toggles it while the energy
-layer is shown); Select (the view button) toggles the energy layer; the right stick zooms.
-The menu button focuses the build palette: A picks a room, the ghost follows the
-cursor, RB/LB rotate, hold A to build, B cancels back to the plan.
+**Gamepad.** The shoulder buttons switch tabs, except while placing a room, when they rotate
+it; the triggers keep time speed. The D-pad moves a cell cursor, the left stick pans, the right
+stick zooms; Y and X change level; A selects the room under the cursor (toggles it on the
+energy layer); the view button toggles the energy layer; the menu button focuses the build
+palette, where A picks a room, the ghost follows the cursor, hold A builds and B cancels.
 
 ---
 
@@ -298,14 +291,13 @@ v10 to v11. An M1.6 save becomes:
 - `banks_installed` = 1 (or `capacity_mwh` of 400): the Level 3 alcove holds a **built**
   Capacitor Bank. More than one bank (not possible through the old action, but handled): the
   extras go to the first valid 3 × 2 places along the Level 3 corridor; if none fits, the save
-  fails to load with "bad_power".
+  fails to load with "bad_power" (the migration card must test this path).
 - `install_ticks_left` above 0: the alcove holds a Capacitor Bank site with the same time left.
 - `stored_mwh` is kept, clamped to the new capacity. `plant_output_mw` is dropped; output now
   comes from the surface plant (30 MW, so the value is the same for every M1.6 save).
 - The calendar date is kept; the first month-end falls at the next first of the month.
 
-The playtest guides already tell testers that earlier saves may not load, so if the migration
-is costly the PO may reject old saves instead (open question 4).
+If the migration is costly, old saves may be rejected instead (open question 4).
 
 ---
 
@@ -314,8 +306,9 @@ is costly the PO may reject old saves instead (open question 4).
 1. **Opening.** Is "Build capacitor bank" in the Gate Room, jumping to the alcove on the Base
    tab, the right first action, or should the first bank simply be built in the Gate Room as
    before and appear on the plan?
-2. **Slower charging.** The starting rooms draw 7 MW, so the first lock is ready about 4 hours
-   later than in M1.6 unless rooms are switched off. Keep, or start with fewer rooms on?
+2. **Slower charging.** The starting rooms draw 7 MW: the first lock takes about 16 hours
+   (M1.6: 12.2), or 14.1 hours with Quarters and Archive off. Keep, or start with fewer rooms
+   on?
 3. **Brownout.** When the bank runs dry, every switchable room goes off at once (no
    priorities). Acceptable, or bring back a simple priority order?
 4. **Old saves.** Migrate M1.6 saves (section 7) or start M2 with a clean break?
