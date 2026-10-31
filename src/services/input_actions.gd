@@ -23,6 +23,7 @@ const ACTIONS: Array[StringName] = [
 	&"view_previous",
 	&"view_gate_room",
 	&"view_archive",
+	&"view_base",
 ]
 
 ## Gamepad bindings added to Godot's built-in UI actions at start-up, as {action: [encoded]},
@@ -122,6 +123,11 @@ const DEFAULTS: Dictionary = {
 	&"view_archive":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F2}],
+		GAMEPAD: [],
+	},
+	&"view_base":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F3}],
 		GAMEPAD: [],
 	},
 }

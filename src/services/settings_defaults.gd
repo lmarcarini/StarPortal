@@ -46,5 +46,6 @@ const VALUES: Dictionary = {
 		&"view_previous": {},
 		&"view_gate_room": {},
 		&"view_archive": {},
+		&"view_base": {},
 	},
 }

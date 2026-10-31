@@ -1,0 +1,58 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/views/base/base_view.gd" id="1_base_view"]
+[ext_resource type="Script" path="res://src/ui/base/level_tabs.gd" id="2_levels"]
+[ext_resource type="Script" path="res://src/ui/base/base_plan.gd" id="3_plan"]
+[ext_resource type="Script" path="res://src/ui/base/room_panel.gd" id="4_panel"]
+
+[node name="BaseView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_base_view")
+
+[node name="Columns" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="LevelTabs" type="VBoxContainer" parent="Columns"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+script = ExtResource("2_levels")
+
+[node name="PlanColumn" type="VBoxContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="LevelHeading" type="Label" parent="Columns/PlanColumn"]
+unique_name_in_owner = true
+auto_translate_mode = 2
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+
+[node name="Plan" type="Control" parent="Columns/PlanColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 200)
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 2
+script = ExtResource("3_plan")
+
+[node name="RoomPanel" type="VBoxContainer" parent="Columns"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(352, 0)
+layout_mode = 2
+script = ExtResource("4_panel")
