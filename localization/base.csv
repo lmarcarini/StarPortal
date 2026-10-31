@@ -1,0 +1,25 @@
+keys,en,pt_BR
+ROOM_GATE_NAME,Gate Room,Sala do Portal
+ROOM_GATE_DESC,The Ring and its dial console. Always on.,O Anel e seu console de discagem. Sempre ligada.
+ROOM_CONTROL_NAME,Control Room,Sala de Controle
+ROOM_CONTROL_DESC,Overlooks the Gate Room. Always on.,Vigia a Sala do Portal. Sempre ligada.
+ROOM_POWER_PLANT_NAME,Power Plant (diesel),Usina (diesel)
+ROOM_POWER_PLANT_DESC,Adds 30 MW of output while on. Upkeep is fuel.,Gera 30 MW enquanto ligada. A manutenção é combustível.
+ROOM_CAPACITOR_BANK_NAME,Capacitor Bank,Banco de Capacitores
+ROOM_CAPACITOR_BANK_DESC,"Stores 400 MWh for the Ring, charged from spare power.","Armazena 400 MWh para o Anel, carregado com a energia livre."
+ROOM_QUARTERS_NAME,Quarters,Alojamento
+ROOM_QUARTERS_DESC,Six beds. Staff arrive later.,Seis camas. A equipe chega depois.
+ROOM_ARCHIVE_NAME,Archive,Arquivo
+ROOM_ARCHIVE_DESC,Holds the documents. Labs next to it work faster.,Guarda os documentos. Laboratórios vizinhos trabalham mais rápido.
+ROOM_PHYSICS_LAB_NAME,Physics Lab,Laboratório de Física
+ROOM_PHYSICS_LAB_DESC,Labs open when research does.,Os laboratórios abrem quando a pesquisa abrir.
+ROOM_WORKSHOP_NAME,Workshop,Oficina
+ROOM_WORKSHOP_DESC,Opens when prototypes do.,Abre quando os protótipos abrirem.
+ROOM_INFIRMARY_NAME,Infirmary,Enfermaria
+ROOM_INFIRMARY_DESC,Opens when staff arrive.,Abre quando a equipe chegar.
+ROOM_LIFT_NAME,Lift,Elevador
+ROOM_LIFT_DESC,Joins all levels through the same 2 × 2 cells.,Liga todos os níveis pelas mesmas células 2 × 2.
+ROOM_STAIRS_NAME,Stairs,Escada
+ROOM_STAIRS_DESC,Joins one level to the next.,Liga um nível ao seguinte.
+ROOM_CORRIDOR_NAME,Corridor,Corredor
+ROOM_CORRIDOR_DESC,Connects rooms. One cell.,Liga as salas. Uma célula.
