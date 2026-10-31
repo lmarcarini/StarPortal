@@ -1,36 +1,21 @@
-## Tests for BaseState, LevelState and RoomState: the starting base, the save round trip and
+## Tests for BaseState, LevelState and RoomState: the new game's base, the save round trip and
 ## validate_dict().
 ## Bible: game-design.md#base-building-and-power, technical-architecture.md#data-model
 extends GdUnitTestSuite
 
 
-## The starting base: three dug underground levels (1 to 3, no surface) on a 36 × 20 grid,
-## only the Gate Room, built, on level 3, the deepest.
-func test_starting_base() -> void:
-	var base := BaseState.starting()
-	assert_int(base.level_count).is_equal(3)
-	assert_that(base.grid_size).is_equal(Vector2i(36, 20))
-	assert_int(base.rooms.size()).is_equal(1)
-	var gate: RoomState = base.rooms[0]
-	assert_str(String(gate.def_id)).is_equal("room_gate")
-	assert_int(gate.level).is_equal(3)
-	assert_bool(gate.is_built()).is_true()
-	assert_object(base.find_room(&"room_1")).is_same(gate)
-	assert_int(base.next_room_number).is_equal(2)
-
-
 ## A new game has the starting base.
 func test_new_game_has_the_starting_base() -> void:
 	var state := GameState.new_game(7)
-	assert_dict(state.base.to_dict()).is_equal(BaseState.starting().to_dict())
+	assert_dict(state.base.to_dict()).is_equal(StartingBase.build(BalanceConfig.new()).to_dict())
 
 
 ## Every value survives a JSON round trip and validates.
 func test_round_trip() -> void:
-	var base := BaseState.starting()
+	var base := StartingBase.build(BalanceConfig.new())
 	base.levels.append(LevelState.new())
 	base.levels[3].dig_ticks_left = 500
-	var lab: RoomState = base.add_room(&"room_lab", 1, Vector2i(3, 4))
+	var lab: RoomState = base.add_room(&"room_physics_lab", 1, Vector2i(3, 4))
 	lab.rotated = true
 	lab.build_ticks_left = 99
 	lab.powered_on = false
@@ -39,14 +24,15 @@ func test_round_trip() -> void:
 	var loaded := BaseState.from_dict(data)
 	assert_dict(loaded.to_dict()).is_equal(base.to_dict())
 	assert_int(loaded.level_count).is_equal(4)
-	assert_str(String(loaded.rooms[1].id)).is_equal("room_2")
-	assert_that(loaded.rooms[1].origin).is_equal(Vector2i(3, 4))
+	var last: RoomState = loaded.rooms[loaded.rooms.size() - 1]
+	assert_str(String(last.id)).is_equal(String(lab.id))
+	assert_that(last.origin).is_equal(Vector2i(3, 4))
 
 
 ## The whole GameState round trip keeps the base and validates.
 func test_game_state_round_trip() -> void:
 	var state := GameState.new_game(7)
-	state.base.add_room(&"room_lab", 1, Vector2i(1, 1))
+	state.base.add_room(&"room_physics_lab", 1, Vector2i(1, 1))
 	var data: Dictionary = JSON.parse_string(JSON.stringify(state.to_dict()))
 	assert_array(GameState.validate_dict(data)).is_empty()
 	assert_dict(GameState.from_dict(data).base.to_dict()).is_equal(state.base.to_dict())
@@ -65,7 +51,7 @@ func test_validate_rejects_bad_data() -> void:
 		{"rooms": [5]},
 	]
 	for change: Dictionary in cases:
-		var data: Dictionary = BaseState.starting().to_dict()
+		var data: Dictionary = StartingBase.build(BalanceConfig.new()).to_dict()
 		data.merge(change, true)
 		(
 			assert_array(BaseState.validate_dict(data))
@@ -89,7 +75,7 @@ func test_validate_rejects_bad_rooms() -> void:
 		{"origin": [36, 0]},
 	]
 	for change: Dictionary in cases:
-		var data: Dictionary = BaseState.starting().to_dict()
+		var data: Dictionary = StartingBase.build(BalanceConfig.new()).to_dict()
 		var rooms: Array = data["rooms"]
 		var room: Dictionary = rooms[0]
 		room.merge(change, true)
@@ -98,8 +84,9 @@ func test_validate_rejects_bad_rooms() -> void:
 			. override_failure_message(str(change))
 			. is_not_empty()
 		)
-	var twice: Dictionary = BaseState.starting().to_dict()
+	var twice: Dictionary = StartingBase.build(BalanceConfig.new()).to_dict()
 	var twice_rooms: Array = twice["rooms"]
 	var first: Dictionary = twice_rooms[0]
 	twice_rooms.append(first.duplicate())
-	assert_array(BaseState.validate_dict(twice)).contains(["rooms 1: duplicate id 'room_1'"])
+	var dup: String = "rooms %d: duplicate id 'room_1'" % (twice_rooms.size() - 1)
+	assert_array(BaseState.validate_dict(twice)).contains([dup])
