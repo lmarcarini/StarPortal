@@ -241,7 +241,7 @@ fittings, corridors darker. A cell is 24 px, so a level is 864 × 480 px at 1× 
 +------------------------------------------------------------------------------------+ 0
 | top bar: date, clock controls, money $11,400k, Save/Load                     40 px |
 | tabs: F1 Gate Room | F2 Archive | F3 Base | F4 ... | F5 ...                   28 px |
-| power [GG|C|A|CHARGE 26 MW ........|      ] 30 MW   Capacitors 214/400 MWh   [P] |
+| power [GG|C|A|CHARGE 26 MW ........|      ] 30 MW    Capacitors 214/400 MWh    [P] |
 +------+-------------------------------------------------------------+---------------+ 96
 | L1   |  LEVEL 3                                                    | SELECTED      |
 | L2   |  +--------+      +================+                        | Physics Lab   |
