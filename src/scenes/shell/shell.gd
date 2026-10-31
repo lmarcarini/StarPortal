@@ -92,6 +92,9 @@ func quick_load() -> void:
 		if result.error_code == &"missing_file":
 			_show_toast(&"UI_QUICK_SAVE_MISSING")
 			return
+		if result.error_code == &"old_format_version":
+			_show_toast(&"UI_LOAD_OLD_SAVE")
+			return
 		push_warning("Shell: quick load failed: %s %s" % [result.error_code, result.detail])
 		_show_toast(&"UI_LOAD_FAILED")
 		return

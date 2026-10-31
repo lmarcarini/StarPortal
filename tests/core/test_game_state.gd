@@ -181,6 +181,7 @@ func test_to_dict_sections() -> void:
 			"flags",
 			"gate",
 			"power",
+			"base",
 			"worlds",
 			"archive",
 			"address_book",

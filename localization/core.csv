@@ -12,6 +12,7 @@ UI_TIME_SLOWER,Slower,Mais devagar
 UI_TIME_FASTER,Faster,Mais rápido
 UI_SAVE_FAILED,Could not save the game,Não foi possível salvar o jogo
 UI_LOAD_FAILED,Could not load the game,Não foi possível carregar o jogo
+UI_LOAD_OLD_SAVE,This save is from an older build and can't be loaded. Start a new game.,Este salvamento é de uma versão anterior e não pode ser carregado. Comece um novo jogo.
 UI_QUICK_SAVE_MISSING,No quick save yet,Ainda não há salvamento rápido
 UI_AUTOSAVE_FAILED,Autosave failed,Falha no salvamento automático
 UI_DEBUG_TITLE,Debug,Depuração

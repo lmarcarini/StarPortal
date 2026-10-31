@@ -1,0 +1,84 @@
+{
+	"format_version": 10,
+	"game_version": "0.0.0",
+	"saved_at_unix": 1793474142,
+	"state": {
+		"address_book": {
+			"entries": []
+		},
+		"archive": {
+			"read": {
+				"doc_sill_order": true
+			},
+			"received": [
+				"doc_sill_order",
+				"doc_sill_sketch"
+			],
+			"received_tick": {
+				"doc_sill_order": 0,
+				"doc_sill_sketch": 0
+			}
+		},
+		"clock": {
+			"holds": [],
+			"mode": "paused",
+			"mode_after_hold": "paused",
+			"speed_index": 1,
+			"tick": 60
+		},
+		"flags": {
+			"fixture_v10": true
+		},
+		"gate": {
+			"connected_world_id": "",
+			"current_address": null,
+			"dial_log": [],
+			"dial_started_tick": -1,
+			"is_hostile": false,
+			"lock_energy_mwh": "0000000000000000",
+			"lock_started_tick": -1,
+			"mode": "idle"
+		},
+		"operations_log": {
+			"entries": [
+				{
+					"args": {
+						"document_id": "doc_sill_order"
+					},
+					"kind": "document",
+					"tick": 0,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"document_id": "doc_sill_sketch"
+					},
+					"kind": "document",
+					"tick": 0,
+					"world_id": ""
+				}
+			]
+		},
+		"power": {
+			"banks_installed": 0,
+			"capacity_mwh": "0000000000000000",
+			"install_ticks_left": 300,
+			"plant_output_mw": "403e000000000000",
+			"stored_mwh": "0000000000000000"
+		},
+		"random": {
+			"base_seed": "20261031",
+			"streams": {}
+		},
+		"worlds": {
+			"consoles_read": {},
+			"galaxy_seed": "535468442604154636",
+			"generator_version": 1,
+			"horizon_records": {},
+			"pole_camera_ticks_left": 0,
+			"pole_camera_world_id": "",
+			"statuses": {}
+		}
+	},
+	"tick": 60
+}

@@ -78,6 +78,7 @@ func test_outbox_is_transient() -> void:
 			"flags",
 			"gate",
 			"power",
+			"base",
 			"worlds",
 			"archive",
 			"address_book",

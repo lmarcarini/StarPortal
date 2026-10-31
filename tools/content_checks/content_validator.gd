@@ -29,7 +29,8 @@ static func run(
 	return errors
 
 
-## Checks 2, 3, 4, the balance tunables and the documents: everything that needs no generated
+## Checks 2, 3, 4, the balance tunables, the rooms and the documents: everything that needs no
+## generated
 ## galaxy.
 static func _check_content(registry: RegistryScript) -> Array[String]:
 	var errors: Array[String] = []
@@ -40,6 +41,10 @@ static func _check_content(registry: RegistryScript) -> Array[String]:
 		ContentCheckGlyphs.check(glyphs, ContentSource.read_keys(ContentSource.GLYPH_TABLE))
 	)
 	errors.append_array(ContentCheckBalance.check(registry.balance()))
+	var rooms: Array[RoomDef] = []
+	for def: DefBase in registry.get_all_of(RoomDef):
+		rooms.append(def as RoomDef)
+	errors.append_array(ContentCheckRooms.check(rooms))
 	var field: AnchorFieldDef = ContentSource.home_field(registry)
 	for def: DefBase in registry.get_all_of(AnchorFieldDef):
 		var each: AnchorFieldDef = def as AnchorFieldDef
