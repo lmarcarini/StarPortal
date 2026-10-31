@@ -49,12 +49,14 @@ func _enter_tree() -> void:
 	EventBus.tick_advanced.connect(_on_tick_advanced)
 	EventBus.horizon_record_taken.connect(_on_record_taken)
 	EventBus.wormhole_closed.connect(_on_wormhole_closed)
+	EventBus.dial_resolved.connect(_on_dial_resolved)
 
 
 func _exit_tree() -> void:
 	EventBus.tick_advanced.disconnect(_on_tick_advanced)
 	EventBus.horizon_record_taken.disconnect(_on_record_taken)
 	EventBus.wormhole_closed.disconnect(_on_wormhole_closed)
+	EventBus.dial_resolved.disconnect(_on_dial_resolved)
 
 
 func _notification(what: int) -> void:
@@ -244,8 +246,12 @@ func _set_enlarged(is_enlarged: bool) -> void:
 
 
 func _on_tick_advanced(_tick: int) -> void:
-	if _phase == Phase.DEVELOPING:
+	if _phase == Phase.DEVELOPING or _phase != _phase_of(_simulation):
 		refresh()
+
+
+func _on_dial_resolved(_outcome: int, _address_key: String) -> void:
+	refresh()
 
 
 func _on_record_taken(_world_id_taken: StringName) -> void:
