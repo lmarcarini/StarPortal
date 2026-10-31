@@ -55,13 +55,14 @@ var galaxy: GalaxyCatalogue = null
 ## RandomState.derive_seed(base_seed, &"galaxy") and the generator version is
 ## WorldGenerator.GENERATOR_VERSION. With a [param balance], power starts at
 ## PowerState.starting(balance) and the budget at BudgetState.starting(balance); without one
-## they are all zero. The base is BaseState.starting().
+## they are all zero. The base is StartingBase.build() over [param balance], or over the
+## BalanceConfig defaults without one.
 static func new_game(base_seed: int, balance: BalanceConfig = null) -> GameState:
 	var state := GameState.new()
 	state.random.base_seed = base_seed
 	state.worlds.galaxy_seed = RandomState.derive_seed(base_seed, &"galaxy")
 	state.worlds.generator_version = WorldGenerator.GENERATOR_VERSION
-	state.base = BaseState.starting()
+	state.base = StartingBase.build(balance if balance != null else BalanceConfig.new())
 	if balance != null:
 		state.power = PowerState.starting(balance)
 		state.budget = BudgetState.starting(balance)

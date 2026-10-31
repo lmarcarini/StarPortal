@@ -45,7 +45,7 @@ enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://localization/core.en.translation", "res://localization/core.pt_BR.translation", "res://localization/gate.en.translation", "res://localization/gate.pt_BR.translation", "res://localization/glyphs.en.translation", "res://localization/glyphs.pt_BR.translation", "res://localization/clues.en.translation", "res://localization/clues.pt_BR.translation", "res://localization/archive.en.translation", "res://localization/archive.pt_BR.translation", "res://localization/documents.en.translation", "res://localization/documents.pt_BR.translation")
+locale/translations=PackedStringArray("res://localization/core.en.translation", "res://localization/core.pt_BR.translation", "res://localization/gate.en.translation", "res://localization/gate.pt_BR.translation", "res://localization/glyphs.en.translation", "res://localization/glyphs.pt_BR.translation", "res://localization/clues.en.translation", "res://localization/clues.pt_BR.translation", "res://localization/archive.en.translation", "res://localization/archive.pt_BR.translation", "res://localization/documents.en.translation", "res://localization/documents.pt_BR.translation", "res://localization/base.en.translation", "res://localization/base.pt_BR.translation")
 pseudolocalization/expansion_ratio=0.3
 
 [physics]

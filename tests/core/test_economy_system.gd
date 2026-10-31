@@ -22,6 +22,7 @@ func _defs() -> Array[RoomDef]:
 
 func _state() -> GameState:
 	var state := GameState.new_game(1, BalanceConfig.new())
+	state.base.rooms.clear()
 	state.base.add_room(&"room_lab", 1, Vector2i(0, 0))
 	state.base.add_room(&"room_plant", 1, Vector2i(10, 0))
 	return state
@@ -36,8 +37,8 @@ func test_month_adds_allocation_and_subtracts_upkeep() -> void:
 
 func test_off_room_pays_half_and_unbuilt_pays_nothing() -> void:
 	var state := _state()
+	state.base.rooms[0].powered_on = false
 	state.base.rooms[1].powered_on = false
-	state.base.rooms[2].powered_on = false
 	state.base.add_room(&"room_lab", 2, Vector2i(0, 0)).build_ticks_left = 5
 	var by_id: Dictionary[StringName, RoomDef] = {}
 	for def: RoomDef in _defs():
@@ -74,3 +75,12 @@ func test_lift_shaft_pays_once() -> void:
 	for def: RoomDef in _defs():
 		by_id[def.id] = def
 	assert_int(EconomySystem.monthly_upkeep_k(state.base, by_id)).is_equal(210 + 10)
+
+
+func test_starting_base_upkeep_is_240k() -> void:
+	var defs: GameDefs = GameDefs.from_registry(Registry)
+	var by_id: Dictionary[StringName, RoomDef] = {}
+	for def: RoomDef in defs.rooms:
+		by_id[def.id] = def
+	var state := GameState.new_game(1, defs.balance)
+	assert_int(EconomySystem.monthly_upkeep_k(state.base, by_id)).is_equal(240)

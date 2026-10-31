@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RoomDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/room_def.gd" id="1_room"]
+
+; Numbers from docs/content/m2-base.md section 1.
+[resource]
+script = ExtResource("1_room")
+size_cells = Vector2i(5, 4)
+rotatable = true
+build_cost_k = 2000
+build_ticks = 14400
+power_draw_mw = 0.0
+fixed = false
+always_on = false
+power_output_mw = 30.0
+max_charge_rate_mw = 0.0
+upkeep_k = 150
+name_key = &"ROOM_POWER_PLANT_NAME"
+description_key = &"ROOM_POWER_PLANT_DESC"
+id = &"room_power_plant"
