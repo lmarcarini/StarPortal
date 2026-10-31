@@ -10,5 +10,6 @@ rotatable = true
 build_cost_k = 500
 build_ticks = 720
 power_draw_mw = 0.0
+upkeep_k_per_month = 10
 fixed = false
 id = &"room_capacitor_bank"

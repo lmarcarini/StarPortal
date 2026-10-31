@@ -10,5 +10,6 @@ rotatable = true
 build_cost_k = 1200
 build_ticks = 1440
 power_draw_mw = 2.0
+upkeep_k_per_month = 60
 fixed = false
 id = &"room_lab"
