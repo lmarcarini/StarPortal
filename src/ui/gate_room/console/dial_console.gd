@@ -21,7 +21,6 @@ signal address_changed(address: GateAddress)
 const HINT_IDLE: StringName = &"CONSOLE_HINT_IDLE"
 ## Notice key when a glyph is clicked with all seven seals set.
 const NOTICE_ALL_SET: StringName = &"CONSOLE_ALL_SET"
-## Notice key when a glyph already in a seal is clicked.
 ## How long a notice replaces the hint, in real seconds.
 const NOTICE_SECONDS: float = 2.5
 
