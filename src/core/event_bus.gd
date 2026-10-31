@@ -59,6 +59,9 @@ signal capacitors_installed(capacity_mwh: float)
 ## through the outbox).
 @warning_ignore("unused_signal")
 signal horizon_record_taken(world_id: StringName)
+## Emitted when the budget changes, with the new balance in $k (posted through the outbox).
+@warning_ignore("unused_signal")
+signal budget_changed(budget_k: int)
 ## Emitted when the player reads a far Ring's console, with that world's id (posted through
 ## the outbox).
 @warning_ignore("unused_signal")
