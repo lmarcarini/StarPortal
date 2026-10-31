@@ -57,11 +57,14 @@ func test_default_bindings() -> void:
 	_assert_keys(service, &"time_slower", [KEY_MINUS, KEY_KP_SUBTRACT])
 	_assert_keys(service, &"quick_save", [KEY_F5])
 	_assert_keys(service, &"quick_load", [KEY_F9])
-	_assert_keys(service, &"debug_toggle_overlay", [KEY_F3])
+	_assert_keys(service, &"debug_toggle_overlay", [KEY_F12])
 	_assert_keys(service, &"view_next", [KEY_E])
 	_assert_keys(service, &"view_previous", [KEY_Q])
 	_assert_keys(service, &"view_gate_room", [KEY_F1])
 	_assert_keys(service, &"view_archive", [KEY_F2])
+	_assert_keys(service, &"view_base", [KEY_F3])
+	_assert_keys(service, &"base_level_up", [KEY_PAGEUP])
+	_assert_keys(service, &"base_level_down", [KEY_PAGEDOWN])
 	_assert_pad(service, &"time_toggle_pause", [JOY_BUTTON_START])
 	_assert_trigger(service, &"time_faster", JOY_AXIS_TRIGGER_RIGHT)
 	_assert_trigger(service, &"time_slower", JOY_AXIS_TRIGGER_LEFT)
@@ -72,6 +75,9 @@ func test_default_bindings() -> void:
 	_assert_pad(service, &"view_previous", [JOY_BUTTON_LEFT_SHOULDER])
 	_assert_pad(service, &"view_gate_room", [])
 	_assert_pad(service, &"view_archive", [])
+	_assert_pad(service, &"view_base", [])
+	_assert_pad(service, &"base_level_up", [JOY_BUTTON_Y])
+	_assert_pad(service, &"base_level_down", [JOY_BUTTON_X])
 
 
 ## No two default bindings of one device kind are the same event, so the defaults pass the

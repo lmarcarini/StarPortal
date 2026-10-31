@@ -2,7 +2,8 @@ class_name BaseView
 extends GameView
 ## The Base tab (F3): the level column, the plan of the shown level and the selected-room
 ## panel (docs/content/m2-base.md section 6). Read only for now; building and the energy layer
-## come later. PageUp and PageDown, or (Y) and (X), change level.
+## come later. The base_level_up and base_level_down actions (PageUp and PageDown, (Y) and
+## (X)) change level.
 ## Bible: docs/content/m2-base.md section 6, game-design.md#base-building-and-power
 
 var _simulation: Simulation = null
@@ -72,20 +73,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
-## -1 for the level above (PageUp, (Y)), +1 for the one below (PageDown, (X)), else 0.
+## -1 for the level above (base_level_up), +1 for the one below (base_level_down), else 0.
 static func _level_step(event: InputEvent) -> int:
-	var key: InputEventKey = event as InputEventKey
-	if key != null and key.pressed and not key.echo:
-		if key.physical_keycode == KEY_PAGEUP:
-			return -1
-		if key.physical_keycode == KEY_PAGEDOWN:
-			return 1
-	var button: InputEventJoypadButton = event as InputEventJoypadButton
-	if button != null and button.pressed:
-		if button.button_index == JOY_BUTTON_Y:
-			return -1
-		if button.button_index == JOY_BUTTON_X:
-			return 1
+	if InputActions.is_new_press(event, &"base_level_up"):
+		return -1
+	if InputActions.is_new_press(event, &"base_level_down"):
+		return 1
 	return 0
 
 
@@ -128,7 +121,9 @@ func _on_selection_changed(selected: StringName) -> void:
 func _balance() -> BalanceConfig:
 	if _simulation.state.balance != null:
 		return _simulation.state.balance
-	return Registry.balance()
+	if Registry.balance() != null:
+		return Registry.balance()
+	return BalanceConfig.new()
 
 
 static func _room_defs() -> Dictionary:

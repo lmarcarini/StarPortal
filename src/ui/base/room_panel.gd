@@ -6,12 +6,12 @@ extends VBoxContainer
 ## Bible: docs/content/m2-base.md section 6
 
 var _heading: Label = _add_label(16)
-var _name: Label = _add_label(20)
-var _size: Label = _add_label(14)
-var _draw_line: Label = _add_label(14)
-var _upkeep: Label = _add_label(14)
-var _status: Label = _add_label(14)
-var _description: Label = _add_label(14)
+var _name: Label = _add_label(22)
+var _size: Label = _add_label(16)
+var _draw_line: Label = _add_label(16)
+var _upkeep: Label = _add_label(16)
+var _status: Label = _add_label(16)
+var _description: Label = _add_label(16)
 
 
 ## Shows nothing selected.
