@@ -82,6 +82,7 @@ func test_transient_references_are_never_saved() -> void:
 			"flags",
 			"gate",
 			"power",
+			"base",
 			"worlds",
 			"archive",
 			"address_book",
