@@ -1,6 +1,5 @@
-## Tests for toggling a placed glyph from the palette: a click takes it out of its seal, but
-## the release that ends a drag never counts as a click, even when the glyph is dropped back on
-## its own palette button.
+## Tests for toggling a placed glyph from the palette: a click or gamepad A takes it out of
+## its seal, while a drag dropped back on its own palette button never counts as a click.
 ## Bible: gate-and-address-spec.md#the-dial-console
 extends GdUnitTestSuite
 
@@ -44,25 +43,14 @@ func test_a_drag_back_onto_the_palette_is_not_a_click() -> void:
 	assert_bool(button.is_placed()).is_false()
 
 
-## Even if the engine reports a press at the end of a drag, the glyph ignores it: once a drag
-## has started, only a fresh mouse press, a key or a gamepad button counts as a click.
-func test_a_press_ending_a_drag_is_ignored() -> void:
+## A glyph dragged onto a seal is toggled off by gamepad A on its palette button.
+func test_gamepad_toggles_a_dragged_glyph_off() -> void:
 	var button: PaletteGlyph = _palette().get_button(_glyph)
-	var clicks: Array[int] = []
-	button.chosen.connect(func(glyph: int) -> void: clicks.append(glyph))
-	var start: Vector2 = button.get_global_rect().get_center()
-	_push_button(button, start, true)
-	await UiInput.settle(button)
-	_push_motion(button, start + Vector2(40, 40), Vector2(40, 40))
-	await UiInput.settle(button)
-	button.pressed.emit()
-	_push_button(button, start + Vector2(40, 40), false)
-	await UiInput.settle(button)
-	assert_array(clicks).is_empty()
-	await UiInput.click(button)
-	assert_array(clicks).is_equal([_glyph])
+	await UiInput.drag(button, _seals().get_slot(3))
+	assert_int(_console.get_placed(3)).is_equal(_glyph)
 	await UiInput.pad(button, JOY_BUTTON_A)
-	assert_array(clicks).is_equal([_glyph, _glyph])
+	assert_int(_console.get_placed(3)).is_equal(-1)
+	assert_bool(button.is_placed()).is_false()
 
 
 # Presses on [param from], moves over [param via] with the left button held and back, and

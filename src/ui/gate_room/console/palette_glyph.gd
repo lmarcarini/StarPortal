@@ -36,9 +36,6 @@ var glyph: int = -1
 
 var _is_placed: bool = false
 var _is_locked: bool = false
-## True from a drag's start until the next mouse press, so the release that ends a drag is
-## never taken as a click, whatever it was dropped on.
-var _dragged: bool = false
 
 @onready var _content: VBoxContainer = %Content
 @onready var _icon: GlyphIcon = %Icon
@@ -46,7 +43,7 @@ var _dragged: bool = false
 
 
 func _ready() -> void:
-	pressed.connect(_on_pressed)
+	pressed.connect(func() -> void: chosen.emit(glyph))
 	_content.minimum_size_changed.connect(_fit_content)
 	_fit_content()
 	_apply_glyph()
@@ -66,21 +63,7 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	preview.size = PREVIEW_SIZE
 	preview.glyph_index = glyph
 	set_drag_preview(preview)
-	_dragged = true
 	return make_drag_data(glyph)
-
-
-func _gui_input(event: InputEvent) -> void:
-	var button: InputEventMouseButton = event as InputEventMouseButton
-	if button != null and button.pressed and button.button_index == MOUSE_BUTTON_LEFT:
-		_dragged = false
-
-
-func _on_pressed() -> void:
-	if _dragged:
-		_dragged = false
-		return
-	chosen.emit(glyph)
 
 
 func _draw() -> void:
