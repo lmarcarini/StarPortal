@@ -10,6 +10,5 @@ rotatable = false
 build_cost_k = 0
 build_ticks = 0
 power_draw_mw = 5.0
-upkeep_k_per_month = 0
 fixed = true
 id = &"room_gate"

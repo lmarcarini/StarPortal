@@ -22,10 +22,6 @@ static func check(
 			errors.append("room %s: build_cost_k %d is negative" % [room.id, room.build_cost_k])
 		if room.build_ticks < 0:
 			errors.append("room %s: build_ticks %d is negative" % [room.id, room.build_ticks])
-		if room.upkeep_k_per_month < 0:
-			errors.append(
-				"room %s: upkeep_k_per_month %d is negative" % [room.id, room.upkeep_k_per_month]
-			)
 		if not (is_finite(room.power_draw_mw) and room.power_draw_mw >= 0.0):
 			errors.append("room %s: power_draw_mw is not finite and at least 0" % room.id)
 	return errors
