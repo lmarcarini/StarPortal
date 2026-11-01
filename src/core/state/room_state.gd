@@ -1,9 +1,11 @@
 class_name RoomState
 extends RefCounted
 ## Saved state of one room placed in the base: which RoomDef it is, where it stands, whether it
-## is turned, how long until it is built and whether the player has switched it on.
+## is turned, how long until it is built or demolished, which site it is built with and whether
+## the player has switched it on.
 ## Saved shape: {"id", "def_id", "level", "origin": [x, y], "rotated", "build_ticks_left",
-## "powered_on"}.
+## "powered_on", "demolish_ticks_left", "site"}. The last two are optional when loading
+## (older saves): missing means 0 and "".
 ## Bible: game-design.md#base-building-and-power, technical-architecture.md#data-model
 
 ## Saved keys holding whole numbers of at least 0.
@@ -23,6 +25,11 @@ var rotated: bool = false
 var build_ticks_left: int = 0
 ## The player's switch for this room (read by the energy layer).
 var powered_on: bool = true
+## Ticks of demolition left; 0 means not being demolished. A room being demolished is off.
+var demolish_ticks_left: int = 0
+## Id of the site this room is built with when it shares one with other rooms (a corridor run,
+## a lift shaft, stairs); empty when the room is its own site. See site_key().
+var site: StringName = &""
 
 
 ## Returns a room of [param def_id] with instance [param room_id] at [param origin] on
@@ -43,6 +50,16 @@ func is_built() -> bool:
 	return build_ticks_left == 0
 
 
+## True while the room is being demolished.
+func is_demolishing() -> bool:
+	return demolish_ticks_left > 0
+
+
+## The id of the construction site the room belongs to: [member site], or its own id.
+func site_key() -> StringName:
+	return id if site.is_empty() else site
+
+
 ## Returns JSON-safe data for saving.
 func to_dict() -> Dictionary:
 	return {
@@ -53,6 +70,8 @@ func to_dict() -> Dictionary:
 		"rotated": rotated,
 		"build_ticks_left": build_ticks_left,
 		"powered_on": powered_on,
+		"demolish_ticks_left": demolish_ticks_left,
+		"site": String(site),
 	}
 
 
@@ -67,13 +86,16 @@ static func from_dict(data: Dictionary) -> RoomState:
 	room.rotated = data.get("rotated") is bool and data["rotated"]
 	room.build_ticks_left = read_count(data.get("build_ticks_left"))
 	room.powered_on = not (data.get("powered_on") is bool) or data["powered_on"]
+	room.demolish_ticks_left = read_count(data.get("demolish_ticks_left"))
+	room.site = StringName(str(data.get("site", "")))
 	return room
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "id" and
 ## "def_id" non-empty Strings, "level" a whole number of at least 1, "build_ticks_left" one of
 ## at least 0,
-## "origin" a cell of two whole numbers of at least 0, "rotated" and "powered_on" bools.
+## "origin" a cell of two whole numbers of at least 0, "rotated" and "powered_on" bools; when
+## present, "demolish_ticks_left" a whole number of at least 0 and "site" a String.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in ["id", "def_id"]:
@@ -89,6 +111,10 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	for key: String in ["rotated", "powered_on"]:
 		if not data.get(key) is bool:
 			errors.append("'%s' is not a bool" % key)
+	if data.has("demolish_ticks_left") and not is_count(data["demolish_ticks_left"]):
+		errors.append("'demolish_ticks_left' is not a whole number of at least 0")
+	if data.has("site") and not data["site"] is String:
+		errors.append("'site' is not a String")
 	return errors
 
 

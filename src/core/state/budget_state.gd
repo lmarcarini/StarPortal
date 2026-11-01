@@ -39,6 +39,13 @@ func spend(cost_k: int) -> StringName:
 	return error
 
 
+## Adds [param amount_k] (at least 0), e.g. a refund. Call only from Command.apply() or
+## SimSystem.tick().
+func credit(amount_k: int) -> void:
+	assert(amount_k >= 0, "BudgetState.credit() needs an amount of at least 0")
+	funds_k += maxi(0, amount_k)
+
+
 ## Returns JSON-safe data for saving.
 func to_dict() -> Dictionary:
 	return {"funds_k": funds_k}

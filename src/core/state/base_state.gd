@@ -34,6 +34,40 @@ func add_room(def_id: StringName, level: int, origin: Vector2i) -> RoomState:
 	return room
 
 
+## Removes the room with id [param room_id], if any.
+func remove_room(room_id: StringName) -> void:
+	for index: int in rooms.size():
+		if rooms[index].id == room_id:
+			rooms.remove_at(index)
+			return
+
+
+## Adds a new deepest level that takes [param dig_ticks] (at least 1) to dig, and returns its
+## number. Call only from Command.apply().
+func start_dig(dig_ticks: int) -> int:
+	var level := LevelState.new()
+	level.dig_ticks_left = maxi(1, dig_ticks)
+	levels.append(level)
+	return levels.size()
+
+
+## The number of the level being dug, or 0 when none is.
+func digging_level() -> int:
+	for index: int in levels.size():
+		if not levels[index].is_dug():
+			return index + 1
+	return 0
+
+
+## Drops the level being dug, if it is the deepest (it holds no rooms). Returns true when one
+## was dropped.
+func cancel_dig() -> bool:
+	if levels.is_empty() or levels[-1].is_dug():
+		return false
+	levels.remove_at(levels.size() - 1)
+	return true
+
+
 ## Returns the room with instance id [param room_id], or null.
 func find_room(room_id: StringName) -> RoomState:
 	for room: RoomState in rooms:
@@ -79,7 +113,8 @@ static func from_dict(data: Dictionary) -> BaseState:
 ## Returns human-readable errors for saved [param data], empty when it is valid: every key
 ## present; "grid_size" two whole numbers of at least 1; "levels" a non-empty array of valid
 ## levels; "rooms" an array of valid rooms with unique ids, each on an existing level with its
-## origin inside the grid; "next_room_number" a whole number of at least 1. Footprints are not
+## origin inside the grid; "next_room_number" a whole number of at least 1 and above every
+## "room_<n>" id's number (so add_room() can never repeat an id). Footprints are not
 ## checked here: that needs the RoomDefs (BaseRules.fits()).
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
@@ -135,7 +170,20 @@ static func _room_place_errors(base: BaseState) -> Array[String]:
 			errors.append("rooms %d: level %d does not exist" % [index, room.level])
 		if not Rect2i(Vector2i.ZERO, base.grid_size).has_point(room.origin):
 			errors.append("rooms %d: origin %s is outside the grid" % [index, room.origin])
+		if _room_number(room.id) >= base.next_room_number:
+			errors.append("rooms %d: id '%s' is not below 'next_room_number'" % [index, room.id])
 	return errors
+
+
+## The n of a "room_<n>" id, or 0 for any other id.
+static func _room_number(room_id: StringName) -> int:
+	var text: String = String(room_id)
+	if not text.begins_with("room_"):
+		return 0
+	var digits: String = text.substr(5)
+	if not digits.is_valid_int():
+		return 0
+	return maxi(0, digits.to_int())
 
 
 static func _has_zero(cell: Vector2i) -> bool:

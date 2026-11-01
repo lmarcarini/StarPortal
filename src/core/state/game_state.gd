@@ -49,6 +49,8 @@ var balance: BalanceConfig = null
 ## The generated galaxy, read only. Transient: not in to_dict(); GameSetup.build() sets it
 ## from the saved galaxy seed and generator version.
 var galaxy: GalaxyCatalogue = null
+## Every RoomDef by id, read only. Transient: not in to_dict(); GameSetup.build() sets it.
+var room_defs: Dictionary[StringName, RoomDef] = {}
 
 
 ## Returns a fresh campaign state seeded with [param base_seed]. The galaxy seed is
