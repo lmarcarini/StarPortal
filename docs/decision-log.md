@@ -237,3 +237,10 @@ Each entry has four fields:
 - **Decision:** The banks keep charging at their rates while a wormhole is open; the open wormhole's 20 MWh/h drain is taken from the net flow. At the starting 26 MW the charge out-runs the drain; a wormhole closes on empty capacitors only when the total charge rate is below 20 MW. To be tuned in playtest.
 - **Reason:** It keeps the power and Ring rules simple and independent. Whether it makes open wormholes too cheap is a playtest question.
 - **Bible section:** [gate-and-address-spec.md#dialing-outcomes-and-energy](bible/gate-and-address-spec.md#dialing-outcomes-and-energy); details in [content/m2-base.md](content/m2-base.md) section 3
+
+## 2026-11-01 — Soak time budget raised to 90 s
+
+- **Date:** 2026-11-01
+- **Decision:** The soak test's wall-clock budget is 90 s, a ceiling for slow or shared machines; a normal run takes about 55 s. Making the per-tick power checks faster is a follow-up card.
+- **Reason:** At 60 s the soak failed now and then (exit 100) when it shared the CPU with another Godot run, with no fault in the game.
+- **Bible section:** [technical-architecture.md#testing-and-tooling](bible/technical-architecture.md#testing-and-tooling)

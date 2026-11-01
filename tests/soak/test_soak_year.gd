@@ -27,8 +27,9 @@ const YEAR_TICKS: int = YEAR_DAYS * TimeMath.TICKS_PER_DAY
 const YEAR_MONTHS: int = 12
 ## Slot the save-and-load run writes at every month close.
 const SLOT: StringName = &"soak_month"
-## Time budget of the whole test on CI, in milliseconds.
-const BUDGET_MSEC: int = 60000
+## Time budget of the whole test, in milliseconds: a ceiling for slow or shared machines, not
+## a target. A normal run takes about 55 s (decision log, 2026-11-01).
+const BUDGET_MSEC: int = 90000
 
 var _service: SaveServiceScript
 var _defs: GameDefs
