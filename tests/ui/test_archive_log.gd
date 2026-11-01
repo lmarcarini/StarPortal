@@ -25,7 +25,7 @@ func before() -> void:
 	var simulation: Simulation = built.value
 	_player = M15Player.new(simulation)
 	_player.step()
-	_player.install_bank()
+	_player.build_bank()
 	var miss: GateAddress = _player.address(MISS_GLYPHS)
 	_player.wait_for_charge(miss)
 	_player.dial(miss)

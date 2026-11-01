@@ -80,6 +80,7 @@ func _reload() -> void:
 	var loaded: GameState = GameState.from_dict(data)
 	loaded.balance = _state.balance
 	loaded.galaxy = _state.galaxy
+	loaded.room_defs = _state.room_defs
 	loaded.clock.is_paused = true
 	_state = loaded
 	_simulation = _simulation_over(loaded)

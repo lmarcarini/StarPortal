@@ -39,7 +39,8 @@ func _samples() -> Array[Command]:
 		DeliverDocumentCommand.create(&"doc_survey_note_1958"),
 		MarkDocumentReadCommand.create(&"doc_survey_note_1958"),
 		NoteAddressCommand.create("3-17-0-22-9-14-30-5", "dead world, safe"),
-		InstallCapacitorsCommand.new(),
+		SwitchRoomCommand.create(&"room_4", false),
+		SetChargeRateCommand.create(&"room_9", 26),
 		ReadConsoleCommand.new(),
 		ExtendPoleCameraCommand.new(),
 		PlaceRoomCommand.create(&"room_physics_lab", 2, Vector2i(3, 4), true),
@@ -147,13 +148,14 @@ func test_defaults_are_registered_lazily() -> void:
 				&"dial",
 				&"dig_level",
 				&"extend_pole_camera",
-				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
 				&"paint_corridor",
 				&"place_room",
 				&"read_console",
+				&"set_charge_rate",
 				&"set_flag",
+				&"switch_room",
 			]
 		)
 	)
@@ -177,14 +179,15 @@ func test_register_type_adds_a_type() -> void:
 				&"dial",
 				&"dig_level",
 				&"extend_pole_camera",
-				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
 				&"paint_corridor",
 				&"ping",
 				&"place_room",
 				&"read_console",
+				&"set_charge_rate",
 				&"set_flag",
+				&"switch_room",
 			]
 		)
 	)
@@ -210,13 +213,14 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"dial",
 				&"dig_level",
 				&"extend_pole_camera",
-				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
 				&"paint_corridor",
 				&"place_room",
 				&"read_console",
+				&"set_charge_rate",
 				&"set_flag",
+				&"switch_room",
 			]
 		)
 	)

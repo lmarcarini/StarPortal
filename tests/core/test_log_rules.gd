@@ -34,7 +34,7 @@ func _kinds(from: int) -> Array[StringName]:
 ## Plays SILL from a new game; returns the outcome of the dial before SILL.
 func _play_sill() -> DialLogEntry:
 	_player.step()
-	assert_int(_player.install_bank()).is_greater(0)
+	assert_int(_player.build_bank()).is_greater(0)
 	var miss: GateAddress = _player.address(MISS_GLYPHS)
 	assert_bool(_player.wait_for_charge(miss)).is_true()
 	var missed: DialLogEntry = _player.dial(miss)

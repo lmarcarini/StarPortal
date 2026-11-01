@@ -17,10 +17,11 @@ var _events: Array[StringName] = []
 func before_test() -> void:
 	var defs: GameDefs = GameDefs.from_registry(Registry)
 	_simulation = GameSetup.build(GameState.new_game(SEED, defs.balance), defs).value
-	var power: PowerState = _simulation.state.power
-	power.banks_installed = 1
-	power.capacity_mwh = BIG_BANK_MWH
-	power.stored_mwh = BIG_BANK_MWH
+	var state: GameState = _simulation.state
+	state.balance = defs.balance.duplicate()
+	state.balance.capacitor_bank_capacity_mwh = BIG_BANK_MWH
+	PowerFixture.add_bank(state)
+	state.power.stored_mwh = BIG_BANK_MWH
 	_events.clear()
 	_simulation.event_posted.connect(
 		func(event_name: StringName, _args: Array) -> void: _events.append(event_name)

@@ -82,7 +82,8 @@ static func capacity_mwh(state: GameState) -> float:
 		return 0.0
 	var banks: int = 0
 	for room: RoomState in state.base.rooms:
-		if is_standing(room) and is_bank(state.room_defs.get(room.def_id)):
+		var def: RoomDef = state.room_defs.get(room.def_id)
+		if is_standing(room) and is_bank(def):
 			banks += 1
 	return banks * state.balance.capacitor_bank_capacity_mwh
 

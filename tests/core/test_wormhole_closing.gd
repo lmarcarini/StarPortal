@@ -37,8 +37,8 @@ func _advance(ticks: int) -> void:
 		_simulation.advance_tick()
 
 
-## The lock drains 20 MW out of the 30 MW output for exactly 60 ticks, then closes with
-## &"timeout"; the bank gains only the 10 MW left over.
+## The lock drains 20 MWh per hour for exactly 60 ticks, then closes with &"timeout"; the
+## capacitors net the charge rate less the drain.
 func test_lock_drains_and_times_out_at_max_open_ticks() -> void:
 	var lock_tick: int = _state.gate.lock_started_tick
 	var stored_at_lock: float = _state.power.stored_mwh
@@ -49,7 +49,7 @@ func test_lock_drains_and_times_out_at_max_open_ticks() -> void:
 	_advance(1)
 	assert_array(_closes).is_equal([[[&"timeout"], lock_tick + 60]])
 	assert_int(_state.gate.mode).is_equal(GateState.RingMode.IDLE)
-	var net_mw: float = _state.balance.starting_plant_output_mw - _state.balance.open_drain_mw_8
+	var net_mw: float = DialFixture.CHARGE_RATE_MW - _state.balance.open_drain_mw_8
 	var expected: float = stored_at_lock + net_mw * 60.0 / PowerMath.TICKS_PER_HOUR
 	assert_float(_state.power.stored_mwh).is_equal_approx(expected, TOLERANCE)
 	_advance(1)
@@ -70,9 +70,9 @@ func test_player_closes_the_wormhole() -> void:
 	assert_int(GateQueries.open_ticks_left(_state)).is_equal(0)
 
 
-## Storage reaching 0 under a drain larger than the output closes it with &"power".
+## Capacitors reaching 0 under a drain larger than the charging close it with &"power".
 func test_empty_storage_under_a_larger_drain_closes_for_power() -> void:
-	_state.power.plant_output_mw = 5.0
+	_set_rate(5)
 	_state.power.stored_mwh = 0.6
 	_advance(2)
 	assert_array(_closes).is_empty()
@@ -83,14 +83,19 @@ func test_empty_storage_under_a_larger_drain_closes_for_power() -> void:
 	assert_int(_state.gate.mode).is_equal(GateState.RingMode.IDLE)
 
 
-## Empty storage is not enough: while the output covers the drain the wormhole stays open.
-func test_empty_storage_with_output_covering_the_drain_stays_open() -> void:
+## Empty capacitors close it even when the charging only matches the drain: the Ring never
+## draws on the supply (m2-base.md section 3).
+func test_empty_capacitors_close_even_when_charging_matches_the_drain() -> void:
 	_state.power.stored_mwh = 0.0
-	_state.power.plant_output_mw = _state.balance.open_drain_mw_8
-	_advance(10)
-	assert_array(_closes).is_empty()
-	assert_int(_state.gate.mode).is_equal(GateState.RingMode.LOCKED)
-	assert_float(_state.power.stored_mwh).is_equal(0.0)
+	_set_rate(roundi(_state.balance.open_drain_mw_8))
+	_advance(1)
+	assert_array(_closes).is_equal([[[&"power"], _state.clock.tick]])
+
+
+## Sets every bank's charge rate to [param mw].
+func _set_rate(mw: int) -> void:
+	for room_id: StringName in _state.power.charge_rates:
+		_state.power.charge_rates[room_id] = mw
 
 
 ## The CloseWormholeCommand is rejected with &"not_locked" once the wormhole has closed.

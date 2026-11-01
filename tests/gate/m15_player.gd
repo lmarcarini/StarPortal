@@ -78,13 +78,14 @@ func step() -> void:
 	ticks_run += 1
 
 
-## Installs the capacitor bank and runs the clock until it is in; returns the ticks it took,
-## or -1 when the install was refused or never finished.
-func install_bank() -> int:
-	if not simulation.submit(InstallCapacitorsCommand.new()).is_ok:
+## Builds a Capacitor Bank in the capacitor alcove (docs/content/m2-base.md section 3) and
+## runs the clock until it is charging; returns the ticks it took, or -1 when the build was
+## refused or never finished.
+func build_bank() -> int:
+	if not simulation.submit(PowerFixture.build_bank_in_alcove(state())).is_ok:
 		return -1
 	var started: int = state().clock.tick
-	while state().power.banks_installed == 0:
+	while state().power.charge_rates.is_empty():
 		if state().clock.tick - started > MAX_WAIT_TICKS:
 			return -1
 		step()
@@ -155,7 +156,7 @@ func reachable_console_entries() -> Array[AddressEntry]:
 		if entry.source != AddressEntry.Source.CONSOLE or entry.last_outcome >= 0:
 			continue
 		var target: GateAddress = parse_key(entry.address_key)
-		if GateQueries.lock_energy_mwh(state(), target) <= state().power.capacity_mwh:
+		if GateQueries.lock_energy_mwh(state(), target) <= PowerRules.capacity_mwh(state()):
 			found.push_front(entry)
 	return found
 

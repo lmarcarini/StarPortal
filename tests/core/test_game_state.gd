@@ -144,8 +144,7 @@ func _gate_power_worlds_state() -> GameState:
 		entry.energy_spent_mwh = 0.1 + 0.2
 		entry.world_id = &"" if kind == DialOutcome.Kind.NO_GATE else &"abydos"
 		state.gate.dial_log.append(entry)
-	state.power.banks_installed = 1
-	state.power.capacity_mwh = 400.0
+	state.power.charge_rates[&"room_1"] = 26
 	state.power.stored_mwh = 0.1 + 0.2
 	state.worlds.statuses[&"abydos"] = WorldsState.WorldStatus.LOCKED
 	state.worlds.statuses[&"chulak"] = WorldsState.WorldStatus.LOCKED
@@ -213,9 +212,9 @@ func test_validate_gate_power_worlds() -> void:
 		wrong[key] = []
 		assert_array(GameState.validate_dict(wrong)).is_equal(["'%s' is not an object" % key])
 	var bad_power := good.duplicate(true)
-	bad_power["power"]["stored_mwh"] = ExactFloat.encode(1000.0)
+	bad_power["power"]["stored_mwh"] = ExactFloat.encode(-1.0)
 	assert_array(GameState.validate_dict(bad_power)).is_equal(
-		["power: 'stored_mwh' is above 'capacity_mwh'"]
+		["power: 'stored_mwh' is not an exact float, finite and at least 0"]
 	)
 	for key: String in ["dial_started_tick", "lock_started_tick"]:
 		var late := good.duplicate(true)

@@ -32,7 +32,7 @@ func _new_player() -> M15Player:
 	assert_bool(built.is_ok).is_true()
 	var simulation: Simulation = built.value
 	var player := M15Player.new(simulation)
-	assert_int(player.install_bank()).is_greater(0)
+	assert_int(player.build_bank()).is_greater(0)
 	return player
 
 

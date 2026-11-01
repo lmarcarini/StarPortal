@@ -53,6 +53,11 @@ func validate(state: GameState) -> CommandResult:
 		return CommandResult.fail(&"no_switch")
 	if room.powered_on == on:
 		return CommandResult.ok()
+	return _power_check(state, def)
+
+
+## The power rules of the switch: the last plant stays on, and the change must fit the spare.
+func _power_check(state: GameState, def: RoomDef) -> CommandResult:
 	if not on and def.power_output_mw > 0.0 and _running_plants(state) <= 1:
 		return CommandResult.fail(&"last_plant")
 	var delta: float = def.power_draw_mw - def.power_output_mw

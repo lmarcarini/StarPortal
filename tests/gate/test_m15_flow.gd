@@ -1,6 +1,6 @@
 ## M1.5 and M1.6 end to end, headless, over the real data/ content: a scripted player who knows
 ## the approved answers starts a new game, finds the opening documents in the Archive, cannot
-## dial until the capacitor bank is installed, then enters SILL, LINTEL, MILESTONE and
+## dial until the Capacitor Bank is built as a room, then enters SILL, LINTEL, MILESTONE and
 ## STILLWATER in turn by clicking the real dial console (click to fill, click a slot to remove)
 ## and dials them at 10×; each lock drops the clock to 1×. After each lock it extends the pole
 ## camera for the next documents (the lock alone delivers none), reads the console (2 to 4
@@ -104,23 +104,27 @@ func _assert_start(player: M15Player) -> void:
 	assert_dict(player.state().worlds.statuses).is_empty()
 
 
-## Before the bank and while it installs, SILL's answer is refused for want of charge; the
-## install takes the balance's 360 ticks, after which the answer can be charged.
+## Before the bank and while it is built, SILL's answer is refused for want of charge; the
+## Capacitor Bank is built as a room in the capacitor alcove over its 360 build ticks, takes
+## the spare supply on the next tick, and the answer can then be charged.
 func _assert_no_dial_before_bank(player: M15Player) -> void:
 	var sill_glyphs: Array = M15Player.PUZZLES[0]["glyphs"]
 	var sill: GateAddress = player.address(sill_glyphs)
-	assert_float(player.state().power.capacity_mwh).is_equal(0.0)
+	var state: GameState = player.state()
+	assert_float(PowerRules.capacity_mwh(state)).is_equal(0.0)
 	_assert_dial_refused(player, sill)
-	assert_int(GateQueries.ticks_until_ready(player.state(), sill)).is_equal(-1)
-	assert_bool(player.simulation.submit(InstallCapacitorsCommand.new()).is_ok).is_true()
-	for _tick: int in _defs.balance.capacitor_bank_install_ticks - 1:
+	assert_int(GateQueries.ticks_until_ready(state, sill)).is_equal(-1)
+	assert_bool(player.simulation.submit(PowerFixture.build_bank_in_alcove(state)).is_ok).is_true()
+	var bank_def: RoomDef = state.room_defs[StartingBase.CAPACITOR_BANK_DEF]
+	assert_int(bank_def.build_ticks).is_equal(360)
+	for _tick: int in bank_def.build_ticks:
 		player.step()
-	assert_int(player.state().power.banks_installed).is_equal(0)
+	assert_bool(state.power.charge_rates.is_empty()).is_true()
 	_assert_dial_refused(player, sill)
 	player.step()
-	assert_int(player.state().power.banks_installed).is_equal(1)
-	assert_int(_defs.balance.capacitor_bank_install_ticks).is_equal(360)
-	assert_int(GateQueries.ticks_until_ready(player.state(), sill)).is_greater(0)
+	assert_array(state.power.charge_rates.values()).is_equal([26])
+	assert_float(PowerRules.allocated_mw(state)).is_equal(PowerRules.supply_mw(state))
+	assert_int(GateQueries.ticks_until_ready(state, sill)).is_greater(0)
 	player.rejections.clear()
 
 

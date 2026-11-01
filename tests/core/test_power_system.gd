@@ -1,27 +1,18 @@
-## Tests for PowerSystem: the placeholder plant charging the bank and the open drain, and the
-## capacitor bank install finishing. The charging tests start from an installed bank.
-## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy,
-## gate-and-address-spec.md#the-dial-console, game-design.md#base-building-and-power
+## Tests for PowerSystem: banks charge at their rate up to capacity, an open wormhole drains
+## them, a completed bank takes the spare supply, a gone bank is forgotten and allocation is
+## brought back within supply.
+## Bible: docs/content/m2-base.md section 3
 extends GdUnitTestSuite
 
 const TOLERANCE: float = 1e-9
 
-var _balance: BalanceConfig
 var _system: PowerSystem
 var _state: GameState
 
 
 func before_test() -> void:
-	_balance = BalanceConfig.new()
-	_system = PowerSystem.new(_balance)
-	_state = GameState.new_game(1, _balance)
-	_install_bank(_state.power)
-
-
-## Gives [param power] the one capacitor bank of the balance, already installed.
-func _install_bank(power: PowerState) -> void:
-	power.banks_installed = 1
-	power.capacity_mwh = _balance.capacitor_bank_capacity_mwh
+	_state = ConstructionFixture.state()
+	_system = PowerSystem.new(_state.balance)
 
 
 func _tick(count: int) -> void:
@@ -29,116 +20,103 @@ func _tick(count: int) -> void:
 		_system.tick(_state)
 
 
-func _lock_ring() -> void:
-	_state.gate.mode = GateState.RingMode.LOCKED
-
-
 ## The system's id is power.
 func test_id() -> void:
 	assert_str(String(_system.get_id())).is_equal("power")
 
 
-## An empty 400 MWh bank with 30 MW and an idle Ring holds 300 MWh after 10 hours.
-func test_idle_ring_charges_the_bank() -> void:
+## A bank charging at 26 MW holds 260 MWh after 10 hours and stops at 400 exactly.
+func test_bank_charges_at_its_rate_up_to_capacity() -> void:
+	PowerFixture.add_bank(_state, 26)
 	_tick(600)
-	assert_float(_state.power.stored_mwh).is_equal_approx(300.0, TOLERANCE)
-
-
-## The bank stops at its capacity, exactly.
-func test_bank_stops_at_capacity() -> void:
-	_tick(800)
-	assert_float(_state.power.stored_mwh).is_equal(400.0)
+	assert_float(_state.power.stored_mwh).is_equal_approx(260.0, TOLERANCE)
 	_tick(500)
 	assert_float(_state.power.stored_mwh).is_equal(400.0)
+	assert_float(PowerRules.allocated_mw(_state)).is_equal(30.0)
 
 
-## While LOCKED the 20 MW drain comes out of the output first: the bank gains 10 MW worth.
-func test_locked_ring_drain_comes_from_output_first() -> void:
-	_lock_ring()
-	_tick(60)
-	assert_float(_state.power.stored_mwh).is_equal_approx(10.0, TOLERANCE)
-
-
-## An output below the drain makes the bank lose the difference, and it stops at 0.
-func test_drain_above_output_empties_the_bank_and_stops_at_zero() -> void:
+## An open wormhole drains 20 MWh per hour from the capacitors, less the charging; at 0 it
+## stops.
+func test_open_wormhole_drains_the_capacitors() -> void:
+	PowerFixture.add_bank(_state, 5)
 	_state.power.stored_mwh = 100.0
-	_state.power.plant_output_mw = 5.0
-	_lock_ring()
+	_state.gate.mode = GateState.RingMode.LOCKED
 	_tick(60)
 	assert_float(_state.power.stored_mwh).is_equal_approx(85.0, TOLERANCE)
 	_tick(60 * 7)
 	assert_float(_state.power.stored_mwh).is_equal(0.0)
-	_tick(120)
-	assert_float(_state.power.stored_mwh).is_equal(0.0)
 
 
-## DIALING does not drain: only an open wormhole does.
-func test_dialing_ring_does_not_drain() -> void:
+## DIALING does not drain.
+func test_dialing_does_not_drain() -> void:
+	PowerFixture.add_bank(_state, 26)
 	_state.gate.mode = GateState.RingMode.DIALING
 	_tick(60)
-	assert_float(_state.power.stored_mwh).is_equal_approx(30.0, TOLERANCE)
+	assert_float(_state.power.stored_mwh).is_equal_approx(26.0, TOLERANCE)
 
 
-## Closing the wormhole ends the drain.
-func test_drain_follows_the_ring_mode() -> void:
-	_lock_ring()
-	_tick(60)
-	_state.gate.mode = GateState.RingMode.IDLE
-	_tick(60)
-	assert_float(_state.power.stored_mwh).is_equal_approx(40.0, TOLERANCE)
-
-
-## Zero capacity or zero output never produces NaN or infinity.
-func test_zero_capacity_and_zero_output_stay_finite() -> void:
-	_state.power.capacity_mwh = 0.0
-	_tick(10)
-	assert_float(_state.power.stored_mwh).is_equal(0.0)
-	_state.power = PowerState.starting(_balance)
-	_install_bank(_state.power)
-	_state.power.plant_output_mw = 0.0
-	_tick(10)
-	assert_float(_state.power.stored_mwh).is_equal(0.0)
-	_lock_ring()
-	_tick(10)
-	assert_float(_state.power.stored_mwh).is_equal(0.0)
-	assert_bool(is_finite(_state.power.stored_mwh)).is_true()
-
-
-## Without an install finishing, the system posts no events.
-func test_posts_no_events() -> void:
-	_lock_ring()
-	_tick(5)
-	assert_bool(_state.events.size() == 0).is_true()
-
-
-## A new game has no capacity: the plant runs but nothing is stored.
-func test_new_game_without_bank_stores_nothing() -> void:
-	_state.power = PowerState.starting(_balance)
+## No bank: nothing is stored, nothing is posted, nothing is NaN.
+func test_no_bank_stores_nothing() -> void:
+	_state.gate.mode = GateState.RingMode.LOCKED
 	_tick(120)
-	assert_float(_state.power.capacity_mwh).is_equal(0.0)
 	assert_float(_state.power.stored_mwh).is_equal(0.0)
-
-
-## The install counts down one tick per tick; on its last tick the bank's capacity is added,
-## capacitors_installed and the pause request are posted once, and charging follows.
-func test_install_finishes_on_its_last_tick() -> void:
-	_state.power = PowerState.starting(_balance)
-	_state.power.install_ticks_left = 360
-	_tick(359)
-	assert_int(_state.power.install_ticks_left).is_equal(1)
-	assert_float(_state.power.capacity_mwh).is_equal(0.0)
 	assert_int(_state.events.size()).is_equal(0)
+
+
+## A completed bank takes the spare supply (30 - 4 = 26 MW) once, posts capacitors_installed
+## with the capacity and a pause request, then charges.
+func test_completed_bank_takes_the_spare_supply() -> void:
+	var bank: RoomState = PowerFixture.add_bank(_state)
+	_state.power.charge_rates.erase(bank.id)
 	_tick(1)
-	assert_int(_state.power.install_ticks_left).is_equal(0)
-	assert_int(_state.power.banks_installed).is_equal(1)
-	assert_float(_state.power.capacity_mwh).is_equal(400.0)
-	assert_float(_state.power.stored_mwh).is_equal_approx(0.5, TOLERANCE)
+	assert_int(_state.power.charge_rates[bank.id]).is_equal(26)
 	var events: Array[SimEvent] = _state.events.drain()
-	assert_int(events.size()).is_equal(2)
-	assert_str(String(events[0].name)).is_equal("capacitors_installed")
+	var names: Array[String] = []
+	for event: SimEvent in events:
+		names.append(String(event.name))
+	assert_array(names).is_equal(
+		["capacitors_installed", "pause_requested", "power_allocation_changed"]
+	)
 	assert_array(events[0].args).is_equal([400.0])
-	assert_str(String(events[1].name)).is_equal("pause_requested")
 	assert_array(events[1].args).is_equal([&"capacitors_installed"])
-	_tick(60)
+	_tick(59)
+	assert_float(_state.power.stored_mwh).is_equal_approx(26.0, TOLERANCE)
 	assert_int(_state.events.size()).is_equal(0)
-	assert_float(_state.power.stored_mwh).is_equal_approx(30.5, TOLERANCE)
+
+
+## A bank under construction neither charges nor counts.
+func test_unbuilt_bank_does_nothing() -> void:
+	var bank: RoomState = PowerFixture.add_bank(_state)
+	_state.power.charge_rates.erase(bank.id)
+	bank.build_ticks_left = 10
+	_tick(5)
+	assert_bool(_state.power.charge_rates.has(bank.id)).is_false()
+	assert_float(PowerRules.capacity_mwh(_state)).is_equal(0.0)
+
+
+## A bank being demolished loses its rate, its capacity and the charge above what is left.
+func test_demolished_bank_loses_its_energy() -> void:
+	var first: RoomState = PowerFixture.add_bank(_state, 10)
+	PowerFixture.add_bank(_state, 10)
+	_state.power.stored_mwh = 700.0
+	first.demolish_ticks_left = 30
+	_tick(1)
+	assert_bool(_state.power.charge_rates.has(first.id)).is_false()
+	assert_float(PowerRules.capacity_mwh(_state)).is_equal(400.0)
+	assert_float(_state.power.stored_mwh).is_equal(400.0)
+
+
+## A room completing beyond the supply is switched off; then, if still over, the newest
+## switchable rooms go off and charge rates come down until allocation fits.
+func test_over_allocation_is_shed() -> void:
+	var bank: RoomState = PowerFixture.add_bank(_state, 26)
+	var lab: RoomState = _state.base.add_room(&"room_physics_lab", 2, Vector2i(20, 2))
+	_tick(1)
+	assert_bool(lab.powered_on).is_false()
+	assert_int(_state.power.charge_rates[bank.id]).is_equal(26)
+	assert_int(_state.events.size()).is_equal(1)
+	_state.power.charge_rates[bank.id] = 30
+	_tick(1)
+	assert_bool(PowerFixture.first_room(_state, &"room_archive").powered_on).is_false()
+	assert_int(_state.power.charge_rates[bank.id]).is_equal(27)
+	assert_float(PowerRules.allocated_mw(_state)).is_equal(PowerRules.supply_mw(_state))

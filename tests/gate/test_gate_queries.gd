@@ -24,25 +24,27 @@ func test_lock_energy_matches_energy_math() -> void:
 	assert_float(expected).is_greater_equal(_state.balance.lock_energy_base_mwh)
 
 
-## A full bank is ready now; an empty one counts the ticks at the plant output.
+## A full bank is ready now; an empty one counts the ticks at the charge rate.
 func test_ticks_until_ready() -> void:
 	assert_int(GateQueries.ticks_until_ready(_state, _address)).is_equal(0)
 	_state.power.stored_mwh = 0.0
 	var needed: float = GateQueries.lock_energy_mwh(_state, _address)
-	var expected: int = PowerMath.ticks_until_mwh(0.0, needed, _state.power.plant_output_mw)
+	var expected: int = PowerMath.ticks_until_mwh(0.0, needed, DialFixture.CHARGE_RATE_MW)
 	assert_int(GateQueries.ticks_until_ready(_state, _address)).is_equal(expected)
 	assert_int(expected).is_greater(0)
 
 
-## Never ready: a lock energy above the capacity, no output, or a drain at least the output.
+## Never ready: a lock energy above the capacity, no charging, or a drain at least the
+## charging.
 func test_ticks_until_ready_never() -> void:
 	_state.power.stored_mwh = 0.0
-	_state.power.capacity_mwh = 10.0
+	_state.balance.capacitor_bank_capacity_mwh = 10.0
 	assert_int(GateQueries.ticks_until_ready(_state, _address)).is_equal(-1)
-	_state.power.capacity_mwh = DialFixture.CAPACITY_MWH
-	_state.power.plant_output_mw = 0.0
+	_state.balance.capacitor_bank_capacity_mwh = DialFixture.CAPACITY_MWH
+	var bank: StringName = _state.power.charge_rates.keys()[0]
+	_state.power.charge_rates[bank] = 0
 	assert_int(GateQueries.ticks_until_ready(_state, _address)).is_equal(-1)
-	_state.power.plant_output_mw = _state.balance.open_drain_mw_8
+	_state.power.charge_rates[bank] = roundi(_state.balance.open_drain_mw_8)
 	_state.gate.mode = GateState.RingMode.LOCKED
 	assert_int(GateQueries.ticks_until_ready(_state, _address)).is_equal(-1)
 
