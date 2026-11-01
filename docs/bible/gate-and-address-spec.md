@@ -58,11 +58,11 @@ E_{lock} = E_{base} \times \left(1 + \frac{d}{d_{ref}}\right) \times M_{seals}
 | E\_base | 300 MWh |
 | d\_ref | 10,000 light years |
 | M\_seals | 1 for 8 seals, 25 for 9, 400 for 10 |
-| Open drain | 20 MW (8 seals), 200 MW (9), set by the story for 10 |
+| Open drain | 20 MWh per hour from the capacitors (8 seals), 200 MW (9), set by the story for 10 |
 | Starting plant | Diesel, 30 MW output |
-| Starting storage | None. The first capacitor bank (400 MWh) is installed from the Gate Room, taking 6 in-game hours, before the first dial |
+| Starting storage | None. The first capacitor bank (400 MWh) is built as a room in the alcove beside the Gate Room (the Gate Room's Build capacitor bank button leads there) before the first dial; it charges at the power the player allocates to it |
 
-At these values an early dial needs most of a day's spare output to charge. An open wormhole can outrun the plant, which forces the player to shed rooms. Dialing nine seals before the Halvane tap means tapping the national grid, which causes a regional blackout and an Exposure spike. Incoming wormholes cost the dialing side, never CAIRN.
+At these values an early dial needs most of a day's spare output to charge. An open wormhole drains the capacitors and closes when they run empty, so holding one open means keeping enough plant output on charging. Dialing nine seals before the Halvane tap means tapping the national grid, which causes a regional blackout and an Exposure spike. Incoming wormholes cost the dialing side, never CAIRN.
 
 **Seal telemetry**, an early Gate technology, improves No gate results. It reports how many glyphs of the attempt appear in the nearest real address. This gives deduction a hot-or-cold signal without making brute force viable.
 

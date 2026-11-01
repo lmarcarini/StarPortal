@@ -24,7 +24,7 @@ The look is Cold War bureaucratic science fiction: pre-rendered rooms with baked
 Rooms and characters are modelled in Blender and rendered to sprites. This gives rich lighting at the cost of a 2D game, which suits low-end PCs.
 
 1. **Model** each room in Blender on a shared grid, so every room fits a slot.
-2. **Render** with a fixed three-quarter orthographic camera (about 60 degrees down) for base rooms; staff are dots on the plan, full sprites only in the Gate Room and cutscenes (the Gate Room view is a fixed perspective shot through the control room glass) at twice the target size, with baked lighting.
+2. **Render** with a fixed straight top-down orthographic camera for base rooms (warm sodium lighting, concrete, furniture visible from above); staff are dots on the plan, full sprites only in the Gate Room and cutscenes (the Gate Room view is a fixed perspective shot through the control room glass) at twice the target size, with baked lighting.
 3. **Post-process** in a script: palette quantisation, light dither, grain. The script is the same for every asset, so the style stays consistent.
 4. **Export** variants per room: idle, active, damaged, alarm-lit.
 5. **Characters:** one rigged base body with swappable uniforms, rendered as sprite sheets facing left and right, with walk, work and idle cycles.

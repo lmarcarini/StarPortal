@@ -35,7 +35,7 @@ These are settled; changing one means editing this table first, then every tab t
 | Time model | Real time with pause. One tick = one in-game minute; at 1× a tick is one real second. Speeds: pause, 1×, 3×, 10×. |
 | Structure | Campaign of a prologue plus seven arcs, with sandbox elements and free play after the ending |
 | Setting | An unnamed Western government. Other governments appear as factions |
-| Presentation | Hybrid (decided 2026-10-26). The Gate Room is one fixed illustrated view through the control room glass: the Ring is the clickable centrepiece, the dial console is the desk below it. The base is a separate three-quarter plan, FTL style; the Archive, Expeditions and Command are instrument screens. The drone feed is the one first-person, real-time low-poly view. Papers, Please-inspired look |
+| Presentation | Hybrid (decided 2026-10-26). The Gate Room is one fixed illustrated view through the control room glass: the Ring is the clickable centrepiece, the dial console is the desk below it. The base is a separate straight top-down plan in a lit-diorama look, FTL style; the Archive, Expeditions and Command are instrument screens. The drone feed is the one first-person, real-time low-poly view. Papers, Please-inspired look |
 | Engine | Godot 4 (latest stable 4.x, pinned), statically typed GDScript, Compatibility renderer |
 | Platform and store | PC, low requirements. Steam, considered only once the game proves good enough |
 | Input and accessibility | Fully playable with keyboard and mouse or gamepad; every binding remappable; accessibility options from the first build |
