@@ -67,6 +67,20 @@ signal budget_changed(budget_k: int)
 @warning_ignore("unused_signal")
 signal console_read(world_id: StringName)
 
+## Emitted when a construction site starts, with its site id (posted through the outbox).
+@warning_ignore("unused_signal")
+signal room_build_started(site_id: StringName)
+## Emitted when a construction site finishes, with its site id (posted through the outbox).
+@warning_ignore("unused_signal")
+signal room_built(site_id: StringName)
+## Emitted when a demolished room (all its levels) is gone, with its site id (posted through
+## the outbox).
+@warning_ignore("unused_signal")
+signal room_demolished(site_id: StringName)
+## Emitted when a new level is dug, with its number (posted through the outbox).
+@warning_ignore("unused_signal")
+signal level_dug(level: int)
+
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared
 ## name, so a system can never fake a tick, a day, a pause or a save. pause_requested is

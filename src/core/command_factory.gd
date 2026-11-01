@@ -61,6 +61,11 @@ static func register_defaults() -> void:
 	_types[InstallCapacitorsCommand.TYPE] = InstallCapacitorsCommand
 	_types[ReadConsoleCommand.TYPE] = ReadConsoleCommand
 	_types[ExtendPoleCameraCommand.TYPE] = ExtendPoleCameraCommand
+	_types[PlaceRoomCommand.TYPE] = PlaceRoomCommand
+	_types[PaintCorridorCommand.TYPE] = PaintCorridorCommand
+	_types[CancelBuildCommand.TYPE] = CancelBuildCommand
+	_types[DemolishRoomCommand.TYPE] = DemolishRoomCommand
+	_types[DigLevelCommand.TYPE] = DigLevelCommand
 
 
 ## Drops every registration, so tests can restore a clean registry. The built-in types are

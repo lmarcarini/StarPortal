@@ -90,3 +90,27 @@ func test_validate_rejects_bad_rooms() -> void:
 	twice_rooms.append(first.duplicate())
 	var dup: String = "rooms %d: duplicate id 'room_1'" % (twice_rooms.size() - 1)
 	assert_array(BaseState.validate_dict(twice)).contains([dup])
+
+
+## next_room_number at or below an existing room's number is rejected: add_room() would repeat
+## an id.
+func test_validate_rejects_next_room_number_not_above_ids() -> void:
+	var base := BaseState.new()
+	base.levels.append(LevelState.new())
+	base.grid_size = Vector2i(10, 10)
+	base.add_room(&"room_quarters", 1, Vector2i(1, 1))
+	base.add_room(&"room_quarters", 1, Vector2i(5, 1))
+	var data: Dictionary = base.to_dict()
+	assert_array(BaseState.validate_dict(data)).is_empty()
+	data["next_room_number"] = 2
+	assert_array(BaseState.validate_dict(data)).is_not_empty()
+
+
+func test_start_and_cancel_dig() -> void:
+	var base := BaseState.new()
+	base.levels.append(LevelState.new())
+	assert_int(base.start_dig(50)).is_equal(2)
+	assert_int(base.digging_level()).is_equal(2)
+	assert_bool(base.cancel_dig()).is_true()
+	assert_int(base.level_count).is_equal(1)
+	assert_bool(base.cancel_dig()).is_false()

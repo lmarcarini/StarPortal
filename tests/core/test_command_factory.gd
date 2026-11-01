@@ -42,6 +42,11 @@ func _samples() -> Array[Command]:
 		InstallCapacitorsCommand.new(),
 		ReadConsoleCommand.new(),
 		ExtendPoleCameraCommand.new(),
+		PlaceRoomCommand.create(&"room_physics_lab", 2, Vector2i(3, 4), true),
+		PaintCorridorCommand.create(1, [Vector2i(1, 1), Vector2i(2, 1)]),
+		CancelBuildCommand.create(&"room_7"),
+		DemolishRoomCommand.create(&"room_3"),
+		DigLevelCommand.new(),
 	]
 
 
@@ -135,13 +140,18 @@ func test_defaults_are_registered_lazily() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"cancel_build",
 				&"close_wormhole",
 				&"deliver_document",
+				&"demolish_room",
 				&"dial",
+				&"dig_level",
 				&"extend_pole_camera",
 				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
+				&"paint_corridor",
+				&"place_room",
 				&"read_console",
 				&"set_flag",
 			]
@@ -160,14 +170,19 @@ func test_register_type_adds_a_type() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"cancel_build",
 				&"close_wormhole",
 				&"deliver_document",
+				&"demolish_room",
 				&"dial",
+				&"dig_level",
 				&"extend_pole_camera",
 				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
+				&"paint_corridor",
 				&"ping",
+				&"place_room",
 				&"read_console",
 				&"set_flag",
 			]
@@ -188,13 +203,18 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"cancel_build",
 				&"close_wormhole",
 				&"deliver_document",
+				&"demolish_room",
 				&"dial",
+				&"dig_level",
 				&"extend_pole_camera",
 				&"install_capacitors",
 				&"mark_document_read",
 				&"note_address",
+				&"paint_corridor",
+				&"place_room",
 				&"read_console",
 				&"set_flag",
 			]

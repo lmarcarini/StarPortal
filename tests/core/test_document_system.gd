@@ -282,4 +282,4 @@ func test_documents_system_runs_after_gate() -> void:
 	var ids: Array[StringName] = []
 	for system: SimSystem in simulation._systems:
 		ids.append(system.get_id())
-	assert_array(ids).is_equal([&"power", &"gate", &"documents", &"economy"])
+	assert_array(ids).is_equal([&"power", &"gate", &"documents", &"economy", &"construction"])
