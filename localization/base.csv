@@ -23,3 +23,23 @@ ROOM_STAIRS_NAME,Stairs,Escada
 ROOM_STAIRS_DESC,Joins one level to the next.,Liga um nível ao seguinte.
 ROOM_CORRIDOR_NAME,Corridor,Corredor
 ROOM_CORRIDOR_DESC,Connects rooms. One cell.,Liga as salas. Uma célula.
+BASE_TITLE,Base,Base
+BASE_LEVEL_SHORT,L{n},N{n}
+BASE_LEVEL_DIGGING,L{n} ~{days}d,N{n} ~{days}d
+BASE_LEVEL_HEADING,LEVEL {n},NÍVEL {n}
+BASE_PANEL_SELECTED,SELECTED,SELECIONADO
+BASE_PANEL_NONE,"Click a room, or move the cursor and press Enter or (A), to see it here.","Clique numa sala, ou mova o cursor e aperte Enter ou (A), para vê-la aqui."
+BASE_PANEL_SIZE,Size {w} × {h} cells,Tamanho {w} × {h} células
+BASE_PANEL_DRAW,Draw {mw} MW,Consumo {mw} MW
+BASE_PANEL_OUTPUT,Output +{mw} MW,Geração +{mw} MW
+BASE_PANEL_NO_DRAW,No power draw,Sem consumo de energia
+BASE_PANEL_UPKEEP,Upkeep ${k}k / month,Manutenção ${k} mil / mês
+BASE_PANEL_NO_UPKEEP,No upkeep,Sem manutenção
+BASE_STATUS_ON,On,Ligada
+BASE_STATUS_OFF,Off,Desligada
+BASE_STATUS_ALWAYS_ON,Always on,Sempre ligada
+BASE_STATUS_BUILDING,Under construction: {days} d left,Em obras: faltam {days} d
+BASE_STATUS_SITE,Marked site,Local demarcado
+BASE_ALCOVE_NAME,Capacitor alcove,Nicho dos capacitores
+BASE_ALCOVE_DESC,Marked site for the first Capacitor Bank.,Local reservado para o primeiro Banco de Capacitores.
+BASE_ALCOVE_LABEL,SITE,LOCAL

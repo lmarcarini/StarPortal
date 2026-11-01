@@ -3,8 +3,8 @@ extends Control
 ## Hosts the game views under a tab bar and shows one at a time. Each child of %Views is a
 ## [GameView]; its id is its node name in snake_case ([code]GateRoom[/code] is
 ## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
-## (view_next and view_previous wrap at the ends; view_gate_room, view_archive) and the
-## gamepad shoulders switch views. Hidden views stay in the tree and keep their own state,
+## (view_next and view_previous wrap at the ends; view_gate_room, view_archive, view_base)
+## and the gamepad shoulders switch views. Hidden views stay in the tree and keep their own state,
 ## but are invisible, do not process and cannot take focus or the mouse. Only the view root's
 ## own process, focus and mouse modes are changed, and showing the view restores the values
 ## it had before it was hidden; descendants inherit and keep their own settings.
@@ -23,6 +23,8 @@ signal view_changed(view_id: StringName)
 const GATE_ROOM: StringName = &"gate_room"
 ## Id of the Archive view.
 const ARCHIVE: StringName = &"archive"
+## Id of the Base view.
+const BASE: StringName = &"base"
 
 const _ACTION_NEXT: StringName = &"view_next"
 const _ACTION_PREVIOUS: StringName = &"view_previous"
@@ -30,6 +32,7 @@ const _ACTION_PREVIOUS: StringName = &"view_previous"
 const _DIRECT_ACTIONS: Dictionary = {
 	&"view_gate_room": GATE_ROOM,
 	&"view_archive": ARCHIVE,
+	&"view_base": BASE,
 }
 
 var _ids: Array[StringName] = []
@@ -77,8 +80,9 @@ func setup(simulation: Simulation) -> void:
 		_views[id].setup(simulation)
 
 
-## Shows the view [param view_id] ([constant GATE_ROOM], [constant ARCHIVE]), hides the
-## others and gives focus to its default control. An unknown id warns and changes nothing.
+## Shows the view [param view_id] ([constant GATE_ROOM], [constant ARCHIVE],
+## [constant BASE]), hides the others and gives focus to its default control. An unknown id
+## warns and changes nothing.
 func show_view(view_id: StringName) -> void:
 	if not _views.has(view_id):
 		push_warning("ViewSwitcher: unknown view %s" % view_id)

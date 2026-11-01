@@ -61,7 +61,7 @@ func test_view_actions_switch_views_in_the_shell() -> void:
 	await _press_action(&"time_toggle_pause")
 	assert_bool(SimClock.simulation.state.clock.is_paused).is_false()
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
-	assert_str(String(switcher.current_view_id())).is_equal("gate_room")
+	assert_str(String(switcher.current_view_id())).is_equal("base")
 	assert_int(SimClock.simulation.state.clock.speed_index).is_equal(1)
 
 

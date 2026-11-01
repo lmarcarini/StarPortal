@@ -23,6 +23,9 @@ const ACTIONS: Array[StringName] = [
 	&"view_previous",
 	&"view_gate_room",
 	&"view_archive",
+	&"view_base",
+	&"base_level_up",
+	&"base_level_down",
 ]
 
 ## Gamepad bindings added to Godot's built-in UI actions at start-up, as {action: [encoded]},
@@ -89,7 +92,7 @@ const DEFAULTS: Dictionary = {
 	},
 	&"debug_toggle_overlay":
 	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F3}],
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F12}],
 		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_BACK}],
 	},
 	&"view_next":
@@ -123,6 +126,21 @@ const DEFAULTS: Dictionary = {
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F2}],
 		GAMEPAD: [],
+	},
+	&"view_base":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F3}],
+		GAMEPAD: [],
+	},
+	&"base_level_up":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_PAGEUP}],
+		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_Y}],
+	},
+	&"base_level_down":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_PAGEDOWN}],
+		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_X}],
 	},
 }
 

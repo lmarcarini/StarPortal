@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://src/ui/views/view_switcher.gd" id="1_view_switcher"]
 [ext_resource type="PackedScene" path="res://src/ui/views/gate_room/gate_room_view.tscn" id="2_gate_room"]
 [ext_resource type="PackedScene" path="res://src/ui/views/archive/archive_view.tscn" id="3_archive"]
+[ext_resource type="PackedScene" path="res://src/ui/views/base/base_view.tscn" id="4_base"]
 
 [node name="ViewSwitcher" type="Control"]
 layout_mode = 3
@@ -40,4 +41,7 @@ mouse_filter = 2
 layout_mode = 1
 
 [node name="Archive" parent="Layout/Views" instance=ExtResource("3_archive")]
+layout_mode = 1
+
+[node name="Base" parent="Layout/Views" instance=ExtResource("4_base")]
 layout_mode = 1

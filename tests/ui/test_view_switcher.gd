@@ -34,37 +34,45 @@ func after_test() -> void:
 
 
 func test_starts_on_the_gate_room_with_translated_tabs() -> void:
-	assert_array(_switcher.get_view_ids()).is_equal([&"gate_room", &"archive"])
+	assert_array(_switcher.get_view_ids()).is_equal([&"gate_room", &"archive", &"base"])
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	var tabs: TabBar = _switcher.get_tab_bar()
-	assert_int(tabs.tab_count).is_equal(2)
+	assert_int(tabs.tab_count).is_equal(3)
 	assert_str(tabs.get_tab_title(0)).is_equal("Gate Room")
 	assert_str(tabs.get_tab_title(1)).is_equal("Archive")
+	assert_str(tabs.get_tab_title(2)).is_equal("Base")
 	TranslationServer.set_locale("pt_BR")
 	await _runner.simulate_frames(2)
 	assert_str(tabs.get_tab_title(0)).is_equal("Sala do Portal")
 	assert_str(tabs.get_tab_title(1)).is_equal("Arquivo")
 	assert_str(_view(&"gate_room").get_title_key()).is_equal("GATE_ROOM_TITLE")
 	assert_str(_view(&"archive").get_title_key()).is_equal("ARCHIVE_TITLE")
+	assert_str(_view(&"base").get_title_key()).is_equal("BASE_TITLE")
 
 
 func test_view_actions_switch_and_wrap() -> void:
 	await _press_action(&"view_next")
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"view_next")
+	assert_str(String(_switcher.current_view_id())).is_equal("base")
+	await _press_action(&"view_next")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
+	await _press_action(&"view_previous")
+	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _press_action(&"view_previous")
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"view_previous")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
+	await _press_action(&"view_base")
+	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _press_action(&"view_archive")
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"view_archive")
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"view_gate_room")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
-	var expected: Array[StringName] = [&"gate_room", &"archive", &"gate_room", &"archive"]
-	expected.append_array([&"gate_room", &"archive", &"gate_room"])
+	var expected: Array[StringName] = [&"gate_room", &"archive", &"base", &"gate_room"]
+	expected.append_array([&"base", &"archive", &"gate_room", &"base", &"archive", &"gate_room"])
 	assert_array(_changes).is_equal(expected)
 
 
@@ -77,10 +85,12 @@ func test_default_keys_and_gamepad_shoulders_switch_views() -> void:
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _runner.simulate_key_pressed(KEY_Q)
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
-	await _press_joypad(JOY_BUTTON_LEFT_SHOULDER)
-	assert_str(String(_switcher.current_view_id())).is_equal("archive")
+	await _runner.simulate_key_pressed(KEY_F3)
+	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
+	await _press_joypad(JOY_BUTTON_LEFT_SHOULDER)
+	assert_str(String(_switcher.current_view_id())).is_equal("base")
 
 
 func test_switching_focuses_the_new_views_default_control() -> void:
@@ -148,9 +158,9 @@ func test_view_action_on_an_axis_fires_once_per_pull() -> void:
 	await _move_axis(JOY_AXIS_RIGHT_X, [0.1, 0.4, 0.8, 1.0, 1.0, 0.6, 0.3, 0.0])
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	await _move_axis(JOY_AXIS_RIGHT_X, [0.9, 1.0, 0.0])
-	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
+	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _move_axis(JOY_AXIS_RIGHT_X, [-0.9, -1.0, 0.0])
-	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
+	assert_str(String(_switcher.current_view_id())).is_equal("base")
 
 
 ## Hiding and showing a view restores its root's own modes and leaves a descendant that is
@@ -182,7 +192,7 @@ func test_hidden_view_keeps_its_nodes() -> void:
 
 
 func test_unknown_view_changes_nothing() -> void:
-	_switcher.show_view(&"base")
+	_switcher.show_view(&"no_such_view")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	assert_array(_changes).is_equal([&"gate_room"])
 
@@ -194,7 +204,7 @@ func test_setup_reaches_every_view_again_and_again() -> void:
 	spy.name = "Spy"
 	switcher.get_node("%Views").add_child(spy)
 	await _run(switcher)
-	assert_array(_switcher.get_view_ids()).is_equal([&"gate_room", &"archive", &"spy"])
+	assert_array(_switcher.get_view_ids()).is_equal([&"gate_room", &"archive", &"base", &"spy"])
 	assert_bool(spy.visible).is_false()
 	var first := Simulation.new(GameState.new_game(1))
 	var second := Simulation.new(GameState.new_game(2))
