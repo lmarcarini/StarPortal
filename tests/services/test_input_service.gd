@@ -120,7 +120,7 @@ func test_rebind_refuses_conflict_and_names_other_action() -> void:
 
 	var pad: Result = service.rebind(&"quick_save", GAMEPAD, 0, _button(JOY_BUTTON_BACK))
 	assert_str(pad.error_code).is_equal(&"binding_conflict")
-	assert_str(pad.detail).is_equal("debug_toggle_overlay")
+	assert_str(pad.detail).is_equal("base_energy_layer")
 
 
 ## Conflicts are checked within one device kind only.
@@ -130,7 +130,7 @@ func test_find_conflict_is_per_device_kind() -> void:
 	assert_str(service.find_conflict(_key(KEY_SPACE), GAMEPAD)).is_equal(&"")
 	assert_str(service.find_conflict(_key(KEY_J), KEYBOARD)).is_equal(&"")
 	assert_str(service.find_conflict(_button(JOY_BUTTON_BACK), GAMEPAD)).is_equal(
-		&"debug_toggle_overlay"
+		&"base_energy_layer"
 	)
 
 

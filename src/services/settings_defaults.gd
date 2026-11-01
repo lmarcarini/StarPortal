@@ -49,5 +49,6 @@ const VALUES: Dictionary = {
 		&"view_base": {},
 		&"base_level_up": {},
 		&"base_level_down": {},
+		&"base_energy_layer": {},
 	},
 }

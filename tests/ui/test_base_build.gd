@@ -254,6 +254,27 @@ func test_every_catalogue_room_finds_a_valid_spot() -> void:
 		assert_bool(found).override_failure_message(String(def_id)).is_true()
 
 
+func test_energy_layer_and_ghost_do_not_fight() -> void:
+	var power: BaseViewPower = _view.get_power()
+	_view.place_capacitor_bank()
+	power.toggle_layer()
+	assert_bool(power.is_layer_on()).is_true()
+	assert_bool(_ghost().is_placing()).is_false()
+	_view.get_palette().get_room_button(&"room_quarters").pressed.emit()
+	assert_bool(power.is_layer_on()).is_false()
+	assert_bool(_ghost().is_placing()).is_true()
+	_view.place_capacitor_bank()
+	power.toggle_layer()
+	var button := InputEventJoypadButton.new()
+	button.button_index = JOY_BUTTON_A
+	button.pressed = true
+	get_viewport().push_input(button)
+	await _wait_hold()
+	button.pressed = false
+	get_viewport().push_input(button)
+	assert_int(_count(StartingBase.CAPACITOR_BANK_DEF)).is_equal(0)
+
+
 func _push_key(key: Key, pressed: bool) -> void:
 	var event := InputEventKey.new()
 	event.keycode = key

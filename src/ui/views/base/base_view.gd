@@ -1,9 +1,10 @@
 class_name BaseView
 extends GameView
 ## The Base tab (F3): the level column, the plan of the shown level and the selected-room
-## panel (docs/content/m2-base.md section 6), with the build palette under them (building is
-## wired in its own section below, through [BaseBuild]). The base_level_up and
-## base_level_down actions (PageUp and PageDown, (Y) and (X)) change level.
+## panel (docs/content/m2-base.md section 6), with the power strip, switches and energy layer
+## of [BaseViewPower] above them and the build palette under them (building is wired in its
+## own section below, through [BaseBuild]). The base_level_up and base_level_down actions
+## (PageUp and PageDown, (Y) and (X)) change level.
 ## Bible: docs/content/m2-base.md section 6, game-design.md#base-building-and-power
 
 var _simulation: Simulation = null
@@ -12,6 +13,8 @@ var _defs: Dictionary = {}
 var _signature: int = 0
 ## Building (card #140), wired in its own section at the end.
 var _build: BaseBuild = null
+## The power strip, switches and energy layer (card #141).
+var _power: BaseViewPower = BaseViewPower.new()
 
 @onready var _levels: LevelTabs = %LevelTabs
 @onready var _heading: Label = %LevelHeading
@@ -25,6 +28,7 @@ func _ready() -> void:
 	_plan.selection_changed.connect(_on_selection_changed)
 	_panel.show_nothing()
 	_ready_build()
+	_setup_power()
 
 
 func _enter_tree() -> void:
@@ -55,6 +59,7 @@ func setup(simulation: Simulation) -> void:
 	_show_level(gate_level(base))
 	_signature = signature(base)
 	_setup_build()
+	_power.setup(simulation)
 
 
 func get_default_focus() -> Control:
@@ -108,6 +113,7 @@ func _refresh() -> void:
 	_plan.queue_redraw()
 	_on_selection_changed(_plan.selected())
 	_refresh_build()
+	_power.refresh()
 
 
 func _on_tick_advanced(_tick: int) -> void:
@@ -143,6 +149,7 @@ static func signature(base: BaseState) -> int:
 
 
 func _on_selection_changed(selected: StringName) -> void:
+	_power.select(selected)
 	if selected == BasePlan.ALCOVE:
 		_panel.show_alcove(_def(StartingBase.CAPACITOR_BANK_DEF))
 		return
@@ -179,6 +186,21 @@ func _def(def_id: StringName) -> RoomDef:
 	return found if found is RoomDef else null
 
 
+# --- Power (card #141): the strip, the panel's switch and charge control, the energy layer.
+# All of it lives in BaseViewPower; the view only attaches it and passes the selection on.
+
+
+## Returns the power part of the tab, for tests.
+func get_power() -> BaseViewPower:
+	return _power
+
+
+func _setup_power() -> void:
+	_power.name = "Power"
+	add_child(_power)
+	_power.attach(_heading.get_parent() as Control, _plan, _panel)
+
+
 # --- Building (card #140): palette, placement ghost, panel actions, dig -------------------
 
 
@@ -192,6 +214,7 @@ func place_capacitor_bank() -> void:
 		return
 	var balance: BalanceConfig = _balance()
 	_show_level(balance.capacitor_alcove_level)
+	_close_energy_layer()
 	_build.place_at(bank.id, StartingBase.alcove(balance, bank).position)
 
 
@@ -208,6 +231,20 @@ func get_palette() -> BuildPalette:
 func _ready_build() -> void:
 	_build = BaseBuild.new(_plan, _palette, _panel)
 	_plan.selection_changed.connect(_build.show_action)
+	_palette.room_picked.connect(_close_energy_layer.unbind(1))
+	_power.layer.visibility_changed.connect(_on_energy_layer_toggled)
+
+
+## Placing a room closes the energy layer, so (A) on the plan builds and toggles nothing.
+func _close_energy_layer() -> void:
+	if _power.is_layer_on():
+		_power.toggle_layer()
+
+
+## Opening the energy layer puts the ghost away, so (A) toggles rooms and builds nothing.
+func _on_energy_layer_toggled() -> void:
+	if _power.is_layer_on() and _build.get_ghost().is_placing():
+		_build.get_ghost().stop(true)
 
 
 func _setup_build() -> void:
