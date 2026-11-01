@@ -353,6 +353,11 @@ func _random_value(rng: RandomNumberGenerator) -> Variant:
 ## next level whenever a dig is allowed and affordable; never submits a refused command.
 func _work_base(simulation: Simulation) -> void:
 	var state: GameState = simulation.state
+	if (
+		builds >= 2
+		and (state.base.digging_level() != 0 or digs >= state.balance.dig_level_costs_k.size())
+	):
+		return
 	var next: Command = null
 	if builds == 0:
 		var run: Array[Vector2i] = LAB_CORRIDOR.duplicate()

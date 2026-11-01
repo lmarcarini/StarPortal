@@ -56,7 +56,8 @@ class SoakRun:
 	var month_close_pending: bool = false
 	## Ticks after which stored power was below 0 or above the capacity.
 	var power_out_of_bounds: int = 0
-	## Ticks after which the budget was below 0 or above the start plus a year's allocations.
+	## Month closes after which the budget was below 0 or above the start plus a year's
+	## allocations (spending is validated, so only the month-end can break it).
 	var budget_out_of_bounds: int = 0
 
 	## Starts a run on a new game seeded with [param base_seed], built by GameSetup from
@@ -76,7 +77,7 @@ class SoakRun:
 		elif sums[PowerRules.DRAW] + PowerRules.charge_mw_of(state, sums) > sums[0]:
 			power_out_of_bounds += 1
 
-	## Counts the tick just run when the budget left 0 .. start + 12 allocations: the bot only
+	## Counts the month close just run when the budget left 0 .. start + 12 allocations: the bot only
 	## spends what it has and the allocation out-runs the upkeep.
 	func check_budget() -> void:
 		var balance: BalanceConfig = simulation.state.balance
@@ -180,10 +181,10 @@ func _play(run: SoakRun, reload_each_month: bool) -> void:
 			continue
 		run.simulation.advance_tick()
 		run.check_power()
-		run.check_budget()
 		if not run.month_close_pending:
 			continue
 		run.month_close_pending = false
+		run.check_budget()
 		if reload_each_month:
 			_reload(run)
 
@@ -268,7 +269,7 @@ func _assert_run_ring(run: SoakRun) -> void:
 
 
 ## Checks [param run] built the corridor run and the lab and dug both extra levels, and the
-## budget stayed in bounds on every tick.
+## budget stayed in bounds at every month close.
 func _assert_run_base(run: SoakRun) -> void:
 	var state: GameState = run.simulation.state
 	assert_int(run.budget_out_of_bounds).is_equal(0)
