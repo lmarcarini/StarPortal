@@ -148,7 +148,7 @@ static func _construction_errors(base: BaseState) -> Array[String]:
 	var errors: Array[String] = []
 	for index: int in base.levels.size():
 		if not base.levels[index].is_dug() and index != base.levels.size() - 1:
-			errors.append("levels %d: being dug but not the deepest level" % index)
+			errors.append("level %d: being dug but not the deepest level" % (index + 1))
 	for index: int in base.rooms.size():
 		var room: RoomState = base.rooms[index]
 		var on_level: bool = room.level >= 1 and room.level <= base.level_count

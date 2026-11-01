@@ -41,8 +41,9 @@ func get_type() -> StringName:
 
 
 ## Rejects a dig target with no dig running (&"no_dig"), a room that is not part of a site
-## still building (&"not_a_site") and a site whose removal leaves a room or site touching no
-## corridor, lift or stairs, counting rooms being demolished as gone
+## still building (&"not_a_site"), a site with a cell being demolished
+## (&"demolition_in_progress": no second refund) and a site whose removal leaves a room or
+## site touching no corridor, lift or stairs, counting rooms being demolished as gone
 ## (&"leaves_room_unconnected").
 func validate(state: GameState) -> CommandResult:
 	if target == DIG_TARGET:
@@ -53,6 +54,9 @@ func validate(state: GameState) -> CommandResult:
 	if room == null or not _is_building(state.base, room.site_key()):
 		return CommandResult.fail(&"not_a_site", String(target))
 	var rooms: Array[RoomState] = BaseRules.site_rooms(state.base, room.site_key())
+	for part: RoomState in rooms:
+		if part.is_demolishing():
+			return CommandResult.fail(&"demolition_in_progress")
 	if BaseRules.strands_a_room(state.base, state.room_defs, rooms):
 		return CommandResult.fail(&"leaves_room_unconnected")
 	return CommandResult.ok()

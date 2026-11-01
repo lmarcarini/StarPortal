@@ -141,3 +141,46 @@ func test_lift_rejects_a_level_out_of_range() -> void:
 	for level: int in [0, 4, 99]:
 		var result := PlaceRoomCommand.create(&"room_lift", level, Vector2i(2, 14)).validate(game)
 		assert_str(result.error_code).is_equal("no_such_level")
+
+
+## Funds spent minus funds refunded on [param game] since it started at 12000.
+func _net_cost(game: GameState) -> int:
+	return 12000 - game.budget.funds_k
+
+
+func test_cancel_refused_while_run_cells_are_demolished() -> void:
+	var game := _state()
+	var run: Array[Vector2i] = [
+		Vector2i(10, 16), Vector2i(10, 17), Vector2i(10, 18), Vector2i(10, 19)
+	]
+	var first: RoomState = _paint(game, run)
+	var system := ConstructionSystem.new()
+	ConstructionFixture.advance(game, system, 180)
+	var cells: Array[RoomState] = BaseRules.site_rooms(game.base, first.id)
+	for index: int in [2, 1, 0]:
+		ConstructionFixture.run(game, DemolishRoomCommand.create(cells[index].id))
+	var result := CancelBuildCommand.create(cells[3].id).validate(game)
+	assert_str(result.error_code).is_equal("demolition_in_progress")
+	assert_int(_net_cost(game)).is_greater_equal(0)
+
+
+## Every order of paint, demolish and cancel on one run, with the clock running between them,
+## refunds no more than the run cost.
+func test_refunds_never_exceed_cost_on_one_run() -> void:
+	var run: Array[Vector2i] = [Vector2i(10, 16), Vector2i(10, 17), Vector2i(10, 18)]
+	for plan: int in 81:
+		var game := _state()
+		var first: RoomState = _paint(game, run)
+		var system := ConstructionSystem.new()
+		var cells: Array[RoomState] = BaseRules.site_rooms(game.base, first.id)
+		var step_plan: int = plan
+		for step: int in 4:
+			var choice: int = step_plan % 3
+			step_plan /= 3
+			ConstructionFixture.advance(game, system, 60)
+			if choice == 1:
+				ConstructionFixture.run(game, CancelBuildCommand.create(cells[step % 3].id))
+			elif choice == 2:
+				ConstructionFixture.run(game, DemolishRoomCommand.create(cells[2 - step % 3].id))
+		ConstructionFixture.advance(game, system, 200)
+		assert_int(_net_cost(game)).is_greater_equal(0)
