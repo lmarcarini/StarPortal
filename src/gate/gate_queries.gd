@@ -17,19 +17,17 @@ static func lock_energy_mwh(state: GameState, address: GateAddress) -> float:
 	return EnergyMath.lock_energy_mwh(address, home_ly, state.galaxy.anchors_ly(), state.balance)
 
 
-## Returns the ticks until the bank holds the lock energy of [param address] at the current
-## plant output less any open drain: 0 when it already does, -1 when it never will (the
-## energy is above the bank's capacity, or the net flow is not positive).
+## Returns the ticks until the capacitors hold the lock energy of [param address] at the
+## current charge rates less any open drain: 0 when they already do, -1 when they never will
+## (the energy is above the capacity, or the net flow is not positive).
 static func ticks_until_ready(state: GameState, address: GateAddress) -> int:
 	var needed: float = lock_energy_mwh(state, address)
-	var power: PowerState = state.power
-	if power.stored_mwh >= needed:
+	var stored: float = state.power.stored_mwh
+	if stored >= needed:
 		return 0
-	if needed > power.capacity_mwh:
+	if needed > PowerRules.capacity_mwh(state):
 		return -1
-	var drain: float = PowerMath.drain_mw(state.gate, state.balance)
-	var net: float = PowerMath.net_flow_mw(power.plant_output_mw, drain)
-	return PowerMath.ticks_until_mwh(power.stored_mwh, needed, net)
+	return PowerMath.ticks_until_mwh(stored, needed, PowerRules.net_flow_mw(state))
 
 
 ## Returns the Dial Log entries whose address equals [param address] seal for seal, oldest

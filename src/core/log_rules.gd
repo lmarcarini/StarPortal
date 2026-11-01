@@ -48,11 +48,11 @@ static func _dial_entries(args: Array, state: GameState, tick: int) -> Array[Log
 	]
 
 
-## The "power" entry of a capacitors_installed event: banks installed and capacity in MWh.
+## The "power" entry of a capacitors_installed event: banks charging and capacity in MWh.
 static func _power_entry(args: Array, state: GameState, tick: int) -> LogEntry:
 	var capacity: float = args[0] if args.size() == 1 and args[0] is float else 0.0
 	var details: Dictionary = {
-		"banks": state.power.banks_installed, "capacity_mwh": roundi(capacity)
+		"banks": state.power.charge_rates.size(), "capacity_mwh": roundi(capacity)
 	}
 	return LogEntry.create(tick, &"power", &"", details)
 

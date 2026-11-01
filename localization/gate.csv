@@ -2,7 +2,6 @@ keys,en,pt_BR
 GATE_ROOM_TITLE,Gate Room,Sala do Portal
 GATE_DURATION_MINUTES,{minutes} min,{minutes} min
 GATE_DURATION_HOURS,{hours} h {minutes} min,{hours} h {minutes} min
-GATE_DURATION_WHOLE_HOURS,{hours} h,{hours} h
 GATE_ENERGY,{value} MWh,{value} MWh
 GATE_OUTCOME_NO_GATE,No gate,Sem portal
 GATE_OUTCOME_BLOCKED,Blocked,Bloqueado
@@ -31,8 +30,6 @@ GATE_DIAL_CAPACITORS_EMPTY,Capacitors empty.,Capacitores vazios.
 GATE_DIAL_REJECT_CHARGE,Not enough charge. The Ring would not turn.,Carga insuficiente. O Anel não chegou a girar.
 GATE_GAUGE_TITLE,Capacitors,Capacitores
 GATE_GAUGE_VALUES,{stored} of {capacity},{stored} de {capacity}
-GATE_GAUGE_INSTALL,Install capacitor bank ({duration}),Instalar banco de capacitores ({duration})
-GATE_GAUGE_INSTALLING,Installing: {left} left,Instalando: faltam {left}
 GATE_WORMHOLE_DESTINATION,Destination: {designation},Destino: {designation}
 GATE_WORMHOLE_TIME_LEFT,Time left: {left} of {total},Tempo restante: {left} de {total}
 GATE_WORMHOLE_DRAIN,Power drain: {power} MW,Consumo de energia: {power} MW

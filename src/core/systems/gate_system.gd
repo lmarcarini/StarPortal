@@ -2,7 +2,7 @@ class_name GateSystem
 extends SimSystem
 ## Runs CAIRN's Ring each tick, after PowerSystem: resolves a dial once its seals have engaged
 ## for [member BalanceConfig.dial_duration_ticks] ticks, and closes an open wormhole when it
-## times out or the power runs out. Reads the transient balance and galaxy on the state.
+## times out or the capacitors run empty. Reads the transient balance and galaxy on the state.
 ## [br][br]
 ## Timing: the Simulation advances the clock after every system has ticked, so the tick
 ## being run ends at clock tick + 1. A dial that started at tick S has engaged its seals
@@ -25,7 +25,7 @@ extends SimSystem
 
 ## Close reason when the wormhole reached its maximum open time.
 const REASON_TIMEOUT: StringName = &"timeout"
-## Close reason when storage ran empty under a drain larger than the plant output.
+## Close reason when the open wormhole drained the capacitors empty.
 const REASON_POWER: StringName = &"power"
 
 
@@ -78,10 +78,9 @@ func _resolve(state: GameState, end_tick: int) -> void:
 
 
 ## Returns why the open wormhole closes as [param end_tick] begins, or &"" when it stays open.
-## Power is checked first: storage is empty and the drain exceeds the plant output.
+## Power is checked first: the capacitors are empty (docs/content/m2-base.md section 3).
 func _close_reason(state: GameState, end_tick: int) -> StringName:
-	var drain: float = PowerMath.drain_mw(state.gate, state.balance)
-	if state.power.stored_mwh <= 0.0 and drain > state.power.plant_output_mw:
+	if state.power.stored_mwh <= 0.0:
 		return REASON_POWER
 	if end_tick - state.gate.lock_started_tick >= state.balance.max_open_ticks:
 		return REASON_TIMEOUT

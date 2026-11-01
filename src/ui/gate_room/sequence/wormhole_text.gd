@@ -47,11 +47,9 @@ static func bank(state: GameState) -> String:
 	var power: PowerState = state.power
 	var values: Dictionary = {
 		"stored": GateRoomFormat.energy(power.stored_mwh),
-		"capacity": GateRoomFormat.energy(power.capacity_mwh),
+		"capacity": GateRoomFormat.energy(PowerRules.capacity_mwh(state)),
 	}
-	var net: float = PowerMath.net_flow_mw(
-		power.plant_output_mw, PowerMath.drain_mw(state.gate, state.balance)
-	)
+	var net: float = PowerRules.net_flow_mw(state)
 	if net >= 0.0:
 		return _format(&"GATE_WORMHOLE_BANK_STEADY", values)
 	values["time"] = GateRoomFormat.duration(ticks_until_empty(power.stored_mwh, -net))
