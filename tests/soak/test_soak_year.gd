@@ -68,9 +68,10 @@ class SoakRun:
 	func check_power() -> void:
 		var state: GameState = simulation.state
 		var stored: float = state.power.stored_mwh
-		if is_nan(stored) or stored < 0.0 or stored > PowerRules.capacity_mwh(state):
+		var sums: PackedFloat64Array = PowerRules.totals(state)
+		if is_nan(stored) or stored < 0.0 or stored > PowerRules.capacity_of(state, sums):
 			power_out_of_bounds += 1
-		elif PowerRules.allocated_mw(state) > PowerRules.supply_mw(state):
+		elif sums[PowerRules.DRAW] + PowerRules.charge_mw_of(state, sums) > sums[0]:
 			power_out_of_bounds += 1
 
 	## Makes [param next] the simulation this run plays and listens to its signals.

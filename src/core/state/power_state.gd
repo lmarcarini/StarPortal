@@ -11,6 +11,17 @@ var stored_mwh: float = 0.0
 ## Charge rate of each Capacitor Bank that has been completed, in whole MW, by room id.
 ## PowerSystem adds a bank when it is completed and drops it when it is gone.
 var charge_rates: Dictionary[StringName, int] = {}
+## Transient, not saved: the base's rooms that give, draw or store power, and the key they were
+## gathered for (see PowerRules.powered_rooms()).
+var powered_rooms_cache: Array[RoomState] = []
+## Transient: the RoomDef of each room in [member powered_rooms_cache], by index.
+var powered_defs_cache: Array[RoomDef] = []
+## Transient: the base instance id, room count, next room number and RoomDef count the cache
+## was gathered for; -1 before the first gathering.
+var powered_rooms_base: int = -1
+var powered_rooms_count: int = -1
+var powered_rooms_next: int = -1
+var powered_rooms_defs: int = -1
 
 
 ## Returns the campaign's starting power: nothing stored, no bank.

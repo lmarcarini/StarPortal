@@ -89,6 +89,9 @@ var charge_sets: int = 0
 var _next_action_tick: int = 0
 ## The address the bot will dial next, or null.
 var _picked: GateAddress = null
+## Clock tick before which the picked address cannot be charged yet: the bot skips asking
+## until then (the charge only rises while the Ring is idle).
+var _check_at_tick: int = 0
 
 
 ## Acts once on [param simulation] before its next tick. While running, the bot waits for
@@ -141,7 +144,10 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	if _picked == null:
 		_pick_address(state, rng)
 		return
+	if state.clock.tick < _check_at_tick:
+		return
 	var ready_in: int = GateQueries.ticks_until_ready(state, _picked)
+	_check_at_tick = state.clock.tick + maxi(ready_in - 1, 0)
 	if ready_in < 0:
 		_picked = null
 		addresses_dropped += 1
@@ -236,6 +242,7 @@ static func _reachable_worlds(state: GameState, first_glyphs: Array[int]) -> Arr
 ## Glyphs other than the home origin whose anchor, as seal 1, needs no more lock energy than
 ## the bank can hold. Lock energy depends on seal 1 only.
 static func _reachable_first_glyphs(state: GameState) -> Array[int]:
+	var capacity: float = PowerRules.capacity_mwh(state)
 	var origin: int = state.galaxy.home().origin_glyph
 	var others: Array[int] = []
 	for glyph: int in GateAddress.GLYPH_COUNT:
@@ -248,7 +255,7 @@ static func _reachable_first_glyphs(state: GameState) -> Array[int]:
 			if other != glyph and coordinates.size() < GateAddress.COORDINATE_COUNT:
 				coordinates.append(other)
 		var probe := GateAddress.create(coordinates, origin)
-		if GateQueries.lock_energy_mwh(state, probe) <= PowerRules.capacity_mwh(state):
+		if GateQueries.lock_energy_mwh(state, probe) <= capacity:
 			reachable.append(glyph)
 	return reachable
 

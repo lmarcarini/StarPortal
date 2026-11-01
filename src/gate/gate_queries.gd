@@ -25,9 +25,12 @@ static func ticks_until_ready(state: GameState, address: GateAddress) -> int:
 	var stored: float = state.power.stored_mwh
 	if stored >= needed:
 		return 0
-	if needed > PowerRules.capacity_mwh(state):
+	var sums: PackedFloat64Array = PowerRules.totals(state)
+	if needed > PowerRules.capacity_of(state, sums):
 		return -1
-	return PowerMath.ticks_until_mwh(stored, needed, PowerRules.net_flow_mw(state))
+	var drain: float = PowerMath.drain_mw(state.gate, state.balance)
+	var net: float = PowerRules.charge_mw_of(state, sums) - drain
+	return PowerMath.ticks_until_mwh(stored, needed, net)
 
 
 ## Returns the Dial Log entries whose address equals [param address] seal for seal, oldest

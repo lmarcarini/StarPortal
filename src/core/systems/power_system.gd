@@ -26,15 +26,23 @@ func get_id() -> StringName:
 	return &"power"
 
 
-## Runs one tick of power: banks, allocation, then charge.
+## Runs one tick of power: banks, allocation, then charge. One pass over the rooms when
+## nothing changed.
 func tick(state: GameState) -> void:
-	_forget_lost_banks(state)
-	_adopt_new_banks(state)
-	if PowerRules.allocated_mw(state) > PowerRules.supply_mw(state):
+	var sums: PackedFloat64Array = PowerRules.totals(state)
+	var rated: int = int(sums[PowerRules.RATED_BANKS])
+	if rated != state.power.charge_rates.size() or rated != int(sums[PowerRules.BANKS]):
+		_forget_lost_banks(state)
+		_adopt_new_banks(state)
+		sums = PowerRules.totals(state)
+	var charge: float = PowerRules.charge_mw_of(state, sums)
+	if sums[PowerRules.DRAW] + charge > sums[PowerRules.SUPPLY]:
 		_shed(state)
 		state.events.post(&"power_allocation_changed", [])
-	var capacity: float = PowerRules.capacity_mwh(state)
-	var net: float = PowerRules.net_flow_mw(state)
+		sums = PowerRules.totals(state)
+		charge = PowerRules.charge_mw_of(state, sums)
+	var capacity: float = PowerRules.capacity_of(state, sums)
+	var net: float = charge - PowerMath.drain_mw(state.gate, state.balance)
 	state.power.stored_mwh = PowerMath.step_stored_mwh(state.power.stored_mwh, capacity, net)
 
 
