@@ -36,14 +36,14 @@ Real sizes are given in the text.
 | Screen | Key | What it is for | Reached from |
 | --- | --- | --- | --- |
 | Gate Room | F1 | The Ring, the dial console, the radio, the document tray, incoming wormholes | Top bar, any wormhole alert |
-| Base | F2 | Build, dig, lay conduits, power, staff, research labs, incursions | Top bar, any base alert |
-| Archive | F3 | Documents, Worlds, Codex, Log | Top bar, the document tray, any link |
+| Archive | F2 | Documents, Worlds, Codex, Log | Top bar, the document tray, any link |
+| Base | F3 | Build, dig, lay conduits, power, staff, research labs, incursions | Top bar, any base alert |
 | Expeditions | F4 | Plan teams, follow the field timeline, read check-ins | Top bar, Ring "Send team" |
 | Command | F5 | Budget, Committee, factions, requests, news | Top bar, the radio, request alerts |
 | Drone feed | none | Fly the MOTH and later probes | Ring "Send MOTH"; Expeditions for rovers |
 
-Q and E (gamepad shoulders) cycle the five tabs; F1 to F5 jump (the current build's F2
-Archive moves to F3 in M2). The drone feed is a mode, not a tab (layout below), and **Recall**
+Q and E (gamepad shoulders) cycle the five tabs; F1 to F5 jump (F1 Gate Room, F2 Archive,
+F3 Base). The drone feed is a mode, not a tab (layout below), and **Recall**
 returns to where the player was. Conversations (section 6) open as a
 panel over the current screen.
 

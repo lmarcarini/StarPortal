@@ -27,7 +27,8 @@ tick is one in-game minute. Energy in MWh, power in MW.
 
 ## 1. Room catalogue for M2
 
-Footprints are width × height in cells. "Rotates" means R turns the footprint 90 degrees.
+Footprints are width × height in cells. "Rotates" means Q or E (or a gamepad shoulder button)
+turns the footprint 90 degrees while placing.
 Draw is what the room takes while **on**. Upkeep is charged at each month-end; an off room pays
 half (section 3).
 
@@ -255,7 +256,7 @@ fittings, corridors darker. A cell is 24 px, so a level is 864 × 480 px at 1× 
 |      |             864 x 480 plan, zoom/pan                         | [Demolish]    |
 +------+-------------------------------------------------------------+---------------+ 576
 | BUILD  Plant  Capacitor  Quarters  Archive  Lab  Workshop  Infirmary  Lift  Stairs |
-|        Corridor  |  DIG LEVEL 4  $3,000k 20 d        ghost: R rotate, hold to build |
+|        Corridor  |  DIG LEVEL 4  $3,000k 20 d      ghost: Q/E rotate, hold to build |
 +------------------------------------------------------------------------------------+ 676
 | message: "Capacitor bank built. Charging at 26 MW."                       44 px   |
 +------------------------------------------------------------------------------------+ 720
@@ -276,11 +277,16 @@ fittings, corridors darker. A cell is 24 px, so a level is 864 × 480 px at 1× 
   meter.
 - **Messages** (bottom strip): the latest event, also in the Log.
 
+**Keys.** Q and E switch tabs (F1 Gate Room, F2 Archive, F3 Base), except while placing a
+room, when they rotate it. P toggles the energy layer. Esc on the plan cancels placing; with
+nothing to cancel it moves focus to the build palette. The debug overlay is on F12 only.
+
 **Gamepad.** The shoulder buttons switch tabs, except while placing a room, when they rotate
 it; the triggers keep time speed. The D-pad moves a cell cursor, the left stick pans, the right
 stick zooms; Y and X change level; A selects the room under the cursor (toggles it on the
 energy layer; on a bank, left and right on the D-pad change its charge rate); the view button toggles the energy layer; the menu button focuses the build
-palette, where A picks a room, the ghost follows the cursor, hold A builds and B cancels.
+palette, where A picks a room, the ghost follows the cursor, hold A builds and B cancels. On the
+plan with nothing to cancel, B focuses the build palette.
 
 ---
 

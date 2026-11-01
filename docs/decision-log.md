@@ -209,3 +209,31 @@ Each entry has four fields:
 - **Decision:** The owner delegates in-game names (worlds, documents, UI labels) to the product owner, within the bible's rule of original names; the owner can still overrule any name in review.
 - **Reason:** Naming was holding cards up. The product owner sees every card and can keep names consistent.
 - **Bible section:** [overview.md#locked-decisions](bible/overview.md#locked-decisions) (Intellectual property)
+
+## 2026-10-31 — M2: FTL-style power; capacitors only for the Ring
+
+- **Date:** 2026-10-31
+- **Decision:** Base power is a fixed plant output shared among rooms, each switched on or off; switching on past the supply is refused, so there is no brownout. The capacitors are a separate store used only by the Ring and charged from the supply at a charge rate. Digging and building cost only money and time and draw no power.
+- **Reason:** The owner wants power managed simply, like FTL, and kept apart from the portal's energy, so the base needs no micromanagement.
+- **Bible section:** [game-design.md#base-building-and-power](bible/game-design.md#base-building-and-power); details in [content/m2-base.md](content/m2-base.md) section 3
+
+## 2026-10-31 — M2: the base plan is a top-down lit diorama, without conduits
+
+- **Date:** 2026-10-31
+- **Decision:** The Base tab uses concept B, the lit diorama, seen straight from above. Concepts A (instrument schematic) and C (drafting table) may be used locally, such as on instrument panels, the energy layer and building sites. There are no conduits: power is managed on an energy layer over the plan.
+- **Reason:** The owner chose B from the "Base Plan Concepts" mock-ups; conduits added work without adding decisions.
+- **Bible section:** [overview.md#locked-decisions](bible/overview.md#locked-decisions) (Presentation); details in [content/m2-base.md](content/m2-base.md) section 6
+
+## 2026-10-31 — M2: underground only, and a clean save break
+
+- **Date:** 2026-10-31
+- **Decision:** The base is underground only, Levels 1 to 3 at the start with the Ring on Level 3; there is no surface level for now. M2 does not migrate earlier saves: the save format moves to v11 and any older save is rejected with a message to start a new game.
+- **Reason:** A surface level adds nothing to M2's play; migrating M1.6 saves into the new base would cost more than testers starting a new game.
+- **Bible section:** [technical-architecture.md#save-system](bible/technical-architecture.md#save-system); details in [content/m2-base.md](content/m2-base.md) sections 2 and 7
+
+## 2026-11-01 — M2: charging continues while a wormhole is open
+
+- **Date:** 2026-11-01
+- **Decision:** The banks keep charging at their rates while a wormhole is open; the open wormhole's 20 MWh/h drain is taken from the net flow. At the starting 26 MW the charge out-runs the drain; a wormhole closes on empty capacitors only when the total charge rate is below 20 MW. To be tuned in playtest.
+- **Reason:** It keeps the power and Ring rules simple and independent. Whether it makes open wormholes too cheap is a playtest question.
+- **Bible section:** [gate-and-address-spec.md#dialing-outcomes-and-energy](bible/gate-and-address-spec.md#dialing-outcomes-and-energy); details in [content/m2-base.md](content/m2-base.md) section 3
