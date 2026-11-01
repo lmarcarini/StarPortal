@@ -146,7 +146,7 @@ func test_address_book_round_trip() -> void:
 func test_a_collapse_with_actions_hidden_shows_the_reason() -> void:
 	_dial_open()
 	_screen().hide_actions()
-	_simulation.state.power.plant_output_mw = 0.0
+	PowerFixture.set_charge(_simulation.state, 0)
 	_simulation.state.power.stored_mwh = 0.0
 	SimClock.step_ticks(1)
 	assert_str(_screen().get_closed_text()).is_equal("Wormhole collapsed: the capacitors ran dry.")

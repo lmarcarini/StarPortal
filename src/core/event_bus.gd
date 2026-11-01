@@ -51,10 +51,14 @@ signal document_received(document_id: StringName)
 ## outbox).
 @warning_ignore("unused_signal")
 signal address_book_changed
-## Emitted when a capacitor bank finishes installing, with the new capacity in MWh (posted
-## through the outbox).
+## Emitted when a Capacitor Bank room is completed and starts charging, with the new capacity
+## in MWh (posted through the outbox).
 @warning_ignore("unused_signal")
 signal capacitors_installed(capacity_mwh: float)
+## Emitted when the power allocation changes: a room switched, a charge rate set, a new bank
+## or rooms switched off to fit the supply (posted through the outbox).
+@warning_ignore("unused_signal")
+signal power_allocation_changed
 ## Emitted when the pole camera takes a world's horizon record, with the world id (posted
 ## through the outbox).
 @warning_ignore("unused_signal")

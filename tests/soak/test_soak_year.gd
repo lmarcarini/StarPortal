@@ -4,8 +4,9 @@
 ## Both must end with the same to_dict(), which catches any state to_dict() forgets.
 ## Both runs are built by GameSetup from the real data/ content, so PowerSystem and
 ## GateSystem tick all year (and are rebuilt with the galaxy after every load); stored power
-## must stay within 0..capacity, and never NaN, on every tick. The bot installs the first
-## capacitor bank, then dials directly all year: Address Book entries, random addresses and
+## must stay within 0..capacity, and never NaN, and allocation within supply, on every tick.
+## The bot builds the first Capacitor Bank and sets its charge rate, then dials directly all
+## year: Address Book entries, random addresses and
 ## now and then a real world's true address; it reads each new far Ring's console when a
 ## wormhole opens, which fills the book, and closes the wormhole.
 ## Run with scripts/soak.sh; scripts/test.sh skips this folder.
@@ -65,9 +66,12 @@ class SoakRun:
 
 	## Counts the tick just run when stored power was NaN or left 0..capacity.
 	func check_power() -> void:
-		var power: PowerState = simulation.state.power
-		var stored: float = power.stored_mwh
-		if is_nan(stored) or stored < 0.0 or stored > power.capacity_mwh:
+		var state: GameState = simulation.state
+		var stored: float = state.power.stored_mwh
+		var sums: PackedFloat64Array = PowerRules.totals(state)
+		if is_nan(stored) or stored < 0.0 or stored > PowerRules.capacity_of(state, sums):
+			power_out_of_bounds += 1
+		elif sums[PowerRules.DRAW] + PowerRules.charge_mw_of(state, sums) > sums[0]:
 			power_out_of_bounds += 1
 
 	## Makes [param next] the simulation this run plays and listens to its signals.
@@ -205,11 +209,13 @@ func _assert_run_events(
 	assert_array(run.rejections).is_empty()
 	assert_int(run.simulation.state.clock.tick).is_equal(YEAR_TICKS)
 	assert_int(run.power_out_of_bounds).is_equal(0)
-	var power: PowerState = run.simulation.state.power
-	assert_float(power.stored_mwh).is_between(0.0, power.capacity_mwh)
-	assert_float(power.capacity_mwh).is_equal(_defs.balance.capacitor_bank_capacity_mwh)
-	assert_int(power.banks_installed).is_equal(1)
+	var state: GameState = run.simulation.state
+	var capacity: float = PowerRules.capacity_mwh(state)
+	assert_float(state.power.stored_mwh).is_between(0.0, capacity)
+	assert_float(capacity).is_equal(_defs.balance.capacitor_bank_capacity_mwh)
+	assert_int(state.power.charge_rates.size()).is_equal(1)
 	assert_int(run.bot.installs).is_equal(1)
+	assert_int(run.bot.charge_sets).is_equal(1)
 	_assert_run_ring(run)
 	var commands: int = run.bot.commands_submitted
 	assert_int(commands).is_between(15 * YEAR_DAYS, 25 * YEAR_DAYS)

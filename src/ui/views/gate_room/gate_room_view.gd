@@ -47,7 +47,6 @@ func _ready() -> void:
 	_overlays.changed.connect(_on_overlays_changed)
 	_overlays.address_book_requested.connect(_on_address_book_requested)
 	_overlays.archive_requested.connect(archive_requested.emit)
-	_gauge.install_started.connect(_on_install_started)
 	_sequence.get_parent().add_child(_photo)
 	_ring.add_child(_camera_cue)
 	var wormhole: WormholeScreen = _overlays.get_wormhole_screen()
@@ -176,10 +175,6 @@ func _on_camera_extended() -> void:
 	_photo.refresh()
 	_photo.flash()
 	_camera_cue.play()
-
-
-func _on_install_started() -> void:
-	_ensure_focus.call_deferred()
 
 
 func _on_dial_started(_address_key: String) -> void:

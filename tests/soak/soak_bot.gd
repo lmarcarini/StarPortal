@@ -2,8 +2,10 @@ extends RefCounted
 ## Seeded stand-in player for the soak test. It sets random flags through SetFlagCommand
 ## about 20 times per in-game day, pauses and resumes the clock at random, and adds and
 ## releases named system holds through TimeControl (a dozen or so per month). Before anything
-## else on the Ring it installs the first capacitor bank (InstallCapacitorsCommand) and leaves
-## the Ring alone until the bank is in. It then works the Ring on every call with no command
+## else on the Ring it builds the first Capacitor Bank as a room in the capacitor alcove
+## (PlaceRoomCommand), leaves the Ring alone until it is built, then gives it all the spare
+## supply as its charge rate once (SetChargeRateCommand). It then works the Ring on every call
+## with no command
 ## waiting: with the Ring idle and no address picked it picks one (a console's Address Book
 ## entry the bank can power sometimes, a real world's true address now and then, otherwise a random
 ## well-formed one whose seal 1 the bank can reach); once the bank holds that address's lock
@@ -79,12 +81,18 @@ var closes: int = 0
 var consoles_read: int = 0
 ## Times the bot extended the pole camera.
 var cameras_extended: int = 0
-## Capacitor bank installs the bot started.
+## Capacitor Bank builds the bot started.
 var installs: int = 0
+## Charge rates the bot set.
+var charge_sets: int = 0
 
 var _next_action_tick: int = 0
 ## The address the bot will dial next, or null.
 var _picked: GateAddress = null
+## Clock tick before which the picked address cannot be charged yet: the bot skips asking
+## until then (with the Ring idle nothing drains the capacitors; the charge falls only while a
+## wormhole is open and total charging is below its 20 MWh/h drain).
+var _check_at_tick: int = 0
 
 
 ## Acts once on [param simulation] before its next tick. While running, the bot waits for
@@ -116,14 +124,17 @@ func act(simulation: Simulation) -> void:
 	_submit_random_flag(simulation, rng)
 
 
-## Installs the first capacitor bank and waits for it; then, on a lock, works the wormhole;
-## with the Ring idle, picks, drops or dials.
+## Builds the first Capacitor Bank and waits for it, then sets its charge rate; then, on a
+## lock, works the wormhole; with the Ring idle, picks, drops or dials.
 func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	var state: GameState = simulation.state
-	if state.power.banks_installed == 0:
-		if state.power.install_ticks_left == 0:
-			simulation.submit(InstallCapacitorsCommand.new())
+	if state.power.charge_rates.is_empty():
+		if installs == 0:
+			simulation.submit(PowerFixture.build_bank_in_alcove(state))
 			installs += 1
+		return
+	if charge_sets == 0:
+		_set_full_charge(simulation)
 		return
 	var gate: GateState = state.gate
 	if gate.mode == GateState.RingMode.LOCKED:
@@ -134,7 +145,10 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	if _picked == null:
 		_pick_address(state, rng)
 		return
+	if state.clock.tick < _check_at_tick:
+		return
 	var ready_in: int = GateQueries.ticks_until_ready(state, _picked)
+	_check_at_tick = state.clock.tick + maxi(ready_in - 1, 0)
 	if ready_in < 0:
 		_picked = null
 		addresses_dropped += 1
@@ -229,6 +243,7 @@ static func _reachable_worlds(state: GameState, first_glyphs: Array[int]) -> Arr
 ## Glyphs other than the home origin whose anchor, as seal 1, needs no more lock energy than
 ## the bank can hold. Lock energy depends on seal 1 only.
 static func _reachable_first_glyphs(state: GameState) -> Array[int]:
+	var capacity: float = PowerRules.capacity_mwh(state)
 	var origin: int = state.galaxy.home().origin_glyph
 	var others: Array[int] = []
 	for glyph: int in GateAddress.GLYPH_COUNT:
@@ -241,7 +256,7 @@ static func _reachable_first_glyphs(state: GameState) -> Array[int]:
 			if other != glyph and coordinates.size() < GateAddress.COORDINATE_COUNT:
 				coordinates.append(other)
 		var probe := GateAddress.create(coordinates, origin)
-		if GateQueries.lock_energy_mwh(state, probe) <= state.power.capacity_mwh:
+		if GateQueries.lock_energy_mwh(state, probe) <= capacity:
 			reachable.append(glyph)
 	return reachable
 
@@ -317,3 +332,14 @@ func _random_value(rng: RandomNumberGenerator) -> Variant:
 			return rng.randi_range(-MAX_INT_VALUE, MAX_INT_VALUE)
 		_:
 			return "value_%d" % rng.randi()
+
+
+## Gives the first bank all the spare supply, up to its maximum, as its charge rate.
+func _set_full_charge(simulation: Simulation) -> void:
+	var state: GameState = simulation.state
+	var bank: StringName = state.power.charge_rates.keys()[0]
+	var def: RoomDef = state.room_defs[StartingBase.CAPACITOR_BANK_DEF]
+	var rate: int = state.power.charge_rates[bank] + floori(PowerRules.spare_mw(state))
+	rate = mini(rate, floori(def.max_charge_rate_mw))
+	simulation.submit(SetChargeRateCommand.create(bank, rate))
+	charge_sets += 1

@@ -55,6 +55,7 @@ func _tick_sites(state: GameState) -> void:
 			room.build_ticks_left -= 1
 			done = done and room.is_built()
 		if done:
+			PowerSystem.settle(state)
 			state.events.post(&"room_built", [key])
 
 

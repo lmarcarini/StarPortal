@@ -58,7 +58,8 @@ static func register_defaults() -> void:
 	_types[DeliverDocumentCommand.TYPE] = DeliverDocumentCommand
 	_types[MarkDocumentReadCommand.TYPE] = MarkDocumentReadCommand
 	_types[NoteAddressCommand.TYPE] = NoteAddressCommand
-	_types[InstallCapacitorsCommand.TYPE] = InstallCapacitorsCommand
+	_types[SwitchRoomCommand.TYPE] = SwitchRoomCommand
+	_types[SetChargeRateCommand.TYPE] = SetChargeRateCommand
 	_types[ReadConsoleCommand.TYPE] = ReadConsoleCommand
 	_types[ExtendPoleCameraCommand.TYPE] = ExtendPoleCameraCommand
 	_types[PlaceRoomCommand.TYPE] = PlaceRoomCommand

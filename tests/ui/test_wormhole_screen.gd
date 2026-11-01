@@ -101,7 +101,7 @@ func test_the_bank_line_and_no_lock_energy() -> void:
 	var lock_text: String = GateRoomFormat.energy(
 		GateQueries.lock_energy_mwh(_simulation.state, address)
 	)
-	_simulation.state.power.plant_output_mw = 0.0
+	PowerFixture.set_charge(_simulation.state, 0)
 	_dial(DialOutcome.Kind.LOCK)
 	var stored: float = _simulation.state.power.stored_mwh
 	var minutes: int = WormholeText.ticks_until_empty(stored, 20.0)
@@ -118,9 +118,9 @@ func test_the_bank_line_and_no_lock_energy() -> void:
 			)
 		)
 	)
-	_simulation.state.power.plant_output_mw = 30.0
+	PowerFixture.set_charge(_simulation.state, 26)
 	SimClock.step_ticks(1)
-	assert_str(_screen().get_bank_text()).ends_with("The plant covers the drain.")
+	assert_str(_screen().get_bank_text()).ends_with("Charging covers the drain.")
 	for text: String in Fixture.visible_texts(_screen()):
 		assert_str(text).not_contains(lock_text)
 
@@ -238,7 +238,7 @@ func test_cancel_dismisses_the_closed_message(
 
 func test_a_power_collapse_says_so() -> void:
 	_dial(DialOutcome.Kind.LOCK)
-	_simulation.state.power.plant_output_mw = 0.0
+	PowerFixture.set_charge(_simulation.state, 0)
 	_simulation.state.power.stored_mwh = 0.0
 	SimClock.step_ticks(1)
 	assert_str(_screen().get_closed_text()).is_equal("Wormhole collapsed: the capacitors ran dry.")

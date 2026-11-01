@@ -14,6 +14,8 @@ const GUARDED_ID: StringName = &"world_guarded"
 const NEAR_OFFSET_LY := Vector3i(120, 80, 10)
 ## Capacity of the fixture's bank, large enough for any fixture dial.
 const CAPACITY_MWH: float = 100_000.0
+## The fixture bank's charge rate: the starting plant's 30 MW less the starting rooms' 4 MW.
+const CHARGE_RATE_MW: int = 26
 
 
 ## Returns the fixture galaxy: home first, then the open, buried, shielded and guarded worlds,
@@ -40,16 +42,18 @@ static func galaxy() -> GalaxyCatalogue:
 
 
 ## Returns a new game wired to the fixture galaxy and [param balance] (a default one when
-## null), with one installed bank of CAPACITY_MWH, full, and paused or running as
-## [param paused] says.
+## null, then holding CAPACITY_MWH per bank), the real RoomDefs and one built bank, full and
+## charging at CHARGE_RATE_MW, paused or running as [param paused] says.
 static func state(balance: BalanceConfig = null, paused: bool = true) -> GameState:
-	var config: BalanceConfig = balance if balance != null else BalanceConfig.new()
+	var config: BalanceConfig = balance
+	if config == null:
+		config = BalanceConfig.new()
+		config.capacitor_bank_capacity_mwh = CAPACITY_MWH
 	var game: GameState = GameState.new_game(1, config)
 	game.balance = config
 	game.galaxy = galaxy()
-	game.power.banks_installed = 1
-	game.power.capacity_mwh = CAPACITY_MWH
-	game.power.stored_mwh = CAPACITY_MWH
+	PowerFixture.add_bank(game, CHARGE_RATE_MW)
+	game.power.stored_mwh = config.capacitor_bank_capacity_mwh
 	game.clock.is_paused = paused
 	return game
 

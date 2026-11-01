@@ -54,8 +54,7 @@ func _sample_state() -> GameState:
 	state.gate.dial_log.append(_log_entry(DialOutcome.Kind.NO_GATE, 0.1 + 0.2, &""))
 	state.gate.dial_log.append(_log_entry(DialOutcome.Kind.BLOCKED, 75.0 / 7.0, &"chulak"))
 	state.gate.dial_log.append(_log_entry(DialOutcome.Kind.HOSTILE_LOCK, 1.0 / 3.0, &"abydos"))
-	state.power.banks_installed = 1
-	state.power.capacity_mwh = 400.0
+	state.power.charge_rates[&"room_1"] = 26
 	state.power.stored_mwh = 0.1 + 0.2
 	state.worlds.statuses[&"abydos"] = WorldsState.WorldStatus.LOCKED
 	state.worlds.statuses[&"chulak"] = WorldsState.WorldStatus.LOCKED
@@ -83,8 +82,6 @@ func test_one_three_hundredth_in_every_float_field() -> void:
 	var value := 1.0 / 300.0
 	var state := _sample_state()
 	state.power.stored_mwh = value
-	state.power.capacity_mwh = value
-	state.power.plant_output_mw = value
 	state.gate.lock_energy_mwh = value
 	for entry: DialLogEntry in state.gate.dial_log:
 		entry.energy_spent_mwh = value
@@ -92,8 +89,6 @@ func test_one_three_hundredth_in_every_float_field() -> void:
 	assert_dict(loaded.to_dict()).is_equal(state.to_dict())
 	var floats: Array[float] = [
 		loaded.power.stored_mwh,
-		loaded.power.capacity_mwh,
-		loaded.power.plant_output_mw,
 		loaded.gate.lock_energy_mwh,
 	]
 	for entry: DialLogEntry in loaded.gate.dial_log:

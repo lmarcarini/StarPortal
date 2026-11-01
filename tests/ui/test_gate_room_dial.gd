@@ -121,7 +121,7 @@ func test_disabled_with_no_capacitors_or_an_empty_bank() -> void:
 	_controls().set_address(_view.get_console().get_address())
 	assert_bool(_button().disabled).is_true()
 	assert_str(_controls().get_reason_text()).is_equal("Capacitors empty.")
-	_simulation.state.power.capacity_mwh = 0.0
+	PowerFixture.remove_banks(_simulation.state)
 	_controls().set_address(_view.get_console().get_address())
 	assert_str(_controls().get_reason_text()).is_equal("No capacitors installed.")
 	TranslationServer.set_locale("pt_BR")

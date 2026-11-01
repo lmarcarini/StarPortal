@@ -31,8 +31,7 @@ func test_defs_from_the_registry() -> void:
 func test_build_from_real_content_runs_both_systems() -> void:
 	var defs: GameDefs = _defs()
 	var state: GameState = GameState.new_game(SEED, defs.balance)
-	state.power.banks_installed = 1
-	state.power.capacity_mwh = defs.balance.capacitor_bank_capacity_mwh
+	PowerFixture.add_bank(state, 26)
 	var result: Result = GameSetup.build(state, defs)
 	assert_bool(result.is_ok).is_true()
 	var simulation: Simulation = result.value
@@ -45,7 +44,7 @@ func test_build_from_real_content_runs_both_systems() -> void:
 	assert_array(ids).is_equal([&"power", &"gate", &"documents", &"economy", &"construction"])
 	for index: int in 60:
 		simulation.advance_tick()
-	assert_float(state.power.stored_mwh).is_equal_approx(30.0, 1e-9)
+	assert_float(state.power.stored_mwh).is_equal_approx(26.0, 1e-9)
 
 
 ## A state rebuilt from its JSON round-tripped to_dict() gets the same galaxy: every world

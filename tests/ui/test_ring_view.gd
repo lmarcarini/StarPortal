@@ -109,7 +109,7 @@ func test_the_horizon_goes_dark_when_the_wormhole_closes(
 		"time":
 			SimClock.step_ticks(_simulation.state.balance.max_open_ticks)
 		"power":
-			_simulation.state.power.plant_output_mw = 0.0
+			PowerFixture.set_charge(_simulation.state, 0)
 			_simulation.state.power.stored_mwh = 0.0
 			SimClock.step_ticks(1)
 	assert_int(_simulation.state.gate.mode).is_equal(GateState.RingMode.IDLE)

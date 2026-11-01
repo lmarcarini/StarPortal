@@ -1,105 +1,74 @@
 class_name PowerState
 extends RefCounted
-## Saved state of the base's power: the capacitors' charge and size, the plant's output, the
-## capacitor banks installed and the install running. An M1 placeholder; M2 replaces it with
-## rooms.
-## Saved shape: {"stored_mwh", "capacity_mwh", "plant_output_mw"}, each an ExactFloat string
-## (16 hex digits of the IEEE-754 pattern), so values load back bit for bit, and
-## {"banks_installed", "install_ticks_left"}, whole numbers.
-## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy (starting plant and storage),
-## gate-and-address-spec.md#the-dial-console, technical-architecture.md#data-model
+## Saved state of the Ring's capacitors: the energy they hold and each Capacitor Bank's charge
+## rate. Supply, allocation and capacity are not saved: PowerRules derives them from the rooms.
+## Saved shape: {"stored_mwh": ExactFloat string (16 hex digits of the IEEE-754 pattern, so it
+## loads back bit for bit), "charge_rates": {bank room id: whole MW}}.
+## Bible: docs/content/m2-base.md section 3, technical-architecture.md#data-model
 
-## Saved keys holding ExactFloat strings.
-const _FLOAT_KEYS: Array[String] = ["stored_mwh", "capacity_mwh", "plant_output_mw"]
-## Saved keys holding whole numbers of at least 0.
-const _COUNT_KEYS: Array[String] = ["banks_installed", "install_ticks_left"]
-
-## Energy held in the capacitors, in MWh; never above [member capacity_mwh].
+## Energy held in the capacitors, in MWh; never above PowerRules.capacity_mwh().
 var stored_mwh: float = 0.0
-## Capacitor storage, in MWh.
-var capacity_mwh: float = 0.0
-## Plant output, in MW.
-var plant_output_mw: float = 0.0
-## Capacitor banks installed so far.
-var banks_installed: int = 0
-## Ticks until the capacitor bank being installed is ready; 0 when no install is running.
-var install_ticks_left: int = 0
+## Charge rate of each Capacitor Bank that has been completed, in whole MW, by room id.
+## PowerSystem adds a bank when it is completed and drops it when it is gone.
+var charge_rates: Dictionary[StringName, int] = {}
+## Transient, not saved: the base's rooms that give, draw or store power, and the key they were
+## gathered for (see PowerRules.powered_rooms()).
+var powered_rooms_cache: Array[RoomState] = []
+## Transient: the RoomDef of each room in [member powered_rooms_cache], by index.
+var powered_defs_cache: Array[RoomDef] = []
+## Transient: the base instance id, room count, next room number and RoomDef count the cache
+## was gathered for; -1 before the first gathering.
+var powered_rooms_base: int = -1
+var powered_rooms_count: int = -1
+var powered_rooms_next: int = -1
+var powered_rooms_defs: int = -1
 
 
-## Returns the campaign's starting power: capacity and plant output from [param balance],
-## nothing stored yet, no bank installed and no install running.
-static func starting(balance: BalanceConfig) -> PowerState:
-	var power := PowerState.new()
-	power.capacity_mwh = balance.starting_capacity_mwh
-	power.plant_output_mw = balance.starting_plant_output_mw
-	return power
+## Returns the campaign's starting power: nothing stored, no bank.
+static func starting(_balance: BalanceConfig) -> PowerState:
+	return PowerState.new()
 
 
-## Returns JSON-safe data for saving; every float is ExactFloat.encode()d.
+## Returns JSON-safe data for saving.
 func to_dict() -> Dictionary:
-	return {
-		"stored_mwh": ExactFloat.encode(stored_mwh),
-		"capacity_mwh": ExactFloat.encode(capacity_mwh),
-		"plant_output_mw": ExactFloat.encode(plant_output_mw),
-		"banks_installed": banks_installed,
-		"install_ticks_left": install_ticks_left,
-	}
+	var rates: Dictionary = {}
+	for room_id: StringName in charge_rates:
+		rates[String(room_id)] = charge_rates[room_id]
+	return {"stored_mwh": ExactFloat.encode(stored_mwh), "charge_rates": rates}
 
 
 ## Builds a PowerState from saved [param data], e.g. after a JSON round trip (whole floats
-## become ints). Missing or unreadable values are 0. Call validate_dict() first for untrusted
-## data.
+## become ints). Missing or unreadable values are 0 or skipped. Call validate_dict() first for
+## untrusted data.
 static func from_dict(data: Dictionary) -> PowerState:
 	var power := PowerState.new()
-	power.stored_mwh = _read_float(data.get("stored_mwh"))
-	power.capacity_mwh = _read_float(data.get("capacity_mwh"))
-	power.plant_output_mw = _read_float(data.get("plant_output_mw"))
-	power.banks_installed = _read_count(data.get("banks_installed"))
-	power.install_ticks_left = _read_count(data.get("install_ticks_left"))
+	var stored: Variant = data.get("stored_mwh")
+	if ExactFloat.is_encoded(stored):
+		power.stored_mwh = ExactFloat.decode(str(stored))
+	var rates: Variant = data.get("charge_rates")
+	if rates is Dictionary:
+		var rate_data: Dictionary = rates
+		for key: Variant in rate_data:
+			if RoomState.is_count(rate_data[key]):
+				power.charge_rates[StringName(str(key))] = RoomState.read_count(rate_data[key])
 	return power
 
 
-## Returns human-readable errors for saved [param data], empty when it is valid: every float
-## an ExactFloat string of a finite number of at least 0, "stored_mwh" not above
-## "capacity_mwh", and "banks_installed" and "install_ticks_left" whole numbers from 0 to
-## [constant JsonLimits.MAX_EXACT_INT].
+## Returns human-readable errors for saved [param data], empty when it is valid: "stored_mwh"
+## an ExactFloat string of a finite number of at least 0, and "charge_rates" an object whose
+## values are whole numbers of at least 0. Capacity is checked against the rooms by GameState.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
-	for key: String in _FLOAT_KEYS:
-		if not data.has(key):
-			errors.append("missing '%s'" % key)
-		elif not ExactFloat.is_finite_non_negative(data[key]):
-			errors.append("'%s' is not an exact float, finite and at least 0" % key)
-	for key: String in _COUNT_KEYS:
-		if not data.has(key):
-			errors.append("missing '%s'" % key)
-		elif not _is_count(data[key]):
-			errors.append("'%s' is not a whole number of at least 0" % key)
-	if not errors.is_empty():
+	if not data.has("stored_mwh"):
+		errors.append("missing 'stored_mwh'")
+	elif not ExactFloat.is_finite_non_negative(data["stored_mwh"]):
+		errors.append("'stored_mwh' is not an exact float, finite and at least 0")
+	var rates: Variant = data.get("charge_rates")
+	if not rates is Dictionary:
+		errors.append("'charge_rates' is not an object")
 		return errors
-	if _read_float(data["stored_mwh"]) > _read_float(data["capacity_mwh"]):
-		errors.append("'stored_mwh' is above 'capacity_mwh'")
+	var rate_data: Dictionary = rates
+	for key: Variant in rate_data:
+		if not RoomState.is_count(rate_data[key]):
+			errors.append("'charge_rates.%s' is not a whole number of at least 0" % str(key))
 	return errors
-
-
-## The float encoded in [param value], or 0.0 when it is not an ExactFloat string.
-static func _read_float(value: Variant) -> float:
-	if not ExactFloat.is_encoded(value):
-		return 0.0
-	var text: String = value
-	return ExactFloat.decode(text)
-
-
-## The whole number in [param value], or 0 when it is not a count.
-static func _read_count(value: Variant) -> int:
-	if not _is_count(value):
-		return 0
-	return type_convert(value, TYPE_INT)
-
-
-## True for an int, or a whole float, from 0 to [constant JsonLimits.MAX_EXACT_INT].
-static func _is_count(value: Variant) -> bool:
-	if not JsonLimits.is_exact_int(value):
-		return false
-	var number: float = value
-	return number >= 0.0

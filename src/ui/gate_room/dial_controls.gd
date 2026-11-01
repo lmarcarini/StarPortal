@@ -98,14 +98,14 @@ func disabled_reason_key() -> StringName:
 		return &"GATE_REASON_WORMHOLE_OPEN"
 	if _address == null or not _address.is_well_formed():
 		return &"GATE_REASON_INCOMPLETE"
-	return _bank_reason_key(state.power)
+	return _bank_reason_key(state)
 
 
 ## The reason the bank cannot dial anything: no capacitors, or no charge; &"" when it can try.
-static func _bank_reason_key(power: PowerState) -> StringName:
-	if power.capacity_mwh <= 0.0:
+static func _bank_reason_key(state: GameState) -> StringName:
+	if PowerRules.capacity_mwh(state) <= 0.0:
 		return &"GATE_DIAL_NO_CAPACITORS"
-	if power.stored_mwh <= 0.0:
+	if state.power.stored_mwh <= 0.0:
 		return &"GATE_DIAL_CAPACITORS_EMPTY"
 	return &""
 
