@@ -2,8 +2,8 @@ class_name PaintCorridorCommand
 extends Command
 ## The player drags a corridor run across free cells of one level and holds to build: pays the
 ## corridor's cost per cell (at most the level's cell count) and starts one site. The run's
-## cells finish one by one, the def's build time apart, so the whole run takes that time per cell. Posts room_build_started(site
-## id) and budget_changed when applied.
+## cells finish one by one, the def's build time apart, so the whole run takes that time per
+## cell. Posts room_build_started(site id) and budget_changed when applied.
 ## Bible: docs/content/m2-base.md sections 1 and 4
 
 ## The command's stable type id.
