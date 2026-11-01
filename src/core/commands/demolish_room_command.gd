@@ -57,14 +57,9 @@ func validate(state: GameState) -> CommandResult:
 		return CommandResult.fail(&"not_built")
 	if room.is_demolishing():
 		return CommandResult.fail(&"already_demolishing")
-	if def.fixed:
-		return CommandResult.fail(&"fixed_room")
-	if BaseRules.is_starting_lift(room):
-		return CommandResult.fail(&"starting_lift")
-	if def.power_output_mw > 0.0 and _plants_left(state) <= 1:
-		return CommandResult.fail(&"last_plant")
-	if BaseRules.is_connector(room.def_id) and _strands_a_room(state, room):
-		return CommandResult.fail(&"leaves_room_unconnected")
+	var error: StringName = _protection_error(state, room, def)
+	if not error.is_empty():
+		return CommandResult.fail(error)
 	return CommandResult.ok()
 
 
@@ -82,6 +77,19 @@ func apply(state: GameState) -> void:
 ## Returns JSON-safe data: type and room_id.
 func to_dict() -> Dictionary:
 	return {"type": String(TYPE), "room_id": String(room_id)}
+
+
+## Why [param room] may never come down, or &"".
+func _protection_error(state: GameState, room: RoomState, def: RoomDef) -> StringName:
+	if def.fixed:
+		return &"fixed_room"
+	if BaseRules.is_starting_lift(room):
+		return &"starting_lift"
+	if def.power_output_mw > 0.0 and _plants_left(state) <= 1:
+		return &"last_plant"
+	if BaseRules.is_connector(room.def_id) and _strands_a_room(state, room):
+		return &"leaves_room_unconnected"
+	return &""
 
 
 ## Built plants of the base not already coming down.

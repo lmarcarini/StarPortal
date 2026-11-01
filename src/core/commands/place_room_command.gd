@@ -65,10 +65,9 @@ func get_type() -> StringName:
 ## (&"insufficient_funds").
 func validate(state: GameState) -> CommandResult:
 	var def: RoomDef = state.room_defs.get(def_id)
-	if def == null:
-		return CommandResult.fail(&"unknown_room", String(def_id))
-	if def.fixed or def_id == StartingBase.CORRIDOR_DEF:
-		return CommandResult.fail(&"not_buildable", String(def_id))
+	var def_error: StringName = _def_error(def)
+	if not def_error.is_empty():
+		return CommandResult.fail(def_error, String(def_id))
 	var planned: Array[RoomState] = _planned(state.base)
 	if planned.is_empty():
 		return CommandResult.fail(&"no_such_level")
@@ -111,6 +110,15 @@ func to_dict() -> Dictionary:
 		"origin": [origin.x, origin.y],
 		"rotated": rotated,
 	}
+
+
+## &"unknown_room" without a def, &"not_buildable" for a fixed room or a corridor, else &"".
+func _def_error(def: RoomDef) -> StringName:
+	if def == null:
+		return &"unknown_room"
+	if def.fixed or def_id == StartingBase.CORRIDOR_DEF:
+		return &"not_buildable"
+	return &""
 
 
 ## The rooms this command would add, with empty ids: one per dug level for a lift, two for

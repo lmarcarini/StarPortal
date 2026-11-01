@@ -35,8 +35,12 @@ func validate(state: GameState) -> CommandResult:
 	if state.balance == null:
 		return CommandResult.fail(&"level_limit", "no balance")
 	var index: int = state.base.level_count - state.balance.starting_levels
-	if index < 0 or index >= mini(
-		state.balance.dig_level_costs_k.size(), state.balance.dig_level_ticks.size()
+	if (
+		index < 0
+		or (
+			index
+			>= mini(state.balance.dig_level_costs_k.size(), state.balance.dig_level_ticks.size())
+		)
 	):
 		return CommandResult.fail(&"level_limit")
 	var cost: int = state.balance.dig_level_costs_k[index]

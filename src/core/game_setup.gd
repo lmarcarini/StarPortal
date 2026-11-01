@@ -9,9 +9,10 @@ extends RefCounted
 
 
 ## Returns a Result whose value is a Simulation over [param state] with
-## [PowerSystem, GateSystem, DocumentSystem,
-## EconomySystem, ConstructionSystem], after setting [code]state.balance[/code],
-## [code]state.room_defs[/code] and [code]state.galaxy[/code] from [param defs]. Fails, leaving the state unchanged, with
+## [PowerSystem, GateSystem, DocumentSystem, EconomySystem,
+## ConstructionSystem], after setting [code]state.balance[/code],
+## [code]state.room_defs[/code] and [code]state.galaxy[/code] from [param defs]. Fails,
+## leaving the state unchanged, with
 ## &"missing_content" when [param defs] lacks the balance, 36 anchors or exactly one home
 ## world, and with &"galaxy_version_mismatch" when the state's generator version is not
 ## WorldGenerator.GENERATOR_VERSION (the same seed would give another galaxy).

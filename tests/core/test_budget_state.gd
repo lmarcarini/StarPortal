@@ -52,3 +52,10 @@ func test_game_state_round_trip_keeps_budget() -> void:
 	var data: Dictionary = JSON.parse_string(JSON.stringify(state.to_dict()))
 	assert_array(GameState.validate_dict(data)).is_empty()
 	assert_int(GameState.from_dict(data).budget.funds_k).is_equal(4321)
+
+
+func test_credit_adds_even_when_in_debt() -> void:
+	var budget := BudgetState.new()
+	budget.funds_k = -50
+	budget.credit(80)
+	assert_int(budget.funds_k).is_equal(30)
