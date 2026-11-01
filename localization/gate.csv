@@ -42,7 +42,7 @@ GATE_CLOSED_OTHER,Wormhole closed.,Buraco de minhoca fechado.
 GATE_SEQ_ADDRESS,Address: {address},Endereço: {address}
 GATE_SEQ_SKIP,Skip,Pular
 GATE_RESULT_OK,OK,OK
-GATE_WORMHOLE_BANK_STEADY,Capacitors: {stored} of {capacity}. The plant covers the drain.,Capacitores: {stored} de {capacity}. A usina cobre o consumo.
+GATE_WORMHOLE_BANK_STEADY,Capacitors: {stored} of {capacity}. Charging covers the drain.,Capacitores: {stored} de {capacity}. A carga cobre o consumo.
 GATE_WORMHOLE_BANK_FALLING,"Capacitors: {stored} of {capacity}, falling. They run dry in {time}, and then the wormhole collapses.","Capacitores: {stored} de {capacity}, caindo. Eles secam em {time}, e então o buraco de minhoca colapsa."
 GATE_WORMHOLE_ACTIONS,What you can do now,O que você pode fazer agora
 GATE_WORMHOLE_NEW_DOCUMENTS,New in the Archive: {titles},Novo no Arquivo: {titles}

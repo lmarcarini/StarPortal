@@ -120,7 +120,7 @@ func test_the_bank_line_and_no_lock_energy() -> void:
 	)
 	PowerFixture.set_charge(_simulation.state, 26)
 	SimClock.step_ticks(1)
-	assert_str(_screen().get_bank_text()).ends_with("The plant covers the drain.")
+	assert_str(_screen().get_bank_text()).ends_with("Charging covers the drain.")
 	for text: String in Fixture.visible_texts(_screen()):
 		assert_str(text).not_contains(lock_text)
 

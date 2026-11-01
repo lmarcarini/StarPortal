@@ -30,24 +30,38 @@ func get_id() -> StringName:
 ## nothing changed.
 func tick(state: GameState) -> void:
 	var sums: PackedFloat64Array = PowerRules.totals(state)
-	var rated: int = int(sums[PowerRules.RATED_BANKS])
-	if rated != state.power.charge_rates.size() or rated != int(sums[PowerRules.BANKS]):
-		_forget_lost_banks(state)
-		_adopt_new_banks(state)
+	if _needs_settling(state, sums):
+		settle(state)
 		sums = PowerRules.totals(state)
-	var charge: float = PowerRules.charge_mw_of(state, sums)
-	if sums[PowerRules.DRAW] + charge > sums[PowerRules.SUPPLY]:
-		_shed(state)
-		state.events.post(&"power_allocation_changed", [])
-		sums = PowerRules.totals(state)
-		charge = PowerRules.charge_mw_of(state, sums)
 	var capacity: float = PowerRules.capacity_of(state, sums)
+	var charge: float = PowerRules.charge_mw_of(state, sums)
 	var net: float = charge - PowerMath.drain_mw(state.gate, state.balance)
 	state.power.stored_mwh = PowerMath.step_stored_mwh(state.power.stored_mwh, capacity, net)
 
 
+## Brings [param state]'s power back in line after rooms change: forgets gone banks, gives
+## completed banks their rate, and sheds allocation above supply. Posts
+## power_allocation_changed() only when something changed. Called by this system each tick
+## when needed, and by ConstructionSystem and DemolishRoomCommand the moment rooms finish or
+## start coming down, so allocation never exceeds supply between ticks.
+static func settle(state: GameState) -> void:
+	_forget_lost_banks(state)
+	_adopt_new_banks(state)
+	if _shed(state):
+		state.events.post(&"power_allocation_changed", [])
+
+
+## True when a bank was added or lost, or allocation is above supply.
+static func _needs_settling(state: GameState, sums: PackedFloat64Array) -> bool:
+	var rated: int = int(sums[PowerRules.RATED_BANKS])
+	if rated != state.power.charge_rates.size() or rated != int(sums[PowerRules.BANKS]):
+		return true
+	var allocated: float = sums[PowerRules.DRAW] + PowerRules.charge_mw_of(state, sums)
+	return allocated > sums[PowerRules.SUPPLY]
+
+
 ## Drops the charge rate of every bank that no longer stands.
-func _forget_lost_banks(state: GameState) -> void:
+static func _forget_lost_banks(state: GameState) -> void:
 	for room_id: StringName in state.power.charge_rates.keys():
 		var room: RoomState = state.base.find_room(room_id)
 		if room == null or not PowerRules.is_standing(room):
@@ -55,7 +69,7 @@ func _forget_lost_banks(state: GameState) -> void:
 
 
 ## Gives each standing bank without a charge rate the spare supply, up to its maximum.
-func _adopt_new_banks(state: GameState) -> void:
+static func _adopt_new_banks(state: GameState) -> void:
 	for room: RoomState in state.base.rooms:
 		var def: RoomDef = state.room_defs.get(room.def_id)
 		if not PowerRules.is_bank(def) or not PowerRules.is_standing(room):
@@ -69,23 +83,56 @@ func _adopt_new_banks(state: GameState) -> void:
 		state.events.post(&"power_allocation_changed", [])
 
 
-## Switches the newest switchable consumer rooms off, then lowers charge rates (newest bank
-## first), until allocation fits supply.
-func _shed(state: GameState) -> void:
+## Fits allocation to supply: first switches stopped plants back on while supply is below the
+## always-on load, then switches the newest switchable rooms off, then lowers charge rates
+## (newest bank first). Returns true when it changed anything.
+static func _shed(state: GameState) -> bool:
+	if PowerRules.allocated_mw(state) <= PowerRules.supply_mw(state):
+		return false
+	var changed: bool = _restart_plants(state)
 	var rooms: Array[RoomState] = state.base.rooms.duplicate()
 	rooms.reverse()
 	for room: RoomState in rooms:
 		if PowerRules.allocated_mw(state) <= PowerRules.supply_mw(state):
-			return
+			return true
 		var def: RoomDef = state.room_defs.get(room.def_id)
 		if PowerRules.has_switch(def) and def.power_output_mw <= 0.0:
 			if PowerRules.is_running(room, def):
 				room.powered_on = false
+				changed = true
 	var banks: Array[StringName] = state.power.charge_rates.keys()
 	banks.reverse()
 	for room_id: StringName in banks:
 		var over: float = PowerRules.allocated_mw(state) - PowerRules.supply_mw(state)
-		if over <= 0.0:
-			return
 		var rate: int = state.power.charge_rates[room_id]
+		if over <= 0.0 or rate == 0:
+			continue
 		state.power.charge_rates[room_id] = maxi(rate - ceili(over), 0)
+		changed = true
+	return changed
+
+
+## Switches stopped, standing plants back on, oldest first, while supply is below the
+## always-on rooms' draw. Returns true when it switched any.
+static func _restart_plants(state: GameState) -> bool:
+	var changed: bool = false
+	for room: RoomState in state.base.rooms:
+		if PowerRules.supply_mw(state) >= _always_on_mw(state):
+			return changed
+		var def: RoomDef = state.room_defs.get(room.def_id)
+		if def == null or def.power_output_mw <= 0.0 or room.powered_on:
+			continue
+		if PowerRules.is_standing(room):
+			room.powered_on = true
+			changed = true
+	return changed
+
+
+## MW drawn by the standing always-on rooms.
+static func _always_on_mw(state: GameState) -> float:
+	var total: float = 0.0
+	for room: RoomState in state.base.rooms:
+		var def: RoomDef = state.room_defs.get(room.def_id)
+		if def != null and def.always_on and PowerRules.is_standing(room):
+			total += def.power_draw_mw
+	return total

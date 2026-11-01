@@ -71,6 +71,7 @@ func apply(state: GameState) -> void:
 	for target: RoomState in targets(state.base, room):
 		target.demolish_ticks_left = maxi(1, def.build_ticks / 4)
 		target.powered_on = false
+	PowerSystem.settle(state)
 	state.budget.credit(def.build_cost_k * REFUND_PERCENT / 100)
 	state.events.post(&"budget_changed", [state.budget.funds_k])
 
@@ -93,12 +94,11 @@ func _protection_error(state: GameState, room: RoomState, def: RoomDef) -> Strin
 	return &""
 
 
-## Built plants of the base not already coming down.
+## Running plants of the base: built, not coming down and switched on (m2-base.md section 3).
 func _plants_left(state: GameState) -> int:
 	var count: int = 0
 	for other: RoomState in state.base.rooms:
 		var def: RoomDef = state.room_defs.get(other.def_id)
-		if def != null and def.power_output_mw > 0.0:
-			if other.is_built() and not other.is_demolishing():
-				count += 1
+		if def != null and def.power_output_mw > 0.0 and PowerRules.is_running(other, def):
+			count += 1
 	return count

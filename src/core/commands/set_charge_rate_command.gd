@@ -37,7 +37,8 @@ func get_type() -> StringName:
 
 
 ## Rejects an unknown room (&"unknown_room"), a room that is not a bank (&"not_a_bank"), a
-## bank not yet completed or coming down (&"not_built"), a rate below 0 or above the bank's
+## bank not yet completed or coming down (&"not_built"; a completed bank is settable at once,
+## even before PowerSystem has given it a rate), a rate below 0 or above the bank's
 ## maximum (&"rate_out_of_range"), and a raise that would push allocation over supply
 ## (&"no_spare_power").
 func validate(state: GameState) -> CommandResult:
@@ -47,11 +48,11 @@ func validate(state: GameState) -> CommandResult:
 		return CommandResult.fail(&"unknown_room", String(room_id))
 	if not PowerRules.is_bank(def):
 		return CommandResult.fail(&"not_a_bank")
-	if not PowerRules.is_standing(room) or not state.power.charge_rates.has(room_id):
+	if not PowerRules.is_standing(room):
 		return CommandResult.fail(&"not_built")
 	if rate_mw < 0 or rate_mw > def.max_charge_rate_mw:
 		return CommandResult.fail(&"rate_out_of_range")
-	var raise: int = rate_mw - state.power.charge_rates[room_id]
+	var raise: int = rate_mw - state.power.charge_rates.get(room_id, 0)
 	var spare: float = PowerRules.supply_mw(state) - PowerRules.allocated_mw(state)
 	if raise > spare:
 		return CommandResult.fail(&"no_spare_power", "needs %d MW; %s MW spare" % [raise, spare])

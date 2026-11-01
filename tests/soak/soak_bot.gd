@@ -90,7 +90,8 @@ var _next_action_tick: int = 0
 ## The address the bot will dial next, or null.
 var _picked: GateAddress = null
 ## Clock tick before which the picked address cannot be charged yet: the bot skips asking
-## until then (the charge only rises while the Ring is idle).
+## until then (with the Ring idle nothing drains the capacitors; the charge falls only while a
+## wormhole is open and total charging is below its 20 MWh/h drain).
 var _check_at_tick: int = 0
 
 

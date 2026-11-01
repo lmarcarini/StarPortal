@@ -106,7 +106,7 @@ func _assert_start(player: M15Player) -> void:
 
 ## Before the bank and while it is built, SILL's answer is refused for want of charge; the
 ## Capacitor Bank is built as a room in the capacitor alcove over its 360 build ticks, takes
-## the spare supply on the next tick, and the answer can then be charged.
+## the spare supply the moment it is completed, and the answer can then be charged.
 func _assert_no_dial_before_bank(player: M15Player) -> void:
 	var sill_glyphs: Array = M15Player.PUZZLES[0]["glyphs"]
 	var sill: GateAddress = player.address(sill_glyphs)
@@ -117,7 +117,7 @@ func _assert_no_dial_before_bank(player: M15Player) -> void:
 	assert_bool(player.simulation.submit(PowerFixture.build_bank_in_alcove(state)).is_ok).is_true()
 	var bank_def: RoomDef = state.room_defs[StartingBase.CAPACITOR_BANK_DEF]
 	assert_int(bank_def.build_ticks).is_equal(360)
-	for _tick: int in bank_def.build_ticks:
+	for _tick: int in bank_def.build_ticks - 1:
 		player.step()
 	assert_bool(state.power.charge_rates.is_empty()).is_true()
 	_assert_dial_refused(player, sill)
