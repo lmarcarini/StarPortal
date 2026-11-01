@@ -26,6 +26,7 @@ const ACTIONS: Array[StringName] = [
 	&"view_base",
 	&"base_level_up",
 	&"base_level_down",
+	&"base_energy_layer",
 ]
 
 ## Gamepad bindings added to Godot's built-in UI actions at start-up, as {action: [encoded]},
@@ -38,10 +39,11 @@ const UI_GAMEPAD_DEFAULTS: Dictionary = {
 
 ## Default bindings as {action: {KEYBOARD: [encoded], GAMEPAD: [encoded]}}, each event
 ## encoded by [InputEventCodec], at most [code]InputService.BINDINGS_PER_DEVICE[/code] each.
-## The gamepad chord Back + Right stick press for [code]debug_toggle_overlay[/code] cannot be
-## bound in [InputMap], so its default is Back alone. The shoulders switch views (the usual
-## tab convention), so the time speed sits on the triggers: an axis pulled past the action's
-## deadzone, read once per pull by [method Input.is_action_just_pressed_by_event].
+## The gamepad View (Back) button toggles the Base tab's energy layer
+## (docs/content/m2-base.md section 6), so [code]debug_toggle_overlay[/code] is F12 only.
+## The shoulders switch views (the usual tab convention), so the time speed sits on the
+## triggers: an axis pulled past the action's deadzone, read once per pull by
+## [method Input.is_action_just_pressed_by_event].
 const DEFAULTS: Dictionary = {
 	&"time_toggle_pause":
 	{
@@ -93,7 +95,7 @@ const DEFAULTS: Dictionary = {
 	&"debug_toggle_overlay":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F12}],
-		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_BACK}],
+		GAMEPAD: [],
 	},
 	&"view_next":
 	{
@@ -141,6 +143,11 @@ const DEFAULTS: Dictionary = {
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_PAGEDOWN}],
 		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_X}],
+	},
+	&"base_energy_layer":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_P}],
+		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_BACK}],
 	},
 }
 
