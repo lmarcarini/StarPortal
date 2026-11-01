@@ -43,3 +43,29 @@ BASE_STATUS_SITE,Marked site,Local demarcado
 BASE_ALCOVE_NAME,Capacitor alcove,Nicho dos capacitores
 BASE_ALCOVE_DESC,Marked site for the first Capacitor Bank.,Local reservado para o primeiro Banco de Capacitores.
 BASE_ALCOVE_LABEL,SITE,LOCAL
+BASE_POWER_BAR_CHARGE,Charge,Carga
+BASE_POWER_SUPPLY,{supply} MW · {spare} spare,{supply} MW · {spare} livres
+BASE_POWER_LAYER_BUTTON,Energy (P),Energia (P)
+BASE_POWER_CAP_NONE,No capacitors installed,Nenhum capacitor instalado
+BASE_POWER_CAP_FILL,"Capacitors {stored}/{cap} MWh, full in {h} h","Capacitores {stored}/{cap} MWh, cheios em {h} h"
+BASE_POWER_CAP_FULL,"Capacitors {stored}/{cap} MWh, full","Capacitores {stored}/{cap} MWh, cheios"
+BASE_POWER_CAP_IDLE,"Capacitors {stored}/{cap} MWh, not charging","Capacitores {stored}/{cap} MWh, sem carga"
+BASE_POWER_CAP_DRAIN,"Capacitors {stored}/{cap} MWh, draining","Capacitores {stored}/{cap} MWh, descarregando"
+BASE_POWER_SWITCH_ON,ON · switch off,LIGADA · desligar
+BASE_POWER_SWITCH_OFF,OFF · switch on,DESLIGADA · ligar
+BASE_POWER_SWITCH_LOCKED,ON · locked,LIGADA · travada
+BASE_POWER_LOCK_ALWAYS_ON,Always on: the Gate Room and Control Room never switch off.,Sempre ligada: a Sala do Portal e a Sala de Controle nunca desligam.
+BASE_POWER_LOCK_LAST_PLANT,The base's last running plant.,A última usina em funcionamento da base.
+BASE_POWER_REFUSED_SPARE,Needs {need} MW; {spare} MW spare.,Precisa de {need} MW; {spare} MW livres.
+BASE_POWER_REFUSED_PLANT_OFF,Switching it off takes away {need} MW; only {spare} MW spare. Switch rooms off or lower charging first.,Desligá-la tira {need} MW; só há {spare} MW livres. Desligue salas ou reduza a carga antes.
+BASE_POWER_REFUSED_NO_SWITCH,This room has no switch.,Esta sala não tem interruptor.
+BASE_POWER_REFUSED_OTHER,Not possible right now.,Não é possível agora.
+BASE_POWER_TAG_ON,ON {mw},LIG {mw}
+BASE_POWER_TAG_OFF,OFF,DESL
+BASE_POWER_TAG_LOCK,LOCK {mw},TRAVA {mw}
+BASE_POWER_TAG_PLANT,+{mw},+{mw}
+BASE_POWER_TAG_CHARGE,− CHG {mw} +,− CRG {mw} +
+BASE_POWER_TAG_NEED,NEEDS {mw},PRECISA {mw}
+BASE_POWER_CHARGE_RATE,Charge rate {mw} / {max} MW,Taxa de carga {mw} / {max} MW
+BASE_POWER_RATE_DOWN,−,−
+BASE_POWER_RATE_UP,+,+

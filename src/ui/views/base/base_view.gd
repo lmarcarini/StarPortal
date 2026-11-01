@@ -1,8 +1,8 @@
 class_name BaseView
 extends GameView
 ## The Base tab (F3): the level column, the plan of the shown level and the selected-room
-## panel (docs/content/m2-base.md section 6). Read only for now; building and the energy layer
-## come later. The base_level_up and base_level_down actions (PageUp and PageDown, (Y) and
+## panel (docs/content/m2-base.md section 6), with the power strip, switches and energy layer
+## of [BaseViewPower]. The base_level_up and base_level_down actions (PageUp and PageDown, (Y) and
 ## (X)) change level.
 ## Bible: docs/content/m2-base.md section 6, game-design.md#base-building-and-power
 
@@ -10,6 +10,8 @@ var _simulation: Simulation = null
 var _defs: Dictionary = {}
 ## What the plan last drew from; a tick redraws only when it changes.
 var _signature: int = 0
+## The power strip, switches and energy layer (card #141).
+var _power: BaseViewPower = BaseViewPower.new()
 
 @onready var _levels: LevelTabs = %LevelTabs
 @onready var _heading: Label = %LevelHeading
@@ -21,6 +23,7 @@ func _ready() -> void:
 	_levels.level_chosen.connect(_show_level)
 	_plan.selection_changed.connect(_on_selection_changed)
 	_panel.show_nothing()
+	_setup_power()
 
 
 func _enter_tree() -> void:
@@ -48,6 +51,7 @@ func setup(simulation: Simulation) -> void:
 	_levels.show_levels(base.levels, _plan.level)
 	_show_level(gate_level(base))
 	_signature = signature(base)
+	_power.setup(simulation)
 
 
 func get_default_focus() -> Control:
@@ -98,6 +102,7 @@ func _refresh() -> void:
 	_heading.text = tr(&"BASE_LEVEL_HEADING").format({"n": _plan.level})
 	_plan.queue_redraw()
 	_on_selection_changed(_plan.selected())
+	_power.refresh()
 
 
 func _on_tick_advanced(_tick: int) -> void:
@@ -131,6 +136,7 @@ static func signature(base: BaseState) -> int:
 
 
 func _on_selection_changed(selected: StringName) -> void:
+	_power.select(selected)
 	if selected == BasePlan.ALCOVE:
 		_panel.show_alcove(_def(StartingBase.CAPACITOR_BANK_DEF))
 		return
@@ -165,3 +171,18 @@ static func _room_defs() -> Dictionary:
 func _def(def_id: StringName) -> RoomDef:
 	var found: Variant = _defs.get(def_id)
 	return found if found is RoomDef else null
+
+
+# --- Power (card #141): the strip, the panel's switch and charge control, the energy layer.
+# All of it lives in BaseViewPower; the view only attaches it and passes the selection on.
+
+
+## Returns the power part of the tab, for tests.
+func get_power() -> BaseViewPower:
+	return _power
+
+
+func _setup_power() -> void:
+	_power.name = "Power"
+	add_child(_power)
+	_power.attach(_heading.get_parent() as Control, _plan, _panel)

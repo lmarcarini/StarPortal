@@ -65,12 +65,13 @@ func test_default_bindings() -> void:
 	_assert_keys(service, &"view_base", [KEY_F3])
 	_assert_keys(service, &"base_level_up", [KEY_PAGEUP])
 	_assert_keys(service, &"base_level_down", [KEY_PAGEDOWN])
+	_assert_keys(service, &"base_energy_layer", [KEY_P])
 	_assert_pad(service, &"time_toggle_pause", [JOY_BUTTON_START])
 	_assert_trigger(service, &"time_faster", JOY_AXIS_TRIGGER_RIGHT)
 	_assert_trigger(service, &"time_slower", JOY_AXIS_TRIGGER_LEFT)
 	_assert_pad(service, &"quick_save", [])
 	_assert_pad(service, &"quick_load", [])
-	_assert_pad(service, &"debug_toggle_overlay", [JOY_BUTTON_BACK])
+	_assert_pad(service, &"debug_toggle_overlay", [])
 	_assert_pad(service, &"view_next", [JOY_BUTTON_RIGHT_SHOULDER])
 	_assert_pad(service, &"view_previous", [JOY_BUTTON_LEFT_SHOULDER])
 	_assert_pad(service, &"view_gate_room", [])
@@ -78,6 +79,7 @@ func test_default_bindings() -> void:
 	_assert_pad(service, &"view_base", [])
 	_assert_pad(service, &"base_level_up", [JOY_BUTTON_Y])
 	_assert_pad(service, &"base_level_down", [JOY_BUTTON_X])
+	_assert_pad(service, &"base_energy_layer", [JOY_BUTTON_BACK])
 
 
 ## No two default bindings of one device kind are the same event, so the defaults pass the
