@@ -26,6 +26,7 @@ GATE_REPEAT_WARNING,Dialed on {date}: {outcome}. Dialing it again will spend the
 GATE_REASON_BUSY,The Ring is busy: it is dialing or has a wormhole open.,O Anel está ocupado: está discando ou há um buraco de minhoca aberto.
 GATE_REASON_REJECTED,The dial was refused.,A discagem foi recusada.
 GATE_DIAL_NO_CAPACITORS,No capacitors installed.,Nenhum capacitor instalado.
+GATE_BUILD_CAPACITOR_BANK,Build capacitor bank,Construir banco de capacitores
 GATE_DIAL_CAPACITORS_EMPTY,Capacitors empty.,Capacitores vazios.
 GATE_DIAL_REJECT_CHARGE,Not enough charge. The Ring would not turn.,Carga insuficiente. O Anel não chegou a girar.
 GATE_GAUGE_TITLE,Capacitors,Capacitores

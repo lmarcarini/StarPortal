@@ -19,6 +19,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 autowrap_mode = 3
 
+[node name="BuildBank" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+text = "GATE_BUILD_CAPACITOR_BANK"
+
 [node name="BarArea" type="Control" parent="."]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 28)

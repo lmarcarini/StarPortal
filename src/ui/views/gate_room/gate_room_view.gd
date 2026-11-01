@@ -23,6 +23,8 @@ extends GameView
 
 ## The wormhole actions asked to read [param document_id] in the Archive.
 signal archive_requested(document_id: StringName)
+## The capacitor gauge asked to build the first Capacitor Bank in the Base tab.
+signal capacitor_bank_requested
 
 const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
 
@@ -47,6 +49,7 @@ func _ready() -> void:
 	_overlays.changed.connect(_on_overlays_changed)
 	_overlays.address_book_requested.connect(_on_address_book_requested)
 	_overlays.archive_requested.connect(archive_requested.emit)
+	_gauge.build_bank_requested.connect(capacitor_bank_requested.emit)
 	_sequence.get_parent().add_child(_photo)
 	_ring.add_child(_camera_cue)
 	var wormhole: WormholeScreen = _overlays.get_wormhole_screen()

@@ -10,7 +10,8 @@ extends Control
 ## it had before it was hidden; descendants inherit and keep their own settings.
 ## The Archive's tab counts its unread documents ("Archive (2)"), as the Archive view
 ## reports them. When the Gate Room asks for a document (Read in the Archive on the wormhole
-## screen), the switcher opens the Archive with that document selected.
+## screen), the switcher opens the Archive with that document selected. When the Gate Room
+## asks to build the first Capacitor Bank, it opens the Base with the bank's ghost placed.
 ## The switcher holds no game state: it passes the simulation down and forgets it.
 ## Bible: game-design.md#core-loop, technical-architecture.md#signals-and-scenes,
 ## technical-architecture.md#input-accessibility-and-localisation
@@ -136,6 +137,7 @@ func _connect_view(view: GameView) -> void:
 		(view as ArchiveView).unread_changed.connect(_refresh_titles)
 	elif view is GateRoomView:
 		(view as GateRoomView).archive_requested.connect(_on_archive_requested)
+		(view as GateRoomView).capacitor_bank_requested.connect(_on_capacitor_bank_requested)
 
 
 ## Shows [param view_id] and hides the others, without moving focus.
@@ -238,3 +240,14 @@ func _on_archive_requested(document_id: StringName) -> void:
 		return
 	archive.open_document(document_id)
 	show_view(ARCHIVE)
+
+
+## Opens the Base with the Capacitor Bank's ghost in the capacitor alcove.
+func _on_capacitor_bank_requested() -> void:
+	if not _views.has(BASE):
+		return
+	var base: BaseView = _views[BASE] as BaseView
+	if base == null:
+		return
+	show_view(BASE)
+	base.place_capacitor_bank()
