@@ -43,6 +43,45 @@ BASE_STATUS_SITE,Marked site,Local demarcado
 BASE_ALCOVE_NAME,Capacitor alcove,Nicho dos capacitores
 BASE_ALCOVE_DESC,Marked site for the first Capacitor Bank.,Local reservado para o primeiro Banco de Capacitores.
 BASE_ALCOVE_LABEL,SITE,LOCAL
+BASE_BUILD_TITLE,BUILD,CONSTRUIR
+BASE_BUILD_HINT,"Pick a room, or (B) on the plan to reach this palette.","Escolha uma sala, ou (B) na planta para chegar a esta paleta."
+BASE_BUILD_HOLD,Hold to build,Segure para construir
+BASE_BUILD_DAYS,{n} d,{n} d
+BASE_BUILD_HOURS,{n} h,{n} h
+BASE_BUILD_MINUTES,{n} min,{n} min
+BASE_BUILD_SUMMARY,"{name}: {cost}, {time}. {power}.","{name}: {cost}, {time}. {power}."
+BASE_BUILD_SUMMARY_CELL,"{name}: {cost} and {time} per cell.","{name}: {cost} e {time} por célula."
+BASE_BUILD_PLACING,"{name}: {cost}, {time}. Q or E rotates; hold to build; Esc or (B) leaves.","{name}: {cost}, {time}. Q ou E gira; segure para construir; Esc ou (B) sai."
+BASE_BUILD_STARTED,{name}: construction started ({cost}).,{name}: obra iniciada ({cost}).
+BASE_BUILD_CANCEL,Cancel (hold): refund {refund},Cancelar (segure): reembolso {refund}
+BASE_BUILD_CANCELLED,{extra} site cancelled. Refund +{refund}.,Obra de {extra} cancelada. Reembolso +{refund}.
+BASE_BUILD_DEMOLISH,"Demolish (hold): refund {refund}, {extra}","Demolir (segure): reembolso {refund}, {extra}"
+BASE_BUILD_DEMOLISHING,{extra} coming down. Refund +{refund}.,{extra} em demolição. Reembolso +{refund}.
+BASE_BUILD_DIG,"Dig Level {n}: {cost}, {time}","Escavar Nível {n}: {cost}, {time}"
+BASE_BUILD_DIG_CANCEL,Cancel dig of Level {n}: refund {refund},Cancelar escavação do Nível {n}: reembolso {refund}
+BASE_BUILD_DIG_DONE,All levels dug,Todos os níveis escavados
+BASE_BUILD_DIG_STARTED,Digging Level {extra}.,Escavando o Nível {extra}.
+BASE_BUILD_DIG_CANCELLED,Dig of Level {extra} cancelled. Refund +{refund}.,Escavação do Nível {extra} cancelada. Reembolso +{refund}.
+BASE_BUILD_NEEDS_MONEY,Needs {cost}; you have {have}.,Precisa de {cost}; você tem {have}.
+BASE_BUILD_OVERLAP,Overlaps the {name}.,Sobrepõe {name}.
+BASE_BUILD_OVERLAP_LEVEL,Overlaps the {name} on Level {level}.,Sobrepõe {name} no Nível {level}.
+BASE_BUILD_OVERLAP_ANY,Overlaps a room.,Sobrepõe uma sala.
+BASE_BUILD_ERR_OUTSIDE_LEVEL,Outside the level.,Fora do nível.
+BASE_BUILD_ERR_NOT_CONNECTED,Must touch a corridor.,Precisa tocar um corredor.
+BASE_BUILD_ERR_NOT_ROTATABLE,This room can't turn.,Esta sala não gira.
+BASE_BUILD_ERR_NO_SUCH_LEVEL,Needs a level below.,Precisa de um nível abaixo.
+BASE_BUILD_ERR_LEVEL_NOT_DUG,The level is still being dug.,O nível ainda está sendo escavado.
+BASE_BUILD_ERR_INVALID_RUN,Paint one joined corridor run.,Pinte um trecho de corredor contínuo.
+BASE_BUILD_ERR_NOT_BUILDABLE,This room can't be built.,Esta sala não pode ser construída.
+BASE_BUILD_ERR_FIXED_ROOM,The Gate and Control Rooms stay.,As Salas do Portal e de Controle ficam.
+BASE_BUILD_ERR_STARTING_LIFT,The starting lift stays.,O elevador inicial fica.
+BASE_BUILD_ERR_LAST_PLANT,The base's last running plant.,A última usina em funcionamento da base.
+BASE_BUILD_ERR_LEAVES_ROOM_UNCONNECTED,A room would touch no corridor.,Uma sala ficaria sem corredor.
+BASE_BUILD_ERR_ALREADY_DEMOLISHING,Coming down.,Em demolição.
+BASE_BUILD_ERR_DEMOLITION_IN_PROGRESS,Part of the site is coming down.,Parte da obra está em demolição.
+BASE_BUILD_ERR_DIG_RUNNING,A level is already being dug.,Um nível já está sendo escavado.
+BASE_BUILD_ERR_LEVEL_LIMIT,All levels dug.,Todos os níveis escavados.
+BASE_BUILD_ERR_OTHER,Can't do that here.,Não é possível aqui.
 BASE_POWER_BAR_CHARGE,Charge,Carga
 BASE_POWER_SUPPLY,{supply} MW · {spare} spare,{supply} MW · {spare} livres
 BASE_POWER_LAYER_BUTTON,Energy (P),Energia (P)
