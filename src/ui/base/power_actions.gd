@@ -39,9 +39,3 @@ static func set_rate(simulation: Simulation, room_id: StringName, rate_mw: int) 
 	if result.is_ok:
 		return ""
 	return PowerText.refusal(result.error_code, target - current, spare, false)
-
-
-## Moves bank [param room_id]'s charge rate by [param step] MW.
-static func step_rate(simulation: Simulation, room_id: StringName, step: int) -> String:
-	var current: int = simulation.state.power.charge_rates.get(room_id, 0)
-	return set_rate(simulation, room_id, current + step)

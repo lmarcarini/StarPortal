@@ -33,6 +33,7 @@ func before_test() -> void:
 
 
 func after_test() -> void:
+	EventBus.bind_simulation(null)
 	if is_instance_valid(_root):
 		_root.free()
 	TranslationServer.set_locale(_real_locale)
@@ -151,6 +152,26 @@ func test_layout_fits_in_both_languages() -> void:
 		await _runner.simulate_frames(2)
 		var needed_now: Vector2 = (_view.get_node("Columns") as Control).get_combined_minimum_size()
 		assert_bool(needed_now.x <= VIEW_SIZE.x and needed_now.y <= VIEW_SIZE.y).is_true()
+
+
+## A demolish submitted while paused refreshes the bar through the events alone.
+func test_demolish_while_paused_refreshes_the_bar() -> void:
+	EventBus.bind_simulation(_simulation)
+	var archive: RoomState = PowerFixture.first_room(_simulation.state, &"room_archive")
+	var result: CommandResult = _simulation.submit(DemolishRoomCommand.create(archive.id))
+	assert_bool(result.is_ok).override_failure_message(String(result.error_code)).is_true()
+	assert_float(_drawn_mw()).is_equal(PowerRules.allocated_mw(_simulation.state))
+	assert_float(_drawn_mw()).is_equal(3.0)
+
+
+## The view keeps working after leaving and re-entering the tree.
+func test_survives_leaving_and_reentering_the_tree() -> void:
+	_root.remove_child(_view)
+	_root.add_child(_view)
+	EventBus.bind_simulation(_simulation)
+	var archive: RoomState = PowerFixture.first_room(_simulation.state, &"room_archive")
+	_simulation.submit(SwitchRoomCommand.create(archive.id, false))
+	assert_float(_drawn_mw()).is_equal(3.0)
 
 
 func _drawn_mw() -> float:

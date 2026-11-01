@@ -32,14 +32,40 @@ func attach(column: Control, plan: BasePlan, panel: Control) -> void:
 	room_switch.toggle_requested.connect(_toggle)
 	charge.rate_requested.connect(_set_rate)
 	plan.gui_input.connect(_on_plan_input)
+
+
+func _enter_tree() -> void:
 	EventBus.tick_advanced.connect(_on_tick)
 	EventBus.power_allocation_changed.connect(refresh)
+	EventBus.budget_changed.connect(_on_budget_changed)
+	EventBus.room_build_started.connect(_on_room_event)
+	EventBus.room_built.connect(_on_room_event)
+	EventBus.room_demolished.connect(_on_room_event)
+	EventBus.level_dug.connect(_on_level_dug)
 
 
 func _exit_tree() -> void:
-	if EventBus.tick_advanced.is_connected(_on_tick):
-		EventBus.tick_advanced.disconnect(_on_tick)
-		EventBus.power_allocation_changed.disconnect(refresh)
+	EventBus.tick_advanced.disconnect(_on_tick)
+	EventBus.power_allocation_changed.disconnect(refresh)
+	EventBus.budget_changed.disconnect(_on_budget_changed)
+	EventBus.room_build_started.disconnect(_on_room_event)
+	EventBus.room_built.disconnect(_on_room_event)
+	EventBus.room_demolished.disconnect(_on_room_event)
+	EventBus.level_dug.disconnect(_on_level_dug)
+
+
+## A build, demolish, cancel or dig changes rooms: demolish and cancel post only
+## budget_changed when they start, so that refreshes too.
+func _on_budget_changed(_budget_k: int) -> void:
+	refresh()
+
+
+func _on_room_event(_site_id: StringName) -> void:
+	refresh()
+
+
+func _on_level_dug(_level: int) -> void:
+	refresh()
 
 
 ## Reads the power of [param simulation].
