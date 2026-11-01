@@ -14,6 +14,9 @@ extends RefCounted
 ## unread, which fills the Address Book, then extends the pole camera (ExtendPoleCameraCommand)
 ## if the world's horizon record is not taken, and closes the wormhole once the camera is back
 ## and the wormhole has been open a few ticks.
+## Once the bank charges it builds on: a corridor run off the Level 2 spine and a Physics Lab
+## against it (the lab completes off, since the bank holds the spare supply), and it digs each
+## extra level as soon as the money allows (DigLevelCommand), one at a time.
 ## Every random draw comes from the run's own GameState stream &"soak_bot", so two runs from
 ## the same seed act identically, and a saved and reloaded state carries the stream on. The
 ## picked address is the bot's own, not game state: it carries on across reloads with the bot.
@@ -50,6 +53,13 @@ const MAX_INT_VALUE: int = 1000000
 const BOOK_CHANCE: float = 0.3
 ## Chance that a newly picked address is a real world's true address.
 const TARGET_CHANCE: float = 0.1
+## The corridor run and the Physics Lab the bot builds on Level 2 (as in test_m2_flow.gd).
+const LAB_LEVEL: int = 2
+const LAB_CORRIDOR: Array[Vector2i] = [
+	Vector2i(20, 14), Vector2i(20, 13), Vector2i(20, 12), Vector2i(20, 11), Vector2i(20, 10)
+]
+const LAB_DEF: StringName = &"room_physics_lab"
+const LAB_ORIGIN: Vector2i = Vector2i(21, 10)
 ## Ticks an open wormhole stays open before the bot closes it.
 const CLOSE_AFTER_TICKS: int = 5
 
@@ -85,6 +95,9 @@ var cameras_extended: int = 0
 var installs: int = 0
 ## Charge rates the bot set.
 var charge_sets: int = 0
+## Base builds the bot started (corridor runs and rooms), and digs.
+var builds: int = 0
+var digs: int = 0
 
 var _next_action_tick: int = 0
 ## The address the bot will dial next, or null.
@@ -104,6 +117,8 @@ func act(simulation: Simulation) -> void:
 	var rng: RandomNumberGenerator = simulation.state.random.stream(STREAM_ID)
 	if simulation.commands.pending_count() == 0:
 		_work_ring(simulation, rng)
+	if simulation.commands.pending_count() == 0 and charge_sets > 0:
+		_work_base(simulation)
 	if not clock.is_paused and clock.tick < _next_action_tick:
 		return
 	if clock.mode == ClockState.Mode.HELD:
@@ -332,6 +347,32 @@ func _random_value(rng: RandomNumberGenerator) -> Variant:
 			return rng.randi_range(-MAX_INT_VALUE, MAX_INT_VALUE)
 		_:
 			return "value_%d" % rng.randi()
+
+
+## Builds the corridor run, then the lab against it once the run's site stands, then digs the
+## next level whenever a dig is allowed and affordable; never submits a refused command.
+func _work_base(simulation: Simulation) -> void:
+	var state: GameState = simulation.state
+	if (
+		builds >= 2
+		and (state.base.digging_level() != 0 or digs >= state.balance.dig_level_costs_k.size())
+	):
+		return
+	var next: Command = null
+	if builds == 0:
+		var run: Array[Vector2i] = LAB_CORRIDOR.duplicate()
+		next = PaintCorridorCommand.create(LAB_LEVEL, run)
+	elif builds == 1:
+		next = PlaceRoomCommand.create(LAB_DEF, LAB_LEVEL, LAB_ORIGIN)
+	else:
+		next = DigLevelCommand.new()
+	if not next.validate(state).is_ok:
+		return
+	simulation.submit(next)
+	if builds < 2:
+		builds += 1
+	else:
+		digs += 1
 
 
 ## Gives the first bank all the spare supply, up to its maximum, as its charge rate.

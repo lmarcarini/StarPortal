@@ -27,8 +27,9 @@ const YEAR_TICKS: int = YEAR_DAYS * TimeMath.TICKS_PER_DAY
 const YEAR_MONTHS: int = 12
 ## Slot the save-and-load run writes at every month close.
 const SLOT: StringName = &"soak_month"
-## Time budget of the whole test on CI, in milliseconds.
-const BUDGET_MSEC: int = 60000
+## Time budget of the whole test, in milliseconds: a ceiling for slow or shared machines, not
+## a target. A normal run takes about 55 s (decision log, 2026-11-01).
+const BUDGET_MSEC: int = 90000
 
 var _service: SaveServiceScript
 var _defs: GameDefs
@@ -56,6 +57,9 @@ class SoakRun:
 	var month_close_pending: bool = false
 	## Ticks after which stored power was below 0 or above the capacity.
 	var power_out_of_bounds: int = 0
+	## Month closes after which the budget was below 0 or above the start plus a year's
+	## allocations (spending is validated, so only the month-end can break it).
+	var budget_out_of_bounds: int = 0
 
 	## Starts a run on a new game seeded with [param base_seed], built by GameSetup from
 	## [param defs].
@@ -73,6 +77,15 @@ class SoakRun:
 			power_out_of_bounds += 1
 		elif sums[PowerRules.DRAW] + PowerRules.charge_mw_of(state, sums) > sums[0]:
 			power_out_of_bounds += 1
+
+	## Counts the month close just run when the budget left 0 .. start + 12 allocations: the bot only
+	## spends what it has and the allocation out-runs the upkeep.
+	func check_budget() -> void:
+		var balance: BalanceConfig = simulation.state.balance
+		var most: int = balance.starting_budget_k + YEAR_MONTHS * balance.monthly_allocation_k
+		var funds: int = simulation.state.budget.funds_k
+		if funds < 0 or funds > most:
+			budget_out_of_bounds += 1
 
 	## Makes [param next] the simulation this run plays and listens to its signals.
 	func attach(next: Simulation) -> void:
@@ -172,6 +185,7 @@ func _play(run: SoakRun, reload_each_month: bool) -> void:
 		if not run.month_close_pending:
 			continue
 		run.month_close_pending = false
+		run.check_budget()
 		if reload_each_month:
 			_reload(run)
 
@@ -216,6 +230,7 @@ func _assert_run_events(
 	assert_int(state.power.charge_rates.size()).is_equal(1)
 	assert_int(run.bot.installs).is_equal(1)
 	assert_int(run.bot.charge_sets).is_equal(1)
+	_assert_run_base(run)
 	_assert_run_ring(run)
 	var commands: int = run.bot.commands_submitted
 	assert_int(commands).is_between(15 * YEAR_DAYS, 25 * YEAR_DAYS)
@@ -252,6 +267,22 @@ func _assert_run_ring(run: SoakRun) -> void:
 		named.append(entry.world_id)
 	for world_id: StringName in state.worlds.statuses:
 		assert_bool(named.has(world_id)).override_failure_message(world_id).is_true()
+
+
+## Checks [param run] built the corridor run and the lab and dug both extra levels, and the
+## budget stayed in bounds at every month close.
+func _assert_run_base(run: SoakRun) -> void:
+	var state: GameState = run.simulation.state
+	assert_int(run.budget_out_of_bounds).is_equal(0)
+	assert_int(run.bot.builds).is_equal(2)
+	assert_int(run.bot.digs).is_equal(_defs.balance.dig_level_costs_k.size())
+	assert_int(state.base.level_count).is_equal(
+		_defs.balance.starting_levels + _defs.balance.dig_level_costs_k.size()
+	)
+	assert_int(state.base.digging_level()).is_equal(0)
+	var lab: RoomState = PowerFixture.first_room(state, SoakBot.LAB_DEF)
+	assert_object(lab).is_not_null()
+	assert_bool(lab.is_built()).is_true()
 
 
 ## Locks and hostile locks in [param run]'s Dial Log.
