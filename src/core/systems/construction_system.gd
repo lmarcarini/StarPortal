@@ -19,6 +19,8 @@ func get_id() -> StringName:
 ## Advances the dig, the active sites and every demolition by one tick.
 func tick(state: GameState) -> void:
 	_tick_dig(state)
+	if not _has_work(state.base):
+		return
 	_tick_sites(state)
 	_tick_demolitions(state)
 
@@ -31,6 +33,14 @@ static func site_queue(base: BaseState) -> Array[StringName]:
 		if not room.is_built() and not room.site_key() in keys:
 			keys.append(room.site_key())
 	return keys
+
+
+## True when a room of [param base] is building or coming down.
+static func _has_work(base: BaseState) -> bool:
+	for room: RoomState in base.rooms:
+		if room.build_ticks_left > 0 or room.demolish_ticks_left > 0:
+			return true
+	return false
 
 
 func _tick_sites(state: GameState) -> void:
