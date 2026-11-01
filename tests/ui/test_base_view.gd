@@ -162,3 +162,18 @@ func _action(action: StringName) -> InputEventAction:
 func _press_action(action: StringName) -> void:
 	_runner.simulate_action_pressed(String(action))
 	await _runner.await_input_processed()
+
+
+func test_signature_changes_only_with_what_is_shown() -> void:
+	var base: BaseState = _simulation.state.base
+	var before: int = BaseView.signature(base)
+	assert_int(BaseView.signature(base)).is_equal(before)
+	var room: RoomState = base.add_room(&"room_physics_lab", 3, Vector2i(4, 4))
+	room.build_ticks_left = TimeMath.TICKS_PER_DAY * 2
+	var built: int = BaseView.signature(base)
+	assert_int(built).is_not_equal(before)
+	room.build_ticks_left -= 1
+	assert_int(BaseView.signature(base)).is_equal(built)
+	room.build_ticks_left = TimeMath.TICKS_PER_DAY
+	assert_int(BaseView.signature(base)).is_not_equal(built)
+	assert_int(BaseView.gate_level(base)).is_equal(3)

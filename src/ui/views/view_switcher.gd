@@ -3,9 +3,8 @@ extends Control
 ## Hosts the game views under a tab bar and shows one at a time. Each child of %Views is a
 ## [GameView]; its id is its node name in snake_case ([code]GateRoom[/code] is
 ## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
-## (view_next and view_previous wrap at the ends; view_gate_room, view_archive,
-## view_base) and the
-## gamepad shoulders switch views. Hidden views stay in the tree and keep their own state,
+## (view_next and view_previous wrap at the ends; view_gate_room, view_archive, view_base)
+## and the gamepad shoulders switch views. Hidden views stay in the tree and keep their own state,
 ## but are invisible, do not process and cannot take focus or the mouse. Only the view root's
 ## own process, focus and mouse modes are changed, and showing the view restores the values
 ## it had before it was hidden; descendants inherit and keep their own settings.

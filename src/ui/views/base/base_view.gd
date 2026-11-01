@@ -8,6 +8,8 @@ extends GameView
 
 var _simulation: Simulation = null
 var _defs: Dictionary = {}
+## What the plan last drew from; a tick redraws only when it changes.
+var _signature: int = 0
 
 @onready var _levels: LevelTabs = %LevelTabs
 @onready var _heading: Label = %LevelHeading
@@ -44,7 +46,8 @@ func setup(simulation: Simulation) -> void:
 	var alcove: Rect2i = StartingBase.alcove(balance, bank) if bank != null else Rect2i()
 	_plan.show_base(base, _defs, alcove, balance.capacitor_alcove_level)
 	_levels.show_levels(base.levels, _plan.level)
-	_show_level(base.level_count)
+	_show_level(gate_level(base))
+	_signature = signature(base)
 
 
 func get_default_focus() -> Control:
@@ -98,8 +101,33 @@ func _refresh() -> void:
 
 
 func _on_tick_advanced(_tick: int) -> void:
-	if is_visible_in_tree():
-		_refresh()
+	if _simulation == null or not is_visible_in_tree():
+		return
+	var now: int = signature(_simulation.state.base)
+	if now == _signature:
+		return
+	_signature = now
+	_refresh()
+
+
+## Returns the level of [param base]'s Gate Room, or its deepest level when there is none.
+static func gate_level(base: BaseState) -> int:
+	for room: RoomState in base.rooms:
+		if room.def_id == StartingBase.GATE_ROOM_DEF:
+			return room.level
+	return base.level_count
+
+
+## Returns a cheap hash of what the view shows of [param base]: rooms, their switches and
+## whole days left to build, and the levels' whole days left to dig.
+static func signature(base: BaseState) -> int:
+	var parts: Array[int] = [base.rooms.size(), base.levels.size()]
+	for room: RoomState in base.rooms:
+		parts.append(ceili(float(room.build_ticks_left) / TimeMath.TICKS_PER_DAY))
+		parts.append(int(room.powered_on))
+	for level: LevelState in base.levels:
+		parts.append(ceili(float(level.dig_ticks_left) / TimeMath.TICKS_PER_DAY))
+	return hash(parts)
 
 
 func _on_selection_changed(selected: StringName) -> void:
