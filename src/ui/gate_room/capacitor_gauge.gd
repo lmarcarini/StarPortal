@@ -33,6 +33,7 @@ func _enter_tree() -> void:
 	EventBus.capacitors_installed.connect(_on_capacitors_installed)
 	EventBus.room_build_started.connect(_on_room_changed)
 	EventBus.room_demolished.connect(_on_room_changed)
+	EventBus.budget_changed.connect(_on_budget_changed)
 
 
 func _exit_tree() -> void:
@@ -41,6 +42,7 @@ func _exit_tree() -> void:
 	EventBus.capacitors_installed.disconnect(_on_capacitors_installed)
 	EventBus.room_build_started.disconnect(_on_room_changed)
 	EventBus.room_demolished.disconnect(_on_room_changed)
+	EventBus.budget_changed.disconnect(_on_budget_changed)
 
 
 func _notification(what: int) -> void:
@@ -136,4 +138,9 @@ func _on_capacitors_installed(_capacity_mwh: float) -> void:
 
 
 func _on_room_changed(_site_id: StringName) -> void:
+	_refresh()
+
+
+## A cancel or a demolition posts only budget_changed: refresh at once, also while paused.
+func _on_budget_changed(_budget_k: int) -> void:
 	_refresh()

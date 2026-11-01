@@ -88,3 +88,21 @@ func test_charge_display_never_shows_the_lock_energy() -> void:
 	Fixture.select(_view, address)
 	var lock: float = GateQueries.lock_energy_mwh(_simulation.state, address)
 	assert_str(_gauge().get_values_text()).not_contains(String.num(lock, 1))
+
+
+func test_build_button_follows_build_and_cancel_while_paused() -> void:
+	var state: GameState = _simulation.state
+	state.clock.is_paused = true
+	var button: Button = _gauge().get_build_button()
+	assert_bool(button.visible).is_true()
+	var alcove: Rect2i = StartingBase.alcove(
+		state.balance, state.room_defs[StartingBase.CAPACITOR_BANK_DEF]
+	)
+	var place := PlaceRoomCommand.create(
+		StartingBase.CAPACITOR_BANK_DEF, state.balance.capacitor_alcove_level, alcove.position
+	)
+	assert_bool(_simulation.submit(place).is_ok).is_true()
+	assert_bool(button.visible).is_false()
+	var site: RoomState = state.base.rooms[-1]
+	assert_bool(_simulation.submit(CancelBuildCommand.create(site.id)).is_ok).is_true()
+	assert_bool(button.visible).is_true()

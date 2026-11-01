@@ -5,8 +5,9 @@ extends Control
 ## It follows the mouse and the plan's cell cursor. Q, E or a shoulder button turns it; holding the
 ## left mouse button, Enter or (A) for [constant HoldButton.HOLD_SECONDS] builds it; Esc or (B)
 ## leaves placing. A corridor is painted as a run: drag with the mouse, or move the cursor; a press
-## on the run, Enter or (A) held, builds it, and Esc or (B) first clears the run. Changes no state:
-## it emits [signal build_held] with the command to submit.
+## on the run, Enter or (A) held, builds it, and Esc or (B) first clears the run. Keys count only
+## while the plan has focus, so focused buttons and dialogs get theirs first. Changes no state: it
+## emits [signal build_held] with the command to submit.
 ## Bible: docs/content/m2-base.md sections 4 and 6
 
 ## Emitted when a hold confirms the placement; [param command] is the one to submit.
@@ -142,6 +143,13 @@ func begin_hold() -> void:
 		_hold_seconds = 0.0
 
 
+## The hold's progress from 0.0 to 1.0, or -1.0 with no hold in progress.
+func get_hold_progress() -> float:
+	if _hold_seconds < 0.0:
+		return -1.0
+	return clampf(_hold_seconds / HoldButton.HOLD_SECONDS, 0.0, 1.0)
+
+
 ## Drops a hold in progress.
 func cancel_hold() -> void:
 	_hold_seconds = -1.0
@@ -189,7 +197,7 @@ func follow(cell: Vector2i) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if not is_placing() or not is_visible_in_tree():
+	if not is_placing() or not is_visible_in_tree() or not _plan.has_focus():
 		return
 	if PlacementInput.handle_key(self, event):
 		get_viewport().set_input_as_handled()
