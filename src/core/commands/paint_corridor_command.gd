@@ -1,15 +1,13 @@
 class_name PaintCorridorCommand
 extends Command
 ## The player drags a corridor run across free cells of one level and holds to build: pays the
-## corridor's cost per cell and starts one site. The run's cells finish one by one, the def's
-## build time apart, so the whole run takes that time per cell. Posts room_build_started(site
+## corridor's cost per cell (at most the level's cell count) and starts one site. The run's
+## cells finish one by one, the def's build time apart, so the whole run takes that time per cell. Posts room_build_started(site
 ## id) and budget_changed when applied.
 ## Bible: docs/content/m2-base.md sections 1 and 4
 
 ## The command's stable type id.
 const TYPE: StringName = &"paint_corridor"
-## Most cells in one run: a whole level of the default grid.
-const MAX_CELLS: int = 36 * 20
 
 ## Level number (1 the top).
 var level: int = 1
@@ -26,14 +24,12 @@ static func create(on_level: int, run: Array[Vector2i]) -> PaintCorridorCommand:
 
 
 ## Rebuilds a command from its to_dict() [param data]. Fails with &"malformed_command" when
-## "level" is not a whole number or "cells" is not an array of at most MAX_CELLS cells.
+## "level" is not a whole number or "cells" is not an array of cells.
 static func from_dict(data: Dictionary) -> Result:
 	var cell_data: Variant = data.get("cells")
 	if not (RoomState.is_count(data.get("level")) and cell_data is Array):
 		return Result.fail(&"malformed_command", "%s needs level and cells" % TYPE)
 	var entries: Array = cell_data
-	if entries.size() > MAX_CELLS:
-		return Result.fail(&"malformed_command", "%s run too long" % TYPE)
 	var run: Array[Vector2i] = []
 	for entry: Variant in entries:
 		if not RoomState.is_cell(entry):
@@ -47,7 +43,8 @@ func get_type() -> StringName:
 	return TYPE
 
 
-## Rejects an empty, too long, repeating or broken run (&"invalid_run"), a cell breaking a
+## Rejects an empty, repeating or broken run, or one longer than the level has cells
+## (&"invalid_run"), a cell breaking a
 ## placement rule (&"no_such_level", &"level_not_dug", &"outside_level", &"overlap"), a run
 ## touching no room, corridor, lift or stairs (&"not_connected") and too little money
 ## (&"insufficient_funds").
@@ -55,7 +52,7 @@ func validate(state: GameState) -> CommandResult:
 	var def: RoomDef = state.room_defs.get(StartingBase.CORRIDOR_DEF)
 	if def == null:
 		return CommandResult.fail(&"unknown_room", String(StartingBase.CORRIDOR_DEF))
-	if not _is_run():
+	if not _is_run(state.base.grid_size.x * state.base.grid_size.y):
 		return CommandResult.fail(&"invalid_run")
 	var connected: bool = false
 	for cell: Vector2i in cells:
@@ -98,10 +95,10 @@ func to_dict() -> Dictionary:
 	return {"type": String(TYPE), "level": level, "cells": cell_data}
 
 
-## True when the run has 1 to MAX_CELLS distinct cells, each after the first sharing an edge
-## with an earlier one.
-func _is_run() -> bool:
-	if cells.is_empty() or cells.size() > MAX_CELLS:
+## True when the run has 1 to [param max_cells] distinct cells, each after the first sharing an
+## edge with an earlier one.
+func _is_run(max_cells: int) -> bool:
+	if cells.is_empty() or cells.size() > max_cells:
 		return false
 	var seen: Dictionary[Vector2i, bool] = {}
 	for index: int in cells.size():

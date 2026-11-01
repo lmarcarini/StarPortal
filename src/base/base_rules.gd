@@ -146,16 +146,39 @@ static func site_rooms(base: BaseState, site_key: StringName) -> Array[RoomState
 	return found
 
 
-## What the unbuilt part of [param rooms] (one site) cost, in $k: the def's cost per unbuilt
-## cell for a corridor run, the def's cost once for any other site with an unbuilt room.
-static func unbuilt_cost_k(defs: Dictionary, rooms: Array[RoomState]) -> int:
+## What the whole site [param rooms] cost, in $k: the def's cost per cell for a corridor run,
+## the def's cost once for any other site (a lift shaft or stairs pays once).
+static func site_cost_k(defs: Dictionary, rooms: Array[RoomState]) -> int:
 	var total: int = 0
 	for room: RoomState in rooms:
 		var def: RoomDef = _def_of(defs, room.def_id)
-		if def == null or room.is_built():
+		if def == null:
 			continue
-		if room.def_id == StartingBase.CORRIDOR_DEF:
-			total += def.build_cost_k
-		else:
+		if room.def_id != StartingBase.CORRIDOR_DEF:
 			return def.build_cost_k
+		total += def.build_cost_k
 	return total
+
+
+## True when taking [param removing] out of [param base] would leave a room or site (not a
+## corridor, lift or stairs) that touches a connector today touching none. Rooms already being
+## demolished count as gone, both today and after.
+static func strands_a_room(base: BaseState, defs: Dictionary, removing: Array[RoomState]) -> bool:
+	var leaving: Array[StringName] = []
+	for room: RoomState in base.rooms:
+		if room.is_demolishing():
+			leaving.append(room.id)
+	var gone: Array[StringName] = leaving.duplicate()
+	var levels: Array[int] = []
+	for room: RoomState in removing:
+		gone.append(room.id)
+		levels.append(room.level)
+	for other: RoomState in base.rooms:
+		if other.level not in levels or other.id in gone or is_connector(other.def_id):
+			continue
+		if (
+			touches_connector(base, defs, other, leaving)
+			and not touches_connector(base, defs, other, gone)
+		):
+			return true
+	return false

@@ -113,8 +113,9 @@ static func from_dict(data: Dictionary) -> BaseState:
 ## Returns human-readable errors for saved [param data], empty when it is valid: every key
 ## present; "grid_size" two whole numbers of at least 1; "levels" a non-empty array of valid
 ## levels; "rooms" an array of valid rooms with unique ids, each on an existing level with its
-## origin inside the grid; "next_room_number" a whole number of at least 1 and above every
-## "room_<n>" id's number (so add_room() can never repeat an id). Footprints are not
+## origin inside the grid, on a dug level, and not both building and being demolished; at most
+## one level being dug, and only the deepest; "next_room_number" a whole number of at least 1
+## and above every "room_<n>" id's number (so add_room() can never repeat an id). Footprints are not
 ## checked here: that needs the RoomDefs (BaseRules.fits()).
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
@@ -135,7 +136,26 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	var levels: Array = data["levels"]
 	if levels.is_empty():
 		errors.append("'levels' is empty")
-	errors.append_array(_room_place_errors(BaseState.from_dict(data)))
+	var base: BaseState = BaseState.from_dict(data)
+	errors.append_array(_room_place_errors(base))
+	errors.append_array(_construction_errors(base))
+	return errors
+
+
+## Errors for an undug level that is not the deepest or not the only one, rooms on an undug
+## level and rooms both building and coming down.
+static func _construction_errors(base: BaseState) -> Array[String]:
+	var errors: Array[String] = []
+	for index: int in base.levels.size():
+		if not base.levels[index].is_dug() and index != base.levels.size() - 1:
+			errors.append("levels %d: being dug but not the deepest level" % index)
+	for index: int in base.rooms.size():
+		var room: RoomState = base.rooms[index]
+		var on_level: bool = room.level >= 1 and room.level <= base.level_count
+		if on_level and not base.levels[room.level - 1].is_dug():
+			errors.append("rooms %d: level %d is still being dug" % [index, room.level])
+		if not room.is_built() and room.is_demolishing():
+			errors.append("rooms %d: both building and being demolished" % index)
 	return errors
 
 

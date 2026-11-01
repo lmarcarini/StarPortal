@@ -4,7 +4,9 @@ extends SimSystem
 ## clock runs. Up to MAX_ACTIVE_SITES sites build at once, oldest first; later ones wait in
 ## the queue. A site is every room sharing a site key (a corridor run, a lift shaft, stairs).
 ## A dug level gets a level of every lift shaft for free. Draws no power.
-## Posts room_built(site id), room_demolished(site id) and level_dug(level), each once.
+## Posts room_built(site id), room_demolished(id) and level_dug(level), each once:
+## room_demolished carries the cell's room id for a corridor (each cell is its own demolition
+## order) and the site id for any other room.
 ## Bible: docs/content/m2-base.md section 4
 
 ## Sites building at once; later sites queue.
@@ -67,7 +69,9 @@ func _tick_demolitions(state: GameState) -> void:
 	for room: RoomState in finished:
 		state.base.remove_room(room.id)
 		var key: StringName = room.site_key()
-		if BaseRules.site_rooms(state.base, key).is_empty() and not key in posted:
+		if room.def_id == StartingBase.CORRIDOR_DEF:
+			key = room.id
+		if not key in posted:
 			posted.append(key)
 			state.events.post(&"room_demolished", [key])
 

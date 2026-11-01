@@ -1,8 +1,9 @@
 class_name CancelBuildCommand
 extends Command
-## The player cancels a construction site or the dig. A site's unbuilt rooms are removed and
-## 75% of what they cost comes back at once (built cells of a corridor run stay); a dig refunds
-## 50% of its cost and drops the level. Posts budget_changed when applied.
+## The player cancels a construction site or the dig. The whole site is removed (a corridor
+## run with its finished cells) and 75% of its full cost comes back at once; a dig refunds 50%
+## of its cost and drops the level. Refunds round down to whole $k. Posts budget_changed when
+## applied.
 ## Bible: docs/content/m2-base.md section 4
 
 ## The command's stable type id.
@@ -39,16 +40,21 @@ func get_type() -> StringName:
 	return TYPE
 
 
-## Rejects a dig target with no dig running (&"no_dig") and a room that is not part of a
-## site still building (&"not_a_site").
+## Rejects a dig target with no dig running (&"no_dig"), a room that is not part of a site
+## still building (&"not_a_site") and a site whose removal leaves a room or site touching no
+## corridor, lift or stairs, counting rooms being demolished as gone
+## (&"leaves_room_unconnected").
 func validate(state: GameState) -> CommandResult:
 	if target == DIG_TARGET:
 		if state.base.digging_level() == 0 or state.balance == null:
 			return CommandResult.fail(&"no_dig")
 		return CommandResult.ok()
 	var room: RoomState = state.base.find_room(target)
-	if room == null or room.is_built():
+	if room == null or not _is_building(state.base, room.site_key()):
 		return CommandResult.fail(&"not_a_site", String(target))
+	var rooms: Array[RoomState] = BaseRules.site_rooms(state.base, room.site_key())
+	if BaseRules.strands_a_room(state.base, state.room_defs, rooms):
+		return CommandResult.fail(&"leaves_room_unconnected")
 	return CommandResult.ok()
 
 
@@ -62,10 +68,9 @@ func apply(state: GameState) -> void:
 		var rooms: Array[RoomState] = BaseRules.site_rooms(
 			state.base, state.base.find_room(target).site_key()
 		)
-		var cost_k: int = BaseRules.unbuilt_cost_k(state.room_defs, rooms)
+		var cost_k: int = BaseRules.site_cost_k(state.room_defs, rooms)
 		for room: RoomState in rooms:
-			if not room.is_built():
-				state.base.remove_room(room.id)
+			state.base.remove_room(room.id)
 		state.budget.credit(cost_k * SITE_REFUND_PERCENT / 100)
 	state.events.post(&"budget_changed", [state.budget.funds_k])
 
@@ -73,3 +78,11 @@ func apply(state: GameState) -> void:
 ## Returns JSON-safe data: type and target.
 func to_dict() -> Dictionary:
 	return {"type": String(TYPE), "target": String(target)}
+
+
+## True when a room of the site [param site_key] is still building.
+static func _is_building(base: BaseState, site_key: StringName) -> bool:
+	for room: RoomState in BaseRules.site_rooms(base, site_key):
+		if not room.is_built():
+			return true
+	return false

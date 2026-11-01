@@ -45,12 +45,15 @@ func test_cancel_dig_refunds_half() -> void:
 	var game := ConstructionFixture.state()
 	ConstructionFixture.run(game, DigLevelCommand.new())
 	ConstructionFixture.advance(game, ConstructionSystem.new(), 100)
-	assert_bool(
-		(
-			ConstructionFixture
-			. run(game, CancelBuildCommand.create(CancelBuildCommand.DIG_TARGET))
-			. is_ok
+	(
+		assert_bool(
+			(
+				ConstructionFixture
+				. run(game, CancelBuildCommand.create(CancelBuildCommand.DIG_TARGET))
+				. is_ok
+			)
 		)
+		. is_true()
 	)
 	assert_int(game.budget.funds_k).is_equal(12000 - 3000 + 1500)
 	assert_int(game.base.level_count).is_equal(3)

@@ -122,9 +122,12 @@ func _def_error(def: RoomDef) -> StringName:
 
 
 ## The rooms this command would add, with empty ids: one per dug level for a lift, two for
-## stairs (empty when the level below does not exist), one otherwise.
+## stairs (empty when the level below does not exist), one otherwise; empty when [member level]
+## is not a level of [param base] (a lift's level must exist too).
 func _planned(base: BaseState) -> Array[RoomState]:
 	var levels: Array[int] = [level]
+	if level < 1 or level > base.level_count:
+		return []
 	if def_id == StartingBase.LIFT_DEF:
 		levels.clear()
 		for number: int in range(1, base.level_count + 1):
