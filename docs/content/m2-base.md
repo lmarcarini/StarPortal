@@ -116,7 +116,7 @@ Future: the button moves onto the base screen, with a tutorial leading there.
 
 ## 3. Energy layer rules
 
-> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md) section 6 (5 MW blocks); the rules here otherwise stand.
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md) section 6 (5 MW blocks) and section 3 (a finished room switches on, taking power from charging first).
 
 Power (MW) and capacitor energy (MWh) are separate. Power works like FTL: a fixed supply shared
 out between rooms. The capacitors are the Ring's store and are charged from that supply.

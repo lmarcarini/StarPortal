@@ -51,7 +51,7 @@ and a Research Lab (4 × 3) many times over, without any reserved site.
 clock starts at 00:00 on 1 January. Lock timings for SILL (366.6 MWh):
 
 - **Bank only:** bank done at 01:00, charging at 25 MW; lock ready about **15.7 h** in
-  (15:42 on day 1). M2 took about 20.1 h.
+  (15:40 on day 1). M2 took about 20.1 h.
 - **Bank, then lab** (lab started when the bank is done): 200 MWh stored by 09:00, when the lab
   finishes and charging drops to 20 MW ("Research Lab on: charging lowered to 20 MW"); lock
   ready about **17.3 h** in, still day 1.
@@ -89,8 +89,9 @@ level only; on the empty level below they become the anchor that corridors join.
 
 **A lift and a new dig.** A lift built before a dig extends into the new level when the dig
 finishes, as one **lift segment: $100k, 1 hour**, charged and started automatically when the
-dig ends (refused with a message if funds are short; the player can then build it from the
-palette). A lift built after the dig takes its 2 × 2 cells on every existing level, at the
+dig ends. It uses no building slot and shows on the plan as a normal construction site with
+its own Cancel (hold). It is refused with a message if funds are short; the player can then
+build it from the palette. A lift built after the dig takes its 2 × 2 cells on every existing level, at the
 full lift price.
 
 ---
@@ -168,7 +169,7 @@ Base). **R**, or a **Research** button at the right end of the power strip, swap
 |   Fuel contracts         $300k  2 d   Upkeep    needs R4    |               |
 |   Bank array             $600k  3 d   3 banks       [Start] | [Start]       |
 |   Field engineering      $500k  3 d   Workshop      [Start] |               |
-|   Unknown                Requires an alien find      locked |
+|   Unknown                Requires an alien find      locked |               |
 |   Unknown                Requires staff              locked |               |
 +-------------------------------------------------------------+---------------+
 ```
@@ -263,7 +264,7 @@ The early base read as 2, 1, 1, 4 and 26 MW: too many small numbers.
 
 **Fallback if the owner defers the blocks:** keep M2's draws (Gate 2, Control 1, Research
 Lab 4, Workshop 5) and the 1 MW charge-rate steps. Spare at start is then 27 MW: bank only,
-lock about 14.6 h in; bank then lab (23 MW from 09:00), about 15.9 h; lab first, about
+lock about 14.6 h in; bank then lab (23 MW from 09:00), about 15.5 h; lab first, about
 24.9 h (day 2). Every other number in this document stands.
 
 **Recommendation: apply Option A now.** It is only data changes (draws and the meter's
