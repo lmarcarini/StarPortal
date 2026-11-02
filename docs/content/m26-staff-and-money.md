@@ -47,8 +47,9 @@ Nothing is hidden: the player sees every field.
 
 ## 2. Recruitment
 
-**A monthly candidate list (PO proposal).** On the 1st of each month, with the month-end
-report, the game draws a new list of **four candidates**. The list replaces the previous one;
+**A monthly candidate list (PO proposal).** A new game starts with a list of **four
+candidates**, and on the 1st of each month, with the month-end report, the game draws a new
+list of four. The list replaces the previous one;
 candidates not hired are gone. Each candidate shows name, role, skill, salary, pipeline,
 hiring fee and arrival time.
 
@@ -59,7 +60,12 @@ hiring fee and arrival time.
 | Intelligence | Analysts | 1 month's salary | 7 days | 168 min | 16.8 min |
 
 The list always holds at least one scientist and one engineer; the other two are drawn from
-any pipeline. Skill is drawn 1–5, weighted to 2–3 (one candidate in five is skill 4 or 5).
+any pipeline. Skill is drawn 1–5: skill 1 10%, 2 35%, 3 35%, 4 15%, 5 5%. Draws use the
+recruitment system's seeded generator.
+
+**The first list is fixed** so every new game opens the same way: Dr Ines Moreau (Scientist,
+skill 3), Dr Kenji Arai (Scientist, skill 3), Sgt Dan Kowalski (Engineer, skill 3) and Cpl Sara
+Lind (Engineer, skill 3), each $30k a month. The examples in section 7 hire from it.
 
 - **Hiring:** pick a candidate, press **Hire**. The fee is paid at once, a bed is reserved, and
   the person appears in the roster as "Arriving in 3 d 4 h". On arrival they are Unassigned,
@@ -86,7 +92,7 @@ people of the matching role can fill a slot.
 
 | Room | Slots | Unstaffed (floor) | Staffed effect |
 | --- | --- | --- | --- |
-| Research Lab | 4 scientists | Research at **25%** speed | Speed = total skill ÷ 6, at most 200% (two skill-3 scientists = 100%) |
+| Research Lab | 4 scientists | Research at **25%** speed | Speed = max(25%, total skill ÷ 6), at most 200% (two skill-3 scientists = 100%); staffing is never slower than empty |
 | Power Plant | 2 engineers | **20 MW** (4 blocks) | 1 engineer: 25 MW; 2 engineers: 30 MW. Skill does not matter |
 | Workshop | 2 engineers | Sites and digs **10%** faster | Bonus = 10% + 2.5% × total skill, at most 35% (two skill-3 engineers = 25%) |
 | Control Room | 2 analysts | Runs the Gate Room as now | Each analyst adds +1 Confidence a month ("Reports filed") |
@@ -99,10 +105,14 @@ locks up and the M2.5 base still runs if the player ignores the Personnel tab. A
 **Research speed.** The M2.5 "listed time" becomes the time for a standard crew: two skill-3
 scientists (total skill 6). Excavation survey (2 days) takes 8 days with an empty lab, 2 days
 with the starting crew, 1.5 days with skill 8, and 1 day at the 200% cap (total skill 12).
-**Several labs now run several projects, one per lab**, as m25 promised; the "One lab is
-enough until staff arrive" line goes. A project belongs to the lab that started it; moving
-scientists away slows it, and demolishing that lab pauses it (resume it in another lab from
-the Research tab).
+Total skill counts the scientists in **every lab that is on**.
+
+**Research stays one project at a time in M2.6 (PO ruling).** Scientists in all labs pool
+into the one active project, so a second lab adds four scientist slots, not a second project.
+The Research tab keeps its single header and the "One project at a time." refusal. The
+project pauses only when no lab is on. The palette note "One lab is enough until staff
+arrive." becomes "More labs hold more scientists." (pt_BR "Mais laboratórios comportam mais
+cientistas."). *Later idea:* several projects at once, one per lab, with Start picking a lab.
 
 **Engineers and building.** Engineers speed building only through the Workshop; there is no
 separate per-site engineer bonus, so the speed-up stays in one place and is never counted
@@ -111,6 +121,17 @@ Workshop now gives 10%. Digs and sites still need no staff to proceed. Engineers
 are the other use: a second diesel plant (R4) gives only 20 MW until it is crewed, so power
 growth now also costs salaries.
 
+**Rule: supply drops take from charging first (PO ruling).** This extends the M2.5 rule for a
+finishing room to every loss of plant output: a plant switched off or demolished, or an
+engineer unassigned, moved or dismissed. The game first lowers Capacitor Bank charge rates,
+newest bank first, by just enough. Only if zero charging is still not enough does it switch
+off the newest switchable rooms. It shows a message and a Log line, as in M2.5. This changes
+the M2 plant-loss rule (rooms first, then charging) for the implementation card.
+
+*Opening case:* Gate 5 + Lab 5 + charging 20 = 30 MW. Dismissing Cpl Mendes drops the plant to
+25 MW; charging falls to 15 MW ("Power Plant crew reduced: charging lowered to 15 MW."), and
+the lab stays on. Dismissing both engineers leaves 20 MW and charging at 10 MW.
+
 **Quarters: beds cap headcount.** The base starts with **6 beds** in the Control Room's crew
 bunks (shown in the Personnel header, "Beds 5 / 6"). Each **Quarters** adds **4 beds**.
 Headcount, counting people still arriving, can't exceed beds. Demolishing Quarters is refused
@@ -118,8 +139,23 @@ if it would leave more people than beds ("Dismiss someone first.").
 
 **Quarters numbers, re-timed to M2.5:** 3 × 2 cells, **$150k, 2 hours**, 0 MW, upkeep
 $10k. It returns to the palette **from the start** of M2.6: hiring is available from day 1,
-and the first Quarters is needed as soon as the player hires a second person. Its lines:
-Now "Sleeps 4. Beds cap how many people the base holds." / Later "Rest lowers stress."
+and the first Quarters is needed as soon as the player hires a second person. Its lines are in the table below.
+
+**New Now/Later lines** (replacing m25 section 4 for these rooms):
+
+| Room | Now (en) | Later (en) |
+| --- | --- | --- |
+| Power Plant | Gives 30 MW with two engineers, 20 MW without. Upkeep is fuel. | Upgrades to fission and beyond. |
+| Research Lab | Holds four scientists. More skill, faster research. | Splits into physics, xenobiology and linguistics labs. |
+| Workshop | While on, sites and digs finish faster: 10% empty, 25% with two engineers. | Builds prototypes and equipment. |
+| Quarters | Sleeps 4. Beds cap how many people the base holds. | Rest lowers stress. |
+
+| Room | Agora (pt_BR) | Depois (pt_BR) |
+| --- | --- | --- |
+| Power Plant | Gera 30 MW com dois engenheiros, 20 MW sem eles. A manutenção é combustível. | Evolui para fissão e além. |
+| Research Lab | Comporta quatro cientistas. Mais perícia, pesquisa mais rápida. | Divide-se em laboratórios de física, xenobiologia e linguística. |
+| Workshop | Ligada, as obras e escavações terminam mais rápido: 10% vazia, 25% com dois engenheiros. | Constrói protótipos e equipamentos. |
+| Quarters | Abriga 4 pessoas. As camas limitam quantas pessoas a base comporta. | O descanso reduz o estresse. |
 
 **Infirmary: stays locked** until M3. Nothing in M2.6 injures anyone, and no medics exist. Its
 locked row now reads "Requires expeditions (M3)".
@@ -163,13 +199,17 @@ earns or loses Confidence.
 **Not a cause yet: failed dials.** The player is learning addresses by trial; punishing
 misses would discourage the Archive work the game is built on. Dials cost energy already.
 
-**Quarterly review, simplest form.** On 1 April, 1 July, 1 October and 1 January, the
+**Quarterly review, simplest form.** On 1 April, 1 July, 1 October and 1 January (the first is 1 April of year 1; the game's start on 1 January has none), the
 month-end report adds a review line from the Committee, by Confidence after the month's
 change:
 
 - **70 or more:** "The Committee is pleased." A one-off grant of **$1,000k**.
 - **30 to 69:** "The Committee notes your progress." No effect.
 - **Below 30:** "The Committee questions this programme." No money; a warning only.
+
+**Order at a month-end:** pay the allocation, charge upkeep and salaries, check Within budget
+or In the red, apply the Confidence change, then (in a quarter month) the review and its
+grant. The grant never decides the budget check; it lands after it.
 
 Choosing which results to present, overstating them and scandals wait for M3, with the Command
 tab.
@@ -225,7 +265,7 @@ arrives (M3); the bible's tab list needs that one change.
 
 ```
 +------------------------------------------------------------+----------------+
-| PERSONNEL   Staff 5   Beds 5/6   Salaries $150k/month      | SELECTED       |
+| PERSONNEL   Staff 5   Beds 5/6   Salaries $145k/month      | SELECTED       |
 | [Roster]  [Candidates (4)]                                 | Dr A. Ferreira |
 |------------------------------------------------------------| Scientist      |
 | > Dr Ana Ferreira    Scientist  ***    $30k  Research Lab  | Skill 3  $30k  |
@@ -286,42 +326,48 @@ manual. With these five, every M2.5 number holds: the plant gives 30 MW, the lab
 | | A: research rush | B: power and people |
 | --- | --- | --- |
 | Capacitor Bank, Research Lab | 1,400 | 1,400 |
-| Research | R1, R4, R6, R7: 2,000 | R4: 500 |
+| Research | R1, R4, R6, R7: 2,000 | R4, R6: 1,100 |
 | Second Power Plant | – | 2,000 |
+| Second Capacitor Bank | – | 600 |
 | Quarters | 150 | 150 |
-| Hires | 2 scientists (skill 3): 60 | 2 engineers (skill 3): 60 |
-| **Spent** | **3,610** | **4,110** |
-| Balance before month-end | 2,390 | 1,890 |
-| Upkeep (rooms) | 270 | 420 |
+| Hires (first list) | Moreau, Arai: 60 | Kowalski, Lind: 60 |
+| **Spent** | **3,610** | **5,310** |
+| Balance before month-end | 2,390 | 690 |
+| Upkeep (rooms) | 270 | 430 |
 | Salaries (7 people) | 205 | 205 |
-| Balance after month-end | 4,915 | 4,265 |
-| Confidence | +5 SILL, +12 research, +1, +2 = +20, capped +15 → **65** | +5 SILL, +3, +1, +2 = +11 → **61** |
-| Next allocation | 3,450 | 3,330 |
-| Power | 30 MW: 1 bank charging at 20 MW, a second bank to fill | 60 MW: lots of spare charge |
+| Balance after month-end | 4,915 | 3,055 |
+| Confidence | +5 SILL, +12 research, +1, +2 = +20, capped +15 → **65** | +5 SILL, +6 research, +1, +2 = +14 → **64** |
+| Next allocation | 3,450 | 3,420 |
+| Power | 30 MW: Gate 5, Lab 5, one bank at 20 MW (R6 done, second bank not built) | 60 MW: Gate 5, Lab 5, banks at 30 + 20 MW |
 
 A's four scientists put R1, R4, R6 and R7 through in about 9 days (200% once the hires arrive),
-but the base still has one plant and 20 MW of charging. B
-has the power for two banks and later a fission future, but one project and a slower Committee.
-A player who builds nothing new and runs no research loses 4 Confidence (idle) a month and
-sees the allocation shrink, so standing still costs money. That is the M2 done-when: power
-and money balanced with real trade-offs over a 30-day run.
+but the base still has one plant and 20 MW of charging. B fills two banks at 50 MW, more
+than double A's rate, and its four engineers crew both plants, but it ran two projects, ends
+the month with $1,860k less and a slightly smaller allocation.
+
+**Standing still.** An idle month with the starting crew scores −4 idle, +2 within budget
+and +1 reports = **−1**, about −$30k of allocation a month. PO proposal: keep it mild. The
+real pressure is the + causes the player did not earn: a month with a lock and two projects
+is worth +11, about $330k more a month. That is the M2 done-when: power and money balanced
+with real trade-offs over a 30-day run.
 
 **Room upkeep check** for A: Control 40 + Plant 150 + Bank 10 + Lab 60 + Quarters 10 = 270.
-For B: + second Plant 150 = 420 (R5 brings each plant to 100).
+For B: + second Plant 150 + second Bank 10 = 430 (R5 brings each plant to 100).
 
 ---
 
 ## 8. Saves and open questions
 
 **Saves: clean break, v13.** The save gains the roster (people, assignments, arrival times),
-the candidate list and its random seed, Confidence, months in the red, and per-lab research.
-Research moves from one active project to one per lab, which a v12 save can't express
-without guessing. As in M2 and M2.5, testers can start a new game in a minute; older saves get
+the candidate list and its random seed, Confidence, and months in the red.
+A v12 base has staffable rooms with no one in them, which would load at floor rates and
+surprise the player. As in M2 and M2.5, testers can start a new game in a minute; older saves get
 the existing "earlier build" message.
 
 **Decided here as PO proposals:** three roles now (medic and soldier wait); salary 15 + 5 ×
 skill; four candidates a month; one-month hiring fee; floor rates for every staffable room;
-Quarters back in the palette from the start; Infirmary locked; Workshop 10% empty, 25%
+Quarters back in the palette from the start; Infirmary locked; research one project at a time with pooled scientists;
+supply drops take from charging first; Workshop 10% empty, 25%
 with a standard crew; five starting staff; Confidence 50 with the formula above; quarterly
 grant at 70+; Personnel on F5, Command to F6; save v13.
 
