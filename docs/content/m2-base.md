@@ -27,6 +27,8 @@ tick is one in-game minute. Energy in MWh, power in MW.
 
 ## 1. Room catalogue for M2
 
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md) sections 4 and 5 (roles, build times, the Research Lab, the cut Archive).
+
 Footprints are width × height in cells. "Rotates" means Q or E (or a gamepad shoulder button)
 turns the footprint 90 degrees while placing.
 Draw is what the room takes while **on**. Upkeep is charged at each month-end; an off room pays
@@ -77,6 +79,8 @@ bonus in M2, shown but inert until research: **Lab next to the Archive: +10% res
 
 ## 2. Starting base
 
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md) section 1 (one level, $6,000k, no alcove).
+
 A new game has **Levels 1 to 3**, all underground; there is no surface level for now. The Ring
 is on Level 3, the deepest. Every level is 36 × 20 cells. One lift shaft runs from Level 1 to
 Level 3, with a corridor spine on each level.
@@ -116,6 +120,8 @@ Future: the button moves onto the base screen, with a tutorial leading there.
 ---
 
 ## 3. Energy layer rules
+
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md) section 6 (5 MW blocks) and section 3 (a finished room switches on, taking power from charging first).
 
 Power (MW) and capacitor energy (MWh) are separate. Power works like FTL: a fixed supply shared
 out between rooms. The capacitors are the Ring's store and are charged from that supply.
@@ -175,6 +181,8 @@ capacitors read `Capacitors 214/400 MWh, full in 7 h`.
 
 ## 4. Building and digging
 
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md) sections 2 and 5 (digs gated by research, one-click building, new times).
+
 **Placement rules.** A room's ghost footprint is green when all hold, red with the first
 broken rule as its reason:
 
@@ -220,6 +228,8 @@ later, containment far from the Ring).
 
 ## 5. Money (minimal for M2)
 
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md) section 1 (starting funds) and section 3 (research costs).
+
 - **Starting budget:** $12,000k.
 - **Monthly allocation:** a fixed $3,000k, paid at 00:00 on the first of each in-game month.
 - **Upkeep:** each room's monthly upkeep (half when off) is charged at the same moment, as one
@@ -238,6 +248,8 @@ costs.
 ---
 
 ## 6. Base plan screen
+
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md) section 3 (the Research view) and section 4 (palette contents).
 
 The Base tab (F3). A 1280 × 720 layout, straight top-down, in the lit-diorama look: concrete
 floors, furniture and lights visible inside each room, warm sodium light from the ceiling
@@ -302,6 +314,8 @@ plan with nothing to cancel, B focuses the build palette.
 
 ## 7. Saves: clean break
 
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md) section 7 (v12).
+
 Owner decision: M2 does not migrate M1.6 saves. The save format moves to v11 and any older
 save is rejected on load with a clear message: "This save is from an earlier build and can't
 be loaded in this one. Start a new game." Nothing from an old save is carried over.
@@ -309,6 +323,8 @@ be loaded in this one. Start a new game." Nothing from an old save is carried ov
 ---
 
 ## 8. Owner decisions (2026-10-31)
+
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md); decisions 1 (no alcove, one-click build), 2 (starting draw and the finished-room power rule) and 4 (v12) are revised there; 5 now starts with Level 1 only.
 
 1. **Opening.** "Build capacitor bank" in the Gate Room stays as one of the first actions, to
    teach base building (section 2). Future: it moves onto the base screen, with a tutorial
