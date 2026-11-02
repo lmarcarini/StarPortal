@@ -8,6 +8,9 @@ extends RefCounted
 const RegistryScript := preload("res://src/content/registry.gd")
 ## Galaxy seeds checked by default: 1..20.
 const DEFAULT_SEEDS: int = 20
+## Tables holding the research names (base) and lines (research).
+const RESEARCH_TABLE: String = "research.csv"
+const BASE_TABLE: String = "base.csv"
 
 
 ## Returns the problems found in [param registry] (already loaded with load_all(), whose own
@@ -29,9 +32,8 @@ static func run(
 	return errors
 
 
-## Checks 2, 3, 4, the balance tunables, the rooms and the documents: everything that needs no
-## generated
-## galaxy.
+## Checks 2, 3, 4, the balance tunables, the rooms, the research and the documents:
+## everything that needs no generated galaxy.
 static func _check_content(registry: RegistryScript) -> Array[String]:
 	var errors: Array[String] = []
 	var glyphs: Array[GlyphDef] = []
@@ -45,6 +47,12 @@ static func _check_content(registry: RegistryScript) -> Array[String]:
 	for def: DefBase in registry.get_all_of(RoomDef):
 		rooms.append(def as RoomDef)
 	errors.append_array(ContentCheckRooms.check(rooms))
+	var research: Array[ResearchDef] = []
+	for def: DefBase in registry.get_all_of(ResearchDef):
+		research.append(def as ResearchDef)
+	var research_keys: Dictionary[String, bool] = ContentSource.read_keys(RESEARCH_TABLE)
+	research_keys.merge(ContentSource.read_keys(BASE_TABLE))
+	errors.append_array(ContentCheckResearch.check(research, research_keys))
 	var field: AnchorFieldDef = ContentSource.home_field(registry)
 	for def: DefBase in registry.get_all_of(AnchorFieldDef):
 		var each: AnchorFieldDef = def as AnchorFieldDef
