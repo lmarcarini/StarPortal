@@ -2,10 +2,11 @@ class_name BaseBuild
 extends RefCounted
 ## Building from the Base tab (docs/content/m2-base.md sections 4 and 6): joins the build
 ## palette, the placement ghost over the plan and the selected-room panel's action to the
-## simulation. Picking a room starts its ghost at the cursor; a hold submits PlaceRoomCommand
-## or PaintCorridorCommand; the panel offers Cancel (a site, 75% back) or Demolish (a room,
-## 50% back) with the refund shown; the Dig button digs or cancels the dig. The result, or
-## why the command was refused, shows on the palette's hint line. Changes no state itself.
+## simulation. Picking a room starts its ghost at the cursor; a click or press submits
+## PlaceRoomCommand or PaintCorridorCommand and the ghost stays out for another; the panel
+## offers Cancel (a site, 75% back) or Demolish (a room, 50% back) with the refund shown;
+## the Dig button digs or cancels the dig. The result, or why the command was refused, shows
+## on the palette's hint line. Changes no state itself.
 ## Bible: docs/content/m2-base.md sections 4 and 6
 
 var _simulation: Simulation = null
@@ -138,8 +139,7 @@ func _submit_build(command: Command) -> void:
 	if not result.is_ok:
 		_palette.show_message(BuildText.reason(result, _simulation.state, cost_k))
 		return
-	_ghost.stop()
-	_palette.set_placing(false, false)
+	_ghost.after_build()
 	_palette.show_message(
 		_t(&"BASE_BUILD_STARTED").format(
 			{"name": _t(def.name_key), "cost": MoneyLabel.format_k(cost_k)}
