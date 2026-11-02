@@ -21,6 +21,8 @@ const LOCKS: Array[StringName] = [&"alien_find", &"staff"]
 @export var effects: Array = []
 ## Empty for a project; one of [constant LOCKS] for a later slot.
 @export var lock: StringName = &""
+## Id of the ResearchCategoryDef whose sub-tab shows this project or slot.
+@export var category: StringName = &""
 ## Translation key of the name ("Unknown" for a locked slot).
 @export var name_key: StringName = &""
 ## Translation key of the one-line effect ("Up to 3 Capacitor Banks.") or, for a locked
@@ -33,15 +35,19 @@ func is_locked() -> bool:
 	return not lock.is_empty()
 
 
-## The projects this one needs.
+## The projects this one needs, and its category.
 func get_references() -> Array[StringName]:
-	return needs.duplicate()
+	var found: Array[StringName] = needs.duplicate()
+	if not category.is_empty():
+		found.append(category)
+	return found
 
 
 ## Problems against the other loaded [param defs]: needs that are not projects (or are this
-## one), a bad cost or time, an unknown lock, a project without effects, or a locked slot
-## that has a cost, needs or effects. The effect pairs themselves are checked by the content
-## validator (ContentCheckResearch), since content may not depend on the simulation.
+## one), no category or one that is not a ResearchCategoryDef, a bad cost or time, an unknown
+## lock, a project without effects, or a locked slot that has a cost, needs or effects. The
+## effect pairs themselves are checked by the content validator (ContentCheckResearch), since
+## content may not depend on the simulation.
 func get_content_errors(defs: Dictionary[StringName, DefBase]) -> Array[String]:
 	var errors: Array[String] = []
 	for need: StringName in needs:
@@ -49,6 +55,9 @@ func get_content_errors(defs: Dictionary[StringName, DefBase]) -> Array[String]:
 		var project: ResearchDef = other as ResearchDef
 		if need == id or (other != null and (project == null or project.is_locked())):
 			errors.append("needs '%s', which is not another open project" % need)
+	var group: DefBase = defs.get(category)
+	if category.is_empty() or (group != null and not group is ResearchCategoryDef):
+		errors.append("has category '%s', which is not a research category" % category)
 	if cost_k < 0 or days < 1:
 		errors.append("needs cost_k >= 0 and days >= 1")
 	if is_locked():

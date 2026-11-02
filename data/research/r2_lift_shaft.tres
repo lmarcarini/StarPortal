@@ -10,6 +10,7 @@ cost_k = 300
 days = 2
 needs = Array[StringName]([&"excavation_survey"])
 effects = [[&"unlock_room", &"room_lift"]]
+category = &"research_construction"
 name_key = &"RESEARCH_LIFT_SHAFT_NAME"
 line_key = &"RESEARCH_LIFT_SHAFT_LINE"
 id = &"lift_shaft"

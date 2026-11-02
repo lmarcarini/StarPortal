@@ -10,6 +10,7 @@ cost_k = 300
 days = 2
 needs = Array[StringName]([&"second_plant"])
 effects = [[&"plant_upkeep", 100]]
+category = &"research_energy"
 name_key = &"RESEARCH_FUEL_CONTRACTS_NAME"
 line_key = &"RESEARCH_FUEL_CONTRACTS_LINE"
 id = &"fuel_contracts"

@@ -72,3 +72,28 @@ func test_def_content_errors() -> void:
 	assert_array(def.get_content_errors(defs)).has_size(2)
 	locked.cost_k = 10
 	assert_array(locked.get_content_errors(defs)).has_size(1)
+
+
+## Every real def names a known category; an unknown or missing category, a category that is
+## not a ResearchCategoryDef, a duplicate category order and a missing key are reported.
+func test_categories() -> void:
+	var categories: Array[ResearchCategoryDef] = []
+	categories.assign(ResearchView.categories())
+	assert_int(categories.size()).is_equal(5)
+	var empty: Dictionary[String, bool] = {}
+	assert_array(ContentCheckResearch.check_categories(_real(), categories, empty)).is_empty()
+	var def: ResearchDef = _copy(&"bank_array")
+	def.category = &"research_teleport"
+	var twin: ResearchCategoryDef = categories[0].duplicate()
+	twin.id = &"research_twin"
+	categories.append(twin)
+	var keys: Dictionary[String, bool] = {"RESEARCH_CAT_ENERGY": true}
+	var text: String = "\n".join(ContentCheckResearch.check_categories([def], categories, keys))
+	assert_str(text).contains("unknown category").contains("is taken").contains("no table")
+	var defs: Dictionary[StringName, DefBase] = {
+		def.id: def, &"research_teleport": _copy(&"lift_shaft")
+	}
+	assert_str("\n".join(def.get_content_errors(defs))).contains("not a research category")
+	def.category = &""
+	assert_str("\n".join(def.get_content_errors({}))).contains("not a research category")
+	assert_array(_copy(&"lift_shaft").get_references()).contains([&"research_construction"])

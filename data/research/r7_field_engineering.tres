@@ -10,6 +10,7 @@ cost_k = 500
 days = 3
 needs = Array[StringName]([])
 effects = [[&"unlock_room", &"room_workshop"]]
+category = &"research_construction"
 name_key = &"RESEARCH_FIELD_ENGINEERING_NAME"
 line_key = &"RESEARCH_FIELD_ENGINEERING_LINE"
 id = &"field_engineering"
