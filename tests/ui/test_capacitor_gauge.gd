@@ -71,18 +71,18 @@ func test_no_capacitors_state_in_both_languages() -> void:
 
 ## Once a bank stands the gauge shows its charge against the capacity, following the clock.
 func test_charge_display_after_a_bank_is_built() -> void:
-	PowerFixture.add_bank(_simulation.state, 26)
+	PowerFixture.add_bank(_simulation.state, 25)
 	SimClock.step_ticks(60)
 	assert_int(_gauge().get_mode()).is_equal(CapacitorGauge.Mode.CHARGE)
 	assert_float(_gauge().get_bar_max()).is_equal(100_000.0)
-	assert_float(_gauge().get_bar_value()).is_equal_approx(26.0, 1e-9)
+	assert_float(_gauge().get_bar_value()).is_equal_approx(25.0, 1e-9)
 	assert_bool((_gauge().get_node("BarArea") as Control).visible).is_true()
 	await _assert_fits()
 
 
 ## The gauge shows charge only: the text holds no lock energy of the loaded address.
 func test_charge_display_never_shows_the_lock_energy() -> void:
-	PowerFixture.add_bank(_simulation.state, 26)
+	PowerFixture.add_bank(_simulation.state, 25)
 	SimClock.step_ticks(360)
 	var address: GateAddress = Fixture.address_for(_simulation.state, DialOutcome.Kind.LOCK)
 	Fixture.select(_view, address)

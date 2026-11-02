@@ -20,7 +20,7 @@ func _id(def_id: StringName) -> StringName:
 
 ## Rooms without a switch, unknown rooms and sites are refused.
 func test_switch_refusals() -> void:
-	for def_id: StringName in [&"room_gate", &"room_control", &"room_lift", &"room_corridor"]:
+	for def_id: StringName in [&"room_gate", &"room_control", &"room_corridor"]:
 		assert_str(String(_run(SwitchRoomCommand.create(_id(def_id), false)).error_code)).is_equal(
 			"no_switch"
 		)
@@ -31,23 +31,23 @@ func test_switch_refusals() -> void:
 	assert_str(String(_run(SwitchRoomCommand.create(&"room_999", true)).error_code)).is_equal(
 		"unknown_room"
 	)
-	var archive: RoomState = PowerFixture.first_room(_state, &"room_archive")
-	archive.build_ticks_left = 3
-	assert_str(String(_run(SwitchRoomCommand.create(archive.id, false)).error_code)).is_equal(
+	var lab: RoomState = PowerFixture.lab(_state)
+	lab.build_ticks_left = 3
+	assert_str(String(_run(SwitchRoomCommand.create(lab.id, false)).error_code)).is_equal(
 		"not_built"
 	)
 
 
 ## Switching on is refused when the draw does not fit the spare; off then on works.
 func test_switch_on_needs_spare_power() -> void:
-	var archive: StringName = _id(&"room_archive")
-	assert_bool(_run(SwitchRoomCommand.create(archive, false)).is_ok).is_true()
-	assert_float(PowerRules.allocated_mw(_state)).is_equal(3.0)
-	var bank: RoomState = PowerFixture.add_bank(_state, 27)
-	var result: CommandResult = _run(SwitchRoomCommand.create(archive, true))
+	var lab: StringName = PowerFixture.lab(_state).id
+	assert_bool(_run(SwitchRoomCommand.create(lab, false)).is_ok).is_true()
+	assert_float(PowerRules.allocated_mw(_state)).is_equal(5.0)
+	var bank: RoomState = PowerFixture.add_bank(_state, 25)
+	var result: CommandResult = _run(SwitchRoomCommand.create(lab, true))
 	assert_str(String(result.error_code)).is_equal("no_spare_power")
-	assert_bool(_run(SetChargeRateCommand.create(bank.id, 26)).is_ok).is_true()
-	assert_bool(_run(SwitchRoomCommand.create(archive, true)).is_ok).is_true()
+	assert_bool(_run(SetChargeRateCommand.create(bank.id, 20)).is_ok).is_true()
+	assert_bool(_run(SwitchRoomCommand.create(lab, true)).is_ok).is_true()
 	assert_float(PowerRules.allocated_mw(_state)).is_equal(PowerRules.supply_mw(_state))
 	assert_int(_state.events.drain().size()).is_equal(3)
 
@@ -59,13 +59,13 @@ func test_plants() -> void:
 	assert_str(String(_run(SwitchRoomCommand.create(plant, false)).error_code)).is_equal(
 		"last_plant"
 	)
-	_state.base.add_room(&"room_power_plant", 2, Vector2i(2, 2))
+	_state.base.add_room(&"room_power_plant", 1, Vector2i(24, 2))
 	assert_float(PowerRules.supply_mw(_state)).is_equal(60.0)
 	var bank: RoomState = PowerFixture.add_bank(_state, 30)
 	assert_str(String(_run(SwitchRoomCommand.create(plant, false)).error_code)).is_equal(
 		"no_spare_power"
 	)
-	assert_bool(_run(SetChargeRateCommand.create(bank.id, 26)).is_ok).is_true()
+	assert_bool(_run(SetChargeRateCommand.create(bank.id, 25)).is_ok).is_true()
 	assert_bool(_run(SwitchRoomCommand.create(plant, false)).is_ok).is_true()
 	assert_float(PowerRules.supply_mw(_state)).is_equal(30.0)
 
@@ -73,19 +73,19 @@ func test_plants() -> void:
 ## Charge rates: only for a standing bank, within 0..max, and within the spare.
 func test_charge_rate_refusals() -> void:
 	var bank: RoomState = PowerFixture.add_bank(_state, 0)
-	var archive: StringName = _id(&"room_archive")
+	var lab: StringName = PowerFixture.lab(_state).id
 	var cases: Array = [
-		[SetChargeRateCommand.create(archive, 5), "not_a_bank"],
+		[SetChargeRateCommand.create(lab, 5), "not_a_bank"],
 		[SetChargeRateCommand.create(&"room_999", 5), "unknown_room"],
 		[SetChargeRateCommand.create(bank.id, 31), "rate_out_of_range"],
 		[SetChargeRateCommand.create(bank.id, -1), "rate_out_of_range"],
-		[SetChargeRateCommand.create(bank.id, 27), "no_spare_power"],
+		[SetChargeRateCommand.create(bank.id, 21), "no_spare_power"],
 	]
 	for case: Array in cases:
 		var command: Command = case[0]
 		assert_str(String(_run(command).error_code)).is_equal(case[1])
-	assert_bool(_run(SetChargeRateCommand.create(bank.id, 26)).is_ok).is_true()
-	assert_int(_state.power.charge_rates[bank.id]).is_equal(26)
+	assert_bool(_run(SetChargeRateCommand.create(bank.id, 20)).is_ok).is_true()
+	assert_int(_state.power.charge_rates[bank.id]).is_equal(20)
 	bank.demolish_ticks_left = 2
 	assert_str(String(_run(SetChargeRateCommand.create(bank.id, 0)).error_code)).is_equal(
 		"not_built"

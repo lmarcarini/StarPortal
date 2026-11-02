@@ -20,8 +20,6 @@ static func draw(canvas: CanvasItem, area: Rect2, def_id: StringName) -> void:
 			_ring(canvas, area)
 		&"room_quarters":
 			_columns(canvas, inner, 3, _SHEET)
-		&"room_archive":
-			_rows(canvas, inner, 4, BasePlanPainter.FURNITURE)
 		&"room_capacitor_bank":
 			_columns(canvas, inner, 3, _BANK)
 		&"room_power_plant":

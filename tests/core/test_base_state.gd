@@ -14,8 +14,8 @@ func test_new_game_has_the_starting_base() -> void:
 func test_round_trip() -> void:
 	var base := StartingBase.build(BalanceConfig.new())
 	base.levels.append(LevelState.new())
-	base.levels[3].dig_ticks_left = 500
-	var lab: RoomState = base.add_room(&"room_physics_lab", 1, Vector2i(3, 4))
+	base.levels[1].dig_ticks_left = 500
+	var lab: RoomState = base.add_room(&"room_research_lab", 1, Vector2i(3, 4))
 	lab.rotated = true
 	lab.build_ticks_left = 99
 	lab.powered_on = false
@@ -23,7 +23,7 @@ func test_round_trip() -> void:
 	assert_array(BaseState.validate_dict(data)).is_empty()
 	var loaded := BaseState.from_dict(data)
 	assert_dict(loaded.to_dict()).is_equal(base.to_dict())
-	assert_int(loaded.level_count).is_equal(4)
+	assert_int(loaded.level_count).is_equal(2)
 	var last: RoomState = loaded.rooms[loaded.rooms.size() - 1]
 	assert_str(String(last.id)).is_equal(String(lab.id))
 	assert_that(last.origin).is_equal(Vector2i(3, 4))
@@ -32,7 +32,7 @@ func test_round_trip() -> void:
 ## The whole GameState round trip keeps the base and validates.
 func test_game_state_round_trip() -> void:
 	var state := GameState.new_game(7)
-	state.base.add_room(&"room_physics_lab", 1, Vector2i(1, 1))
+	state.base.add_room(&"room_research_lab", 1, Vector2i(1, 1))
 	var data: Dictionary = JSON.parse_string(JSON.stringify(state.to_dict()))
 	assert_array(GameState.validate_dict(data)).is_empty()
 	assert_dict(GameState.from_dict(data).base.to_dict()).is_equal(state.base.to_dict())

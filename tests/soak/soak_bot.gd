@@ -13,9 +13,12 @@ extends RefCounted
 ## Book, then extends the pole camera (ExtendPoleCameraCommand) if the world's horizon record is not
 ## taken, and closes the wormhole once the camera is back and the wormhole has been open a few
 ## ticks.
-## Once the bank charges it builds on: a corridor run off the Level 2 spine and a Physics Lab
+## Once the bank charges it builds on: a corridor run off the Level 1 spine and a Research Lab
 ## against it (the lab completes off, since the bank holds the spare supply), and it digs each
-## extra level as soon as the money allows (DigLevelCommand), one at a time.
+## extra level as soon as the money allows (DigLevelCommand), one at a time. Until research
+## exists, it grants itself the digging projects (Excavation survey, Lift shaft, Deep
+## excavation) directly (ConstructionFixture.grant_dig_research()) before its first dig
+## (m25-lean-start.md section 3); the unlocks are game state, so they survive a reload.
 ## Every random draw comes from the run's own GameState stream &"soak_bot", so two runs from
 ## the same seed act identically, and a saved and reloaded state carries the stream on. The
 ## picked address is the bot's own, not game state: it carries on across reloads with the bot.
@@ -52,13 +55,13 @@ const MAX_INT_VALUE: int = 1000000
 const BOOK_CHANCE: float = 0.3
 ## Chance that a newly picked address is a real world's true address.
 const TARGET_CHANCE: float = 0.1
-## The corridor run and the Physics Lab the bot builds on Level 2 (as in test_m2_flow.gd).
-const LAB_LEVEL: int = 2
+## The corridor run and the Research Lab the bot builds on Level 1 (as in test_m2_flow.gd).
+const LAB_LEVEL: int = 1
 const LAB_CORRIDOR: Array[Vector2i] = [
-	Vector2i(20, 14), Vector2i(20, 13), Vector2i(20, 12), Vector2i(20, 11), Vector2i(20, 10)
+	Vector2i(24, 9), Vector2i(24, 8), Vector2i(24, 7), Vector2i(24, 6), Vector2i(24, 5)
 ]
-const LAB_DEF: StringName = &"room_physics_lab"
-const LAB_ORIGIN: Vector2i = Vector2i(21, 10)
+const LAB_DEF: StringName = &"room_research_lab"
+const LAB_ORIGIN: Vector2i = Vector2i(25, 5)
 ## Ticks an open wormhole stays open before the bot closes it.
 const CLOSE_AFTER_TICKS: int = 5
 
@@ -364,6 +367,7 @@ func _work_base(simulation: Simulation) -> void:
 	elif builds == 1:
 		next = PlaceRoomCommand.create(LAB_DEF, LAB_LEVEL, LAB_ORIGIN)
 	else:
+		ConstructionFixture.grant_dig_research(state)
 		next = DigLevelCommand.new()
 	if not next.validate(state).is_ok:
 		return

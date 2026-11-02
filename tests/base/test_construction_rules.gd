@@ -6,7 +6,7 @@ extends GdUnitTestSuite
 
 
 func _state() -> GameState:
-	return ConstructionFixture.state()
+	return ConstructionFixture.grown()
 
 
 func _paint(game: GameState, run: Array[Vector2i]) -> RoomState:
@@ -58,7 +58,7 @@ func test_each_corridor_demolition_posts_once() -> void:
 func test_cancel_removes_the_whole_run_and_refunds_its_full_cost() -> void:
 	var game := _state()
 	var first: RoomState = _paint(game, [Vector2i(10, 16), Vector2i(10, 17), Vector2i(10, 18)])
-	ConstructionFixture.advance(game, ConstructionSystem.new(), 60)
+	ConstructionFixture.advance(game, ConstructionSystem.new(), 10)
 	assert_bool(first.is_built()).is_true()
 	assert_bool(ConstructionFixture.run(game, CancelBuildCommand.create(first.id)).is_ok).is_true()
 	assert_array(BaseRules.site_rooms(game.base, first.id)).is_empty()
@@ -86,7 +86,9 @@ func test_refunds_round_down_to_whole_k() -> void:
 
 func test_full_game_save_mid_demolition_keeps_progress() -> void:
 	var game := _state()
-	ConstructionFixture.run(game, PlaceRoomCommand.create(&"room_physics_lab", 2, Vector2i(20, 16)))
+	ConstructionFixture.run(
+		game, PlaceRoomCommand.create(&"room_research_lab", 2, Vector2i(20, 16))
+	)
 	var lab: RoomState = game.base.rooms[-1]
 	var system := ConstructionSystem.new()
 	ConstructionFixture.advance(game, system, lab.build_ticks_left)
@@ -100,7 +102,7 @@ func test_full_game_save_mid_demolition_keeps_progress() -> void:
 	var copy: RoomState = loaded.base.find_room(lab.id)
 	assert_int(copy.demolish_ticks_left).is_equal(lab.demolish_ticks_left)
 	assert_bool(copy.powered_on).is_false()
-	assert_int(loaded.base.levels[3].dig_ticks_left).is_equal(20 * 1440 - 50)
+	assert_int(loaded.base.levels[3].dig_ticks_left).is_equal(5 * 1440 - 50)
 
 
 func test_validate_rejects_inconsistent_construction() -> void:
@@ -155,7 +157,7 @@ func test_cancel_refused_while_run_cells_are_demolished() -> void:
 	]
 	var first: RoomState = _paint(game, run)
 	var system := ConstructionSystem.new()
-	ConstructionFixture.advance(game, system, 180)
+	ConstructionFixture.advance(game, system, 30)
 	var cells: Array[RoomState] = BaseRules.site_rooms(game.base, first.id)
 	for index: int in [2, 1, 0]:
 		ConstructionFixture.run(game, DemolishRoomCommand.create(cells[index].id))

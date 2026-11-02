@@ -7,6 +7,8 @@ extends RefCounted
 const ROOM_DIR: String = "res://data/rooms/"
 ## Where add_bank() puts banks: level 1, a free strip near the top of the grid.
 const BANK_ROW: int = 0
+## Where lab() puts the Research Lab: Level 1, west of the plant, against the spine.
+const LAB_ORIGIN: Vector2i = Vector2i(0, 11)
 
 
 ## Fills [param state]'s room_defs with every real RoomDef when it has none.
@@ -29,6 +31,16 @@ static func add_bank(state: GameState, rate_mw: int = 0) -> RoomState:
 	)
 	state.power.charge_rates[bank.id] = rate_mw
 	return bank
+
+
+## Returns [param state]'s first Research Lab, adding a built, switched-on one at LAB_ORIGIN
+## when there is none: the switchable 5 MW room the power tests use (the lean start has none).
+static func lab(state: GameState) -> RoomState:
+	load_room_defs(state)
+	var found: RoomState = first_room(state, &"room_research_lab")
+	if found != null:
+		return found
+	return state.base.add_room(&"room_research_lab", 1, LAB_ORIGIN)
 
 
 ## Returns the first room of [param def_id] in [param state]'s base, or null.

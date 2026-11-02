@@ -173,20 +173,24 @@ func test_new_game_with_balance_starts_power() -> void:
 ## The sections are saved under their names; the event outbox is not.
 func test_to_dict_sections() -> void:
 	var data := _gate_power_worlds_state().to_dict()
-	assert_array(data.keys()).contains_exactly_in_any_order(
-		[
-			"clock",
-			"random",
-			"flags",
-			"gate",
-			"power",
-			"budget",
-			"base",
-			"worlds",
-			"archive",
-			"address_book",
-			"operations_log"
-		]
+	(
+		assert_array(data.keys())
+		. contains_exactly_in_any_order(
+			[
+				"clock",
+				"random",
+				"flags",
+				"gate",
+				"power",
+				"budget",
+				"base",
+				"worlds",
+				"archive",
+				"address_book",
+				"operations_log",
+				"unlocks",
+			]
+		)
 	)
 	assert_bool(_is_json_safe(data)).is_true()
 

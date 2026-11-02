@@ -1,13 +1,15 @@
-## M2 end to end, headless, over the real data/ content: a new game opens on the Gate Room, whose
-## "Build capacitor bank" button switches to the Base tab with the bank's ghost on the nearest valid
-## spot to the Gate Room, and one click builds it. The bank completes after 6 hours and takes the
-## spare 26 MW; SILL then charges and locks, and the pole camera brings its documents. The player
-## paints a corridor and builds a Physics Lab against it on Level 2 (it completes off: the bank
-## holds all the spare power, and switching it on is refused), digs Level 4, and the month-end pays
-## the allocation less the upkeep. Last, with the total charge rate lowered below the open
+## M2 end to end on the M2.5 lean start, headless, over the real data/ content: a new game opens on
+## the Gate Room, whose "Build capacitor bank" button switches to the Base tab with the bank's
+## ghost on the nearest valid spot to the Gate Room, and one click builds it. The bank completes
+## after 1 hour and takes the spare 25 MW; SILL then charges and locks, and the pole camera brings
+## its documents. The player paints a corridor and builds a Research Lab against it on Level 1 (it
+## completes off: the bank holds all the spare power, and switching it on is refused; the
+## finishing-room rule is card M2.5-07), is granted Excavation survey through
+## UnlockRules.apply_project() (no research system yet), digs Level 2, and the month-end pays the
+## allocation less the upkeep. Last, with the total charge rate lowered below the open
 ## wormhole's 20 MWh/h drain, a lock closes when the capacitors run empty.
 ## Bible: roadmap.md (M2 check), technical-architecture.md#testing-and-tooling,
-## docs/content/m2-base.md sections 2 to 5
+## docs/content/m2-base.md sections 2 to 5, docs/content/m25-lean-start.md sections 1 to 6
 extends GdUnitTestSuite
 
 const M15Player := preload("res://tests/gate/m15_player.gd")
@@ -16,14 +18,14 @@ const SWITCHER_SCENE: String = "res://src/ui/views/view_switcher.tscn"
 
 ## Seed of the played game.
 const SEED: int = 20_261_101
-## The corridor run on Level 2: from the spine up column 20.
-const CORRIDOR_LEVEL: int = 2
+## The corridor run on Level 1: from the spine up column 24, east of the Gate Room.
+const CORRIDOR_LEVEL: int = 1
 const CORRIDOR_RUN: Array[Vector2i] = [
-	Vector2i(20, 14), Vector2i(20, 13), Vector2i(20, 12), Vector2i(20, 11), Vector2i(20, 10)
+	Vector2i(24, 9), Vector2i(24, 8), Vector2i(24, 7), Vector2i(24, 6), Vector2i(24, 5)
 ]
-## Where the Physics Lab (4 × 3) stands: east of the corridor run, touching it.
-const LAB_DEF: StringName = &"room_physics_lab"
-const LAB_ORIGIN: Vector2i = Vector2i(21, 10)
+## Where the Research Lab (4 × 3) stands: east of the corridor run, touching it.
+const LAB_DEF: StringName = &"room_research_lab"
+const LAB_ORIGIN: Vector2i = Vector2i(25, 5)
 ## A charge rate below the open wormhole's 20 MWh/h drain.
 const LOW_CHARGE_MW: int = 10
 
@@ -60,7 +62,7 @@ func test_new_game_to_month_end() -> void:
 	_assert_bank_completes(player)
 	_lock_sill_and_send_camera(player)
 	_build_lab_with_corridor(player)
-	_dig_level_4(player)
+	_dig_level_2(player)
 	_assert_month_end(player)
 	_assert_empty_capacitors_close(player)
 	assert_array(player.rejections).is_empty()
@@ -71,7 +73,7 @@ func _on_event(event_name: StringName, args: Array) -> void:
 		_closed_reasons.append(args[0])
 
 
-## The Gate Room's button switches to the Base tab on Level 3 with the bank's ghost green on
+## The Gate Room's button switches to the Base tab on Level 1 with the bank's ghost green on
 ## the nearest valid spot (BaseSpots.bank_spot); one click pays $600k and starts the site; the
 ## button is gone.
 func _build_bank_from_gate_room(player: M15Player) -> void:
@@ -90,7 +92,7 @@ func _build_bank_from_gate_room(player: M15Player) -> void:
 	var base := switcher.get_view(&"base") as BaseView
 	var ghost: PlacementGhost = base.get_build().get_ghost()
 	assert_bool(ghost.is_placing()).is_true()
-	assert_int(base.get_plan().level).is_equal(3)
+	assert_int(base.get_plan().level).is_equal(1)
 	var spot: Vector2i = BaseSpots.bank_spot(player.state().base, player.state().room_defs)
 	assert_vector(Vector2(ghost.origin)).is_equal(Vector2(spot))
 	assert_str(ghost.reason()).is_empty()
@@ -102,17 +104,17 @@ func _build_bank_from_gate_room(player: M15Player) -> void:
 	_root = null
 
 
-## The site takes 360 ticks (6 hours); the bank then charges at the spare 26 MW.
+## The site takes 60 ticks (1 hour); the bank then charges at the spare 25 MW.
 func _assert_bank_completes(player: M15Player) -> void:
-	for _tick: int in 359:
+	for _tick: int in 59:
 		player.step()
 	assert_bool(player.state().power.charge_rates.is_empty()).is_true()
 	player.step()
-	assert_array(player.state().power.charge_rates.values()).is_equal([26])
+	assert_array(player.state().power.charge_rates.values()).is_equal([25])
 	assert_float(PowerRules.spare_mw(player.state())).is_equal(0.0)
 
 
-## SILL charges (about 14 hours at 26 MW), locks, and the pole camera brings its documents.
+## SILL charges (about 14.7 hours at 25 MW), locks, and the pole camera brings its documents.
 func _lock_sill_and_send_camera(player: M15Player) -> void:
 	var sill: GateAddress = player.address(M15Player.PUZZLES[0]["glyphs"])
 	var started: int = player.state().clock.tick
@@ -128,7 +130,7 @@ func _lock_sill_and_send_camera(player: M15Player) -> void:
 	assert_bool(player.close_wormhole()).is_true()
 
 
-## Paints a corridor run off the Level 2 spine, builds a Physics Lab against it, and waits for
+## Paints a corridor run off the Level 1 spine, builds a Research Lab against it, and waits for
 ## both. The lab completes switched off (no spare power), and switching it on is refused
 ## until the bank's charge rate is lowered.
 func _build_lab_with_corridor(player: M15Player) -> void:
@@ -162,21 +164,25 @@ func _corridor_built_at(state: GameState, cell: Vector2i) -> bool:
 	return false
 
 
-## Digs Level 4 ($3,000k, 20 days) and waits for it.
-func _dig_level_4(player: M15Player) -> void:
+## Digging is refused until Excavation survey; granted directly, Level 2 ($1,500k, 3 days)
+## is dug.
+func _dig_level_2(player: M15Player) -> void:
+	var refused: CommandResult = DigLevelCommand.new().validate(player.state())
+	assert_str(String(refused.error_code)).is_equal("needs_research")
+	assert_bool(UnlockRules.apply_project(player.state().unlocks, &"excavation_survey")).is_true()
 	var funds: int = player.state().budget.funds_k
 	assert_bool(player.simulation.submit(DigLevelCommand.new()).is_ok).is_true()
-	assert_int(player.state().budget.funds_k).is_equal(funds - 3000)
-	assert_int(player.state().base.digging_level()).is_equal(4)
+	assert_int(player.state().budget.funds_k).is_equal(funds - 1500)
+	assert_int(player.state().base.digging_level()).is_equal(2)
 	var started: int = player.state().clock.tick
 	while player.state().base.digging_level() != 0:
 		player.step()
-	assert_int(player.state().clock.tick - started).is_equal(20 * TimeMath.TICKS_PER_DAY)
-	assert_int(player.state().base.level_count).is_equal(4)
+	assert_int(player.state().clock.tick - started).is_equal(3 * TimeMath.TICKS_PER_DAY)
+	assert_int(player.state().base.level_count).is_equal(2)
 
 
 ## At the month-end the budget gains the $3,000k allocation less the upkeep: the starting
-## $240k, the bank's $10k and half the lab's $60k (it is off); corridors pay nothing.
+## $190k, the bank's $10k and half the lab's $60k (it is off); corridors pay nothing.
 func _assert_month_end(player: M15Player) -> void:
 	var closes: Array[int] = []
 	player.simulation.month_closed.connect(
@@ -185,10 +191,10 @@ func _assert_month_end(player: M15Player) -> void:
 	var funds: int = player.state().budget.funds_k
 	while closes.is_empty():
 		player.step()
-	assert_int(player.state().budget.funds_k).is_equal(funds + 3000 - (240 + 10 + 30))
+	assert_int(player.state().budget.funds_k).is_equal(funds + 3000 - (190 + 10 + 30))
 
 
-## At the starting 26 MW the charge out-runs the open wormhole's 20 MWh/h drain, so a lock
+## At the starting 25 MW the charge out-runs the open wormhole's 20 MWh/h drain, so a lock
 ## stays open. With the charge rate lowered below the drain (the lab switched on with the MW
 ## freed), the next lock, dialed as soon as SILL's charge is ready, closes for power when the
 ## capacitors run empty, before its time runs out.

@@ -32,15 +32,18 @@ func tick(_state: GameState) -> void:
 
 ## Adds the allocation, subtracts the upkeep and posts budget_changed(new balance).
 func on_month(state: GameState) -> void:
-	var upkeep_k: int = monthly_upkeep_k(state.base, _room_defs)
+	var upkeep_k: int = monthly_upkeep_k(state.base, _room_defs, state.unlocks)
 	state.budget.funds_k += _balance.monthly_allocation_k - upkeep_k
 	state.events.post(&"budget_changed", [state.budget.funds_k])
 
 
 ## Total monthly upkeep of [param base]'s built rooms, in $k, with [param room_defs] by id:
 ## a room switched off pays half (rounded down), a lift shaft pays once
-## and unknown defs pay nothing.
-static func monthly_upkeep_k(base: BaseState, room_defs: Dictionary[StringName, RoomDef]) -> int:
+## and unknown defs pay nothing. With [param unlocks], a research upkeep override replaces the
+## def's upkeep (UnlockRules.upkeep_k(), e.g. Fuel contracts).
+static func monthly_upkeep_k(
+	base: BaseState, room_defs: Dictionary[StringName, RoomDef], unlocks: UnlockState = null
+) -> int:
 	var total: int = 0
 	var shafts_seen: Dictionary[String, bool] = {}
 	for room: RoomState in base.rooms:
@@ -52,5 +55,6 @@ static func monthly_upkeep_k(base: BaseState, room_defs: Dictionary[StringName, 
 			if shafts_seen.has(shaft):
 				continue
 			shafts_seen[shaft] = true
-		total += def.upkeep_k if room.powered_on else def.upkeep_k / 2
+		var upkeep: int = def.upkeep_k if unlocks == null else UnlockRules.upkeep_k(unlocks, def)
+		total += upkeep if room.powered_on else upkeep / 2
 	return total

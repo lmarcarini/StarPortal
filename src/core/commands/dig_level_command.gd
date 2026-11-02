@@ -3,7 +3,7 @@ extends Command
 ## The player digs a new level below the deepest: pays BalanceConfig.dig_level_costs_k and
 ## the level arrives after dig_level_ticks (ConstructionSystem). One dig at a time; it uses no
 ## construction slot and draws no power. Posts budget_changed when applied.
-## Bible: docs/content/m2-base.md section 4
+## Bible: docs/content/m2-base.md section 4, docs/content/m25-lean-start.md section 2
 
 ## The command's stable type id.
 const TYPE: StringName = &"dig_level"
@@ -27,13 +27,18 @@ func get_type() -> StringName:
 	return TYPE
 
 
-## Rejects a second dig (&"dig_running"), a dig past the extra levels allowed or with no
-## balance (&"level_limit") and too little money (&"insufficient_funds").
+## Rejects a second dig (&"dig_running"), a dig research has not allowed yet
+## (BaseRules.can_dig(): &"needs_research", or &"level_limit" when no research ever will), a
+## dig past the extra levels allowed or with no balance (&"level_limit") and too little money
+## (&"insufficient_funds").
 func validate(state: GameState) -> CommandResult:
 	if state.base.digging_level() != 0:
 		return CommandResult.fail(&"dig_running")
 	if state.balance == null:
 		return CommandResult.fail(&"level_limit", "no balance")
+	var unlocked: CommandResult = BaseRules.can_dig(state)
+	if not unlocked.is_ok:
+		return unlocked
 	var index: int = state.base.level_count - state.balance.starting_levels
 	if (
 		index < 0

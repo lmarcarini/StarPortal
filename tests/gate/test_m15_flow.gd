@@ -105,7 +105,7 @@ func _assert_start(player: M15Player) -> void:
 
 
 ## Before the bank and while it is built, SILL's answer is refused for want of charge; the
-## Capacitor Bank is built as a room on the nearest valid spot to the Gate Room over its 360
+## Capacitor Bank is built as a room on the nearest valid spot to the Gate Room over its 60
 ## build ticks, takes the spare supply the moment it is completed, and the answer can then be
 ## charged.
 func _assert_no_dial_before_bank(player: M15Player) -> void:
@@ -117,13 +117,13 @@ func _assert_no_dial_before_bank(player: M15Player) -> void:
 	assert_int(GateQueries.ticks_until_ready(state, sill)).is_equal(-1)
 	assert_bool(player.simulation.submit(PowerFixture.build_first_bank(state)).is_ok).is_true()
 	var bank_def: RoomDef = state.room_defs[StartingBase.CAPACITOR_BANK_DEF]
-	assert_int(bank_def.build_ticks).is_equal(360)
+	assert_int(bank_def.build_ticks).is_equal(60)
 	for _tick: int in bank_def.build_ticks - 1:
 		player.step()
 	assert_bool(state.power.charge_rates.is_empty()).is_true()
 	_assert_dial_refused(player, sill)
 	player.step()
-	assert_array(state.power.charge_rates.values()).is_equal([26])
+	assert_array(state.power.charge_rates.values()).is_equal([25])
 	assert_float(PowerRules.allocated_mw(state)).is_equal(PowerRules.supply_mw(state))
 	assert_int(GateQueries.ticks_until_ready(state, sill)).is_greater(0)
 	player.rejections.clear()

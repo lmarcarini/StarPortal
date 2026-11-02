@@ -115,13 +115,13 @@ func test_date_label_follows_ticks() -> void:
 
 
 func test_quick_save_then_load_restores_date() -> void:
-	PowerFixture.add_bank(SimClock.simulation.state, 26)
+	PowerFixture.add_bank(SimClock.simulation.state, 25)
 	SimClock.step_ticks(90)
 	await _runner.simulate_key_pressed(KEY_F5)
 	assert_str(_shell.get_toast_text()).is_equal(tr("UI_SAVED"))
 	assert_bool(FileAccess.file_exists(SaveService.slot_path(&"quick"))).is_true()
 	var before_load: Simulation = SimClock.simulation
-	assert_float(before_load.state.power.stored_mwh).is_equal_approx(39.0, 1e-9)
+	assert_float(before_load.state.power.stored_mwh).is_equal_approx(37.5, 1e-9)
 	SimClock.step_ticks(500)
 	assert_str(_label("DateLabel").text).is_equal("2026-01-01 09:50")
 	await _runner.simulate_key_pressed(KEY_F9)

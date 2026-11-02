@@ -188,7 +188,7 @@ func _act(target: StringName, step: int) -> void:
 	if _is_bank(target):
 		if step != 0:
 			var rate: int = _simulation.state.power.charge_rates.get(target, 0)
-			_set_rate(target, rate + step)
+			_set_rate(target, rate + step * ChargeControl.STEP_MW)
 		return
 	if PowerRules.has_switch(_def_of(target)):
 		_toggle(target)

@@ -49,7 +49,7 @@ func test_capacitor_bank_button_places_the_ghost_and_one_click_builds() -> void:
 	_view.place_capacitor_bank()
 	var ghost: PlacementGhost = _ghost()
 	assert_bool(ghost.is_placing()).is_true()
-	assert_int(_view.get_plan().level).is_equal(3)
+	assert_int(_view.get_plan().level).is_equal(1)
 	var spot: Vector2i = BaseSpots.bank_spot(_simulation.state.base, _simulation.state.room_defs)
 	assert_vector(Vector2(ghost.origin)).is_equal(Vector2(spot))
 	assert_str(ghost.reason()).is_empty()
@@ -64,7 +64,7 @@ func test_capacitor_bank_button_places_the_ghost_and_one_click_builds() -> void:
 
 func test_invalid_spots_say_why() -> void:
 	var ghost: PlacementGhost = _ghost()
-	_view.get_build().start_placing(&"room_physics_lab")
+	_view.get_build().start_placing(&"room_research_lab")
 	ghost.move_to(Vector2i(15, 5))
 	assert_str(ghost.reason()).is_equal("Overlaps the Gate Room.")
 	ghost.move_to(Vector2i(34, 0))
@@ -73,13 +73,43 @@ func test_invalid_spots_say_why() -> void:
 	assert_str(ghost.reason()).is_equal("Must touch a corridor.")
 	_simulation.state.budget.funds_k = 100
 	ghost.recheck()
-	ghost.move_to(Vector2i(4, 16))
+	ghost.move_to(Vector2i(24, 11))
 	assert_str(ghost.reason()).is_equal("Needs $800k; you have $100k.")
 	ghost.confirm()
-	assert_int(_count(&"room_physics_lab")).is_equal(0)
+	assert_int(_count(&"room_research_lab")).is_equal(0)
+
+
+## A new game's palette offers only the Capacitor Bank, Research Lab and Corridor
+## (m25-lean-start.md section 1); research adds the rest on the next refresh.
+func test_palette_offers_only_unlocked_rooms() -> void:
+	var palette: BuildPalette = _view.get_palette()
+	for def_id: StringName in BuildPalette.ROOMS:
+		var wanted: bool = (
+			def_id in [&"room_capacitor_bank", &"room_research_lab", &"room_corridor"]
+		)
+		(
+			assert_bool(palette.get_room_button(def_id) != null)
+			. override_failure_message(String(def_id))
+			. is_equal(wanted)
+		)
+	await _unlock_everything()
+	for def_id: StringName in BuildPalette.ROOMS:
+		assert_object(palette.get_room_button(def_id)).is_not_null()
+	assert_object(palette.get_room_button(&"room_quarters")).is_null()
+
+
+## Every research unlock, and an empty dug Level 2 below, then a refresh.
+func _unlock_everything() -> void:
+	ConstructionFixture.unlock_all(_simulation.state)
+	_simulation.state.budget.funds_k = 100000
+	_simulation.state.base.levels.append(LevelState.new())
+	_view.get_build().refresh()
+	for _frame: int in 2:
+		await get_tree().process_frame
 
 
 func test_every_catalogue_room_has_a_palette_button_and_summary() -> void:
+	await _unlock_everything()
 	for def_id: StringName in BuildPalette.ROOMS:
 		var button: Button = _view.get_palette().get_room_button(def_id)
 		assert_object(button).is_not_null()
@@ -89,7 +119,7 @@ func test_every_catalogue_room_has_a_palette_button_and_summary() -> void:
 
 func test_rotate_turns_the_ghost() -> void:
 	var ghost: PlacementGhost = _ghost()
-	_view.get_build().start_placing(&"room_physics_lab")
+	_view.get_build().start_placing(&"room_research_lab")
 	ghost.move_to(Vector2i(4, 16))
 	assert_object(ghost.area().size).is_equal(Vector2i(4, 3))
 	ghost.rotate_ghost()
@@ -99,11 +129,11 @@ func test_rotate_turns_the_ghost() -> void:
 func test_corridor_painting_builds_one_run() -> void:
 	var ghost: PlacementGhost = _ghost()
 	_view.get_build().start_placing(StartingBase.CORRIDOR_DEF)
-	ghost.move_to(Vector2i(10, 16))
-	ghost.move_to(Vector2i(10, 17))
-	ghost.move_to(Vector2i(11, 17))
+	ghost.move_to(Vector2i(24, 11))
+	ghost.move_to(Vector2i(24, 12))
+	ghost.move_to(Vector2i(25, 12))
 	assert_int(ghost.run.size()).is_equal(3)
-	ghost.move_to(Vector2i(10, 17))
+	ghost.move_to(Vector2i(24, 12))
 	assert_int(ghost.run.size()).is_equal(2)
 	var before: int = _count(StartingBase.CORRIDOR_DEF)
 	ghost.confirm()
@@ -114,12 +144,12 @@ func test_corridor_painting_builds_one_run() -> void:
 ## shows the Gate level with the ghost out, and the palette says why.
 func test_capacitor_bank_button_without_a_spot_explains() -> void:
 	var base: BaseState = _simulation.state.base
-	for room: RoomState in BaseRules.rooms_on_level(base, 3):
+	for room: RoomState in BaseRules.rooms_on_level(base, 1):
 		if BaseRules.is_connector(room.def_id):
 			base.rooms.erase(room)
 	_view.place_capacitor_bank()
 	assert_bool(_ghost().is_placing()).is_true()
-	assert_int(_view.get_plan().level).is_equal(3)
+	assert_int(_view.get_plan().level).is_equal(1)
 	assert_str(_ghost().reason()).is_not_empty()
 	assert_str(_view.get_palette().get_hint()).starts_with("No free 3 × 2 spot")
 
@@ -138,29 +168,33 @@ func test_cancel_site_shows_and_pays_the_refund() -> void:
 	assert_int(_count(StartingBase.CAPACITOR_BANK_DEF)).is_equal(0)
 
 
-func test_demolish_refused_for_the_gate_room_and_allowed_for_quarters() -> void:
+func test_demolish_refused_for_the_gate_room_and_allowed_for_a_lab() -> void:
 	var panel: RoomPanel = _view.get_room_panel()
 	var gate: RoomState = _find(StartingBase.GATE_ROOM_DEF)
 	_view.get_plan().select(gate.id)
 	assert_bool(panel.get_action_button().disabled).is_true()
 	assert_str(panel.get_action_reason()).is_equal("The Gate and Control Rooms stay.")
-	_view.get_plan().show_level(1)
-	var quarters: RoomState = _find(&"room_quarters")
-	_view.get_plan().select(quarters.id)
-	assert_str(panel.get_action_button().text).contains("$75k")
+	var lab: RoomState = _simulation.state.base.add_room(&"room_research_lab", 1, Vector2i(24, 11))
+	_view.get_plan().select(lab.id)
+	assert_str(panel.get_action_button().text).contains("$400k")
 	panel.get_action_button().begin_hold()
 	panel.get_action_button().advance(1.0)
-	assert_bool(quarters.is_demolishing()).is_true()
+	assert_bool(lab.is_demolishing()).is_true()
 
 
 func test_dig_button_digs_and_cancels() -> void:
 	var dig: DigButton = _view.get_palette().get_dig_button()
-	assert_str(dig.text).is_equal("Dig Level 4: $3,000k, 20 d")
+	assert_str(dig.text).is_equal("Dig Level 2: $1,500k, 3 d")
+	assert_bool(dig.disabled).is_true()
+	assert_str(dig.get_reason()).is_equal("Needs research: Excavation survey.")
+	UnlockRules.apply_project(_simulation.state.unlocks, &"excavation_survey")
+	_view.get_build().refresh()
+	assert_bool(dig.disabled).is_false()
 	dig.begin_hold()
 	dig.advance(1.0)
-	assert_int(_simulation.state.base.digging_level()).is_equal(4)
+	assert_int(_simulation.state.base.digging_level()).is_equal(2)
 	assert_int(_view.get_plan().get_parent().get_parent().get_child_count()).is_greater(0)
-	assert_str(dig.text).contains("$1,500k")
+	assert_str(dig.text).contains("$750k")
 	dig.begin_hold()
 	dig.advance(1.0)
 	assert_int(_simulation.state.base.digging_level()).is_equal(0)
@@ -174,6 +208,7 @@ func test_signature_includes_room_ids_and_positions() -> void:
 
 
 func test_palette_fits_1280_by_720_in_both_languages() -> void:
+	await _unlock_everything()
 	for locale: String in ["en", "pt_BR"]:
 		TranslationServer.set_locale(locale)
 		_view.get_build().refresh()
@@ -199,16 +234,16 @@ func test_palette_fits_1280_by_720_in_both_languages() -> void:
 
 func test_focused_palette_button_gets_enter_not_the_ghost() -> void:
 	_view.place_capacitor_bank()
-	var quarters: Button = _view.get_palette().get_room_button(&"room_quarters")
-	quarters.grab_focus()
-	var before: int = _count(&"room_quarters")
+	var lab: Button = _view.get_palette().get_room_button(&"room_research_lab")
+	lab.grab_focus()
+	var before: int = _count(&"room_research_lab")
 	await get_tree().process_frame
 	_push_key(KEY_ENTER, true)
 	_push_key(KEY_ENTER, false)
 	await get_tree().process_frame
-	assert_str(String(_ghost().def_id)).is_equal("room_quarters")
+	assert_str(String(_ghost().def_id)).is_equal("room_research_lab")
 	# The Enter that picked the room on the palette must not also build it.
-	assert_int(_count(&"room_quarters")).is_equal(before)
+	assert_int(_count(&"room_research_lab")).is_equal(before)
 
 
 func test_mouse_click_builds_with_real_events() -> void:
@@ -245,12 +280,13 @@ func test_gamepad_a_press_builds_with_real_events() -> void:
 
 
 func test_every_catalogue_room_finds_a_valid_spot() -> void:
+	await _unlock_everything()
 	var ghost: PlacementGhost = _ghost()
 	var plan: BasePlan = _view.get_plan()
 	var grid: Vector2i = _simulation.state.base.grid_size
 	for def_id: StringName in BuildPalette.ROOMS:
 		var found: bool = false
-		for level: int in [1, 2, 3]:
+		for level: int in [1, 2]:
 			plan.show_level(level)
 			_view.get_build().start_placing(def_id)
 			for y: int in grid.y:
@@ -274,7 +310,7 @@ func test_energy_layer_and_ghost_do_not_fight() -> void:
 	power.toggle_layer()
 	assert_bool(power.is_layer_on()).is_true()
 	assert_bool(_ghost().is_placing()).is_false()
-	_view.get_palette().get_room_button(&"room_quarters").pressed.emit()
+	_view.get_palette().get_room_button(&"room_research_lab").pressed.emit()
 	assert_bool(power.is_layer_on()).is_false()
 	assert_bool(_ghost().is_placing()).is_true()
 	_view.place_capacitor_bank()

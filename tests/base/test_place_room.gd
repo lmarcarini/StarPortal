@@ -9,13 +9,13 @@ func _code(game: GameState, command: Command) -> StringName:
 
 
 func test_places_a_lab_against_the_spine_and_pays() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var result := ConstructionFixture.run(
-		game, PlaceRoomCommand.create(&"room_physics_lab", 2, Vector2i(20, 16))
+		game, PlaceRoomCommand.create(&"room_research_lab", 2, Vector2i(20, 16))
 	)
 	assert_bool(result.is_ok).is_true()
 	var room: RoomState = game.base.rooms[-1]
-	assert_int(room.build_ticks_left).is_equal(game.room_defs[&"room_physics_lab"].build_ticks)
+	assert_int(room.build_ticks_left).is_equal(game.room_defs[&"room_research_lab"].build_ticks)
 	assert_int(game.budget.funds_k).is_equal(12000 - 800)
 	assert_array(ConstructionFixture.event_names(game)).is_equal(
 		[&"room_build_started", &"budget_changed"]
@@ -23,8 +23,8 @@ func test_places_a_lab_against_the_spine_and_pays() -> void:
 
 
 func test_rejections_follow_the_rules() -> void:
-	var game := ConstructionFixture.state()
-	var lab := &"room_physics_lab"
+	var game := ConstructionFixture.grown()
+	var lab := &"room_research_lab"
 	assert_str(_code(game, PlaceRoomCommand.create(&"nope", 2, Vector2i(20, 16)))).is_equal(
 		"unknown_room"
 	)
@@ -48,9 +48,9 @@ func test_rejections_follow_the_rules() -> void:
 
 
 func test_turned_room_swaps_its_footprint() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	ConstructionFixture.run(
-		game, PlaceRoomCommand.create(&"room_physics_lab", 2, Vector2i(20, 16), true)
+		game, PlaceRoomCommand.create(&"room_research_lab", 2, Vector2i(20, 16), true)
 	)
 	var lab: RoomState = game.base.rooms[-1]
 	var area: Rect2i = BaseRules.footprint(lab, game.room_defs[lab.def_id])
@@ -62,7 +62,7 @@ func test_turned_room_swaps_its_footprint() -> void:
 
 
 func test_lift_takes_every_dug_level_for_one_cost() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	assert_bool(
 		(
 			ConstructionFixture
@@ -78,14 +78,14 @@ func test_lift_takes_every_dug_level_for_one_cost() -> void:
 
 
 func test_lift_blocked_on_one_level_names_it() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var result := PlaceRoomCommand.create(&"room_lift", 1, Vector2i(6, 13)).validate(game)
 	assert_str(result.error_code).is_equal("overlap")
 	assert_str(result.detail).is_equal("level 1")
 
 
 func test_stairs_join_two_levels() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	assert_bool(
 		(
 			ConstructionFixture
@@ -102,17 +102,17 @@ func test_stairs_join_two_levels() -> void:
 
 
 func test_corridor_run_is_one_site_paid_per_cell() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var run: Array[Vector2i] = [Vector2i(10, 16), Vector2i(10, 17), Vector2i(11, 17)]
 	assert_bool(ConstructionFixture.run(game, PaintCorridorCommand.create(2, run)).is_ok).is_true()
 	assert_int(game.budget.funds_k).is_equal(12000 - 15)
 	var cells: Array[RoomState] = BaseRules.site_rooms(game.base, game.base.rooms[-3].id)
 	assert_int(cells.size()).is_equal(3)
-	assert_int(cells[2].build_ticks_left).is_equal(180)
+	assert_int(cells[2].build_ticks_left).is_equal(30)
 
 
 func test_corridor_run_rejections() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var broken: Array[Vector2i] = [Vector2i(10, 16), Vector2i(12, 16)]
 	var loose: Array[Vector2i] = [Vector2i(10, 3)]
 	var onto: Array[Vector2i] = [Vector2i(10, 15)]

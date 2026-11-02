@@ -32,6 +32,6 @@ func test_shell_shows_the_starting_budget() -> void:
 	var runner: GdUnitSceneRunner = scene_runner(shell)
 	await runner.await_input_processed()
 	var label: MoneyLabel = shell.get_node("%MoneyLabel")
-	assert_str(label.text).is_equal("$12,000k")
+	assert_str(label.text).is_equal("$6,000k")
 	shell.free()
 	SaveService.saves_dir = real_saves_dir

@@ -45,8 +45,8 @@ func get_type() -> StringName:
 
 
 ## Rejects an unknown room (&"unknown_room"), a site (&"not_built"), a room already coming
-## down (&"already_demolishing"), the Gate and Control Rooms (&"fixed_room"), the starting
-## lift (&"starting_lift"), the last Power Plant (&"last_plant") and a connector whose removal
+## down (&"already_demolishing"), the Gate and Control Rooms (&"fixed_room"), the last Power
+## Plant (&"last_plant") and a connector whose removal
 ## leaves a room or site touching no corridor, lift or stairs, counting rooms already coming
 ## down as gone (&"leaves_room_unconnected").
 func validate(state: GameState) -> CommandResult:
@@ -85,8 +85,6 @@ func to_dict() -> Dictionary:
 func _protection_error(state: GameState, room: RoomState, def: RoomDef) -> StringName:
 	if def.fixed:
 		return &"fixed_room"
-	if BaseRules.is_starting_lift(room):
-		return &"starting_lift"
 	if def.power_output_mw > 0.0 and _plants_left(state) <= 1:
 		return &"last_plant"
 	if BaseRules.strands_a_room(state.base, state.room_defs, targets(state.base, room)):

@@ -1,7 +1,7 @@
 class_name DigButton
 extends HoldButton
-## The palette's Dig button (docs/content/m2-base.md section 4): "Dig Level 4 · $3,000k ·
-## 20 d", held to dig. While a level is being dug it offers to cancel the dig with its 50%
+## The palette's Dig button (docs/content/m2-base.md section 4): "Dig Level 2 · $1,500k ·
+## 3 d", held to dig. While a level is being dug it offers to cancel the dig with its 50%
 ## refund instead; past the last level allowed it is disabled. A refused dig shows why in its
 ## tooltip and in [method get_reason]. It changes no state: it emits [signal command_held].
 ## Bible: docs/content/m2-base.md section 4

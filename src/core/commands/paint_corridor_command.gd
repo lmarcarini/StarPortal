@@ -43,15 +43,17 @@ func get_type() -> StringName:
 	return TYPE
 
 
-## Rejects an empty, repeating or broken run, or one longer than the level has cells
-## (&"invalid_run"), a cell breaking a
+## Rejects a missing or locked corridor (BaseRules.can_build_room(): &"unknown_room" and the
+## research reasons), an empty, repeating or broken run, or one longer than the level has
+## cells (&"invalid_run"), a cell breaking a
 ## placement rule (&"no_such_level", &"level_not_dug", &"outside_level", &"overlap"), a run
 ## touching no room, corridor, lift or stairs (&"not_connected") and too little money
 ## (&"insufficient_funds").
 func validate(state: GameState) -> CommandResult:
-	var def: RoomDef = state.room_defs.get(StartingBase.CORRIDOR_DEF)
-	if def == null:
-		return CommandResult.fail(&"unknown_room", String(StartingBase.CORRIDOR_DEF))
+	var unlocked: CommandResult = BaseRules.can_build_room(state, StartingBase.CORRIDOR_DEF)
+	if not unlocked.is_ok:
+		return unlocked
+	var def: RoomDef = state.room_defs[StartingBase.CORRIDOR_DEF]
 	if not _is_run(state.base.grid_size.x * state.base.grid_size.y):
 		return CommandResult.fail(&"invalid_run")
 	var connected: bool = false

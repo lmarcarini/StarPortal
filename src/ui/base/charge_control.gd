@@ -9,6 +9,10 @@ extends VBoxContainer
 ## Emitted when the player asks for bank [param room_id] to charge at [param rate_mw].
 signal rate_requested(room_id: StringName, rate_mw: int)
 
+## The − and + step and the slider's step, in MW: power comes in 5 MW blocks
+## (m25-lean-start.md section 6).
+const STEP_MW: int = 5
+
 var _room_id: StringName = &""
 var _rate: Label = _label()
 var _row: HBoxContainer = HBoxContainer.new()
@@ -27,7 +31,7 @@ func _ready() -> void:
 		button.custom_minimum_size = Vector2(36.0, 0.0)
 	_minus.text = tr(&"BASE_POWER_RATE_DOWN")
 	_plus.text = tr(&"BASE_POWER_RATE_UP")
-	_slider.step = 1.0
+	_slider.step = STEP_MW
 	_slider.size_flags_horizontal = SIZE_EXPAND_FILL
 	_slider.size_flags_vertical = SIZE_SHRINK_CENTER
 	_row.add_child(_minus)
@@ -35,8 +39,8 @@ func _ready() -> void:
 	_row.add_child(_plus)
 	add_child(_stored)
 	add_child(_note)
-	_minus.pressed.connect(func() -> void: _request(roundi(_slider.value) - 1))
-	_plus.pressed.connect(func() -> void: _request(roundi(_slider.value) + 1))
+	_minus.pressed.connect(func() -> void: _request(roundi(_slider.value) - STEP_MW))
+	_plus.pressed.connect(func() -> void: _request(roundi(_slider.value) + STEP_MW))
 	_slider.value_changed.connect(func(value: float) -> void: _request(roundi(value)))
 	visible = false
 
