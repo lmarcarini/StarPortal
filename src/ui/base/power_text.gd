@@ -5,8 +5,9 @@ extends RefCounted
 ## Bible: docs/content/m2-base.md sections 3 and 6
 
 
-## "Capacitors 214/400 MWh, full in 7 h" (or full, not charging, draining), or "No capacitors
-## installed" when [param state] has no capacity.
+## "Capacitors 214/400 MWh, full in 7 h" (or full, not charging, draining), "Capacitors
+## empty, ..." under 1 MWh, or "No capacitors installed" when [param state] has no capacity.
+## "Not charging" means no bank has a charge rate.
 static func capacitors(state: GameState) -> String:
 	var capacity: float = PowerRules.capacity_mwh(state)
 	if capacity <= 0.0:
@@ -18,10 +19,26 @@ static func capacitors(state: GameState) -> String:
 		return _tr(&"BASE_POWER_CAP_FULL").format(values)
 	if net < 0.0:
 		return _tr(&"BASE_POWER_CAP_DRAIN").format(values)
-	if net <= 0.0:
-		return _tr(&"BASE_POWER_CAP_IDLE").format(values)
+	var empty: bool = is_empty(state)
+	if net <= 0.0 or not is_charging(state):
+		var idle: StringName = &"BASE_POWER_CAP_EMPTY_IDLE" if empty else &"BASE_POWER_CAP_IDLE"
+		return _tr(idle).format(values)
 	values["h"] = ceili((capacity - stored) / net)
-	return _tr(&"BASE_POWER_CAP_FILL").format(values)
+	var fill: StringName = &"BASE_POWER_CAP_EMPTY_FILL" if empty else &"BASE_POWER_CAP_FILL"
+	return _tr(fill).format(values)
+
+
+## True when [param state] has capacitors holding under 1 MWh.
+static func is_empty(state: GameState) -> bool:
+	return PowerRules.capacity_mwh(state) > 0.0 and state.power.stored_mwh < 1.0
+
+
+## True when any bank of [param state] has a charge rate.
+static func is_charging(state: GameState) -> bool:
+	for rate: int in state.power.charge_rates.values():
+		if rate > 0:
+			return true
+	return false
 
 
 ## Why [param room]'s switch is locked: always on, or the base's last running plant; "" when

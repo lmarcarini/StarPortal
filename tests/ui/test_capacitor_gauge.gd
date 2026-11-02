@@ -101,3 +101,14 @@ func test_build_button_follows_build_and_cancel_while_paused() -> void:
 	var site: RoomState = state.base.rooms[-1]
 	assert_bool(_simulation.submit(CancelBuildCommand.create(site.id)).is_ok).is_true()
 	assert_bool(button.visible).is_true()
+
+
+## An empty bank says so, in both languages, and the gauge still fits.
+func test_empty_capacitors_say_so_in_both_languages() -> void:
+	PowerFixture.add_bank(_simulation.state, 0)
+	SimClock.step_ticks(1)
+	assert_str(_gauge().get_values_text()).ends_with(" · Capacitors empty.")
+	TranslationServer.set_locale("pt_BR")
+	SimClock.step_ticks(1)
+	assert_str(_gauge().get_values_text()).ends_with(" · Capacitores vazios.")
+	await _assert_fits()

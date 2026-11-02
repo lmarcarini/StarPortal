@@ -82,11 +82,14 @@ BASE_BUILD_NO_BANK_SPOT,"No free 3 × 2 spot touching a corridor on Level {n}. C
 BASE_BUILD_ERR_OTHER,Can't do that here.,Não é possível aqui.
 BASE_POWER_BAR_CHARGE,Charge,Carga
 BASE_POWER_SUPPLY,{supply} MW · {spare} spare,{supply} MW · {spare} livres
+BASE_POWER_SUPPLY_NO_SPARE,{supply} MW · No spare power,{supply} MW · Sem energia livre
 BASE_POWER_LAYER_BUTTON,Energy (P),Energia (P)
 BASE_POWER_CAP_NONE,No capacitors installed,Nenhum capacitor instalado
 BASE_POWER_CAP_FILL,"Capacitors {stored}/{cap} MWh, full in {h} h","Capacitores {stored}/{cap} MWh, cheios em {h} h"
 BASE_POWER_CAP_FULL,"Capacitors {stored}/{cap} MWh, full","Capacitores {stored}/{cap} MWh, cheios"
-BASE_POWER_CAP_IDLE,"Capacitors {stored}/{cap} MWh, not charging","Capacitores {stored}/{cap} MWh, sem carga"
+BASE_POWER_CAP_IDLE,"Capacitors {stored}/{cap} MWh, Not charging","Capacitores {stored}/{cap} MWh, Sem carregar"
+BASE_POWER_CAP_EMPTY_IDLE,"Capacitors empty (0/{cap} MWh), Not charging","Capacitores vazios (0/{cap} MWh), Sem carregar"
+BASE_POWER_CAP_EMPTY_FILL,"Capacitors empty (0/{cap} MWh), full in {h} h","Capacitores vazios (0/{cap} MWh), cheios em {h} h"
 BASE_POWER_CAP_DRAIN,"Capacitors {stored}/{cap} MWh, draining","Capacitores {stored}/{cap} MWh, descarregando"
 BASE_POWER_SWITCH_ON,ON · switch off,LIGADA · desligar
 BASE_POWER_SWITCH_OFF,OFF · switch on,DESLIGADA · ligar
