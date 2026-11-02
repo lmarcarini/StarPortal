@@ -47,6 +47,20 @@ func test_unchanged_state_reuses_the_cache() -> void:
 	assert_float(PowerRules.supply_mw(_state)).is_equal(999.0)
 
 
+## A room finishing with no spare power lowers charging (the finishing-room rule): the cached
+## totals match a fresh sum after the rebalance.
+func test_finishing_room_rebalance() -> void:
+	_state.power.charge_rates[_state.power.charge_rates.keys()[0]] = 25
+	_tick(1)
+	var lab: RoomState = _state.base.add_room(&"room_research_lab", 2, Vector2i(20, 2))
+	lab.build_ticks_left = 1
+	_assert_cache_is_fresh()
+	ConstructionSystem.new().tick(_state)
+	assert_bool(lab.powered_on).is_true()
+	assert_float(PowerRules.charge_mw(_state)).is_equal(20.0)
+	_assert_cache_is_fresh()
+
+
 ## A room placed as a site, then finished.
 func test_room_built_and_finished() -> void:
 	var lab: RoomState = _state.base.add_room(&"room_research_lab", 2, Vector2i(20, 2))

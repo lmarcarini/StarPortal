@@ -84,6 +84,18 @@ signal room_demolished(site_id: StringName)
 ## Emitted when a new level is dug, with its number (posted through the outbox).
 @warning_ignore("unused_signal")
 signal level_dug(level: int)
+## Emitted when a finished room switched on by lowering charging, with its id and the total
+## charge rate left in MW (posted through the outbox).
+@warning_ignore("unused_signal")
+signal charging_lowered(room_id: StringName, charge_mw: int)
+## Emitted when a finished room stays off because even zero charging is not enough, with its
+## id, its draw and the spare supply in MW (posted through the outbox).
+@warning_ignore("unused_signal")
+signal room_finished_off(room_id: StringName, need_mw: int, spare_mw: int)
+## Emitted when a dug level's lift segment is refused for lack of funds, with the level and
+## the segment's cost in $k (posted through the outbox).
+@warning_ignore("unused_signal")
+signal lift_segment_refused(level: int, cost_k: int)
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared

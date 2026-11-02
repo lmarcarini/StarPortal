@@ -4,12 +4,14 @@ extends SimSystem
 ## [br]1. Forgets the charge rate of a bank that is gone or being demolished.
 ## [br]2. Gives a newly completed Capacitor Bank the spare supply as its charge rate (up to its
 ## maximum), and posts capacitors_installed(capacity) and pause_requested(&"capacitors_installed").
-## [br]3. Keeps allocation within supply: if a room just completed or a plant went away, it
+## [br]3. Keeps allocation within supply: if a plant went away (or a room is demolished), it
 ## switches the newest switchable rooms off, then lowers charge rates, until it fits, and posts
-## power_allocation_changed().
+## power_allocation_changed(). A room that just finished is handled first by FinishingPower
+## (charging comes down for it; no room is switched off), so the shed does not touch it.
 ## [br]4. Charges the capacitors at the banks' rates less an open wormhole's drain, clamped to
 ## 0..capacity. The Ring never draws on the supply and the rooms never draw on the capacitors.
-## Bible: docs/content/m2-base.md section 3, gate-and-address-spec.md#dialing-outcomes-and-energy
+## Bible: docs/content/m2-base.md section 3, docs/content/m25-lean-start.md section 3,
+## gate-and-address-spec.md#dialing-outcomes-and-energy
 
 ## Reason of the pause request a completed bank posts.
 const PAUSE_REASON: StringName = &"capacitors_installed"
