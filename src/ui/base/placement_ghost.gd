@@ -4,8 +4,10 @@ extends Control
 ## when the placement command would be accepted, red with the first broken rule's reason otherwise.
 ## It follows the mouse and the plan's cell cursor. Q, E or a shoulder button turns it; one left
 ## click, Enter or (A) builds it at once (no hold), and the ghost stays out to place another; Esc,
-## (B) or a right click leaves placing. A corridor is painted as a run: drag with the mouse (the run
-## builds on release), or move the cursor and press Enter or (A); Esc or (B) first clears the run.
+## (B) or a right click leaves placing. A corridor is painted as an L-shaped run from a start cell
+## to the cursor: press, drag and release with the mouse (a click builds one cell), or press Enter
+## or (A) to set the start, move the cursor and press again to build; Esc or (B) first clears the
+## start. With no start the ghost is the one cell under the pointer or cursor.
 ## Keys count only while the plan has focus, so focused buttons and dialogs get theirs first.
 ## Changes no state: it emits [signal build_held] with the command to submit.
 ## Bible: docs/content/m2-base.md sections 4 and 6
@@ -19,7 +21,7 @@ signal cancelled
 
 const _OK := Color(0.35, 0.85, 0.45, 0.45)
 const _BAD := Color(0.9, 0.3, 0.25, 0.45)
-const _STEPS: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
+const _NO_START := Vector2i(-1000000, -1000000)
 
 ## Def being placed, or &"" when not placing.
 var def_id: StringName = &""
@@ -34,6 +36,10 @@ var _plan: BasePlan = null
 var _state: GameState = null
 var _reason: String = ""
 var _painting: bool = false
+## Start cell of the corridor run, or [constant _NO_START] when none is set.
+var _start: Vector2i = _NO_START
+## True when the run leaves its start along the column first (the first move off it was vertical).
+var _column_first: bool = false
 var _cursor: Vector2i = Vector2i.ZERO
 
 
@@ -58,6 +64,8 @@ func start(room_def: StringName, cell: Vector2i) -> void:
 	def_id = room_def
 	rotated = false
 	run.clear()
+	_painting = false
+	_start = _NO_START
 	_set_placing(true)
 	move_to(cell)
 
@@ -67,6 +75,7 @@ func stop(by_player: bool = false) -> void:
 	def_id = &""
 	run.clear()
 	_painting = false
+	_start = _NO_START
 	_set_placing(false)
 	queue_redraw()
 	if by_player:
@@ -82,14 +91,29 @@ func rotate_ghost() -> void:
 	_check()
 
 
-## Moves the ghost to [param cell]; a corridor run grows to it, or shrinks when it steps back.
+## Moves the ghost to [param cell]; a corridor run reaches it from its start, if one is set.
 func move_to(cell: Vector2i) -> void:
 	if not is_placing():
 		return
 	origin = cell
 	if is_corridor():
-		_extend_run(cell)
+		var single: Array[Vector2i] = [cell]
+		run = _path_to(cell) if has_start() else single
 	_check()
+
+
+## True when a corridor run has its start cell set.
+func has_start() -> bool:
+	return _start != _NO_START
+
+
+## Sets the corridor run's start at the ghost's cell when [param on] (Enter or (A) with no start
+## yet), or clears it, leaving the ghost one cell again.
+func set_start(on: bool = true) -> void:
+	_start = origin if on and is_corridor() else _NO_START
+	if not on:
+		_painting = false
+	move_to(origin)
 
 
 ## True when a corridor is being painted.
@@ -161,9 +185,10 @@ func confirm() -> void:
 
 ## After a build: a corridor starts a new run at the cursor; the ghost stays out and checks again.
 func after_build() -> void:
+	_painting = false
+	_start = _NO_START
 	if is_corridor():
 		run = [origin]
-	_painting = false
 	recheck()
 
 
@@ -203,8 +228,8 @@ func _gui_input(event: InputEvent) -> void:
 func set_painting(on: bool, cell: Vector2i) -> void:
 	_painting = on and is_corridor()
 	if _painting:
-		run.clear()
-		follow(cell)
+		_start = cell
+	follow(cell)
 
 
 ## True while a corridor run is being dragged.
@@ -212,27 +237,28 @@ func is_painting() -> bool:
 	return _painting
 
 
-func _extend_run(cell: Vector2i) -> void:
-	if run.size() >= 2 and run[-2] == cell:
-		run.pop_back()
-		return
-	if cell in run:
-		return
-	if run.is_empty() or (not _painting and _distance(run[-1], cell) != 1):
-		run = [cell]
-		return
-	var step: Vector2i = run[-1]
-	while step != cell:
-		if step.x != cell.x:
-			step.x += signi(cell.x - step.x)
+## The run from the start to [param cell]: the first move off the start picks the leg to go first.
+func _path_to(cell: Vector2i) -> Array[Vector2i]:
+	if cell == _start:
+		_column_first = false
+	elif run.size() <= 1 or run[0] != _start:
+		var off: Vector2i = (cell - _start).abs()
+		_column_first = off.y > off.x
+	return _l_path(_start, cell, _column_first)
+
+
+## The cells from [param from] to [param to]: along the row, then the column, or the column first
+## when [param column_first].
+static func _l_path(from: Vector2i, to: Vector2i, column_first: bool) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = [from]
+	var step: Vector2i = from
+	while step != to:
+		if step.x != to.x and (not column_first or step.y == to.y):
+			step.x += signi(to.x - step.x)
 		else:
-			step.y += signi(cell.y - step.y)
-		if step not in run:
-			run.append(step)
-
-
-static func _distance(a: Vector2i, b: Vector2i) -> int:
-	return absi(a.x - b.x) + absi(a.y - b.y)
+			step.y += signi(to.y - step.y)
+		cells.append(step)
+	return cells
 
 
 func _check() -> void:

@@ -2,10 +2,11 @@ class_name PlacementInput
 extends RefCounted
 ## Input of the [PlacementGhost] while a room is being placed. Keys and buttons: Q, E
 ## (view_previous, view_next) or the shoulders turn it (the shoulders switch tabs otherwise); Enter
-## or (A) builds at once; Esc or (B) clears a corridor run, then leaves placing. Mouse: the ghost
-## follows the pointer; a left click builds a room; for a corridor, a press off the run starts a
-## new run, a drag paints it and the release builds it, and a click on a run builds it. A right
-## click (no drag) leaves placing. Wheel and right drag reach the plan.
+## or (A) builds at once (for a corridor, the first press sets the run's start, the second builds);
+## Esc or (B) clears a corridor's start, then leaves placing. Mouse: the ghost follows the pointer;
+## a left click builds a room; for a corridor, a press sets the start, a drag paints the run and
+## the release builds it (a click builds one cell). A right click (no drag) leaves placing. Wheel
+## and right drag reach the plan.
 ## Bible: docs/content/m2-base.md section 6 (Gamepad)
 
 const _ROTATE_ACTIONS: Array[StringName] = [&"view_next", &"view_previous"]
@@ -22,15 +23,18 @@ static func handle_key(ghost: PlacementGhost, event: InputEvent) -> bool:
 		ghost.rotate_ghost()
 		return true
 	if event.is_action_pressed(&"ui_accept", true, true):
-		if not event.is_echo():
+		if event.is_echo():
+			return true
+		if ghost.is_corridor() and not ghost.has_start():
+			ghost.set_start()
+		else:
 			ghost.confirm()
 		return true
 	if event.is_action_released(&"ui_accept", true):
 		return true
 	if event.is_action_pressed(&"ui_cancel", false, true):
-		if ghost.is_corridor() and ghost.run.size() > 1:
-			ghost.run = [ghost.origin]
-			ghost.recheck()
+		if ghost.is_corridor() and ghost.has_start():
+			ghost.set_start(false)
 		else:
 			ghost.stop(true)
 		return true
@@ -43,8 +47,6 @@ static func handle_mouse(ghost: PlacementGhost, plan: BasePlan, event: InputEven
 		if plan.is_dragging():
 			return false
 		var cell: Vector2i = plan.cell_at((event as InputEventMouseMotion).position)
-		if ghost.is_corridor() and not ghost.is_painting() and ghost.run.size() > 1:
-			return false
 		if cell != ghost.origin:
 			ghost.follow(cell)
 		return false
@@ -61,9 +63,11 @@ static func handle_mouse(ghost: PlacementGhost, plan: BasePlan, event: InputEven
 		if ghost.is_painting():
 			ghost.set_painting(false, at)
 			ghost.confirm()
+			if ghost.has_start():
+				ghost.set_start(false)
 		return true
 	plan.grab_focus()
-	if ghost.is_corridor() and not (at in ghost.run and ghost.run.size() > 1):
+	if ghost.is_corridor():
 		ghost.set_painting(true, at)
 		return true
 	if not ghost.is_corridor():

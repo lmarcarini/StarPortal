@@ -179,8 +179,11 @@ func _on_checked(reason: String) -> void:
 		_palette.show_message(reason)
 		return
 	var def: RoomDef = _simulation.state.room_defs.get(_ghost.def_id)
+	var key: StringName = &"BASE_BUILD_PLACING"
+	if _ghost.is_corridor():
+		key = &"BASE_BUILD_CORRIDOR_END" if _ghost.has_start() else &"BASE_BUILD_CORRIDOR_START"
 	var text: String = (
-		_t(&"BASE_BUILD_PLACING")
+		_t(key)
 		. format(
 			{
 				"name": _t(def.name_key),
