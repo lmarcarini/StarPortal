@@ -109,9 +109,7 @@ func show_action(selected: StringName) -> void:
 		command = CancelBuildCommand.create(room.id)
 		var site: Array[RoomState] = BaseRules.site_rooms(state.base, room.site_key())
 		refund_k = (
-			BaseRules.site_cost_k(state.room_defs, site)
-			* CancelBuildCommand.SITE_REFUND_PERCENT
-			/ 100
+			LiftShafts.site_cost_k(state, site) * CancelBuildCommand.SITE_REFUND_PERCENT / 100
 		)
 		text = tr_format(&"BASE_BUILD_CANCEL", refund_k, "")
 		_action_message = tr_format(&"BASE_BUILD_CANCELLED", refund_k, _t(def.name_key))

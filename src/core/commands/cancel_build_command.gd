@@ -72,7 +72,7 @@ func apply(state: GameState) -> void:
 		var rooms: Array[RoomState] = BaseRules.site_rooms(
 			state.base, state.base.find_room(target).site_key()
 		)
-		var cost_k: int = BaseRules.site_cost_k(state.room_defs, rooms)
+		var cost_k: int = LiftShafts.site_cost_k(state, rooms)
 		for room: RoomState in rooms:
 			state.base.remove_room(room.id)
 		state.budget.credit(cost_k * SITE_REFUND_PERCENT / 100)

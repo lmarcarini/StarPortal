@@ -2,9 +2,13 @@ class_name PlaceRoomCommand
 extends Command
 ## The player places a room's ghost and holds to build: pays the full cost and starts a site
 ## (ConstructionSystem builds it). A lift takes the same cells on every dug level, stairs the
-## same cells on this level and the one below; either is one site. Corridors use
+## same cells on this level and the one below; either is one site. A lift placed on an
+## existing shaft only fills the dug levels the shaft misses, at the lift segment price and
+## time (LiftShafts). Stairs and lifts need to touch a connector on one of their levels only,
+## so placed from a level above they reach an empty new level, where corridors then join
+## them (m25-lean-start.md section 2). Corridors use
 ## PaintCorridorCommand. Posts room_build_started(site id) and budget_changed when applied.
-## Bible: docs/content/m2-base.md sections 1 and 4
+## Bible: docs/content/m2-base.md sections 1 and 4, docs/content/m25-lean-start.md section 2
 
 ## The command's stable type id.
 const TYPE: StringName = &"place_room"
@@ -72,30 +76,51 @@ func validate(state: GameState) -> CommandResult:
 		return buildable
 	var planned: Array[RoomState] = _planned(state.base)
 	if planned.is_empty():
-		return CommandResult.fail(&"no_such_level")
+		return _nothing_planned(state.base)
 	var connected: bool = false
 	for room: RoomState in planned:
 		var error: StringName = BaseRules.placement_error(state.base, state.room_defs, room)
 		if not error.is_empty():
 			return CommandResult.fail(error, "level %d" % room.level)
 		connected = connected or BaseRules.touches_connector(state.base, state.room_defs, room)
-	if not connected:
+	if not connected and not _extends_shaft(state.base):
 		return CommandResult.fail(&"not_connected")
-	var funds_error: StringName = state.budget.spend_error(def.build_cost_k)
+	var cost_k: int = cost_of(state)
+	var funds_error: StringName = state.budget.spend_error(cost_k)
 	if not funds_error.is_empty():
-		return CommandResult.fail(funds_error, "needs %dk" % def.build_cost_k)
+		return CommandResult.fail(funds_error, "needs %dk" % cost_k)
 	return CommandResult.ok()
+
+
+## Why nothing can be planned: the shaft already fills every level (&"overlap"), else
+## &"no_such_level".
+func _nothing_planned(base: BaseState) -> CommandResult:
+	if _extends_shaft(base) and level >= 1 and level <= base.level_count:
+		return CommandResult.fail(&"overlap", "level %d" % level)
+	return CommandResult.fail(&"no_such_level")
+
+
+## What the command costs in $k in [param state]: the def's cost, or for a lift extending a
+## shaft the segment price per level it adds.
+func cost_of(state: GameState) -> int:
+	if _extends_shaft(state.base) and state.balance != null:
+		return state.balance.lift_segment_cost_k * _planned(state.base).size()
+	var def: RoomDef = state.room_defs.get(def_id)
+	return 0 if def == null else def.build_cost_k
 
 
 ## Pays the cost and adds the site's rooms, unbuilt and switched on.
 func apply(state: GameState) -> void:
 	var def: RoomDef = state.room_defs[def_id]
-	state.budget.spend(def.build_cost_k)
+	var ticks: int = def.build_ticks
+	if _extends_shaft(state.base) and state.balance != null:
+		ticks = state.balance.lift_segment_ticks
+	state.budget.spend(cost_of(state))
 	var site_id: StringName = &""
 	for planned: RoomState in _planned(state.base):
 		var room: RoomState = state.base.add_room(def_id, planned.level, origin)
 		room.rotated = rotated
-		room.build_ticks_left = maxi(1, def.build_ticks)
+		room.build_ticks_left = maxi(1, ticks)
 		if site_id.is_empty():
 			site_id = room.id
 		room.site = site_id if def_id in MULTI_LEVEL_DEFS else &""
@@ -131,7 +156,13 @@ func _def_error(def: RoomDef) -> StringName:
 	return &""
 
 
-## The rooms this command would add, with empty ids: one per dug level for a lift, two for
+## True when this is a lift placed on an existing shaft: it only fills the levels it misses.
+func _extends_shaft(base: BaseState) -> bool:
+	return def_id == StartingBase.LIFT_DEF and not LiftShafts.shaft_levels(base, origin).is_empty()
+
+
+## The rooms this command would add, with empty ids: one per dug level for a lift (the levels
+## its shaft misses when one stands at [member origin]), two for
 ## stairs (empty when the level below does not exist), one otherwise; empty when [member level]
 ## is not a level of [param base] (a lift's level must exist too).
 func _planned(base: BaseState) -> Array[RoomState]:
@@ -140,8 +171,9 @@ func _planned(base: BaseState) -> Array[RoomState]:
 		return []
 	if def_id == StartingBase.LIFT_DEF:
 		levels.clear()
+		var shaft: Array[int] = LiftShafts.shaft_levels(base, origin)
 		for number: int in range(1, base.level_count + 1):
-			if base.levels[number - 1].is_dug():
+			if base.levels[number - 1].is_dug() and not number in shaft:
 				levels.append(number)
 	elif def_id == BaseRules.STAIRS_DEF:
 		if level >= base.level_count:
