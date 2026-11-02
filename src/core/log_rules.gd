@@ -30,6 +30,8 @@ static func entries_for(
 			return [_power_entry(args, state, tick)]
 		&"charging_lowered", &"room_finished_off":
 			return _finished_room_entries(event_name, args, state, tick)
+		&"research_done":
+			return [LogEntry.create(tick, &"research", &"", {"project_id": _text(args)})]
 	return []
 
 

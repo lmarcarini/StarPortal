@@ -48,6 +48,8 @@ func _samples() -> Array[Command]:
 		CancelBuildCommand.create(&"room_7"),
 		DemolishRoomCommand.create(&"room_3"),
 		DigLevelCommand.new(),
+		StartResearchCommand.create(&"bank_array"),
+		CancelResearchCommand.new(),
 	]
 
 
@@ -142,6 +144,7 @@ func test_defaults_are_registered_lazily() -> void:
 		. contains_exactly(
 			[
 				&"cancel_build",
+				&"cancel_research",
 				&"close_wormhole",
 				&"deliver_document",
 				&"demolish_room",
@@ -155,6 +158,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"read_console",
 				&"set_charge_rate",
 				&"set_flag",
+				&"start_research",
 				&"switch_room",
 			]
 		)
@@ -173,6 +177,7 @@ func test_register_type_adds_a_type() -> void:
 		. contains_exactly(
 			[
 				&"cancel_build",
+				&"cancel_research",
 				&"close_wormhole",
 				&"deliver_document",
 				&"demolish_room",
@@ -187,6 +192,7 @@ func test_register_type_adds_a_type() -> void:
 				&"read_console",
 				&"set_charge_rate",
 				&"set_flag",
+				&"start_research",
 				&"switch_room",
 			]
 		)
@@ -207,6 +213,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 		. contains_exactly(
 			[
 				&"cancel_build",
+				&"cancel_research",
 				&"close_wormhole",
 				&"deliver_document",
 				&"demolish_room",
@@ -220,6 +227,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"read_console",
 				&"set_charge_rate",
 				&"set_flag",
+				&"start_research",
 				&"switch_room",
 			]
 		)

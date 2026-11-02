@@ -16,6 +16,7 @@ const KIND_KEYS: Array[StringName] = [
 	&"LOG_KIND_CONSOLE",
 	&"LOG_KIND_HORIZON",
 	&"LOG_KIND_POWER",
+	&"LOG_KIND_RESEARCH",
 ]
 ## Line keys of the close reasons.
 const _CLOSE_KEYS: Dictionary[String, StringName] = {
@@ -101,6 +102,15 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 				return finished_room_line(entry.args)
 			var capacity: float = type_convert(entry.args.get("capacity_mwh", 0), TYPE_FLOAT)
 			return _tr(&"LOG_LINE_POWER").format({"capacity": GateRoomFormat.energy(capacity)})
+		&"research":
+			var project: ResearchDef = (
+				Registry.get_def(StringName(str(entry.args.get("project_id", "")))) as ResearchDef
+			)
+			if project == null:
+				return ""
+			return _tr(&"LOG_LINE_RESEARCH").format(
+				{"name": _tr(project.name_key), "line": _tr(project.line_key)}
+			)
 	return ""
 
 

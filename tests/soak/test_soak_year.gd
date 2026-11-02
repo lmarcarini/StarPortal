@@ -269,8 +269,8 @@ func _assert_run_ring(run: SoakRun) -> void:
 		assert_bool(named.has(world_id)).override_failure_message(world_id).is_true()
 
 
-## Checks [param run] built the corridor run and the lab and dug every extra level, and the
-## budget stayed in bounds at every month close.
+## Checks [param run] built the corridor run and the lab, switched the lab on, researched R1-R6
+## and dug every extra level, and the budget stayed in bounds at every month close.
 func _assert_run_base(run: SoakRun) -> void:
 	var state: GameState = run.simulation.state
 	assert_int(run.budget_out_of_bounds).is_equal(0)
@@ -283,6 +283,11 @@ func _assert_run_base(run: SoakRun) -> void:
 	var lab: RoomState = PowerFixture.first_room(state, SoakBot.LAB_DEF)
 	assert_object(lab).is_not_null()
 	assert_bool(lab.is_built()).is_true()
+	assert_bool(lab.powered_on).is_true()
+	assert_int(run.bot.research_started).is_equal(SoakResearch.ORDER.size())
+	assert_array(state.research.done).is_equal(SoakResearch.ORDER)
+	assert_bool(state.research.is_running()).is_false()
+	assert_int(state.unlocks.dig_depth).is_equal(4)
 
 
 ## Locks and hostile locks in [param run]'s Dial Log.

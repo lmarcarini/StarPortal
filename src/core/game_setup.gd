@@ -3,15 +3,16 @@ extends RefCounted
 ## Builds a runnable Simulation around a new or loaded GameState: regenerates the galaxy from
 ## the state's saved seed and generator version, sets the state's transient balance and
 ## galaxy, and adds the systems in the bible's fixed tick order (power, gate, documents,
-## economy, construction).
+## economy, construction, research).
 ## Bible: technical-architecture.md#simulation-clock-and-commands,
 ## technical-architecture.md#save-system, technical-architecture.md#data-model
 
 
 ## Returns a Result whose value is a Simulation over [param state] with
 ## [PowerSystem, GateSystem, DocumentSystem, EconomySystem,
-## ConstructionSystem], after setting [code]state.balance[/code],
-## [code]state.room_defs[/code] and [code]state.galaxy[/code] from [param defs]. Fails,
+## ConstructionSystem, ResearchSystem], after setting [code]state.balance[/code],
+## [code]state.room_defs[/code], [code]state.research_defs[/code] and
+## [code]state.galaxy[/code] from [param defs]. Fails,
 ## leaving the state unchanged, with
 ## &"missing_content" when [param defs] lacks the balance, 36 anchors or exactly one home
 ## world, and with &"galaxy_version_mismatch" when the state's generator version is not
@@ -33,6 +34,9 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	state.room_defs.clear()
 	for def: RoomDef in defs.rooms:
 		state.room_defs[def.id] = def
+	state.research_defs.clear()
+	for def: ResearchDef in defs.research:
+		state.research_defs[def.id] = def
 	state.galaxy = build_galaxy(state.worlds.galaxy_seed, defs)
 	var systems: Array[SimSystem] = [
 		PowerSystem.new(defs.balance),
@@ -40,6 +44,7 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 		DocumentSystem.new(defs.documents),
 		EconomySystem.new(defs.balance, defs.rooms),
 		ConstructionSystem.new(),
+		ResearchSystem.new(),
 	]
 	return Result.ok(Simulation.new(state, systems))
 

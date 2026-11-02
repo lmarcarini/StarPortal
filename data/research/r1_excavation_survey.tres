@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1_research"]
+
+; docs/content/m25-lean-start.md section 3.
+[resource]
+script = ExtResource("1_research")
+order = 1
+cost_k = 400
+days = 2
+needs = Array[StringName]([])
+effects = [[&"dig_depth", 2], [&"unlock_room", &"room_stairs"]]
+name_key = &"RESEARCH_EXCAVATION_SURVEY_NAME"
+line_key = &"RESEARCH_EXCAVATION_SURVEY_LINE"
+id = &"excavation_survey"
