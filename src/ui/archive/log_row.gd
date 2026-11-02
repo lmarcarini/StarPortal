@@ -17,6 +17,7 @@ const KIND_KEYS: Array[StringName] = [
 	&"LOG_KIND_HORIZON",
 	&"LOG_KIND_POWER",
 	&"LOG_KIND_RESEARCH",
+	&"LOG_KIND_STAFF",
 ]
 ## Line keys of the close reasons.
 const _CLOSE_KEYS: Dictionary[String, StringName] = {
@@ -111,7 +112,24 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 			return _tr(&"LOG_LINE_RESEARCH").format(
 				{"name": _tr(project.name_key), "line": _tr(project.line_key)}
 			)
+		&"staff":
+			return staff_line(entry.args)
 	return ""
+
+
+## The line of a "staff" entry's [param args]: "Research Lab staffed: 2 scientists." for the
+## first room of a type, "Staff unassigned from Workshop: 2." for a room coming down.
+static func staff_line(args: Dictionary) -> String:
+	var def: RoomDef = Registry.get_def(StringName(str(args.get("room", "")))) as RoomDef
+	var room: String = "" if def == null else _tr(def.name_key)
+	var count: int = type_convert(args.get("count", 0), TYPE_INT)
+	if str(args.get("reason", "")) != String(StaffChanges.AUTO_ASSIGNED):
+		return _tr(&"LOG_LINE_STAFF_RELEASED").format({"room": room, "count": count})
+	var role: RoleDef = null if def == null else Registry.get_def(def.staff_role) as RoleDef
+	var people: String = str(count)
+	if role != null:
+		people = _tr(role.count_one_key if count == 1 else role.count_key).format({"count": count})
+	return _tr(&"LOG_LINE_STAFFED").format({"room": room, "people": people})
 
 
 ## The line of a finished room's "power" entry [param args]: charging lowered for it, or it

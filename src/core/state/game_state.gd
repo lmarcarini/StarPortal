@@ -19,6 +19,7 @@ const _SECTIONS: Array[String] = [
 	"operations_log",
 	"unlocks",
 	"research",
+	"staff",
 ]
 
 ## The simulation clock.
@@ -47,6 +48,8 @@ var operations_log: LogState = LogState.new()
 var unlocks: UnlockState = UnlockState.new()
 ## The research project running, its progress and the projects done.
 var research: ResearchState = ResearchState.new()
+## The roster: people, their rooms and the room types waiting to auto-staff.
+var staff: StaffState = StaffState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -67,7 +70,8 @@ var research_defs: Dictionary[StringName, ResearchDef] = {}
 ## WorldGenerator.GENERATOR_VERSION. With a [param balance], power starts at
 ## PowerState.starting(balance) and the budget at BudgetState.starting(balance); without one
 ## they are all zero. The base is StartingBase.build() over [param balance], or over the
-## BalanceConfig defaults without one, and so are the unlocks (UnlockState.starting()).
+## BalanceConfig defaults without one, and so are the unlocks (UnlockState.starting()) and
+## the starting crew (StartingStaff.build()).
 static func new_game(base_seed: int, balance: BalanceConfig = null) -> GameState:
 	var state := GameState.new()
 	state.random.base_seed = base_seed
@@ -76,6 +80,7 @@ static func new_game(base_seed: int, balance: BalanceConfig = null) -> GameState
 	var rules: BalanceConfig = balance if balance != null else BalanceConfig.new()
 	state.base = StartingBase.build(rules)
 	state.unlocks = UnlockState.starting(rules)
+	state.staff = StartingStaff.build(state.base, rules)
 	if balance != null:
 		state.power = PowerState.starting(balance)
 		state.budget = BudgetState.starting(balance)
@@ -101,6 +106,7 @@ func to_dict() -> Dictionary:
 		"operations_log": operations_log.to_dict(),
 		"unlocks": unlocks.to_dict(),
 		"research": research.to_dict(),
+		"staff": staff.to_dict(),
 	}
 
 
@@ -121,6 +127,7 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.operations_log = LogState.from_dict(_dict_or_empty(data.get("operations_log")))
 	state.unlocks = UnlockState.from_dict(_dict_or_empty(data.get("unlocks")))
 	state.research = ResearchState.from_dict(_dict_or_empty(data.get("research")))
+	state.staff = StaffState.from_dict(_dict_or_empty(data.get("staff")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -134,16 +141,19 @@ static func from_dict(data: Dictionary) -> GameState:
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
 ## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book",
-## "operations_log", "unlocks" and "research" must be objects, the sub-states must pass their own
-## validate_dict(), and
+## "operations_log", "unlocks", "research" and "staff" must be objects, the sub-states must pass
+## their own validate_dict(), and
 ## every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
 ## not survive JSON, whether they arrive as ints or as floats). The Ring's "dial_started_tick" and
 ## "lock_started_tick", every Dial Log entry's "tick", every document's "received_tick" and every
 ## Address Book entry's "last_dialed_tick" and every operations log entry's "tick" must not be
-## later than the clock's tick. Errors from a
+## later than the clock's tick. Every person's room must exist and a person still arriving has
+## none (StaffSaveChecks.roster_errors()). With [param defs], ids are also checked against the
+## content (StaffSaveChecks.content_errors()): room def ids, research ids, role ids, and each
+## assignment's role and slot count. Errors from a
 ## sub-state are prefixed with its key, e.g. "clock: 'tick' is not a whole number ...".
-static func validate_dict(data: Dictionary) -> Array[String]:
+static func validate_dict(data: Dictionary, defs: GameDefs = null) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _SECTIONS:
 		if not data.has(key):
@@ -166,6 +176,9 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append_array(_ring_tick_errors(clock_data, gate_data))
 		var now: float = clock_data["tick"]
 		errors.append_array(_record_tick_errors(now, data))
+		errors.append_array(StaffSaveChecks.roster_errors(data))
+	if errors.is_empty() and defs != null:
+		errors.append_array(StaffSaveChecks.content_errors(data, defs))
 	return errors
 
 
@@ -196,6 +209,8 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return UnlockState.validate_dict(section)
 		"research":
 			return ResearchState.validate_dict(section)
+		"staff":
+			return StaffState.validate_dict(section)
 	return []
 
 

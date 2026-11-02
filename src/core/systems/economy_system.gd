@@ -1,10 +1,11 @@
 class_name EconomySystem
 extends SimSystem
 ## Minimal M2 money. At each month-end it pays the fixed allocation and charges every built
-## room's upkeep (half, rounded down, for a room switched off), then posts budget_changed.
+## room's upkeep (half, rounded down, for a room switched off) and every salary, arriving
+## people included (StaffRules.monthly_salaries_k()), then posts budget_changed.
 ## Rooms under construction pay nothing. A lift is one RoomState per level at the same cells,
 ## but one shaft pays its upkeep once.
-## Bible: docs/content/m2-base.md section 5
+## Bible: docs/content/m2-base.md section 5, docs/content/m26-staff-and-money.md section 4
 
 ## Defs whose rooms stack into one shaft across levels: same def and origin pay once.
 const SHAFT_DEFS: Array[StringName] = [&"room_lift"]
@@ -30,9 +31,11 @@ func tick(_state: GameState) -> void:
 	pass
 
 
-## Adds the allocation, subtracts the upkeep and posts budget_changed(new balance).
+## Adds the allocation, subtracts the upkeep and the salaries and posts
+## budget_changed(new balance).
 func on_month(state: GameState) -> void:
 	var upkeep_k: int = monthly_upkeep_k(state.base, _room_defs, state.unlocks)
+	upkeep_k += StaffRules.monthly_salaries_k(state)
 	state.budget.funds_k += _balance.monthly_allocation_k - upkeep_k
 	state.events.post(&"budget_changed", [state.budget.funds_k])
 

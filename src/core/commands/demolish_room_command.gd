@@ -5,9 +5,11 @@ extends Command
 ## (ConstructionSystem removes it). A lift or stairs comes down on all its levels; a corridor
 ## run one cell at a time. A lift shaft's built segments are part of it (refunded at this
 ## rate); its segments still building are removed at once at the cancel rate (75% of what was
-## paid for them, CancelBuildCommand.SITE_REFUND_PERCENT), so no segment is left alone. Posts
-## budget_changed when applied.
-## Bible: docs/content/m2-base.md section 4, docs/content/m25-lean-start.md section 2
+## paid for them, CancelBuildCommand.SITE_REFUND_PERCENT), so no segment is left alone. The
+## people working in the rooms become Unassigned at once (StaffChanges.release(), logged).
+## Posts budget_changed when applied.
+## Bible: docs/content/m2-base.md section 4, docs/content/m25-lean-start.md section 2,
+## docs/content/m26-staff-and-money.md section 3
 
 ## The command's stable type id.
 const TYPE: StringName = &"demolish_room"
@@ -59,7 +61,8 @@ func get_type() -> StringName:
 
 ## Rejects an unknown room (&"unknown_room"), a site (&"not_built"), a room already coming
 ## down (&"already_demolishing"), the Gate and Control Rooms (&"fixed_room"), the last Power
-## Plant (&"last_plant") and a connector whose removal
+## Plant (&"last_plant"), a room whose beds the people on the roster need (&"beds_needed":
+## "Dismiss someone first.") and a connector whose removal
 ## leaves a room or site touching no corridor, lift or stairs, counting rooms already coming
 ## down as gone (&"leaves_room_unconnected").
 func validate(state: GameState) -> CommandResult:
@@ -88,6 +91,7 @@ func apply(state: GameState) -> void:
 	for target: RoomState in targets(state.base, room):
 		target.demolish_ticks_left = maxi(1, def.build_ticks / 4)
 		target.powered_on = false
+	StaffChanges.release(state, targets(state.base, room))
 	PowerSystem.settle(state)
 	state.budget.credit(refund)
 	state.events.post(&"budget_changed", [state.budget.funds_k])
@@ -104,6 +108,8 @@ func _protection_error(state: GameState, room: RoomState, def: RoomDef) -> Strin
 		return &"fixed_room"
 	if def.power_output_mw > 0.0 and _plants_left(state) <= 1:
 		return &"last_plant"
+	if def.beds > 0 and StaffRules.beds_free(state) < def.beds:
+		return &"beds_needed"
 	if BaseRules.strands_a_room(state.base, state.room_defs, targets(state.base, room)):
 		return &"leaves_room_unconnected"
 	return &""

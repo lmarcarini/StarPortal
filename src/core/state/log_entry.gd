@@ -9,7 +9,15 @@ extends RefCounted
 
 ## Every kind an entry can have.
 const KINDS: Array[StringName] = [
-	&"dial", &"lock", &"close", &"document", &"console", &"horizon", &"power", &"research"
+	&"dial",
+	&"lock",
+	&"close",
+	&"document",
+	&"console",
+	&"horizon",
+	&"power",
+	&"research",
+	&"staff",
 ]
 
 ## Tick the event happened.
