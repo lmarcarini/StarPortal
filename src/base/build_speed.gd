@@ -35,3 +35,37 @@ static func has_running_workshop(state: GameState) -> bool:
 		if room.def_id == WORKSHOP_DEF and PowerRules.is_running(room, def):
 			return true
 	return false
+
+
+## Clock ticks a site or dig with [param work] ticks of progress left needs to finish, when
+## its next progress tick is clock tick [param first_tick] (the clock's current tick: systems
+## tick before the clock moves) and a Workshop is running when [param workshop] is true. Assumes
+## the Workshop stays as it is. 0 when no work is left.
+static func ticks_to_finish(work: int, first_tick: int, workshop: bool) -> int:
+	if work <= 0:
+		return 0
+	if not workshop:
+		return work
+	var ticks: int = 0
+	while work > 0 and (first_tick + ticks) % BONUS_EVERY_TICKS != 0:
+		work -= _step_at(first_tick + ticks)
+		ticks += 1
+	if work <= 0:
+		return ticks
+	var cycles: int = (work - 1) / (BONUS_EVERY_TICKS + 1)
+	ticks += cycles * BONUS_EVERY_TICKS
+	work -= cycles * (BONUS_EVERY_TICKS + 1)
+	while work > 0:
+		work -= _step_at(first_tick + ticks)
+		ticks += 1
+	return ticks
+
+
+## Clock ticks [param state]'s site or dig with [param work] ticks of progress left needs to
+## finish, with the Workshop as it is now.
+static func ticks_left(state: GameState, work: int) -> int:
+	return ticks_to_finish(work, state.clock.tick, has_running_workshop(state))
+
+
+static func _step_at(tick: int) -> int:
+	return 2 if tick % BONUS_EVERY_TICKS == BONUS_EVERY_TICKS - 1 else 1
