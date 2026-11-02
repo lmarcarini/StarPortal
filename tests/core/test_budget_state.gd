@@ -5,7 +5,7 @@ extends GdUnitTestSuite
 
 func test_new_game_starts_with_the_doc_budget() -> void:
 	var state := GameState.new_game(1, BalanceConfig.new())
-	assert_int(state.budget.funds_k).is_equal(12000)
+	assert_int(state.budget.funds_k).is_equal(6000)
 	assert_int(BalanceConfig.new().monthly_allocation_k).is_equal(3000)
 
 

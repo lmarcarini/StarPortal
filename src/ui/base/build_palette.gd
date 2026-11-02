@@ -17,11 +17,8 @@ signal back_requested
 const ROOMS: Array[StringName] = [
 	&"room_power_plant",
 	&"room_capacitor_bank",
-	&"room_quarters",
-	&"room_archive",
-	&"room_physics_lab",
+	&"room_research_lab",
 	&"room_workshop",
-	&"room_infirmary",
 	&"room_lift",
 	&"room_stairs",
 	&"room_corridor",
@@ -34,6 +31,7 @@ var _build: Button = Button.new()
 var _buttons: Dictionary[StringName, Button] = {}
 var _defs: Dictionary = {}
 var _message: String = ""
+var _shown_unlocks: Array[StringName] = []
 
 
 func _init() -> void:
@@ -58,15 +56,17 @@ func _init() -> void:
 	line.add_child(_build)
 
 
-## Fills the palette with the rooms of [param defs] (RoomDef by id) that are in [constant ROOMS].
-func show_rooms(defs: Dictionary) -> void:
+## Fills the palette with the rooms of [param defs] (RoomDef by id) that are in [constant ROOMS]
+## and in [param unlocked] (UnlockState.rooms): research-locked rooms are not offered.
+func show_rooms(defs: Dictionary, unlocked: Array[StringName]) -> void:
 	_defs = defs
+	_shown_unlocks = unlocked.duplicate()
 	for button: Button in _buttons.values():
 		button.queue_free()
 	_buttons.clear()
 	for def_id: StringName in ROOMS:
 		var def: RoomDef = defs.get(def_id)
-		if def == null:
+		if def == null or not def_id in unlocked:
 			continue
 		var button := Button.new()
 		button.text = def.name_key
@@ -77,6 +77,11 @@ func show_rooms(defs: Dictionary) -> void:
 		_rooms.add_child(button)
 		_buttons[def_id] = button
 	_refresh_hint()
+
+
+## True when [param unlocked] differs from the unlocks the palette was last filled for.
+func unlocks_changed(unlocked: Array[StringName]) -> bool:
+	return unlocked != _shown_unlocks
 
 
 ## Returns the Dig button.

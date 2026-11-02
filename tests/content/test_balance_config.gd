@@ -15,13 +15,17 @@ const EXPECTED: Dictionary[String, Variant] = {
 	"starting_plant_output_mw": 30.0,
 	"starting_capacity_mwh": 0.0,
 	"capacitor_bank_capacity_mwh": 400.0,
-	"capacitor_bank_install_ticks": 360,
+	"capacitor_bank_install_ticks": 60,
 	"max_capacitor_banks": 1,
 	"cost_fraction_no_gate": 0.10,
 	"cost_fraction_blocked": 0.25,
 	"cost_fraction_origin_rejected": 0.25,
 	"dial_duration_ticks": 2,
 	"max_open_ticks": 60,
+	"starting_levels": 1,
+	"starting_budget_k": 6000,
+	"lift_segment_cost_k": 100,
+	"lift_segment_ticks": 60,
 }
 
 

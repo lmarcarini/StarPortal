@@ -86,13 +86,16 @@ static func is_connector(def_id: StringName) -> bool:
 	return def_id in [StartingBase.CORRIDOR_DEF, StartingBase.LIFT_DEF, STAIRS_DEF]
 
 
-## True for one level of the starting lift shaft: it can never be demolished.
-static func is_starting_lift(room: RoomState) -> bool:
-	return (
-		room.def_id == StartingBase.LIFT_DEF
-		and room.origin == StartingBase.LIFT_ORIGIN
-		and room.site.is_empty()
-	)
+## Whether [param state] may build a room of [param def_id] now as far as research and the
+## bank cap go; see UnlockRules.can_build_room() (the reasons live there).
+static func can_build_room(state: GameState, def_id: StringName) -> CommandResult:
+	return UnlockRules.can_build_room(state, def_id)
+
+
+## Whether [param state] may dig its next level now as far as research goes; see
+## UnlockRules.can_dig().
+static func can_dig(state: GameState) -> CommandResult:
+	return UnlockRules.can_dig(state)
 
 
 ## The first placement rule [param room] breaks in [param base], as an error code, or &"" when

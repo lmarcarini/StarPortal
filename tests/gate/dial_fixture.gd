@@ -15,7 +15,7 @@ const NEAR_OFFSET_LY := Vector3i(120, 80, 10)
 ## Capacity of the fixture's bank, large enough for any fixture dial.
 const CAPACITY_MWH: float = 100_000.0
 ## The fixture bank's charge rate: the starting plant's 30 MW less the starting rooms' 4 MW.
-const CHARGE_RATE_MW: int = 26
+const CHARGE_RATE_MW: int = 25
 
 
 ## Returns the fixture galaxy: home first, then the open, buried, shielded and guarded worlds,

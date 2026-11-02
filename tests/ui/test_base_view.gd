@@ -37,10 +37,11 @@ func after_test() -> void:
 
 func test_starts_on_the_gate_level_with_rooms_at_their_cells() -> void:
 	var plan: BasePlan = _view.get_plan()
-	assert_int(plan.level).is_equal(3)
+	assert_int(plan.level).is_equal(1)
 	assert_str(_def_at(Vector2i(16, 6))).is_equal("room_gate")
 	assert_str(_def_at(Vector2i(16, 13))).is_equal("room_control")
-	assert_str(_def_at(Vector2i(10, 15))).is_equal("room_corridor")
+	assert_str(_def_at(Vector2i(10, 10))).is_equal("room_corridor")
+	assert_str(_def_at(Vector2i(7, 12))).is_equal("room_power_plant")
 	# The former capacitor alcove's cells are ordinary free cells (card #158).
 	assert_str(String(plan.item_at(Vector2i(23, 11)))).is_equal("")
 	assert_str(String(plan.item_at(Vector2i(0, 0)))).is_equal("")
@@ -51,15 +52,32 @@ func test_starts_on_the_gate_level_with_rooms_at_their_cells() -> void:
 func test_level_actions_change_level_and_rooms() -> void:
 	var plan: BasePlan = _view.get_plan()
 	await _press_action(&"base_level_up")
-	assert_int(plan.level).is_equal(2)
-	assert_str(_def_at(Vector2i(13, 13))).is_equal("room_archive")
-	assert_str(String(plan.item_at(Vector2i(23, 11)))).is_equal("")
-	await _press_action(&"base_level_up")
-	await _press_action(&"base_level_up")
 	assert_int(plan.level).is_equal(1)
-	assert_str(_def_at(Vector2i(7, 12))).is_equal("room_power_plant")
+	await _press_action(&"base_level_down")
+	assert_int(plan.level).is_equal(1)
+	var base: BaseState = _simulation.state.base
+	base.levels.append(LevelState.new())
+	base.add_room(&"room_corridor", 2, Vector2i(5, 5))
+	_view.setup(_simulation)
 	await _press_action(&"base_level_down")
 	assert_int(plan.level).is_equal(2)
+	assert_str(_def_at(Vector2i(5, 5))).is_equal("room_corridor")
+	await _press_action(&"base_level_up")
+	assert_int(plan.level).is_equal(1)
+
+
+## The level caption follows the shown level, in pt_BR too (PO note on card #164: it read
+## "NÍVEL 3" while Level 1 was shown).
+func test_level_caption_follows_the_shown_level() -> void:
+	var heading: Label = _view.get_node("%LevelHeading")
+	assert_str(heading.text).is_equal("LEVEL 1")
+	TranslationServer.set_locale("pt_BR")
+	await _runner.await_input_processed()
+	assert_str(heading.text).is_equal("NÍVEL 1")
+	_simulation.state.base.levels.append(LevelState.new())
+	_view.setup(_simulation)
+	await _press_action(&"base_level_down")
+	assert_str(heading.text).is_equal("NÍVEL 2")
 
 
 func test_click_selects_a_room_and_fills_the_panel() -> void:
@@ -91,12 +109,12 @@ func test_cursor_and_accept_on_a_free_cell_select_nothing() -> void:
 
 
 func test_a_room_under_construction_shows_days_left() -> void:
-	var room: RoomState = _simulation.state.base.add_room(&"room_physics_lab", 3, Vector2i(4, 4))
+	var room: RoomState = _simulation.state.base.add_room(&"room_research_lab", 1, Vector2i(4, 4))
 	room.build_ticks_left = TimeMath.TICKS_PER_DAY * 5 - 10
 	_view.get_plan().select(room.id)
 	var lines: Array[String] = _view.get_room_panel().lines()
-	assert_str(lines[1]).is_equal("Physics Lab")
-	assert_str(lines[3]).is_equal("Draw 4 MW")
+	assert_str(lines[1]).is_equal("Research Lab")
+	assert_str(lines[3]).is_equal("Draw 5 MW")
 	assert_str(lines[4]).is_equal("Upkeep $60k / month")
 	assert_str(lines[5]).is_equal("Under construction: 5 d left")
 
@@ -169,7 +187,7 @@ func test_signature_changes_only_with_what_is_shown() -> void:
 	var base: BaseState = _simulation.state.base
 	var before: int = BaseView.signature(base)
 	assert_int(BaseView.signature(base)).is_equal(before)
-	var room: RoomState = base.add_room(&"room_physics_lab", 3, Vector2i(4, 4))
+	var room: RoomState = base.add_room(&"room_research_lab", 1, Vector2i(4, 4))
 	room.build_ticks_left = TimeMath.TICKS_PER_DAY * 2
 	var built: int = BaseView.signature(base)
 	assert_int(built).is_not_equal(before)
@@ -177,4 +195,4 @@ func test_signature_changes_only_with_what_is_shown() -> void:
 	assert_int(BaseView.signature(base)).is_equal(built)
 	room.build_ticks_left = TimeMath.TICKS_PER_DAY
 	assert_int(BaseView.signature(base)).is_not_equal(built)
-	assert_int(BaseView.gate_level(base)).is_equal(3)
+	assert_int(BaseView.gate_level(base)).is_equal(1)

@@ -10,6 +10,8 @@ extends RefCounted
 ## Bible: docs/content/m2-base.md sections 4 and 6
 
 var _simulation: Simulation = null
+## RoomDefs by id, to refill the palette when research unlocks a room.
+var _defs: Dictionary = {}
 var _plan: BasePlan = null
 var _palette: BuildPalette = null
 var _panel: RoomPanel = null
@@ -39,7 +41,8 @@ func setup(simulation: Simulation, defs: Dictionary) -> void:
 	_simulation = simulation
 	_ghost.stop()
 	_ghost.attach(_plan, simulation.state)
-	_palette.show_rooms(defs)
+	_defs = defs
+	_palette.show_rooms(defs, simulation.state.unlocks.rooms)
 	_palette.set_placing(false, false)
 	refresh()
 
@@ -72,6 +75,8 @@ func place_at(def_id: StringName, cell: Vector2i) -> void:
 func refresh() -> void:
 	if _simulation == null:
 		return
+	if _palette.unlocks_changed(_simulation.state.unlocks.rooms):
+		_palette.show_rooms(_defs, _simulation.state.unlocks.rooms)
 	_palette.get_dig_button().refresh(_simulation.state)
 	_ghost.recheck()
 	show_action(_plan.selected())

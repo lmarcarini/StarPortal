@@ -45,10 +45,23 @@ func test_negative_numbers() -> void:
 	var room := _def(&"bad", Vector2i(2, 2))
 	room.build_cost_k = -1
 	room.build_ticks = -5
-	room.power_draw_mw = -0.5
+	room.power_draw_mw = -5.0
 	room.upkeep_k = -1
 	var rooms: Array[RoomDef] = [room]
 	assert_array(ContentCheckRooms.check(rooms)).has_size(4)
+
+
+## Power comes in 5 MW blocks: a draw, output or charge rate off the block is rejected
+## (m25-lean-start.md section 6).
+func test_power_in_5_mw_blocks() -> void:
+	var room := _def(&"odd", Vector2i(2, 2))
+	room.power_draw_mw = 4.0
+	room.power_output_mw = 32.0
+	room.max_charge_rate_mw = 25.0
+	var rooms: Array[RoomDef] = [room]
+	var errors: Array[String] = ContentCheckRooms.check(rooms)
+	assert_array(errors).has_size(2)
+	assert_str(errors[0]).contains("not a multiple of 5")
 
 
 ## The same id twice is rejected.
@@ -75,22 +88,22 @@ func test_always_on_rule() -> void:
 	)
 
 
-## The real catalogue has the doc's numbers for every row.
+## The real catalogue has the doc's numbers for every row (m25-lean-start.md sections 4-6;
+## Quarters and Infirmary keep their M2 numbers, the Infirmary's draw rounded up to a block).
 func test_catalogue_numbers() -> void:
 	# id: [w, h, rotatable, cost, ticks, draw, output, charge, upkeep]
 	var table: Dictionary = {
-		&"room_gate": [8, 8, false, 0, 0, 2.0, 0.0, 0.0, 0],
-		&"room_control": [5, 3, false, 0, 0, 1.0, 0.0, 0.0, 40],
-		&"room_power_plant": [5, 4, true, 2000, 14400, 0.0, 30.0, 0.0, 150],
-		&"room_capacitor_bank": [3, 2, true, 600, 360, 0.0, 0.0, 30.0, 10],
+		&"room_gate": [8, 8, false, 0, 0, 5.0, 0.0, 0.0, 0],
+		&"room_control": [5, 3, false, 0, 0, 0.0, 0.0, 0.0, 40],
+		&"room_power_plant": [5, 4, true, 2000, 1440, 0.0, 30.0, 0.0, 150],
+		&"room_capacitor_bank": [3, 2, true, 600, 60, 0.0, 0.0, 30.0, 10],
 		&"room_quarters": [3, 2, true, 150, 2880, 0.0, 0.0, 0.0, 10],
-		&"room_archive": [3, 3, true, 300, 4320, 1.0, 0.0, 0.0, 20],
-		&"room_physics_lab": [4, 3, true, 800, 7200, 4.0, 0.0, 0.0, 60],
-		&"room_workshop": [5, 4, true, 700, 7200, 5.0, 0.0, 0.0, 50],
-		&"room_infirmary": [4, 3, true, 500, 5760, 2.0, 0.0, 0.0, 40],
-		&"room_lift": [2, 2, false, 400, 5760, 0.0, 0.0, 0.0, 10],
-		&"room_stairs": [2, 1, true, 100, 2880, 0.0, 0.0, 0.0, 0],
-		&"room_corridor": [1, 1, false, 5, 60, 0.0, 0.0, 0.0, 0],
+		&"room_research_lab": [4, 3, true, 800, 480, 5.0, 0.0, 0.0, 60],
+		&"room_workshop": [5, 4, true, 700, 360, 5.0, 0.0, 0.0, 50],
+		&"room_infirmary": [4, 3, true, 500, 5760, 5.0, 0.0, 0.0, 40],
+		&"room_lift": [2, 2, false, 400, 240, 0.0, 0.0, 0.0, 10],
+		&"room_stairs": [2, 1, true, 100, 120, 0.0, 0.0, 0.0, 0],
+		&"room_corridor": [1, 1, false, 5, 10, 0.0, 0.0, 0.0, 0],
 	}
 	assert_int(Registry.get_all_of(RoomDef).size()).is_equal(table.size())
 	for id: StringName in table:

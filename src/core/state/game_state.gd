@@ -16,7 +16,8 @@ const _SECTIONS: Array[String] = [
 	"worlds",
 	"archive",
 	"address_book",
-	"operations_log"
+	"operations_log",
+	"unlocks",
 ]
 
 ## The simulation clock.
@@ -41,6 +42,8 @@ var archive: ArchiveState = ArchiveState.new()
 var address_book: AddressBookState = AddressBookState.new()
 ## The operations log: what happened, oldest first.
 var operations_log: LogState = LogState.new()
+## What research has unlocked: buildable rooms, dig depth, bank cap, upkeep overrides.
+var unlocks: UnlockState = UnlockState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -58,13 +61,15 @@ var room_defs: Dictionary[StringName, RoomDef] = {}
 ## WorldGenerator.GENERATOR_VERSION. With a [param balance], power starts at
 ## PowerState.starting(balance) and the budget at BudgetState.starting(balance); without one
 ## they are all zero. The base is StartingBase.build() over [param balance], or over the
-## BalanceConfig defaults without one.
+## BalanceConfig defaults without one, and so are the unlocks (UnlockState.starting()).
 static func new_game(base_seed: int, balance: BalanceConfig = null) -> GameState:
 	var state := GameState.new()
 	state.random.base_seed = base_seed
 	state.worlds.galaxy_seed = RandomState.derive_seed(base_seed, &"galaxy")
 	state.worlds.generator_version = WorldGenerator.GENERATOR_VERSION
-	state.base = StartingBase.build(balance if balance != null else BalanceConfig.new())
+	var rules: BalanceConfig = balance if balance != null else BalanceConfig.new()
+	state.base = StartingBase.build(rules)
+	state.unlocks = UnlockState.starting(rules)
 	if balance != null:
 		state.power = PowerState.starting(balance)
 		state.budget = BudgetState.starting(balance)
@@ -88,6 +93,7 @@ func to_dict() -> Dictionary:
 		"archive": archive.to_dict(),
 		"address_book": address_book.to_dict(),
 		"operations_log": operations_log.to_dict(),
+		"unlocks": unlocks.to_dict(),
 	}
 
 
@@ -106,6 +112,7 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.archive = ArchiveState.from_dict(_dict_or_empty(data.get("archive")))
 	state.address_book = AddressBookState.from_dict(_dict_or_empty(data.get("address_book")))
 	state.operations_log = LogState.from_dict(_dict_or_empty(data.get("operations_log")))
+	state.unlocks = UnlockState.from_dict(_dict_or_empty(data.get("unlocks")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -118,8 +125,9 @@ static func from_dict(data: Dictionary) -> GameState:
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
-## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book" and
-## "operations_log" must be objects, the sub-states must pass their own validate_dict(), and
+## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book",
+## "operations_log" and "unlocks" must be objects, the sub-states must pass their own
+## validate_dict(), and
 ## every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
 ## not survive JSON, whether they arrive as ints or as floats). The Ring's "dial_started_tick" and
@@ -176,6 +184,8 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return AddressBookState.validate_dict(section)
 		"operations_log":
 			return LogState.validate_dict(section)
+		"unlocks":
+			return UnlockState.validate_dict(section)
 	return []
 
 

@@ -45,13 +45,33 @@ static func reason(result: CommandResult, state: GameState, cost_k: int) -> Stri
 				}
 			)
 		)
+	var unlock: String = unlock_reason(result, state)
+	if not unlock.is_empty():
+		return unlock
 	var key: String = "BASE_BUILD_ERR_%s" % String(result.error_code).to_upper()
 	var text: String = _tr(StringName(key))
 	return _tr(&"BASE_BUILD_ERR_OTHER") if text == key else text
 
 
-## "Overlaps the Archive." for the first room on [param level] covering part of [param area];
-## with [param other_level] true, "Overlaps the Archive on Level 2." (a lift's blocking level).
+## The words for a refusal of UnlockRules (m25-lean-start.md section 3): "Needs research:
+## Excavation survey.", "Up to 1 Capacitor Bank until Bank array.", or "" for any other code.
+static func unlock_reason(result: CommandResult, state: GameState) -> String:
+	var project: String = _tr(UnlockRules.project_name_key(StringName(result.detail)))
+	match result.error_code:
+		&"needs_research":
+			return _tr(&"BASE_BUILD_ERR_NEEDS_RESEARCH").format({"name": project})
+		&"bank_cap":
+			var key: StringName = (
+				&"BASE_BUILD_ERR_BANK_CAP"
+				if result.detail.is_empty()
+				else &"BASE_BUILD_ERR_BANK_CAP_UNTIL"
+			)
+			return _tr(key).format({"n": state.unlocks.bank_cap, "name": project})
+	return ""
+
+
+## "Overlaps the Gate Room." for the first room on [param level] covering part of [param area];
+## with [param other_level] true, "Overlaps the Gate Room on Level 2." (a lift's blocking level).
 static func overlap_reason(
 	state: GameState, level: int, area: Rect2i, other_level: bool = false
 ) -> String:

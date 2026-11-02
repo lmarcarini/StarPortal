@@ -59,15 +59,17 @@ func get_type() -> StringName:
 
 
 ## Rejects, in the doc's rule order: an unknown def (&"unknown_room"), a fixed room or a
-## corridor (&"not_buildable"), a placement rule broken on any level (&"not_rotatable",
+## corridor (&"not_buildable"), a room research has not unlocked or past the bank cap
+## (BaseRules.can_build_room(): &"needs_research", &"needs_staff", &"bank_cap"), a placement
+## rule broken on any level (&"not_rotatable",
 ## &"no_such_level", &"level_not_dug", &"outside_level", &"overlap"), no edge touching a
 ## corridor, lift or stairs on any of its levels (&"not_connected"), and too little money
 ## (&"insufficient_funds").
 func validate(state: GameState) -> CommandResult:
 	var def: RoomDef = state.room_defs.get(def_id)
-	var def_error: StringName = _def_error(def)
-	if not def_error.is_empty():
-		return CommandResult.fail(def_error, String(def_id))
+	var buildable: CommandResult = _buildable(state, def)
+	if not buildable.is_ok:
+		return buildable
 	var planned: Array[RoomState] = _planned(state.base)
 	if planned.is_empty():
 		return CommandResult.fail(&"no_such_level")
@@ -110,6 +112,14 @@ func to_dict() -> Dictionary:
 		"origin": [origin.x, origin.y],
 		"rotated": rotated,
 	}
+
+
+## Fails with [method _def_error]'s code, then with BaseRules.can_build_room()'s; else ok.
+func _buildable(state: GameState, def: RoomDef) -> CommandResult:
+	var def_error: StringName = _def_error(def)
+	if not def_error.is_empty():
+		return CommandResult.fail(def_error, String(def_id))
+	return BaseRules.can_build_room(state, def_id)
 
 
 ## &"unknown_room" without a def, &"not_buildable" for a fixed room or a corridor, else &"".

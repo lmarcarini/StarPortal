@@ -269,7 +269,7 @@ func _assert_run_ring(run: SoakRun) -> void:
 		assert_bool(named.has(world_id)).override_failure_message(world_id).is_true()
 
 
-## Checks [param run] built the corridor run and the lab and dug both extra levels, and the
+## Checks [param run] built the corridor run and the lab and dug every extra level, and the
 ## budget stayed in bounds at every month close.
 func _assert_run_base(run: SoakRun) -> void:
 	var state: GameState = run.simulation.state

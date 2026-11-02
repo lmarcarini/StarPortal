@@ -75,7 +75,7 @@ func test_layer_marks_unpowered_rooms() -> void:
 	var layer: EnergyLayer = auto_free(EnergyLayer.new())
 	var plan: BasePlan = auto_free(BasePlan.new())
 	layer.setup(plan, _state)
-	var archive: RoomState = PowerFixture.first_room(_state, &"room_archive")
+	var archive: RoomState = PowerFixture.lab(_state)
 	var gate: RoomState = PowerFixture.first_room(_state, &"room_gate")
 	assert_bool(layer.is_unpowered(archive.id)).is_false()
 	archive.powered_on = false

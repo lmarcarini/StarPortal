@@ -75,10 +75,10 @@ func _drag(cell: Vector2i) -> void:
 
 
 func test_one_enter_builds_and_the_ghost_stays_for_another() -> void:
-	_view.get_build().start_placing(&"room_quarters")
-	_ghost().move_to(Vector2i(4, 16))
+	_view.get_build().start_placing(&"room_research_lab")
+	_ghost().move_to(Vector2i(24, 11))
 	assert_str(_ghost().reason()).is_empty()
-	var before: int = _count(&"room_quarters")
+	var before: int = _count(&"room_research_lab")
 	await get_tree().process_frame
 	var key := InputEventKey.new()
 	key.keycode = KEY_ENTER
@@ -86,19 +86,19 @@ func test_one_enter_builds_and_the_ghost_stays_for_another() -> void:
 	key.pressed = true
 	get_viewport().push_input(key)
 	await get_tree().process_frame
-	assert_int(_count(&"room_quarters")).is_equal(before + 1)
+	assert_int(_count(&"room_research_lab")).is_equal(before + 1)
 	assert_bool(_ghost().is_placing()).is_true()
-	assert_str(String(_ghost().def_id)).is_equal("room_quarters")
+	assert_str(String(_ghost().def_id)).is_equal("room_research_lab")
 	key.pressed = false
 	get_viewport().push_input(key)
-	_ghost().move_to(Vector2i(4, 18))
+	_ghost().move_to(Vector2i(24, 7))
 	if _ghost().reason().is_empty():
 		_ghost().confirm()
-		assert_int(_count(&"room_quarters")).is_equal(before + 2)
+		assert_int(_count(&"room_research_lab")).is_equal(before + 2)
 
 
 func test_invalid_click_shows_the_reason_and_builds_nothing() -> void:
-	_view.get_build().start_placing(&"room_physics_lab")
+	_view.get_build().start_placing(&"room_research_lab")
 	await get_tree().process_frame
 	var before: int = _simulation.state.base.rooms.size()
 	_mouse(MOUSE_BUTTON_LEFT, true, Vector2i(0, 0))
@@ -109,7 +109,7 @@ func test_invalid_click_shows_the_reason_and_builds_nothing() -> void:
 
 
 func test_right_click_puts_the_ghost_away_but_a_right_drag_pans() -> void:
-	_view.get_build().start_placing(&"room_quarters")
+	_view.get_build().start_placing(&"room_research_lab")
 	await get_tree().process_frame
 	_mouse(MOUSE_BUTTON_RIGHT, true, Vector2i(4, 16))
 	_mouse(MOUSE_BUTTON_RIGHT, false, Vector2i(4, 16), Vector2(40, 0))
@@ -121,7 +121,7 @@ func test_right_click_puts_the_ghost_away_but_a_right_drag_pans() -> void:
 
 
 func test_esc_puts_the_ghost_away() -> void:
-	_view.get_build().start_placing(&"room_quarters")
+	_view.get_build().start_placing(&"room_research_lab")
 	await get_tree().process_frame
 	var key := InputEventKey.new()
 	key.keycode = KEY_ESCAPE
@@ -136,12 +136,12 @@ func test_corridor_drag_builds_on_release() -> void:
 	_view.get_build().start_placing(StartingBase.CORRIDOR_DEF)
 	await get_tree().process_frame
 	var before: int = _count(StartingBase.CORRIDOR_DEF)
-	_mouse(MOUSE_BUTTON_LEFT, true, Vector2i(10, 16))
-	_drag(Vector2i(10, 17))
-	_drag(Vector2i(11, 17))
+	_mouse(MOUSE_BUTTON_LEFT, true, Vector2i(24, 11))
+	_drag(Vector2i(24, 12))
+	_drag(Vector2i(25, 12))
 	assert_int(_count(StartingBase.CORRIDOR_DEF)).is_equal(before)
 	assert_int(_ghost().run.size()).is_equal(3)
-	_mouse(MOUSE_BUTTON_LEFT, false, Vector2i(11, 17))
+	_mouse(MOUSE_BUTTON_LEFT, false, Vector2i(25, 12))
 	assert_int(_count(StartingBase.CORRIDOR_DEF)).is_equal(before + 3)
 	assert_bool(_ghost().is_placing()).is_true()
 	assert_int(_ghost().run.size()).is_equal(1)

@@ -49,7 +49,7 @@ func test_unchanged_state_reuses_the_cache() -> void:
 
 ## A room placed as a site, then finished.
 func test_room_built_and_finished() -> void:
-	var lab: RoomState = _state.base.add_room(&"room_physics_lab", 2, Vector2i(20, 2))
+	var lab: RoomState = _state.base.add_room(&"room_research_lab", 2, Vector2i(20, 2))
 	lab.build_ticks_left = 5
 	_assert_cache_is_fresh()
 	lab.build_ticks_left = 1
@@ -60,10 +60,28 @@ func test_room_built_and_finished() -> void:
 
 ## A room switched off and on, by command and directly.
 func test_room_switched() -> void:
-	var archive: RoomState = PowerFixture.first_room(_state, &"room_archive")
-	_run(SwitchRoomCommand.create(archive.id, false))
+	var lab: RoomState = PowerFixture.lab(_state)
 	_assert_cache_is_fresh()
-	archive.powered_on = true
+	_run(SwitchRoomCommand.create(lab.id, false))
+	_assert_cache_is_fresh()
+	lab.powered_on = true
+	_assert_cache_is_fresh()
+
+
+## Every research unlock effect (m25-lean-start.md section 3), applied through
+## UnlockRules.apply_to_game(), leaves the cache equal to a fresh sum, and so does a second
+## plant built once Second plant is done.
+func test_unlock_effects() -> void:
+	PowerRules.totals(_state)
+	for project_id: StringName in UnlockRules.PROJECTS:
+		for pair: Array in UnlockRules.PROJECTS[project_id]:
+			var effect: StringName = pair[0]
+			assert_bool(UnlockRules.apply_to_game(_state, effect, pair[1])).is_true()
+			assert_int(_state.power.totals_revision).is_equal(-1)
+			_assert_cache_is_fresh()
+	var plant: RoomState = _state.base.add_room(&"room_power_plant", 1, Vector2i(24, 2))
+	_assert_cache_is_fresh()
+	plant.powered_on = false
 	_assert_cache_is_fresh()
 
 

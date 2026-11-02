@@ -1,7 +1,7 @@
-## Tests for StartingBase: the m2-base.md section 2 layout, every pre-built room fits and
-## touches a corridor or lift, and no cell is reserved: the first
+## Tests for StartingBase: the m25-lean-start.md section 1 layout, every pre-built room fits
+## and touches a corridor, and no cell is reserved: the first
 ## Capacitor Bank finds a spot sharing a wall with the Gate Room.
-## Bible: game-design.md#base-building-and-power, docs/content/m2-base.md (section 2)
+## Bible: game-design.md#base-building-and-power, docs/content/m25-lean-start.md section 1
 extends GdUnitTestSuite
 
 const CONNECTORS: Array[StringName] = [&"room_corridor", &"room_lift", &"room_stairs"]
@@ -30,37 +30,24 @@ func _area(room: RoomState) -> Rect2i:
 	return BaseRules.footprint(room, def)
 
 
-## Levels 1 to 3 on the balance's grid, with exactly the rooms of section 2 on each.
+## One level on the balance's grid, with exactly the rooms of m25-lean-start.md section 1:
+## Gate Room, Control Room, Power Plant and a 36-cell corridor spine, all built and on, and
+## 585 free cells.
 func test_layout() -> void:
 	var base := StartingBase.build(_balance)
-	assert_int(base.level_count).is_equal(3)
+	assert_int(base.level_count).is_equal(1)
 	assert_that(base.grid_size).is_equal(Vector2i(36, 20))
-	var expected: Array = [
-		{&"room_power_plant": 1, &"room_quarters": 2, &"room_lift": 1},
-		{&"room_archive": 1, &"room_lift": 1},
-		{&"room_gate": 1, &"room_control": 1, &"room_lift": 1},
-	]
-	for level: int in range(1, 4):
-		var wanted: Dictionary = expected[level - 1]
-		var others: int = 0
-		for room: RoomState in BaseRules.rooms_on_level(base, level):
-			assert_bool(room.is_built() and room.powered_on).is_true()
-			if room.def_id != &"room_corridor":
-				others += 1
-		for def_id: StringName in wanted:
-			assert_int(_count(base, level, def_id)).is_equal(wanted[def_id])
-		assert_int(others).is_equal(
-			wanted.values().reduce(func(a: int, b: int) -> int: return a + b)
-		)
-		assert_int(_count(base, level, &"room_corridor")).is_greater(0)
-
-
-## The lift shaft takes the same cells on every level.
-func test_lift_shaft_lines_up() -> void:
-	var base := StartingBase.build(_balance)
+	var wanted: Dictionary = {
+		&"room_gate": 1, &"room_control": 1, &"room_power_plant": 1, &"room_corridor": 36
+	}
+	assert_int(base.rooms.size()).is_equal(39)
+	for def_id: StringName in wanted:
+		assert_int(_count(base, 1, def_id)).is_equal(wanted[def_id])
+	var used: int = 0
 	for room: RoomState in base.rooms:
-		if room.def_id == &"room_lift":
-			assert_that(room.origin).is_equal(StartingBase.LIFT_ORIGIN)
+		assert_bool(room.is_built() and room.powered_on).is_true()
+		used += _area(room).get_area()
+	assert_int(36 * 20 - used).is_equal(585)
 
 
 ## Every room's def exists, every room fits, and every non-connector room touches a corridor
@@ -87,7 +74,7 @@ func test_first_bank_spot_beside_the_gate_room() -> void:
 	var base := StartingBase.build(_balance)
 	var spot: Vector2i = BaseSpots.bank_spot(base, _defs)
 	assert_vector(Vector2(spot)).is_not_equal(Vector2(BaseSpots.NO_SPOT))
-	var probe := RoomState.create(&"probe", &"room_capacitor_bank", 3, spot)
+	var probe := RoomState.create(&"probe", &"room_capacitor_bank", 1, spot)
 	assert_bool(BaseRules.fits(base, _defs, probe)).is_true()
 	var next_to: Array[StringName] = []
 	for other: RoomState in BaseRules.neighbours(base, _defs, probe):
@@ -103,19 +90,30 @@ func test_new_game_has_it() -> void:
 	assert_dict(bare.base.to_dict()).is_equal(StartingBase.build(_balance).to_dict())
 
 
-## Starting draw with everything on is 4 MW of the plant's 30, and upkeep sums to $240k when
-## the lift shaft is counted once.
+## Starting draw with everything on is 5 MW of the plant's 30 (25 MW spare), and upkeep is
+## $190k a month (section 1).
 func test_starting_power_and_upkeep() -> void:
-	var base := StartingBase.build(_balance)
-	var draw: float = 0.0
-	var output: float = 0.0
-	var upkeep: int = 0
-	for room: RoomState in base.rooms:
-		var def: RoomDef = _defs[room.def_id]
-		draw += def.power_draw_mw
-		output += def.power_output_mw
-		if room.def_id != &"room_lift" or room.level == 1:
-			upkeep += def.upkeep_k
-	assert_float(draw).is_equal(4.0)
-	assert_float(output).is_equal(30.0)
-	assert_int(upkeep).is_equal(240)
+	var state := GameState.new_game(7, _balance)
+	state.balance = _balance
+	for def_id: StringName in _defs:
+		state.room_defs[def_id] = _defs[def_id]
+	assert_float(PowerRules.supply_mw(state)).is_equal(30.0)
+	assert_float(PowerRules.spare_mw(state)).is_equal(25.0)
+	assert_int(EconomySystem.monthly_upkeep_k(state.base, state.room_defs, state.unlocks)).is_equal(
+		190
+	)
+	assert_int(state.budget.funds_k).is_equal(6000)
+
+
+## The power cache built over the starting base agrees with a fresh sum (rooms come from
+## add_room(), so RoomState.revision moved).
+func test_power_cache_matches_fresh_sum() -> void:
+	var state := GameState.new_game(7, _balance)
+	for def_id: StringName in _defs:
+		state.room_defs[def_id] = _defs[def_id]
+	var cached: PackedFloat64Array = PowerRules.totals(state)
+	var fresh := GameState.new_game(7, _balance)
+	fresh.room_defs = state.room_defs
+	assert_array(Array(PowerRules.totals(fresh))).is_equal(Array(cached))
+	state.base = StartingBase.build(_balance)
+	assert_array(Array(PowerRules.totals(state))).is_equal(Array(cached))

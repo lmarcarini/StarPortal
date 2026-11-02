@@ -4,7 +4,7 @@
 ## Bible: docs/content/m2-base.md section 4
 extends GdUnitTestSuite
 
-const LAB: StringName = &"room_physics_lab"
+const LAB: StringName = &"room_research_lab"
 
 
 func _place_lab(game: GameState) -> RoomState:
@@ -14,7 +14,7 @@ func _place_lab(game: GameState) -> RoomState:
 
 
 func test_room_is_built_after_its_time_and_posts_once() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var lab := _place_lab(game)
 	var system := ConstructionSystem.new()
 	ConstructionFixture.advance(game, system, game.room_defs[LAB].build_ticks - 1)
@@ -27,7 +27,7 @@ func test_room_is_built_after_its_time_and_posts_once() -> void:
 
 
 func test_fourth_site_waits_in_the_queue() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	for column: int in [5, 9, 13, 17]:
 		ConstructionFixture.run(
 			game, PlaceRoomCommand.create(&"room_quarters", 2, Vector2i(column, 16))
@@ -41,20 +41,20 @@ func test_fourth_site_waits_in_the_queue() -> void:
 
 
 func test_corridor_run_finishes_cell_by_cell() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var run: Array[Vector2i] = [Vector2i(10, 16), Vector2i(10, 17)]
 	ConstructionFixture.run(game, PaintCorridorCommand.create(2, run))
 	game.events.drain()
 	var system := ConstructionSystem.new()
-	ConstructionFixture.advance(game, system, 60)
+	ConstructionFixture.advance(game, system, 10)
 	assert_bool(game.base.rooms[-2].is_built()).is_true()
 	assert_bool(game.base.rooms[-1].is_built()).is_false()
-	ConstructionFixture.advance(game, system, 60)
+	ConstructionFixture.advance(game, system, 10)
 	assert_array(ConstructionFixture.event_names(game)).is_equal([&"room_built"])
 
 
 func test_cancel_refunds_three_quarters() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var lab := _place_lab(game)
 	ConstructionSystem.new().tick(game)
 	assert_bool(ConstructionFixture.run(game, CancelBuildCommand.create(lab.id)).is_ok).is_true()
@@ -65,7 +65,7 @@ func test_cancel_refunds_three_quarters() -> void:
 
 
 func test_demolish_refunds_half_and_takes_a_quarter_of_the_time() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var lab := _place_lab(game)
 	var system := ConstructionSystem.new()
 	var ticks: int = game.room_defs[LAB].build_ticks
@@ -87,7 +87,7 @@ func test_demolish_refunds_half_and_takes_a_quarter_of_the_time() -> void:
 
 
 func test_cannot_demolish_protected_rooms() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var codes: Dictionary[StringName, StringName] = {}
 	for room: RoomState in game.base.rooms:
 		var code: StringName = DemolishRoomCommand.create(room.id).validate(game).error_code
@@ -95,13 +95,14 @@ func test_cannot_demolish_protected_rooms() -> void:
 	assert_str(codes[&"room_gate"]).is_equal("fixed_room")
 	assert_str(codes[&"room_control"]).is_equal("fixed_room")
 	assert_str(codes[&"room_power_plant"]).is_equal("last_plant")
-	assert_str(codes[&"room_lift"]).is_equal("starting_lift")
+	# No lift is protected any more: the lean start has none (m25-lean-start.md section 1).
+	assert_str(codes[&"room_lift"]).is_empty()
 	var lab := _place_lab(game)
 	assert_str(DemolishRoomCommand.create(lab.id).validate(game).error_code).is_equal("not_built")
 
 
 func test_cannot_demolish_a_corridor_a_room_hangs_on() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	var run: Array[Vector2i] = [Vector2i(10, 16)]
 	ConstructionFixture.run(game, PaintCorridorCommand.create(2, run))
 	var cell: RoomState = game.base.rooms[-1]
@@ -113,13 +114,13 @@ func test_cannot_demolish_a_corridor_a_room_hangs_on() -> void:
 
 
 func test_save_mid_build_keeps_progress() -> void:
-	var game := ConstructionFixture.state()
+	var game := ConstructionFixture.grown()
 	_place_lab(game)
 	var run: Array[Vector2i] = [Vector2i(10, 16), Vector2i(10, 17)]
 	ConstructionFixture.run(game, PaintCorridorCommand.create(2, run))
-	ConstructionFixture.advance(game, ConstructionSystem.new(), 100)
+	ConstructionFixture.advance(game, ConstructionSystem.new(), 15)
 	var data: Dictionary = JSON.parse_string(JSON.stringify(game.base.to_dict()))
 	assert_array(BaseState.validate_dict(data)).is_empty()
 	var loaded := BaseState.from_dict(data)
 	assert_dict(loaded.to_dict()).is_equal(game.base.to_dict())
-	assert_int(loaded.rooms[-1].build_ticks_left).is_equal(20)
+	assert_int(loaded.rooms[-1].build_ticks_left).is_equal(5)

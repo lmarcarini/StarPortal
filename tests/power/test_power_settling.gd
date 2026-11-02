@@ -46,8 +46,8 @@ func test_shed_restarts_a_stopped_plant_and_then_stays_quiet() -> void:
 
 ## A room that finishes with no spare power is shed on the same tick it finishes.
 func test_allocation_fits_on_the_tick_a_room_finishes() -> void:
-	PowerFixture.add_bank(_state, 26)
-	var lab: RoomState = _state.base.add_room(&"room_physics_lab", 2, Vector2i(20, 2))
+	PowerFixture.add_bank(_state, 25)
+	var lab: RoomState = _state.base.add_room(&"room_research_lab", 2, Vector2i(20, 2))
 	lab.build_ticks_left = 1
 	ConstructionSystem.new().tick(_state)
 	assert_bool(lab.is_built()).is_true()

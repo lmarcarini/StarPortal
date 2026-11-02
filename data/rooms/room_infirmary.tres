@@ -2,14 +2,14 @@
 
 [ext_resource type="Script" path="res://src/content/room_def.gd" id="1_room"]
 
-; Numbers from docs/content/m2-base.md section 1.
+; Numbers from docs/content/m25-lean-start.md sections 4-6 (m2-base.md otherwise).
 [resource]
 script = ExtResource("1_room")
 size_cells = Vector2i(4, 3)
 rotatable = true
 build_cost_k = 500
 build_ticks = 5760
-power_draw_mw = 2.0
+power_draw_mw = 5.0
 fixed = false
 always_on = false
 power_output_mw = 0.0

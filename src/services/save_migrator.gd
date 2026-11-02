@@ -3,15 +3,16 @@ extends RefCounted
 ## Brings saved data forward to the current save format, one version at a time.
 ## Each step is a function Dictionary -> Dictionary that turns data at version N into data
 ## at version N + 1. Steps are pure: no side effects, no autoloads.
-## M2 is a clean break: saves older than [constant OLDEST_VERSION] are not migrated but
+## M2 and M2.5 (v12, docs/content/m25-lean-start.md section 7) are clean breaks: saves older
+## than [constant OLDEST_VERSION] are not migrated but
 ## rejected with &"old_format_version" (owner ruling on card #133). Steps for later versions
 ## go in built_in_steps().
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 11
+const TARGET_VERSION: int = 12
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
-const OLDEST_VERSION: int = 11
+const OLDEST_VERSION: int = 12
 
 
 ## Returns the built-in steps, keyed by the version they migrate from; none yet since the M2
