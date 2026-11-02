@@ -188,7 +188,7 @@ func _on_checked(reason: String) -> void:
 			{
 				"name": _t(def.name_key),
 				"cost": MoneyLabel.format_k(_ghost.cost_k()),
-				"time": BuildText.duration(def.build_ticks * maxi(1, _ghost.run.size())),
+				"time": BuildText.duration(_ghost.build_ticks()),
 			}
 		)
 	)

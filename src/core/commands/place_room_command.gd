@@ -109,12 +109,18 @@ func cost_of(state: GameState) -> int:
 	return 0 if def == null else def.build_cost_k
 
 
+## Ticks each room of the site takes in [param state]: the def's build time, or for a lift
+## extending a shaft the segment time (the ghost shows the same).
+func ticks_of(state: GameState) -> int:
+	if _extends_shaft(state.base) and state.balance != null:
+		return state.balance.lift_segment_ticks
+	var def: RoomDef = state.room_defs.get(def_id)
+	return 0 if def == null else def.build_ticks
+
+
 ## Pays the cost and adds the site's rooms, unbuilt and switched on.
 func apply(state: GameState) -> void:
-	var def: RoomDef = state.room_defs[def_id]
-	var ticks: int = def.build_ticks
-	if _extends_shaft(state.base) and state.balance != null:
-		ticks = state.balance.lift_segment_ticks
+	var ticks: int = ticks_of(state)
 	state.budget.spend(cost_of(state))
 	var site_id: StringName = &""
 	for planned: RoomState in _planned(state.base):

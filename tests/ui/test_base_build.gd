@@ -97,6 +97,26 @@ func test_palette_offers_only_unlocked_rooms() -> void:
 
 
 ## Every research unlock, and an empty dug Level 2 below, then a refresh.
+## A lift ghost on an existing shaft shows what the command charges: the segment price and
+## time for the one missing level ($100k, 1 h), not the full lift (m25-lean-start.md
+## section 2).
+func test_lift_ghost_on_a_shaft_shows_the_segment_price() -> void:
+	await _unlock_everything()
+	var state: GameState = _simulation.state
+	state.base.add_room(&"room_lift", 1, Vector2i(24, 8))
+	var ghost: PlacementGhost = _ghost()
+	_view.get_build().start_placing(&"room_lift")
+	ghost.move_to(Vector2i(24, 8))
+	assert_str(ghost.reason()).is_empty()
+	var command := ghost.command() as PlaceRoomCommand
+	assert_int(ghost.cost_k()).is_equal(command.cost_of(state)).is_equal(100)
+	assert_int(ghost.build_ticks()).is_equal(command.ticks_of(state)).is_equal(60)
+	assert_str(_view.get_palette().get_hint()).contains("$100k").contains("1 h")
+	ghost.move_to(Vector2i(2, 16))
+	assert_int(ghost.cost_k()).is_equal(400)
+	assert_int(ghost.build_ticks()).is_equal(240)
+
+
 func _unlock_everything() -> void:
 	ConstructionFixture.unlock_all(_simulation.state)
 	_simulation.state.budget.funds_k = 100000
