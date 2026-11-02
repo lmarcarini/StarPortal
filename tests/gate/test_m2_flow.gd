@@ -153,8 +153,13 @@ func _build_lab_with_corridor(player: M15Player) -> void:
 	assert_bool(lab.powered_on).is_true()
 	assert_float(PowerRules.charge_mw(player.state())).is_equal(20.0)
 	var line: String = "Research Lab on: charging lowered to 20 MW."
-	var entry: LogEntry = player.state().operations_log.entries[-1]
+	var entry: LogEntry = player.state().operations_log.entries[-2]
 	assert_str(ArchiveLogRow.line_for(entry, player.state())).is_equal(line)
+	var staffed: LogEntry = player.state().operations_log.entries[-1]
+	assert_str(ArchiveLogRow.line_for(staffed, player.state())).is_equal(
+		"Research Lab staffed: 2 scientists."
+	)
+	assert_int(StaffRules.assigned(player.state(), lab).size()).is_equal(2)
 
 
 func _corridor_built_at(state: GameState, cell: Vector2i) -> bool:
@@ -182,7 +187,8 @@ func _dig_level_2(player: M15Player) -> void:
 
 
 ## At the month-end the budget gains the $3,000k allocation less the upkeep: the starting
-## $190k, the bank's $10k and the lab's $60k (it is on); corridors pay nothing.
+## $190k, the bank's $10k and the lab's $60k (it is on); corridors pay nothing. The five
+## starting staff are paid $145k (m26-staff-and-money.md section 7).
 func _assert_month_end(player: M15Player) -> void:
 	var closes: Array[int] = []
 	player.simulation.month_closed.connect(
@@ -191,7 +197,7 @@ func _assert_month_end(player: M15Player) -> void:
 	var funds: int = player.state().budget.funds_k
 	while closes.is_empty():
 		player.step()
-	assert_int(player.state().budget.funds_k).is_equal(funds + 3000 - (190 + 10 + 60))
+	assert_int(player.state().budget.funds_k).is_equal(funds + 3000 - (190 + 10 + 60) - 145)
 
 
 ## With the lab switched off and charging back at 25 MW, the charge out-runs the open

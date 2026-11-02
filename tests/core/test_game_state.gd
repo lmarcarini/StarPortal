@@ -190,6 +190,7 @@ func test_to_dict_sections() -> void:
 				"operations_log",
 				"unlocks",
 				"research",
+				"staff",
 			]
 		)
 	)

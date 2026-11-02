@@ -111,9 +111,13 @@ func _build_lab_after_bank(player: M15Player) -> void:
 	assert_int(_wait(player, lab.is_built)).is_equal(8 * 60)
 	assert_bool(lab.powered_on).is_true()
 	assert_float(PowerRules.charge_mw(player.state())).is_equal(20.0)
-	var entry: LogEntry = player.state().operations_log.entries[-1]
+	var entry: LogEntry = player.state().operations_log.entries[-2]
 	var line: String = ArchiveLogRow.line_for(entry, player.state())
 	assert_str(line).is_equal("Research Lab on: charging lowered to 20 MW.")
+	var staffed: LogEntry = player.state().operations_log.entries[-1]
+	assert_str(ArchiveLogRow.line_for(staffed, player.state())).is_equal(
+		"Research Lab staffed: 2 scientists."
+	)
 
 
 ## SILL's lock energy is ready about 17.3 hours into the game (section 1); it locks.

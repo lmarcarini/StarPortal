@@ -3,19 +3,20 @@ extends RefCounted
 ## Brings saved data forward to the current save format, one version at a time.
 ## Each step is a function Dictionary -> Dictionary that turns data at version N into data
 ## at version N + 1. Steps are pure: no side effects, no autoloads.
-## M2 and M2.5 (v12, docs/content/m25-lean-start.md section 7) are clean breaks: saves older
+## M2, M2.5 (v12, docs/content/m25-lean-start.md section 7) and M2.6 (v13,
+## docs/content/m26-staff-and-money.md section 8) are clean breaks: saves older
 ## than [constant OLDEST_VERSION] are not migrated but
 ## rejected with &"old_format_version" (owner ruling on card #133). Steps for later versions
 ## go in built_in_steps().
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 12
+const TARGET_VERSION: int = 13
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
-const OLDEST_VERSION: int = 12
+const OLDEST_VERSION: int = 13
 
 
-## Returns the built-in steps, keyed by the version they migrate from; none yet since the M2
+## Returns the built-in steps, keyed by the version they migrate from; none yet since the M2.6
 ## clean break. (A function, not a constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
 	var built_in: Dictionary[int, Callable] = {}

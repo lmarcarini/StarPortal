@@ -50,6 +50,8 @@ func _samples() -> Array[Command]:
 		DigLevelCommand.new(),
 		StartResearchCommand.create(&"bank_array"),
 		CancelResearchCommand.new(),
+		AssignStaffCommand.create(&"person_1", &"room_2"),
+		UnassignStaffCommand.create(&"person_2"),
 	]
 
 
@@ -143,6 +145,7 @@ func test_defaults_are_registered_lazily() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"assign_staff",
 				&"cancel_build",
 				&"cancel_research",
 				&"close_wormhole",
@@ -160,6 +163,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"set_flag",
 				&"start_research",
 				&"switch_room",
+				&"unassign_staff",
 			]
 		)
 	)
@@ -176,6 +180,7 @@ func test_register_type_adds_a_type() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"assign_staff",
 				&"cancel_build",
 				&"cancel_research",
 				&"close_wormhole",
@@ -194,6 +199,7 @@ func test_register_type_adds_a_type() -> void:
 				&"set_flag",
 				&"start_research",
 				&"switch_room",
+				&"unassign_staff",
 			]
 		)
 	)
@@ -212,6 +218,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"assign_staff",
 				&"cancel_build",
 				&"cancel_research",
 				&"close_wormhole",
@@ -229,6 +236,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"set_flag",
 				&"start_research",
 				&"switch_room",
+				&"unassign_staff",
 			]
 		)
 	)

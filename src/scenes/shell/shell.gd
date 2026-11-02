@@ -89,7 +89,7 @@ func quick_save() -> void:
 ## Loads slot [constant QUICK_SLOT], restarts SimClock with it and shows a toast. On failure
 ## the running game carries on.
 func quick_load() -> void:
-	var result: Result = SaveService.load_game(QUICK_SLOT)
+	var result: Result = SaveService.load_game(QUICK_SLOT, GameDefs.from_registry(Registry))
 	if not result.is_ok:
 		if result.error_code == &"missing_file":
 			_show_toast(&"UI_QUICK_SAVE_MISSING")

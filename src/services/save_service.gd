@@ -50,8 +50,10 @@ func save_game(state: GameState, slot: StringName) -> Result:
 ## value. The state is checked with GameState.validate_dict() before it is built, so a
 ## hand-edited value of the wrong type fails with &"invalid_state" instead of loading as a
 ## default. A header "tick" that differs from the state's clock tick also fails with
-## &"invalid_state". Emits EventBus.game_loaded on success. Never crashes on a bad file.
-func load_game(slot: StringName) -> Result:
+## &"invalid_state". With [param defs], saved ids are also checked against the content
+## (GameState.validate_dict()). Emits EventBus.game_loaded on success. Never crashes on a bad
+## file.
+func load_game(slot: StringName, defs: GameDefs = null) -> Result:
 	if not is_valid_slot_name(slot):
 		return Result.fail(&"bad_slot_name", "invalid slot name '%s'" % slot)
 	var read := _read_data(slot_path(slot))
@@ -65,7 +67,7 @@ func load_game(slot: StringName) -> Result:
 	var checked := _check_header(data)
 	if not checked.is_ok:
 		return checked
-	var built := _build_state(data)
+	var built := _build_state(data, defs)
 	if built.is_ok:
 		EventBus.game_loaded.emit(slot)
 	return built
@@ -247,10 +249,11 @@ static func _check_header(data: Dictionary) -> Result:
 
 ## Validates the "state" of migrated, header-checked [param data] and returns the built
 ## GameState as the value. Fails with &"invalid_state" when GameState.validate_dict()
-## reports errors or when the header "tick" differs from the state's clock tick.
-static func _build_state(data: Dictionary) -> Result:
+## reports errors (ids checked against [param defs] when given) or when the header "tick"
+## differs from the state's clock tick.
+static func _build_state(data: Dictionary, defs: GameDefs = null) -> Result:
 	var state_data: Dictionary = data["state"]
-	var errors := GameState.validate_dict(state_data)
+	var errors := GameState.validate_dict(state_data, defs)
 	if not errors.is_empty():
 		return Result.fail(&"invalid_state", "; ".join(errors))
 	var state := GameState.from_dict(state_data)

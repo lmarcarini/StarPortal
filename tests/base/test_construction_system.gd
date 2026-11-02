@@ -23,7 +23,8 @@ func test_room_is_built_after_its_time_and_posts_once() -> void:
 	ConstructionFixture.advance(game, system, 1)
 	assert_bool(lab.is_built()).is_true()
 	ConstructionFixture.advance(game, system, 10)
-	assert_array(ConstructionFixture.event_names(game)).is_equal([&"room_built"])
+	# The first lab also takes the two waiting scientists (StaffChanges.auto_assign()).
+	assert_array(ConstructionFixture.event_names(game)).is_equal([&"staff_changed", &"room_built"])
 
 
 func test_fourth_site_waits_in_the_queue() -> void:
@@ -81,8 +82,9 @@ func test_demolish_refunds_half_and_takes_a_quarter_of_the_time() -> void:
 	assert_object(game.base.find_room(lab.id)).is_not_null()
 	ConstructionFixture.advance(game, system, 1)
 	assert_object(game.base.find_room(lab.id)).is_null()
+	# The lab's two auto-assigned scientists are released at once.
 	assert_array(ConstructionFixture.event_names(game)).is_equal(
-		[&"budget_changed", &"room_demolished"]
+		[&"staff_changed", &"budget_changed", &"room_demolished"]
 	)
 
 
