@@ -30,6 +30,7 @@ func before_test() -> void:
 
 
 func after_test() -> void:
+	EventBus.bind_simulation(null)
 	if is_instance_valid(_root):
 		_root.free()
 	TranslationServer.set_locale(_real_locale)
@@ -127,6 +128,27 @@ func test_a_room_under_construction_shows_its_progress() -> void:
 	EventBus.room_demolished.emit(&"none")
 	assert_str(_view.get_room_panel().lines()[5]).is_equal("Demolishing: 50%, 1 h left")
 	assert_int(_view.get_plan().progress_of(room.id).kind).is_equal(SiteProgress.Kind.DEMOLISHING)
+
+
+func test_switching_the_workshop_while_paused_updates_the_time_left() -> void:
+	var state: GameState = _simulation.state
+	for def: DefBase in Registry.get_all_of(RoomDef):
+		state.room_defs[def.id] = def
+	state.clock.is_paused = true
+	state.clock.tick = 0
+	EventBus.bind_simulation(_simulation)
+	var workshop: RoomState = state.base.add_room(BuildSpeed.WORKSHOP_DEF, 1, Vector2i(26, 2))
+	workshop.powered_on = false
+	var lab: RoomState = state.base.add_room(&"room_research_lab", 1, Vector2i(4, 4))
+	lab.build_ticks_left = 480
+	EventBus.room_build_started.emit(lab.id)
+	_view.get_plan().select(lab.id)
+	assert_int(_view.get_plan().progress_of(lab.id).ticks_left).is_equal(480)
+	assert_str(_view.get_room_panel().lines()[5]).contains("8 h left")
+	var result: CommandResult = _simulation.submit(SwitchRoomCommand.create(workshop.id, true))
+	assert_bool(result.is_ok).override_failure_message(result.detail).is_true()
+	assert_int(_view.get_plan().progress_of(lab.id).ticks_left).is_equal(384)
+	assert_str(_view.get_room_panel().lines()[5]).contains("7 h left")
 
 
 func test_progress_text_formats_time_left() -> void:

@@ -286,6 +286,20 @@ func _connect_build_events(on: bool) -> void:
 			event.connect(_on_build_event)
 		else:
 			event.disconnect(_on_build_event)
+	if on:
+		EventBus.power_allocation_changed.connect(_on_power_changed)
+	else:
+		EventBus.power_allocation_changed.disconnect(_on_power_changed)
+
+
+## A room switched on or off (a Workshop changes every site's and the dig's time left):
+## rereads only the progress, the level column and the SELECTED panel, also while paused.
+func _on_power_changed() -> void:
+	if _simulation == null or not is_node_ready():
+		return
+	_show_progress()
+	_levels.refresh()
+	_on_selection_changed(_plan.selected())
 
 
 func _on_build_event(_arg: Variant = null) -> void:
