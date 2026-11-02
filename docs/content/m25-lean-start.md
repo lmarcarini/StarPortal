@@ -289,20 +289,16 @@ finished project ids.
 
 ---
 
-## 8. Open questions for the owner
+## 8. Owner decisions (2026-11-01)
 
-1. **Archive.** Cut the room from M2.5 and bring it back in M4 as the artefact store (PO
-   proposal)? Or keep it locked with a small role?
-2. **Energy blocks.** Apply 5 MW blocks now (PO recommendation), or keep M2's numbers until
-   tuning?
-3. **Workshop effect.** Is "sites build 25% faster while on" the right small role, or should
-   the Workshop stay locked until prototypes like Quarters and the Infirmary?
-4. **Lock estimator.** The bible says the console never states an address's cost until the
-   lock estimator is researched. Should it join this list as an eighth project, or wait for
-   M4's Gate branch? (PO proposal: wait; the M1.5 puzzles state their charges in the
-   documents.)
+The owner approved this design and answered the open questions:
 
-**Decided here as PO proposals:** one level at start with Gate Room, Control Room and one
-diesel plant; $6,000k start; seven projects; the Research Lab replaces the Physics Lab;
-Quarters and Infirmary locked until staff; the Ring stays on Level 1 and digs go downward;
-save v12.
+1. **Archive.** Cut from M2.5; it returns in M4 as the artefact store.
+2. **Energy blocks.** Apply the 5 MW blocks now.
+3. **Workshop.** "Sites and digs finish 25% faster while on" is its role for now.
+4. **Lock estimator.** Waits for M4's Gate branch.
+
+**Also decided (PO proposals, approved with the design):** one level at start with Gate Room,
+Control Room and one diesel plant; $6,000k start; seven projects; the Research Lab replaces the
+Physics Lab; Quarters and Infirmary locked until staff; the Ring stays on Level 1 and digs go
+downward; save v12.
