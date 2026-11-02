@@ -12,6 +12,11 @@ extends SimSystem
 ## Sites building at once; later sites queue.
 const MAX_ACTIVE_SITES: int = 3
 
+# Memory only: the base and RoomState.revision at which the base was last found idle. A room
+# only gets work by setting its build or demolition ticks, which moves the revision.
+var _idle_base: int = -1
+var _idle_revision: int = -1
+
 
 ## Returns the system id, &"construction".
 func get_id() -> StringName:
@@ -21,7 +26,7 @@ func get_id() -> StringName:
 ## Advances the dig, the active sites and every demolition by one tick.
 func tick(state: GameState) -> void:
 	_tick_dig(state)
-	if not _has_work(state.base):
+	if _is_idle(state.base):
 		return
 	_tick_sites(state)
 	_tick_demolitions(state)
@@ -35,6 +40,19 @@ static func site_queue(base: BaseState) -> Array[StringName]:
 		if not room.is_built() and not room.site_key() in keys:
 			keys.append(room.site_key())
 	return keys
+
+
+## True when no room of [param base] is building or coming down. Remembers an idle base until
+## a room's build or demolition state changes, so an idle tick skips the scan of the rooms.
+func _is_idle(base: BaseState) -> bool:
+	if _idle_revision == RoomState.revision and _idle_base == base.get_instance_id():
+		return true
+	if _has_work(base):
+		_idle_revision = -1
+		return false
+	_idle_revision = RoomState.revision
+	_idle_base = base.get_instance_id()
+	return true
 
 
 ## True when a room of [param base] is building or coming down.
