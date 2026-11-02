@@ -244,7 +244,7 @@ more cells of wall are neighbours for adjacency bonuses.
 | --- | --- | --- |
 | Gate Room | 8 × 8 | Fixed on Level 3, the deepest original level |
 | Control Room | 5 × 3 | Fixed, against the Gate Room's window wall |
-| Capacitor Bank | 3 × 2 | The first is a fixed alcove off the Gate Room |
+| Capacitor Bank | 3 × 2 | Anywhere on the plan (M2.5: no reserved alcove) |
 | Power Plant | 5 × 4 | Tiers upgrade in place, same footprint |
 | Lab (physics, xenobiology, linguistics, engineering) | 4 × 3 | |
 | Analysis Centre | 4 × 3 | |
