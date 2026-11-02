@@ -93,6 +93,7 @@ func test_transient_references_are_never_saved() -> void:
 				"operations_log",
 				"unlocks",
 				"research",
+				"staff",
 			]
 		)
 	)

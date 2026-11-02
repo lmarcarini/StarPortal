@@ -5,7 +5,8 @@ extends SimSystem
 ## the queue. A site is every room sharing a site key (a corridor run, a lift shaft, stairs).
 ## A lift segment (LiftShafts) builds outside the slots. A dug level extends every lift shaft
 ## (LiftShafts.extend()). A finished room switches on taking power from charging first
-## (FinishingPower). A running Workshop speeds sites and the dig up by 25% (BuildSpeed).
+## (FinishingPower) and, when it is the first of its type, takes the waiting crew
+## (StaffChanges.auto_assign()). A running Workshop speeds sites and the dig up by 25% (BuildSpeed).
 ## Draws no power.
 ## Posts room_built(site id), room_demolished(id) and level_dug(level), each once:
 ## room_demolished carries the cell's room id for a corridor (each cell is its own demolition
@@ -94,6 +95,7 @@ func _tick_sites(state: GameState, step: int) -> void:
 			LiftShafts.join_shaft(state.base, rooms)
 			for room: RoomState in rooms:
 				FinishingPower.switch_on(state, room)
+				StaffChanges.auto_assign(state, room)
 			PowerSystem.settle(state)
 			state.events.post(&"room_built", [key])
 

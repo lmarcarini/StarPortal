@@ -25,6 +25,7 @@ func _state() -> GameState:
 	state.base.rooms.clear()
 	state.base.add_room(&"room_lab", 1, Vector2i(0, 0))
 	state.base.add_room(&"room_plant", 1, Vector2i(10, 0))
+	state.staff = StaffState.new()
 	return state
 
 

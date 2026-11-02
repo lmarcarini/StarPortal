@@ -196,7 +196,7 @@ func _reload(run: SoakRun) -> void:
 	var before: Dictionary = run.simulation.state.to_dict()
 	var saved: Result = _service.save_game(run.simulation.state, SLOT)
 	assert_bool(saved.is_ok).override_failure_message(str(saved.error_code)).is_true()
-	var loaded: Result = _service.load_game(SLOT)
+	var loaded: Result = _service.load_game(SLOT, _defs)
 	assert_bool(loaded.is_ok).override_failure_message(str(loaded.error_code)).is_true()
 	var original: Simulation = run.simulation
 	var loaded_state: GameState = loaded.value

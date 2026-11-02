@@ -32,7 +32,22 @@ static func entries_for(
 			return _finished_room_entries(event_name, args, state, tick)
 		&"research_done":
 			return [LogEntry.create(tick, &"research", &"", {"project_id": _text(args)})]
+		&"staff_changed":
+			return _staff_entries(args, tick)
 	return []
+
+
+## The "staff" entry of a staff_changed event that is logged: the first room of a type took
+## the waiting crew (&"auto_assigned") or a room coming down released its people
+## (&"released"); args "reason", "room" (def id) and "count". Player moves are not logged.
+static func _staff_entries(args: Array, tick: int) -> Array[LogEntry]:
+	if args.size() != 3 or not args[2] is int:
+		return []
+	var reason: StringName = StringName(str(args[0]))
+	if not reason in [StaffChanges.AUTO_ASSIGNED, StaffChanges.RELEASED]:
+		return []
+	var details: Dictionary = {"reason": String(reason), "room": str(args[1]), "count": args[2]}
+	return [LogEntry.create(tick, &"staff", &"", details)]
 
 
 ## The "power" entry of a room that finished: charging lowered for it ("room", "charge_mw")

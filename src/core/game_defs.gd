@@ -21,12 +21,16 @@ var rooms: Array[RoomDef] = []
 var documents: Array[DocumentDef] = []
 ## Every research project and locked slot, in Registry load order (sorted by path).
 var research: Array[ResearchDef] = []
+## Every staff role, in Registry load order (sorted by path).
+var roles: Array[RoleDef] = []
+## The staff name list (&"staff_names"), or null.
+var staff_names: StaffNameListDef = null
 
 
 ## Returns the definitions loaded by [param registry], the Registry autoload passed in: the
 ## balance, the home anchor field (&"anchors_home"), every WorldDef, every RoomDef, every
-## DocumentDef and every ResearchDef. Missing ones stay null or empty; GameSetup.build()
-## reports them.
+## DocumentDef, every ResearchDef, every RoleDef and the staff name list. Missing ones stay
+## null or empty; GameSetup.build() reports them.
 static func from_registry(registry: Node) -> GameDefs:
 	var defs := GameDefs.new()
 	var balance_def: Variant = registry.call(&"balance")
@@ -51,4 +55,11 @@ static func from_registry(registry: Node) -> GameDefs:
 	for def: Variant in research:
 		if def is ResearchDef:
 			defs.research.append(def)
+	var roles: Array = registry.call(&"get_all_of", RoleDef)
+	for def: Variant in roles:
+		if def is RoleDef:
+			defs.roles.append(def)
+	var names_def: Variant = registry.call(&"get_def", StaffNameListDef.NAMES_ID)
+	if names_def is StaffNameListDef:
+		defs.staff_names = names_def
 	return defs

@@ -88,6 +88,7 @@ func test_outbox_is_transient() -> void:
 				"operations_log",
 				"unlocks",
 				"research",
+				"staff",
 			]
 		)
 	)

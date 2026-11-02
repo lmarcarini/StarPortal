@@ -77,6 +77,11 @@ const BALANCE_ID: StringName = &"balance"
 @export var starting_budget_k: int = 6000
 ## Fixed allocation paid at each month-end, in thousands of dollars (m2-base.md section 5).
 @export var monthly_allocation_k: int = 3000
+## Salary of a skill-0 person, in $k a month: salary = base + per skill × skill
+## (m26-staff-and-money.md section 1: skill 1 = $20k, skill 3 = $30k, skill 5 = $40k).
+@export var salary_base_k: int = 15
+## Salary added per skill point, in $k a month.
+@export var salary_per_skill_k: int = 5
 
 
 func _init() -> void:

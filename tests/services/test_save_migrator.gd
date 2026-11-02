@@ -29,11 +29,11 @@ func test_current_version_is_pass_through() -> void:
 	assert_dict(result.value).is_equal(data)
 
 
-## The target and oldest loadable version are both 12 (the M2.5 clean break,
-## m25-lean-start.md section 7), with no steps.
-func test_target_version_is_twelve() -> void:
-	assert_int(SaveMigrator.TARGET_VERSION).is_equal(12)
-	assert_int(SaveMigrator.OLDEST_VERSION).is_equal(12)
+## The target and oldest loadable version are both 13 (the M2.6 clean break,
+## m26-staff-and-money.md section 8), with no steps.
+func test_target_version_is_thirteen() -> void:
+	assert_int(SaveMigrator.TARGET_VERSION).is_equal(13)
+	assert_int(SaveMigrator.OLDEST_VERSION).is_equal(13)
 	assert_dict(SaveMigrator.built_in_steps()).is_empty()
 
 
@@ -48,7 +48,7 @@ func test_old_versions_fail() -> void:
 
 ## A JSON-parsed version (a float such as 1.0) is accepted.
 func test_json_float_version_is_accepted() -> void:
-	var parsed: Variant = JSON.parse_string('{"format_version": 12, "tick": 3}')
+	var parsed: Variant = JSON.parse_string('{"format_version": 13, "tick": 3}')
 	var data: Dictionary = parsed
 	var result := SaveMigrator.migrate(data)
 	assert_bool(result.is_ok).is_true()

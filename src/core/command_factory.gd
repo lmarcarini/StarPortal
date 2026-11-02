@@ -69,6 +69,8 @@ static func register_defaults() -> void:
 	_types[DigLevelCommand.TYPE] = DigLevelCommand
 	_types[StartResearchCommand.TYPE] = StartResearchCommand
 	_types[CancelResearchCommand.TYPE] = CancelResearchCommand
+	_types[AssignStaffCommand.TYPE] = AssignStaffCommand
+	_types[UnassignStaffCommand.TYPE] = UnassignStaffCommand
 
 
 ## Drops every registration, so tests can restore a clean registry. The built-in types are

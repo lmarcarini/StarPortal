@@ -107,6 +107,11 @@ signal research_cancelled(project_id: StringName)
 ## through the outbox).
 @warning_ignore("unused_signal")
 signal research_done(project_id: StringName)
+## Emitted when people change rooms, with the reason (StaffChanges: &"assigned",
+## &"unassigned", &"auto_assigned" or &"released"), the def id of the room concerned and how
+## many people moved (posted through the outbox).
+@warning_ignore("unused_signal")
+signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared

@@ -30,4 +30,6 @@ dial_duration_ticks = 2
 max_open_ticks = 60
 starting_budget_k = 6000
 monthly_allocation_k = 3000
+salary_base_k = 15
+salary_per_skill_k = 5
 id = &"balance"
