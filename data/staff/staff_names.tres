@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StaffNameListDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/staff_name_list_def.gd" id="1_names"]
+
+; docs/content/m26-staff-and-money.md section 1: names that read the same in en and pt_BR.
+[resource]
+script = ExtResource("1_names")
+given_names = Array[String](["Ana", "Tom", "Lena", "Raul", "Mira", "Ines", "Kenji", "Dan", "Sara", "Laura", "Paulo", "Clara", "Marco", "Sofia", "Victor", "Julia", "Hugo", "Elena", "Daniel", "Nina", "Igor", "Lucas", "Marta", "Rafael", "Teresa", "Simon", "Vera", "Oscar", "Irene", "Leo"])
+surnames = Array[String](["Ferreira", "Okafor", "Brandt", "Mendes", "Kovacs", "Moreau", "Arai", "Kowalski", "Lind", "Costa", "Novak", "Silva", "Weber", "Rossi", "Tanaka", "Duarte", "Nilsen", "Moreno", "Barros", "Keller", "Lopes", "Ibsen", "Castro", "Varga", "Pereira", "Haas", "Ramos", "Sato", "Lima", "Berg"])
+id = &"staff_names"

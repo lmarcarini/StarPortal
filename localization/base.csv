@@ -138,3 +138,15 @@ BASE_POWER_RATE_UP,+,+
 BASE_MSG_CHARGING_LOWERED,{room} on: charging lowered to {mw} MW.,Em funcionamento: {room}. Carga reduzida para {mw} MW.
 BASE_MSG_FINISHED_OFF,{room} finished off. {reason},{room}: obra concluída sem energia. {reason}
 BASE_MSG_LIFT_SEGMENT_REFUSED,Lift not extended to Level {n}: needs {cost}. Build it from the palette.,Elevador não estendido ao Nível {n}: precisa de {cost}. Construa-o pela paleta.
+STAFF_ROLE_SCIENTIST,Scientist,Cientista
+STAFF_ROLE_ENGINEER,Engineer,Engenheiro
+STAFF_ROLE_ANALYST,Analyst,Analista
+STAFF_COUNT_SCIENTIST,{count} scientists,{count} cientistas
+STAFF_COUNT_ENGINEER,{count} engineers,{count} engenheiros
+STAFF_COUNT_ANALYST,{count} analysts,{count} analistas
+STAFF_COUNT_ONE_SCIENTIST,1 scientist,1 cientista
+STAFF_COUNT_ONE_ENGINEER,1 engineer,1 engenheiro
+STAFF_COUNT_ONE_ANALYST,1 analyst,1 analista
+LOG_KIND_STAFF,Staff,Pessoal
+LOG_LINE_STAFFED,{room} staffed: {people}.,{room} com equipe: {people}.
+LOG_LINE_STAFF_RELEASED,Staff unassigned from {room}: {count}.,Pessoal liberado de {room}: {count}.

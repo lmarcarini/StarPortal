@@ -4,7 +4,7 @@ extends DefBase
 ## a quarter turn, its build cost and time, its power draw or output, its monthly upkeep and
 ## its text keys. Read only at runtime.
 ## Bible: game-design.md#base-building-and-power, technical-architecture.md#data-model,
-## docs/content/m2-base.md (sections 1 and 3)
+## docs/content/m2-base.md (sections 1 and 3), docs/content/m26-staff-and-money.md section 3
 
 ## Footprint in cells (width × height) before rotation; each side at least 1.
 @export var size_cells: Vector2i = Vector2i.ONE
@@ -30,3 +30,27 @@ extends DefBase
 @export var name_key: StringName = &""
 ## Translation key of the room's one-line description.
 @export var description_key: StringName = &""
+## Role id (a RoleDef) of the people this room's staff slots take; empty when it has none.
+@export var staff_role: StringName = &""
+## Staff slots: people of [member staff_role] the room holds; 0 for none (plants, owner
+## 2026-11-02).
+@export var staff_slots: int = 0
+## Beds the room adds while built and not coming down (Control Room 6, Quarters 4).
+@export var beds: int = 0
+
+
+## The staff role, when the room has one.
+func get_references() -> Array[StringName]:
+	if staff_role.is_empty():
+		return []
+	return [staff_role]
+
+
+## Errors: slots without a role or a role without slots, and negative counts.
+func get_content_errors(_defs: Dictionary[StringName, DefBase]) -> Array[String]:
+	var errors: Array[String] = []
+	if staff_slots < 0 or beds < 0:
+		errors.append("has negative staff slots or beds")
+	if (staff_slots > 0) != (not staff_role.is_empty()):
+		errors.append("needs both a staff role and staff slots, or neither")
+	return errors
