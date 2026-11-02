@@ -1,0 +1,165 @@
+class_name ResearchView
+extends GameView
+## The Research tab (F4; docs/content/m25-lean-start.md section 3, "Where it lives"): the
+## project list with its header on the left and the SELECTED panel on the right. The tab is
+## available once a Research Lab has finished and stays so for the rest of the game. Up and
+## down (D-pad) move between rows; (A), Enter or the panel's button starts the focused
+## project, or cancels it while it runs. Every action is a command; a refusal shows on the
+## panel. The list rereads the state on every research, money, room and power event, so it
+## stays right while paused.
+## Bible: docs/content/m25-lean-start.md section 3
+
+var _simulation: Simulation = null
+## Set once a lab has finished in this game; the tab never hides again.
+var _available: bool = false
+var _signature: int = 0
+
+@onready var _list: ResearchList = %List
+@onready var _panel: ResearchPanel = %Panel
+
+
+func _ready() -> void:
+	_list.project_chosen.connect(_on_chosen)
+	_list.project_activated.connect(act)
+	_panel.action_pressed.connect(act)
+
+
+func _enter_tree() -> void:
+	_connect_events(true)
+
+
+func _exit_tree() -> void:
+	_connect_events(false)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		refresh()
+
+
+## Reads [param simulation]'s research.
+func setup(simulation: Simulation) -> void:
+	_simulation = simulation
+	_available = false
+	_panel.show_notice("")
+	refresh()
+	_check_available()
+
+
+func get_default_focus() -> Control:
+	var rows: Array[ResearchRow] = _list.rows()
+	return rows[0] if not rows.is_empty() else _panel.get_button()
+
+
+func get_title_key() -> StringName:
+	return &"RESEARCH_TITLE"
+
+
+## True once a Research Lab has finished in this game, or research has begun.
+func is_available() -> bool:
+	return _available
+
+
+## Returns the list, for tests.
+func get_list() -> ResearchList:
+	return _list
+
+
+## Returns the SELECTED panel, for tests.
+func get_panel() -> ResearchPanel:
+	return _panel
+
+
+## Starts [param project_id], or cancels it when it is the running project; shows a refusal.
+func act(project_id: StringName) -> void:
+	if _simulation == null or project_id.is_empty():
+		return
+	var command: Command = StartResearchCommand.create(project_id)
+	if _simulation.state.research.active == project_id:
+		command = CancelResearchCommand.new()
+	var result: CommandResult = _simulation.submit(command)
+	refresh()
+	_panel.show_notice("" if result.is_ok else ResearchText.refusal(result, _simulation.state))
+
+
+## Rereads the list and the panel from the simulation.
+func refresh() -> void:
+	if _simulation == null:
+		return
+	var state: GameState = _simulation.state
+	_list.show_state(state)
+	var shown: StringName = _panel.get_project()
+	if shown.is_empty() and not _list.rows().is_empty():
+		shown = _list.rows()[0].project_id
+	var def: ResearchDef = state.research_defs.get(shown)
+	_panel.show_project(state, def)
+	_signature = _research_signature(state)
+
+
+## True when [param state]'s base has a Research Lab that has finished building.
+static func has_finished_lab(state: GameState) -> bool:
+	for room: RoomState in state.base.rooms:
+		if room.def_id == ResearchRules.LAB_DEF and room.build_ticks_left <= 0:
+			return true
+	return false
+
+
+func _check_available() -> void:
+	if _available or _simulation == null:
+		return
+	var state: GameState = _simulation.state
+	if has_finished_lab(state) or state.research.is_running() or not state.research.done.is_empty():
+		_available = true
+		availability_changed.emit()
+
+
+func _on_chosen(project_id: StringName) -> void:
+	if _simulation != null:
+		var def: ResearchDef = _simulation.state.research_defs.get(project_id)
+		_panel.show_project(_simulation.state, def)
+
+
+func _connect_events(on: bool) -> void:
+	var signals: Array[Signal] = [
+		EventBus.research_started,
+		EventBus.research_cancelled,
+		EventBus.research_done,
+		EventBus.budget_changed,
+		EventBus.room_built,
+		EventBus.room_demolished,
+		EventBus.power_allocation_changed,
+	]
+	for event: Signal in signals:
+		if on:
+			event.connect(_on_event)
+		else:
+			event.disconnect(_on_event)
+	if on:
+		EventBus.tick_advanced.connect(_on_tick)
+	else:
+		EventBus.tick_advanced.disconnect(_on_tick)
+
+
+func _on_event(_arg: Variant = null) -> void:
+	_check_available()
+	refresh()
+
+
+## While shown, redraws when the time left changes by an hour or a lab goes on or off.
+func _on_tick(_tick: int) -> void:
+	if _simulation == null:
+		return
+	_check_available()
+	if is_visible_in_tree() and _research_signature(_simulation.state) != _signature:
+		refresh()
+
+
+static func _research_signature(state: GameState) -> int:
+	return hash(
+		[
+			state.research.active,
+			ceili(ResearchRules.ticks_left(state) / 60.0),
+			state.research.done.size(),
+			ResearchRules.has_lab_on(state),
+		]
+	)
