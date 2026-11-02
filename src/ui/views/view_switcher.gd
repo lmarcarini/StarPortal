@@ -3,11 +3,14 @@ extends Control
 ## Hosts the game views under a tab bar and shows one at a time. Each child of %Views is a
 ## [GameView]; its id is its node name in snake_case ([code]GateRoom[/code] is
 ## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
-## (view_next and view_previous wrap at the ends; view_gate_room, view_archive, view_base)
-## and the gamepad shoulders switch views. Hidden views stay in the tree and keep their own state,
-## but are invisible, do not process and cannot take focus or the mouse. Only the view root's
-## own process, focus and mouse modes are changed, and showing the view restores the values
-## it had before it was hidden; descendants inherit and keep their own settings.
+## (view_next and view_previous wrap at the ends; view_gate_room, view_archive, view_base,
+## view_research) and the gamepad shoulders switch views. A view that is not available
+## ([method GameView.is_available]: the Research tab before a lab finishes) has its tab
+## hidden, is skipped by view_next and view_previous, and its action does nothing.
+## Hidden views stay in the tree and keep their own state, but are invisible, do not process
+## and cannot take focus or the mouse. Only the view root's own process, focus and mouse modes
+## are changed, and showing the view restores the values it had before it was hidden;
+## descendants inherit and keep their own settings.
 ## The Archive's tab counts its unread documents ("Archive (2)"), as the Archive view
 ## reports them. When the Gate Room asks for a document (Read in the Archive on the wormhole
 ## screen), the switcher opens the Archive with that document selected. When the Gate Room
@@ -26,6 +29,8 @@ const GATE_ROOM: StringName = &"gate_room"
 const ARCHIVE: StringName = &"archive"
 ## Id of the Base view.
 const BASE: StringName = &"base"
+## Id of the Research view.
+const RESEARCH: StringName = &"research"
 
 const _ACTION_NEXT: StringName = &"view_next"
 const _ACTION_PREVIOUS: StringName = &"view_previous"
@@ -34,6 +39,7 @@ const _DIRECT_ACTIONS: Dictionary = {
 	&"view_gate_room": GATE_ROOM,
 	&"view_archive": ARCHIVE,
 	&"view_base": BASE,
+	&"view_research": RESEARCH,
 }
 
 var _ids: Array[StringName] = []
@@ -52,6 +58,7 @@ func _ready() -> void:
 	for _id: StringName in _ids:
 		_tabs.add_tab()
 	_refresh_titles()
+	_refresh_availability()
 	_tabs.tab_changed.connect(_on_tab_changed)
 	_tabs.tab_clicked.connect(_on_tab_clicked)
 	var own: NodePath = _tabs.get_path_to(_tabs)
@@ -79,6 +86,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func setup(simulation: Simulation) -> void:
 	for id: StringName in _ids:
 		_views[id].setup(simulation)
+	_refresh_availability()
 
 
 ## Shows the view [param view_id] ([constant GATE_ROOM], [constant ARCHIVE],
@@ -87,6 +95,8 @@ func setup(simulation: Simulation) -> void:
 func show_view(view_id: StringName) -> void:
 	if not _views.has(view_id):
 		push_warning("ViewSwitcher: unknown view %s" % view_id)
+		return
+	if not _views[view_id].is_available():
 		return
 	_activate(view_id)
 	_views[view_id].get_default_focus().grab_focus()
@@ -128,6 +138,7 @@ func _collect_views() -> void:
 		_views[id] = view
 		_set_active(id, false)
 		_connect_view(view)
+		view.availability_changed.connect(_refresh_availability)
 
 
 ## Listens to the requests of the views that make any: the Archive's unread count and the
@@ -163,13 +174,28 @@ func _view_for_event(event: InputEvent) -> StringName:
 		return _neighbour(-1)
 	for action: StringName in _DIRECT_ACTIONS:
 		if InputActions.is_new_press(event, action):
-			return _DIRECT_ACTIONS[action]
+			var id: StringName = _DIRECT_ACTIONS[action]
+			return id if _views.has(id) and _views[id].is_available() else &""
 	return &""
 
 
 ## Returns the id [param offset] tabs away from the current one, wrapping at the ends.
 func _neighbour(offset: int) -> StringName:
-	return _ids[posmod(_ids.find(_current) + offset, _ids.size())]
+	var index: int = _ids.find(_current)
+	for _step: int in _ids.size():
+		index = posmod(index + offset, _ids.size())
+		if _views[_ids[index]].is_available():
+			break
+	return _ids[index]
+
+
+## Hides the tab of every view that is not available; leaves a view that stops being
+## available for the first available one.
+func _refresh_availability() -> void:
+	for index: int in _ids.size():
+		_tabs.set_tab_hidden(index, not _views[_ids[index]].is_available())
+	if _views.has(_current) and not _views[_current].is_available():
+		_activate(_ids[0])
 
 
 func _refresh_titles() -> void:

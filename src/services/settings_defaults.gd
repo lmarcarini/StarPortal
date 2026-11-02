@@ -47,6 +47,7 @@ const VALUES: Dictionary = {
 		&"view_gate_room": {},
 		&"view_archive": {},
 		&"view_base": {},
+		&"view_research": {},
 		&"base_level_up": {},
 		&"base_level_down": {},
 		&"base_energy_layer": {},

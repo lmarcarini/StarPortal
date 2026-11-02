@@ -9,6 +9,9 @@ extends Control
 
 ## Called by the switcher before the view is shown, and again after a load with the new
 ## [param simulation]. The view drops anything it read from the previous one.
+## Emitted when [method is_available] may have changed.
+signal availability_changed
+
 @abstract func setup(simulation: Simulation) -> void
 
 ## Returns the control that takes focus when the view opens (gamepad). It must be focusable.
@@ -16,3 +19,9 @@ extends Control
 
 ## Returns the translation key of the view's tab title.
 @abstract func get_title_key() -> StringName
+
+
+## False while the view's tab is hidden (the Research tab before a lab finishes). The
+## switcher hides the tab, skips it with view_next and view_previous, and ignores its action.
+func is_available() -> bool:
+	return true
