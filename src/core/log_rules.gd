@@ -28,6 +28,8 @@ static func entries_for(
 			return [LogEntry.create(tick, &"horizon", StringName(_text(args)))]
 		&"capacitors_installed":
 			return [_power_entry(args, state, tick)]
+		&"research_done":
+			return [LogEntry.create(tick, &"research", &"", {"project_id": _text(args)})]
 	return []
 
 

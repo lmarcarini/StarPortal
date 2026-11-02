@@ -19,11 +19,14 @@ var authored_worlds: Array[WorldDef] = []
 var rooms: Array[RoomDef] = []
 ## Every document, in Registry load order (sorted by path).
 var documents: Array[DocumentDef] = []
+## Every research project and locked slot, in Registry load order (sorted by path).
+var research: Array[ResearchDef] = []
 
 
 ## Returns the definitions loaded by [param registry], the Registry autoload passed in: the
-## balance, the home anchor field (&"anchors_home"), every WorldDef, every RoomDef and every
-## DocumentDef. Missing ones stay null or empty; GameSetup.build() reports them.
+## balance, the home anchor field (&"anchors_home"), every WorldDef, every RoomDef, every
+## DocumentDef and every ResearchDef. Missing ones stay null or empty; GameSetup.build()
+## reports them.
 static func from_registry(registry: Node) -> GameDefs:
 	var defs := GameDefs.new()
 	var balance_def: Variant = registry.call(&"balance")
@@ -44,4 +47,8 @@ static func from_registry(registry: Node) -> GameDefs:
 	for def: Variant in documents:
 		if def is DocumentDef:
 			defs.documents.append(def)
+	var research: Array = registry.call(&"get_all_of", ResearchDef)
+	for def: Variant in research:
+		if def is ResearchDef:
+			defs.research.append(def)
 	return defs

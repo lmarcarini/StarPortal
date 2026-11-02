@@ -14,11 +14,10 @@ extends RefCounted
 ## taken, and closes the wormhole once the camera is back and the wormhole has been open a few
 ## ticks.
 ## Once the bank charges it builds on: a corridor run off the Level 1 spine and a Research Lab
-## against it (the lab completes off, since the bank holds the spare supply), and it digs each
-## extra level as soon as the money allows (DigLevelCommand), one at a time. Until research
-## exists, it grants itself the digging projects (Excavation survey, Lift shaft, Deep
-## excavation) directly (ConstructionFixture.grant_dig_research()) before its first dig
-## (m25-lean-start.md section 3); the unlocks are game state, so they survive a reload.
+## against it. When the lab stands off (the bank holds the spare supply), it lowers the bank's
+## charge rate by just enough and switches the lab on. It then researches R1-R6 in list order
+## (StartResearchCommand), each as soon as it may start, and digs each extra level as soon as
+## research and money allow (DigLevelCommand), one at a time (m25-lean-start.md section 3).
 ## Every random draw comes from the run's own GameState stream &"soak_bot", so two runs from
 ## the same seed act identically, and a saved and reloaded state carries the stream on. The
 ## picked address is the bot's own, not game state: it carries on across reloads with the bot.
@@ -100,6 +99,10 @@ var charge_sets: int = 0
 ## Base builds the bot started (corridor runs and rooms), and digs.
 var builds: int = 0
 var digs: int = 0
+## Commands the bot sent to get the lab on (charge lowered, lab switched on), and research
+## projects it started.
+var lab_steps: int = 0
+var research_started: int = 0
 
 var _next_action_tick: int = 0
 ## The address the bot will dial next, or null.
@@ -351,30 +354,33 @@ func _random_value(rng: RandomNumberGenerator) -> Variant:
 			return "value_%d" % rng.randi()
 
 
-## Builds the corridor run, then the lab against it once the run's site stands, then digs the
-## next level whenever a dig is allowed and affordable; never submits a refused command.
+## Builds the corridor run, then the lab against it once the run's site stands; then gets the
+## lab on, starts the next project and digs the next level whenever allowed and affordable.
+## Sends at most one command per call and never a refused one.
 func _work_base(simulation: Simulation) -> void:
 	var state: GameState = simulation.state
-	if (
-		builds >= 2
-		and (state.base.digging_level() != 0 or digs >= state.balance.dig_level_costs_k.size())
-	):
-		return
 	var next: Command = null
 	if builds == 0:
 		var run: Array[Vector2i] = LAB_CORRIDOR.duplicate()
 		next = PaintCorridorCommand.create(LAB_LEVEL, run)
 	elif builds == 1:
 		next = PlaceRoomCommand.create(LAB_DEF, LAB_LEVEL, LAB_ORIGIN)
-	else:
-		ConstructionFixture.grant_dig_research(state)
-		next = DigLevelCommand.new()
-	if not next.validate(state).is_ok:
+	if next != null:
+		if next.validate(state).is_ok:
+			simulation.submit(next)
+			builds += 1
 		return
-	simulation.submit(next)
-	if builds < 2:
-		builds += 1
-	else:
+	if SoakResearch.work_lab(simulation, LAB_DEF):
+		lab_steps += 1
+		return
+	if SoakResearch.work_research(simulation, SoakResearch.ORDER):
+		research_started += 1
+		return
+	if state.base.digging_level() != 0 or digs >= state.balance.dig_level_costs_k.size():
+		return
+	next = DigLevelCommand.new()
+	if next.validate(state).is_ok:
+		simulation.submit(next)
 		digs += 1
 
 

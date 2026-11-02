@@ -54,17 +54,6 @@ static func grown() -> GameState:
 	return game
 
 
-## Grants [param state] the digging projects (Excavation survey, Lift shaft, Deep excavation)
-## through UnlockRules.apply_to_game(), once: the soak bot's stand-in for research.
-static func grant_dig_research(state: GameState) -> void:
-	if state.unlocks.dig_depth >= 4:
-		return
-	for project_id: StringName in [&"excavation_survey", &"lift_shaft", &"deep_excavation"]:
-		for pair: Array in UnlockRules.PROJECTS[project_id]:
-			var effect: StringName = pair[0]
-			UnlockRules.apply_to_game(state, effect, pair[1])
-
-
 ## Validates and, when valid, applies [param command]; returns the validation result.
 static func run(game: GameState, command: Command) -> CommandResult:
 	var result: CommandResult = command.validate(game)

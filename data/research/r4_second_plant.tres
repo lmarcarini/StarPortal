@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1_research"]
+
+; docs/content/m25-lean-start.md section 3.
+[resource]
+script = ExtResource("1_research")
+order = 4
+cost_k = 500
+days = 3
+needs = Array[StringName]([])
+effects = [[&"unlock_room", &"room_power_plant"]]
+name_key = &"RESEARCH_SECOND_PLANT_NAME"
+line_key = &"RESEARCH_SECOND_PLANT_LINE"
+id = &"second_plant"
