@@ -125,14 +125,14 @@ func _lock_sill(player: M15Player) -> void:
 	assert_bool(player.close_wormhole()).is_true()
 
 
-## F4 opens the Research tab; clicking the Excavation survey row and its Start button starts it.
+## F4 opens the Research tab; clicking the Excavation survey node and its Start button starts it.
 func _start_survey_from_research_tab(player: M15Player) -> void:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
 	await UiInput.key(switcher, KEY_F4)
 	assert_str(String(switcher.current_view_id())).is_equal("research")
 	var view := switcher.get_view(&"research") as ResearchView
-	await UiInput.click(view.get_list().row_of(&"excavation_survey"))
+	await UiInput.click(view.get_board().get_tree_view().node_of(&"excavation_survey"))
 	var start: Button = view.get_panel().get_button()
 	assert_str(start.text).is_equal("Start")
 	var funds: int = player.state().budget.funds_k

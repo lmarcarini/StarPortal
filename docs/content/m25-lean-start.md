@@ -157,34 +157,53 @@ row's label: "Requires an alien find" or "Requires staff"):
 **Where it lives.** A **Research tab** (F4), after Gate Room F1, Archive F2 and Base F3.
 The tab is hidden until a Research Lab has finished building; F4 does nothing before then.
 Once a lab has finished, the tab stays for the rest of the game, even if the lab is switched
-off or demolished (Start is then greyed: "Needs a Research Lab that is on."). The list and
+off or demolished (Start is then greyed: "Needs a Research Lab that is on."). The tree and
 the SELECTED panel fill the whole view area. *(Changed by the owner on 2026-11-02: it was a
 view swapped into the Base tab with R, L3 or a power-strip button.)*
+
+**Tech tree** *(card #181, from the owner's M2.5 playtest)*. The list above became a tech
+tree with category sub-tabs: **Construction** (R1, R2, R3, R7), **Energy** (R4, R5, R6),
+**Gate** (empty for now: "Nothing to research yet"), **Alien** (the five alien-find slots)
+and **Staff** (the staff slots). The categories are data (`ResearchCategoryDef` under
+`data/research/categories/`); each project names one, and the validator checks it. The
+bible's Gate, Defence and Life branches can map onto new categories later without code. A
+sub-tab with a project to start shows a small dot ("Energy •").
 
 ```
 +-------------------------------------------------------------+---------------+
 | RESEARCH   Current: Excavation survey   1 d 6 h left  [=== ]| SELECTED      |
-|-------------------------------------------------------------| Bank array    |
-| > Excavation survey      $400k  2 d   Dig L2, Stairs  ACTIVE| $600k  3 days |
-|   Lift shaft             $300k  2 d   Lift     needs R1     | Up to 3       |
-|   Deep excavation        $800k  4 d   Dig L3-4 needs R2     | Capacitor     |
-|   Second plant           $500k  3 d   Plant         [Start] | Banks.        |
-|   Fuel contracts         $300k  2 d   Upkeep    needs R4    |               |
-|   Bank array             $600k  3 d   3 banks       [Start] | [Start]       |
-|   Field engineering      $500k  3 d   Workshop      [Start] |               |
-|   Unknown                Requires an alien find      locked |               |
-|   Unknown                Requires staff              locked |               |
+|-------------------------------------------------------------| Lift shaft    |
+| [Construction •] Energy •  Gate  Alien  Staff               | $300k  2 days |
+|                                                             | Build Lifts.  |
+|  +-----------------+   +-----------------+   +------------+ |               |
+|  |Excavation survey|---|Lift shaft       |---|Deep excav. | | [Start] greyed|
+|  |$400k · 2 d      |   |$300k · 2 d      |   |$800k · 4 d | | Needs         |
+|  |1 d 6 h left [==]|   |needs Excavation |   |needs Lift  | | research: ... |
+|  +-----------------+   +-----------------+   +------------+ |               |
+|  +-----------------+                                        |               |
+|  |Field engineering|                                        |               |
+|  |$500k · 3 d Start|                                        |               |
+|  +-----------------+                                        |               |
 +-------------------------------------------------------------+---------------+
 ```
 
-Rows are 48 px; at 1280 × 720 the whole list fits under the header, and it scrolls if it
-grows. Done projects move to the bottom, ticked. The SELECTED panel shows the project's line
-and **Start** (or **Cancel**, refund shown). Starting while another project runs is refused:
-"One project at a time." A finished project pauses the game like a finished building and
-writes a Log line: "Research done: Bank array. Up to 3 Capacitor Banks."
+Layout rule: the column is the prerequisite depth within the category (0 for a project that
+needs nothing in it), the row is the order within the column, by list order. A line joins
+each need to the project that needs it. A need in another category does not move the node;
+it shows as a short labelled stub ("from Second plant"). Node states: available (Start),
+active (progress bar and time left), done (ticked), needs (dimmed, naming the missing
+project) and locked ("Unknown" with its reason). The tree scrolls if it grows. The SELECTED
+panel shows the project's line and **Start** (or **Cancel**, refund shown). Starting while
+another project runs is refused: "One project at a time." A finished project pauses the game
+like a finished building and writes a Log line: "Research done: Bank array. Up to 3
+Capacitor Banks."
 
-**Gamepad.** The tab is reached like the others, with the shoulder buttons. The D-pad moves
-between rows, and A starts or cancels the focused project.
+**Input.** The mouse clicks a node. On a gamepad the tab is reached like the others; the
+D-pad moves along the tree (left and right by column, to the nearest row; up and down within
+a column), the shoulder buttons switch sub-tabs (past the first or last sub-tab they switch
+the main tabs, so the player can always leave), and A starts or cancels the focused project.
+On the keyboard, Q and E still switch the main tabs; the sub-tabs are clicked or reached by
+moving focus up to them.
 
 ---
 
