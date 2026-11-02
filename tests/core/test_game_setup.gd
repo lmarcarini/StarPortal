@@ -41,7 +41,9 @@ func test_build_from_real_content_runs_both_systems() -> void:
 	var ids: Array[StringName] = []
 	for system: SimSystem in simulation._systems:
 		ids.append(system.get_id())
-	assert_array(ids).is_equal([&"power", &"gate", &"documents", &"economy", &"construction"])
+	assert_array(ids).is_equal(
+		[&"power", &"gate", &"documents", &"economy", &"construction", &"research"]
+	)
 	for index: int in 60:
 		simulation.advance_tick()
 	assert_float(state.power.stored_mwh).is_equal_approx(25.0, 1e-9)
@@ -90,6 +92,7 @@ func test_transient_references_are_never_saved() -> void:
 				"address_book",
 				"operations_log",
 				"unlocks",
+				"research",
 			]
 		)
 	)

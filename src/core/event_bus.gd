@@ -84,6 +84,17 @@ signal room_demolished(site_id: StringName)
 ## Emitted when a new level is dug, with its number (posted through the outbox).
 @warning_ignore("unused_signal")
 signal level_dug(level: int)
+## Emitted when a research project starts, with its id (posted through the outbox).
+@warning_ignore("unused_signal")
+signal research_started(project_id: StringName)
+## Emitted when the running research project is cancelled, with its id (posted through the
+## outbox).
+@warning_ignore("unused_signal")
+signal research_cancelled(project_id: StringName)
+## Emitted when a research project finishes and its unlocks apply, with its id (posted
+## through the outbox).
+@warning_ignore("unused_signal")
+signal research_done(project_id: StringName)
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared

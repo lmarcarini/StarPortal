@@ -18,6 +18,7 @@ const _SECTIONS: Array[String] = [
 	"address_book",
 	"operations_log",
 	"unlocks",
+	"research",
 ]
 
 ## The simulation clock.
@@ -44,6 +45,8 @@ var address_book: AddressBookState = AddressBookState.new()
 var operations_log: LogState = LogState.new()
 ## What research has unlocked: buildable rooms, dig depth, bank cap, upkeep overrides.
 var unlocks: UnlockState = UnlockState.new()
+## The research project running, its progress and the projects done.
+var research: ResearchState = ResearchState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -54,6 +57,9 @@ var balance: BalanceConfig = null
 var galaxy: GalaxyCatalogue = null
 ## Every RoomDef by id, read only. Transient: not in to_dict(); GameSetup.build() sets it.
 var room_defs: Dictionary[StringName, RoomDef] = {}
+## Every ResearchDef by id, projects and locked slots, read only. Transient: not in
+## to_dict(); GameSetup.build() sets it.
+var research_defs: Dictionary[StringName, ResearchDef] = {}
 
 
 ## Returns a fresh campaign state seeded with [param base_seed]. The galaxy seed is
@@ -94,6 +100,7 @@ func to_dict() -> Dictionary:
 		"address_book": address_book.to_dict(),
 		"operations_log": operations_log.to_dict(),
 		"unlocks": unlocks.to_dict(),
+		"research": research.to_dict(),
 	}
 
 
@@ -113,6 +120,7 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.address_book = AddressBookState.from_dict(_dict_or_empty(data.get("address_book")))
 	state.operations_log = LogState.from_dict(_dict_or_empty(data.get("operations_log")))
 	state.unlocks = UnlockState.from_dict(_dict_or_empty(data.get("unlocks")))
+	state.research = ResearchState.from_dict(_dict_or_empty(data.get("research")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -126,7 +134,7 @@ static func from_dict(data: Dictionary) -> GameState:
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
 ## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book",
-## "operations_log" and "unlocks" must be objects, the sub-states must pass their own
+## "operations_log", "unlocks" and "research" must be objects, the sub-states must pass their own
 ## validate_dict(), and
 ## every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
@@ -186,6 +194,8 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return LogState.validate_dict(section)
 		"unlocks":
 			return UnlockState.validate_dict(section)
+		"research":
+			return ResearchState.validate_dict(section)
 	return []
 
 
