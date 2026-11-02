@@ -104,8 +104,10 @@ func _assert_start(player: M15Player) -> void:
 	assert_dict(player.state().worlds.statuses).is_empty()
 
 
-## Capacitor Bank is built as a room on the nearest valid spot to the Gate Room over its 360 build
-## ticks, takes the spare supply the moment it is completed, and the answer can then be charged.
+## Before the bank and while it is built, SILL's answer is refused for want of charge; the
+## Capacitor Bank is built as a room on the nearest valid spot to the Gate Room over its 360
+## build ticks, takes the spare supply the moment it is completed, and the answer can then be
+## charged.
 func _assert_no_dial_before_bank(player: M15Player) -> void:
 	var sill_glyphs: Array = M15Player.PUZZLES[0]["glyphs"]
 	var sill: GateAddress = player.address(sill_glyphs)

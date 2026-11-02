@@ -10,10 +10,6 @@ extends Control
 ## Emitted when the selection changes: a room id or [code]&""[/code].
 signal selection_changed(selected: StringName)
 
-## Former selection id of the capacitor alcove (removed by card #158). Nothing selects it any
-## more; kept only while base_view_power.gd (card #157) still compares against it.
-const ALCOVE: StringName = &"alcove"
-
 ## Level shown, 1 the top one.
 var level: int = 1
 ## Cell under the keyboard and gamepad cursor.

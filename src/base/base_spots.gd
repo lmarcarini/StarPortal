@@ -23,6 +23,8 @@ static func nearest_spot(
 		return NO_SPOT
 	var best: Vector2i = NO_SPOT
 	var best_key: Vector2i = Vector2i.MAX
+	# Rows top to bottom, columns left to right, and only a strictly better key replaces the
+	# best: so among equal keys the top-most, then left-most, spot wins (the tie-break).
 	for y: int in range(base.grid_size.y - def.size_cells.y + 1):
 		for x: int in range(base.grid_size.x - def.size_cells.x + 1):
 			var probe := RoomState.create(&"", def_id, level, Vector2i(x, y))

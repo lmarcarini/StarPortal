@@ -1,11 +1,13 @@
-## nearest valid spot to the Gate Room, and one click builds it. The bank completes after 6 hours
-## and takes the spare 26 MW; SILL then charges and locks, and the pole camera brings its documents.
-## The player paints a corridor and builds a Physics Lab against it on Level 2 (it completes off:
-## the bank holds all the spare power, and switching it on is refused), digs Level 4, and the
-## month-end pays the allocation less the upkeep. Last, with the total charge rate lowered below the
-## open wormhole's 20 MWh/h drain, a lock closes when the capacitors run empty. Bible: roadmap.md
-## (M2 check), technical-architecture.md#testing-and-tooling, docs/content/m2-base.md sections 2 to
-## 5
+## M2 end to end, headless, over the real data/ content: a new game opens on the Gate Room, whose
+## "Build capacitor bank" button switches to the Base tab with the bank's ghost on the nearest valid
+## spot to the Gate Room, and one click builds it. The bank completes after 6 hours and takes the
+## spare 26 MW; SILL then charges and locks, and the pole camera brings its documents. The player
+## paints a corridor and builds a Physics Lab against it on Level 2 (it completes off: the bank
+## holds all the spare power, and switching it on is refused), digs Level 4, and the month-end pays
+## the allocation less the upkeep. Last, with the total charge rate lowered below the open
+## wormhole's 20 MWh/h drain, a lock closes when the capacitors run empty.
+## Bible: roadmap.md (M2 check), technical-architecture.md#testing-and-tooling,
+## docs/content/m2-base.md sections 2 to 5
 extends GdUnitTestSuite
 
 const M15Player := preload("res://tests/gate/m15_player.gd")
@@ -69,6 +71,7 @@ func _on_event(event_name: StringName, args: Array) -> void:
 		_closed_reasons.append(args[0])
 
 
+## The Gate Room's button switches to the Base tab on Level 3 with the bank's ghost green on
 ## the nearest valid spot (BaseSpots.bank_spot); one click pays $600k and starts the site; the
 ## button is gone.
 func _build_bank_from_gate_room(player: M15Player) -> void:

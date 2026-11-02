@@ -1,9 +1,10 @@
 class_name RoomPanel
 extends VBoxContainer
-## output), monthly upkeep and status, then its description. With nothing selected it shows a hint.
-## Under the lines, a hold button offers the room's action (Cancel a site, Demolish a room) with its
-## refund, or why it is refused; the panel only emits [signal action_held]. Bible:
-## docs/content/m2-base.md sections 4 and 6
+## The selected-room panel of the Base tab, read only: the room's name, size, power draw (or
+## output), monthly upkeep and status, then its description. With nothing selected it shows
+## a hint. Under the lines, a hold button offers the room's action (Cancel a site, Demolish a
+## room) with its refund, or why it is refused; the panel only emits [signal action_held].
+## Bible: docs/content/m2-base.md sections 4 and 6
 
 ## Emitted when the action button's hold confirms; [param command] is the one to submit.
 signal action_held(command: Command)
