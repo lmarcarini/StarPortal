@@ -154,9 +154,12 @@ row's label: "Requires an alien find" or "Requires staff"):
 | Fission plant | Requires staff (research once staff exist, M3 or M4) |
 | Quarters, Infirmary | Requires staff (M3) |
 
-**Where it lives.** A **Research view** inside the Base tab (bible: Research lives inside the
-Base). **R**, or a **Research** button at the right end of the power strip, swaps the
-864 × 480 plan for the list; R again, Esc or (B) goes back to the plan.
+**Where it lives.** A **Research tab** (F4), after Gate Room F1, Archive F2 and Base F3.
+The tab is hidden until a Research Lab has finished building; F4 does nothing before then.
+Once a lab has finished, the tab stays for the rest of the game, even if the lab is switched
+off or demolished (Start is then greyed: "Needs a Research Lab that is on."). The list and
+the SELECTED panel fill the whole view area. *(Changed by the owner on 2026-11-02: it was a
+view swapped into the Base tab with R, L3 or a power-strip button.)*
 
 ```
 +-------------------------------------------------------------+---------------+
@@ -174,14 +177,14 @@ Base). **R**, or a **Research** button at the right end of the power strip, swap
 +-------------------------------------------------------------+---------------+
 ```
 
-Rows are 48 px; eight fit in the 480 px area with the header, and the list scrolls beyond
-that. Done projects move to the bottom, ticked. The SELECTED panel shows the project's line
+Rows are 48 px; at 1280 × 720 the whole list fits under the header, and it scrolls if it
+grows. Done projects move to the bottom, ticked. The SELECTED panel shows the project's line
 and **Start** (or **Cancel**, refund shown). Starting while another project runs is refused:
 "One project at a time." A finished project pauses the game like a finished building and
 writes a Log line: "Research done: Bank array. Up to 3 Capacitor Banks."
 
-**Gamepad.** Pressing the left stick (L3) toggles the Research view. The D-pad moves between
-rows, A starts or cancels the focused project, B returns to the plan.
+**Gamepad.** The tab is reached like the others, with the shoulder buttons. The D-pad moves
+between rows, and A starts or cancels the focused project.
 
 ---
 

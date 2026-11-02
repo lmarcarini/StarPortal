@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://src/ui/views/gate_room/gate_room_view.tscn" id="2_gate_room"]
 [ext_resource type="PackedScene" path="res://src/ui/views/archive/archive_view.tscn" id="3_archive"]
 [ext_resource type="PackedScene" path="res://src/ui/views/base/base_view.tscn" id="4_base"]
+[ext_resource type="PackedScene" path="res://src/ui/views/research/research_view.tscn" id="5_research"]
 
 [node name="ViewSwitcher" type="Control"]
 layout_mode = 3
@@ -44,4 +45,7 @@ layout_mode = 1
 layout_mode = 1
 
 [node name="Base" parent="Layout/Views" instance=ExtResource("4_base")]
+layout_mode = 1
+
+[node name="Research" parent="Layout/Views" instance=ExtResource("5_research")]
 layout_mode = 1

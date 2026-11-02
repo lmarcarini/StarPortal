@@ -7,6 +7,10 @@ extends Control
 ## Bible: game-design.md#core-loop, technical-architecture.md#signals-and-scenes,
 ## technical-architecture.md#input-accessibility-and-localisation
 
+## Emitted when [method is_available] may have changed; the switcher then shows or hides
+## the view's tab.
+signal availability_changed
+
 ## Called by the switcher before the view is shown, and again after a load with the new
 ## [param simulation]. The view drops anything it read from the previous one.
 @abstract func setup(simulation: Simulation) -> void
@@ -16,3 +20,9 @@ extends Control
 
 ## Returns the translation key of the view's tab title.
 @abstract func get_title_key() -> StringName
+
+
+## False while the view's tab is hidden (the Research tab before a lab finishes). The
+## switcher hides the tab, skips it with view_next and view_previous, and ignores its action.
+func is_available() -> bool:
+	return true

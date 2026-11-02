@@ -15,3 +15,22 @@ RESEARCH_ERR_NEEDS_PROJECT,Needs research: {name}.,Precisa da pesquisa: {name}.
 RESEARCH_ERR_FUNDS,Needs ${cost}k.,Precisa de ${cost}k.
 LOG_KIND_RESEARCH,Research,Pesquisa
 LOG_LINE_RESEARCH,Research done: {name}. {line},Pesquisa concluída: {name}. {line}
+RESEARCH_TITLE,Research,Pesquisa
+RESEARCH_HEADING,RESEARCH,PESQUISA
+RESEARCH_CURRENT,Current: {name},Atual: {name}
+RESEARCH_CURRENT_NONE,No project running,Nenhum projeto em andamento
+RESEARCH_LEFT,{time} left,faltam {time}
+RESEARCH_LEFT_PAUSED,"{time} left, paused: no lab on","faltam {time}, pausado: nenhum laboratório ligado"
+RESEARCH_DAYS_HOURS,{d} d {h} h,{d} d {h} h
+RESEARCH_DAYS,{n} d,{n} d
+RESEARCH_PANEL_COST,{cost} · {n} days,{cost} · {n} dias
+RESEARCH_STATE_START,Start,Iniciar
+RESEARCH_STATE_NEEDS,needs R{n},requer R{n}
+RESEARCH_STATE_ACTIVE,ACTIVE,ATIVO
+RESEARCH_STATE_DONE,done ✓,concluído ✓
+RESEARCH_STATE_LOCKED,locked,bloqueado
+RESEARCH_START,Start,Iniciar
+RESEARCH_CANCEL,Cancel ({refund} back),Cancelar ({refund} de volta)
+RESEARCH_SELECTED,SELECTED,SELECIONADO
+RESEARCH_ERR_OTHER,Not possible right now.,Não é possível agora.
+RESEARCH_ONE_LAB_ENOUGH,One lab is enough until staff arrive.,Um laboratório basta até a equipe chegar.
