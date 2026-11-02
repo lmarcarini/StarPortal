@@ -242,7 +242,8 @@ func _on_archive_requested(document_id: StringName) -> void:
 	show_view(ARCHIVE)
 
 
-## Opens the Base with the Capacitor Bank's ghost in the capacitor alcove.
+## Opens the Base with the Capacitor Bank's ghost on the nearest valid spot to
+## the Gate Room.
 func _on_capacitor_bank_requested() -> void:
 	if not _views.has(BASE):
 		return

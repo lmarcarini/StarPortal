@@ -39,14 +39,12 @@ static func first_room(state: GameState, def_id: StringName) -> RoomState:
 	return null
 
 
-## Returns the command that builds a Capacitor Bank in the capacitor alcove of [param state]
-## (needs its balance and room_defs).
-static func build_bank_in_alcove(state: GameState) -> PlaceRoomCommand:
-	var bank: RoomDef = state.room_defs[StartingBase.CAPACITOR_BANK_DEF]
-	var area: Rect2i = StartingBase.alcove(state.balance, bank)
-	return PlaceRoomCommand.create(
-		StartingBase.CAPACITOR_BANK_DEF, state.balance.capacitor_alcove_level, area.position
-	)
+## Returns the command that builds a Capacitor Bank of [param state] on the nearest valid spot
+## to the Gate Room (BaseSpots.bank_spot), as the Gate Room's button does (needs room_defs).
+static func build_first_bank(state: GameState) -> PlaceRoomCommand:
+	var gate: RoomState = BaseSpots.gate_room(state.base)
+	var spot: Vector2i = BaseSpots.bank_spot(state.base, state.room_defs)
+	return PlaceRoomCommand.create(StartingBase.CAPACITOR_BANK_DEF, gate.level, spot)
 
 
 ## Sets every bank's charge rate in [param state] to [param mw].

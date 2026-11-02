@@ -1,11 +1,11 @@
-## M2 end to end, headless, over the real data/ content: a new game opens on the Gate Room,
-## whose "Build capacitor bank" button switches to the Base tab with the bank's ghost in the
-## capacitor alcove, and one hold builds it. The bank completes after 6 hours and takes the
-## spare 26 MW; SILL then charges and locks, and the pole camera brings its documents. The
-## player paints a corridor and builds a Physics Lab against it on Level 2 (it completes off:
-## the bank holds all the spare power, and switching it on is refused), digs Level 4, and the
-## month-end pays the allocation less the upkeep. Last, with the total charge rate lowered
-## below the open wormhole's 20 MWh/h drain, a lock closes when the capacitors run empty.
+## M2 end to end, headless, over the real data/ content: a new game opens on the Gate Room, whose
+## "Build capacitor bank" button switches to the Base tab with the bank's ghost on the nearest valid
+## spot to the Gate Room, and one click builds it. The bank completes after 6 hours and takes the
+## spare 26 MW; SILL then charges and locks, and the pole camera brings its documents. The player
+## paints a corridor and builds a Physics Lab against it on Level 2 (it completes off: the bank
+## holds all the spare power, and switching it on is refused), digs Level 4, and the month-end pays
+## the allocation less the upkeep. Last, with the total charge rate lowered below the open
+## wormhole's 20 MWh/h drain, a lock closes when the capacitors run empty.
 ## Bible: roadmap.md (M2 check), technical-architecture.md#testing-and-tooling,
 ## docs/content/m2-base.md sections 2 to 5
 extends GdUnitTestSuite
@@ -71,8 +71,9 @@ func _on_event(event_name: StringName, args: Array) -> void:
 		_closed_reasons.append(args[0])
 
 
-## The Gate Room's button switches to the Base tab on Level 3 with the bank's ghost green in
-## the alcove; one hold pays $600k and starts the site; the button is gone.
+## The Gate Room's button switches to the Base tab on Level 3 with the bank's ghost green on
+## the nearest valid spot (BaseSpots.bank_spot); one click pays $600k and starts the site; the
+## button is gone.
 func _build_bank_from_gate_room(player: M15Player) -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -90,6 +91,8 @@ func _build_bank_from_gate_room(player: M15Player) -> void:
 	var ghost: PlacementGhost = base.get_build().get_ghost()
 	assert_bool(ghost.is_placing()).is_true()
 	assert_int(base.get_plan().level).is_equal(3)
+	var spot: Vector2i = BaseSpots.bank_spot(player.state().base, player.state().room_defs)
+	assert_vector(Vector2(ghost.origin)).is_equal(Vector2(spot))
 	assert_str(ghost.reason()).is_empty()
 	var funds: int = player.state().budget.funds_k
 	ghost.confirm()

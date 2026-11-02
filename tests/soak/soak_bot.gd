@@ -1,19 +1,18 @@
 extends RefCounted
-## Seeded stand-in player for the soak test. It sets random flags through SetFlagCommand
-## about 20 times per in-game day, pauses and resumes the clock at random, and adds and
-## releases named system holds through TimeControl (a dozen or so per month). Before anything
-## else on the Ring it builds the first Capacitor Bank as a room in the capacitor alcove
-## (PlaceRoomCommand), leaves the Ring alone until it is built, then gives it all the spare
-## supply as its charge rate once (SetChargeRateCommand). It then works the Ring on every call
-## with no command
-## waiting: with the Ring idle and no address picked it picks one (a console's Address Book
-## entry the bank can power sometimes, a real world's true address now and then, otherwise a random
-## well-formed one whose seal 1 the bank can reach); once the bank holds that address's lock
-## energy it dials it directly (an address the bank can never charge is just dropped). When a
-## wormhole opens it reads the far Ring's console (ReadConsoleCommand) if that console is
-## unread, which fills the Address Book, then extends the pole camera (ExtendPoleCameraCommand)
-## if the world's horizon record is not taken, and closes the wormhole once the camera is back
-## and the wormhole has been open a few ticks.
+## Seeded stand-in player for the soak test. It sets random flags through SetFlagCommand about 20
+## times per in-game day, pauses and resumes the clock at random, and adds and releases named system
+## holds through TimeControl (a dozen or so per month). Before anything else on the Ring it builds
+## the first Capacitor Bank as a room on the nearest valid spot to the Gate Room (PlaceRoomCommand),
+## leaves the Ring alone until it is built, then gives it all the spare supply as its charge rate
+## once (SetChargeRateCommand). It then works the Ring on every call with no command waiting: with
+## the Ring idle and no address picked it picks one (a console's Address Book entry the bank can
+## power sometimes, a real world's true address now and then, otherwise a random well-formed one
+## whose seal 1 the bank can reach); once the bank holds that address's lock energy it dials it
+## directly (an address the bank can never charge is just dropped). When a wormhole opens it reads
+## the far Ring's console (ReadConsoleCommand) if that console is unread, which fills the Address
+## Book, then extends the pole camera (ExtendPoleCameraCommand) if the world's horizon record is not
+## taken, and closes the wormhole once the camera is back and the wormhole has been open a few
+## ticks.
 ## Once the bank charges it builds on: a corridor run off the Level 2 spine and a Physics Lab
 ## against it (the lab completes off, since the bank holds the spare supply), and it digs each
 ## extra level as soon as the money allows (DigLevelCommand), one at a time.
@@ -145,7 +144,7 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	var state: GameState = simulation.state
 	if state.power.charge_rates.is_empty():
 		if installs == 0:
-			simulation.submit(PowerFixture.build_bank_in_alcove(state))
+			simulation.submit(PowerFixture.build_first_bank(state))
 			installs += 1
 		return
 	if charge_sets == 0:

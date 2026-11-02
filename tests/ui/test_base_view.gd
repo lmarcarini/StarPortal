@@ -1,5 +1,5 @@
-## Tests for the Base tab: the plan shows each level's rooms at their cells, the alcove as a
-## marked site and rooms under construction as sites; selection by mouse, keyboard and action
+## Tests for the Base tab: the plan shows each level's rooms at their cells, no reserved
+## cells, and rooms under construction as sites; selection by mouse, keyboard and action
 ## fills the panel; level actions change level; zoom and pan; the layout fits 1280 × 720 in
 ## both languages.
 ## Bible: docs/content/m2-base.md section 6
@@ -41,7 +41,8 @@ func test_starts_on_the_gate_level_with_rooms_at_their_cells() -> void:
 	assert_str(_def_at(Vector2i(16, 6))).is_equal("room_gate")
 	assert_str(_def_at(Vector2i(16, 13))).is_equal("room_control")
 	assert_str(_def_at(Vector2i(10, 15))).is_equal("room_corridor")
-	assert_str(String(plan.item_at(Vector2i(23, 11)))).is_equal(String(BasePlan.ALCOVE))
+	# The former capacitor alcove's cells are ordinary free cells (card #158).
+	assert_str(String(plan.item_at(Vector2i(23, 11)))).is_equal("")
 	assert_str(String(plan.item_at(Vector2i(0, 0)))).is_equal("")
 	assert_str(_view.get_title_key()).is_equal("BASE_TITLE")
 	assert_object(_view.get_default_focus()).is_same(plan)
@@ -75,15 +76,15 @@ func test_click_selects_a_room_and_fills_the_panel() -> void:
 	assert_str(String(plan.selected())).is_equal("")
 
 
-func test_cursor_and_accept_select_the_alcove() -> void:
+func test_cursor_and_accept_on_a_free_cell_select_nothing() -> void:
 	var plan: BasePlan = _view.get_plan()
 	plan.grab_focus()
 	plan.cursor = Vector2i(21, 11)
 	_send(plan, _action(&"ui_right"))
 	assert_vector(Vector2(plan.cursor)).is_equal(Vector2(22, 11))
 	_send(plan, _action(&"ui_accept"))
-	assert_str(String(plan.selected())).is_equal(String(BasePlan.ALCOVE))
-	assert_str(_view.get_room_panel().lines()[1]).is_equal("Capacitor alcove")
+	assert_str(String(plan.selected())).is_equal("")
+	assert_str(_view.get_room_panel().lines()[1]).is_equal("")
 	plan.cursor = Vector2i.ZERO
 	_send(plan, _action(&"ui_up"))
 	assert_vector(Vector2(plan.cursor)).is_equal(Vector2.ZERO)

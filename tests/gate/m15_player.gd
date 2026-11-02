@@ -78,11 +78,11 @@ func step() -> void:
 	ticks_run += 1
 
 
-## Builds a Capacitor Bank in the capacitor alcove (docs/content/m2-base.md section 3) and
-## runs the clock until it is charging; returns the ticks it took, or -1 when the build was
-## refused or never finished.
+## Builds a Capacitor Bank on the nearest valid spot to the Gate Room (docs/content/m2-base.md
+## section 3) and runs the clock until it is charging; returns the ticks it took, or -1 when the
+## build was refused or never finished.
 func build_bank() -> int:
-	if not simulation.submit(PowerFixture.build_bank_in_alcove(state())).is_ok:
+	if not simulation.submit(PowerFixture.build_first_bank(state())).is_ok:
 		return -1
 	var started: int = state().clock.tick
 	while state().power.charge_rates.is_empty():

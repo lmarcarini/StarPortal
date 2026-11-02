@@ -182,7 +182,7 @@ func _on_plan_input(event: InputEvent) -> void:
 
 ## Toggles [param target], or steps its charge rate by [param step] when it is a bank.
 func _act(target: StringName, step: int) -> void:
-	if target == &"" or target == BasePlan.ALCOVE:
+	if target == &"":
 		return
 	_plan.select(target)
 	if _is_bank(target):

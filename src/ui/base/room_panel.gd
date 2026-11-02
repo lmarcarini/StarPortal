@@ -1,10 +1,9 @@
 class_name RoomPanel
 extends VBoxContainer
 ## The selected-room panel of the Base tab, read only: the room's name, size, power draw (or
-## output), monthly upkeep and status, then its description. For the capacitor alcove it
-## names the marked site. With nothing selected it shows a hint. Under the lines, a hold
-## button offers the room's action (Cancel a site, Demolish a room) with its refund, or why it
-## is refused; the panel only emits [signal action_held].
+## output), monthly upkeep and status, then its description. With nothing selected it shows
+## a hint. Under the lines, a hold button offers the room's action (Cancel a site, Demolish a
+## room) with its refund, or why it is refused; the panel only emits [signal action_held].
 ## Bible: docs/content/m2-base.md sections 4 and 6
 
 ## Emitted when the action button's hold confirms; [param command] is the one to submit.
@@ -38,22 +37,6 @@ func show_room(room: RoomState, def: RoomDef) -> void:
 			BasePanelText.upkeep(def.upkeep_k),
 			BasePanelText.status(room, def),
 			tr(def.description_key),
-		]
-	)
-
-
-## Shows the free capacitor alcove, sized for [param bank].
-func show_alcove(bank: RoomDef) -> void:
-	var cells: Vector2i = bank.size_cells if bank != null else Vector2i.ZERO
-	_set_lines(
-		[
-			tr(&"BASE_PANEL_SELECTED"),
-			tr(&"BASE_ALCOVE_NAME"),
-			tr(&"BASE_PANEL_SIZE").format({"w": cells.x, "h": cells.y}),
-			"",
-			"",
-			tr(&"BASE_STATUS_SITE"),
-			tr(&"BASE_ALCOVE_DESC"),
 		]
 	)
 

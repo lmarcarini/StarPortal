@@ -43,7 +43,7 @@ func test_digging_and_building_draw_nothing() -> void:
 	assert_bool(ConstructionFixture.run(_state, DigLevelCommand.new()).is_ok).is_true()
 	var site := PlaceRoomCommand.create(&"room_physics_lab", 2, Vector2i(20, 12))
 	assert_bool(ConstructionFixture.run(_state, site).is_ok).is_true()
-	var bank_site: PlaceRoomCommand = PowerFixture.build_bank_in_alcove(_state)
+	var bank_site: PlaceRoomCommand = PowerFixture.build_first_bank(_state)
 	assert_bool(ConstructionFixture.run(_state, bank_site).is_ok).is_true()
 	assert_array(_numbers()).is_equal(before)
 

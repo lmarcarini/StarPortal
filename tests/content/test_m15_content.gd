@@ -139,7 +139,7 @@ func test_each_document_arrives_as_the_chain_says() -> void:
 		)
 
 
-## A new game: build the bank in the alcove, then for each puzzle wait for the charge, dial the
+## A new game: build the first bank, then for each puzzle wait for the charge, dial the
 ## answer, lock
 ## the right world, extend the pole camera and receive exactly the next documents; close and go
 ## on.
@@ -151,7 +151,7 @@ func test_dialing_each_answer_from_a_new_game_locks_its_world_and_delivers_the_n
 	var state: GameState = simulation.state
 	assert_array(state.archive.received).is_equal(AT_START)
 	state.clock.is_paused = true
-	assert_bool(simulation.submit(PowerFixture.build_bank_in_alcove(state)).is_ok).is_true()
+	assert_bool(simulation.submit(PowerFixture.build_first_bank(state)).is_ok).is_true()
 	for index: int in WORLDS.size():
 		var coordinates: Array[int] = []
 		coordinates.assign(ANSWERS[index])

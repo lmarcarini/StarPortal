@@ -95,12 +95,7 @@ func test_build_button_follows_build_and_cancel_while_paused() -> void:
 	state.clock.is_paused = true
 	var button: Button = _gauge().get_build_button()
 	assert_bool(button.visible).is_true()
-	var alcove: Rect2i = StartingBase.alcove(
-		state.balance, state.room_defs[StartingBase.CAPACITOR_BANK_DEF]
-	)
-	var place := PlaceRoomCommand.create(
-		StartingBase.CAPACITOR_BANK_DEF, state.balance.capacitor_alcove_level, alcove.position
-	)
+	var place: PlaceRoomCommand = PowerFixture.build_first_bank(state)
 	assert_bool(_simulation.submit(place).is_ok).is_true()
 	assert_bool(button.visible).is_false()
 	var site: RoomState = state.base.rooms[-1]

@@ -65,7 +65,7 @@ static func no_power_mark_centre(cells: Rect2i) -> Vector2:
 
 
 ## Draws a site over [param cells]: blueprint hatching and a dashed-looking outline. Used for
-## rooms under construction and for the capacitor alcove.
+## rooms under construction.
 static func draw_site(canvas: CanvasItem, cells: Rect2i) -> void:
 	var area: Rect2 = _pixels(cells)
 	canvas.draw_rect(area, SITE)
