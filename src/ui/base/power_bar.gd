@@ -4,7 +4,9 @@ extends Control
 ## of supply, filled in one block per running room that draws power and one block for
 ## charging the capacitors; spare segments stay empty. A block is labelled with its room's
 ## name when that fits; when [member expanded] (the energy layer is on) a block too narrow for
-## its name shows its MW instead, so every block is labelled.
+## its name shows its MW instead, so every block is labelled. With no spare power the bar's
+## end carries the "no spare power" mark; after a refusal for lack of power the spare part is
+## outlined for a moment, blinking unless reduced flashing is on.
 ## Bible: docs/content/m2-base.md sections 3 and 6
 
 ## Kind of a block in blocks_of().
@@ -17,6 +19,10 @@ const ROOM := Color("#e0a040")
 const ALWAYS_ON := Color("#c97c2c")
 const CHARGE := Color("#5cb8d6")
 const INK := Color("#15171a")
+const SPARE_OUTLINE := Color("#e5534b")
+## Seconds the spare part stays outlined after a refusal, and its blink period.
+const FLASH_SECONDS: float = 1.2
+const BLINK_SECONDS: float = 0.2
 const _FONT_SIZE: int = 11
 
 ## True on the energy layer: taller and every block labelled.
@@ -27,17 +33,21 @@ var expanded: bool = false:
 		queue_redraw()
 
 var _supply: float = 0.0
+var _spare: float = 0.0
 var _blocks: Array[Dictionary] = []
+var _flash_left: float = 0.0
 
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(200.0, 22.0)
 	mouse_filter = MOUSE_FILTER_PASS
+	set_process(false)
 
 
 ## Shows the power of [param state].
 func show_state(state: GameState) -> void:
 	_supply = PowerRules.supply_mw(state)
+	_spare = maxf(PowerRules.spare_mw(state), 0.0)
 	_blocks = blocks_of(state)
 	tooltip_text = PowerText.mw(_supply) + " MW"
 	queue_redraw()
@@ -46,6 +56,35 @@ func show_state(state: GameState) -> void:
 ## Returns the supply shown, in MW.
 func get_supply() -> float:
 	return _supply
+
+
+## True when the bar shows no spare power.
+func has_no_spare() -> bool:
+	return _spare < 0.5
+
+
+## Outlines the spare part for [constant FLASH_SECONDS] (the whole bar when none is spare):
+## a refusal for lack of power. It blinks unless reduced flashing is on.
+func flash_spare() -> void:
+	_flash_left = FLASH_SECONDS
+	set_process(true)
+	queue_redraw()
+
+
+## True while the spare outline is drawn this frame.
+func is_spare_outlined() -> bool:
+	if _flash_left <= 0.0:
+		return false
+	if Settings.get_bool(&"accessibility", &"reduced_flashing"):
+		return true
+	return fmod(FLASH_SECONDS - _flash_left, BLINK_SECONDS * 2.0) < BLINK_SECONDS
+
+
+func _process(delta: float) -> void:
+	_flash_left = maxf(_flash_left - delta, 0.0)
+	if _flash_left <= 0.0:
+		set_process(false)
+	queue_redraw()
 
 
 ## Returns the blocks shown: see blocks_of().
@@ -89,6 +128,7 @@ func label_for(block: Dictionary, width: float) -> String:
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), BACK)
 	if _supply <= 0.0:
+		_draw_no_spare()
 		return
 	var per_mw: float = size.x / _supply
 	var x: float = 0.0
@@ -104,6 +144,24 @@ func _draw() -> void:
 		draw_line(Vector2(at_x, 0.0), Vector2(at_x, size.y), Color(EDGE, 0.6))
 	_draw_labels(per_mw)
 	draw_rect(Rect2(Vector2.ZERO, size), EDGE, false, 1.0)
+	_draw_no_spare()
+	if is_spare_outlined():
+		draw_rect(_spare_area(per_mw), SPARE_OUTLINE, false, 2.0)
+
+
+func _draw_no_spare() -> void:
+	if not has_no_spare():
+		return
+	var mark: float = size.y - 4.0
+	PowerMarks.draw_no_power(self, Vector2(size.x - mark * 0.5 - 2.0, size.y * 0.5), mark)
+
+
+## The spare part of the bar, or the whole bar when nothing is spare.
+func _spare_area(per_mw: float) -> Rect2:
+	var spare_width: float = per_mw * _spare
+	if spare_width < 2.0:
+		return Rect2(Vector2.ONE, size - Vector2.ONE * 2.0)
+	return Rect2(size.x - spare_width + 1.0, 1.0, spare_width - 2.0, size.y - 2.0)
 
 
 func _draw_labels(per_mw: float) -> void:

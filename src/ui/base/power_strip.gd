@@ -33,7 +33,10 @@ func show_state(state: GameState, energy_on: bool) -> void:
 	bar.show_state(state)
 	var supply: String = PowerText.mw(PowerRules.supply_mw(state))
 	var spare: String = PowerText.mw(PowerRules.spare_mw(state))
-	_supply.text = tr(&"BASE_POWER_SUPPLY").format({"supply": supply, "spare": spare})
+	var key: StringName = (
+		&"BASE_POWER_SUPPLY_NO_SPARE" if bar.has_no_spare() else &"BASE_POWER_SUPPLY"
+	)
+	_supply.text = tr(key).format({"supply": supply, "spare": spare})
 	_capacitors.text = PowerText.capacitors(state)
 	_button.text = tr(&"BASE_POWER_LAYER_BUTTON")
 	_button.set_pressed_no_signal(energy_on)
