@@ -96,6 +96,26 @@ func test_palette_offers_only_unlocked_rooms() -> void:
 	assert_object(palette.get_room_button(&"room_quarters")).is_null()
 
 
+## A lift ghost on an existing shaft shows what the command charges: the segment price and
+## time for the one missing level ($100k, 1 h), not the full lift (m25-lean-start.md
+## section 2).
+func test_lift_ghost_on_a_shaft_shows_the_segment_price() -> void:
+	await _unlock_everything()
+	var state: GameState = _simulation.state
+	state.base.add_room(&"room_lift", 1, Vector2i(24, 8))
+	var ghost: PlacementGhost = _ghost()
+	_view.get_build().start_placing(&"room_lift")
+	ghost.move_to(Vector2i(24, 8))
+	assert_str(ghost.reason()).is_empty()
+	var command := ghost.command() as PlaceRoomCommand
+	assert_int(ghost.cost_k()).is_equal(command.cost_of(state)).is_equal(100)
+	assert_int(ghost.build_ticks()).is_equal(command.ticks_of(state)).is_equal(60)
+	assert_str(_view.get_palette().get_hint()).contains("$100k").contains("1 h")
+	ghost.move_to(Vector2i(2, 16))
+	assert_int(ghost.cost_k()).is_equal(400)
+	assert_int(ghost.build_ticks()).is_equal(240)
+
+
 ## Every research unlock, and an empty dug Level 2 below, then a refresh.
 func _unlock_everything() -> void:
 	ConstructionFixture.unlock_all(_simulation.state)
@@ -173,6 +193,7 @@ func test_demolish_refused_for_the_gate_room_and_allowed_for_a_lab() -> void:
 	assert_bool(panel.get_action_button().disabled).is_true()
 	assert_str(panel.get_action_reason()).is_equal("The Gate and Control Rooms stay.")
 	var lab: RoomState = _simulation.state.base.add_room(&"room_research_lab", 1, Vector2i(24, 11))
+	lab.paid_k = 800
 	_view.get_plan().select(lab.id)
 	assert_str(panel.get_action_button().text).contains("$400k")
 	panel.get_action_button().begin_hold()

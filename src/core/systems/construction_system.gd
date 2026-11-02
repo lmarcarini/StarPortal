@@ -3,11 +3,14 @@ extends SimSystem
 ## Builds sites, takes demolished rooms down and digs levels, one tick at a time, while the
 ## clock runs. Up to MAX_ACTIVE_SITES sites build at once, oldest first; later ones wait in
 ## the queue. A site is every room sharing a site key (a corridor run, a lift shaft, stairs).
-## A dug level gets a level of every lift shaft for free. Draws no power.
+## A lift segment (LiftShafts) builds outside the slots. A dug level extends every lift shaft
+## (LiftShafts.extend()). A finished room switches on taking power from charging first
+## (FinishingPower). A running Workshop speeds sites and the dig up by 25% (BuildSpeed).
+## Draws no power.
 ## Posts room_built(site id), room_demolished(id) and level_dug(level), each once:
 ## room_demolished carries the cell's room id for a corridor (each cell is its own demolition
 ## order) and the site id for any other room.
-## Bible: docs/content/m2-base.md section 4
+## Bible: docs/content/m2-base.md section 4, docs/content/m25-lean-start.md sections 2 to 4
 
 ## Sites building at once; later sites queue.
 const MAX_ACTIVE_SITES: int = 3
@@ -23,21 +26,34 @@ func get_id() -> StringName:
 	return &"construction"
 
 
-## Advances the dig, the active sites and every demolition by one tick.
+## Advances the active sites, every demolition and then the dig by one tick (a lift segment
+## started by the dig begins building on the next tick).
 func tick(state: GameState) -> void:
-	_tick_dig(state)
-	if _is_idle(state.base):
-		return
-	_tick_sites(state)
-	_tick_demolitions(state)
+	var step: int = BuildSpeed.progress(state)
+	if not _is_idle(state.base):
+		_tick_sites(state, step)
+		_tick_demolitions(state)
+	_tick_dig(state, step)
 
 
-## The site keys still building in [param base], oldest first: the first MAX_ACTIVE_SITES are
-## active, the rest queued (the UI shows "Queued: 2nd" from the index).
+## The site keys still building in [param base], oldest first, lift segments left out: the
+## first MAX_ACTIVE_SITES are active, the rest queued (the UI shows "Queued: 2nd" from the
+## index).
 static func site_queue(base: BaseState) -> Array[StringName]:
+	return _sites(base, false)
+
+
+## The keys of the lift segments still building in [param base]: they take no slot.
+static func segment_sites(base: BaseState) -> Array[StringName]:
+	return _sites(base, true)
+
+
+static func _sites(base: BaseState, segments: bool) -> Array[StringName]:
 	var keys: Array[StringName] = []
 	for room: RoomState in base.rooms:
-		if not room.is_built() and not room.site_key() in keys:
+		if room.is_built() or room.site_key() in keys:
+			continue
+		if LiftShafts.is_segment(base, room) == segments:
 			keys.append(room.site_key())
 	return keys
 
@@ -63,16 +79,21 @@ static func _has_work(base: BaseState) -> bool:
 	return false
 
 
-func _tick_sites(state: GameState) -> void:
+func _tick_sites(state: GameState, step: int) -> void:
 	var active: Array[StringName] = site_queue(state.base).slice(0, MAX_ACTIVE_SITES)
+	active.append_array(segment_sites(state.base))
 	for key: StringName in active:
 		var done: bool = true
-		for room: RoomState in BaseRules.site_rooms(state.base, key):
+		var rooms: Array[RoomState] = BaseRules.site_rooms(state.base, key)
+		for room: RoomState in rooms:
 			if room.is_built():
 				continue
-			room.build_ticks_left -= 1
+			room.build_ticks_left = maxi(room.build_ticks_left - step, 0)
 			done = done and room.is_built()
 		if done:
+			LiftShafts.join_shaft(state.base, rooms)
+			for room: RoomState in rooms:
+				FinishingPower.switch_on(state, room)
 			PowerSystem.settle(state)
 			state.events.post(&"room_built", [key])
 
@@ -95,29 +116,13 @@ func _tick_demolitions(state: GameState) -> void:
 			state.events.post(&"room_demolished", [key])
 
 
-func _tick_dig(state: GameState) -> void:
+func _tick_dig(state: GameState, step: int) -> void:
 	var level: int = state.base.digging_level()
 	if level == 0:
 		return
 	var dug: LevelState = state.base.levels[level - 1]
-	dug.dig_ticks_left -= 1
+	dug.dig_ticks_left = maxi(dug.dig_ticks_left - step, 0)
 	if not dug.is_dug():
 		return
-	_extend_lifts(state.base, level)
+	LiftShafts.extend(state, level)
 	state.events.post(&"level_dug", [level])
-
-
-## Adds a level of every lift shaft of [param base] to [param level], as far built as the
-## shaft.
-static func _extend_lifts(base: BaseState, level: int) -> void:
-	var seen: Array[StringName] = []
-	for room: RoomState in base.rooms.duplicate():
-		if room.def_id != StartingBase.LIFT_DEF or room.is_demolishing():
-			continue
-		var shaft: StringName = StringName("%s" % room.origin)
-		if shaft in seen:
-			continue
-		seen.append(shaft)
-		var copy: RoomState = base.add_room(room.def_id, level, room.origin)
-		copy.site = room.site
-		copy.build_ticks_left = room.build_ticks_left

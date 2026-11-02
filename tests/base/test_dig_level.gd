@@ -19,6 +19,8 @@ func test_dig_needs_research() -> void:
 	assert_str(result.detail).is_equal("excavation_survey")
 
 
+## The dig pays and takes 3 days; the built lift then extends into Level 2 as a paid lift
+## segment ($100k, 1 hour; m25-lean-start.md section 2).
 func test_dig_pays_takes_its_days_and_extends_the_lift() -> void:
 	var game := ConstructionFixture.unlock_all(ConstructionFixture.state())
 	var lift: RoomState = game.base.add_room(&"room_lift", 1, Vector2i(0, 11))
@@ -31,11 +33,15 @@ func test_dig_pays_takes_its_days_and_extends_the_lift() -> void:
 	assert_int(game.base.digging_level()).is_equal(2)
 	ConstructionFixture.advance(game, system, 1)
 	assert_int(game.base.digging_level()).is_equal(0)
-	ConstructionFixture.advance(game, system, 5)
-	assert_array(ConstructionFixture.event_names(game)).is_equal([&"level_dug"])
+	assert_array(ConstructionFixture.event_names(game)).is_equal(
+		[&"room_build_started", &"budget_changed", &"level_dug"]
+	)
+	assert_int(game.budget.funds_k).is_equal(6000 - 1500 - 100)
 	var lifts: Array[RoomState] = BaseRules.rooms_on_level(game.base, 2)
 	assert_int(lifts.size()).is_equal(1)
 	assert_that(lifts[0].origin).is_equal(lift.origin)
+	assert_int(lifts[0].build_ticks_left).is_equal(60)
+	ConstructionFixture.advance(game, system, 60)
 	assert_bool(lifts[0].is_built()).is_true()
 
 

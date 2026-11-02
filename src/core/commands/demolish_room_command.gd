@@ -1,10 +1,13 @@
 class_name DemolishRoomCommand
 extends Command
-## The player demolishes a built room: 50% of its cost comes back at once and the room is off
-## while it comes down, over a quarter of its build time (ConstructionSystem removes it). A
-## lift or stairs comes down on all its levels; a corridor run one cell at a time. Posts
+## The player demolishes a built room: 50% of what was paid for it (RoomState.paid_k) comes
+## back at once and the room is off while it comes down, over a quarter of its build time
+## (ConstructionSystem removes it). A lift or stairs comes down on all its levels; a corridor
+## run one cell at a time. A lift shaft's built segments are part of it (refunded at this
+## rate); its segments still building are removed at once at the cancel rate (75% of what was
+## paid for them, CancelBuildCommand.SITE_REFUND_PERCENT), so no segment is left alone. Posts
 ## budget_changed when applied.
-## Bible: docs/content/m2-base.md section 4
+## Bible: docs/content/m2-base.md section 4, docs/content/m25-lean-start.md section 2
 
 ## The command's stable type id.
 const TYPE: StringName = &"demolish_room"
@@ -39,6 +42,16 @@ static func targets(base: BaseState, room: RoomState) -> Array[RoomState]:
 	return BaseRules.site_rooms(base, room.site_key())
 
 
+## What demolishing [param room] of [param state] refunds, in $k: REFUND_PERCENT of what was
+## paid for targets(), plus, for a lift, the cancel share of its segments still building.
+static func refund_k(state: GameState, room: RoomState) -> int:
+	var refund: int = BaseRules.paid_k(targets(state.base, room)) * REFUND_PERCENT / 100
+	var building: Array[RoomState] = LiftShafts.building_segments(state.base, room)
+	if room.def_id == StartingBase.LIFT_DEF and not building.is_empty():
+		refund += BaseRules.paid_k(building) * CancelBuildCommand.SITE_REFUND_PERCENT / 100
+	return refund
+
+
 ## Returns &"demolish_room".
 func get_type() -> StringName:
 	return TYPE
@@ -64,15 +77,19 @@ func validate(state: GameState) -> CommandResult:
 	return CommandResult.ok()
 
 
-## Refunds half the cost, rounded down to whole $k, and starts taking the room down, switched off.
+## Refunds refund_k(), removes the shaft's segments still building, and starts taking the
+## room down, switched off.
 func apply(state: GameState) -> void:
 	var room: RoomState = state.base.find_room(room_id)
 	var def: RoomDef = state.room_defs[room.def_id]
+	var refund: int = refund_k(state, room)
+	for segment: RoomState in LiftShafts.building_segments(state.base, room):
+		state.base.remove_room(segment.id)
 	for target: RoomState in targets(state.base, room):
 		target.demolish_ticks_left = maxi(1, def.build_ticks / 4)
 		target.powered_on = false
 	PowerSystem.settle(state)
-	state.budget.credit(def.build_cost_k * REFUND_PERCENT / 100)
+	state.budget.credit(refund)
 	state.events.post(&"budget_changed", [state.budget.funds_k])
 
 

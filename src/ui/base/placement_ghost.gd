@@ -128,12 +128,28 @@ func area() -> Rect2i:
 	return BaseRules.footprint(probe, def)
 
 
-## Total cost of the ghost in $k.
+## Total cost of the ghost in $k: for a room, what PlaceRoomCommand.cost_of() charges (the
+## segment price when a lift extends a shaft).
 func cost_k() -> int:
 	var def: RoomDef = _def()
 	if def == null:
 		return 0
-	return def.build_cost_k * (maxi(1, run.size()) if is_corridor() else 1)
+	if is_corridor():
+		return def.build_cost_k * maxi(1, run.size())
+	if _state == null:
+		return def.build_cost_k
+	return PlaceRoomCommand.create(def_id, _plan.level, origin, rotated).cost_of(_state)
+
+
+## Build time of the ghost in ticks: a corridor run's cells one after another, else what
+## PlaceRoomCommand.ticks_of() gives (the segment time when a lift extends a shaft).
+func build_ticks() -> int:
+	var def: RoomDef = _def()
+	if def == null:
+		return 0
+	if is_corridor() or _state == null:
+		return def.build_ticks * maxi(1, run.size())
+	return PlaceRoomCommand.create(def_id, _plan.level, origin, rotated).ticks_of(_state)
 
 
 ## Emits [signal build_held] with the command when the ghost is valid.

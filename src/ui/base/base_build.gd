@@ -107,17 +107,12 @@ func show_action(selected: StringName) -> void:
 	var text: String = ""
 	if not room.is_built():
 		command = CancelBuildCommand.create(room.id)
-		var site: Array[RoomState] = BaseRules.site_rooms(state.base, room.site_key())
-		refund_k = (
-			BaseRules.site_cost_k(state.room_defs, site)
-			* CancelBuildCommand.SITE_REFUND_PERCENT
-			/ 100
-		)
+		refund_k = CancelBuildCommand.refund_k(state, room.id)
 		text = tr_format(&"BASE_BUILD_CANCEL", refund_k, "")
 		_action_message = tr_format(&"BASE_BUILD_CANCELLED", refund_k, _t(def.name_key))
 	else:
 		command = DemolishRoomCommand.create(room.id)
-		refund_k = def.build_cost_k * DemolishRoomCommand.REFUND_PERCENT / 100
+		refund_k = DemolishRoomCommand.refund_k(state, room)
 		text = tr_format(
 			&"BASE_BUILD_DEMOLISH", refund_k, BuildText.duration(maxi(1, def.build_ticks / 4))
 		)
@@ -190,7 +185,7 @@ func _on_checked(reason: String) -> void:
 			{
 				"name": _t(def.name_key),
 				"cost": MoneyLabel.format_k(_ghost.cost_k()),
-				"time": BuildText.duration(def.build_ticks * maxi(1, _ghost.run.size())),
+				"time": BuildText.duration(_ghost.build_ticks()),
 			}
 		)
 	)

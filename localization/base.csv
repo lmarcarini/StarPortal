@@ -128,3 +128,6 @@ BASE_POWER_TAG_NEED,NEEDS {mw},PRECISA {mw}
 BASE_POWER_CHARGE_RATE,Charge rate {mw} / {max} MW,Taxa de carga {mw} / {max} MW
 BASE_POWER_RATE_DOWN,−,−
 BASE_POWER_RATE_UP,+,+
+BASE_MSG_CHARGING_LOWERED,{room} on: charging lowered to {mw} MW.,Em funcionamento: {room}. Carga reduzida para {mw} MW.
+BASE_MSG_FINISHED_OFF,{room} finished off. {reason},{room}: obra concluída sem energia. {reason}
+BASE_MSG_LIFT_SEGMENT_REFUSED,Lift not extended to Level {n}: needs {cost}. Build it from the palette.,Elevador não estendido ao Nível {n}: precisa de {cost}. Construa-o pela paleta.

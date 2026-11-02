@@ -98,6 +98,8 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 		&"horizon":
 			return _tr(&"LOG_LINE_HORIZON").format({"world": world})
 		&"power":
+			if entry.args.has("room"):
+				return finished_room_line(entry.args)
 			var capacity: float = type_convert(entry.args.get("capacity_mwh", 0), TYPE_FLOAT)
 			return _tr(&"LOG_LINE_POWER").format({"capacity": GateRoomFormat.energy(capacity)})
 		&"research":
@@ -110,6 +112,19 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 				{"name": _tr(project.name_key), "line": _tr(project.line_key)}
 			)
 	return ""
+
+
+## The line of a finished room's "power" entry [param args]: charging lowered for it, or it
+## stayed off with the refusal reason (also the Base tab's message line).
+static func finished_room_line(args: Dictionary) -> String:
+	var def: RoomDef = Registry.get_def(StringName(str(args.get("room", "")))) as RoomDef
+	var room: String = "" if def == null else _tr(def.name_key)
+	if args.has("charge_mw"):
+		return _tr(&"BASE_MSG_CHARGING_LOWERED").format({"room": room, "mw": args["charge_mw"]})
+	var reason: String = _tr(&"BASE_POWER_REFUSED_SPARE").format(
+		{"need": args.get("need_mw", 0), "spare": args.get("spare_mw", 0)}
+	)
+	return _tr(&"BASE_MSG_FINISHED_OFF").format({"room": room, "reason": reason})
 
 
 ## Returns the text the search matches for [param entry]: its line, its kind's name and, for a

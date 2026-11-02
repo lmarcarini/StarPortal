@@ -3,8 +3,8 @@
 ## ghost on the nearest valid spot to the Gate Room, and one click builds it. The bank completes
 ## after 1 hour and takes the spare 25 MW; SILL then charges and locks, and the pole camera brings
 ## its documents. The player paints a corridor and builds a Research Lab against it on Level 1 (it
-## completes off: the bank holds all the spare power, and switching it on is refused; the
-## finishing-room rule is card M2.5-07), is granted Excavation survey through
+## completes on, taking its 5 MW from charging: "Research Lab on: charging lowered to 20 MW",
+## m25-lean-start.md section 3), is granted Excavation survey through
 ## UnlockRules.apply_project() (no research system yet), digs Level 2, and the month-end pays the
 ## allocation less the upkeep. Last, with the total charge rate lowered below the open
 ## wormhole's 20 MWh/h drain, a lock closes when the capacitors run empty.
@@ -131,8 +131,8 @@ func _lock_sill_and_send_camera(player: M15Player) -> void:
 
 
 ## Paints a corridor run off the Level 1 spine, builds a Research Lab against it, and waits for
-## both. The lab completes switched off (no spare power), and switching it on is refused
-## until the bank's charge rate is lowered.
+## both. The lab completes switched on: the bank held all the spare power, so its charge rate
+## comes down from 25 to 20 MW, and the log says so.
 func _build_lab_with_corridor(player: M15Player) -> void:
 	var funds: int = player.state().budget.funds_k
 	var run: Array[Vector2i] = CORRIDOR_RUN.duplicate()
@@ -150,11 +150,11 @@ func _build_lab_with_corridor(player: M15Player) -> void:
 		player.step()
 	for cell: Vector2i in CORRIDOR_RUN:
 		assert_bool(_corridor_built_at(player.state(), cell)).is_true()
-	assert_bool(lab.powered_on).is_false()
-	var refused: CommandResult = player.simulation.submit(SwitchRoomCommand.create(lab.id, true))
-	assert_str(String(refused.error_code)).is_equal("no_spare_power")
-	assert_bool(lab.powered_on).is_false()
-	player.rejections.clear()
+	assert_bool(lab.powered_on).is_true()
+	assert_float(PowerRules.charge_mw(player.state())).is_equal(20.0)
+	var line: String = "Research Lab on: charging lowered to 20 MW."
+	var entry: LogEntry = player.state().operations_log.entries[-1]
+	assert_str(ArchiveLogRow.line_for(entry, player.state())).is_equal(line)
 
 
 func _corridor_built_at(state: GameState, cell: Vector2i) -> bool:
@@ -182,7 +182,7 @@ func _dig_level_2(player: M15Player) -> void:
 
 
 ## At the month-end the budget gains the $3,000k allocation less the upkeep: the starting
-## $190k, the bank's $10k and half the lab's $60k (it is off); corridors pay nothing.
+## $190k, the bank's $10k and the lab's $60k (it is on); corridors pay nothing.
 func _assert_month_end(player: M15Player) -> void:
 	var closes: Array[int] = []
 	player.simulation.month_closed.connect(
@@ -191,16 +191,21 @@ func _assert_month_end(player: M15Player) -> void:
 	var funds: int = player.state().budget.funds_k
 	while closes.is_empty():
 		player.step()
-	assert_int(player.state().budget.funds_k).is_equal(funds + 3000 - (190 + 10 + 30))
+	assert_int(player.state().budget.funds_k).is_equal(funds + 3000 - (190 + 10 + 60))
 
 
-## At the starting 25 MW the charge out-runs the open wormhole's 20 MWh/h drain, so a lock
-## stays open. With the charge rate lowered below the drain (the lab switched on with the MW
-## freed), the next lock, dialed as soon as SILL's charge is ready, closes for power when the
-## capacitors run empty, before its time runs out.
+## With the lab switched off and charging back at 25 MW, the charge out-runs the open
+## wormhole's 20 MWh/h drain, so a lock stays open. With the charge rate lowered below the
+## drain (the lab switched on with the MW freed), the next lock, dialed as soon as SILL's
+## charge is ready, closes for power when the capacitors run empty, before its time runs out.
 func _assert_empty_capacitors_close(player: M15Player) -> void:
 	var state: GameState = player.state()
 	var sill: GateAddress = player.address(M15Player.PUZZLES[0]["glyphs"])
+	var lab: RoomState = PowerFixture.first_room(state, LAB_DEF)
+	var bank: StringName = state.power.charge_rates.keys()[0]
+	assert_bool(player.simulation.submit(SwitchRoomCommand.create(lab.id, false)).is_ok).is_true()
+	assert_bool(player.simulation.submit(SetChargeRateCommand.create(bank, 25)).is_ok).is_true()
+	assert_bool(player.wait_for_charge(sill)).is_true()
 	assert_int(player.dial(sill).outcome).is_equal(DialOutcome.Kind.LOCK)
 	var stored: float = state.power.stored_mwh
 	for _tick: int in state.balance.max_open_ticks / 2:
@@ -208,10 +213,8 @@ func _assert_empty_capacitors_close(player: M15Player) -> void:
 	assert_int(state.gate.mode).is_equal(GateState.RingMode.LOCKED)
 	assert_float(state.power.stored_mwh).is_greater(stored)
 	assert_bool(player.close_wormhole()).is_true()
-	var bank: StringName = state.power.charge_rates.keys()[0]
 	var lower := SetChargeRateCommand.create(bank, LOW_CHARGE_MW)
 	assert_bool(player.simulation.submit(lower).is_ok).is_true()
-	var lab: RoomState = PowerFixture.first_room(state, LAB_DEF)
 	assert_bool(player.simulation.submit(SwitchRoomCommand.create(lab.id, true)).is_ok).is_true()
 	assert_bool(lab.powered_on).is_true()
 	assert_bool(player.wait_for_charge(sill)).is_true()
