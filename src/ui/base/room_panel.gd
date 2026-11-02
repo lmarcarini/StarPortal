@@ -1,10 +1,11 @@
 class_name RoomPanel
 extends VBoxContainer
 ## The selected-room panel of the Base tab, read only: the room's name, size, power draw (or
-## output), monthly upkeep and status, then its description. With nothing selected it shows
-## a hint. Under the lines, a hold button offers the room's action (Cancel a site, Demolish a
-## room) with its refund, or why it is refused; the panel only emits [signal action_held].
-## Bible: docs/content/m2-base.md sections 4 and 6
+## output), monthly upkeep (with research overrides) and status, then its "now" line and, in
+## grey, its "later" line. With nothing selected it shows a hint. Under the lines, a hold
+## button offers the room's action (Cancel a site, Demolish a room) with its refund, or why
+## it is refused; the panel only emits [signal action_held].
+## Bible: docs/content/m2-base.md sections 4 and 6, m25-lean-start.md section 4
 
 ## Emitted when the action button's hold confirms; [param command] is the one to submit.
 signal action_held(command: Command)
@@ -16,6 +17,7 @@ var _draw_line: Label = _add_label(16)
 var _upkeep: Label = _add_label(16)
 var _status: Label = _add_label(16)
 var _description: Label = _add_label(16)
+var _later: Label = _add_later()
 var _action: HoldButton = _add_action()
 var _reason: Label = _add_label(14)
 var _command: Command = null
@@ -23,20 +25,21 @@ var _command: Command = null
 
 ## Shows nothing selected.
 func show_nothing() -> void:
-	_set_lines([tr(&"BASE_PANEL_SELECTED"), "", "", "", "", "", tr(&"BASE_PANEL_NONE")])
+	_set_lines([tr(&"BASE_PANEL_SELECTED"), "", "", "", "", "", tr(&"BASE_PANEL_NONE"), ""])
 
 
-## Shows [param room] built from [param def].
-func show_room(room: RoomState, def: RoomDef) -> void:
+## Shows [param room] built from [param def]; [param unlocks] gives the upkeep overrides.
+func show_room(room: RoomState, def: RoomDef, unlocks: UnlockState) -> void:
 	_set_lines(
 		[
 			tr(&"BASE_PANEL_SELECTED"),
 			tr(def.name_key),
 			size_text(room, def),
 			BasePanelText.power(def),
-			BasePanelText.upkeep(def.upkeep_k),
+			BasePanelText.upkeep(UnlockRules.upkeep_k(unlocks, def)),
 			BasePanelText.status(room, def),
-			tr(def.description_key),
+			BasePanelText.now(def),
+			BasePanelText.later(def),
 		]
 	)
 
@@ -44,7 +47,7 @@ func show_room(room: RoomState, def: RoomDef) -> void:
 ## Returns the panel's lines, top to bottom, as shown.
 func lines() -> Array[String]:
 	var found: Array[String] = []
-	for label: Label in [_heading, _name, _size, _draw_line, _upkeep, _status, _description]:
+	for label: Label in _lines():
 		found.append(label.text)
 	return found
 
@@ -56,7 +59,7 @@ func size_text(room: RoomState, def: RoomDef) -> String:
 
 
 func _set_lines(texts: Array) -> void:
-	var labels: Array[Label] = [_heading, _name, _size, _draw_line, _upkeep, _status, _description]
+	var labels: Array[Label] = _lines()
 	for index: int in labels.size():
 		var text: String = texts[index]
 		labels[index].text = text
@@ -82,6 +85,16 @@ func get_action_button() -> HoldButton:
 ## Returns the reason under the action button, or "".
 func get_action_reason() -> String:
 	return _reason.text if _reason.visible else ""
+
+
+func _lines() -> Array[Label]:
+	return [_heading, _name, _size, _draw_line, _upkeep, _status, _description, _later]
+
+
+func _add_later() -> Label:
+	var label: Label = _add_label(14)
+	label.modulate = Color(1, 1, 1, 0.6)
+	return label
 
 
 func _add_action() -> HoldButton:

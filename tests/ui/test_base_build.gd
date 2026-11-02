@@ -79,22 +79,20 @@ func test_invalid_spots_say_why() -> void:
 	assert_int(_count(&"room_research_lab")).is_equal(0)
 
 
-## A new game's palette offers only the Capacitor Bank, Research Lab and Corridor
-## (m25-lean-start.md section 1); research adds the rest on the next refresh.
+## A new game's palette can pick only the Capacitor Bank, Research Lab and Corridor
+## (m25-lean-start.md section 1); research-locked rooms show disabled until research adds them.
 func test_palette_offers_only_unlocked_rooms() -> void:
 	var palette: BuildPalette = _view.get_palette()
 	for def_id: StringName in BuildPalette.ROOMS:
 		var wanted: bool = (
 			def_id in [&"room_capacitor_bank", &"room_research_lab", &"room_corridor"]
 		)
-		(
-			assert_bool(palette.get_room_button(def_id) != null)
-			. override_failure_message(String(def_id))
-			. is_equal(wanted)
-		)
+		var button: Button = palette.get_room_button(def_id)
+		assert_object(button).override_failure_message(String(def_id)).is_not_null()
+		assert_bool(not button.disabled).override_failure_message(String(def_id)).is_equal(wanted)
 	await _unlock_everything()
 	for def_id: StringName in BuildPalette.ROOMS:
-		assert_object(palette.get_room_button(def_id)).is_not_null()
+		assert_bool(palette.get_room_button(def_id).disabled).is_false()
 	assert_object(palette.get_room_button(&"room_quarters")).is_null()
 
 
