@@ -16,5 +16,5 @@ power_output_mw = 0.0
 max_charge_rate_mw = 30.0
 upkeep_k = 10
 name_key = &"ROOM_CAPACITOR_BANK_NAME"
-description_key = &"ROOM_CAPACITOR_BANK_DESC"
+description_key = &"ROOM_CAPACITOR_BANK_NOW"
 id = &"room_capacitor_bank"
