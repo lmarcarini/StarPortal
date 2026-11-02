@@ -11,6 +11,11 @@ extends RefCounted
 ## Saved keys holding whole numbers of at least 0.
 const _COUNT_KEYS: Array[String] = ["build_ticks_left"]
 
+## Transient, not saved, shared by every room: goes up whenever a room's switch is flipped or
+## it starts or stops building or being demolished, so PowerRules knows its cached totals are
+## stale. Counting down build or demolition ticks does not change it.
+static var revision: int = 0
+
 ## Unique instance id within the base, e.g. &"room_1".
 var id: StringName = &""
 ## Id of the RoomDef this room is.
@@ -22,11 +27,23 @@ var origin: Vector2i = Vector2i.ZERO
 ## True when turned a quarter turn: the def's width and height are swapped.
 var rotated: bool = false
 ## Ticks of building left; 0 means built.
-var build_ticks_left: int = 0
+var build_ticks_left: int = 0:
+	set(value):
+		if (value > 0) != (build_ticks_left > 0):
+			revision += 1
+		build_ticks_left = value
 ## The player's switch for this room (read by the energy layer).
-var powered_on: bool = true
+var powered_on: bool = true:
+	set(value):
+		if value != powered_on:
+			revision += 1
+		powered_on = value
 ## Ticks of demolition left; 0 means not being demolished. A room being demolished is off.
-var demolish_ticks_left: int = 0
+var demolish_ticks_left: int = 0:
+	set(value):
+		if (value > 0) != (demolish_ticks_left > 0):
+			revision += 1
+		demolish_ticks_left = value
 ## Id of the site this room is built with when it shares one with other rooms (a corridor run,
 ## a lift shaft, stairs); empty when the room is its own site. See site_key().
 var site: StringName = &""

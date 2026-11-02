@@ -14,6 +14,7 @@ const SUPPLY: int = 0
 const DRAW: int = 1
 const BANKS: int = 2
 const RATED_BANKS: int = 3
+const CHARGE: int = 4
 
 
 ## True when [param room] is built and not being demolished.
@@ -41,9 +42,27 @@ static func has_switch(def: RoomDef) -> bool:
 	return def.power_draw_mw > 0.0 or def.power_output_mw > 0.0
 
 
-## One pass over [param state]'s rooms: [supply MW, running rooms' draw MW, standing banks,
-## standing banks that have a charge rate], over powered_rooms() only.
+## [supply MW, running rooms' draw MW, standing banks, standing banks that have a charge
+## rate, MW allocated to charging] for [param state], over powered_rooms() only. Cached on the
+## PowerState (memory only) and summed again only when the powered rooms, a room's switch,
+## build or demolition state (RoomState.revision) or the charge rates change.
 static func totals(state: GameState) -> PackedFloat64Array:
+	var power: PowerState = state.power
+	if (
+		power.totals_revision == RoomState.revision
+		and _gathered_for(state)
+		and power.totals_rates == power.charge_rates
+	):
+		return power.totals_cache
+	var sums: PackedFloat64Array = _sum(state)
+	power.totals_cache = sums
+	power.totals_revision = RoomState.revision
+	power.totals_rates = power.charge_rates.duplicate()
+	return sums
+
+
+## One pass over powered_rooms() for totals(), uncached.
+static func _sum(state: GameState) -> PackedFloat64Array:
 	var supply: float = 0.0
 	var draw: float = 0.0
 	var banks: float = 0.0
@@ -63,21 +82,43 @@ static func totals(state: GameState) -> PackedFloat64Array:
 		elif def.always_on or room.powered_on:
 			supply += def.power_output_mw
 			draw += def.power_draw_mw
-	return PackedFloat64Array([supply, draw, banks, rated])
+	var charge: float = _sum_charge(state, int(rated) == rates.size())
+	return PackedFloat64Array([supply, draw, banks, rated, charge])
 
 
-## The rooms of [param state]'s base whose def gives, draws or stores power, built or not.
-## Cached on the PowerState and gathered again only when rooms are added or removed (or the
-## defs change); their switches and build state are read live.
-static func powered_rooms(state: GameState) -> Array[RoomState]:
+## The charge rates of the standing banks; when [param all_standing] it is the plain sum of
+## the rates, without looking the rooms up.
+static func _sum_charge(state: GameState, all_standing: bool) -> float:
+	var total: float = 0.0
+	for room_id: StringName in state.power.charge_rates:
+		if not all_standing:
+			var room: RoomState = state.base.find_room(room_id)
+			if room == null or not is_standing(room):
+				continue
+		total += state.power.charge_rates[room_id]
+	return total
+
+
+## True when the powered_rooms() cache was gathered for [param state]'s current rooms and defs.
+static func _gathered_for(state: GameState) -> bool:
 	var base: BaseState = state.base
 	var power: PowerState = state.power
-	if (
+	return (
 		power.powered_rooms_count == base.rooms.size()
 		and power.powered_rooms_next == base.next_room_number
 		and power.powered_rooms_defs == state.room_defs.size()
 		and power.powered_rooms_base == base.get_instance_id()
-	):
+	)
+
+
+## The rooms of [param state]'s base whose def gives, draws or stores power, built or not.
+## Cached on the PowerState and gathered again only when rooms are added or removed (or the
+## defs change); their switches and build state are read live. Gathering again also drops
+## the cached totals().
+static func powered_rooms(state: GameState) -> Array[RoomState]:
+	var base: BaseState = state.base
+	var power: PowerState = state.power
+	if _gathered_for(state):
 		return power.powered_rooms_cache
 	var found: Array[RoomState] = []
 	var found_defs: Array[RoomDef] = []
@@ -94,6 +135,7 @@ static func powered_rooms(state: GameState) -> Array[RoomState]:
 	power.powered_rooms_count = base.rooms.size()
 	power.powered_rooms_next = base.next_room_number
 	power.powered_rooms_defs = state.room_defs.size()
+	power.totals_revision = -1
 	return found
 
 
@@ -112,18 +154,9 @@ static func charge_mw(state: GameState) -> float:
 	return charge_mw_of(state, totals(state))
 
 
-## charge_mw() given [param state]'s [param sums] from totals(): when every rated bank stands
-## it is the plain sum of the rates, without looking the rooms up.
-static func charge_mw_of(state: GameState, sums: PackedFloat64Array) -> float:
-	var total: float = 0.0
-	var all_standing: bool = int(sums[RATED_BANKS]) == state.power.charge_rates.size()
-	for room_id: StringName in state.power.charge_rates:
-		if not all_standing:
-			var room: RoomState = state.base.find_room(room_id)
-			if room == null or not is_standing(room):
-				continue
-		total += state.power.charge_rates[room_id]
-	return total
+## charge_mw() given [param _state]'s [param sums] from totals().
+static func charge_mw_of(_state: GameState, sums: PackedFloat64Array) -> float:
+	return sums[CHARGE]
 
 
 ## MW allocated in all: running rooms' draws plus charging.
