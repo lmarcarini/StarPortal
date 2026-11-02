@@ -112,7 +112,8 @@ into the one active project, so a second lab adds four scientist slots, not a se
 The Research tab keeps its single header and the "One project at a time." refusal. The
 project pauses only when no lab is on. The palette note "One lab is enough until staff
 arrive." becomes "More labs hold more scientists." (pt_BR "Mais laboratórios comportam mais
-cientistas."). *Later idea:* several projects at once, one per lab, with Start picking a lab.
+cientistas."). The 25% floor and the 200% cap apply to this pooled total for the one active
+project: a second lab adds scientist slots, not a higher cap. *Later idea:* several projects at once, one per lab, with Start picking a lab.
 
 **Engineers and building.** Engineers speed building only through the Workshop; there is no
 separate per-site engineer bonus, so the speed-up stays in one place and is never counted
@@ -127,6 +128,10 @@ engineer unassigned, moved or dismissed. The game first lowers Capacitor Bank ch
 newest bank first, by just enough. Only if zero charging is still not enough does it switch
 off the newest switchable rooms. It shows a message and a Log line, as in M2.5. This changes
 the M2 plant-loss rule (rooms first, then charging) for the implementation card.
+
+**Switching a plant off** is allowed when lowering charging covers the loss. It is refused
+("Switch rooms off first") only if rooms would have to go off. This replaces M2's plant
+switch-off refusal.
 
 *Opening case:* Gate 5 + Lab 5 + charging 20 = 30 MW. Dismissing Cpl Mendes drops the plant to
 25 MW; charging falls to 15 MW ("Power Plant crew reduced: charging lowered to 15 MW."), and
