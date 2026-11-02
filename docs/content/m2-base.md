@@ -85,7 +85,7 @@ Level 3, with a corridor spine on each level.
 | --- | --- |
 | Level 1 | Power Plant (diesel, on), two Quarters, corridor, lift |
 | Level 2 | Archive, corridor, lift |
-| Level 3 | Gate Room with the Ring, Control Room, corridor, lift, and the **capacitor alcove**: a marked 3 × 2 site beside the Gate Room |
+| Level 3 | Gate Room with the Ring, Control Room, corridor, lift. No cell is reserved |
 
 Starting draw with everything on: Gate 2 + Control 1 + Archive 1 + Quarters 0 + Lift 0 =
 **4 MW** against 30 MW of supply, leaving 26 MW spare. Nothing needs switching off.
@@ -98,14 +98,19 @@ Capacitor Bank room, and stays one short action that teaches base building:
 
 1. The game opens in the Gate Room. The Capacitors gauge reads "No capacitors installed" and
    offers one button, **Build capacitor bank**, which switches to the Base tab (F3) on
-   Level 3, with the alcove highlighted and its ghost footprint already placed and green.
-2. **Hold to build** ($600k, 6 hours). The alcove becomes a construction site with hours left.
+   the Gate Room's level, centred on the nearest valid spot to the Gate Room for a 3 × 2 bank,
+   with its ghost footprint already placed there and green.
+2. **Click to build** ($600k, 6 hours). The spot becomes a construction site with hours left.
 3. The player resumes the clock. After 6 in-game hours the bank is built and, by default, the
    spare 26 MW is allocated to charging it: 366.6 / 26 = about **14.1 hours** to the 366.6 MWh
    of a lock (400 / 26 = 15.4 hours to full).
 
-The alcove is an ordinary site; the first bank may go anywhere valid, and more banks anywhere
-(no conduits). The Gate Room button shows only while no bank exists or is being built.
+There is no reserved spot (the capacitor alcove was removed after the M2 playtest): the first
+bank may go anywhere valid, and more banks anywhere (no conduits). The nearest valid spot is the
+one with the fewest empty cells between it and the Gate Room, then the closest centres, then the
+top-most and left-most; valid means it breaks no placement rule and touches a corridor, lift or
+stairs (money is not part of it). If the level has no valid spot, the button still opens the
+Base tab with the ghost out on the Gate Room and the palette says why. The Gate Room button shows only while no bank exists or is being built.
 Future: the button moves onto the base screen, with a tutorial leading there.
 
 ---
@@ -271,6 +276,9 @@ fittings, corridors darker. A cell is 24 px, so a level is 864 × 480 px at 1× 
 - **Build palette** (bottom): each room shows cost, draw and build time on hover or focus.
 - **Building is one click** (or A, or Enter) on a valid ghost, with no hold; the ghost stays out
   to place another until Esc, B or a right click. Cancel (hold) and Demolish (hold) keep their hold.
+- **No reserved cells.** The plan marks no site for a room that is not placed yet; every free
+  cell is ordinary. The Gate Room's Build capacitor bank button jumps to the nearest valid spot
+  (section 2).
 - **Energy layer** (P, or the button at the end of the meter): the plan dims the scenery and
   draws on each room a switch and its MW (`ON 4`, `OFF`); always-on rooms show a lock instead
   of a switch; plants show `+30`; banks show their charge rate (`CHG 26`) with − and + steps.
