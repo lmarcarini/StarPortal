@@ -2,15 +2,15 @@ class_name PlacementGhost
 extends Control
 ## The ghost footprint of the room being placed, drawn over the [BasePlan] it is a child of: green
 ## when the placement command would be accepted, red with the first broken rule's reason otherwise.
-## It follows the mouse and the plan's cell cursor. Q, E or a shoulder button turns it; holding the
-## left mouse button, Enter or (A) for [constant HoldButton.HOLD_SECONDS] builds it; Esc or (B)
-## leaves placing. A corridor is painted as a run: drag with the mouse, or move the cursor; a press
-## on the run, Enter or (A) held, builds it, and Esc or (B) first clears the run. Keys count only
-## while the plan has focus, so focused buttons and dialogs get theirs first. Changes no state: it
-## emits [signal build_held] with the command to submit.
+## It follows the mouse and the plan's cell cursor. Q, E or a shoulder button turns it; one left
+## click, Enter or (A) builds it at once (no hold), and the ghost stays out to place another; Esc,
+## (B) or a right click leaves placing. A corridor is painted as a run: drag with the mouse (the run
+## builds on release), or move the cursor and press Enter or (A); Esc or (B) first clears the run.
+## Keys count only while the plan has focus, so focused buttons and dialogs get theirs first.
+## Changes no state: it emits [signal build_held] with the command to submit.
 ## Bible: docs/content/m2-base.md sections 4 and 6
 
-## Emitted when a hold confirms the placement; [param command] is the one to submit.
+## Emitted when a click or press confirms the placement; [param command] is the one to submit.
 signal build_held(command: Command)
 ## Emitted when the ghost is checked again: [param reason] is empty when it is valid.
 signal checked(reason: String)
@@ -33,7 +33,6 @@ var run: Array[Vector2i] = []
 var _plan: BasePlan = null
 var _state: GameState = null
 var _reason: String = ""
-var _hold_seconds: float = -1.0
 var _painting: bool = false
 var _cursor: Vector2i = Vector2i.ZERO
 
@@ -137,42 +136,19 @@ func cost_k() -> int:
 	return def.build_cost_k * (maxi(1, run.size()) if is_corridor() else 1)
 
 
-## Starts a hold to build; ignored while the ghost is invalid.
-func begin_hold() -> void:
-	if is_placing() and _reason.is_empty():
-		_hold_seconds = 0.0
-
-
-## The hold's progress from 0.0 to 1.0, or -1.0 with no hold in progress.
-func get_hold_progress() -> float:
-	if _hold_seconds < 0.0:
-		return -1.0
-	return clampf(_hold_seconds / HoldButton.HOLD_SECONDS, 0.0, 1.0)
-
-
-## Drops a hold in progress.
-func cancel_hold() -> void:
-	_hold_seconds = -1.0
-	queue_redraw()
-
-
-## Adds [param delta] seconds to the hold; confirms when it is long enough. Tests call it.
-func advance(delta: float) -> void:
-	if _hold_seconds < 0.0:
-		return
-	_hold_seconds += delta
-	queue_redraw()
-	if _hold_seconds < HoldButton.HOLD_SECONDS:
-		return
-	cancel_hold()
-	confirm()
-
-
 ## Emits [signal build_held] with the command when the ghost is valid.
 func confirm() -> void:
 	_check()
 	if is_placing() and _reason.is_empty():
 		build_held.emit(command())
+
+
+## After a build: a corridor starts a new run at the cursor; the ghost stays out and checks again.
+func after_build() -> void:
+	if is_corridor():
+		run = [origin]
+	_painting = false
+	recheck()
 
 
 ## Checks the ghost again (money or rooms may have changed).
@@ -181,11 +157,10 @@ func recheck() -> void:
 		_check()
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if _plan != null and _plan.cursor != _cursor:
 		_cursor = _plan.cursor
 		move_to(_cursor)
-	advance(delta)
 
 
 ## Moves the plan's cursor and the ghost to [param cell] together (the mouse).
@@ -273,10 +248,6 @@ func _draw() -> void:
 		var box: Rect2 = _pixels(area())
 		draw_rect(box, color)
 		draw_rect(box, color.lightened(0.4), false, 2.0)
-	if _hold_seconds > 0.0:
-		var box: Rect2 = _pixels(area())
-		var share: float = clampf(_hold_seconds / HoldButton.HOLD_SECONDS, 0.0, 1.0)
-		draw_rect(Rect2(box.position, Vector2(box.size.x * share, 4.0)), Color.WHITE)
 	draw_set_transform(Vector2.ZERO)
 
 
@@ -291,8 +262,6 @@ func _set_placing(on: bool) -> void:
 	set_process(on)
 	if on and _plan != null:
 		_cursor = _plan.cursor
-	if not on:
-		cancel_hold()
 
 
 func _def() -> RoomDef:

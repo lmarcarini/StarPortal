@@ -92,8 +92,7 @@ func _build_bank_from_gate_room(player: M15Player) -> void:
 	assert_int(base.get_plan().level).is_equal(3)
 	assert_str(ghost.reason()).is_empty()
 	var funds: int = player.state().budget.funds_k
-	ghost.begin_hold()
-	ghost.advance(HoldButton.HOLD_SECONDS + 0.1)
+	ghost.confirm()
 	assert_int(player.state().budget.funds_k).is_equal(funds - 600)
 	assert_bool(CapacitorGauge.needs_bank(player.state())).is_false()
 	_root.free()

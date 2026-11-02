@@ -1,5 +1,5 @@
 ## Tests for building from the Base tab: the palette places rooms through the ghost (valid and
-## invalid with reasons), rotate, hold to build, corridor painting, cancel and demolish with
+## invalid with reasons), rotate, one click to build, corridor painting, cancel and demolish with
 ## refunds, dig, the Gate Room button's alcove ghost, the signature, and the 1280 × 720 fit.
 ## Bible: docs/content/m2-base.md sections 2, 4 and 6
 extends GdUnitTestSuite
@@ -45,18 +45,18 @@ func _count(def_id: StringName) -> int:
 	return found
 
 
-func test_capacitor_bank_button_places_the_ghost_and_one_hold_builds() -> void:
+func test_capacitor_bank_button_places_the_ghost_and_one_click_builds() -> void:
 	_view.place_capacitor_bank()
 	var ghost: PlacementGhost = _ghost()
 	assert_bool(ghost.is_placing()).is_true()
 	assert_int(_view.get_plan().level).is_equal(3)
 	assert_str(ghost.reason()).is_empty()
 	var funds: int = _simulation.state.budget.funds_k
-	ghost.begin_hold()
-	ghost.advance(HoldButton.HOLD_SECONDS + 0.1)
+	ghost.confirm()
 	assert_int(_count(StartingBase.CAPACITOR_BANK_DEF)).is_equal(1)
 	assert_int(_simulation.state.budget.funds_k).is_equal(funds - 600)
-	assert_bool(ghost.is_placing()).is_false()
+	assert_bool(ghost.is_placing()).is_true()
+	assert_str(ghost.reason()).is_not_empty()
 	assert_bool(CapacitorGauge.needs_bank(_simulation.state)).is_false()
 
 
@@ -73,8 +73,7 @@ func test_invalid_spots_say_why() -> void:
 	ghost.recheck()
 	ghost.move_to(Vector2i(4, 16))
 	assert_str(ghost.reason()).is_equal("Needs $800k; you have $100k.")
-	ghost.begin_hold()
-	ghost.advance(1.0)
+	ghost.confirm()
 	assert_int(_count(&"room_physics_lab")).is_equal(0)
 
 
@@ -186,16 +185,17 @@ func test_focused_palette_button_gets_enter_not_the_ghost() -> void:
 	_view.place_capacitor_bank()
 	var quarters: Button = _view.get_palette().get_room_button(&"room_quarters")
 	quarters.grab_focus()
+	var before: int = _count(&"room_quarters")
 	await get_tree().process_frame
 	_push_key(KEY_ENTER, true)
 	_push_key(KEY_ENTER, false)
 	await get_tree().process_frame
 	assert_str(String(_ghost().def_id)).is_equal("room_quarters")
-	_ghost().advance(1.0)
-	assert_int(_count(&"room_quarters")).is_equal(2)
+	# The Enter that picked the room on the palette must not also build it.
+	assert_int(_count(&"room_quarters")).is_equal(before)
 
 
-func test_mouse_hold_builds_with_real_events() -> void:
+func test_mouse_click_builds_with_real_events() -> void:
 	_view.place_capacitor_bank()
 	await get_tree().process_frame
 	var plan: BasePlan = _view.get_plan()
@@ -203,20 +203,18 @@ func test_mouse_hold_builds_with_real_events() -> void:
 	var at: Vector2 = plan.get_global_rect().position + plan.view.offset
 	at += (Vector2(cell) + Vector2(0.5, 0.5)) * BasePlanPainter.CELL * plan.view.scale()
 	# Headless Godot picks no control under the pointer, so the event goes to the ghost's
-	# own GUI entry, the same one the viewport calls; the hold then runs on real frames.
+	# own GUI entry, the same one the viewport calls.
 	var press := InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT
 	press.pressed = true
 	press.position = at - plan.get_global_rect().position
 	_ghost()._gui_input(press)
-	assert_bool(_ghost().get_hold_progress() >= 0.0).is_true()
-	await _wait_hold()
 	assert_int(_count(StartingBase.CAPACITOR_BANK_DEF)).is_equal(1)
 	press.pressed = false
 	_ghost()._gui_input(press)
 
 
-func test_gamepad_a_hold_builds_with_real_events() -> void:
+func test_gamepad_a_press_builds_with_real_events() -> void:
 	_view.place_capacitor_bank()
 	await get_tree().process_frame
 	assert_bool(_view.get_plan().has_focus()).is_true()
@@ -224,7 +222,7 @@ func test_gamepad_a_hold_builds_with_real_events() -> void:
 	button.button_index = JOY_BUTTON_A
 	button.pressed = true
 	get_viewport().push_input(button)
-	await _wait_hold()
+	await get_tree().process_frame
 	assert_int(_count(StartingBase.CAPACITOR_BANK_DEF)).is_equal(1)
 	button.pressed = false
 	get_viewport().push_input(button)
@@ -269,7 +267,7 @@ func test_energy_layer_and_ghost_do_not_fight() -> void:
 	button.button_index = JOY_BUTTON_A
 	button.pressed = true
 	get_viewport().push_input(button)
-	await _wait_hold()
+	await get_tree().process_frame
 	button.pressed = false
 	get_viewport().push_input(button)
 	assert_int(_count(StartingBase.CAPACITOR_BANK_DEF)).is_equal(0)
@@ -281,13 +279,6 @@ func _push_key(key: Key, pressed: bool) -> void:
 	event.physical_keycode = key
 	event.pressed = pressed
 	get_viewport().push_input(event)
-
-
-func _wait_hold() -> void:
-	var waited: float = 0.0
-	while waited < HoldButton.HOLD_SECONDS + 0.3:
-		await get_tree().process_frame
-		waited += get_process_delta_time()
 
 
 func _find(def_id: StringName) -> RoomState:
