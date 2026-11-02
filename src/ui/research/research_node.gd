@@ -13,12 +13,14 @@ signal chosen(project_id: StringName)
 signal activated(project_id: StringName)
 
 ## Size of a node, in pixels.
-const SIZE: Vector2 = Vector2(220, 84)
+const SIZE: Vector2 = Vector2(220, 116)
+## Lines each text may take: the name one, the detail and the state two each.
+const LINES: Array[int] = [1, 2, 2]
 
 var project_id: StringName = &""
-var _name: Label = _label(16)
-var _detail: Label = _label(14)
-var _state: Label = _label(14)
+var _name: Label = _label(16, 1)
+var _detail: Label = _label(14, 2)
+var _state: Label = _label(14, 2)
 var _bar: ProgressBar = ProgressBar.new()
 
 
@@ -95,9 +97,18 @@ func _on_focus() -> void:
 	chosen.emit(project_id)
 
 
-static func _label(font_size: int) -> Label:
+## Returns the node's labels, top to bottom: name, detail, state.
+func labels() -> Array[Label]:
+	return [_name, _detail, _state]
+
+
+static func _label(font_size: int, lines: int) -> Label:
 	var label := Label.new()
 	label.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
+	if lines > 1:
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.max_lines_visible = lines
+		label.size_flags_vertical = SIZE_EXPAND_FILL
 	label.clip_text = true
 	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	label.mouse_filter = MOUSE_FILTER_IGNORE

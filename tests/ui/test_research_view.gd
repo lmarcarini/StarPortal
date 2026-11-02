@@ -186,6 +186,55 @@ func test_mouse_click_selects_a_node() -> void:
 	assert_str(String(_view.get_panel().get_project())).is_equal("bank_array")
 
 
+## Every line of every node, in every state shown and in both languages, fits the node's
+## inner width in the lines it may take, measured with the label's real font; and every tree
+## fits the board's width in the 1920 × 1080 layout.
+func test_node_text_is_never_cut() -> void:
+	_root.size = Vector2(1920, 1080)
+	_view.size = _root.size
+	ResearchFixture.finish(_simulation.state, &"second_plant")
+	_view.act(&"excavation_survey")
+	var board_width: float = 1920 - 32 - 24 - 352
+	for locale: String in ["en", "pt_BR"]:
+		TranslationServer.set_locale(locale)
+		for category: StringName in [
+			"research_construction", "research_energy", "research_alien", "research_staff"
+		]:
+			_view.get_board().show_category(category)
+			_view.refresh()
+			await _runner.simulate_frames(1)
+			assert_float(_tree().custom_minimum_size.x).is_less_equal(board_width)
+			for node: ResearchNode in _tree().nodes():
+				_assert_fits(node, locale)
+
+
+func _assert_fits(node: ResearchNode, locale: String) -> void:
+	for label: Label in node.labels():
+		var font: Font = label.get_theme_font(&"font")
+		var font_size: int = label.get_theme_font_size(&"font_size")
+		var inner: float = label.size.x
+		var message: String = (
+			"%s: '%s' is cut (%d/%d lines, %s)"
+			% [
+				locale,
+				label.text,
+				label.get_line_count(),
+				label.get_visible_line_count(),
+				label.size
+			]
+		)
+		assert_float(label.get_global_rect().end.y).override_failure_message(message).is_less_equal(
+			node.get_global_rect().end.y
+		)
+		if label.autowrap_mode == TextServer.AUTOWRAP_OFF:
+			var width: float = font.get_string_size(label.text, 0, -1, font_size).x
+			assert_float(width).override_failure_message(message).is_less_equal(inner)
+			continue
+		assert_int(label.get_line_count()).override_failure_message(message).is_less_equal(
+			label.get_visible_line_count()
+		)
+
+
 func test_tab_is_available_once_a_lab_has_finished() -> void:
 	var state: GameState = ResearchFixture.state(false)
 	_view.setup(Simulation.new(state))

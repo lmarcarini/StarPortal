@@ -7,7 +7,7 @@ RESEARCH_FUEL_CONTRACTS_LINE,Diesel plant upkeep $150k → $100k a month.,Manute
 RESEARCH_BANK_ARRAY_LINE,Up to 3 Capacitor Banks.,Até 3 Bancos de Capacitores.
 RESEARCH_FIELD_ENGINEERING_LINE,Workshop (sites build faster).,Oficina (obras ficam prontas mais rápido).
 RESEARCH_UNKNOWN_NAME,Unknown,Desconhecido
-RESEARCH_LOCK_ALIEN_FIND,Requires an alien find,Requer uma descoberta alienígena
+RESEARCH_LOCK_ALIEN_FIND,Requires an alien find,Requer achado alienígena
 RESEARCH_LOCK_STAFF,Requires staff,Requer pessoal
 RESEARCH_ERR_NEEDS_LAB,Needs a Research Lab that is on.,Precisa de um Laboratório de Pesquisa ligado.
 RESEARCH_ERR_RUNNING,One project at a time.,Um projeto por vez.
