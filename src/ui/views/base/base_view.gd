@@ -160,7 +160,7 @@ func _on_selection_changed(selected: StringName) -> void:
 	if def == null:
 		_panel.show_nothing()
 		return
-	_panel.show_room(room, def)
+	_panel.show_room(room, def, _simulation.state.unlocks)
 
 
 static func _room_defs() -> Dictionary:

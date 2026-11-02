@@ -11,7 +11,7 @@ extends RefCounted
 
 var _simulation: Simulation = null
 ## RoomDefs by id, to refill the palette when research unlocks a room.
-var _defs: Dictionary = {}
+var _defs: Dictionary[StringName, RoomDef] = {}
 var _plan: BasePlan = null
 var _palette: BuildPalette = null
 var _panel: RoomPanel = null
@@ -41,7 +41,7 @@ func setup(simulation: Simulation, defs: Dictionary) -> void:
 	_simulation = simulation
 	_ghost.stop()
 	_ghost.attach(_plan, simulation.state)
-	_defs = defs
+	_defs.assign(defs)
 	_palette.show_rooms(defs, simulation.state.unlocks.rooms)
 	_palette.set_placing(false, false)
 	refresh()

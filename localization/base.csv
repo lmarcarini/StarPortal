@@ -1,26 +1,37 @@
 keys,en,pt_BR
 ROOM_GATE_NAME,Gate Room,Sala do Portal
-ROOM_GATE_DESC,The Ring and its dial console. Always on.,O Anel e seu console de discagem. Sempre ligada.
+ROOM_GATE_NOW,The Ring and its dial console. Always on.,O Anel e seu console de discagem. Sempre ligada.
+ROOM_GATE_LATER,"Gains the Shutter, telemetry and new seals.","Ganha o Obturador, telemetria e novos selos."
 ROOM_CONTROL_NAME,Control Room,Sala de Controle
-ROOM_CONTROL_DESC,Overlooks the Gate Room. Always on.,Vigia a Sala do Portal. Sempre ligada.
+ROOM_CONTROL_NOW,Runs the Gate Room. Always on.,Opera a Sala do Portal. Sempre ligada.
+ROOM_CONTROL_LATER,Commands defence; losing it ends the game.,Comanda a defesa; perdê-la encerra o jogo.
 ROOM_POWER_PLANT_NAME,Power Plant (diesel),Usina (diesel)
-ROOM_POWER_PLANT_DESC,Adds 30 MW of output while on. Upkeep is fuel.,Gera 30 MW enquanto ligada. A manutenção é combustível.
+ROOM_POWER_PLANT_NOW,Gives 30 MW while on. Upkeep is fuel.,Gera 30 MW enquanto ligada. A manutenção é combustível.
+ROOM_POWER_PLANT_LATER,Upgrades to fission and beyond.,Evolui para fissão e além.
 ROOM_CAPACITOR_BANK_NAME,Capacitor Bank,Banco de Capacitores
-ROOM_CAPACITOR_BANK_DESC,"Stores 400 MWh for the Ring, charged from spare power.","Armazena 400 MWh para o Anel, carregado com a energia livre."
+ROOM_CAPACITOR_BANK_NOW,"Stores 400 MWh for the Ring, charged from spare power.","Armazena 400 MWh para o Anel, carregado com a energia livre."
+ROOM_CAPACITOR_BANK_LATER,Larger banks from alien designs.,Bancos maiores a partir de projetos alienígenas.
 ROOM_QUARTERS_NAME,Quarters,Alojamento
-ROOM_QUARTERS_DESC,Six beds. Staff arrive later.,Seis camas. A equipe chega depois.
+ROOM_QUARTERS_NOW,Six beds. Staff arrive later.,Seis camas. A equipe chega depois.
 ROOM_RESEARCH_LAB_NAME,Research Lab,Laboratório de Pesquisa
-ROOM_RESEARCH_LAB_DESC,Runs one research project at a time.,Conduz um projeto de pesquisa por vez.
+ROOM_RESEARCH_LAB_NOW,Runs one research project at a time.,Conduz um projeto de pesquisa por vez.
+ROOM_RESEARCH_LAB_LATER,Scientists make research faster.,Cientistas aceleram a pesquisa.
 ROOM_WORKSHOP_NAME,Workshop,Oficina
-ROOM_WORKSHOP_DESC,Opens when prototypes do.,Abre quando os protótipos abrirem.
+ROOM_WORKSHOP_NOW,"While on, building sites and digs finish 25% faster.","Ligada, as obras e escavações terminam 25% mais rápido."
+ROOM_WORKSHOP_LATER,Builds prototypes and equipment.,Constrói protótipos e equipamentos.
 ROOM_INFIRMARY_NAME,Infirmary,Enfermaria
-ROOM_INFIRMARY_DESC,Opens when staff arrive.,Abre quando a equipe chegar.
+ROOM_INFIRMARY_NOW,Opens when staff arrive.,Abre quando a equipe chegar.
 ROOM_LIFT_NAME,Lift,Elevador
-ROOM_LIFT_DESC,Joins all levels through the same 2 × 2 cells.,Liga todos os níveis pelas mesmas células 2 × 2.
+ROOM_LIFT_NOW,Joins every level through the same 2 × 2 cells.,Liga todos os níveis pelas mesmas células 2 × 2.
+ROOM_LIFT_LATER,Moves squads faster than stairs.,Leva esquadrões mais rápido que a escada.
 ROOM_STAIRS_NAME,Stairs,Escada
-ROOM_STAIRS_DESC,Joins one level to the next.,Liga um nível ao seguinte.
+ROOM_STAIRS_NOW,Joins one level to the next.,Liga um nível ao seguinte.
+ROOM_STAIRS_LATER,Squads move between levels.,Esquadrões circulam entre os níveis.
 ROOM_CORRIDOR_NAME,Corridor,Corredor
-ROOM_CORRIDOR_DESC,Connects rooms. One cell.,Liga as salas. Uma célula.
+ROOM_CORRIDOR_NOW,Connects rooms. One cell.,Liga as salas. Uma célula.
+ROOM_CORRIDOR_LATER,Blast doors make chokepoints.,Portas blindadas criam pontos de estrangulamento.
+ROOM_LATER_LINE,Later: {text},Depois: {text}
+ROOM_UNLOCK_BY,Unlock: {name},Desbloqueio: {name}
 BASE_TITLE,Base,Base
 BASE_LEVEL_SHORT,L{n},N{n}
 BASE_LEVEL_DIGGING,L{n} ~{days}d,N{n} ~{days}d
