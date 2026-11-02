@@ -67,8 +67,8 @@ func test_header_is_current_when_the_tab_opens() -> void:
 	simulation.state.clock.is_paused = true
 	await _press(&"view_research")
 	var view: ResearchView = _shell.view_switcher.get_view(ViewSwitcher.RESEARCH) as ResearchView
-	assert_str(view.get_list().header()[2]).is_equal("18 h left")
-	assert_float(view.get_list().get_bar().value).is_equal_approx(0.625, 0.001)
+	assert_str(view.get_board().header()[2]).is_equal("18 h left")
+	assert_float(view.get_board().get_bar().value).is_equal_approx(0.625, 0.001)
 
 
 func test_palette_notes_a_second_lab() -> void:

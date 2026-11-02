@@ -3,10 +3,33 @@ extends RefCounted
 ## Content checks for the research definitions (docs/content/m25-lean-start.md section 3):
 ## every effect is an [effect id, value] pair UnlockRules accepts, the open projects are
 ## exactly UnlockRules.PROJECTS with the same effects, list orders are unique, a project's
-## needs come earlier in the list, and every name and line key is in [param keys]. Needs that
-## point at missing or locked defs are the Registry's checks (ResearchDef). Pure; returns one
-## line per problem.
+## needs come earlier in the list, every name and line key is in [param keys], and every def
+## is in a known category (check_categories). Needs that point at missing or locked defs are
+## the Registry's checks (ResearchDef). Pure; returns one line per problem.
 ## Bible: docs/content/m25-lean-start.md section 3, technical-architecture.md#data-model
+
+
+## Returns the problems of the research [param categories]: unique orders, a name key in
+## [param keys] (skipped when empty), and every def of [param research] in one of them.
+static func check_categories(
+	research: Array[ResearchDef],
+	categories: Array[ResearchCategoryDef],
+	keys: Dictionary[String, bool]
+) -> Array[String]:
+	var errors: Array[String] = []
+	var orders: Dictionary[int, StringName] = {}
+	var known: Dictionary[StringName, bool] = {}
+	for category: ResearchCategoryDef in categories:
+		known[category.id] = true
+		if orders.has(category.order):
+			errors.append("research category %s: order %d is taken" % [category.id, category.order])
+		orders[category.order] = category.id
+		if not keys.is_empty() and not keys.has(String(category.name_key)):
+			errors.append("research category %s: text key is in no table" % category.id)
+	for def: ResearchDef in research:
+		if not known.has(def.category):
+			errors.append("research %s: unknown category '%s'" % [def.id, def.category])
+	return errors
 
 
 ## Returns the problems of [param research], checking text keys against [param keys] (the

@@ -10,6 +10,7 @@ cost_k = 600
 days = 3
 needs = Array[StringName]([])
 effects = [[&"bank_cap", 3]]
+category = &"research_energy"
 name_key = &"RESEARCH_BANK_ARRAY_NAME"
 line_key = &"RESEARCH_BANK_ARRAY_LINE"
 id = &"bank_array"

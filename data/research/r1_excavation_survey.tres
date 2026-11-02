@@ -10,6 +10,7 @@ cost_k = 400
 days = 2
 needs = Array[StringName]([])
 effects = [[&"dig_depth", 2], [&"unlock_room", &"room_stairs"]]
+category = &"research_construction"
 name_key = &"RESEARCH_EXCAVATION_SURVEY_NAME"
 line_key = &"RESEARCH_EXCAVATION_SURVEY_LINE"
 id = &"excavation_survey"
