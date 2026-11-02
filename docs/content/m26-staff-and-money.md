@@ -93,10 +93,9 @@ people of the matching role can fill a slot.
 | Room | Slots | Unstaffed (floor) | Staffed effect |
 | --- | --- | --- | --- |
 | Research Lab | 4 scientists | Research at **25%** speed | Speed = max(25%, total skill ÷ 6), at most 200% (two skill-3 scientists = 100%); staffing is never slower than empty |
-| Power Plant | 2 engineers | **20 MW** (4 blocks) | 1 engineer: 25 MW; 2 engineers: 30 MW. Skill does not matter |
 | Workshop | 2 engineers | Sites and digs **10%** faster | Bonus = 10% + 2.5% × total skill, at most 35% (two skill-3 engineers = 25%) |
 | Control Room | 2 analysts | Runs the Gate Room as now | Each analyst adds +1 Confidence a month ("Reports filed") |
-| Gate Room, Capacitor Bank, Corridor, Stairs, Lift, Quarters | none | Works as now | |
+| Gate Room, Power Plant, Capacitor Bank, Corridor, Stairs, Lift, Quarters | none | Works as now | |
 
 **No room stops for lack of staff.** Every room works at its floor rate unstaffed, so nothing
 locks up and the M2.5 base still runs if the player ignores the Personnel tab. A room that is
@@ -118,13 +117,13 @@ project: a second lab adds scientist slots, not a higher cap. *Later idea:* seve
 **Engineers and building.** Engineers speed building only through the Workshop; there is no
 separate per-site engineer bonus, so the speed-up stays in one place and is never counted
 twice. The 25% the owner approved for the Workshop is kept as the staffed value; an empty
-Workshop now gives 10%. Digs and sites still need no staff to proceed. Engineers in plants
-are the other use: a second diesel plant (R4) gives only 20 MW until it is crewed, so power
-growth now also costs salaries.
+Workshop now gives 10%. Digs and sites still need no staff to proceed.
+
+**Plants need no staff (owner, 2026-11-02).** A Power Plant always gives its full 30 MW and
+has no staff slots in M2.6.
 
 **Rule: supply drops take from charging first (PO ruling).** This extends the M2.5 rule for a
-finishing room to every loss of plant output: a plant switched off or demolished, or an
-engineer unassigned, moved or dismissed. The game first lowers Capacitor Bank charge rates,
+finishing room to every loss of plant output: a plant switched off or demolished. The game first lowers Capacitor Bank charge rates,
 newest bank first, by just enough. Only if zero charging is still not enough does it switch
 off the newest switchable rooms. It shows a message and a Log line, as in M2.5. This changes
 the M2 plant-loss rule (rooms first, then charging) for the implementation card.
@@ -132,10 +131,6 @@ the M2 plant-loss rule (rooms first, then charging) for the implementation card.
 **Switching a plant off** is allowed when lowering charging covers the loss. It is refused
 ("Switch rooms off first") only if rooms would have to go off. This replaces M2's plant
 switch-off refusal.
-
-*Opening case:* Gate 5 + Lab 5 + charging 20 = 30 MW. Dismissing Cpl Mendes drops the plant to
-25 MW; charging falls to 15 MW ("Power Plant crew reduced: charging lowered to 15 MW."), and
-the lab stays on. Dismissing both engineers leaves 20 MW and charging at 10 MW.
 
 **Quarters: beds cap headcount.** The base starts with **6 beds** in the Control Room's crew
 bunks (shown in the Personnel header, "Beds 5 / 6"). Each **Quarters** adds **4 beds**.
@@ -146,18 +141,16 @@ if it would leave more people than beds ("Dismiss someone first.").
 $10k. It returns to the palette **from the start** of M2.6: hiring is available from day 1,
 and the first Quarters is needed as soon as the player hires a second person. Its lines are in the table below.
 
-**New Now/Later lines** (replacing m25 section 4 for these rooms):
+**New Now/Later lines** (replacing m25 section 4 for these rooms; the Power Plant keeps its M2.5 lines):
 
 | Room | Now (en) | Later (en) |
 | --- | --- | --- |
-| Power Plant | Gives 30 MW with two engineers, 20 MW without. Upkeep is fuel. | Upgrades to fission and beyond. |
 | Research Lab | Holds four scientists. More skill, faster research. | Splits into physics, xenobiology and linguistics labs. |
 | Workshop | While on, sites and digs finish faster: 10% empty, 25% with two engineers. | Builds prototypes and equipment. |
 | Quarters | Sleeps 4. Beds cap how many people the base holds. | Rest lowers stress. |
 
 | Room | Agora (pt_BR) | Depois (pt_BR) |
 | --- | --- | --- |
-| Power Plant | Gera 30 MW com dois engenheiros, 20 MW sem eles. A manutenção é combustível. | Evolui para fissão e além. |
 | Research Lab | Comporta quatro cientistas. Mais perícia, pesquisa mais rápida. | Divide-se em laboratórios de física, xenobiologia e linguística. |
 | Workshop | Ligada, as obras e escavações terminam mais rápido: 10% vazia, 25% com dois engenheiros. | Constrói protótipos e equipamentos. |
 | Quarters | Abriga 4 pessoas. As camas limitam quantas pessoas a base comporta. | O descanso reduz o estresse. |
@@ -219,19 +212,19 @@ grant. The grant never decides the budget check; it lands after it.
 Choosing which results to present, overstating them and scandals wait for M3, with the Command
 tab.
 
-**Bankruptcy (PO proposal: count now, end the game later).** The month-end report tracks
-"Months in the red: 1 of 3", reset by any month-end at or above zero. In M2.6, reaching 3
-gives a strong warning and a pause, not a game over: there is no end screen yet, and testers
-should keep playing. Confidence 0 likewise only warns. Both become real game overs in M3,
-when the game-over screen exists (open question 2).
+**Bankruptcy and Confidence 0 only warn (owner, 2026-11-02).** The month-end report tracks
+"Months in the red: 1 of 3", reset by any month-end at or above zero. Reaching 3, or
+Confidence 0, gives a Log line and a message, not a game over. Ending the game comes later
+(M3 or after), when a game-over screen exists.
 
 ---
 
 ## 5. Month-end report
 
-At each month-end the game **pauses** and shows a short report, then writes the same lines to
-the Log. It replaces the M2 one-line "Month-end:" Log entry and closes the M2 follow-up
-"month-end Log line". Continue (A / Enter) closes it.
+At each month-end the report is written to the Log and a **non-blocking message** appears
+("Month-end report: Confidence 50 → 65"); the game **does not pause** (owner, 2026-11-02).
+Opening the message shows the report below; Close (B / Esc) dismisses it. It replaces the M2
+one-line "Month-end:" Log entry and closes the M2 follow-up "month-end Log line".
 
 ```
 +------------------------------------------------------+
@@ -250,13 +243,12 @@ the Log. It replaces the M2 one-line "Month-end:" Log entry and closes the M2 fo
 |   Capped at +15 a month                      -5      |
 | Next allocation                          $3,450k     |
 |------------------------------------------------------|
-| 4 new candidates.  [Personnel]        [Continue]     |
+| 4 new candidates.  [Personnel]           [Close]     |
 +------------------------------------------------------+
 ```
 
 The **Personnel** button opens the Personnel tab on the candidate list. In a quarter month a
-review line is added under the Confidence block. Settings gets one toggle, "Pause at
-month-end" (on by default); off, the report goes to the Log only.
+review line is added under the Confidence block. There is no Settings toggle.
 
 ---
 
@@ -275,8 +267,8 @@ arrives (M3); the bible's tab list needs that one change.
 |------------------------------------------------------------| Scientist      |
 | > Dr Ana Ferreira    Scientist  ***    $30k  Research Lab  | Skill 3  $30k  |
 |   Dr Tom Okafor      Scientist  ***    $30k  Research Lab  | Research Lab   |
-|   Sgt Lena Brandt    Engineer   ***    $30k  Power Plant   |  (Level 1)     |
-|   Cpl Raul Mendes    Engineer   **     $25k  Power Plant   |                |
+|   Sgt Lena Brandt    Engineer   ***    $30k  Unassigned    |  (Level 1)     |
+|   Cpl Raul Mendes    Engineer   **     $25k  Unassigned    |                |
 |   Mira Kovacs        Analyst    ***    $30k  Control Room  | [Assign...]    |
 |                                                            | [Unassign]     |
 |                                                            | [Dismiss(hold)]|
@@ -300,8 +292,7 @@ with pipeline, fee and arrival time, and **Hire** in the SELECTED panel.
   assigned.
 
 **On the plan:** each staffable room shows small pips for its slots (filled or empty), so
-an unstaffed plant or lab is visible at a glance. The power strip shows a crewless plant as
-"20 / 30 MW (needs engineers)".
+an unstaffed lab or Workshop is visible at a glance.
 
 ---
 
@@ -313,14 +304,14 @@ an unstaffed plant or lab is visible at a glance. The power strip shows a crewle
 | --- | --- | --- | --- | --- |
 | Dr Ana Ferreira | Scientist | 3 | $30k | Unassigned (no lab yet) |
 | Dr Tom Okafor | Scientist | 3 | $30k | Unassigned (no lab yet) |
-| Sgt Lena Brandt | Engineer | 3 | $30k | Power Plant |
-| Cpl Raul Mendes | Engineer | 2 | $25k | Power Plant |
+| Sgt Lena Brandt | Engineer | 3 | $30k | Unassigned (no Workshop yet) |
+| Cpl Raul Mendes | Engineer | 2 | $25k | Unassigned (no Workshop yet) |
 | Mira Kovacs | Analyst | 3 | $30k | Control Room |
 
-The scientists wait for the Research Lab and are **assigned to it automatically** when the
-first lab finishes (Log: "Research Lab staffed: 2 scientists."); after that, assignment is
-manual. With these five, every M2.5 number holds: the plant gives 30 MW, the lab runs at
-100%, the opening lock times are unchanged.
+The scientists wait for the Research Lab and the engineers for the Workshop (R7); each pair is
+**assigned automatically** when the first such room finishes (Log: "Research Lab staffed: 2
+scientists."); after that, assignment is
+manual. With these five, every M2.5 number holds: the lab runs at 100%, the opening lock times are unchanged.
 
 - **Salaries at start:** $145k a month. **Beds:** 5 of 6.
 - **Starting Confidence:** 50. **Starting funds:** $6,000k (unchanged).
@@ -328,27 +319,28 @@ manual. With these five, every M2.5 number holds: the plant gives 30 MW, the lab
 
 **A 30-day example (1 January to the 1 February month-end).** Two players, same start.
 
-| | A: research rush | B: power and people |
+| | A: research rush | B: power |
 | --- | --- | --- |
 | Capacitor Bank, Research Lab | 1,400 | 1,400 |
 | Research | R1, R4, R6, R7: 2,000 | R4, R6: 1,100 |
 | Second Power Plant | – | 2,000 |
 | Second Capacitor Bank | – | 600 |
-| Quarters | 150 | 150 |
-| Hires (first list) | Moreau, Arai: 60 | Kowalski, Lind: 60 |
-| **Spent** | **3,610** | **5,310** |
-| Balance before month-end | 2,390 | 690 |
-| Upkeep (rooms) | 270 | 430 |
-| Salaries (7 people) | 205 | 205 |
-| Balance after month-end | 4,915 | 3,055 |
+| Quarters | 150 | – |
+| Hires (first list) | Moreau, Arai: 60 | none |
+| **Spent** | **3,610** | **5,100** |
+| Balance before month-end | 2,390 | 900 |
+| Upkeep (rooms) | 270 | 420 |
+| Salaries | 205 (7 people) | 145 (5 people) |
+| Balance after month-end | 4,915 | 3,335 |
 | Confidence | +5 SILL, +12 research, +1, +2 = +20, capped +15 → **65** | +5 SILL, +6 research, +1, +2 = +14 → **64** |
 | Next allocation | 3,450 | 3,420 |
 | Power | 30 MW: Gate 5, Lab 5, one bank at 20 MW (R6 done, second bank not built) | 60 MW: Gate 5, Lab 5, banks at 30 + 20 MW |
 
 A's four scientists put R1, R4, R6 and R7 through in about 9 days (200% once the hires arrive),
 but the base still has one plant and 20 MW of charging. B fills two banks at 50 MW, more
-than double A's rate, and its four engineers crew both plants, but it ran two projects, ends
-the month with $1,860k less and a slightly smaller allocation.
+than double A's rate, but it hired no one, ran two projects at the starting speed, and ends the month with
+$1,580k less and a slightly smaller allocation. Its two engineers stay idle until it researches
+R7 and builds a Workshop.
 
 **Standing still.** An idle month with the starting crew scores −4 idle, +2 within budget
 and +1 reports = **−1**, about −$30k of allocation a month. PO proposal: keep it mild. The
@@ -357,11 +349,11 @@ is worth +11, about $330k more a month. That is the M2 done-when: power and mone
 with real trade-offs over a 30-day run.
 
 **Room upkeep check** for A: Control 40 + Plant 150 + Bank 10 + Lab 60 + Quarters 10 = 270.
-For B: + second Plant 150 + second Bank 10 = 430 (R5 brings each plant to 100).
+For B: no Quarters, + second Plant 150 + second Bank 10 = 420 (R5 brings each plant to 100).
 
 ---
 
-## 8. Saves and open questions
+## 8. Saves and owner decisions
 
 **Saves: clean break, v13.** The save gains the roster (people, assignments, arrival times),
 the candidate list and its random seed, Confidence, and months in the red.
@@ -369,19 +361,20 @@ A v12 base has staffable rooms with no one in them, which would load at floor ra
 surprise the player. As in M2 and M2.5, testers can start a new game in a minute; older saves get
 the existing "earlier build" message.
 
-**Decided here as PO proposals:** three roles now (medic and soldier wait); salary 15 + 5 ×
+**Approved PO proposals:** three roles now (medic and soldier wait); salary 15 + 5 ×
 skill; four candidates a month; one-month hiring fee; floor rates for every staffable room;
+plants need no staff;
 Quarters back in the palette from the start; Infirmary locked; research one project at a time with pooled scientists;
 supply drops take from charging first; Workshop 10% empty, 25%
 with a standard crew; five starting staff; Confidence 50 with the formula above; quarterly
 grant at 70+; Personnel on F5, Command to F6; save v13.
 
-**Open questions for the owner:**
+**Owner decisions (2026-11-02).** The owner approved this design and answered:
 
-1. **Unstaffed plant at 20 MW.** It makes engineers matter and makes a second plant cost
-   people, but a crewless plant is a power drop players may not expect. Keep it, or have plants
-   run at full output regardless of staff?
-2. **Bankruptcy and Confidence 0.** Count and warn in M2.6, game over from M3 (proposed), or
-   game over now?
-3. **Month-end pause.** A paused report each month (proposed, with a Settings toggle), or a
-   Log entry only?
+1. **Empty plant.** "You can decide on the easier": the PO ruled that a plant always gives its
+   full 30 MW, staffed or not. Plants have no staff slots in M2.6; engineers affect only
+   building and digging speed, through the Workshop.
+2. **Bankruptcy and Confidence 0** only warn (Log line and message). Ending the game comes
+   later (M3 or after).
+3. **Month-end report** does not pause: a Log entry and a non-blocking message the player can
+   open. No Settings toggle.
