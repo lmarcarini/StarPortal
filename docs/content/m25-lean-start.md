@@ -47,11 +47,20 @@ and a Research Lab (4 × 3) many times over, without any reserved site.
 3. When it is built the spare **25 MW** charges it by default: SILL's 366.6 MWh takes
    366.6 / 25 = **14.7 hours** (full, 400 MWh, in 16 hours).
 
-The first lock is possible about **15.7 game hours** after the start, against about 20.1 hours
-in M2: the same in-game day, and quicker. If the player builds the Research Lab first and
-switches it on, charging drops to 20 MW and the lock takes 18.3 hours of charging: still the
-same day. After the opening, $5,400k is left: enough for the lab ($800k) and the first two
-or three projects.
+**A finished room switches on, taking power from charging first** (rule in section 3). The
+clock starts at 00:00 on 1 January. Lock timings for SILL (366.6 MWh):
+
+- **Bank only:** bank done at 01:00, charging at 25 MW; lock ready about **15.7 h** in
+  (15:42 on day 1). M2 took about 20.1 h.
+- **Bank, then lab** (lab started when the bank is done): 200 MWh stored by 09:00, when the lab
+  finishes and charging drops to 20 MW ("Research Lab on: charging lowered to 20 MW"); lock
+  ready about **17.3 h** in, still day 1.
+- **Lab first, then bank:** lab done at 08:00, bank at 09:00, charging at 20 MW from the start;
+  lock ready about **27.3 h** in, on **day 2** (03:20). The player who builds the lab first
+  pays most of a day; the Gate Room button keeps pointing at the bank.
+
+After the bank, $5,400k pays for the lab ($800k) and all seven projects ($3,400k), with
+$1,200k left before the first month-end.
 
 ---
 
@@ -78,12 +87,28 @@ Stairs (unlocked with Level 2) or a Lift (its own project). Placement rule 3 is 
 these: stairs or a lift placed from a level above need to touch a corridor on that upper
 level only; on the empty level below they become the anchor that corridors join.
 
+**A lift and a new dig.** A lift built before a dig extends into the new level when the dig
+finishes, as one **lift segment: $100k, 1 hour**, charged and started automatically when the
+dig ends (refused with a message if funds are short; the player can then build it from the
+palette). A lift built after the dig takes its 2 × 2 cells on every existing level, at the
+full lift price.
+
 ---
 
 ## 3. Research, minimal
 
-Building a **Research Lab** enables research. With no lab, or with the lab switched off, the
+Building a **Research Lab** enables research. Like every room, it switches on when it
+finishes, lowering charging if needed (rule below). With no lab, or with the lab switched off, the
 Research view shows the projects but **Start** is greyed: "Needs a Research Lab that is on."
+
+**Rule: a finished room switches on, taking power from charging first (PO ruling).** When a
+room finishes building and its draw is more than the spare supply, the game lowers Capacitor
+Bank charge rates, newest bank first, by just enough. It never switches another room off. It
+shows a message and a Log line: "Research Lab on: charging lowered to 20 MW." If even zero
+charging is not enough, the room finishes **off**, with the existing refusal reason ("Needs
+5 MW; 0 MW spare."). This changes the M2 power rule: "switch off the newest switchable rooms
+first" now applies only to losing a plant and to demolition, not to a room finishing. The
+implementation card picks this up.
 
 **Projects.** One at a time. Each has a money cost, paid in full when started, and a time in
 days. There are no staff, so speed is fixed: a project takes exactly its listed time while
@@ -114,18 +139,19 @@ of real time at 10×. Days at 10×: 2 days = 4.8 min, 3 days = 7.2 min, 4 days =
 **stay locked until staff arrive** (M3) and are not research unlocks yet. The Archive room is
 cut (section 4). The workshop's prototype role waits for M4.
 
-**Slots for later** (shown as locked rows at the bottom of the list, "Requires an alien
-find", so the tree visibly has room; their names are hidden as "Unknown"):
+**Slots for later** (shown as locked rows at the bottom of the list, so the tree visibly has
+room; their names are hidden as "Unknown", with the reason in the Comes from column as the
+row's label: "Requires an alien find" or "Requires staff"):
 
 | Later unlock | Comes from |
 | --- | --- |
-| Capacitor lattice (much larger banks; the ninth-seal charge) | Alien find (M4) |
-| Anterite cell plant | Alien find (M4) |
-| Containment and Quarantine | Alien find (M4) |
-| Archive room (artefact store) | Alien find (M4) |
-| Xenobiology and Linguistics labs | Alien find (M4) |
-| Fission plant | Ordinary research, once staff exist (M3 or M4) |
-| Quarters, Infirmary | Staff (M3) |
+| Capacitor lattice (much larger banks; the ninth-seal charge) | Requires an alien find (M4) |
+| Anterite cell plant | Requires an alien find (M4) |
+| Containment and Quarantine | Requires an alien find (M4) |
+| Archive room (artefact store) | Requires an alien find (M4) |
+| Xenobiology and Linguistics labs | Requires an alien find (M4) |
+| Fission plant | Requires staff (research once staff exist, M3 or M4) |
+| Quarters, Infirmary | Requires staff (M3) |
 
 **Where it lives.** A **Research view** inside the Base tab (bible: Research lives inside the
 Base). **R**, or a **Research** button at the right end of the power strip, swaps the
@@ -142,7 +168,8 @@ Base). **R**, or a **Research** button at the right end of the power strip, swap
 |   Fuel contracts         $300k  2 d   Upkeep    needs R4    |               |
 |   Bank array             $600k  3 d   3 banks       [Start] | [Start]       |
 |   Field engineering      $500k  3 d   Workshop      [Start] |               |
-|   Unknown                Requires an alien find      locked |               |
+|   Unknown                Requires an alien find      locked |
+|   Unknown                Requires staff              locked |               |
 +-------------------------------------------------------------+---------------+
 ```
 
@@ -169,7 +196,7 @@ the current `ROOM_*_DESC`; "Later" is shown under it in grey, as "Later: …".
 | Power Plant | Gives 30 MW while on. Upkeep is fuel. | Upgrades to fission and beyond. |
 | Capacitor Bank | Stores 400 MWh for the Ring, charged from spare power. | Larger banks from alien designs. |
 | Research Lab | Runs one research project at a time. | Scientists make research faster. |
-| Workshop | While on, building sites finish 25% faster. | Builds prototypes and equipment. |
+| Workshop | While on, building sites and digs finish 25% faster. | Builds prototypes and equipment. |
 | Stairs | Joins one level to the next. | Squads move between levels. |
 | Lift | Joins every level through the same 2 × 2 cells. | Moves squads faster than stairs. |
 | Corridor | Connects rooms. One cell. | Blast doors make chokepoints. |
@@ -181,7 +208,7 @@ the current `ROOM_*_DESC`; "Later" is shown under it in grey, as "Later: …".
 | Power Plant | Gera 30 MW enquanto ligada. A manutenção é combustível. | Evolui para fissão e além. |
 | Capacitor Bank | Armazena 400 MWh para o Anel, carregado com a energia livre. | Bancos maiores a partir de projetos alienígenas. |
 | Research Lab | Conduz um projeto de pesquisa por vez. | Cientistas aceleram a pesquisa. |
-| Workshop | Ligada, as obras terminam 25% mais rápido. | Constrói protótipos e equipamentos. |
+| Workshop | Ligada, as obras e escavações terminam 25% mais rápido. | Constrói protótipos e equipamentos. |
 | Stairs | Liga um nível ao seguinte. | Esquadrões circulam entre os níveis. |
 | Lift | Liga todos os níveis pelas mesmas células 2 × 2. | Leva esquadrões mais rápido que a escada. |
 | Corridor | Liga as salas. Uma célula. | Portas blindadas criam pontos de estrangulamento. |
@@ -191,9 +218,10 @@ progresses 25% faster (a 4-hour site takes 3.2 hours). It costs 5 MW, so the pla
 charge rate for build speed: a small, real decision. A second workshop adds nothing.
 
 **Research Lab** replaces the Physics Lab (4 × 3, $800k, 5 MW, $60k a month). It splits into
-physics, xenobiology and linguistics labs once staff and alien finds arrive.
+physics, xenobiology and linguistics labs once staff and alien finds arrive. Name strings:
+`ROOM_RESEARCH_LAB_NAME`, en **Research Lab**, pt_BR **Laboratório de Pesquisa**.
 
-**Archive: cut from M2.5 (PO proposal accepted).** The Archive tab (F2) works without it, and
+**Archive: cut from M2.5 (PO proposal; open question 1).** The Archive tab (F2) works without it, and
 the only role found for it, "+10% research next to the lab", is a 3 × 3 room for a bonus the
 player can't feel with one fixed-speed project. It returns in M4 as the artefact store. The
 "Lab next to the Archive" adjacency bonus goes with it.
@@ -215,7 +243,7 @@ player can't feel with one fixed-speed project. It returns in M4 as the artefact
 | Power Plant | 5 × 4 | 2,000 | 1 day | 24 min | 2.4 min | +30 | 150 (100 after R5) |
 | Dig Level 2 / 3 / 4 | 36 × 20 | 1,500 / 2,500 / 3,500 | 3 / 4 / 5 days | 72 / 96 / 120 min | 7.2 / 9.6 / 12 min | 0 | 0 |
 
-In M2 a plant took 10 days and a dig 20: the new times are 4 to 10 times shorter. Demolishing
+In M2 a plant took 10 days and a dig 20: the new times are 6 to 24 times shorter (bank and corridor 6×, digs about 7×, plant 10×, lab 15×, workshop 20×, lift and stairs 24×). Demolishing
 still takes a quarter of the build time. Up to three sites at once, as before. The Workshop
 bonus (section 4) shortens all of these by a fifth.
 
@@ -232,6 +260,11 @@ The early base read as 2, 1, 1, 4 and 26 MW: too many small numbers.
 - **Option B, abstract power units.** Drop MW from the base: plant 6 units, rooms 1 unit.
   Simpler still, but charging must then convert units to MWh per hour, which hides the link
   between the plant and the capacitors that the Gate Room shows in MWh.
+
+**Fallback if the owner defers the blocks:** keep M2's draws (Gate 2, Control 1, Research
+Lab 4, Workshop 5) and the 1 MW charge-rate steps. Spare at start is then 27 MW: bank only,
+lock about 14.6 h in; bank then lab (23 MW from 09:00), about 15.9 h; lab first, about
+24.9 h (day 2). Every other number in this document stands.
 
 **Recommendation: apply Option A now.** It is only data changes (draws and the meter's
 segment size), the catalogue is being re-timed anyway, and every number in this document

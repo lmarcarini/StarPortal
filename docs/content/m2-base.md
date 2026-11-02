@@ -314,6 +314,8 @@ be loaded in this one. Start a new game." Nothing from an old save is carried ov
 
 ## 8. Owner decisions (2026-10-31)
 
+> **Superseded in part for M2.5:** see [m25-lean-start.md](m25-lean-start.md); decisions 1 (no alcove, one-click build), 2 (starting draw and the finished-room power rule) and 4 (v12) are revised there; 5 now starts with Level 1 only.
+
 1. **Opening.** "Build capacitor bank" in the Gate Room stays as one of the first actions, to
    teach base building (section 2). Future: it moves onto the base screen, with a tutorial
    leading the player there.
