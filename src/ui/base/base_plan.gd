@@ -1,16 +1,17 @@
 class_name BasePlan
 extends Control
 ## The plan of one base level, straight from above (docs/content/m2-base.md section 6). Read
-## only: it shows the rooms at their cells, sites hatched, the capacitor alcove as a marked
-## site while it is free, and the selection. The mouse wheel or the right stick zooms; a right
+## only: it shows the rooms at their cells, sites hatched, and the selection. No cell is
+## reserved. The mouse wheel or the right stick zooms; a right
 ## or middle drag or the left stick pans; a click or (A) on the cursor cell selects what is
 ## there; the arrow keys or the D-pad move the cell cursor.
 ## Bible: docs/content/m2-base.md section 6, game-design.md#base-building-and-power
 
-## Emitted when the selection changes: a room id, [constant ALCOVE], or [code]&""[/code].
+## Emitted when the selection changes: a room id or [code]&""[/code].
 signal selection_changed(selected: StringName)
 
-## Selection id of the capacitor alcove.
+## Former selection id of the capacitor alcove (removed by card #158). Nothing selects it any
+## more; kept only while base_view_power.gd (card #157) still compares against it.
 const ALCOVE: StringName = &"alcove"
 
 ## Level shown, 1 the top one.
@@ -22,8 +23,6 @@ var view: ZoomPan = ZoomPan.new()
 
 var _base: BaseState = null
 var _defs: Dictionary = {}
-var _alcove: Rect2i = Rect2i()
-var _alcove_level: int = 0
 var _selected: StringName = &""
 var _dragging: bool = false
 
@@ -34,16 +33,14 @@ func _ready() -> void:
 	resized.connect(_on_resized)
 
 
-## Shows [param base], with its RoomDefs by id in [param defs], and the capacitor alcove
-## [param alcove] on level [param alcove_level]. Keeps the level when it still exists.
-func show_base(base: BaseState, defs: Dictionary, alcove: Rect2i, alcove_level: int) -> void:
+## Shows [param base], with its RoomDefs by id in [param defs]. Keeps the level when it still
+## exists.
+func show_base(base: BaseState, defs: Dictionary) -> void:
 	_base = base
 	_defs = defs
-	_alcove = alcove
-	_alcove_level = alcove_level
 	level = clampi(level, 1, maxi(1, base.level_count))
 	view.reset(Vector2(base.grid_size) * BasePlanPainter.CELL, size)
-	if _selected != ALCOVE and base.find_room(_selected) == null:
+	if base.find_room(_selected) == null:
 		select(&"")
 	queue_redraw()
 
@@ -60,12 +57,12 @@ func show_level(number: int) -> void:
 	queue_redraw()
 
 
-## Returns the selection: a room id, [constant ALCOVE], or [code]&""[/code].
+## Returns the selection: a room id or [code]&""[/code].
 func selected() -> StringName:
 	return _selected
 
 
-## Selects [param id] (a room id, [constant ALCOVE] or [code]&""[/code]).
+## Selects [param id] (a room id or [code]&""[/code]).
 func select(id: StringName) -> void:
 	if id == _selected:
 		return
@@ -74,8 +71,7 @@ func select(id: StringName) -> void:
 	selection_changed.emit(id)
 
 
-## Returns what stands at [param cell] on the shown level: a room id, [constant ALCOVE] when
-## the alcove is free there, or [code]&""[/code].
+## Returns what stands at [param cell] on the shown level: a room id or [code]&""[/code].
 func item_at(cell: Vector2i) -> StringName:
 	if _base == null:
 		return &""
@@ -83,8 +79,6 @@ func item_at(cell: Vector2i) -> StringName:
 		var def: RoomDef = _def(room.def_id)
 		if def != null and BaseRules.footprint(room, def).has_point(cell):
 			return room.id
-	if _alcove_free() and _alcove.has_point(cell):
-		return ALCOVE
 	return &""
 
 
@@ -94,26 +88,12 @@ func cell_at(point: Vector2) -> Vector2i:
 	return Vector2i((plan_point / BasePlanPainter.CELL).floor())
 
 
-## True while the alcove is on the shown level and no room covers any of its cells.
-func _alcove_free() -> bool:
-	if _alcove_level != level or _alcove.size == Vector2i.ZERO:
-		return false
-	for room: RoomState in BaseRules.rooms_on_level(_base, level):
-		var def: RoomDef = _def(room.def_id)
-		if def != null and BaseRules.footprint(room, def).intersects(_alcove):
-			return false
-	return true
-
-
 func _draw() -> void:
 	if _base == null:
 		return
 	draw_set_transform(view.offset, 0.0, Vector2.ONE * view.scale())
 	BasePlanPainter.draw_ground(self, _base.grid_size)
 	var font: Font = get_theme_default_font()
-	if _alcove_free():
-		BasePlanPainter.draw_site(self, _alcove)
-		BasePlanPainter.draw_label(self, _alcove, tr(&"BASE_ALCOVE_LABEL"), font)
 	for room: RoomState in BaseRules.rooms_on_level(_base, level):
 		_draw_room(room, font)
 	var chosen: Rect2i = _selected_cells()
@@ -140,8 +120,6 @@ func _draw_room(room: RoomState, font: Font) -> void:
 
 
 func _selected_cells() -> Rect2i:
-	if _selected == ALCOVE:
-		return _alcove
 	var room: RoomState = _base.find_room(_selected)
 	if room == null or room.level != level:
 		return Rect2i()

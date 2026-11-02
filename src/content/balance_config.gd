@@ -43,10 +43,6 @@ const BALANCE_ID: StringName = &"balance"
 @export var base_grid_size: Vector2i = Vector2i(36, 20)
 ## Underground levels a new game starts with, all dug; the Ring is on the deepest.
 @export var starting_levels: int = 3
-## Level of the capacitor alcove, the marked site for the first Capacitor Bank.
-@export var capacitor_alcove_level: int = 3
-## Top-left cell of the capacitor alcove; its size is the Capacitor Bank's footprint.
-@export var capacitor_alcove_origin: Vector2i = Vector2i(22, 10)
 ## Cost of digging each extra level, in $k, in order (Level 4, Level 5); its size is the most
 ## extra levels M2 allows (m2-base.md section 4).
 @export var dig_level_costs_k: Array[int] = [3000, 4500]

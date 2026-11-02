@@ -2,13 +2,13 @@ class_name StartingBase
 extends RefCounted
 ## Builds the base a new game starts with (docs/content/m2-base.md section 2): the starting
 ## levels, all dug, each with a corridor spine and the lift shaft, the Power Plant and two
-## Quarters on Level 1, the Archive on Level 2, and the Gate Room, Control Room and the
-## capacitor alcove (left free) on Level 3. Pure: depends only on the BalanceConfig.
+## Quarters on Level 1, the Archive on Level 2, and the Gate Room and Control Room on Level 3.
+## No cell is reserved. Pure: depends only on the BalanceConfig.
 ## Bible: game-design.md#base-building-and-power, docs/content/m2-base.md
 
 ## The Gate Room's def id; the Ring sits on the deepest starting level.
 const GATE_ROOM_DEF: StringName = &"room_gate"
-## The Capacitor Bank's def id; its footprint is the capacitor alcove's.
+## The Capacitor Bank's def id.
 const CAPACITOR_BANK_DEF: StringName = &"room_capacitor_bank"
 ## Corridor def id: one cell per room.
 const CORRIDOR_DEF: StringName = &"room_corridor"
@@ -32,7 +32,7 @@ const ROOMS_GATE_LEVEL: Array = [
 	[&"room_control", Vector2i(15, 12)],
 ]
 ## Extra corridor cells on the Gate level, as (column, first row, last row): one branch to the
-## Gate Room's west wall and one beside the capacitor alcove.
+## Gate Room's west wall and one up column 25.
 const GATE_LEVEL_BRANCHES: Array[Vector3i] = [Vector3i(13, 8, 14), Vector3i(25, 10, 14)]
 
 
@@ -53,12 +53,6 @@ static func build(balance: BalanceConfig) -> BaseState:
 		for row: int in range(branch.y, branch.z + 1):
 			base.add_room(CORRIDOR_DEF, balance.starting_levels, Vector2i(branch.x, row))
 	return base
-
-
-## Returns the capacitor alcove's cells: the balance's alcove origin and [param bank]'s
-## footprint, unturned. The starting base leaves it free.
-static func alcove(balance: BalanceConfig, bank: RoomDef) -> Rect2i:
-	return Rect2i(balance.capacitor_alcove_origin, bank.size_cells)
 
 
 static func _rooms_for(level: int, deepest: int) -> Array:

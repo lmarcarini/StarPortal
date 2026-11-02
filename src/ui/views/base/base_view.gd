@@ -51,10 +51,7 @@ func setup(simulation: Simulation) -> void:
 	_simulation = simulation
 	_defs = _room_defs()
 	var base: BaseState = simulation.state.base
-	var balance: BalanceConfig = _balance()
-	var bank: RoomDef = _def(StartingBase.CAPACITOR_BANK_DEF)
-	var alcove: Rect2i = StartingBase.alcove(balance, bank) if bank != null else Rect2i()
-	_plan.show_base(base, _defs, alcove, balance.capacitor_alcove_level)
+	_plan.show_base(base, _defs)
 	_levels.show_levels(base.levels, _plan.level)
 	_show_level(gate_level(base))
 	_signature = signature(base)
@@ -150,9 +147,6 @@ static func signature(base: BaseState) -> int:
 
 func _on_selection_changed(selected: StringName) -> void:
 	_power.select(selected)
-	if selected == BasePlan.ALCOVE:
-		_panel.show_alcove(_def(StartingBase.CAPACITOR_BANK_DEF))
-		return
 	if _simulation == null:
 		return
 	var room: RoomState = _simulation.state.base.find_room(selected)
@@ -163,14 +157,6 @@ func _on_selection_changed(selected: StringName) -> void:
 		_panel.show_nothing()
 		return
 	_panel.show_room(room, def)
-
-
-func _balance() -> BalanceConfig:
-	if _simulation.state.balance != null:
-		return _simulation.state.balance
-	if Registry.balance() != null:
-		return Registry.balance()
-	return BalanceConfig.new()
 
 
 static func _room_defs() -> Dictionary:
@@ -204,18 +190,23 @@ func _setup_power() -> void:
 # --- Building (card #140): palette, placement ghost, panel actions, dig -------------------
 
 
-## Starts placing a Capacitor Bank in the capacitor alcove: shows its level, centres the plan
-## on it and puts the ghost there, so one hold builds it (the Gate Room's button).
+## Starts placing a Capacitor Bank for the Gate Room's button: shows the Gate Room's level,
+## and puts the ghost on the nearest valid spot to the Gate Room (BaseSpots.bank_spot),
+## centred, so one click builds it. With no valid spot the ghost still comes out, on the Gate
+## Room, and the palette says why.
 func place_capacitor_bank() -> void:
-	if _simulation == null:
+	if _simulation == null or _def(StartingBase.CAPACITOR_BANK_DEF) == null:
 		return
-	var bank: RoomDef = _def(StartingBase.CAPACITOR_BANK_DEF)
-	if bank == null:
-		return
-	var balance: BalanceConfig = _balance()
-	_show_level(balance.capacitor_alcove_level)
+	var base: BaseState = _simulation.state.base
+	_show_level(gate_level(base))
 	_close_energy_layer()
-	_build.place_at(bank.id, StartingBase.alcove(balance, bank).position)
+	var spot: Vector2i = BaseSpots.bank_spot(base, _defs)
+	if spot != BaseSpots.NO_SPOT:
+		_build.place_at(StartingBase.CAPACITOR_BANK_DEF, spot)
+		return
+	var gate: RoomState = BaseSpots.gate_room(base)
+	_build.place_at(StartingBase.CAPACITOR_BANK_DEF, gate.origin if gate != null else Vector2i.ZERO)
+	_palette.show_message(tr(&"BASE_BUILD_NO_BANK_SPOT").format({"n": gate_level(base)}))
 
 
 ## Returns the building controller, for tests.

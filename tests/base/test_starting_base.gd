@@ -1,5 +1,6 @@
 ## Tests for StartingBase: the m2-base.md section 2 layout, every pre-built room fits and
-## touches a corridor or lift, and the capacitor alcove is free and beside the Gate Room.
+## touches a corridor or lift, and no cell is reserved: the first
+## Capacitor Bank finds a spot sharing a wall with the Gate Room.
 ## Bible: game-design.md#base-building-and-power, docs/content/m2-base.md (section 2)
 extends GdUnitTestSuite
 
@@ -80,15 +81,13 @@ func test_rooms_fit_and_connect() -> void:
 		assert_bool(touches).override_failure_message(String(room.id)).is_true()
 
 
-## The capacitor alcove is inside the grid on the Gate level, overlaps nothing, shares a wall
-## with the Gate Room and touches a corridor.
-func test_alcove_reserved() -> void:
+## Nothing is reserved: the first bank's spot (BaseSpots.bank_spot) is on the Gate level, fits,
+## shares a wall with the Gate Room and touches a corridor.
+func test_first_bank_spot_beside_the_gate_room() -> void:
 	var base := StartingBase.build(_balance)
-	var bank: RoomDef = _defs[&"room_capacitor_bank"]
-	var alcove: Rect2i = StartingBase.alcove(_balance, bank)
-	assert_int(_balance.capacitor_alcove_level).is_equal(3)
-	assert_bool(Rect2i(Vector2i.ZERO, base.grid_size).encloses(alcove)).is_true()
-	var probe := RoomState.create(&"probe", &"room_capacitor_bank", 3, alcove.position)
+	var spot: Vector2i = BaseSpots.bank_spot(base, _defs)
+	assert_vector(Vector2(spot)).is_not_equal(Vector2(BaseSpots.NO_SPOT))
+	var probe := RoomState.create(&"probe", &"room_capacitor_bank", 3, spot)
 	assert_bool(BaseRules.fits(base, _defs, probe)).is_true()
 	var next_to: Array[StringName] = []
 	for other: RoomState in BaseRules.neighbours(base, _defs, probe):

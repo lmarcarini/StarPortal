@@ -5,7 +5,7 @@ extends VBoxContainer
 ## against the capacity, and the two numbers. It never shows the charge an address needs: the
 ## player judges that from the outcome. While no bank exists or is being built, a
 ## Build capacitor bank button asks (through [signal build_bank_requested]) for the Base tab
-## with the bank's ghost in the capacitor alcove.
+## with the bank's ghost on the nearest valid spot.
 ## Bible: gate-and-address-spec.md#the-dial-console, docs/content/m2-base.md sections 2 and 3
 
 ## Emitted when the player presses Build capacitor bank.

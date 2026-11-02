@@ -1,6 +1,6 @@
 ## Tests for building from the Base tab: the palette places rooms through the ghost (valid and
 ## invalid with reasons), rotate, one click to build, corridor painting, cancel and demolish with
-## refunds, dig, the Gate Room button's alcove ghost, the signature, and the 1280 × 720 fit.
+## refunds, dig, the Gate Room button's bank ghost, the signature, and the 1280 × 720 fit.
 ## Bible: docs/content/m2-base.md sections 2, 4 and 6
 extends GdUnitTestSuite
 
@@ -50,6 +50,8 @@ func test_capacitor_bank_button_places_the_ghost_and_one_click_builds() -> void:
 	var ghost: PlacementGhost = _ghost()
 	assert_bool(ghost.is_placing()).is_true()
 	assert_int(_view.get_plan().level).is_equal(3)
+	var spot: Vector2i = BaseSpots.bank_spot(_simulation.state.base, _simulation.state.room_defs)
+	assert_vector(Vector2(ghost.origin)).is_equal(Vector2(spot))
 	assert_str(ghost.reason()).is_empty()
 	var funds: int = _simulation.state.budget.funds_k
 	ghost.confirm()
@@ -106,6 +108,20 @@ func test_corridor_painting_builds_one_run() -> void:
 	var before: int = _count(StartingBase.CORRIDOR_DEF)
 	ghost.confirm()
 	assert_int(_count(StartingBase.CORRIDOR_DEF)).is_equal(before + 2)
+
+
+## With no valid spot on the Gate level (no corridor or lift left there), the button still
+## shows the Gate level with the ghost out, and the palette says why.
+func test_capacitor_bank_button_without_a_spot_explains() -> void:
+	var base: BaseState = _simulation.state.base
+	for room: RoomState in BaseRules.rooms_on_level(base, 3):
+		if BaseRules.is_connector(room.def_id):
+			base.rooms.erase(room)
+	_view.place_capacitor_bank()
+	assert_bool(_ghost().is_placing()).is_true()
+	assert_int(_view.get_plan().level).is_equal(3)
+	assert_str(_ghost().reason()).is_not_empty()
+	assert_str(_view.get_palette().get_hint()).starts_with("No free 3 × 2 spot")
 
 
 func test_cancel_site_shows_and_pays_the_refund() -> void:
