@@ -26,6 +26,10 @@ const ROOMS: Array[StringName] = [
 	&"room_corridor",
 ]
 
+## Extra lines shown under a room's "now" line on hover or focus, as {def id: text}; set by
+## the Base view (the second Research Lab note, m25-lean-start.md section 3).
+var notes: Dictionary[StringName, String] = {}
+
 var _rooms: HFlowContainer = HFlowContainer.new()
 var _dig: DigButton = DigButton.new()
 var _hint: Label = Label.new()
@@ -157,6 +161,9 @@ func _show_summary(def_id: StringName) -> void:
 	if def != null:
 		show_message(BuildText.summary(def))
 		_role.text = role_line(def_id)
+		var note: String = notes.get(def_id, "")
+		if not note.is_empty():
+			_role.text = "%s\n%s" % [_role.text, note]
 		_role.visible = not _role.text.is_empty()
 
 

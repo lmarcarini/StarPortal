@@ -57,6 +57,7 @@ func setup(simulation: Simulation) -> void:
 	_signature = signature(base)
 	_setup_build()
 	_power.setup(simulation)
+	_refresh_lab_note()
 
 
 func get_default_focus() -> Control:
@@ -111,6 +112,7 @@ func _refresh() -> void:
 	_on_selection_changed(_plan.selected())
 	_refresh_build()
 	_power.refresh()
+	_refresh_lab_note()
 
 
 func _on_tick_advanced(_tick: int) -> void:
@@ -281,3 +283,16 @@ func _build_input(event: InputEvent) -> bool:
 		return false
 	get_viewport().set_input_as_handled()
 	return true
+
+
+# --- Research (card #167): the palette's note on a second Research Lab ---------------------
+
+
+## With a Research Lab already on the base (built or building), hovering or focusing the
+## palette's Research Lab says "One lab is enough until staff arrive." Building stays allowed.
+func _refresh_lab_note() -> void:
+	_palette.notes.erase(ResearchRules.LAB_DEF)
+	for room: RoomState in _simulation.state.base.rooms:
+		if room.def_id == ResearchRules.LAB_DEF:
+			_palette.notes[ResearchRules.LAB_DEF] = tr(&"RESEARCH_ONE_LAB_ENOUGH")
+			return
