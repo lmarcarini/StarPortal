@@ -251,3 +251,24 @@ Each entry has four fields:
 - **Decision:** A new game starts with one level (the Ring's) holding only the Gate Room, Control Room and one diesel plant, and $6,000k. A Research Lab (replacing the Physics Lab) runs seven projects that unlock digging, stairs and lifts, more plants, cheaper fuel, up to three banks and the Workshop. The Archive room is cut until M4 (artefact store); Quarters and Infirmary stay locked until staff. Build times are 6 to 24 times shorter. Power is counted in whole 5 MW blocks. A room that finishes building switches on by lowering charge rates first and never switches another room off. The Workshop makes sites and digs finish 25% faster while on. The lock estimator waits for M4. Saves move to v12 (clean break).
 - **Reason:** M2 playtest: the start offered too much at once, building felt slow even at 10x, room roles were unclear, and power numbers were too fine-grained.
 - **Bible section:** [game-design.md#base-building-and-power](bible/game-design.md#base-building-and-power); details in [content/m25-lean-start.md](content/m25-lean-start.md)
+
+## 2026-11-02 — M2.5: Research is its own tab (F4)
+
+- **Date:** 2026-11-02
+- **Decision:** Research is a fourth tab, **Research** (F4), after Gate Room, Archive and Base. It is hidden until a Research Lab has finished building and then stays for the rest of the game, even with the lab off or demolished (Start is then greyed: "Needs a Research Lab that is on."). It replaces the planned view swapped into the Base tab with R, L3 or a power-strip button.
+- **Reason:** Owner change: research is a place of its own, not a mode of the base plan, and a full-width list reads better than a panel squeezed beside the plan.
+- **Bible section:** [game-design.md#research-artefacts-and-transformations](bible/game-design.md#research-artefacts-and-transformations); details in [content/m25-lean-start.md](content/m25-lean-start.md) section 3
+
+## 2026-11-02 — M2.5: refunds are a share of what was paid
+
+- **Date:** 2026-11-02
+- **Decision:** Every room remembers what was paid for it (`paid_k` in the save, 0 when missing). Cancelling a site (75%) and demolishing a room (50%) refund a share of that amount, not of the catalogue price.
+- **Reason:** M2.5 makes prices vary: a lift segment costs $100k, not the $400k lift, and a lift placed on a shaft from the palette is charged the segment price. Refunding from the catalogue price would pay back more than was spent.
+- **Bible section:** [game-design.md#base-building-and-power](bible/game-design.md#base-building-and-power); details in [content/m25-lean-start.md](content/m25-lean-start.md) section 2
+
+## 2026-11-02 — M2.5: lift segments belong to their shaft
+
+- **Date:** 2026-11-02
+- **Decision:** A lift segment (the $100k, 1-hour extension started when a dig finishes under a built lift) is its own construction site while it builds: it takes no building slot and can be cancelled alone. Once built it joins its shaft, which is then selected, demolished and refunded as one room on all its levels. Demolishing a shaft also removes its segments still building, at the cancel rate.
+- **Reason:** A shaft with a separate finished segment could be demolished in pieces, leaving a lift that joins nothing; one shaft, one room keeps the plan and the refunds simple.
+- **Bible section:** [game-design.md#base-building-and-power](bible/game-design.md#base-building-and-power); details in [content/m25-lean-start.md](content/m25-lean-start.md) section 2
