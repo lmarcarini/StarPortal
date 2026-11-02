@@ -9,10 +9,8 @@ ROOM_CAPACITOR_BANK_NAME,Capacitor Bank,Banco de Capacitores
 ROOM_CAPACITOR_BANK_DESC,"Stores 400 MWh for the Ring, charged from spare power.","Armazena 400 MWh para o Anel, carregado com a energia livre."
 ROOM_QUARTERS_NAME,Quarters,Alojamento
 ROOM_QUARTERS_DESC,Six beds. Staff arrive later.,Seis camas. A equipe chega depois.
-ROOM_ARCHIVE_NAME,Archive,Arquivo
-ROOM_ARCHIVE_DESC,Holds the documents. Labs next to it work faster.,Guarda os documentos. Laboratórios vizinhos trabalham mais rápido.
-ROOM_PHYSICS_LAB_NAME,Physics Lab,Laboratório de Física
-ROOM_PHYSICS_LAB_DESC,Labs open when research does.,Os laboratórios abrem quando a pesquisa abrir.
+ROOM_RESEARCH_LAB_NAME,Research Lab,Laboratório de Pesquisa
+ROOM_RESEARCH_LAB_DESC,Runs one research project at a time.,Conduz um projeto de pesquisa por vez.
 ROOM_WORKSHOP_NAME,Workshop,Oficina
 ROOM_WORKSHOP_DESC,Opens when prototypes do.,Abre quando os protótipos abrirem.
 ROOM_INFIRMARY_NAME,Infirmary,Enfermaria
@@ -71,7 +69,6 @@ BASE_BUILD_ERR_LEVEL_NOT_DUG,The level is still being dug.,O nível ainda está 
 BASE_BUILD_ERR_INVALID_RUN,Paint one joined corridor run.,Pinte um trecho de corredor contínuo.
 BASE_BUILD_ERR_NOT_BUILDABLE,This room can't be built.,Esta sala não pode ser construída.
 BASE_BUILD_ERR_FIXED_ROOM,The Gate and Control Rooms stay.,As Salas do Portal e de Controle ficam.
-BASE_BUILD_ERR_STARTING_LIFT,The starting lift stays.,O elevador inicial fica.
 BASE_BUILD_ERR_LAST_PLANT,The base's last running plant.,A última usina em funcionamento da base.
 BASE_BUILD_ERR_LEAVES_ROOM_UNCONNECTED,A room would touch no corridor.,Uma sala ficaria sem corredor.
 BASE_BUILD_ERR_ALREADY_DEMOLISHING,Coming down.,Em demolição.
@@ -79,6 +76,17 @@ BASE_BUILD_ERR_DEMOLITION_IN_PROGRESS,Part of the site is coming down.,Parte da 
 BASE_BUILD_ERR_DIG_RUNNING,A level is already being dug.,Um nível já está sendo escavado.
 BASE_BUILD_ERR_LEVEL_LIMIT,All levels dug.,Todos os níveis escavados.
 BASE_BUILD_NO_BANK_SPOT,"No free 3 × 2 spot touching a corridor on Level {n}. Clear space, or lay a corridor, then try again.","Nenhum espaço livre de 3 × 2 tocando um corredor no Nível {n}. Libere espaço ou faça um corredor e tente de novo."
+BASE_BUILD_ERR_NEEDS_RESEARCH,Needs research: {name}.,Precisa de pesquisa: {name}.
+BASE_BUILD_ERR_NEEDS_STAFF,Locked until staff arrive.,Bloqueada até a equipe chegar.
+BASE_BUILD_ERR_BANK_CAP_UNTIL,Up to {n} Capacitor Bank until {name}.,Até {n} Banco de Capacitores até {name}.
+BASE_BUILD_ERR_BANK_CAP,Up to {n} Capacitor Banks.,Até {n} Bancos de Capacitores.
+RESEARCH_EXCAVATION_SURVEY_NAME,Excavation survey,Levantamento de escavação
+RESEARCH_LIFT_SHAFT_NAME,Lift shaft,Poço do elevador
+RESEARCH_DEEP_EXCAVATION_NAME,Deep excavation,Escavação profunda
+RESEARCH_SECOND_PLANT_NAME,Second plant,Segunda usina
+RESEARCH_FUEL_CONTRACTS_NAME,Fuel contracts,Contratos de combustível
+RESEARCH_BANK_ARRAY_NAME,Bank array,Conjunto de bancos
+RESEARCH_FIELD_ENGINEERING_NAME,Field engineering,Engenharia de campo
 BASE_BUILD_ERR_OTHER,Can't do that here.,Não é possível aqui.
 BASE_POWER_BAR_CHARGE,Charge,Carga
 BASE_POWER_SUPPLY,{supply} MW · {spare} spare,{supply} MW · {spare} livres

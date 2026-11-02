@@ -33,21 +33,32 @@ const BALANCE_ID: StringName = &"balance"
 @export_group("Capacitor banks")
 ## Storage one installed capacitor bank adds, in MWh.
 @export var capacitor_bank_capacity_mwh: float = 400.0
-## Ticks installing one capacitor bank takes: six in-game hours.
-@export var capacitor_bank_install_ticks: int = 360
-## Capacitor banks the base has room for.
+## Ticks installing one capacitor bank takes: one in-game hour (m25-lean-start.md section 5).
+@export var capacitor_bank_install_ticks: int = 60
+## Capacitor banks a new game may build (the starting bank cap); the Bank array research
+## raises it (UnlockState.bank_cap).
 @export var max_capacitor_banks: int = 1
 
 @export_group("Base")
 ## Cells of every level (width × height), 3 m each (m2-base.md section 2).
 @export var base_grid_size: Vector2i = Vector2i(36, 20)
-## Underground levels a new game starts with, all dug; the Ring is on the deepest.
-@export var starting_levels: int = 3
-## Cost of digging each extra level, in $k, in order (Level 4, Level 5); its size is the most
-## extra levels M2 allows (m2-base.md section 4).
-@export var dig_level_costs_k: Array[int] = [3000, 4500]
-## Ticks of digging each extra level, in order: 20 and 30 in-game days.
-@export var dig_level_ticks: Array[int] = [28800, 43200]
+## Underground levels a new game starts with, all dug; the Ring is on Level 1
+## (m25-lean-start.md section 1).
+@export var starting_levels: int = 1
+## Cost of digging each extra level, in $k, in order (Level 2, 3, 4); its size is the most
+## extra levels M2.5 allows (m25-lean-start.md section 2).
+@export var dig_level_costs_k: Array[int] = [1500, 2500, 3500]
+## Ticks of digging each extra level, in order: 3, 4 and 5 in-game days.
+@export var dig_level_ticks: Array[int] = [4320, 5760, 7200]
+## Cost of one lift segment, in $k: a lift extended into a newly dug level
+## (m25-lean-start.md section 2; used by card M2.5-07).
+@export var lift_segment_cost_k: int = 100
+## Ticks one lift segment takes to build: one in-game hour.
+@export var lift_segment_ticks: int = 60
+## Room def ids a new game may build before any research (m25-lean-start.md section 1).
+@export var starting_room_unlocks: Array[StringName] = [
+	&"room_capacitor_bank", &"room_research_lab", &"room_corridor"
+]
 
 @export_group("Dial outcomes")
 ## Fraction of the lock energy spent on a No gate outcome.
@@ -62,8 +73,8 @@ const BALANCE_ID: StringName = &"balance"
 @export var max_open_ticks: int = 60
 
 @export_group("Money")
-## Budget a new game starts with, in thousands of dollars (m2-base.md section 5).
-@export var starting_budget_k: int = 12000
+## Budget a new game starts with, in thousands of dollars (m25-lean-start.md section 1).
+@export var starting_budget_k: int = 6000
 ## Fixed allocation paid at each month-end, in thousands of dollars (m2-base.md section 5).
 @export var monthly_allocation_k: int = 3000
 

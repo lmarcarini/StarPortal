@@ -2,9 +2,13 @@ class_name ContentCheckRooms
 extends RefCounted
 ## Content checks for the room definitions: the always-on rule (m2-base.md section 3), a
 ## size of at least one cell that fits a level's
-## grid, no negative cost, build time or power draw, and no id used twice. Pure; returns one
+## grid, no negative cost, build time or power draw, power in whole 5 MW blocks, and no id
+## used twice. Pure; returns one
 ## line per problem.
 ## Bible: game-design.md#base-building-and-power, technical-architecture.md#data-model
+
+## Every draw, output and charge rate is a multiple of this, in MW.
+const BLOCK_MW: float = 5.0
 
 
 ## Returns the problems of [param rooms] against a level of [param grid_size] cells (the size
@@ -29,8 +33,23 @@ static func check(rooms: Array[RoomDef], grid_size: Vector2i = Vector2i.ZERO) ->
 			var value: float = room.get(field)
 			if not (is_finite(value) and value >= 0.0):
 				errors.append("room %s: %s is not finite and at least 0" % [room.id, field])
+		errors.append_array(block_errors(room))
 		if room.upkeep_k < 0:
 			errors.append("room %s: upkeep_k %d is negative" % [room.id, room.upkeep_k])
+	return errors
+
+
+## Power comes in whole blocks (m25-lean-start.md section 6): returns a problem for each of
+## [param room]'s draw, output and highest charge rate that is not a multiple of
+## [constant BLOCK_MW].
+static func block_errors(room: RoomDef) -> Array[String]:
+	var errors: Array[String] = []
+	for field: StringName in [&"power_draw_mw", &"power_output_mw", &"max_charge_rate_mw"]:
+		var value: float = room.get(field)
+		if is_finite(value) and fmod(value, BLOCK_MW) != 0.0:
+			errors.append(
+				"room %s: %s %s is not a multiple of %s MW" % [room.id, field, value, BLOCK_MW]
+			)
 	return errors
 
 
