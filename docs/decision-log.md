@@ -244,3 +244,10 @@ Each entry has four fields:
 - **Decision:** The soak test's wall-clock budget is 90 s, a ceiling for slow or shared machines; a normal run takes about 55 s. Making the per-tick power checks faster is a follow-up card.
 - **Reason:** At 60 s the soak failed now and then (exit 100) when it shared the CPU with another Godot run, with no fault in the game.
 - **Bible section:** [technical-architecture.md#testing-and-tooling](bible/technical-architecture.md#testing-and-tooling)
+
+## 2026-11-01 — M2.5: lean start, research unlocks, 5 MW blocks
+
+- **Date:** 2026-11-01
+- **Decision:** A new game starts with one level (the Ring's) holding only the Gate Room, Control Room and one diesel plant, and $6,000k. A Research Lab (replacing the Physics Lab) runs seven projects that unlock digging, stairs and lifts, more plants, cheaper fuel, up to three banks and the Workshop. The Archive room is cut until M4 (artefact store); Quarters and Infirmary stay locked until staff. Build times are 6 to 24 times shorter. Power is counted in whole 5 MW blocks. A room that finishes building switches on by lowering charge rates first and never switches another room off. The Workshop makes sites and digs finish 25% faster while on. The lock estimator waits for M4. Saves move to v12 (clean break).
+- **Reason:** M2 playtest: the start offered too much at once, building felt slow even at 10x, room roles were unclear, and power numbers were too fine-grained.
+- **Bible section:** [game-design.md#base-building-and-power](bible/game-design.md#base-building-and-power); details in [content/m25-lean-start.md](content/m25-lean-start.md)
