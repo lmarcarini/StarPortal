@@ -183,7 +183,7 @@ broken rule as its reason:
 There is no power rule (no conduits) and no rule that a level is reachable from the Gate Room:
 the lift is pre-built and corridors join to it.
 
-**Construction.** Hold to confirm pays the full cost and places a hatched site showing time
+**Construction.** One click (or A) on a valid ghost pays the full cost and places a hatched site showing time
 left. Time passes only while the clock runs. Up to **three sites** build at once; a fourth waits
 in a queue shown on the site ("Queued: 2nd"). Sites and digging draw no power. In M2 first half, sites
 build at the listed time on their own; when engineers arrive, a site needs them, and the listed
@@ -256,7 +256,7 @@ fittings, corridors darker. A cell is 24 px, so a level is 864 × 480 px at 1× 
 |      |             864 x 480 plan, zoom/pan                         | [Demolish]    |
 +------+-------------------------------------------------------------+---------------+ 576
 | BUILD  Plant  Capacitor  Quarters  Archive  Lab  Workshop  Infirmary  Lift  Stairs |
-|        Corridor  |  DIG LEVEL 4  $3,000k 20 d      ghost: Q/E rotate, hold to build |
+|        Corridor  |  DIG LEVEL 4  $3,000k 20 d      ghost: Q/E rotate, click to build |
 +------------------------------------------------------------------------------------+ 676
 | message: "Capacitor bank built. Charging at 26 MW."                       44 px   |
 +------------------------------------------------------------------------------------+ 720
@@ -269,6 +269,8 @@ fittings, corridors darker. A cell is 24 px, so a level is 864 × 480 px at 1× 
 - **Selected-room panel** (right, 352 px; 64 + 864 + 352 = 1,280): name, draw and on/off
   switch (for a bank: stored MWh and a charge-rate slider, 0 to 30 MW), upkeep, adjacency, status line, Demolish (hold). For a site: time left, Cancel (hold).
 - **Build palette** (bottom): each room shows cost, draw and build time on hover or focus.
+- **Building is one click** (or A, or Enter) on a valid ghost, with no hold; the ghost stays out
+  to place another until Esc, B or a right click. Cancel (hold) and Demolish (hold) keep their hold.
 - **Energy layer** (P, or the button at the end of the meter): the plan dims the scenery and
   draws on each room a switch and its MW (`ON 4`, `OFF`); always-on rooms show a lock instead
   of a switch; plants show `+30`; banks show their charge rate (`CHG 26`) with − and + steps.
@@ -285,7 +287,7 @@ nothing to cancel it moves focus to the build palette. The debug overlay is on F
 it; the triggers keep time speed. The D-pad moves a cell cursor, the left stick pans, the right
 stick zooms; Y and X change level; A selects the room under the cursor (toggles it on the
 energy layer; on a bank, left and right on the D-pad change its charge rate); the view button toggles the energy layer; the menu button focuses the build
-palette, where A picks a room, the ghost follows the cursor, hold A builds and B cancels. On the
+palette, where A picks a room, the ghost follows the cursor, A builds and B cancels. On the
 plan with nothing to cancel, B focuses the build palette.
 
 ---

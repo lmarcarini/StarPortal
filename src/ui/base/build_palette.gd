@@ -2,13 +2,13 @@ class_name BuildPalette
 extends VBoxContainer
 ## The Base tab's build palette (docs/content/m2-base.md section 6): one button per buildable
 ## room in catalogue order, the Dig button, then a line that shows the hovered or focused
-## room's cost, build time and draw, or while placing the ghost's state and a Build button to
-## hold. (B) or Esc on a palette button returns focus to the plan.
+## room's cost, build time and draw, or while placing the ghost's state and a Build button
+## (one click). (B) or Esc on a palette button returns focus to the plan.
 ## Bible: docs/content/m2-base.md sections 4 and 6
 
 ## Emitted when the player picks [param def_id] to place.
 signal room_picked(def_id: StringName)
-## Emitted when the player holds the Build button while placing.
+## Emitted when the player presses the Build button while placing.
 signal build_held
 ## Emitted when the player leaves the palette with (B) or Esc.
 signal back_requested
@@ -30,7 +30,7 @@ const ROOMS: Array[StringName] = [
 var _rooms: HFlowContainer = HFlowContainer.new()
 var _dig: DigButton = DigButton.new()
 var _hint: Label = Label.new()
-var _build: HoldButton = HoldButton.new()
+var _build: Button = Button.new()
 var _buttons: Dictionary[StringName, Button] = {}
 var _defs: Dictionary = {}
 var _message: String = ""
@@ -51,9 +51,9 @@ func _init() -> void:
 	_hint.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_hint.clip_text = true
 	line.add_child(_hint)
-	_build.text = "BASE_BUILD_HOLD"
+	_build.text = "BASE_BUILD_BUILD"
 	_build.visible = false
-	_build.confirmed.connect(build_held.emit)
+	_build.pressed.connect(build_held.emit)
 	line.add_child(_dig)
 	line.add_child(_build)
 
@@ -85,7 +85,7 @@ func get_dig_button() -> DigButton:
 
 
 ## Returns the Build button shown while placing.
-func get_build_button() -> HoldButton:
+func get_build_button() -> Button:
 	return _build
 
 
