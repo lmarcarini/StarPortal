@@ -15,6 +15,8 @@ var _signature: int = 0
 var _build: BaseBuild = null
 ## The power strip, switches and energy layer (card #141).
 var _power: BaseViewPower = BaseViewPower.new()
+## The message line's building and power news (card M2.5-07).
+var _messages: BaseMessages = BaseMessages.new()
 
 @onready var _levels: LevelTabs = %LevelTabs
 @onready var _heading: Label = %LevelHeading
@@ -29,6 +31,7 @@ func _ready() -> void:
 	_panel.show_nothing()
 	_ready_build()
 	_setup_power()
+	add_child(_messages)
 
 
 func _enter_tree() -> void:
@@ -57,6 +60,7 @@ func setup(simulation: Simulation) -> void:
 	_signature = signature(base)
 	_setup_build()
 	_power.setup(simulation)
+	_messages.setup(_palette, simulation.state)
 
 
 func get_default_focus() -> Control:

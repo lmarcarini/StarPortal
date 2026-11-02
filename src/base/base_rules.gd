@@ -163,6 +163,15 @@ static func site_cost_k(defs: Dictionary, rooms: Array[RoomState]) -> int:
 	return total
 
 
+## What was paid for [param rooms] in all, in $k (RoomState.paid_k): what cancel and
+## demolish refund a share of.
+static func paid_k(rooms: Array[RoomState]) -> int:
+	var total: int = 0
+	for room: RoomState in rooms:
+		total += room.paid_k
+	return total
+
+
 ## True when taking [param removing] out of [param base] would leave a room or site (not a
 ## corridor, lift or stairs) that touches a connector today touching none. Rooms already being
 ## demolished count as gone, both today and after.

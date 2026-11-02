@@ -28,9 +28,30 @@ static func entries_for(
 			return [LogEntry.create(tick, &"horizon", StringName(_text(args)))]
 		&"capacitors_installed":
 			return [_power_entry(args, state, tick)]
+		&"charging_lowered", &"room_finished_off":
+			return _finished_room_entries(event_name, args, state, tick)
 		&"research_done":
 			return [LogEntry.create(tick, &"research", &"", {"project_id": _text(args)})]
 	return []
+
+
+## The "power" entry of a room that finished: charging lowered for it ("room", "charge_mw")
+## or it stayed off ("room", "need_mw", "spare_mw"); "room" is its def id.
+static func _finished_room_entries(
+	event_name: StringName, args: Array, state: GameState, tick: int
+) -> Array[LogEntry]:
+	if args.is_empty() or not (args[0] is StringName or args[0] is String):
+		return []
+	var room: RoomState = state.base.find_room(StringName(str(args[0])))
+	var details: Dictionary = {"room": "" if room == null else String(room.def_id)}
+	if event_name == &"charging_lowered" and args.size() == 2 and args[1] is int:
+		details["charge_mw"] = args[1]
+	elif args.size() == 3 and args[1] is int and args[2] is int:
+		details["need_mw"] = args[1]
+		details["spare_mw"] = args[2]
+	else:
+		return []
+	return [LogEntry.create(tick, &"power", &"", details)]
 
 
 ## The "dial" entry of a dial_resolved event, plus a "lock" entry when it locked.
