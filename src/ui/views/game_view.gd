@@ -7,11 +7,12 @@ extends Control
 ## Bible: game-design.md#core-loop, technical-architecture.md#signals-and-scenes,
 ## technical-architecture.md#input-accessibility-and-localisation
 
-## Called by the switcher before the view is shown, and again after a load with the new
-## [param simulation]. The view drops anything it read from the previous one.
-## Emitted when [method is_available] may have changed.
+## Emitted when [method is_available] may have changed; the switcher then shows or hides
+## the view's tab.
 signal availability_changed
 
+## Called by the switcher before the view is shown, and again after a load with the new
+## [param simulation]. The view drops anything it read from the previous one.
 @abstract func setup(simulation: Simulation) -> void
 
 ## Returns the control that takes focus when the view opens (gamepad). It must be focusable.

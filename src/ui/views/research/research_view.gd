@@ -22,6 +22,7 @@ func _ready() -> void:
 	_list.project_chosen.connect(_on_chosen)
 	_list.project_activated.connect(act)
 	_panel.action_pressed.connect(act)
+	visibility_changed.connect(_on_visibility_changed)
 
 
 func _enter_tree() -> void:
@@ -163,3 +164,9 @@ static func _research_signature(state: GameState) -> int:
 			ResearchRules.has_lab_on(state),
 		]
 	)
+
+
+## Ticks are skipped while the tab is hidden, so showing it rereads everything.
+func _on_visibility_changed() -> void:
+	if is_visible_in_tree():
+		refresh()
