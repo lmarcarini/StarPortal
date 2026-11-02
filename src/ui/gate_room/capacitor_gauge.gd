@@ -2,10 +2,10 @@ class_name CapacitorGauge
 extends VBoxContainer
 ## The capacitors, in one of two states. With no Capacitor Bank built: "No capacitors
 ## installed" (the bank is built as a room in the Base tab). Then: a bar of the stored energy
-## against the capacity, and the two numbers. It never shows the charge an address needs: the
-## player judges that from the outcome. While no bank exists or is being built, a
-## Build capacitor bank button asks (through [signal build_bank_requested]) for the Base tab
-## with the bank's ghost in the capacitor alcove.
+## against the capacity, and the two numbers, with "Capacitors empty." under 1 MWh. It never
+## shows the charge an address needs: the player judges that from the outcome. While no bank
+## exists or is being built, a Build capacitor bank button asks (through
+## [signal build_bank_requested]) for the Base tab with the bank's ghost in the capacitor alcove.
 ## Bible: gate-and-address-spec.md#the-dial-console, docs/content/m2-base.md sections 2 and 3
 
 ## Emitted when the player presses Build capacitor bank.
@@ -123,6 +123,8 @@ func _refresh() -> void:
 			}
 		)
 	)
+	if PowerText.is_empty(state):
+		_values.text += " · " + tr("GATE_DIAL_CAPACITORS_EMPTY")
 
 
 func _on_tick_advanced(_tick: int) -> void:
