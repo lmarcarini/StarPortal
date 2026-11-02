@@ -108,15 +108,54 @@ func test_cursor_and_accept_on_a_free_cell_select_nothing() -> void:
 	assert_vector(Vector2(plan.cursor)).is_equal(Vector2.ZERO)
 
 
-func test_a_room_under_construction_shows_days_left() -> void:
+func test_a_room_under_construction_shows_its_progress() -> void:
+	for def: DefBase in Registry.get_all_of(RoomDef):
+		_simulation.state.room_defs[def.id] = def
 	var room: RoomState = _simulation.state.base.add_room(&"room_research_lab", 1, Vector2i(4, 4))
-	room.build_ticks_left = TimeMath.TICKS_PER_DAY * 5 - 10
+	room.build_ticks_left = 120
+	EventBus.room_build_started.emit(room.id)
 	_view.get_plan().select(room.id)
 	var lines: Array[String] = _view.get_room_panel().lines()
 	assert_str(lines[1]).is_equal("Research Lab")
 	assert_str(lines[3]).is_equal("Draw 5 MW")
 	assert_str(lines[4]).is_equal("Upkeep $60k / month")
-	assert_str(lines[5]).is_equal("Under construction: 5 d left")
+	assert_str(lines[5]).is_equal("Under construction: 75%, 2 h left")
+	var bar: SiteProgress = _view.get_plan().progress_of(room.id)
+	assert_float(bar.fraction).is_equal_approx(0.75, 0.001)
+	room.build_ticks_left = 0
+	room.demolish_ticks_left = 60
+	EventBus.room_demolished.emit(&"none")
+	assert_str(_view.get_room_panel().lines()[5]).is_equal("Demolishing: 50%, 1 h left")
+	assert_int(_view.get_plan().progress_of(room.id).kind).is_equal(SiteProgress.Kind.DEMOLISHING)
+
+
+func test_progress_text_formats_time_left() -> void:
+	assert_str(ProgressText.time_left(35)).is_equal("35 min")
+	assert_str(ProgressText.time_left(180)).is_equal("3 h")
+	assert_str(ProgressText.time_left(TimeMath.TICKS_PER_DAY + 239)).is_equal("1 d 4 h")
+	assert_str(ProgressText.time_left(TimeMath.TICKS_PER_DAY * 2)).is_equal("2 d")
+	var queued := SiteProgress.new()
+	queued.kind = SiteProgress.Kind.QUEUED
+	assert_str(ProgressText.caption(queued)).is_equal("Queued")
+
+
+func test_a_dig_shows_on_its_level_tab() -> void:
+	var level := LevelState.new()
+	level.dig_ticks_left = 100
+	var progress := SiteProgress.new()
+	progress.fraction = 0.456
+	assert_str(LevelTabs.label_for(level, 4, progress)).is_equal("L4 45%")
+	level.dig_ticks_left = 0
+	assert_str(LevelTabs.label_for(level, 4, progress)).is_equal("L4")
+
+
+func test_bar_text_only_when_the_room_is_big_enough() -> void:
+	var font: Font = _view.get_theme_default_font()
+	var cell: float = BasePlanPainter.CELL
+	assert_bool(SiteBar.fits(Rect2(0, 0, cell * 4, cell * 3), "1 d 4 h", font)).is_true()
+	assert_bool(SiteBar.fits(Rect2(0, 0, cell, cell), "3 h", font)).is_false()
+	var bar: Rect2 = SiteBar.bar_rect(Rect2(0, 0, cell * 4, cell * 3))
+	assert_float(bar.end.y).is_equal_approx(cell * 3 - SiteBar.INSET, 0.01)
 
 
 func test_wheel_zooms_and_drag_pans() -> void:

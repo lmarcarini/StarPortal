@@ -1,7 +1,7 @@
 class_name LevelTabs
 extends VBoxContainer
 ## The level column of the Base tab: one toggle per level, the shown one pressed; a level
-## still being dug shows its days left ("L4 ~20d").
+## still being dug shows how far the dig has come ("L4 45%").
 ## Bible: docs/content/m2-base.md section 6
 
 ## Emitted when the player picks level [param number] (1 the top one).
@@ -10,6 +10,7 @@ signal level_chosen(number: int)
 var _group: ButtonGroup = ButtonGroup.new()
 var _levels: Array[LevelState] = []
 var _shown: int = 1
+var _dig: SiteProgress = SiteProgress.new()
 
 
 ## Rebuilds the column for [param levels], with level [param shown] pressed.
@@ -36,21 +37,28 @@ func mark(number: int) -> void:
 	refresh()
 
 
-## Rewrites the labels: days left of a level being dug, and which level is shown.
+## Keeps [param progress] (SiteProgress.of_dig) for the level being dug; [method refresh]
+## shows it.
+func show_dig(progress: SiteProgress) -> void:
+	_dig = progress
+
+
+## Rewrites the labels: the progress of a level being dug, and which level is shown.
 func refresh() -> void:
 	for index: int in get_child_count():
 		var button: Button = get_child(index) as Button
-		button.text = label_for(_levels[index], index + 1)
+		button.text = label_for(_levels[index], index + 1, _dig)
 		button.set_pressed_no_signal(index + 1 == _shown)
 
 
-## Returns the label of [param level] numbered [param number]: "L3", or "L4 ~20d" while dug.
-static func label_for(level: LevelState, number: int) -> String:
+## Returns the label of [param level] numbered [param number]: "L3", or "L4 45%" while dug,
+## from the dig's [param progress].
+static func label_for(level: LevelState, number: int, progress: SiteProgress = null) -> String:
 	if level.is_dug():
 		return TranslationServer.translate(&"BASE_LEVEL_SHORT").format({"n": number})
-	var days: int = ceili(float(level.dig_ticks_left) / TimeMath.TICKS_PER_DAY)
+	var pct: int = 0 if progress == null else ProgressText.percent(progress)
 	var text: String = TranslationServer.translate(&"BASE_LEVEL_DIGGING")
-	return text.format({"n": number, "days": days})
+	return text.format({"n": number, "pct": pct})
 
 
 func _on_pressed(number: int) -> void:

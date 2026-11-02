@@ -1,7 +1,8 @@
 class_name BasePlan
 extends Control
 ## The plan of one base level, straight from above (docs/content/m2-base.md section 6). Read
-## only: it shows the rooms at their cells, sites hatched, and the selection. No cell is
+## only: it shows the rooms at their cells, sites hatched, a progress bar on each site and
+## demolition (SiteBar), and the selection. No cell is
 ## reserved. The mouse wheel or the right stick zooms; a right
 ## or middle drag or the left stick pans; a click or (A) on the cursor cell selects what is
 ## there; the arrow keys or the D-pad move the cell cursor.
@@ -21,6 +22,8 @@ var _base: BaseState = null
 var _defs: Dictionary = {}
 var _selected: StringName = &""
 var _dragging: bool = false
+## SiteProgress by room id, for the sites' and demolitions' bars (SiteBar).
+var _progress: Dictionary = {}
 
 
 func _ready() -> void:
@@ -39,6 +42,18 @@ func show_base(base: BaseState, defs: Dictionary) -> void:
 	if base.find_room(_selected) == null:
 		select(&"")
 	queue_redraw()
+
+
+## Shows the bars of [param progress] (SiteProgress by room id, SiteProgress.for_rooms).
+func show_progress(progress: Dictionary) -> void:
+	_progress = progress
+	queue_redraw()
+
+
+## Returns the progress shown for room [param id], or null.
+func progress_of(id: StringName) -> SiteProgress:
+	var found: Variant = _progress.get(id)
+	return found if found is SiteProgress else null
 
 
 ## Shows level [param number] (clamped to the levels there are) and clears the selection.
@@ -109,10 +124,15 @@ func _draw_room(room: RoomState, font: Font) -> void:
 		BasePlanPainter.draw_site(self, cells)
 	elif room.def_id == StartingBase.CORRIDOR_DEF:
 		BasePlanPainter.draw_corridor(self, cells)
-		return
 	else:
 		BasePlanPainter.draw_room(self, cells, room.def_id, room.powered_on or def.always_on)
-	BasePlanPainter.draw_label(self, cells, tr(def.name_key).to_upper(), font)
+	if room.def_id != StartingBase.CORRIDOR_DEF or not room.is_built():
+		BasePlanPainter.draw_label(self, cells, tr(def.name_key).to_upper(), font)
+	var progress: SiteProgress = progress_of(room.id)
+	if progress != null:
+		var cell: float = BasePlanPainter.CELL
+		var area := Rect2(Vector2(cells.position) * cell, Vector2(cells.size) * cell)
+		SiteBar.draw(self, area, progress, ProgressText.caption(progress), font)
 
 
 func _selected_cells() -> Rect2i:

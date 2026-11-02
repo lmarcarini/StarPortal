@@ -2,7 +2,8 @@ class_name DigButton
 extends HoldButton
 ## The palette's Dig button (docs/content/m2-base.md section 4): "Dig Level 2 · $1,500k ·
 ## 3 d", held to dig. While a level is being dug it offers to cancel the dig with its 50%
-## refund instead; past the last level allowed it is disabled. A refused dig shows why in its
+## refund instead, its tooltip showing the dig's progress ("Digging Level 4: 45%, 2 d left");
+## past the last level allowed it is disabled. A refused dig shows why in its
 ## tooltip and in [method get_reason]. It changes no state: it emits [signal command_held].
 ## Bible: docs/content/m2-base.md section 4
 
@@ -58,6 +59,8 @@ func refresh(state: GameState) -> void:
 		text = tr(&"BASE_BUILD_DIG_DONE")
 	disabled = not result.is_ok
 	tooltip_text = _reason
+	if digging != 0 and _reason.is_empty():
+		tooltip_text = ProgressText.dig(digging, SiteProgress.of_dig(state))
 
 
 ## Why the button is disabled, or "".

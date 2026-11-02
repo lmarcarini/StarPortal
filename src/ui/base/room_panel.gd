@@ -28,8 +28,11 @@ func show_nothing() -> void:
 	_set_lines([tr(&"BASE_PANEL_SELECTED"), "", "", "", "", "", tr(&"BASE_PANEL_NONE"), ""])
 
 
-## Shows [param room] built from [param def]; [param unlocks] gives the upkeep overrides.
-func show_room(room: RoomState, def: RoomDef, unlocks: UnlockState) -> void:
+## Shows [param room] built from [param def]; [param unlocks] gives the upkeep overrides and
+## [param progress] the status of a site or demolition (SiteProgress.of_room).
+func show_room(
+	room: RoomState, def: RoomDef, unlocks: UnlockState, progress: SiteProgress = null
+) -> void:
 	_set_lines(
 		[
 			tr(&"BASE_PANEL_SELECTED"),
@@ -37,7 +40,7 @@ func show_room(room: RoomState, def: RoomDef, unlocks: UnlockState) -> void:
 			size_text(room, def),
 			BasePanelText.power(def),
 			BasePanelText.upkeep(UnlockRules.upkeep_k(unlocks, def)),
-			BasePanelText.status(room, def),
+			BasePanelText.status(room, def, progress),
 			BasePanelText.now(def),
 			BasePanelText.later(def),
 		]
