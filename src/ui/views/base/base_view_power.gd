@@ -5,7 +5,8 @@ extends Node
 ## control in the panel, and the energy layer over the plan. The base_energy_layer action
 ## (P, the gamepad View button) or the strip's button toggles the layer. On the layer a click
 ## or (A) on a room toggles it; on a bank a click on its left or right half, or left and right
-## on the D-pad, steps its charge rate. Every change is a command; refusals are shown plainly.
+## on the D-pad, steps its charge rate. Every change is a command; refusals are shown plainly,
+## and one for lack of power outlines the bar's spare part for a moment.
 ## Bible: docs/content/m2-base.md sections 3 and 6
 
 var strip: PowerStrip = PowerStrip.new()
@@ -152,6 +153,9 @@ func _after(room_id: StringName, refused: String) -> void:
 		need = def.power_draw_mw
 	layer.mark_refused(room_id if need > 0.0 else &"", need)
 	refresh()
+	var short_of_power: bool = need > PowerRules.spare_mw(state) or PowerRules.is_bank(def)
+	if not refused.is_empty() and short_of_power:
+		strip.bar.flash_spare()
 
 
 func _on_plan_input(event: InputEvent) -> void:
