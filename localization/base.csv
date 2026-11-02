@@ -34,7 +34,7 @@ ROOM_LATER_LINE,Later: {text},Depois: {text}
 ROOM_UNLOCK_BY,Unlock: {name},Desbloqueio: {name}
 BASE_TITLE,Base,Base
 BASE_LEVEL_SHORT,L{n},N{n}
-BASE_LEVEL_DIGGING,L{n} ~{days}d,N{n} ~{days}d
+BASE_LEVEL_DIGGING,L{n} {pct}%,N{n} {pct}%
 BASE_LEVEL_HEADING,LEVEL {n},NÍVEL {n}
 BASE_PANEL_SELECTED,SELECTED,SELECIONADO
 BASE_PANEL_NONE,"Click a room, or move the cursor and press Enter or (A), to see it here.","Clique numa sala, ou mova o cursor e aperte Enter ou (A), para vê-la aqui."
@@ -47,7 +47,12 @@ BASE_PANEL_NO_UPKEEP,No upkeep,Sem manutenção
 BASE_STATUS_ON,On,Ligada
 BASE_STATUS_OFF,Off,Desligada
 BASE_STATUS_ALWAYS_ON,Always on,Sempre ligada
-BASE_STATUS_BUILDING,Under construction: {days} d left,Em obras: faltam {days} d
+BASE_STATUS_BUILDING,"Under construction: {pct}%, {time} left","Em obras: {pct}%, faltam {time}"
+BASE_STATUS_QUEUED,"Queued: waits for a free building slot (#{n} in line)","Na fila: espera uma vaga de obra (nº {n} da fila)"
+BASE_STATUS_DEMOLISHING,"Demolishing: {pct}%, {time} left","Em demolição: {pct}%, faltam {time}"
+BASE_SITE_QUEUED,Queued,Na fila
+BASE_TIME_DAYS_HOURS,{d} d {h} h,{d} d {h} h
+BASE_DIG_PROGRESS,"Digging Level {n}: {pct}%, {time} left","Escavando o Nível {n}: {pct}%, faltam {time}"
 BASE_STATUS_SITE,Marked site,Local demarcado
 BASE_BUILD_TITLE,BUILD,CONSTRUIR
 BASE_BUILD_HINT,"Pick a room, or (B) on the plan to reach this palette.","Escolha uma sala, ou (B) na planta para chegar a esta paleta."

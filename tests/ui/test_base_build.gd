@@ -214,6 +214,7 @@ func test_dig_button_digs_and_cancels() -> void:
 	assert_int(_simulation.state.base.digging_level()).is_equal(2)
 	assert_int(_view.get_plan().get_parent().get_parent().get_child_count()).is_greater(0)
 	assert_str(dig.text).contains("$750k")
+	assert_str(dig.tooltip_text).is_equal("Digging Level 2: 0%, 3 d left")
 	dig.begin_hold()
 	dig.advance(1.0)
 	assert_int(_simulation.state.base.digging_level()).is_equal(0)

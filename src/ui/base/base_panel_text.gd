@@ -21,11 +21,15 @@ static func upkeep(upkeep_k: int) -> String:
 	return _tr(&"BASE_PANEL_UPKEEP").format({"k": upkeep_k})
 
 
-## The status of [param room]: under construction with days left, always on, on or off.
-static func status(room: RoomState, def: RoomDef) -> String:
+## The status of [param room]: building, queued or coming down with its [param progress]
+## (percentage and time left, ProgressText), always on, on or off.
+static func status(room: RoomState, def: RoomDef, progress: SiteProgress = null) -> String:
+	if progress != null and progress.kind != SiteProgress.Kind.NONE:
+		return ProgressText.status(progress)
 	if not room.is_built():
-		var days: int = ceili(float(room.build_ticks_left) / TimeMath.TICKS_PER_DAY)
-		return _tr(&"BASE_STATUS_BUILDING").format({"days": days})
+		var fallback := SiteProgress.new()
+		fallback.ticks_left = room.build_ticks_left
+		return ProgressText.status(fallback)
 	if def.always_on:
 		return _tr(&"BASE_STATUS_ALWAYS_ON")
 	return _tr(&"BASE_STATUS_ON" if room.powered_on else &"BASE_STATUS_OFF")

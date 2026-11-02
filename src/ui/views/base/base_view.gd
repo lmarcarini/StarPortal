@@ -7,6 +7,10 @@ extends GameView
 ## (PageUp and PageDown, (Y) and (X)) change level.
 ## Bible: docs/content/m2-base.md section 6, game-design.md#base-building-and-power
 
+## Ticks of work per step of the progress bars: a tick redraws the tab only when a site's,
+## demolition's or dig's work left crosses a step.
+const PROGRESS_STEP_TICKS: int = 5
+
 var _simulation: Simulation = null
 var _defs: Dictionary = {}
 ## What the plan last drew from; a tick redraws only when it changes.
@@ -55,6 +59,7 @@ func setup(simulation: Simulation) -> void:
 	_defs = _room_defs()
 	var base: BaseState = simulation.state.base
 	_plan.show_base(base, _defs)
+	_show_progress()
 	_levels.show_levels(base.levels, _plan.level)
 	_show_level(gate_level(base))
 	_signature = signature(base)
@@ -110,6 +115,7 @@ func _show_level(number: int) -> void:
 func _refresh() -> void:
 	if _simulation == null:
 		return
+	_show_progress()
 	_levels.refresh()
 	_heading.text = tr(&"BASE_LEVEL_HEADING").format({"n": _plan.level})
 	_plan.queue_redraw()
@@ -129,6 +135,14 @@ func _on_tick_advanced(_tick: int) -> void:
 	_refresh()
 
 
+## Hands the sites', demolitions' and dig's progress (SiteProgress) to the plan and the level
+## column; read on ticks and events only, never per frame.
+func _show_progress() -> void:
+	var state: GameState = _simulation.state
+	_plan.show_progress(SiteProgress.for_rooms(state, state.base.rooms))
+	_levels.show_dig(SiteProgress.of_dig(state))
+
+
 ## Returns the level of [param base]'s Gate Room, or its deepest level when there is none.
 static func gate_level(base: BaseState) -> int:
 	for room: RoomState in base.rooms:
@@ -138,16 +152,17 @@ static func gate_level(base: BaseState) -> int:
 
 
 ## Returns a cheap hash of what the view shows of [param base]: rooms, their ids, places,
-## switches, whole days left to build or demolish, and the levels' whole days left to dig.
+## switches, and the work left to build, demolish or dig in steps of PROGRESS_STEP_TICKS (the
+## progress bars move at most once per step).
 static func signature(base: BaseState) -> int:
 	var parts: Array = [base.rooms.size(), base.levels.size()]
 	for room: RoomState in base.rooms:
 		parts.append_array([room.id, room.level, room.origin, room.rotated])
-		parts.append(ceili(float(room.build_ticks_left) / TimeMath.TICKS_PER_DAY))
-		parts.append(ceili(float(room.demolish_ticks_left) / TimeMath.TICKS_PER_DAY))
+		parts.append(ceili(float(room.build_ticks_left) / PROGRESS_STEP_TICKS))
+		parts.append(ceili(float(room.demolish_ticks_left) / PROGRESS_STEP_TICKS))
 		parts.append(int(room.powered_on))
 	for level: LevelState in base.levels:
-		parts.append(ceili(float(level.dig_ticks_left) / TimeMath.TICKS_PER_DAY))
+		parts.append(ceili(float(level.dig_ticks_left) / PROGRESS_STEP_TICKS))
 	return hash(parts)
 
 
@@ -162,7 +177,8 @@ func _on_selection_changed(selected: StringName) -> void:
 	if def == null:
 		_panel.show_nothing()
 		return
-	_panel.show_room(room, def, _simulation.state.unlocks)
+	var progress: SiteProgress = SiteProgress.of_room(_simulation.state, room)
+	_panel.show_room(room, def, _simulation.state.unlocks, progress)
 
 
 static func _room_defs() -> Dictionary:
@@ -270,6 +286,20 @@ func _connect_build_events(on: bool) -> void:
 			event.connect(_on_build_event)
 		else:
 			event.disconnect(_on_build_event)
+	if on:
+		EventBus.power_allocation_changed.connect(_on_power_changed)
+	else:
+		EventBus.power_allocation_changed.disconnect(_on_power_changed)
+
+
+## A room switched on or off (a Workshop changes every site's and the dig's time left):
+## rereads only the progress, the level column and the SELECTED panel, also while paused.
+func _on_power_changed() -> void:
+	if _simulation == null or not is_node_ready():
+		return
+	_show_progress()
+	_levels.refresh()
+	_on_selection_changed(_plan.selected())
 
 
 func _on_build_event(_arg: Variant = null) -> void:
