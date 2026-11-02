@@ -82,6 +82,7 @@ func apply(state: GameState) -> void:
 	for index: int in cells.size():
 		var room: RoomState = state.base.add_room(def.id, level, cells[index])
 		room.build_ticks_left = maxi(1, def.build_ticks) * (index + 1)
+		room.paid_k = def.build_cost_k
 		if site_id.is_empty():
 			site_id = room.id
 		room.site = site_id

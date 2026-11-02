@@ -4,8 +4,8 @@ extends RefCounted
 ## is turned, how long until it is built or demolished, which site it is built with and whether
 ## the player has switched it on.
 ## Saved shape: {"id", "def_id", "level", "origin": [x, y], "rotated", "build_ticks_left",
-## "powered_on", "demolish_ticks_left", "site"}. The last two are optional when loading
-## (older saves): missing means 0 and "".
+## "powered_on", "demolish_ticks_left", "site", "paid_k"}. The last three are optional when
+## loading (older saves): missing means 0, "" and 0.
 ## Bible: game-design.md#base-building-and-power, technical-architecture.md#data-model
 
 ## Saved keys holding whole numbers of at least 0.
@@ -47,6 +47,10 @@ var demolish_ticks_left: int = 0:
 ## Id of the site this room is built with when it shares one with other rooms (a corridor run,
 ## a lift shaft, stairs); empty when the room is its own site. See site_key().
 var site: StringName = &""
+## What the player paid for this room when it was placed, in $k (0 for the starting base).
+## Cancel and demolish refund a share of the sum paid for the rooms they remove
+## (m25-lean-start.md section 2: refunds use the money actually paid).
+var paid_k: int = 0
 
 
 ## Returns a room of [param def_id] with instance [param room_id] at [param origin] on
@@ -89,6 +93,7 @@ func to_dict() -> Dictionary:
 		"powered_on": powered_on,
 		"demolish_ticks_left": demolish_ticks_left,
 		"site": String(site),
+		"paid_k": paid_k,
 	}
 
 
@@ -105,6 +110,7 @@ static func from_dict(data: Dictionary) -> RoomState:
 	room.powered_on = not (data.get("powered_on") is bool) or data["powered_on"]
 	room.demolish_ticks_left = read_count(data.get("demolish_ticks_left"))
 	room.site = StringName(str(data.get("site", "")))
+	room.paid_k = read_count(data.get("paid_k"))
 	return room
 
 
@@ -132,6 +138,8 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'demolish_ticks_left' is not a whole number of at least 0")
 	if data.has("site") and not data["site"] is String:
 		errors.append("'site' is not a String")
+	if data.has("paid_k") and not is_count(data["paid_k"]):
+		errors.append("'paid_k' is not a whole number of at least 0")
 	return errors
 
 

@@ -12,6 +12,10 @@ var _system: ConstructionSystem
 func before_test() -> void:
 	_game = ConstructionFixture.grown()
 	_system = ConstructionSystem.new()
+	var shaft: Array[RoomState] = _lifts_on(1) + _lifts_on(2) + _lifts_on(3)
+	for lift: RoomState in shaft:
+		lift.site = shaft[0].id
+	shaft[0].paid_k = 400
 
 
 ## Digs Level 4 and ticks until it is dug; returns the events posted meanwhile.
@@ -133,3 +137,86 @@ func test_lift_after_the_dig_takes_every_level() -> void:
 	assert_int(_game.budget.funds_k).is_equal(funds - 400)
 	var shaft: Array[RoomState] = BaseRules.site_rooms(_game.base, _game.base.rooms[-1].site_key())
 	assert_int(shaft.size()).is_equal(4)
+
+
+## Digs Level 4 and builds its segment; returns the segment.
+func _built_segment() -> RoomState:
+	_dig_level_4()
+	var segment: RoomState = _lifts_on(4)[0]
+	ConstructionFixture.advance(_game, _system, 60)
+	assert_bool(segment.is_built()).is_true()
+	return segment
+
+
+## A built segment joins its shaft: selecting it (its room id) is selecting the shaft, so
+## demolishing it takes every level down and refunds the whole shaft.
+func test_selecting_a_built_segment_selects_the_shaft() -> void:
+	var segment: RoomState = _built_segment()
+	var top: RoomState = _lifts_on(1)[0]
+	assert_str(String(segment.site_key())).is_equal(String(top.site_key()))
+	assert_bool(LiftShafts.is_segment(_game.base, segment)).is_false()
+	assert_int(DemolishRoomCommand.targets(_game.base, segment).size()).is_equal(4)
+	assert_int(DemolishRoomCommand.refund_k(_game, segment)).is_equal(
+		DemolishRoomCommand.refund_k(_game, top)
+	)
+
+
+## Demolishing a shaft with a built segment: all four levels come down; refund is 50% of
+## $400k + $100k paid.
+func test_shaft_demolish_with_a_built_segment() -> void:
+	_built_segment()
+	var funds: int = _game.budget.funds_k
+	var top: RoomState = _lifts_on(1)[0]
+	assert_bool(ConstructionFixture.run(_game, DemolishRoomCommand.create(top.id)).is_ok)
+	assert_int(_game.budget.funds_k).is_equal(funds + 250)
+	ConstructionFixture.advance(_game, _system, 60)
+	for level: int in [1, 2, 3, 4]:
+		assert_array(_lifts_on(level)).is_empty()
+
+
+## Demolishing a shaft while its segment builds: the segment goes at once at the cancel rate
+## (75% of $100k), the shaft at the demolish rate (50% of $400k); nothing is left alone or
+## holds a slot.
+func test_shaft_demolish_with_a_building_segment() -> void:
+	_dig_level_4()
+	var funds: int = _game.budget.funds_k
+	var top: RoomState = _lifts_on(1)[0]
+	assert_int(DemolishRoomCommand.refund_k(_game, top)).is_equal(275)
+	assert_bool(ConstructionFixture.run(_game, DemolishRoomCommand.create(top.id)).is_ok)
+	assert_int(_game.budget.funds_k).is_equal(funds + 275)
+	assert_array(_lifts_on(4)).is_empty()
+	assert_array(ConstructionSystem.segment_sites(_game.base)).is_empty()
+	assert_array(ConstructionSystem.site_queue(_game.base)).is_empty()
+	ConstructionFixture.advance(_game, _system, 60)
+	for level: int in [1, 2, 3]:
+		assert_array(_lifts_on(level)).is_empty()
+
+
+## The review's loop: demolish the segment, rebuild the lift on Level 4, repeat. It can never
+## gain money: each cycle costs at least half of what it paid.
+func test_demolish_rebuild_loop_cannot_gain_money() -> void:
+	var segment: RoomState = _built_segment()
+	var funds: int = _game.budget.funds_k
+	for cycle: int in 3:
+		assert_bool(ConstructionFixture.run(_game, DemolishRoomCommand.create(segment.id)).is_ok)
+		ConstructionFixture.advance(_game, _system, 60)
+		var place := PlaceRoomCommand.create(&"room_lift", 4, ConstructionFixture.GROWN_LIFT)
+		assert_bool(ConstructionFixture.run(_game, place).is_ok).is_true()
+		ConstructionFixture.advance(_game, _system, 240)
+		segment = _lifts_on(4)[0]
+		assert_bool(segment.is_built()).is_true()
+		assert_int(_game.budget.funds_k).is_less(funds)
+		funds = _game.budget.funds_k
+
+
+## Cancelling a palette-built extension refunds 75% of what was paid and leaves the shaft.
+func test_cancel_palette_extension_leaves_the_shaft() -> void:
+	_game.budget.funds_k = 3500 + 50
+	_dig_level_4()
+	_game.budget.funds_k = 1000
+	var place := PlaceRoomCommand.create(&"room_lift", 4, ConstructionFixture.GROWN_LIFT)
+	assert_bool(ConstructionFixture.run(_game, place).is_ok).is_true()
+	var segment: RoomState = _lifts_on(4)[0]
+	assert_bool(ConstructionFixture.run(_game, CancelBuildCommand.create(segment.id)).is_ok)
+	assert_int(_game.budget.funds_k).is_equal(975)
+	assert_int(_lifts_on(1).size() + _lifts_on(2).size() + _lifts_on(3).size()).is_equal(3)

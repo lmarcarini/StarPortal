@@ -3,7 +3,10 @@ extends RefCounted
 ## Lift shafts across levels (docs/content/m25-lean-start.md section 2). A lift built before a
 ## dig extends into the new level when the dig finishes, as one lift segment
 ## (BalanceConfig.lift_segment_cost_k, lift_segment_ticks), charged and started automatically.
-## A segment is its own site, takes no building slot and is cancelled like any site. Short of
+## A segment is its own site while it builds: it takes no building slot and is cancelled like
+## any site (75% of what was paid for it). Once built it joins its shaft (join_shaft()), so a
+## shaft is always selected and demolished whole; demolishing a shaft removes its segments
+## still building at the cancel rate. Short of
 ## funds it is refused with lift_segment_refused(level, cost k); the player can then build it
 ## from the palette by placing a lift on the shaft (PlaceRoomCommand), at the segment price.
 ## Bible: docs/content/m25-lean-start.md section 2
@@ -39,12 +42,38 @@ static func shaft_levels(base: BaseState, origin: Vector2i) -> Array[int]:
 	return levels
 
 
-## What cancelling the site [param rooms] of [param state] refunds against, in $k: the segment
-## price per level for a lift segment, else BaseRules.site_cost_k().
-static func site_cost_k(state: GameState, rooms: Array[RoomState]) -> int:
-	if not rooms.is_empty() and state.balance != null and is_segment(state.base, rooms[0]):
-		return state.balance.lift_segment_cost_k * rooms.size()
-	return BaseRules.site_cost_k(state.room_defs, rooms)
+## The lift segments still building at [param room]'s origin in [param base]: lifts there in
+## another site than [param room]'s, not built yet. Demolishing the shaft removes them.
+static func building_segments(base: BaseState, room: RoomState) -> Array[RoomState]:
+	var found: Array[RoomState] = []
+	for other: RoomState in base.rooms:
+		if (
+			other.def_id == StartingBase.LIFT_DEF
+			and other.origin == room.origin
+			and other.site_key() != room.site_key()
+			and not other.is_built()
+		):
+			found.append(other)
+	return found
+
+
+## Joins the just-built segment [param rooms] to their shaft in [param base]: they take the
+## shaft's site key, so selecting, demolishing and refunding treat the shaft as one room on
+## all its levels. Does nothing for rooms that are not a lift segment.
+static func join_shaft(base: BaseState, rooms: Array[RoomState]) -> void:
+	if rooms.is_empty() or not is_segment(base, rooms[0]):
+		return
+	var shaft_key: StringName = &""
+	for other: RoomState in base.rooms:
+		if (
+			other.def_id == StartingBase.LIFT_DEF
+			and other.origin == rooms[0].origin
+			and other.site_key() != rooms[0].site_key()
+		):
+			shaft_key = other.site_key()
+			break
+	for room: RoomState in rooms:
+		room.site = shaft_key
 
 
 ## Extends every lift shaft of [param state]'s base into the just-dug [param level]. A shaft
@@ -78,6 +107,7 @@ static func _start_segment(state: GameState, level: int, origin: Vector2i) -> vo
 	state.budget.spend(cost_k)
 	var segment: RoomState = state.base.add_room(StartingBase.LIFT_DEF, level, origin)
 	segment.site = segment.id
+	segment.paid_k = cost_k
 	segment.build_ticks_left = maxi(1, state.balance.lift_segment_ticks)
 	state.events.post(&"room_build_started", [segment.id])
 	state.events.post(&"budget_changed", [state.budget.funds_k])

@@ -118,15 +118,18 @@ func ticks_of(state: GameState) -> int:
 	return 0 if def == null else def.build_ticks
 
 
-## Pays the cost and adds the site's rooms, unbuilt and switched on.
+## Pays the cost and adds the site's rooms, unbuilt and switched on; the first room records
+## what was paid (RoomState.paid_k).
 func apply(state: GameState) -> void:
 	var ticks: int = ticks_of(state)
-	state.budget.spend(cost_of(state))
+	var cost_k: int = cost_of(state)
+	state.budget.spend(cost_k)
 	var site_id: StringName = &""
 	for planned: RoomState in _planned(state.base):
 		var room: RoomState = state.base.add_room(def_id, planned.level, origin)
 		room.rotated = rotated
 		room.build_ticks_left = maxi(1, ticks)
+		room.paid_k = cost_k if site_id.is_empty() else 0
 		if site_id.is_empty():
 			site_id = room.id
 		room.site = site_id if def_id in MULTI_LEVEL_DEFS else &""

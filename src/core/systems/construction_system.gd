@@ -91,6 +91,7 @@ func _tick_sites(state: GameState, step: int) -> void:
 			room.build_ticks_left = maxi(room.build_ticks_left - step, 0)
 			done = done and room.is_built()
 		if done:
+			LiftShafts.join_shaft(state.base, rooms)
 			for room: RoomState in rooms:
 				FinishingPower.switch_on(state, room)
 			PowerSystem.settle(state)
