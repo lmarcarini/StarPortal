@@ -1,12 +1,13 @@
 class_name ResearchView
 extends GameView
 ## The Research tab (F4; docs/content/m25-lean-start.md section 3, "Where it lives"): the
-## project list with its header on the left and the SELECTED panel on the right. The tab is
-## available once a Research Lab has finished and stays so for the rest of the game. Up and
-## down (D-pad) move between rows; (A), Enter or the panel's button starts the focused
-## project, or cancels it while it runs. Every action is a command; a refusal shows on the
-## panel. The list rereads the state on every research, money, room and power event, so it
-## stays right while paused.
+## [ResearchBoard] (header, category sub-tabs and the tech tree) on the left and the SELECTED
+## panel on the right. The tab is available once a Research Lab has finished and stays so for
+## the rest of the game. The D-pad moves along the tree; the gamepad shoulders switch sub-tabs
+## (past the first or last they switch the main tabs); (A), Enter or the panel's button starts
+## the focused project, or cancels it while it runs. Every action is a command; a refusal
+## shows on the panel. The board rereads the state on every research, money, room and power
+## event, so it stays right while paused.
 ## Bible: docs/content/m25-lean-start.md section 3
 
 var _simulation: Simulation = null
@@ -14,13 +15,14 @@ var _simulation: Simulation = null
 var _available: bool = false
 var _signature: int = 0
 
-@onready var _list: ResearchList = %List
+@onready var _board: ResearchBoard = %Board
 @onready var _panel: ResearchPanel = %Panel
 
 
 func _ready() -> void:
-	_list.project_chosen.connect(_on_chosen)
-	_list.project_activated.connect(act)
+	_board.project_chosen.connect(_on_chosen)
+	_board.project_activated.connect(act)
+	_board.category_changed.connect(_on_category_changed)
 	_panel.action_pressed.connect(act)
 	visibility_changed.connect(_on_visibility_changed)
 
@@ -35,6 +37,7 @@ func _exit_tree() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_board.set_categories(categories())
 		refresh()
 
 
@@ -42,14 +45,15 @@ func _notification(what: int) -> void:
 func setup(simulation: Simulation) -> void:
 	_simulation = simulation
 	_available = false
+	_board.set_categories(categories())
 	_panel.show_notice("")
 	refresh()
 	_check_available()
 
 
 func get_default_focus() -> Control:
-	var rows: Array[ResearchRow] = _list.rows()
-	return rows[0] if not rows.is_empty() else _panel.get_button()
+	var nodes: Array[ResearchNode] = _board.get_tree_view().nodes()
+	return nodes[0] if not nodes.is_empty() else _board.get_tabs()
 
 
 func get_title_key() -> StringName:
@@ -61,9 +65,17 @@ func is_available() -> bool:
 	return _available
 
 
-## Returns the list, for tests.
-func get_list() -> ResearchList:
-	return _list
+## Returns the board (header, sub-tabs and tree), for tests.
+func get_board() -> ResearchBoard:
+	return _board
+
+
+## The research categories (sub-tabs) loaded by the Registry.
+static func categories() -> Array[ResearchCategoryDef]:
+	var found: Array[ResearchCategoryDef] = []
+	for def: DefBase in Registry.get_all_of(ResearchCategoryDef):
+		found.append(def as ResearchCategoryDef)
+	return found
 
 
 ## Returns the SELECTED panel, for tests.
@@ -88,10 +100,10 @@ func refresh() -> void:
 	if _simulation == null:
 		return
 	var state: GameState = _simulation.state
-	_list.show_state(state)
+	_board.show_state(state)
 	var shown: StringName = _panel.get_project()
-	if shown.is_empty() and not _list.rows().is_empty():
-		shown = _list.rows()[0].project_id
+	if _board.get_tree_view().node_of(shown) == null:
+		shown = _first_project()
 	var def: ResearchDef = state.research_defs.get(shown)
 	_panel.show_project(state, def)
 	_signature = _research_signature(state)
@@ -112,6 +124,31 @@ func _check_available() -> void:
 	if has_finished_lab(state) or state.research.is_running() or not state.research.done.is_empty():
 		_available = true
 		availability_changed.emit()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event is InputEventJoypadButton or not is_visible_in_tree():
+		return
+	var offset: int = 0
+	if InputActions.is_new_press(event, &"view_next"):
+		offset = 1
+	elif InputActions.is_new_press(event, &"view_previous"):
+		offset = -1
+	if offset != 0 and _board.step_category(offset):
+		get_viewport().set_input_as_handled()
+		get_default_focus().grab_focus()
+
+
+func _first_project() -> StringName:
+	var nodes: Array[ResearchNode] = _board.get_tree_view().nodes()
+	return nodes[0].project_id if not nodes.is_empty() else &""
+
+
+func _on_category_changed(_category: StringName) -> void:
+	if _simulation != null:
+		_panel.show_notice("")
+		var def: ResearchDef = _simulation.state.research_defs.get(_first_project())
+		_panel.show_project(_simulation.state, def)
 
 
 func _on_chosen(project_id: StringName) -> void:

@@ -10,6 +10,7 @@ cost_k = 800
 days = 4
 needs = Array[StringName]([&"lift_shaft"])
 effects = [[&"dig_depth", 4]]
+category = &"research_construction"
 name_key = &"RESEARCH_DEEP_EXCAVATION_NAME"
 line_key = &"RESEARCH_DEEP_EXCAVATION_LINE"
 id = &"deep_excavation"

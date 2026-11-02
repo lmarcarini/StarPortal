@@ -47,12 +47,7 @@ static func _check_content(registry: RegistryScript) -> Array[String]:
 	for def: DefBase in registry.get_all_of(RoomDef):
 		rooms.append(def as RoomDef)
 	errors.append_array(ContentCheckRooms.check(rooms))
-	var research: Array[ResearchDef] = []
-	for def: DefBase in registry.get_all_of(ResearchDef):
-		research.append(def as ResearchDef)
-	var research_keys: Dictionary[String, bool] = ContentSource.read_keys(RESEARCH_TABLE)
-	research_keys.merge(ContentSource.read_keys(BASE_TABLE))
-	errors.append_array(ContentCheckResearch.check(research, research_keys))
+	errors.append_array(_check_research(registry))
 	var field: AnchorFieldDef = ContentSource.home_field(registry)
 	for def: DefBase in registry.get_all_of(AnchorFieldDef):
 		var each: AnchorFieldDef = def as AnchorFieldDef
@@ -64,6 +59,21 @@ static func _check_content(registry: RegistryScript) -> Array[String]:
 	errors.append_array(ContentCheckWorlds.check_worlds(worlds, field.positions_ly))
 	errors.append_array(ContentCheckWorlds.check_unique_addresses(worlds, field.positions_ly))
 	errors.append_array(_check_documents(registry, worlds, field.positions_ly))
+	return errors
+
+
+## The research projects and their categories (sub-tabs), with their text keys.
+static func _check_research(registry: RegistryScript) -> Array[String]:
+	var research: Array[ResearchDef] = []
+	for def: DefBase in registry.get_all_of(ResearchDef):
+		research.append(def as ResearchDef)
+	var categories: Array[ResearchCategoryDef] = []
+	for def: DefBase in registry.get_all_of(ResearchCategoryDef):
+		categories.append(def as ResearchCategoryDef)
+	var research_keys: Dictionary[String, bool] = ContentSource.read_keys(RESEARCH_TABLE)
+	research_keys.merge(ContentSource.read_keys(BASE_TABLE))
+	var errors: Array[String] = ContentCheckResearch.check(research, research_keys)
+	errors.append_array(ContentCheckResearch.check_categories(research, categories, research_keys))
 	return errors
 
 

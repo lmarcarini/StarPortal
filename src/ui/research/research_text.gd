@@ -1,9 +1,9 @@
 class_name ResearchText
 extends RefCounted
-## Text of the Research tab (docs/content/m25-lean-start.md section 3): a row's state
-## ("Start", "needs R1", "ACTIVE", "done ✓", "locked"), the header's current project and time
-## left, the SELECTED panel's lines, and a refused command in plain words. Pure: reads the
-## state, never changes it.
+## Text of the Research tab (docs/content/m25-lean-start.md section 3): a node's state
+## ("Start", "needs Lift shaft", "ACTIVE", "done ✓", "locked"), the header's current project
+## and time left, the SELECTED panel's lines, and a refused command in plain words. Pure:
+## reads the state, never changes it.
 ## Bible: docs/content/m25-lean-start.md section 3
 
 ## What a row shows in its state column.
@@ -31,7 +31,8 @@ static func first_unmet(state: GameState, def: ResearchDef) -> StringName:
 	return &""
 
 
-## The state column of [param def]'s row: "Start", "needs R1", "ACTIVE", "done ✓", "locked".
+## The state line of [param def]'s node: "Start", "needs Excavation survey", "ACTIVE",
+## "done ✓", "locked".
 static func state_word(state: GameState, def: ResearchDef) -> String:
 	match kind(state, def):
 		Kind.LOCKED:
@@ -41,9 +42,16 @@ static func state_word(state: GameState, def: ResearchDef) -> String:
 		Kind.ACTIVE:
 			return _tr(&"RESEARCH_STATE_ACTIVE")
 		Kind.NEEDS:
-			var need: ResearchDef = state.research_defs.get(first_unmet(state, def))
-			return _tr(&"RESEARCH_STATE_NEEDS").format({"n": need.order if need != null else 0})
+			return _tr(&"RESEARCH_STATE_NEEDS").format(
+				{"name": name_of(state, first_unmet(state, def))}
+			)
 	return _tr(&"RESEARCH_STATE_START")
+
+
+## The translated name of project [param project_id], or the id when it has no def.
+static func name_of(state: GameState, project_id: StringName) -> String:
+	var def: ResearchDef = state.research_defs.get(project_id)
+	return _tr(def.name_key) if def != null else String(project_id)
 
 
 ## "Current: Excavation survey", or "No project running".

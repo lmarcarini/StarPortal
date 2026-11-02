@@ -9,6 +9,7 @@ order = 104
 cost_k = 0
 days = 1
 lock = &"alien_find"
+category = &"research_alien"
 name_key = &"RESEARCH_UNKNOWN_NAME"
 line_key = &"RESEARCH_LOCK_ALIEN_FIND"
 id = &"later_xenobiology"

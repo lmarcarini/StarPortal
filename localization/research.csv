@@ -7,7 +7,7 @@ RESEARCH_FUEL_CONTRACTS_LINE,Diesel plant upkeep $150k → $100k a month.,Manute
 RESEARCH_BANK_ARRAY_LINE,Up to 3 Capacitor Banks.,Até 3 Bancos de Capacitores.
 RESEARCH_FIELD_ENGINEERING_LINE,Workshop (sites build faster).,Oficina (obras ficam prontas mais rápido).
 RESEARCH_UNKNOWN_NAME,Unknown,Desconhecido
-RESEARCH_LOCK_ALIEN_FIND,Requires an alien find,Requer uma descoberta alienígena
+RESEARCH_LOCK_ALIEN_FIND,Requires an alien find,Requer achado alienígena
 RESEARCH_LOCK_STAFF,Requires staff,Requer pessoal
 RESEARCH_ERR_NEEDS_LAB,Needs a Research Lab that is on.,Precisa de um Laboratório de Pesquisa ligado.
 RESEARCH_ERR_RUNNING,One project at a time.,Um projeto por vez.
@@ -25,7 +25,7 @@ RESEARCH_DAYS_HOURS,{d} d {h} h,{d} d {h} h
 RESEARCH_DAYS,{n} d,{n} d
 RESEARCH_PANEL_COST,{cost} · {n} days,{cost} · {n} dias
 RESEARCH_STATE_START,Start,Iniciar
-RESEARCH_STATE_NEEDS,needs R{n},requer R{n}
+RESEARCH_STATE_NEEDS,needs {name},requer {name}
 RESEARCH_STATE_ACTIVE,ACTIVE,ATIVO
 RESEARCH_STATE_DONE,done ✓,concluído ✓
 RESEARCH_STATE_LOCKED,locked,bloqueado
@@ -34,3 +34,10 @@ RESEARCH_CANCEL,Cancel ({refund} back),Cancelar ({refund} de volta)
 RESEARCH_SELECTED,SELECTED,SELECIONADO
 RESEARCH_ERR_OTHER,Not possible right now.,Não é possível agora.
 RESEARCH_ONE_LAB_ENOUGH,One lab is enough until staff arrive.,Um laboratório basta até a equipe chegar.
+RESEARCH_CAT_CONSTRUCTION,Construction,Construção
+RESEARCH_CAT_ENERGY,Energy,Energia
+RESEARCH_CAT_GATE,Gate,Portal
+RESEARCH_CAT_ALIEN,Alien,Alienígena
+RESEARCH_CAT_STAFF,Staff,Pessoal
+RESEARCH_EMPTY,Nothing to research yet,Nada para pesquisar ainda
+RESEARCH_STUB,from {name},de {name}

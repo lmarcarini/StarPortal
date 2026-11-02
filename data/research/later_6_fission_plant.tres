@@ -9,6 +9,7 @@ order = 105
 cost_k = 0
 days = 1
 lock = &"staff"
+category = &"research_staff"
 name_key = &"RESEARCH_UNKNOWN_NAME"
 line_key = &"RESEARCH_LOCK_STAFF"
 id = &"later_fission_plant"
