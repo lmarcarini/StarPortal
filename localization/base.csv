@@ -12,12 +12,13 @@ ROOM_CAPACITOR_BANK_NAME,Capacitor Bank,Banco de Capacitores
 ROOM_CAPACITOR_BANK_NOW,"Stores 400 MWh for the Ring, charged from spare power.","Armazena 400 MWh para o Anel, carregado com a energia livre."
 ROOM_CAPACITOR_BANK_LATER,Larger banks from alien designs.,Bancos maiores a partir de projetos alienígenas.
 ROOM_QUARTERS_NAME,Quarters,Alojamento
-ROOM_QUARTERS_NOW,Six beds. Staff arrive later.,Seis camas. A equipe chega depois.
+ROOM_QUARTERS_NOW,Sleeps 4. Beds cap how many people the base holds.,Abriga 4 pessoas. As camas limitam quantas pessoas a base comporta.
+ROOM_QUARTERS_LATER,Rest lowers stress.,O descanso reduz o estresse.
 ROOM_RESEARCH_LAB_NAME,Research Lab,Laboratório de Pesquisa
-ROOM_RESEARCH_LAB_NOW,Runs one research project at a time.,Conduz um projeto de pesquisa por vez.
-ROOM_RESEARCH_LAB_LATER,Scientists make research faster.,Cientistas aceleram a pesquisa.
+ROOM_RESEARCH_LAB_NOW,"Holds four scientists. More skill, faster research.","Comporta quatro cientistas. Mais perícia, pesquisa mais rápida."
+ROOM_RESEARCH_LAB_LATER,"Splits into physics, xenobiology and linguistics labs.","Divide-se em laboratórios de física, xenobiologia e linguística."
 ROOM_WORKSHOP_NAME,Workshop,Oficina
-ROOM_WORKSHOP_NOW,"While on, building sites and digs finish 25% faster.","Ligada, as obras e escavações terminam 25% mais rápido."
+ROOM_WORKSHOP_NOW,"While on, sites and digs finish faster: 10% empty, 25% with two engineers.","Ligada, as obras e escavações terminam mais rápido: 10% vazia, 25% com dois engenheiros."
 ROOM_WORKSHOP_LATER,Builds prototypes and equipment.,Constrói protótipos e equipamentos.
 ROOM_INFIRMARY_NAME,Infirmary,Enfermaria
 ROOM_INFIRMARY_NOW,Opens when staff arrive.,Abre quando a equipe chegar.
@@ -123,7 +124,7 @@ BASE_POWER_SWITCH_LOCKED,ON · locked,LIGADA · travada
 BASE_POWER_LOCK_ALWAYS_ON,Always on: the Gate Room and Control Room never switch off.,Sempre ligada: a Sala do Portal e a Sala de Controle nunca desligam.
 BASE_POWER_LOCK_LAST_PLANT,The base's last running plant.,A última usina em funcionamento da base.
 BASE_POWER_REFUSED_SPARE,Needs {need} MW; {spare} MW spare.,Precisa de {need} MW; {spare} MW livres.
-BASE_POWER_REFUSED_PLANT_OFF,Switching it off takes away {need} MW; only {spare} MW spare. Switch rooms off or lower charging first.,Desligá-la tira {need} MW; só há {spare} MW livres. Desligue salas ou reduza a carga antes.
+BASE_POWER_REFUSED_PLANT_OFF,Switching it off takes away {need} MW; even with charging stopped only {spare} MW is free. Switch rooms off first.,Desligá-la tira {need} MW; mesmo sem carga só há {spare} MW livres. Desligue salas antes.
 BASE_POWER_REFUSED_NO_SWITCH,This room has no switch.,Esta sala não tem interruptor.
 BASE_POWER_REFUSED_OTHER,Not possible right now.,Não é possível agora.
 BASE_POWER_TAG_ON,ON {mw},LIG {mw}
@@ -137,6 +138,8 @@ BASE_POWER_RATE_DOWN,−,−
 BASE_POWER_RATE_UP,+,+
 BASE_MSG_CHARGING_LOWERED,{room} on: charging lowered to {mw} MW.,Em funcionamento: {room}. Carga reduzida para {mw} MW.
 BASE_MSG_FINISHED_OFF,{room} finished off. {reason},{room}: obra concluída sem energia. {reason}
+BASE_MSG_SUPPLY_CHARGING,{room} off: charging lowered to {mw} MW.,{room} desligada: carga reduzida para {mw} MW.
+BASE_MSG_SUPPLY_ROOMS_OFF,{room} off: charging stopped and {n} rooms switched off.,{room} desligada: carga zerada e {n} salas desligadas.
 BASE_MSG_LIFT_SEGMENT_REFUSED,Lift not extended to Level {n}: needs {cost}. Build it from the palette.,Elevador não estendido ao Nível {n}: precisa de {cost}. Construa-o pela paleta.
 STAFF_ROLE_SCIENTIST,Scientist,Cientista
 STAFF_ROLE_ENGINEER,Engineer,Engenheiro

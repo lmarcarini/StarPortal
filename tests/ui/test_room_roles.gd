@@ -66,7 +66,7 @@ func test_hovering_a_room_shows_its_summary_and_now_line() -> void:
 	palette.get_room_button(&"room_research_lab").mouse_entered.emit()
 	var time: String = BuildText.duration(_def(&"room_research_lab").build_ticks)
 	assert_str(palette.get_hint()).is_equal("Research Lab: $800k, %s. Draw 5 MW." % time)
-	assert_str(palette.get_role()).is_equal("Runs one research project at a time.")
+	assert_str(palette.get_role()).is_equal("Holds four scientists. More skill, faster research.")
 	palette.get_room_button(&"room_corridor").focus_entered.emit()
 	assert_str(palette.get_role()).is_equal("Connects rooms. One cell.")
 	palette.show_message("Placed.")

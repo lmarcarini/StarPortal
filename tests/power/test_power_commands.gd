@@ -52,8 +52,8 @@ func test_switch_on_needs_spare_power() -> void:
 	assert_int(_state.events.drain().size()).is_equal(3)
 
 
-## The last running plant cannot be switched off; with a second plant one can, if the rest
-## of the supply covers the allocation.
+## The last running plant cannot be switched off; with a second plant one can, taking the
+## lost supply from charging (m26-staff-and-money.md section 3).
 func test_plants() -> void:
 	var plant: StringName = _id(&"room_power_plant")
 	assert_str(String(_run(SwitchRoomCommand.create(plant, false)).error_code)).is_equal(
@@ -62,12 +62,10 @@ func test_plants() -> void:
 	_state.base.add_room(&"room_power_plant", 1, Vector2i(24, 2))
 	assert_float(PowerRules.supply_mw(_state)).is_equal(60.0)
 	var bank: RoomState = PowerFixture.add_bank(_state, 30)
-	assert_str(String(_run(SwitchRoomCommand.create(plant, false)).error_code)).is_equal(
-		"no_spare_power"
-	)
-	assert_bool(_run(SetChargeRateCommand.create(bank.id, 25)).is_ok).is_true()
 	assert_bool(_run(SwitchRoomCommand.create(plant, false)).is_ok).is_true()
 	assert_float(PowerRules.supply_mw(_state)).is_equal(30.0)
+	assert_int(_state.power.charge_rates[bank.id]).is_equal(25)
+	assert_float(PowerRules.allocated_mw(_state)).is_equal(30.0)
 
 
 ## Charge rates: only for a standing bank, within 0..max, and within the spare.

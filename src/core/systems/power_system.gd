@@ -4,13 +4,17 @@ extends SimSystem
 ## [br]1. Forgets the charge rate of a bank that is gone or being demolished.
 ## [br]2. Gives a newly completed Capacitor Bank the spare supply as its charge rate (up to its
 ## maximum), and posts capacitors_installed(capacity) and pause_requested(&"capacitors_installed").
-## [br]3. Keeps allocation within supply: if a plant went away (or a room is demolished), it
-## switches the newest switchable rooms off, then lowers charge rates, until it fits, and posts
-## power_allocation_changed(). A room that just finished is handled first by FinishingPower
-## (charging comes down for it; no room is switched off), so the shed does not touch it.
+## [br]3. Keeps allocation within supply (docs/content/m26-staff-and-money.md section 3, supply
+## drops take from charging first): if a plant went away (switched off or demolished), it lowers
+## the charge rates, newest bank first, by just enough, and only if zero charging is not enough
+## switches the newest switchable rooms off; it posts power_allocation_changed() and, for a
+## plant named as the cause, supply_dropped(plant id, total charge MW, rooms switched off). A room
+## that just finished is handled first by FinishingPower (charging comes down for it; no room is
+## switched off), so the shed does not touch it.
 ## [br]4. Charges the capacitors at the banks' rates less an open wormhole's drain, clamped to
 ## 0..capacity. The Ring never draws on the supply and the rooms never draw on the capacitors.
 ## Bible: docs/content/m2-base.md section 3, docs/content/m25-lean-start.md section 3,
+## docs/content/m26-staff-and-money.md section 3,
 ## gate-and-address-spec.md#dialing-outcomes-and-energy
 
 ## Reason of the pause request a completed bank posts.
@@ -43,14 +47,20 @@ func tick(state: GameState) -> void:
 
 ## Brings [param state]'s power back in line after rooms change: forgets gone banks, gives
 ## completed banks their rate, and sheds allocation above supply. Posts
-## power_allocation_changed() only when something changed. Called by this system each tick
-## when needed, and by ConstructionSystem and DemolishRoomCommand the moment rooms finish or
-## start coming down, so allocation never exceeds supply between ticks.
-static func settle(state: GameState) -> void:
+## power_allocation_changed() only when something changed, and supply_dropped() when the shed
+## acted and [param cause] (the plant that went away) is given. Called by this system each tick
+## when needed, and by ConstructionSystem, DemolishRoomCommand and SwitchRoomCommand the moment
+## rooms finish, start coming down or a plant goes off, so allocation never exceeds supply.
+static func settle(state: GameState, cause: StringName = &"") -> void:
 	_forget_lost_banks(state)
 	_adopt_new_banks(state)
-	if _shed(state):
-		state.events.post(&"power_allocation_changed", [])
+	var rooms_off: int = _shed(state)
+	if rooms_off < 0:
+		return
+	if not cause.is_empty():
+		var charge: int = roundi(PowerRules.charge_mw(state))
+		state.events.post(&"supply_dropped", [cause, charge, rooms_off])
+	state.events.post(&"power_allocation_changed", [])
 
 
 ## True when a bank was added or lost, or allocation is above supply.
@@ -86,32 +96,28 @@ static func _adopt_new_banks(state: GameState) -> void:
 
 
 ## Fits allocation to supply: first switches stopped plants back on while supply is below the
-## always-on load, then switches the newest switchable rooms off, then lowers charge rates
-## (newest bank first). Returns true when it changed anything.
-static func _shed(state: GameState) -> bool:
+## always-on load, then lowers charge rates (newest bank first) by just enough, then, only if
+## zero charging is not enough, switches the newest switchable rooms off. Returns the rooms it
+## switched off, or -1 when it changed nothing.
+static func _shed(state: GameState) -> int:
 	if PowerRules.allocated_mw(state) <= PowerRules.supply_mw(state):
-		return false
-	var changed: bool = _restart_plants(state)
+		return -1
+	_restart_plants(state)
+	var over: float = PowerRules.allocated_mw(state) - PowerRules.supply_mw(state)
+	if over > 0.0:
+		FinishingPower.lower_charging(state, ceili(over))
+	var rooms_off: int = 0
 	var rooms: Array[RoomState] = state.base.rooms.duplicate()
 	rooms.reverse()
 	for room: RoomState in rooms:
 		if PowerRules.allocated_mw(state) <= PowerRules.supply_mw(state):
-			return true
+			break
 		var def: RoomDef = state.room_defs.get(room.def_id)
 		if PowerRules.has_switch(def) and def.power_output_mw <= 0.0:
 			if PowerRules.is_running(room, def):
 				room.powered_on = false
-				changed = true
-	var banks: Array[StringName] = state.power.charge_rates.keys()
-	banks.reverse()
-	for room_id: StringName in banks:
-		var over: float = PowerRules.allocated_mw(state) - PowerRules.supply_mw(state)
-		var rate: int = state.power.charge_rates[room_id]
-		if over <= 0.0 or rate == 0:
-			continue
-		state.power.charge_rates[room_id] = maxi(rate - ceili(over), 0)
-		changed = true
-	return changed
+				rooms_off += 1
+	return rooms_off
 
 
 ## Switches stopped, standing plants back on, oldest first, while supply is below the

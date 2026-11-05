@@ -41,7 +41,7 @@ static func now(def: RoomDef) -> String:
 
 
 ## "Later: Squads move between levels." for [param def] (its ROOM_*_LATER key, next to its
-## name key), or "" when the room has no later line (Quarters, Infirmary).
+## name key), or "" when the room has no later line (Infirmary).
 static func later(def: RoomDef) -> String:
 	var key: String = later_key(def)
 	var text: String = _tr(StringName(key))

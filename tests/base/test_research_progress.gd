@@ -22,6 +22,7 @@ func _ticks(game: GameState, count: int) -> void:
 	var system := ResearchSystem.new()
 	for i: int in count:
 		system.tick(game)
+		game.clock.tick += 1
 
 
 ## A project takes exactly its listed days; a second lab does not make it faster.
@@ -49,7 +50,7 @@ func test_lab_off_pauses_and_keeps() -> void:
 	_ticks(game, 500)
 	assert_int(game.research.ticks_done).is_equal(150)
 	assert_that(game.research.active).is_equal(&"bank_array")
-	PowerFixture.lab(game)
+	StaffFixture.scientists(game, PowerFixture.lab(game), [3, 3])
 	_ticks(game, 3 * DAY - 150)
 	assert_bool(game.research.is_done(&"bank_array")).is_true()
 

@@ -92,7 +92,7 @@ func apply(state: GameState) -> void:
 		target.demolish_ticks_left = maxi(1, def.build_ticks / 4)
 		target.powered_on = false
 	StaffChanges.release(state, targets(state.base, room))
-	PowerSystem.settle(state)
+	PowerSystem.settle(state, room.id if def.power_output_mw > 0.0 else &"")
 	state.budget.credit(refund)
 	state.events.post(&"budget_changed", [state.budget.funds_k])
 

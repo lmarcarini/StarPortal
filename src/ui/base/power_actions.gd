@@ -3,7 +3,7 @@ extends RefCounted
 ## The Base tab's power actions: each builds a SwitchRoomCommand or SetChargeRateCommand and
 ## submits it, and returns "" when it was accepted or the refusal in plain words. Changes no
 ## state itself.
-## Bible: docs/content/m2-base.md sections 3 and 6
+## Bible: docs/content/m2-base.md sections 3 and 6, docs/content/m26-staff-and-money.md section 3
 
 
 ## Switches room [param room_id] of [param simulation] to the other state.
@@ -20,6 +20,8 @@ static func toggle(simulation: Simulation, room_id: StringName) -> String:
 	if result.is_ok:
 		return ""
 	var plant_off: bool = not on and def.power_output_mw > 0.0
+	if plant_off:
+		spare += PowerRules.charge_mw(state)
 	return PowerText.refusal(result.error_code, delta if on else -delta, spare, plant_off)
 
 
