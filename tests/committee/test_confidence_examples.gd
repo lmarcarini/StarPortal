@@ -62,9 +62,17 @@ func _power_lab_with_bank_at_20_mw(player: M15Player) -> void:
 	var state: GameState = player.state()
 	for room: RoomState in state.base.rooms:
 		if room.def_id == &"room_capacitor_bank":
-			assert_bool(player.simulation.submit(SetChargeRateCommand.create(room.id, 20)).is_ok)
+			(
+				assert_bool(
+					player.simulation.submit(SetChargeRateCommand.create(room.id, 20)).is_ok
+				)
+				. is_true()
+			)
 		elif room.def_id == &"room_research_lab":
-			assert_bool(player.simulation.submit(SwitchRoomCommand.create(room.id, true)).is_ok)
+			(
+				assert_bool(player.simulation.submit(SwitchRoomCommand.create(room.id, true)).is_ok)
+				. is_true()
+			)
 
 
 ## Runs to the minute before the month-end, sets the balance the column has left after its
