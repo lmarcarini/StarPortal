@@ -57,7 +57,7 @@ const BALANCE_ID: StringName = &"balance"
 @export var lift_segment_ticks: int = 60
 ## Room def ids a new game may build before any research (m25-lean-start.md section 1).
 @export var starting_room_unlocks: Array[StringName] = [
-	&"room_capacitor_bank", &"room_research_lab", &"room_corridor"
+	&"room_capacitor_bank", &"room_research_lab", &"room_corridor", &"room_quarters"
 ]
 
 @export_group("Dial outcomes")

@@ -4,7 +4,8 @@
 ## finishes on, lowering charging to 20 MW with its message, and SILL locks about 17.3 hours in.
 ## The Research tab (F4) starts Excavation survey through its real row and Start button; Level 2
 ## is dug and Stairs join it. Lift shaft brings a Lift on both levels, Field engineering the
-## Workshop, which makes the next site finish 25% faster, and Bank array a second bank.
+## Workshop, which makes the next site finish 22.5% faster (its starting engineers), and Bank
+## array a second bank.
 ## Bible: roadmap.md (M2.5 check), technical-architecture.md#testing-and-tooling,
 ## docs/content/m25-lean-start.md sections 1 to 6
 extends GdUnitTestSuite
@@ -176,14 +177,15 @@ func _research_and_build_workshop(player: M15Player) -> void:
 	assert_float(PowerRules.charge_mw(player.state())).is_equal(15.0)
 
 
-## Bank array allows a second bank; with the Workshop on its 1-hour site takes 48 minutes (or
-## one less, by phase). Money runs short first: the player waits for the month-end.
+## Bank array allows a second bank; with the Workshop on and its starting engineers (skill 3 and
+## 2: 22.5%, m26-staff-and-money.md section 3) its 1-hour site takes 49 minutes (or one less,
+## by phase). Money runs short first: the player waits for the month-end.
 func _research_and_build_second_bank(player: M15Player) -> void:
 	_research(player, &"bank_array")
 	var cost: int = player.state().room_defs[BANK_DEF].build_cost_k
 	_wait(player, func() -> bool: return player.state().budget.funds_k >= cost)
 	var bank: RoomState = _place_near_gate(player, BANK_DEF)
-	assert_int(_wait(player, bank.is_built)).is_between(47, 48)
+	assert_int(_wait(player, bank.is_built)).is_between(48, 49)
 	assert_int(player.state().power.charge_rates.size()).is_equal(2)
 
 

@@ -1,5 +1,5 @@
 ## Tests for SiteProgress and BuildSpeed.ticks_to_finish: a site's, demolition's and dig's
-## fraction done and real ticks left, with the Workshop's 25%, and a queued site.
+## fraction done and real ticks left, with a staffed Workshop's 25%, and a queued site.
 ## Bible: docs/content/m2-base.md sections 4 and 6, docs/content/m25-lean-start.md section 4
 extends GdUnitTestSuite
 
@@ -21,10 +21,10 @@ func test_ticks_to_finish_matches_the_system() -> void:
 			while left > 0:
 				left -= 2 if (start + ticks) % 4 == 3 else 1
 				ticks += 1
-			assert_int(BuildSpeed.ticks_to_finish(work, start, true)).is_equal(ticks)
-			assert_int(BuildSpeed.ticks_to_finish(work, start, false)).is_equal(work)
-	assert_int(BuildSpeed.ticks_to_finish(240, 0, true)).is_equal(192)
-	assert_int(BuildSpeed.ticks_to_finish(0, 0, true)).is_equal(0)
+			assert_int(BuildSpeed.ticks_to_finish(work, start, 10)).is_equal(ticks)
+			assert_int(BuildSpeed.ticks_to_finish(work, start, 0)).is_equal(work)
+	assert_int(BuildSpeed.ticks_to_finish(240, 0, 10)).is_equal(192)
+	assert_int(BuildSpeed.ticks_to_finish(0, 0, 10)).is_equal(0)
 
 
 func test_a_site_reports_its_fraction_and_real_ticks_left() -> void:
@@ -34,7 +34,8 @@ func test_a_site_reports_its_fraction_and_real_ticks_left() -> void:
 	assert_int(progress.kind).is_equal(SiteProgress.Kind.BUILDING)
 	assert_float(progress.fraction).is_equal_approx(0.75, 0.001)
 	assert_int(progress.ticks_left).is_equal(120)
-	_game.base.add_room(BuildSpeed.WORKSHOP_DEF, 3, Vector2i(4, 16))
+	var workshop: RoomState = _game.base.add_room(BuildSpeed.WORKSHOP_DEF, 3, Vector2i(4, 16))
+	StaffFixture.engineers(_game, workshop, [3, 3])
 	_game.clock.tick = 0
 	assert_int(SiteProgress.of_room(_game, lab).ticks_left).is_equal(96)
 

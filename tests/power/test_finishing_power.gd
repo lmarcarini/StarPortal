@@ -110,8 +110,9 @@ func test_finishes_off_when_zero_charging_is_not_enough() -> void:
 	assert_array(event.args).is_equal([lab.id, 5, 0])
 
 
-## Losing a plant still switches the newest switchable rooms off first (PowerSystem's shed).
-func test_plant_loss_still_sheds_newest_rooms() -> void:
+## Losing a plant takes from charging first too (m26-staff-and-money.md section 3): the rooms
+## stay on and the bank gives up just the lost supply.
+func test_plant_loss_takes_from_charging_first() -> void:
 	var plant_b: RoomState = _state.base.add_room(&"room_power_plant", 3, Vector2i(0, 2))
 	var bank: RoomState = PowerFixture.add_bank(_state, 30)
 	var older: RoomState = _state.base.add_room(&"room_workshop", 2, Vector2i(0, 2))
@@ -119,9 +120,9 @@ func test_plant_loss_still_sheds_newest_rooms() -> void:
 	assert_float(PowerRules.spare_mw(_state)).is_equal(15.0)
 	plant_b.demolish_ticks_left = 30
 	PowerSystem.settle(_state)
-	assert_bool(newer.powered_on).is_false()
-	assert_bool(older.powered_on).is_false()
-	assert_int(_state.power.charge_rates[bank.id]).is_equal(25)
+	assert_bool(newer.powered_on).is_true()
+	assert_bool(older.powered_on).is_true()
+	assert_int(_state.power.charge_rates[bank.id]).is_equal(15)
 
 
 ## The log gets a "power" line for each case.

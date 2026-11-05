@@ -13,9 +13,13 @@ func _code(def_id: StringName) -> String:
 	return String(BaseRules.can_build_room(_game, def_id).error_code)
 
 
-## At the start only the bank, the lab and the corridor are buildable; the rest say why.
+## At the start only the bank, the lab, the corridor and (M2.6) Quarters are buildable; the
+## rest say why.
 func test_start_locks() -> void:
-	for def_id: StringName in [&"room_capacitor_bank", &"room_research_lab", &"room_corridor"]:
+	var open: Array[StringName] = [
+		&"room_capacitor_bank", &"room_research_lab", &"room_corridor", &"room_quarters"
+	]
+	for def_id: StringName in open:
 		assert_bool(BaseRules.can_build_room(_game, def_id).is_ok).is_true()
 	var cases: Dictionary = {
 		&"room_stairs": "excavation_survey",
@@ -27,7 +31,6 @@ func test_start_locks() -> void:
 		var result: CommandResult = BaseRules.can_build_room(_game, def_id)
 		assert_str(String(result.error_code)).is_equal("needs_research")
 		assert_str(result.detail).is_equal(cases[def_id])
-	assert_str(_code(&"room_quarters")).is_equal("needs_staff")
 	assert_str(_code(&"room_infirmary")).is_equal("needs_staff")
 	assert_str(_code(&"room_gate")).is_equal("not_buildable")
 	assert_str(_code(&"room_nope")).is_equal("unknown_room")

@@ -91,6 +91,7 @@ func test_cancel_refunds_half() -> void:
 	var system := ResearchSystem.new()
 	for i: int in 100:
 		system.tick(game)
+		game.clock.tick += 1
 	assert_bool(ConstructionFixture.run(game, cancel).is_ok).is_true()
 	assert_int(game.budget.funds_k).is_equal(funds - 500 + 250)
 	assert_bool(game.research.is_running()).is_false()

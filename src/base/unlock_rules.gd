@@ -17,8 +17,9 @@ const EFFECT_BANK_CAP: StringName = &"bank_cap"
 const EFFECT_PLANT_UPKEEP: StringName = &"plant_upkeep"
 ## The Power Plant's def id, the room EFFECT_PLANT_UPKEEP overrides.
 const PLANT_DEF: StringName = &"room_power_plant"
-## Rooms that stay locked until staff arrive (M3): no research unlocks them in M2.5.
-const STAFF_LOCKED: Array[StringName] = [&"room_quarters", &"room_infirmary"]
+## Rooms that stay locked until M3: no research unlocks them (Quarters is unlocked from the
+## start in M2.6, docs/content/m26-staff-and-money.md section 3).
+const STAFF_LOCKED: Array[StringName] = [&"room_infirmary"]
 ## The M2.5 projects R1-R7 in list order, by id: each an array of [effect, value] pairs. The
 ## research card owns costs, days and prerequisites; this is only what finishing one unlocks.
 const PROJECTS: Dictionary = {
@@ -92,7 +93,7 @@ static func project_for(effect: StringName, value: Variant) -> StringName:
 
 
 ## Whether [param state] may build a room of [param def_id] now, as far as unlocks go:
-## ok, or failed with &"unknown_room", &"needs_staff" (Quarters, Infirmary),
+## ok, or failed with &"unknown_room", &"needs_staff" (Infirmary),
 ## &"needs_research" (detail: the project id that unlocks it), &"not_buildable" (locked and
 ## no project unlocks it) or &"bank_cap" (detail: the project that raises the cap, or "").
 ## Placement and money are the commands' checks.

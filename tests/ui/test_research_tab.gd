@@ -56,7 +56,7 @@ func test_tab_appears_once_a_lab_has_finished() -> void:
 
 func test_header_is_current_when_the_tab_opens() -> void:
 	var simulation: Simulation = SimClock.simulation
-	PowerFixture.lab(simulation.state)
+	StaffChanges.auto_assign(simulation.state, PowerFixture.lab(simulation.state))
 	EventBus.room_built.emit(&"lab")
 	simulation.state.clock.is_paused = true
 	simulation.submit(StartResearchCommand.create(&"excavation_survey"))
@@ -84,12 +84,12 @@ func test_palette_notes_a_second_lab() -> void:
 	var palette: BuildPalette = view.get_palette()
 	var button: Button = palette.get_room_button(ResearchRules.LAB_DEF)
 	button.mouse_entered.emit()
-	assert_bool(palette.get_role().contains("One lab is enough")).is_false()
+	assert_bool(palette.get_role().contains("More labs hold")).is_false()
 	PowerFixture.lab(state)
 	EventBus.room_built.emit(&"lab")
 	button = palette.get_room_button(ResearchRules.LAB_DEF)
 	button.focus_entered.emit()
-	assert_str(palette.get_role()).ends_with("One lab is enough until staff arrive.")
+	assert_str(palette.get_role()).ends_with("More labs hold more scientists.")
 	assert_bool(button.disabled).is_false()
 	root.free()
 

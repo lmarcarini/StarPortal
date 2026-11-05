@@ -1,6 +1,7 @@
-## Tests for the Workshop's effect (BuildSpeed): while built and on, sites and digs progress
-## 25% faster, exactly (a bonus tick every fourth clock tick); nothing while it is off,
-## building or coming down; a second Workshop adds nothing; demolition is not sped up.
+## Tests for the Workshop's effect (BuildSpeed) with a standard crew (two skill-3 engineers):
+## while built and on, sites and digs progress 25% faster, exactly (a bonus tick every fourth clock
+## tick); nothing while it is off, building or coming down; a second Workshop adds nothing;
+## demolition is not sped up.
 ## Bible: docs/content/m25-lean-start.md sections 4 and 5
 extends GdUnitTestSuite
 
@@ -15,9 +16,13 @@ func before_test() -> void:
 	_system = ConstructionSystem.new()
 
 
-## A built, switched-on Workshop on Level 3 (placement unchecked).
-func _workshop(column: int = 4) -> RoomState:
-	return _game.base.add_room(BuildSpeed.WORKSHOP_DEF, 3, Vector2i(column, 16))
+## A built, switched-on Workshop on Level 3 (placement unchecked), staffed by two skill-3
+## engineers (25%) when [param staffed].
+func _workshop(column: int = 4, staffed: bool = true) -> RoomState:
+	var room: RoomState = _game.base.add_room(BuildSpeed.WORKSHOP_DEF, 3, Vector2i(column, 16))
+	if staffed:
+		StaffFixture.engineers(_game, room, [3, 3])
+	return room
 
 
 ## Ticks the system and the clock until [param done] is true; returns the ticks taken.
@@ -60,7 +65,7 @@ func test_workshop_still_building_has_no_effect() -> void:
 
 func test_second_workshop_adds_nothing() -> void:
 	_workshop(4)
-	_workshop(10)
+	_workshop(10, false)
 	var lab: RoomState = _place_lab()
 	assert_int(_ticks_until(lab.is_built)).is_equal(384)
 
