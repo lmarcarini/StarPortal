@@ -133,10 +133,18 @@ static func staff_line(args: Dictionary) -> String:
 
 
 ## The line of a finished room's "power" entry [param args]: charging lowered for it, or it
-## stayed off with the refusal reason (also the Base tab's message line).
+## stayed off with the refusal reason; or, with "rooms_off", a plant gone off and what its supply
+## took (also the Base tab's message line).
 static func finished_room_line(args: Dictionary) -> String:
 	var def: RoomDef = Registry.get_def(StringName(str(args.get("room", "")))) as RoomDef
 	var room: String = "" if def == null else _tr(def.name_key)
+	if args.has("rooms_off"):
+		var off: int = type_convert(args["rooms_off"], TYPE_INT)
+		if off > 0:
+			return _tr(&"BASE_MSG_SUPPLY_ROOMS_OFF").format({"room": room, "n": off})
+		return _tr(&"BASE_MSG_SUPPLY_CHARGING").format(
+			{"room": room, "mw": args.get("charge_mw", 0)}
+		)
 	if args.has("charge_mw"):
 		return _tr(&"BASE_MSG_CHARGING_LOWERED").format({"room": room, "mw": args["charge_mw"]})
 	var reason: String = _tr(&"BASE_POWER_REFUSED_SPARE").format(

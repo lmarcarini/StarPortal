@@ -92,6 +92,11 @@ signal charging_lowered(room_id: StringName, charge_mw: int)
 ## id, its draw and the spare supply in MW (posted through the outbox).
 @warning_ignore("unused_signal")
 signal room_finished_off(room_id: StringName, need_mw: int, spare_mw: int)
+## Emitted when a plant went away (switched off or demolished) and the shed took its supply
+## from charging first, then rooms: the plant's id, the total charge rate left in MW and the
+## rooms switched off (posted through the outbox).
+@warning_ignore("unused_signal")
+signal supply_dropped(room_id: StringName, charge_mw: int, rooms_off: int)
 ## Emitted when a dug level's lift segment is refused for lack of funds, with the level and
 ## the segment's cost in $k (posted through the outbox).
 @warning_ignore("unused_signal")

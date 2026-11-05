@@ -19,12 +19,14 @@ func setup(palette: BuildPalette, state: GameState) -> void:
 func _enter_tree() -> void:
 	EventBus.charging_lowered.connect(_on_charging_lowered)
 	EventBus.room_finished_off.connect(_on_room_finished_off)
+	EventBus.supply_dropped.connect(_on_supply_dropped)
 	EventBus.lift_segment_refused.connect(_on_lift_segment_refused)
 
 
 func _exit_tree() -> void:
 	EventBus.charging_lowered.disconnect(_on_charging_lowered)
 	EventBus.room_finished_off.disconnect(_on_room_finished_off)
+	EventBus.supply_dropped.disconnect(_on_supply_dropped)
 	EventBus.lift_segment_refused.disconnect(_on_lift_segment_refused)
 
 
@@ -36,7 +38,10 @@ func line_for(event_name: StringName, args: Array) -> String:
 			{"n": args[0], "cost": MoneyLabel.format_k(cost_k)}
 		)
 	var details: Dictionary = {"room": _def_id(args[0])}
-	if event_name == &"charging_lowered":
+	if event_name == &"supply_dropped":
+		details["charge_mw"] = args[1]
+		details["rooms_off"] = args[2]
+	elif event_name == &"charging_lowered":
 		details["charge_mw"] = args[1]
 	else:
 		details["need_mw"] = args[1]
@@ -50,6 +55,10 @@ func _on_charging_lowered(room_id: StringName, charge_mw: int) -> void:
 
 func _on_room_finished_off(room_id: StringName, need_mw: int, spare_mw: int) -> void:
 	_show(line_for(&"room_finished_off", [room_id, need_mw, spare_mw]))
+
+
+func _on_supply_dropped(room_id: StringName, charge_mw: int, rooms_off: int) -> void:
+	_show(line_for(&"supply_dropped", [room_id, charge_mw, rooms_off]))
 
 
 func _on_lift_segment_refused(level: int, cost_k: int) -> void:

@@ -28,7 +28,7 @@ static func entries_for(
 			return [LogEntry.create(tick, &"horizon", StringName(_text(args)))]
 		&"capacitors_installed":
 			return [_power_entry(args, state, tick)]
-		&"charging_lowered", &"room_finished_off":
+		&"charging_lowered", &"room_finished_off", &"supply_dropped":
 			return _finished_room_entries(event_name, args, state, tick)
 		&"research_done":
 			return [LogEntry.create(tick, &"research", &"", {"project_id": _text(args)})]
@@ -51,7 +51,8 @@ static func _staff_entries(args: Array, tick: int) -> Array[LogEntry]:
 
 
 ## The "power" entry of a room that finished: charging lowered for it ("room", "charge_mw")
-## or it stayed off ("room", "need_mw", "spare_mw"); "room" is its def id.
+## or it stayed off ("room", "need_mw", "spare_mw"); or of a plant gone off (supply_dropped:
+## "room", "charge_mw", "rooms_off"); "room" is its def id.
 static func _finished_room_entries(
 	event_name: StringName, args: Array, state: GameState, tick: int
 ) -> Array[LogEntry]:
@@ -61,6 +62,9 @@ static func _finished_room_entries(
 	var details: Dictionary = {"room": "" if room == null else String(room.def_id)}
 	if event_name == &"charging_lowered" and args.size() == 2 and args[1] is int:
 		details["charge_mw"] = args[1]
+	elif event_name == &"supply_dropped" and args.size() == 3 and args[1] is int and args[2] is int:
+		details["charge_mw"] = args[1]
+		details["rooms_off"] = args[2]
 	elif args.size() == 3 and args[1] is int and args[2] is int:
 		details["need_mw"] = args[1]
 		details["spare_mw"] = args[2]

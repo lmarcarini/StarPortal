@@ -106,18 +106,17 @@ func test_demolished_bank_loses_its_energy() -> void:
 	assert_float(_state.power.stored_mwh).is_equal(400.0)
 
 
-## A room completing beyond the supply is switched off; then, if still over, the newest
-## switchable rooms go off and charge rates come down until allocation fits.
+## Allocation above supply is shed from charging first (m26-staff-and-money.md section 3): the
+## charge rate comes down by just enough and the room stays on.
 func test_over_allocation_is_shed() -> void:
 	var bank: RoomState = PowerFixture.add_bank(_state, 25)
 	var lab: RoomState = _state.base.add_room(&"room_research_lab", 2, Vector2i(20, 2))
 	_tick(1)
-	assert_bool(lab.powered_on).is_false()
-	assert_int(_state.power.charge_rates[bank.id]).is_equal(25)
+	assert_bool(lab.powered_on).is_true()
+	assert_int(_state.power.charge_rates[bank.id]).is_equal(20)
 	assert_int(_state.events.size()).is_equal(1)
-	lab.powered_on = true
 	_state.power.charge_rates[bank.id] = 30
 	_tick(1)
-	assert_bool(lab.powered_on).is_false()
-	assert_int(_state.power.charge_rates[bank.id]).is_equal(25)
+	assert_bool(lab.powered_on).is_true()
+	assert_int(_state.power.charge_rates[bank.id]).is_equal(20)
 	assert_float(PowerRules.allocated_mw(_state)).is_equal(PowerRules.supply_mw(_state))

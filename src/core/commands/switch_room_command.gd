@@ -1,10 +1,13 @@
 class_name SwitchRoomCommand
 extends Command
 ## The player switches a room on or off (docs/content/m2-base.md section 3). Instant and free.
-## Switching on is refused when the room's draw would push allocation over supply; switching a
-## plant off is refused when it is the last running one, or when the supply left could not
-## cover what is allocated. Posts power_allocation_changed() when applied.
-## Bible: docs/content/m2-base.md section 3
+## Switching on is refused when the room's draw would push allocation over supply. Switching a
+## plant off takes from charging first (docs/content/m26-staff-and-money.md section 3): it is
+## refused only when it is the last running one, or when even zero charging would leave rooms
+## without power ("Switch rooms off first"); otherwise the charge rates come down, newest bank
+## first, by just enough (PowerSystem.settle(), which posts supply_dropped()). Posts
+## power_allocation_changed() when applied.
+## Bible: docs/content/m2-base.md section 3, docs/content/m26-staff-and-money.md section 3
 
 ## The command's stable type id.
 const TYPE: StringName = &"switch_room"
@@ -41,7 +44,8 @@ func get_type() -> StringName:
 ## Rejects an unknown room (&"unknown_room"), a site or a room coming down (&"not_built"), a
 ## room with no switch: always on, a bank, a lift, stairs or a corridor (&"no_switch"), the
 ## last running plant (&"last_plant"), and a change that would leave allocation above supply
-## (&"no_spare_power"). Switching to the state the room is already in is accepted.
+## (&"no_spare_power"; for a plant, above supply even with charging at zero). Switching to the state
+## the room is already in is accepted.
 func validate(state: GameState) -> CommandResult:
 	var room: RoomState = state.base.find_room(room_id)
 	var def: RoomDef = null if room == null else state.room_defs.get(room.def_id)
@@ -62,6 +66,8 @@ func _power_check(state: GameState, def: RoomDef) -> CommandResult:
 		return CommandResult.fail(&"last_plant")
 	var delta: float = def.power_draw_mw - def.power_output_mw
 	var spare: float = PowerRules.supply_mw(state) - PowerRules.allocated_mw(state)
+	if not on and def.power_output_mw > 0.0:
+		spare += PowerRules.charge_mw(state)
 	var needed: float = delta if on else -delta
 	if needed > spare:
 		return CommandResult.fail(&"no_spare_power", "needs %s MW; %s MW spare" % [needed, spare])
@@ -71,6 +77,8 @@ func _power_check(state: GameState, def: RoomDef) -> CommandResult:
 ## Sets the room's switch.
 func apply(state: GameState) -> void:
 	state.base.find_room(room_id).powered_on = on
+	if not on and state.room_defs[state.base.find_room(room_id).def_id].power_output_mw > 0.0:
+		PowerSystem.settle(state, room_id)
 	state.events.post(&"power_allocation_changed", [])
 
 
