@@ -30,3 +30,28 @@ LOG_KIND_DOCUMENT,Documents,Documentos
 LOG_KIND_CONSOLE,Consoles,Consoles
 LOG_KIND_HORIZON,Horizon records,Registros do horizonte
 LOG_KIND_POWER,Power,Energia
+LOG_KIND_MONTH,Month-ends,Fechamentos do mês
+LOG_KIND_COMMITTEE,Committee,Comitê
+MONTH_REPORT_TITLE,Month-end report: Confidence {before} → {after},Relatório do mês: Confiança {before} → {after}
+MONTH_REPORT_ALLOCATION,Allocation: {amount},Verba: {amount}
+MONTH_REPORT_UPKEEP,Room upkeep: {amount},Manutenção das salas: {amount}
+MONTH_REPORT_SALARIES,Salaries ({people} people): {amount},Salários ({people} pessoas): {amount}
+MONTH_REPORT_SALARIES_ONE,Salaries (1 person): {amount},Salários (1 pessoa): {amount}
+MONTH_REPORT_BALANCE,Balance: {before} → {after},Saldo: {before} → {after}
+MONTH_REPORT_CONFIDENCE,Committee Confidence: {before} → {after},Confiança do Comitê: {before} → {after}
+MONTH_CAUSE_LOCKED,New world locked: {worlds} {amount},Novo mundo conectado: {worlds} {amount}
+MONTH_CAUSE_SURVEYED,New world surveyed: {worlds} {amount},Novo mundo explorado: {worlds} {amount}
+MONTH_CAUSE_RESEARCH,Research finished ({count}) {amount},Pesquisas concluídas ({count}) {amount}
+MONTH_CAUSE_REPORTS,Reports filed ({count} analysts) {amount},Relatórios entregues ({count} analistas) {amount}
+MONTH_CAUSE_REPORTS_ONE,Reports filed (1 analyst) {amount},Relatórios entregues (1 analista) {amount}
+MONTH_CAUSE_WITHIN_BUDGET,Within budget {amount},Dentro do orçamento {amount}
+MONTH_CAUSE_IN_RED,In the red {amount},No vermelho {amount}
+MONTH_CAUSE_IDLE,Idle month {amount},Mês parado {amount}
+MONTH_CAUSE_CAP,Capped at {limit} a month {amount},Limite de {limit} por mês {amount}
+MONTH_REVIEW_PLEASED,Quarterly review: The Committee is pleased. Grant {amount},Revisão trimestral: o Comitê está satisfeito. Verba extra {amount}
+MONTH_REVIEW_NOTES,Quarterly review: The Committee notes your progress.,Revisão trimestral: o Comitê registra seu progresso.
+MONTH_REVIEW_QUESTIONS,Quarterly review: The Committee questions this programme.,Revisão trimestral: o Comitê questiona este programa.
+MONTH_REPORT_RED_MONTHS,Months in the red: {count} of {limit},Meses no vermelho: {count} de {limit}
+MONTH_REPORT_NEXT,Next allocation: {amount},Próxima verba: {amount}
+COMMITTEE_WARN_RED_MONTHS,Warning: {count} month-ends in a row in the red. The Committee is concerned about the budget.,Aviso: {count} fechamentos seguidos no vermelho. O Comitê está preocupado com o orçamento.
+COMMITTEE_WARN_CONFIDENCE_ZERO,Warning: Committee Confidence is 0. The Committee has lost faith in the programme.,Aviso: a Confiança do Comitê é 0. O Comitê perdeu a fé no programa.
