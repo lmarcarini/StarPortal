@@ -94,6 +94,7 @@ func test_transient_references_are_never_saved() -> void:
 				"unlocks",
 				"research",
 				"staff",
+				"committee",
 			]
 		)
 	)

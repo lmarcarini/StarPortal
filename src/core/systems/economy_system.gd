@@ -1,8 +1,10 @@
 class_name EconomySystem
 extends SimSystem
-## Minimal M2 money. At each month-end it pays the fixed allocation and charges every built
-## room's upkeep (half, rounded down, for a room switched off) and every salary, arriving
-## people included (StaffRules.monthly_salaries_k()), then posts budget_changed.
+## Month-end money. At each month-end it runs MonthEnd.close(): pays the allocation set
+## by Committee Confidence, charges every built room's upkeep (half, rounded down, for a
+## room switched off) and every salary, arriving people included
+## (StaffRules.monthly_salaries_k()), applies the Confidence change and the
+## quarterly review, files the month-end report and posts budget_changed.
 ## Rooms under construction pay nothing. A lift is one RoomState per level at the same cells,
 ## but one shaft pays its upkeep once.
 ## Bible: docs/content/m2-base.md section 5, docs/content/m26-staff-and-money.md section 4
@@ -31,13 +33,11 @@ func tick(_state: GameState) -> void:
 	pass
 
 
-## Adds the allocation, subtracts the upkeep and the salaries and posts
-## budget_changed(new balance).
+## Runs the month-end (MonthEnd.close()) with the balance's allocation at Confidence 50
+## and the rooms' upkeep.
 func on_month(state: GameState) -> void:
 	var upkeep_k: int = monthly_upkeep_k(state.base, _room_defs, state.unlocks)
-	upkeep_k += StaffRules.monthly_salaries_k(state)
-	state.budget.funds_k += _balance.monthly_allocation_k - upkeep_k
-	state.events.post(&"budget_changed", [state.budget.funds_k])
+	MonthEnd.close(state, _balance.monthly_allocation_k, upkeep_k)
 
 
 ## Total monthly upkeep of [param base]'s built rooms, in $k, with [param room_defs] by id:

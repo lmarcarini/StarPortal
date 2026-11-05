@@ -112,6 +112,15 @@ signal research_done(project_id: StringName)
 ## many people moved (posted through the outbox).
 @warning_ignore("unused_signal")
 signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
+## Emitted after each month-end, with the year and month of the month-end date; the report is
+## state.committee.latest_report() (posted through the outbox). Non-blocking: nothing pauses.
+@warning_ignore("unused_signal")
+signal month_report_filed(year: int, month: int)
+## Emitted when the Committee warns (MonthEnd: &"red_months" at three month-ends in the red
+## in a row, &"confidence_zero" at Confidence 0). A warning only: the game goes on (posted
+## through the outbox).
+@warning_ignore("unused_signal")
+signal committee_warning(reason: StringName)
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared

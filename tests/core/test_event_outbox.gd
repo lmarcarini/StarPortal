@@ -89,6 +89,7 @@ func test_outbox_is_transient() -> void:
 				"unlocks",
 				"research",
 				"staff",
+				"committee",
 			]
 		)
 	)
