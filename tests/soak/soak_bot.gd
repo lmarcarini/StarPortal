@@ -103,6 +103,8 @@ var digs: int = 0
 ## projects it started.
 var lab_steps: int = 0
 var research_started: int = 0
+## Hires and dismissals the bot sent (SoakStaff).
+var staff_moves: int = 0
 
 var _next_action_tick: int = 0
 ## The address the bot will dial next, or null.
@@ -124,6 +126,8 @@ func act(simulation: Simulation) -> void:
 		_work_ring(simulation, rng)
 	if simulation.commands.pending_count() == 0 and charge_sets > 0:
 		_work_base(simulation)
+	if simulation.commands.pending_count() == 0 and SoakStaff.work(simulation):
+		staff_moves += 1
 	if not clock.is_paused and clock.tick < _next_action_tick:
 		return
 	if clock.mode == ClockState.Mode.HELD:

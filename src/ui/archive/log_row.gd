@@ -133,6 +133,8 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 ## The line of a "staff" entry's [param args]: "Research Lab staffed: 2 scientists." for the
 ## first room of a type, "Staff unassigned from Workshop: 2." for a room coming down.
 static func staff_line(args: Dictionary) -> String:
+	if str(args.get("reason", "")) == "arrived":
+		return arrival_line(args)
 	var def: RoomDef = Registry.get_def(StringName(str(args.get("room", "")))) as RoomDef
 	var room: String = "" if def == null else _tr(def.name_key)
 	var count: int = type_convert(args.get("count", 0), TYPE_INT)
@@ -143,6 +145,21 @@ static func staff_line(args: Dictionary) -> String:
 	if role != null:
 		people = _tr(role.count_one_key if count == 1 else role.count_key).format({"count": count})
 	return _tr(&"LOG_LINE_STAFFED").format({"room": room, "people": people})
+
+
+## The line of a hired person's arrival: "Dr Ana Ferreira (Scientist, skill 4) has arrived."
+static func arrival_line(args: Dictionary) -> String:
+	var role: RoleDef = Registry.get_def(StringName(str(args.get("role", "")))) as RoleDef
+	return (
+		_tr(&"LOG_LINE_STAFF_ARRIVED")
+		. format(
+			{
+				"name": str(args.get("name", "")),
+				"role": "" if role == null else _tr(role.name_key),
+				"skill": type_convert(args.get("skill", 0), TYPE_INT),
+			}
+		)
+	)
 
 
 ## The line of a finished room's "power" entry [param args]: charging lowered for it, or it

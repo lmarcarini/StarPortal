@@ -41,6 +41,8 @@ static func entries_for(
 				"reason": _text(args), "months_in_red": state.committee.months_in_red
 			}
 			return [LogEntry.create(tick, &"committee", &"", details)]
+		&"staff_arrived":
+			return _arrival_entries(args, state, tick)
 	return []
 
 
@@ -62,6 +64,18 @@ static func _staff_entries(args: Array, tick: int) -> Array[LogEntry]:
 	if not reason in [StaffChanges.AUTO_ASSIGNED, StaffChanges.RELEASED]:
 		return []
 	var details: Dictionary = {"reason": String(reason), "room": str(args[1]), "count": args[2]}
+	return [LogEntry.create(tick, &"staff", &"", details)]
+
+
+## The "staff" entry of a hired person's arrival: "reason" "arrived", "name", "role" (role
+## id) and "skill", read from the roster when the event is emitted.
+static func _arrival_entries(args: Array, state: GameState, tick: int) -> Array[LogEntry]:
+	var person: PersonState = state.staff.find_person(StringName(_text(args)))
+	if person == null:
+		return []
+	var details: Dictionary = {
+		"reason": "arrived", "name": person.name, "role": String(person.role), "skill": person.skill
+	}
 	return [LogEntry.create(tick, &"staff", &"", details)]
 
 

@@ -107,9 +107,10 @@ signal research_cancelled(project_id: StringName)
 ## through the outbox).
 @warning_ignore("unused_signal")
 signal research_done(project_id: StringName)
-## Emitted when people change rooms, with the reason (StaffChanges: &"assigned",
-## &"unassigned", &"auto_assigned" or &"released"), the def id of the room concerned and how
-## many people moved (posted through the outbox).
+## Emitted when people change rooms or join or leave the roster, with the reason
+## (StaffChanges: &"assigned", &"unassigned", &"auto_assigned", &"released"; RecruitmentRules:
+## &"hired", &"dismissed"), the def id of the room concerned and how many people moved
+## (posted through the outbox).
 @warning_ignore("unused_signal")
 signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
 ## Emitted after each month-end, with the year and month of the month-end date; the report is
@@ -121,6 +122,12 @@ signal month_report_filed(year: int, month: int)
 ## through the outbox).
 @warning_ignore("unused_signal")
 signal committee_warning(reason: StringName)
+## Emitted on the tick a hired person arrives on base (RecruitmentSystem; logged).
+@warning_ignore("unused_signal")
+signal staff_arrived(person_id: StringName)
+## Emitted when the candidate list changes: a new monthly list or a hire.
+@warning_ignore("unused_signal")
+signal candidates_changed
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared
