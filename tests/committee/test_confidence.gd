@@ -1,5 +1,6 @@
-## Tests for Committee Confidence: each cause once, the ±15 cap, the allocation formula, the
-## quarterly review and grant, the warnings, and both 30-day examples of section 7.
+## Tests for Committee Confidence: each cause once (across mid-month reloads), the ±15 cap and
+## the 0..100 bounds line, the allocation formula, the quarterly review and grant, and the
+## warnings. The section 7 examples are in test_confidence_examples.gd.
 ## Bible: docs/content/m26-staff-and-money.md sections 4, 5, 7 and 8
 extends GdUnitTestSuite
 
@@ -38,35 +39,6 @@ func test_starting_confidence_is_50_and_idle_month_scores_minus_1() -> void:
 	assert_array(report.applied_causes()).is_equal([&"reports", &"within_budget", &"idle"])
 	assert_int(report.confidence_after).is_equal(49)
 	assert_int(report.next_allocation_k).is_equal(2970)
-
-
-## Section 7, player A: SILL, four projects, one analyst, within budget: +20 capped to +15.
-func test_example_a_research_rush() -> void:
-	var game := _game(2390)
-	game.worlds.statuses[&"sill"] = WorldsState.WorldStatus.LOCKED
-	_finish_research(game, 4)
-	var salaries: int = StaffRules.monthly_salaries_k(game)
-	var report := MonthEnd.close(game, 3000, 270)
-	assert_int(report.amount_of(&"locked")).is_equal(5)
-	assert_int(report.amount_of(&"research")).is_equal(12)
-	assert_int(report.amount_of(&"reports")).is_equal(1)
-	assert_int(report.amount_of(&"within_budget")).is_equal(2)
-	assert_int(report.amount_of(&"cap")).is_equal(-5)
-	assert_int(game.committee.confidence).is_equal(65)
-	assert_int(report.next_allocation_k).is_equal(3450)
-	assert_int(game.budget.funds_k).is_equal(2390 + 3000 - 270 - salaries)
-
-
-## Section 7, player B: SILL, two projects, one analyst, within budget: +14.
-func test_example_b_power() -> void:
-	var game := _game(900)
-	game.worlds.statuses[&"sill"] = WorldsState.WorldStatus.LOCKED
-	_finish_research(game, 2)
-	var report := MonthEnd.close(game, 3000, 420)
-	assert_int(report.amount_of(&"cap")).is_equal(0)
-	assert_int(game.committee.confidence).is_equal(64)
-	assert_int(report.next_allocation_k).is_equal(3420)
-	assert_int(game.budget.funds_k).is_equal(900 + 3000 - 420 - 145)
 
 
 func test_each_cause_counts_once() -> void:
@@ -163,3 +135,70 @@ func test_bad_committee_data_is_refused() -> void:
 	data = CommitteeState.new().to_dict()
 	data["reports"] = [{"year": 1}]
 	assert_array(CommitteeState.validate_dict(data)).is_not_empty()
+
+
+func test_bounds_line_when_the_range_cuts_the_change() -> void:
+	var game := _game()
+	game.committee.confidence = 3
+	var report := MonthEnd.close(game, 3000, 0)
+	assert_int(report.amount_of(&"idle") + report.amount_of(&"reports")).is_equal(-3)
+	assert_int(report.amount_of(&"within_budget")).is_equal(2)
+	assert_int(report.confidence_after).is_equal(2)
+	assert_int(report.amount_of(&"bounds")).is_equal(0)
+	game.committee.confidence = 0
+	var cut := MonthEnd.close(game, 3000, 0)
+	assert_int(cut.confidence_after).is_equal(0)
+	assert_int(cut.amount_of(&"bounds")).is_equal(1)
+	var total: int = 0
+	for amount: int in cut.amounts:
+		total += amount
+	assert_int(total).is_equal(cut.confidence_after - cut.confidence_before)
+	game.committee.confidence = 99
+	game.worlds.statuses[&"world_a"] = WorldsState.WorldStatus.LOCKED
+	var top := MonthEnd.close(game, 3000, 0)
+	assert_int(top.confidence_after).is_equal(100)
+	assert_int(top.amount_of(&"bounds")).is_equal(-7)
+
+
+func _reloaded(game: GameState) -> GameState:
+	var data: Dictionary = JSON.parse_string(JSON.stringify(game.to_dict()))
+	assert_array(GameState.validate_dict(data)).is_empty()
+	var loaded := GameState.from_dict(data)
+	loaded.room_defs = game.room_defs
+	return loaded
+
+
+## A lock (day 5), a survey and a project (day 15), with a save and load on day 10 and day 20:
+## each counts once at the month-end, and never again after another reload.
+func test_mid_month_reloads_count_each_cause_once() -> void:
+	var game := _game()
+	game.clock.tick = 4 * 1440
+	game.worlds.statuses[&"world_sill"] = WorldsState.WorldStatus.LOCKED
+	game.clock.tick = 9 * 1440
+	game = _reloaded(game)
+	game.clock.tick = 14 * 1440
+	game.worlds.horizon_records[&"world_sill"] = true
+	game.research.done.append(&"excavation_survey")
+	game.clock.tick = 19 * 1440
+	game = _reloaded(game)
+	game.clock.tick = FEB_1
+	var report := MonthEnd.close(game, 3000, 0)
+	assert_int(report.amount_of(&"locked")).is_equal(5)
+	assert_int(report.amount_of(&"surveyed")).is_equal(2)
+	assert_int(report.amount_of(&"research")).is_equal(3)
+	game.clock.tick = FEB_1 + 9 * 1440
+	game = _reloaded(game)
+	var next := MonthEnd.close(game, 3000, 0)
+	assert_int(next.count_of(&"locked") + next.count_of(&"surveyed")).is_equal(0)
+	assert_int(next.count_of(&"research")).is_equal(0)
+	assert_int(next.amount_of(&"idle")).is_equal(-4)
+
+
+func test_saved_report_confidence_out_of_range_is_refused() -> void:
+	var data: Dictionary = MonthReport.blank().to_dict()
+	assert_array(MonthReport.validate_dict(data)).is_empty()
+	data["confidence_after"] = 101
+	assert_array(MonthReport.validate_dict(data)).is_not_empty()
+	data["confidence_after"] = 50
+	data["confidence_before"] = -1
+	assert_array(MonthReport.validate_dict(data)).is_not_empty()

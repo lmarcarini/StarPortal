@@ -86,7 +86,11 @@ static func _apply_change(committee: CommitteeState, report: MonthReport) -> voi
 	var change: int = ConfidenceRules.capped(total)
 	if change != total:
 		report.amounts[ConfidenceRules.CAUSES.find(&"cap")] = change - total
-	committee.confidence = ConfidenceRules.changed(committee.confidence, change)
+	var before: int = committee.confidence
+	committee.confidence = ConfidenceRules.changed(before, change)
+	var cut: int = committee.confidence - before - change
+	if cut != 0:
+		report.amounts[ConfidenceRules.CAUSES.find(&"bounds")] = cut
 	report.confidence_after = committee.confidence
 	report.warn_confidence_zero = committee.confidence <= ConfidenceRules.MIN
 	report.warn_red_months = committee.months_in_red >= ConfidenceRules.RED_MONTHS_WARNING

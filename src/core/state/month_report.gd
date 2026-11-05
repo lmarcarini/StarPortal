@@ -140,8 +140,8 @@ static func from_dict(data: Dictionary) -> MonthReport:
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: every key
-## present with its type, each list one whole number per cause, and "review" empty or a
-## review key.
+## present with its type, Confidence before and after from 0 to 100, each list one whole
+## number per cause, and "review" empty or a review key.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in INT_KEYS:
@@ -156,6 +156,12 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	for key: String in BOOL_KEYS:
 		if not data.get(key) is bool:
 			errors.append("'%s' is missing or not a bool" % key)
+	for key: String in ["confidence_before", "confidence_after"]:
+		var value: Variant = data.get(key)
+		if JsonLimits.is_exact_int(value):
+			var number: float = type_convert(value, TYPE_FLOAT)
+			if number < ConfidenceRules.MIN or number > ConfidenceRules.MAX:
+				errors.append("'%s' is not from 0 to 100" % key)
 	var review_value: Variant = data.get("review")
 	if review_value is String and not str(review_value).is_empty():
 		if not ConfidenceRules.REVIEWS.has(StringName(str(review_value))):

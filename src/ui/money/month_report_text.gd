@@ -15,6 +15,7 @@ const CAUSE_KEYS: Dictionary[StringName, StringName] = {
 	&"in_red": &"MONTH_CAUSE_IN_RED",
 	&"idle": &"MONTH_CAUSE_IDLE",
 	&"cap": &"MONTH_CAUSE_CAP",
+	&"bounds": &"MONTH_CAUSE_BOUNDS",
 }
 ## Line key of each review.
 const REVIEW_KEYS: Dictionary[StringName, StringName] = {

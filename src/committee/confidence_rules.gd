@@ -11,7 +11,8 @@ const MIN: int = 0
 const MAX: int = 100
 ## Largest change in one month, either way.
 const MONTHLY_CAP: int = 15
-## Causes, in report order. "cap" is the line that takes the excess off.
+## Causes, in report order. "cap" is the line that takes the excess over ±15 off; "bounds"
+## the part the 0..100 range cut.
 const CAUSES: Array[StringName] = [
 	&"locked",
 	&"surveyed",
@@ -21,6 +22,7 @@ const CAUSES: Array[StringName] = [
 	&"in_red",
 	&"idle",
 	&"cap",
+	&"bounds",
 ]
 ## Change per lock, survey, project and analyst, and per month for the month causes.
 const LOCK: int = 5

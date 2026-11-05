@@ -55,3 +55,4 @@ MONTH_REPORT_RED_MONTHS,Months in the red: {count} of {limit},Meses no vermelho:
 MONTH_REPORT_NEXT,Next allocation: {amount},Próxima verba: {amount}
 COMMITTEE_WARN_RED_MONTHS,Warning: {count} month-ends in a row in the red. The Committee is concerned about the budget.,Aviso: {count} fechamentos seguidos no vermelho. O Comitê está preocupado com o orçamento.
 COMMITTEE_WARN_CONFIDENCE_ZERO,Warning: Committee Confidence is 0. The Committee has lost faith in the programme.,Aviso: a Confiança do Comitê é 0. O Comitê perdeu a fé no programa.
+MONTH_CAUSE_BOUNDS,Kept within 0–100 {amount},Mantida entre 0 e 100 {amount}
