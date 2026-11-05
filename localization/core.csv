@@ -56,3 +56,11 @@ MONTH_REPORT_NEXT,Next allocation: {amount},Próxima verba: {amount}
 COMMITTEE_WARN_RED_MONTHS,Warning: {count} month-ends in a row in the red. The Committee is concerned about the budget.,Aviso: {count} fechamentos seguidos no vermelho. O Comitê está preocupado com o orçamento.
 COMMITTEE_WARN_CONFIDENCE_ZERO,Warning: Committee Confidence is 0. The Committee has lost faith in the programme.,Aviso: a Confiança do Comitê é 0. O Comitê perdeu a fé no programa.
 MONTH_CAUSE_BOUNDS,Kept within 0–100 {amount},Mantida entre 0 e 100 {amount}
+CONFIDENCE_READOUT,Confidence {value},Confiança {value}
+CONFIDENCE_READOUT_UP,Confidence {value} +{change},Confiança {value} +{change}
+CONFIDENCE_READOUT_DOWN,Confidence {value} −{change},Confiança {value} −{change}
+CONFIDENCE_TOOLTIP_NONE,Committee Confidence (0–100). It changes at each month-end; the report lists why.,Confiança do Comitê (0–100). Muda a cada fechamento do mês; o relatório explica por quê.
+MONTH_PANEL_TITLE,Month-end {date},Fechamento do mês {date}
+MONTH_PANEL_CLOSE,Close,Fechar
+MONTH_NOTICE_VIEW,View,Ver
+MONTH_NOTICE_DISMISS,Dismiss,Dispensar

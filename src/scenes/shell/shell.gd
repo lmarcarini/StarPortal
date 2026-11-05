@@ -34,6 +34,11 @@ var _debug_flag_count: int = 0
 @onready var view_switcher: ViewSwitcher = %ViewSwitcher
 ## The money display in the top bar.
 @onready var money_label: MoneyLabel = %MoneyLabel
+## The Committee Confidence readout beside the funds.
+@onready var confidence_readout: ConfidenceReadout = %ConfidenceReadout
+## The non-blocking month-end message and the report window it opens.
+@onready var month_notice: MonthReportNotice = %MonthReportNotice
+@onready var month_panel: MonthReportPanel = %MonthReportPanel
 @onready var _quick_save_button: Button = %QuickSaveButton
 @onready var _quick_load_button: Button = %QuickLoadButton
 @onready var _debug_flag_button: Button = %DebugFlagButton
@@ -46,6 +51,9 @@ func _ready() -> void:
 	_quick_save_button.pressed.connect(quick_save)
 	_quick_load_button.pressed.connect(quick_load)
 	_toast_timer.timeout.connect(_toast.hide)
+	confidence_readout.report_requested.connect(open_month_report)
+	month_notice.view_requested.connect(open_month_report)
+	month_notice.focus_left.connect(confidence_readout.grab_focus)
 	_setup_debug_tools()
 	_start(GameState.new_game(_choose_seed(), Registry.balance()), true)
 	SimClock.pause()
@@ -108,12 +116,18 @@ func quick_load() -> void:
 	_show_toast(&"UI_LOADED")
 
 
-## Returns every button in focus order: the time bar's, then save, load and (debug only)
-## the flag button. Neighbours wrap around, so a gamepad reaches them all; down from any of
+## Opens the latest month-end report over the running game; the clock is not paused. The
+## Confidence readout and the month-end message's View open it.
+func open_month_report() -> void:
+	month_panel.open(_simulation.state.committee.latest_report(), _simulation.state)
+
+
+## Returns every button in focus order: the time bar's, the Confidence readout, then save,
+## load and (debug only) the flag button. Neighbours wrap around, so a gamepad reaches them all; down from any of
 ## them is the view tabs.
 func get_focus_order() -> Array[Button]:
 	var buttons: Array[Button] = time_bar.get_buttons()
-	buttons.append_array([_quick_save_button, _quick_load_button])
+	buttons.append_array([confidence_readout, _quick_save_button, _quick_load_button])
 	if _debug_flag_button != null:
 		buttons.append(_debug_flag_button)
 	return buttons
@@ -187,6 +201,9 @@ static func _link_focus(buttons: Array[Button], below: Control) -> void:
 func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
 	money_label.show_budget(simulation.state.budget.funds_k)
+	confidence_readout.setup(simulation.state)
+	month_notice.setup(simulation.state)
+	month_panel.close()
 
 
 func _show_toast(key: StringName) -> void:
