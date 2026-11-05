@@ -34,9 +34,24 @@ static func entries_for(
 			return [LogEntry.create(tick, &"research", &"", {"project_id": _text(args)})]
 		&"staff_changed":
 			return _staff_entries(args, tick)
+		&"month_report_filed":
+			return _month_entries(state, tick)
+		&"committee_warning":
+			var details: Dictionary = {
+				"reason": _text(args), "months_in_red": state.committee.months_in_red
+			}
+			return [LogEntry.create(tick, &"committee", &"", details)]
 		&"staff_arrived":
 			return _arrival_entries(args, state, tick)
 	return []
+
+
+## The "month" entry of a month-end: the newest report's data (MonthReport.to_dict()).
+static func _month_entries(state: GameState, tick: int) -> Array[LogEntry]:
+	var report: MonthReport = state.committee.latest_report()
+	if report == null:
+		return []
+	return [LogEntry.create(tick, &"month", &"", report.to_dict())]
 
 
 ## The "staff" entry of a staff_changed event that is logged: the first room of a type took

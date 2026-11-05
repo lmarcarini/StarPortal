@@ -17,6 +17,8 @@ const _LOGGED_EVENTS: Dictionary[StringName, int] = {
 	&"console_read": 1,
 	&"horizon_record_taken": 1,
 	&"capacitors_installed": 1,
+	&"month_report_filed": 2,
+	&"committee_warning": 1,
 }
 
 ## Rows built at once, and the most built per scroll step.

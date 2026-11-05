@@ -78,13 +78,29 @@ class SoakRun:
 		elif sums[PowerRules.DRAW] + PowerRules.charge_mw_of(state, sums) > sums[0]:
 			power_out_of_bounds += 1
 
-	## Counts the month close just run when the budget left 0 .. start + 12 allocations: the bot only
-	## spends what it has and the allocation out-runs the upkeep.
+	## Counts the month close just run when the budget left 0 .. start + 12 top allocations and
+	## four grants, Confidence left 0..100, or the allocation paid differs from the formula at
+	## the Confidence before the month's change: the bot only spends what it has and the
+	## allocation out-runs the upkeep.
 	func check_budget() -> void:
-		var balance: BalanceConfig = simulation.state.balance
-		var most: int = balance.starting_budget_k + YEAR_MONTHS * balance.monthly_allocation_k
-		var funds: int = simulation.state.budget.funds_k
+		var state: GameState = simulation.state
+		var balance: BalanceConfig = state.balance
+		var top_k: int = ConfidenceRules.allocation_k(balance.monthly_allocation_k, 100)
+		var most: int = (
+			balance.starting_budget_k + YEAR_MONTHS * top_k + 4 * ConfidenceRules.GRANT_K
+		)
+		var funds: int = state.budget.funds_k
 		if funds < 0 or funds > most:
+			budget_out_of_bounds += 1
+		var confidence: int = state.committee.confidence
+		if confidence < 0 or confidence > 100:
+			budget_out_of_bounds += 1
+		var report: MonthReport = state.committee.latest_report()
+		var paid: int = -1 if report == null else report.allocation_k
+		var due: int = ConfidenceRules.allocation_k(
+			balance.monthly_allocation_k, -1 if report == null else report.confidence_before
+		)
+		if paid != due:
 			budget_out_of_bounds += 1
 
 	## Makes [param next] the simulation this run plays and listens to its signals.

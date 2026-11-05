@@ -18,6 +18,8 @@ const KINDS: Array[StringName] = [
 	&"power",
 	&"research",
 	&"staff",
+	&"month",
+	&"committee",
 ]
 
 ## Tick the event happened.

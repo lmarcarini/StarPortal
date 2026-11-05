@@ -191,6 +191,7 @@ func test_to_dict_sections() -> void:
 				"unlocks",
 				"research",
 				"staff",
+				"committee",
 				"recruitment",
 			]
 		)
