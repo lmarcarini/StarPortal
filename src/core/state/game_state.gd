@@ -20,6 +20,7 @@ const _SECTIONS: Array[String] = [
 	"unlocks",
 	"research",
 	"staff",
+	"recruitment",
 ]
 
 ## The simulation clock.
@@ -50,6 +51,8 @@ var unlocks: UnlockState = UnlockState.new()
 var research: ResearchState = ResearchState.new()
 ## The roster: people, their rooms and the room types waiting to auto-staff.
 var staff: StaffState = StaffState.new()
+## The month's candidate list.
+var recruitment: RecruitmentState = RecruitmentState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -71,7 +74,8 @@ var research_defs: Dictionary[StringName, ResearchDef] = {}
 ## PowerState.starting(balance) and the budget at BudgetState.starting(balance); without one
 ## they are all zero. The base is StartingBase.build() over [param balance], or over the
 ## BalanceConfig defaults without one, and so are the unlocks (UnlockState.starting()) and
-## the starting crew (StartingStaff.build()).
+## the starting crew (StartingStaff.build()) and the first candidate list
+## (RecruitmentRules.first_list()).
 static func new_game(base_seed: int, balance: BalanceConfig = null) -> GameState:
 	var state := GameState.new()
 	state.random.base_seed = base_seed
@@ -81,6 +85,7 @@ static func new_game(base_seed: int, balance: BalanceConfig = null) -> GameState
 	state.base = StartingBase.build(rules)
 	state.unlocks = UnlockState.starting(rules)
 	state.staff = StartingStaff.build(state.base, rules)
+	state.recruitment.replace_list(RecruitmentRules.first_list(rules))
 	if balance != null:
 		state.power = PowerState.starting(balance)
 		state.budget = BudgetState.starting(balance)
@@ -107,6 +112,7 @@ func to_dict() -> Dictionary:
 		"unlocks": unlocks.to_dict(),
 		"research": research.to_dict(),
 		"staff": staff.to_dict(),
+		"recruitment": recruitment.to_dict(),
 	}
 
 
@@ -128,6 +134,7 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.unlocks = UnlockState.from_dict(_dict_or_empty(data.get("unlocks")))
 	state.research = ResearchState.from_dict(_dict_or_empty(data.get("research")))
 	state.staff = StaffState.from_dict(_dict_or_empty(data.get("staff")))
+	state.recruitment = RecruitmentState.from_dict(_dict_or_empty(data.get("recruitment")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -141,7 +148,8 @@ static func from_dict(data: Dictionary) -> GameState:
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
 ## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book",
-## "operations_log", "unlocks", "research" and "staff" must be objects, the sub-states must pass
+## "operations_log", "unlocks", "research", "staff" and "recruitment" must be objects, the
+## sub-states must pass
 ## their own validate_dict(), and
 ## every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
@@ -151,7 +159,7 @@ static func from_dict(data: Dictionary) -> GameState:
 ## later than the clock's tick. Every person's room must exist and a person still arriving has
 ## none (StaffSaveChecks.roster_errors()). With [param defs], ids are also checked against the
 ## content (StaffSaveChecks.content_errors()): room def ids, research ids, role ids, and each
-## assignment's role and slot count. Errors from a
+## assignment's role and slot count, and candidate roles. Errors from a
 ## sub-state are prefixed with its key, e.g. "clock: 'tick' is not a whole number ...".
 static func validate_dict(data: Dictionary, defs: GameDefs = null) -> Array[String]:
 	var errors: Array[String] = []
@@ -179,6 +187,8 @@ static func validate_dict(data: Dictionary, defs: GameDefs = null) -> Array[Stri
 		errors.append_array(StaffSaveChecks.roster_errors(data))
 	if errors.is_empty() and defs != null:
 		errors.append_array(StaffSaveChecks.content_errors(data, defs))
+		var recruitment_data: Dictionary = data["recruitment"]
+		errors.append_array(RecruitmentState.content_errors(recruitment_data, defs))
 	return errors
 
 
@@ -211,6 +221,8 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return ResearchState.validate_dict(section)
 		"staff":
 			return StaffState.validate_dict(section)
+		"recruitment":
+			return RecruitmentState.validate_dict(section)
 	return []
 
 

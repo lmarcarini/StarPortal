@@ -1,0 +1,7 @@
+keys,en,pt_BR
+LOG_LINE_STAFF_ARRIVED,"{name} ({role}, skill {skill}) has arrived.","{name} ({role}, nível {skill}) chegou."
+STAFF_PIPELINE_ACADEMIA,Academia,Academia
+STAFF_PIPELINE_MILITARY,Military,Militar
+STAFF_PIPELINE_INTELLIGENCE,Intelligence,Inteligência
+STAFF_HIRE_ERR_NO_FREE_BED,No free bed. Build Quarters.,Sem cama livre. Construa um Alojamento.
+STAFF_HIRE_ERR_NO_MONEY,Not enough money,Dinheiro insuficiente

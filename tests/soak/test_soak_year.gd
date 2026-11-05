@@ -285,6 +285,7 @@ func _assert_run_base(run: SoakRun) -> void:
 	assert_bool(lab.is_built()).is_true()
 	assert_bool(lab.powered_on).is_true()
 	assert_int(run.bot.research_started).is_equal(SoakResearch.ORDER.size())
+	assert_int(run.bot.staff_moves).is_greater(1)
 	assert_array(state.research.done).is_equal(SoakResearch.ORDER)
 	assert_bool(state.research.is_running()).is_false()
 	assert_int(state.unlocks.dig_depth).is_equal(4)

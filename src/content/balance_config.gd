@@ -83,6 +83,19 @@ const BALANCE_ID: StringName = &"balance"
 ## Salary added per skill point, in $k a month.
 @export var salary_per_skill_k: int = 5
 
+@export_group("Recruitment")
+## Candidates on each monthly list (m26-staff-and-money.md section 2).
+@export var candidates_per_list: int = 4
+## Weights of a drawn candidate's skill 1 to 5, in percent (section 2: 10, 35, 35, 15, 5).
+@export var candidate_skill_weights: Array[int] = [10, 35, 35, 15, 5]
+## Days from hiring to arrival per role id, i.e. per pipeline (section 2: Academia 5,
+## Military 3, Intelligence 7).
+@export var hire_arrival_days: Dictionary[StringName, int] = {
+	&"role_scientist": 5,
+	&"role_engineer": 3,
+	&"role_analyst": 7,
+}
+
 
 func _init() -> void:
 	id = BALANCE_ID

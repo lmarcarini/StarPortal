@@ -32,4 +32,11 @@ starting_budget_k = 6000
 monthly_allocation_k = 3000
 salary_base_k = 15
 salary_per_skill_k = 5
+candidates_per_list = 4
+candidate_skill_weights = Array[int]([10, 35, 35, 15, 5])
+hire_arrival_days = Dictionary[StringName, int]({
+&"role_analyst": 7,
+&"role_engineer": 3,
+&"role_scientist": 5
+})
 id = &"balance"
