@@ -1,11 +1,12 @@
 class_name ResearchSystem
 extends SimSystem
-## Advances the running research project one tick at a time while the clock runs and a
-## Research Lab is on; with no lab on it pauses and keeps its progress. A finished project
-## applies each of its effects through UnlockRules.apply_to_game(), is added to the done
-## list, and posts research_done(project id) and pause_requested(&"research_done"), which
-## writes the Log line. Draws no power of its own (the lab does).
-## Bible: docs/content/m25-lean-start.md section 3
+## Advances the running research project while the clock runs and a Research Lab is on, at the
+## speed its scientists give (ResearchRules.step(): 25% to 200% of the listed time); with no lab on
+## it pauses and keeps its progress. A finished project applies each of its effects through
+## UnlockRules.apply_to_game(), is added to the done list, and posts research_done(project id) and
+## pause_requested(&"research_done"), which writes the Log line. Draws no power of its own (the lab
+## does).
+## Bible: docs/content/m25-lean-start.md section 3, docs/content/m26-staff-and-money.md section 3
 
 ## Reason of the pause a finished project asks for.
 const PAUSE_REASON: StringName = &"research_done"
@@ -16,8 +17,8 @@ func get_id() -> StringName:
 	return &"research"
 
 
-## Adds a tick of progress to the active project when a lab is on, and finishes it when its
-## time is reached. An active id with no def (content changed) is left alone.
+## Adds the speed's ticks of progress to the active project when a lab is on, and finishes it when
+## its time is reached. An active id with no def (content changed) is left alone.
 func tick(state: GameState) -> void:
 	var research: ResearchState = state.research
 	if not research.is_running():
@@ -25,7 +26,7 @@ func tick(state: GameState) -> void:
 	var def: ResearchDef = state.research_defs.get(research.active)
 	if def == null or not ResearchRules.has_lab_on(state):
 		return
-	research.ticks_done += 1
+	research.ticks_done += ResearchRules.step(state)
 	if research.ticks_done >= ResearchRules.total_ticks(def):
 		finish(state, def)
 

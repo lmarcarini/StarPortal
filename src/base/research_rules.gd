@@ -2,14 +2,25 @@ class_name ResearchRules
 extends RefCounted
 ## Pure rules of research (docs/content/m25-lean-start.md section 3): the project list, whether
 ## a lab is on, whether a project may start (with the reason when not), its length, progress
-## and refund. One project runs at a time; a second lab adds nothing. Never touches a Node or
+## and refund. One project runs at a time. Its speed comes from the scientists in every lab
+## that is on (docs/content/m26-staff-and-money.md section 3): max(25%, total skill ÷ 6), at
+## most 200%, so a second lab adds scientist slots, not a second project or a higher cap. The
+## listed days are the time for a standard crew (total skill 6, 100%). Never touches a Node or
 ## an autoload, and never changes the state.
-## Bible: docs/content/m25-lean-start.md section 3
+## Bible: docs/content/m25-lean-start.md section 3, docs/content/m26-staff-and-money.md section 3
 
 ## The Research Lab's def id.
 const LAB_DEF: StringName = &"room_research_lab"
 ## Share of the cost a cancel refunds, in percent.
 const REFUND_PERCENT: int = 50
+## Speed is counted in 1 / SPEED_DENOMINATOR of the standard crew's (one skill point = 2).
+const SPEED_DENOMINATOR: int = 12
+## Speed per scientist skill point, in twelfths (skill ÷ 6).
+const SPEED_PER_SKILL: int = 2
+## Slowest speed, an empty lab, in twelfths (25%).
+const MIN_SPEED: int = 3
+## Fastest speed, in twelfths (200%).
+const MAX_SPEED: int = 24
 
 
 ## Every ResearchDef of [param state], projects and locked slots, in list order (by order,
@@ -57,17 +68,58 @@ static func can_start(state: GameState, project_id: StringName) -> CommandResult
 	return CommandResult.ok()
 
 
-## Ticks [param def] takes while the clock runs and a lab is on: its days in ticks.
+## Ticks of work [param def] needs: its days in ticks, the time at 100% (a standard crew).
 static func total_ticks(def: ResearchDef) -> int:
 	return def.days * TimeMath.TICKS_PER_DAY
 
 
-## Ticks left on [param state]'s active project; 0 when none runs or its def is unknown.
-static func ticks_left(state: GameState) -> int:
+## Total skill of the scientists assigned to [param state]'s labs that are on; with
+## [param standing], of every lab standing, on or off.
+static func scientist_skill(state: GameState, standing: bool = false) -> int:
+	var def: RoomDef = state.room_defs.get(LAB_DEF)
+	var total: int = 0
+	for room: RoomState in state.base.rooms:
+		if room.def_id != LAB_DEF:
+			continue
+		if PowerRules.is_running(room, def) or (standing and PowerRules.is_standing(room)):
+			for person: PersonState in StaffRules.assigned(state, room):
+				total += person.skill
+	return total
+
+
+## Research speed of [param state] in twelfths of the standard crew's: 2 per skill point,
+## between MIN_SPEED (25%) and MAX_SPEED (200%).
+static func speed(state: GameState) -> int:
+	return clampi(SPEED_PER_SKILL * scientist_skill(state), MIN_SPEED, MAX_SPEED)
+
+
+## Research speed of [param state] as a whole percentage, rounded down (25 to 200).
+static func speed_percent(state: GameState) -> int:
+	return speed(state) * 100 / SPEED_DENOMINATOR
+
+
+## Ticks of work the active project gets on [param state]'s current clock tick while a lab
+## is on (RateSteps: whole ticks, exact across saves).
+static func step(state: GameState) -> int:
+	return RateSteps.step(state.clock.tick, speed(state), SPEED_DENOMINATOR)
+
+
+## Ticks of work left on [param state]'s active project; 0 when none runs or its def is unknown.
+static func work_left(state: GameState) -> int:
 	var def: ResearchDef = state.research_defs.get(state.research.active)
 	if def == null:
 		return 0
 	return maxi(0, total_ticks(def) - state.research.ticks_done)
+
+
+## Clock ticks until [param state]'s active project finishes at the current speed, the lab
+## staying on; while no lab is on (paused), at the speed the standing labs' scientists would
+## give once switched back on. 0 when none runs.
+static func ticks_left(state: GameState) -> int:
+	var rate: int = speed(state)
+	if not has_lab_on(state):
+		rate = clampi(SPEED_PER_SKILL * scientist_skill(state, true), MIN_SPEED, MAX_SPEED)
+	return RateSteps.ticks_to(work_left(state), state.clock.tick, rate, SPEED_DENOMINATOR)
 
 
 ## Share of the active project done, 0.0 to 1.0; 0.0 when none runs.
