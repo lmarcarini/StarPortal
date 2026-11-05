@@ -112,9 +112,7 @@ func _fill() -> void:
 		_add_line(body[index], false)
 	for line: String in warning_lines(_report):
 		_add_line(line, true)
-	_scroll.custom_minimum_size.y = minf(
-		_lines.get_combined_minimum_size().y, MAX_LINES_HEIGHT
-	)
+	_scroll.custom_minimum_size.y = minf(_lines.get_combined_minimum_size().y, MAX_LINES_HEIGHT)
 	reset_size()
 
 

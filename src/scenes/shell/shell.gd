@@ -123,8 +123,8 @@ func open_month_report() -> void:
 
 
 ## Returns every button in focus order: the time bar's, the Confidence readout, then save,
-## load and (debug only) the flag button. Neighbours wrap around, so a gamepad reaches them all; down from any of
-## them is the view tabs.
+## load and (debug only) the flag button. Neighbours wrap around, so a gamepad reaches them
+## all; down from any of them is the view tabs.
 func get_focus_order() -> Array[Button]:
 	var buttons: Array[Button] = time_bar.get_buttons()
 	buttons.append_array([confidence_readout, _quick_save_button, _quick_load_button])
