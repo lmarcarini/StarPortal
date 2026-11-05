@@ -52,6 +52,8 @@ func _samples() -> Array[Command]:
 		CancelResearchCommand.new(),
 		AssignStaffCommand.create(&"person_1", &"room_2"),
 		UnassignStaffCommand.create(&"person_2"),
+		HireCommand.create(&"candidate_1"),
+		DismissCommand.create(&"person_2"),
 	]
 
 
@@ -153,7 +155,9 @@ func test_defaults_are_registered_lazily() -> void:
 				&"demolish_room",
 				&"dial",
 				&"dig_level",
+				&"dismiss",
 				&"extend_pole_camera",
+				&"hire",
 				&"mark_document_read",
 				&"note_address",
 				&"paint_corridor",
@@ -188,7 +192,9 @@ func test_register_type_adds_a_type() -> void:
 				&"demolish_room",
 				&"dial",
 				&"dig_level",
+				&"dismiss",
 				&"extend_pole_camera",
+				&"hire",
 				&"mark_document_read",
 				&"note_address",
 				&"paint_corridor",
