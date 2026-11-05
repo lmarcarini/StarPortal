@@ -97,7 +97,7 @@ func test_catalogue_numbers() -> void:
 		&"room_control": [5, 3, false, 0, 0, 0.0, 0.0, 0.0, 40],
 		&"room_power_plant": [5, 4, true, 2000, 1440, 0.0, 30.0, 0.0, 150],
 		&"room_capacitor_bank": [3, 2, true, 600, 60, 0.0, 0.0, 30.0, 10],
-		&"room_quarters": [3, 2, true, 150, 2880, 0.0, 0.0, 0.0, 10],
+		&"room_quarters": [3, 2, true, 150, 120, 0.0, 0.0, 0.0, 10],
 		&"room_research_lab": [4, 3, true, 800, 480, 5.0, 0.0, 0.0, 60],
 		&"room_workshop": [5, 4, true, 700, 360, 5.0, 0.0, 0.0, 50],
 		&"room_infirmary": [4, 3, true, 500, 5760, 5.0, 0.0, 0.0, 40],

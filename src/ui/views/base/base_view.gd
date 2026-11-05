@@ -323,7 +323,7 @@ func _build_input(event: InputEvent) -> bool:
 
 
 ## With a Research Lab already on the base (built or building), hovering or focusing the
-## palette's Research Lab says "One lab is enough until staff arrive." Building stays allowed.
+## palette's Research Lab says "More labs hold more scientists." Building stays allowed.
 func _refresh_lab_note() -> void:
 	_palette.notes.erase(ResearchRules.LAB_DEF)
 	for room: RoomState in _simulation.state.base.rooms:
