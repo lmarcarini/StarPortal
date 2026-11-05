@@ -6,12 +6,14 @@ extends SimSystem
 ## A lift segment (LiftShafts) builds outside the slots. A dug level extends every lift shaft
 ## (LiftShafts.extend()). A finished room switches on taking power from charging first
 ## (FinishingPower) and, when it is the first of its type, takes the waiting crew
-## (StaffChanges.auto_assign()). A running Workshop speeds sites and the dig up by 25% (BuildSpeed).
+## (StaffChanges.auto_assign()). A running Workshop speeds sites and the dig up by 10% to 35%,
+## by its engineers (BuildSpeed).
 ## Draws no power.
 ## Posts room_built(site id), room_demolished(id) and level_dug(level), each once:
 ## room_demolished carries the cell's room id for a corridor (each cell is its own demolition
 ## order) and the site id for any other room.
-## Bible: docs/content/m2-base.md section 4, docs/content/m25-lean-start.md sections 2 to 4
+## Bible: docs/content/m2-base.md section 4, docs/content/m25-lean-start.md sections 2 to 4,
+## docs/content/m26-staff-and-money.md section 3
 
 ## Sites building at once; later sites queue.
 const MAX_ACTIVE_SITES: int = 3
@@ -30,8 +32,11 @@ func get_id() -> StringName:
 ## Advances the active sites, every demolition and then the dig by one tick (a lift segment
 ## started by the dig begins building on the next tick).
 func tick(state: GameState) -> void:
+	var idle: bool = _is_idle(state.base)
+	if idle and state.base.digging_level() == 0:
+		return
 	var step: int = BuildSpeed.progress(state)
-	if not _is_idle(state.base):
+	if not idle:
 		_tick_sites(state, step)
 		_tick_demolitions(state)
 	_tick_dig(state, step)

@@ -139,6 +139,7 @@ func test_switching_the_workshop_while_paused_updates_the_time_left() -> void:
 	EventBus.bind_simulation(_simulation)
 	var workshop: RoomState = state.base.add_room(BuildSpeed.WORKSHOP_DEF, 1, Vector2i(26, 2))
 	workshop.powered_on = false
+	StaffFixture.engineers(state, workshop, [3, 3])
 	var lab: RoomState = state.base.add_room(&"room_research_lab", 1, Vector2i(4, 4))
 	lab.build_ticks_left = 480
 	EventBus.room_build_started.emit(lab.id)

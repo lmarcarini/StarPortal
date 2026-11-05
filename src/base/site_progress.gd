@@ -3,9 +3,9 @@ extends RefCounted
 ## How far a construction site, a demolition or the dig has come, for the Base tab's bars, the
 ## SELECTED panel and the level tabs (docs/content/m2-base.md section 6). Pure reads of the
 ## state: [member fraction] from the work done, [member ticks_left] the real clock ticks still
-## needed, with a running Workshop's 25% (BuildSpeed; demolition is never sped up). A site
-## waiting for a free building slot is QUEUED, with an empty bar and no time.
-## Bible: docs/content/m2-base.md sections 4 and 6, docs/content/m25-lean-start.md section 4
+## needed, with a running Workshop's bonus from its engineers (BuildSpeed; demolition is never sped
+## up). A site waiting for a free building slot is QUEUED, with an empty bar and no time.
+## Bible: docs/content/m2-base.md sections 4 and 6, docs/content/m26-staff-and-money.md section 3
 
 ## What the progress is of.
 enum Kind { NONE, BUILDING, QUEUED, DEMOLISHING, DIGGING }
@@ -21,10 +21,10 @@ var queue_place: int = 0
 
 
 ## The progress of every room of [param rooms] (of [param state]'s base) that is building,
-## queued or coming down, by room id. Reads the queue and the Workshop once.
+## queued or coming down, by room id. Reads the queue and the Workshop bonus once.
 static func for_rooms(state: GameState, rooms: Array[RoomState]) -> Dictionary:
 	var queue: Array[StringName] = ConstructionSystem.site_queue(state.base)
-	var workshop: bool = BuildSpeed.has_running_workshop(state)
+	var workshop: int = BuildSpeed.bonus(state)
 	var found: Dictionary = {}
 	for room: RoomState in rooms:
 		var progress: SiteProgress = _of(state, room, queue, workshop)
@@ -36,7 +36,7 @@ static func for_rooms(state: GameState, rooms: Array[RoomState]) -> Dictionary:
 ## The progress of [param room] of [param state]'s base; kind NONE when built and standing.
 static func of_room(state: GameState, room: RoomState) -> SiteProgress:
 	var queue: Array[StringName] = ConstructionSystem.site_queue(state.base)
-	return _of(state, room, queue, BuildSpeed.has_running_workshop(state))
+	return _of(state, room, queue, BuildSpeed.bonus(state))
 
 
 ## The progress of the level being dug in [param state]; kind NONE when no dig runs.
@@ -54,7 +54,7 @@ static func of_dig(state: GameState) -> SiteProgress:
 
 
 static func _of(
-	state: GameState, room: RoomState, queue: Array[StringName], workshop: bool
+	state: GameState, room: RoomState, queue: Array[StringName], workshop: int
 ) -> SiteProgress:
 	var def: RoomDef = state.room_defs.get(room.def_id)
 	var build: int = 1 if def == null else maxi(1, def.build_ticks)
