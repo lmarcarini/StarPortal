@@ -11,8 +11,7 @@ extends RefCounted
 ## directly (an address the bank can never charge is just dropped). When a wormhole opens it reads
 ## the far Ring's console (ReadConsoleCommand) if that console is unread, which fills the Address
 ## Book, then extends the pole camera (ExtendPoleCameraCommand) if the world's horizon record is not
-## taken, and closes the wormhole once the camera is back and the wormhole has been open a few
-## ticks.
+## taken, and closes the wormhole once the camera is back and open a few ticks. Staff: SoakStaff.
 ## Once the bank charges it builds on: a corridor run off the Level 1 spine and a Research Lab
 ## against it. When the lab stands off (the bank holds the spare supply), it lowers the bank's
 ## charge rate by just enough and switches the lab on. It then researches R1-R6 in list order
@@ -103,8 +102,9 @@ var digs: int = 0
 ## projects it started.
 var lab_steps: int = 0
 var research_started: int = 0
-## Hires and dismissals the bot sent (SoakStaff).
+## Hires and dismissals, and assignments of arrived hires, the bot sent (SoakStaff).
 var staff_moves: int = 0
+var staff_assigns: int = 0
 
 var _next_action_tick: int = 0
 ## The address the bot will dial next, or null.
@@ -128,6 +128,7 @@ func act(simulation: Simulation) -> void:
 		_work_base(simulation)
 	if simulation.commands.pending_count() == 0 and SoakStaff.work(simulation):
 		staff_moves += 1
+	staff_assigns += int(simulation.commands.pending_count() == 0 and SoakStaff.assign(simulation))
 	if not clock.is_paused and clock.tick < _next_action_tick:
 		return
 	if clock.mode == ClockState.Mode.HELD:
