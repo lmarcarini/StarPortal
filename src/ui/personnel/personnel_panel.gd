@@ -83,6 +83,16 @@ func room_buttons() -> Array[Button]:
 	return found
 
 
+## Returns the Hire button.
+func get_hire_button() -> Button:
+	return _hire
+
+
+## Returns the Dismiss hold button.
+func get_dismiss_button() -> HoldButton:
+	return _dismiss
+
+
 ## Returns the id shown, or &"".
 func get_id() -> StringName:
 	return _id

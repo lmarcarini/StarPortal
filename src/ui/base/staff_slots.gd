@@ -4,9 +4,9 @@ extends VBoxContainer
 ## (docs/content/m26-staff-and-money.md section 6): "Staff 2/4", then one button per slot.
 ## A filled slot shows the person ("Dr Ana Ferreira  ×") and unassigns them; an empty slot's
 ## "+ Empty slot" opens the Unassigned people on base of the room's role, and picking one
-## assigns them. Both go through the commands; a refusal shows under the slots. Hidden for a
-## room with no slots, a site, or a room coming down. It rereads the room on every staff event,
-## so it stays right while paused.
+## assigns them; Back, (B) or Esc closes the list. Both go through the commands; a refusal
+## shows under the slots. Hidden for a room with no slots, a site, or a room coming down. It
+## rereads the room on every staff event, so it stays right while paused.
 ## Bible: docs/content/m26-staff-and-money.md section 6
 
 var _simulation: Simulation = null
@@ -82,8 +82,29 @@ func open_picks() -> void:
 	_picking = true
 	show_room(_room_id)
 	var found: Array[Button] = buttons()
+	var people: int = StaffRules.assigned(_simulation.state, _room()).size()
+	if found.size() > people:
+		found[people].grab_focus()
+
+
+## Closes the people list (Back, (B) or Esc) and focuses the empty slot again.
+func close_picks() -> void:
+	_picking = false
+	show_room(_room_id)
+	var found: Array[Button] = buttons()
 	if not found.is_empty():
 		found[-1].grab_focus()
+
+
+## True while the people list of the empty slot is open.
+func is_picking() -> bool:
+	return _picking
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _picking and is_visible_in_tree() and event.is_action_pressed(&"ui_cancel"):
+		close_picks()
+		get_viewport().set_input_as_handled()
 
 
 ## Assigns [param person_id] to the room shown; a refusal shows under the slots.
@@ -112,6 +133,7 @@ func _add_empty(state: GameState, room: RoomState) -> void:
 		var person_id: StringName = person.id
 		var text: String = "%s  %s" % [person.name, PersonnelText.stars(person.skill)]
 		_add_button(text, func() -> void: assign(person_id))
+	_add_button(tr(&"STAFF_BACK"), close_picks)
 
 
 func _submit(command: Command) -> void:

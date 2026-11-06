@@ -76,7 +76,7 @@ func test_candidates_show_fee_and_arrival() -> void:
 func test_hire_then_no_free_bed_is_shown_plainly() -> void:
 	_view.get_board().show_page(PersonnelBoard.Page.CANDIDATES)
 	_rows()[0].grab_focus()
-	var hire: Button = _view.get_panel().buttons()[3]
+	var hire: Button = _view.get_panel().get_hire_button()
 	assert_bool(hire.visible and not hire.disabled).is_true()
 	assert_str(hire.text).is_equal("Hire (fee $30k)")
 	hire.pressed.emit()
@@ -84,7 +84,7 @@ func test_hire_then_no_free_bed_is_shown_plainly() -> void:
 	assert_int(_rows().size()).is_equal(3)
 	assert_str(_view.get_board().header()[1]).contains("Beds 6/6")
 	_rows()[0].grab_focus()
-	hire = _view.get_panel().buttons()[3]
+	hire = _view.get_panel().get_hire_button()
 	assert_bool(hire.disabled).is_true()
 	_view.hire(_rows()[0].id)
 	assert_int(_state().staff.people.size()).is_equal(6)
@@ -100,10 +100,22 @@ func test_hired_person_shows_arriving_then_arrives_while_paused() -> void:
 	assert_str(_rows()[5].texts()[4]).is_equal("Unassigned")
 
 
+func test_hire_while_running_says_requested_until_applied() -> void:
+	_state().clock.is_paused = false
+	_view.get_board().show_page(PersonnelBoard.Page.CANDIDATES)
+	_rows()[0].grab_focus()
+	_view.hire(_rows()[0].id)
+	assert_int(_state().staff.people.size()).is_equal(5)
+	assert_str(_view.get_panel().lines()[5]).is_equal("Requested. It happens on the next tick.")
+	_simulation.advance_tick()
+	assert_int(_state().staff.people.size()).is_equal(6)
+	assert_str(_view.get_panel().lines()[5]).is_equal("Hired. On the way.")
+
+
 func test_dismiss_is_a_hold_button() -> void:
 	_rows()[4].grab_focus()
 	var id: StringName = _rows()[4].id
-	var dismiss: Button = _view.get_panel().buttons()[2]
+	var dismiss: Button = _view.get_panel().get_dismiss_button()
 	assert_bool(dismiss is HoldButton).is_true()
 	assert_str(dismiss.text).is_equal("Dismiss (hold)")
 	(dismiss as HoldButton).begin_hold()
@@ -182,7 +194,7 @@ func test_refreshes_while_paused_and_on_showing() -> void:
 	EventBus.budget_changed.emit(0)
 	_view.get_board().show_page(PersonnelBoard.Page.CANDIDATES)
 	_rows()[0].grab_focus()
-	assert_bool(_view.get_panel().buttons()[3].disabled).is_true()
+	assert_bool(_view.get_panel().get_hire_button().disabled).is_true()
 
 
 func test_layout_fits_in_both_languages() -> void:

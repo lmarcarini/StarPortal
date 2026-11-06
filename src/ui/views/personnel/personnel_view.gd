@@ -13,6 +13,9 @@ extends GameView
 
 var _simulation: Simulation = null
 var _signature: int = 0
+## The staff_changed reason the last hire or dismiss waits for, and the words it then shows.
+var _pending_reason: StringName = &""
+var _pending_key: StringName = &""
 
 @onready var _board: PersonnelBoard = %Board
 @onready var _panel: PersonnelPanel = %Panel
@@ -85,17 +88,19 @@ func refresh() -> void:
 
 ## Hires [param candidate_id]; a refusal shows on the panel.
 func hire(candidate_id: StringName) -> void:
-	_submit(HireCommand.create(candidate_id), &"STAFF_HIRED")
+	_submit_awaited(HireCommand.create(candidate_id), RecruitmentRules.HIRED, &"STAFF_HIRED")
 
 
 ## Dismisses [param person_id]; a refusal shows on the panel.
 func dismiss(person_id: StringName) -> void:
-	_submit(DismissCommand.create(person_id), &"STAFF_DISMISSED")
+	_submit_awaited(
+		DismissCommand.create(person_id), RecruitmentRules.DISMISSED, &"STAFF_DISMISSED"
+	)
 
 
 ## Assigns [param person_id] to [param room_id]; a refusal shows on the panel.
 func assign(person_id: StringName, room_id: StringName) -> void:
-	_submit(AssignStaffCommand.create(person_id, room_id), &"")
+	_submit(AssignStaffCommand.create(person_id, room_id))
 	var row: PersonnelRow = _board.row_of(person_id)
 	if row != null:
 		row.grab_focus()
@@ -103,22 +108,37 @@ func assign(person_id: StringName, room_id: StringName) -> void:
 
 ## Unassigns [param person_id]; a refusal shows on the panel.
 func unassign(person_id: StringName) -> void:
-	_submit(UnassignStaffCommand.create(person_id), &"")
+	_submit(UnassignStaffCommand.create(person_id))
 
 
-func _submit(command: Command, done_key: StringName) -> void:
+## Submits [param command]; its done words ([param done_key]) show only once staff_changed
+## posts [param reason], so a command queued while the clock runs says "requested" first.
+func _submit_awaited(command: Command, reason: StringName, done_key: StringName) -> void:
+	_pending_reason = reason
+	_pending_key = done_key
+	var result: CommandResult = _submit(command)
+	if result == null or not result.is_ok:
+		_pending_reason = &""
+	elif not _pending_reason.is_empty():
+		_panel.show_notice(tr(&"STAFF_REQUESTED"))
+	else:
+		_panel.show_notice(tr(done_key))
+
+
+## Submits [param command] and rereads the view; a refusal shows on the panel. Returns the
+## result, or null with no simulation.
+func _submit(command: Command) -> CommandResult:
 	if _simulation == null:
-		return
+		return null
 	var shown: StringName = _panel.get_id()
 	var result: CommandResult = _simulation.submit(command)
 	_panel.show_id(_simulation.state, shown)
 	refresh()
 	if not result.is_ok:
 		_panel.show_notice(PersonnelText.refusal(result.error_code))
-	elif not done_key.is_empty():
-		_panel.show_notice(tr(done_key))
 	if _panel.get_id() != shown:
 		get_default_focus().grab_focus()
+	return result
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -163,7 +183,7 @@ func _on_activated(id: StringName) -> void:
 	if _simulation.state.staff.find_person(id) != null:
 		_panel.open_rooms()
 		return
-	var hire_button: Button = _panel.buttons()[3]
+	var hire_button: Button = _panel.get_hire_button()
 	if hire_button.visible and not hire_button.disabled:
 		hire_button.grab_focus()
 
@@ -196,8 +216,11 @@ func _connect_events(on: bool) -> void:
 		EventBus.tick_advanced.disconnect(_on_tick)
 
 
-func _on_event(_a: Variant = null, _b: Variant = null, _c: Variant = null) -> void:
+func _on_event(reason: Variant = null, _b: Variant = null, _c: Variant = null) -> void:
 	refresh()
+	if reason is StringName and not _pending_reason.is_empty() and reason == _pending_reason:
+		_pending_reason = &""
+		_panel.show_notice(tr(_pending_key))
 
 
 ## While shown, redraws when an arrival's hours left change or someone arrives.
@@ -208,7 +231,7 @@ func _on_tick(_tick: int) -> void:
 
 
 static func _staff_signature(state: GameState) -> int:
-	var parts: Array = [state.staff.people.size(), state.recruitment.candidates.size()]
+	var parts: Array[int] = [state.staff.people.size(), state.recruitment.candidates.size()]
 	for person: PersonState in state.staff.people:
 		parts.append(ceili(maxi(0, person.arrives_tick - state.clock.tick) / 60.0))
 	return hash(parts)

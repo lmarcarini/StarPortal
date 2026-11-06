@@ -65,8 +65,18 @@ func test_lab_slots_assign_and_unassign() -> void:
 	person.skill = 2
 	state.staff.add_person(person)
 	slots.open_picks()
-	assert_array(_texts()).contains(["Dr New Hire  **"])
+	assert_array(_texts()).contains(["Dr New Hire  **", "Back"])
+	var cancel := InputEventAction.new()
+	cancel.action = &"ui_cancel"
+	cancel.pressed = true
+	slots._unhandled_input(cancel)
+	assert_bool(slots.is_picking()).is_false()
+	assert_str(_texts()[-1]).is_equal("+ Empty slot")
+	slots.open_picks()
 	slots.buttons()[-1].pressed.emit()
+	assert_bool(slots.is_picking()).is_false()
+	slots.open_picks()
+	slots.buttons()[2].pressed.emit()
 	assert_str(person.room_id).is_equal(_lab().id)
 	assert_str(slots.lines()[0]).is_equal("Staff 3/4")
 	assert_str(_texts()[2]).is_equal("Dr New Hire  ×")
