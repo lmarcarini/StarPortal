@@ -36,7 +36,7 @@ func after_test() -> void:
 
 
 func test_before_the_first_month_end() -> void:
-	assert_str(_shell.confidence_readout.text).is_equal("Confidence 50")
+	assert_str(_shell.confidence_readout.text).is_equal("Conf. 50")
 	assert_str(_shell.confidence_readout.tooltip_text).is_equal(tr(&"CONFIDENCE_TOOLTIP_NONE"))
 	assert_bool(_shell.month_notice.visible).is_false()
 	_shell.open_month_report()
@@ -109,7 +109,7 @@ func test_warnings_show_in_red_while_paused_and_after_setup() -> void:
 	state.committee.add_report(report)
 	assert_bool(state.clock.is_paused).is_true()
 	EventBus.month_report_filed.emit(2026, 4)
-	assert_str(_shell.confidence_readout.text).is_equal("Confidence 0 −5")
+	assert_str(_shell.confidence_readout.text).is_equal("Conf. 0 -5")
 	assert_bool(_shell.confidence_readout.has_theme_color_override(&"font_color")).is_true()
 	var warnings: PackedStringArray = MonthReportPanel.warning_lines(report)
 	assert_int(warnings.size()).is_equal(2)
@@ -121,28 +121,69 @@ func test_warnings_show_in_red_while_paused_and_after_setup() -> void:
 	_shell.month_panel.close()
 	state.committee.confidence = 40
 	_shell.confidence_readout.setup(state)
-	assert_str(_shell.confidence_readout.text).is_equal("Confidence 40 −5")
+	assert_str(_shell.confidence_readout.text).is_equal("Conf. 40 -5")
 
 
 func test_locale_change_refreshes_the_readout() -> void:
 	TranslationServer.set_locale("pt_BR")
 	await _runner.simulate_frames(2)
-	assert_str(_shell.confidence_readout.text).is_equal("Confiança 50")
+	assert_str(_shell.confidence_readout.text).is_equal("Conf. 50")
+
+
+## The month-end message's background lets clicks through; only its buttons take the mouse.
+func test_the_message_lets_clicks_through_outside_its_buttons() -> void:
+	var notice: MonthReportNotice = _shell.month_notice
+	var buttons: Array[Control] = [notice.get_view_button()]
+	buttons.append(notice.get_node("%DismissButton") as Control)
+	for control: Control in _controls(notice):
+		var expected: int = Control.MOUSE_FILTER_STOP
+		if not buttons.has(control):
+			expected = Control.MOUSE_FILTER_IGNORE
+		assert_int(control.mouse_filter).override_failure_message(control.name).is_equal(expected)
+
+
+func test_an_open_report_moves_to_the_next_month_end() -> void:
+	await _month_end()
+	var state: GameState = SimClock.simulation.state
+	_shell.open_month_report()
+	var first: String = _shell.month_panel.get_lines()[0]
+	SimClock.step_ticks(28 * TimeMath.TICKS_PER_DAY)
+	await _runner.simulate_frames(2)
+	assert_bool(_shell.month_panel.visible).is_true()
+	var newest: MonthReport = state.committee.latest_report()
+	assert_str(_shell.month_panel.get_lines()[0]).is_equal(MonthReportPanel.title_of(newest))
+	assert_str(_shell.month_panel.get_lines()[0]).is_not_equal(first)
+
+
+func _controls(root: Node) -> Array[Control]:
+	var found: Array[Control] = []
+	if root is Control:
+		found.append(root as Control)
+	for child: Node in root.get_children():
+		found.append_array(_controls(child))
+	return found
 
 
 @warning_ignore("unused_parameter")
 func test_fits_1280_by_720(
 	locale: String,
+	after: int,
 	test_parameters: Array = [  # gdlint: ignore=unused-argument
-		["en"],
-		["pt_BR"],
+		["en", 0],
+		["pt_BR", 0],
+		["en", 100],
+		["pt_BR", 100],
 	]
 ) -> void:
 	TranslationServer.set_locale(locale)
 	_shell.size = MIN_SIZE
 	var state: GameState = SimClock.simulation.state
-	state.committee.add_report(_busiest_report())
-	state.committee.confidence = 0
+	var report: MonthReport = _busiest_report()
+	# The widest readouts: 0 after -15 and 100 after +15.
+	report.confidence_after = after
+	report.confidence_before = after + 15 if after == 0 else after - 15
+	state.committee.add_report(report)
+	state.committee.confidence = after
 	EventBus.month_report_filed.emit(2026, 4)
 	_shell.open_month_report()
 	await _runner.simulate_frames(3)
@@ -155,6 +196,7 @@ func test_fits_1280_by_720(
 	var needed: float = row.get_combined_minimum_size().x - debug_width + 32.0
 	assert_float(needed).is_less_equal(MIN_SIZE.x)
 	var readout: Button = _shell.confidence_readout
+	assert_str(readout.text).ends_with("-15" if after == 0 else "+15")
 	assert_float(_text_width(readout, readout.text) + 8.0).is_less_equal(readout.size.x)
 	var panel: MonthReportPanel = _shell.month_panel
 	assert_float(panel.get_combined_minimum_size().x).is_less_equal(MIN_SIZE.x - 32.0)

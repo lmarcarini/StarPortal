@@ -1,9 +1,10 @@
 class_name MonthReportNotice
 extends PanelContainer
 ## The non-blocking month-end message (docs/content/m26-staff-and-money.md section 5): at each
-## month-end it shows "Month-end report: Confidence 50 → 65", any Committee warning in red, and
+## month-end it shows "Month-end report: Confidence 50 to 65", any Committee warning in red, and
 ## View (opens the report) and Dismiss. The game never pauses for it, nothing takes focus from
-## the player, and it stays until dismissed, viewed or replaced by the next month-end. Reads
+## the player, its background lets clicks through to the view under it (only View and Dismiss
+## take the mouse), and it stays until dismissed, viewed or replaced by the next month-end. Reads
 ## state only.
 ## Bible: docs/content/m26-staff-and-money.md sections 5 and 6
 

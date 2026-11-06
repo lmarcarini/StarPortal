@@ -1,6 +1,6 @@
 class_name ConfidenceReadout
 extends Button
-## Top bar Committee Confidence readout, beside the funds: "Confidence 62 +4", the last
+## Top bar Committee Confidence readout, beside the funds: "Conf. 62 +4", the last
 ## month-end's change, with a tooltip listing its causes. Red, with the warning in the
 ## tooltip, while the Committee warns (Confidence 0, months in the red). Pressing it opens the
 ## latest month-end report. Refreshes on each month-end, on showing and on a locale change, so
@@ -60,7 +60,7 @@ func refresh() -> void:
 		remove_theme_color_override(&"font_focus_color")
 
 
-## "Confidence 62 +4" (or "−4"; no change before the first month-end or for a flat month).
+## "Conf. 62 +4" (or "-4"; no change before the first month-end or for a flat month).
 static func readout_text(confidence: int, report: MonthReport) -> String:
 	var change: int = 0 if report == null else report.confidence_after - report.confidence_before
 	var key: StringName = &"CONFIDENCE_READOUT"

@@ -3,7 +3,8 @@ extends PanelContainer
 ## The month-end report window (docs/content/m26-staff-and-money.md section 5): the date, then
 ## every line of a MonthReport (money, Confidence and its causes, the review, the next
 ## allocation) and the Committee's warnings in red. It never pauses the game: the clock runs on
-## behind it. Close, B or Esc dismisses it and gives focus back. Reads state only.
+## behind it. A new month-end while it is open shows the new report. Close, B or Esc
+## dismisses it and gives focus back. Reads state only.
 ## Bible: docs/content/m26-staff-and-money.md sections 5 and 6
 
 ## Emitted when the window closes.
@@ -31,6 +32,14 @@ func _ready() -> void:
 	_close.focus_neighbor_right = _close.get_path_to(_close)
 	_close.focus_neighbor_top = _close.get_path_to(_close)
 	_close.focus_neighbor_bottom = _close.get_path_to(_close)
+
+
+func _enter_tree() -> void:
+	EventBus.month_report_filed.connect(_on_month_report_filed)
+
+
+func _exit_tree() -> void:
+	EventBus.month_report_filed.disconnect(_on_month_report_filed)
 
 
 func _notification(what: int) -> void:
@@ -100,6 +109,13 @@ static func warning_lines(report: MonthReport) -> PackedStringArray:
 			MonthReportText.warning_line(MonthEnd.WARN_CONFIDENCE_ZERO, report.months_in_red)
 		)
 	return out
+
+
+func _on_month_report_filed(_year: int, _month: int) -> void:
+	if not visible or _state == null or _state.committee.latest_report() == null:
+		return
+	_report = _state.committee.latest_report()
+	_fill()
 
 
 func _fill() -> void:
