@@ -55,7 +55,7 @@ func test_actions_registered_at_start_up_not_in_project_settings() -> void:
 		assert_bool(ProjectSettings.has_setting("input/%s" % action)).is_false()
 	assert_bool(InputMap.event_is_action(_key(KEY_SPACE), &"time_toggle_pause")).is_true()
 	assert_bool(InputMap.event_is_action(_button(JOY_BUTTON_START), &"time_toggle_pause")).is_true()
-	assert_bool(InputMap.event_is_action(_key(KEY_F5), &"quick_save")).is_true()
+	assert_bool(InputMap.event_is_action(_key(KEY_F8), &"quick_save")).is_true()
 
 
 ## Keys are bound by physical keycode: the key in the Space position triggers the action
@@ -86,7 +86,7 @@ func test_get_bindings_gives_fixed_slots() -> void:
 
 	var keys: Array[InputEvent] = service.get_bindings(&"quick_save", KEYBOARD)
 	(keys[0] as InputEventKey).physical_keycode = KEY_Z
-	_assert_keys(service, &"quick_save", [KEY_F5])
+	_assert_keys(service, &"quick_save", [KEY_F8])
 
 
 ## rebind applies to InputMap, persists, emits bindings_changed and returns the event.
@@ -96,7 +96,7 @@ func test_rebind_applies_and_persists() -> void:
 	assert_bool(result.is_ok).is_true()
 	var bound: InputEventKey = result.value
 	assert_int(bound.physical_keycode).is_equal(KEY_K)
-	_assert_keys(service, &"quick_save", [KEY_F5, KEY_K])
+	_assert_keys(service, &"quick_save", [KEY_F8, KEY_K])
 	assert_bool(InputMap.event_is_action(_key(KEY_K), &"quick_save")).is_true()
 	assert_array(_changed_actions).is_equal([&"quick_save"])
 
@@ -104,7 +104,7 @@ func test_rebind_applies_and_persists() -> void:
 	assert_int(config.load(TEST_PATH)).is_equal(OK)
 	var stored: Dictionary = config.get_value("input", "quick_save")
 	assert_array(stored[InputActions.KEYBOARD]).is_equal(
-		[{"kind": "key", "physical_keycode": KEY_F5}, {"kind": "key", "physical_keycode": KEY_K}]
+		[{"kind": "key", "physical_keycode": KEY_F8}, {"kind": "key", "physical_keycode": KEY_K}]
 	)
 
 

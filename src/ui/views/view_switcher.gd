@@ -4,7 +4,8 @@ extends Control
 ## [GameView]; its id is its node name in snake_case ([code]GateRoom[/code] is
 ## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
 ## (view_next and view_previous wrap at the ends; view_gate_room, view_archive, view_base,
-## view_research) and the gamepad shoulders switch views. A view that is not available
+## view_research, view_personnel)
+## and the gamepad shoulders switch views. A view that is not available
 ## ([method GameView.is_available]: the Research tab before a lab finishes) has its tab
 ## hidden, is skipped by view_next and view_previous, and its action does nothing.
 ## Hidden views stay in the tree and keep their own state, but are invisible, do not process
@@ -31,6 +32,8 @@ const ARCHIVE: StringName = &"archive"
 const BASE: StringName = &"base"
 ## Id of the Research view.
 const RESEARCH: StringName = &"research"
+## Id of the Personnel view.
+const PERSONNEL: StringName = &"personnel"
 
 const _ACTION_NEXT: StringName = &"view_next"
 const _ACTION_PREVIOUS: StringName = &"view_previous"
@@ -40,6 +43,7 @@ const _DIRECT_ACTIONS: Dictionary = {
 	&"view_archive": ARCHIVE,
 	&"view_base": BASE,
 	&"view_research": RESEARCH,
+	&"view_personnel": PERSONNEL,
 }
 
 var _ids: Array[StringName] = []

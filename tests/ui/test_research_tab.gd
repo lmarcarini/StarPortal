@@ -43,7 +43,7 @@ func test_tab_appears_once_a_lab_has_finished() -> void:
 	assert_str(String(switcher.current_view_id())).is_equal("gate_room")
 	await _press(&"view_base")
 	await _press(&"view_next")
-	assert_str(String(switcher.current_view_id())).is_equal("gate_room")
+	assert_str(String(switcher.current_view_id())).is_equal("personnel")
 	PowerFixture.lab(SimClock.simulation.state)
 	EventBus.room_built.emit(&"lab")
 	assert_bool(tabs.is_tab_hidden(index)).is_false()
@@ -51,7 +51,7 @@ func test_tab_appears_once_a_lab_has_finished() -> void:
 	await _press(&"view_research")
 	assert_str(String(switcher.current_view_id())).is_equal("research")
 	await _press(&"view_next")
-	assert_str(String(switcher.current_view_id())).is_equal("gate_room")
+	assert_str(String(switcher.current_view_id())).is_equal("personnel")
 
 
 func test_header_is_current_when_the_tab_opens() -> void:

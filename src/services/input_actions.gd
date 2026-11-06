@@ -25,6 +25,7 @@ const ACTIONS: Array[StringName] = [
 	&"view_archive",
 	&"view_base",
 	&"view_research",
+	&"view_personnel",
 	&"base_level_up",
 	&"base_level_down",
 	&"base_energy_layer",
@@ -85,7 +86,7 @@ const DEFAULTS: Dictionary = {
 	},
 	&"quick_save":
 	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F5}],
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F8}],
 		GAMEPAD: [],
 	},
 	&"quick_load":
@@ -138,6 +139,11 @@ const DEFAULTS: Dictionary = {
 	&"view_research":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F4}],
+		GAMEPAD: [],
+	},
+	&"view_personnel":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F5}],
 		GAMEPAD: [],
 	},
 	&"base_level_up":

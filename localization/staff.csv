@@ -5,3 +5,38 @@ STAFF_PIPELINE_MILITARY,Military,Militar
 STAFF_PIPELINE_INTELLIGENCE,Intelligence,Inteligência
 STAFF_HIRE_ERR_NO_FREE_BED,No free bed. Build Quarters.,Sem cama livre. Construa um Alojamento.
 STAFF_HIRE_ERR_NO_MONEY,Not enough money,Dinheiro insuficiente
+STAFF_TITLE,Personnel,Pessoal
+STAFF_HEADING,PERSONNEL,PESSOAL
+STAFF_HEADER,Staff {staff} · Beds {used}/{beds} · Salaries {salaries}/month,Equipe {staff} · Camas {used}/{beds} · Salários {salaries}/mês
+STAFF_TAB_ROSTER,Roster,Equipe
+STAFF_TAB_CANDIDATES,Candidates ({n}),Candidatos ({n})
+STAFF_SELECTED,SELECTED,SELECIONADO
+STAFF_SKILL,Skill {n},Nível {n}
+STAFF_SALARY,{money}/month,{money}/mês
+STAFF_UNASSIGNED,Unassigned,Sem posto
+STAFF_ARRIVING,Arriving in {time},Chega em {time}
+STAFF_ROOM,{room} (Level {level}),{room} (Nível {level})
+STAFF_OFFER,{pipeline} · fee {fee} · arrives in {time},{pipeline} · taxa {fee} · chega em {time}
+STAFF_ROOM_SLOTS,{room}: {used}/{slots},{room}: {used}/{slots}
+STAFF_EFFECT_SPEED,speed {before}% to {after}%,velocidade de {before}% para {after}%
+STAFF_EFFECT_BUILD,building +{before}% to +{after}%,obras de +{before}% para +{after}%
+STAFF_ASSIGN,Assign…,Designar…
+STAFF_UNASSIGN,Unassign,Tirar do posto
+STAFF_DISMISS,Dismiss (hold),Dispensar (segure)
+STAFF_HIRE,Hire (fee {fee}),Contratar (taxa {fee})
+STAFF_BACK,Back,Voltar
+STAFF_HIRED,Hired. On the way.,Contratado. A caminho.
+STAFF_DISMISSED,Dismissed.,Dispensado.
+STAFF_NO_ROOM,No room has a free slot for this role.,Nenhuma sala tem vaga para esta função.
+STAFF_SLOTS,Staff {used}/{slots},Equipe {used}/{slots}
+STAFF_SLOT_EMPTY,+ Empty slot,+ Vaga livre
+STAFF_SLOT_REMOVE,{name}  ×,{name}  ×
+STAFF_SLOT_NOBODY,No unassigned {role} on base.,Nenhum(a) {role} sem posto na base.
+STAFF_ERR_UNKNOWN_PERSON,That person is no longer on the roster.,Essa pessoa não está mais na equipe.
+STAFF_ERR_UNKNOWN_CANDIDATE,That candidate is no longer available.,Esse candidato não está mais disponível.
+STAFF_ERR_UNKNOWN_ROOM,That room is gone.,Essa sala não existe mais.
+STAFF_ERR_NOT_ON_BASE,Not on base yet.,Ainda não chegou à base.
+STAFF_ERR_NOT_BUILT,The room isn't built.,A sala não está construída.
+STAFF_ERR_WRONG_ROLE,The room needs another role.,A sala precisa de outra função.
+STAFF_ERR_ROOM_FULL,The room is full.,A sala está cheia.
+STAFF_ERR_OTHER,Can't do that now.,Não é possível agora.
