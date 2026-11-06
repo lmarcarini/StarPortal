@@ -36,12 +36,12 @@ func test_month_entry_lines_in_english() -> void:
 		assert_array(Array(lines))
 		. is_equal(
 			[
-				"Month-end report: Confidence 50 → 65",
+				"Month-end report: Confidence 50 to 65",
 				"Allocation: +$3,000k",
 				"Room upkeep: -$270k",
 				"Salaries (5 people): -$145k",
-				"Balance: $2,390k → $4,975k",
-				"Committee Confidence: 50 → 65",
+				"Balance: $2,390k to $4,975k",
+				"Committee Confidence: 50 to 65",
 				"Research finished (5) +15",
 				"Reports filed (1 analyst) +1",
 				"Within budget +2",
