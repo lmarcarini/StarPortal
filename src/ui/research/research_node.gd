@@ -49,7 +49,7 @@ func show_project(state: GameState, def: ResearchDef) -> void:
 	project_id = def.id
 	_name.text = tr(def.name_key)
 	var kind: ResearchText.Kind = ResearchText.kind(state, def)
-	_detail.text = tr(def.line_key) if def.is_locked() else _cost(def)
+	_detail.text = tr(def.line_key) if def.is_locked() else _cost(state, def)
 	_state.text = ResearchText.state_word(state, def)
 	_bar.visible = kind == ResearchText.Kind.ACTIVE
 	if _bar.visible:
@@ -71,9 +71,10 @@ func get_bar() -> ProgressBar:
 	return _bar
 
 
-func _cost(def: ResearchDef) -> String:
-	var days: String = tr(&"RESEARCH_DAYS").format({"n": def.days})
-	return "%s · %s" % [MoneyLabel.format_k(def.cost_k), days]
+## "$400k · 2 d": the cost and the time at the current staffing.
+func _cost(state: GameState, def: ResearchDef) -> String:
+	var time: String = ResearchText.duration(ResearchText.planned_ticks(state, def))
+	return "%s · %s" % [MoneyLabel.format_k(def.cost_k), time]
 
 
 func _gui_input(event: InputEvent) -> void:

@@ -4,7 +4,8 @@ extends GameView
 ## panel (docs/content/m2-base.md section 6), with the power strip, switches and energy layer
 ## of [BaseViewPower] above them and the build palette under them (building is wired in its
 ## own section below, through [BaseBuild]). The base_level_up and base_level_down actions
-## (PageUp and PageDown, (Y) and (X)) change level.
+## (PageUp and PageDown, (Y) and (X)) change level. The panel ends with the selected room's
+## [StaffSlots].
 ## Bible: docs/content/m2-base.md section 6, game-design.md#base-building-and-power
 
 ## Ticks of work per step of the progress bars: a tick redraws the tab only when a site's,
@@ -21,6 +22,8 @@ var _build: BaseBuild = null
 var _power: BaseViewPower = BaseViewPower.new()
 ## The message line's building and power news (card M2.5-07).
 var _messages: BaseMessages = BaseMessages.new()
+## The selected room's staff slots (card M2.6-09).
+var _slots: StaffSlots = StaffSlots.new()
 
 @onready var _levels: LevelTabs = %LevelTabs
 @onready var _heading: Label = %LevelHeading
@@ -36,6 +39,7 @@ func _ready() -> void:
 	_ready_build()
 	_setup_power()
 	add_child(_messages)
+	_panel.add_child(_slots)
 
 
 func _enter_tree() -> void:
@@ -66,6 +70,7 @@ func setup(simulation: Simulation) -> void:
 	_setup_build()
 	_power.setup(simulation)
 	_messages.setup(_palette, simulation.state)
+	_slots.setup(simulation)
 	_refresh_lab_note()
 
 
@@ -80,6 +85,11 @@ func get_title_key() -> StringName:
 ## Returns the plan, for tests.
 func get_plan() -> BasePlan:
 	return _plan
+
+
+## Returns the selected room's staff slots, for tests.
+func get_staff_slots() -> StaffSlots:
+	return _slots
 
 
 ## Returns the selected-room panel, for tests.
@@ -170,6 +180,7 @@ func _on_selection_changed(selected: StringName) -> void:
 	_power.select(selected)
 	if _simulation == null:
 		return
+	_slots.show_room(selected)
 	var room: RoomState = _simulation.state.base.find_room(selected)
 	var def: RoomDef = null
 	if room != null:

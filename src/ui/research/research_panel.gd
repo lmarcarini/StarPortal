@@ -1,10 +1,10 @@
 class_name ResearchPanel
 extends VBoxContainer
 ## The SELECTED panel of the Research tab (docs/content/m25-lean-start.md section 3): the
-## focused project's name, cost and days, its line, and Start, or Cancel with the refund
-## shown while it runs. Start is greyed with the reason when ResearchRules.can_start refuses.
-## A done project shows "done ✓"; a locked slot shows its reason and no button. The panel
-## only emits [signal action_pressed]; the view submits the command.
+## focused project's name, cost and time at the current staffing, its line, and Start, or
+## Cancel with the refund shown while it runs. Start is greyed with the reason when
+## ResearchRules.can_start refuses. A done project shows "done ✓"; a locked slot shows its
+## reason and no button. The panel only emits [signal action_pressed]; the view submits the command.
 ## Bible: docs/content/m25-lean-start.md section 3
 
 ## Emitted when Start or Cancel is pressed for [param project_id].
@@ -32,9 +32,15 @@ func show_project(state: GameState, def: ResearchDef) -> void:
 	_line.text = tr(def.line_key)
 	if def.is_locked():
 		return
-	_cost.text = (tr(&"RESEARCH_PANEL_COST").format(
-		{"cost": MoneyLabel.format_k(def.cost_k), "n": def.days}
-	))
+	_cost.text = (
+		tr(&"RESEARCH_PANEL_COST")
+		. format(
+			{
+				"cost": MoneyLabel.format_k(def.cost_k),
+				"time": ResearchText.duration(ResearchText.planned_ticks(state, def)),
+			}
+		)
+	)
 	_show_action(state, def)
 
 
