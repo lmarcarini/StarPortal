@@ -23,7 +23,7 @@ RESEARCH_LEFT,{time} left,faltam {time}
 RESEARCH_LEFT_PAUSED,"{time} left, paused: no lab on","faltam {time}, pausado: nenhum laboratório ligado"
 RESEARCH_DAYS_HOURS,{d} d {h} h,{d} d {h} h
 RESEARCH_DAYS,{n} d,{n} d
-RESEARCH_PANEL_COST,{cost} · {n} days,{cost} · {n} dias
+RESEARCH_PANEL_COST,{cost} · {time} at current staffing,{cost} · {time} com a equipe atual
 RESEARCH_STATE_START,Start,Iniciar
 RESEARCH_STATE_NEEDS,needs {name},requer {name}
 RESEARCH_STATE_ACTIVE,ACTIVE,ATIVO

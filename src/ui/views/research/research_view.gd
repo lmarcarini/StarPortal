@@ -7,7 +7,7 @@ extends GameView
 ## (past the first or last they switch the main tabs); (A), Enter or the panel's button starts
 ## the focused project, or cancels it while it runs. Every action is a command; a refusal
 ## shows on the panel. The board rereads the state on every research, money, room and power
-## event, so it stays right while paused.
+## and staff event, so it stays right while paused.
 ## Bible: docs/content/m25-lean-start.md section 3
 
 var _simulation: Simulation = null
@@ -174,8 +174,15 @@ func _connect_events(on: bool) -> void:
 			event.disconnect(_on_event)
 	if on:
 		EventBus.tick_advanced.connect(_on_tick)
+		EventBus.staff_changed.connect(_on_staff_changed)
 	else:
 		EventBus.tick_advanced.disconnect(_on_tick)
+		EventBus.staff_changed.disconnect(_on_staff_changed)
+
+
+## Staffing changes every project's time, so the tree and panel reread it.
+func _on_staff_changed(_reason: StringName, _room_def_id: StringName, _count: int) -> void:
+	refresh()
 
 
 func _on_event(_arg: Variant = null) -> void:

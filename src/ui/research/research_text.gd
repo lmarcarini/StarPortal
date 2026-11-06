@@ -72,6 +72,19 @@ static func time_left(state: GameState) -> String:
 	return _tr(key).format({"time": duration(ResearchRules.ticks_left(state))})
 
 
+## Clock ticks [param def] would take from the start at [param state]'s current staffing: the
+## scientists of every standing lab (ResearchRules' speed), from the current tick.
+static func planned_ticks(state: GameState, def: ResearchDef) -> int:
+	var rate: int = clampi(
+		ResearchRules.SPEED_PER_SKILL * ResearchRules.scientist_skill(state, true),
+		ResearchRules.MIN_SPEED,
+		ResearchRules.MAX_SPEED
+	)
+	return RateSteps.ticks_to(
+		ResearchRules.total_ticks(def), state.clock.tick, rate, ResearchRules.SPEED_DENOMINATOR
+	)
+
+
 ## "1 d 6 h", "2 d" or "5 h" for [param ticks] in-game minutes, hours rounded up.
 static func duration(ticks: int) -> String:
 	var hours: int = ceili(maxi(0, ticks) / 60.0)
