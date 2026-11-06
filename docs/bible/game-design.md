@@ -8,7 +8,7 @@ The core loop is: find a document or object, solve the address it hides, dial, p
 
 Dialing is the one step that spends the scarcest resource, so every other step exists to make a dial worth it.
 
-The player moves between tabs that share one clock: Gate Room (F1), Archive (F2), Base (F3), Research (F4, available once a Research Lab is built; owner change 2026-11-02), then Expeditions and Command when they arrive, plus the drone feed (decided 2026-10-26; screen map in docs/content/presentation-and-systems.md). What each covers:
+The player moves between tabs that share one clock: Gate Room (F1), Archive (F2), Base (F3), Research (F4, available once a Research Lab is built; owner change 2026-11-02), Personnel (F5, decided 2026-11-02), then Command (F6) and Expeditions when they arrive, plus the drone feed (decided 2026-10-26; screen map in docs/content/presentation-and-systems.md). What each covers:
 
 | View | What the player does |
 | --- | --- |
