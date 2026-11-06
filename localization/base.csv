@@ -106,6 +106,7 @@ RESEARCH_SECOND_PLANT_NAME,Second plant,Segunda usina
 RESEARCH_FUEL_CONTRACTS_NAME,Fuel contracts,Contratos de combustível
 RESEARCH_BANK_ARRAY_NAME,Bank array,Conjunto de bancos
 RESEARCH_FIELD_ENGINEERING_NAME,Field engineering,Engenharia de campo
+BASE_BUILD_ERR_BEDS_NEEDED,Beds in use. Dismiss someone first.,Camas em uso. Dispense alguém antes.
 BASE_BUILD_ERR_OTHER,Can't do that here.,Não é possível aqui.
 BASE_POWER_BAR_CHARGE,Charge,Carga
 BASE_POWER_SUPPLY,{supply} MW · {spare} spare,{supply} MW · {spare} livres
