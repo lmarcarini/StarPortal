@@ -30,7 +30,7 @@ const WARNING_KEYS: Dictionary[StringName, StringName] = {
 }
 
 
-## The message line: "Month-end report: Confidence 50 → 65".
+## The message line: "Month-end report: Confidence 50 to 65".
 static func headline(report: MonthReport) -> String:
 	return _tr(&"MONTH_REPORT_TITLE").format(
 		{"before": report.confidence_before, "after": report.confidence_after}

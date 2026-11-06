@@ -32,13 +32,13 @@ LOG_KIND_HORIZON,Horizon records,Registros do horizonte
 LOG_KIND_POWER,Power,Energia
 LOG_KIND_MONTH,Month-ends,Fechamentos do mês
 LOG_KIND_COMMITTEE,Committee,Comitê
-MONTH_REPORT_TITLE,Month-end report: Confidence {before} → {after},Relatório do mês: Confiança {before} → {after}
+MONTH_REPORT_TITLE,Month-end report: Confidence {before} to {after},Relatório do mês: Confiança de {before} para {after}
 MONTH_REPORT_ALLOCATION,Allocation: {amount},Verba: {amount}
 MONTH_REPORT_UPKEEP,Room upkeep: {amount},Manutenção das salas: {amount}
 MONTH_REPORT_SALARIES,Salaries ({people} people): {amount},Salários ({people} pessoas): {amount}
 MONTH_REPORT_SALARIES_ONE,Salaries (1 person): {amount},Salários (1 pessoa): {amount}
-MONTH_REPORT_BALANCE,Balance: {before} → {after},Saldo: {before} → {after}
-MONTH_REPORT_CONFIDENCE,Committee Confidence: {before} → {after},Confiança do Comitê: {before} → {after}
+MONTH_REPORT_BALANCE,Balance: {before} to {after},Saldo: de {before} para {after}
+MONTH_REPORT_CONFIDENCE,Committee Confidence: {before} to {after},Confiança do Comitê: de {before} para {after}
 MONTH_CAUSE_LOCKED,New world locked: {worlds} {amount},Novo mundo conectado: {worlds} {amount}
 MONTH_CAUSE_SURVEYED,New world surveyed: {worlds} {amount},Novo mundo explorado: {worlds} {amount}
 MONTH_CAUSE_RESEARCH,Research finished ({count}) {amount},Pesquisas concluídas ({count}) {amount}
@@ -56,3 +56,11 @@ MONTH_REPORT_NEXT,Next allocation: {amount},Próxima verba: {amount}
 COMMITTEE_WARN_RED_MONTHS,Warning: {count} month-ends in a row in the red. The Committee is concerned about the budget.,Aviso: {count} fechamentos seguidos no vermelho. O Comitê está preocupado com o orçamento.
 COMMITTEE_WARN_CONFIDENCE_ZERO,Warning: Committee Confidence is 0. The Committee has lost faith in the programme.,Aviso: a Confiança do Comitê é 0. O Comitê perdeu a fé no programa.
 MONTH_CAUSE_BOUNDS,Kept within 0–100 {amount},Mantida entre 0 e 100 {amount}
+CONFIDENCE_READOUT,Conf. {value},Conf. {value}
+CONFIDENCE_READOUT_UP,Conf. {value} +{change},Conf. {value} +{change}
+CONFIDENCE_READOUT_DOWN,Conf. {value} -{change},Conf. {value} -{change}
+CONFIDENCE_TOOLTIP_NONE,Committee Confidence (0–100). It changes at each month-end; the report lists why.,Confiança do Comitê (0–100). Muda a cada fechamento do mês; o relatório explica por quê.
+MONTH_PANEL_TITLE,Month-end {date},Fechamento do mês {date}
+MONTH_PANEL_CLOSE,Close,Fechar
+MONTH_NOTICE_VIEW,View,Ver
+MONTH_NOTICE_DISMISS,Dismiss,Dispensar

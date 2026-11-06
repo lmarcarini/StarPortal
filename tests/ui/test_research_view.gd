@@ -140,7 +140,7 @@ func test_lab_off_refreshes_while_paused() -> void:
 func test_done_nodes_are_ticked() -> void:
 	ResearchFixture.finish(_simulation.state, &"excavation_survey")
 	_view.refresh()
-	assert_str(_node(&"excavation_survey").texts()[2]).is_equal("done ✓")
+	assert_str(_node(&"excavation_survey").texts()[2]).is_equal("done")
 	assert_str(_node(&"lift_shaft").texts()[2]).is_equal("Start")
 
 
