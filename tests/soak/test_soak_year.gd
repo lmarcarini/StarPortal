@@ -155,7 +155,8 @@ func _summary(elapsed_msec: int) -> String:
 	var template := "soak: %d ticks x 2 runs in %.2f s; %d day_started, %d month_closed, "
 	template += "%d reloads, %d commands (%d while paused), %d pauses; %d dials (%d locks), "
 	template += "%d closes, %d consoles read, %d pole cameras, %d book entries; "
-	template += "%d picked (%d from the book, %d targets, %d dropped)"
+	template += "%d picked (%d from the book, %d targets, %d dropped); "
+	template += "%d staff moves, %d assigns; Confidence %d, funds $%dk"
 	var bot: SoakBot = _reloaded.bot
 	var values: Array = [
 		YEAR_TICKS,
@@ -176,6 +177,10 @@ func _summary(elapsed_msec: int) -> String:
 		bot.book_picked,
 		bot.targets_picked,
 		bot.addresses_dropped,
+		bot.staff_moves,
+		bot.staff_assigns,
+		_reloaded.simulation.state.committee.confidence,
+		_reloaded.simulation.state.budget.funds_k,
 	]
 	return template % values
 
@@ -302,6 +307,7 @@ func _assert_run_base(run: SoakRun) -> void:
 	assert_bool(lab.powered_on).is_true()
 	assert_int(run.bot.research_started).is_equal(SoakResearch.ORDER.size())
 	assert_int(run.bot.staff_moves).is_greater(1)
+	assert_int(run.bot.staff_assigns).is_greater(0)
 	assert_array(state.research.done).is_equal(SoakResearch.ORDER)
 	assert_bool(state.research.is_running()).is_false()
 	assert_int(state.unlocks.dig_depth).is_equal(4)
