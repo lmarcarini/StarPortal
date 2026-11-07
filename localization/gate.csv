@@ -112,3 +112,14 @@ WORLD_SILL_NAME,SILL,SILL
 WORLD_LINTEL_NAME,LINTEL,LINTEL
 WORLD_MILESTONE_NAME,MILESTONE,MILESTONE
 WORLD_STILLWATER_NAME,STILLWATER,STILLWATER
+TARGET_SILL_SLAB,Flat slab before the Ring,Laje plana diante do Anel
+TARGET_LINTEL_DISC,Standing disc with seven carvings,Disco de pé com sete entalhes
+TARGET_MILESTONE_BRONZE_PEGS,Bronze pegs at the top of the cut,Estacas de bronze no alto do corte
+TARGET_STILLWATER_FOOTPRINTS,Bare footprints in the mud,Pegadas descalças na lama
+TARGET_STILLWATER_IRON_OBJECT,Iron object at the causeway's end,Objeto de ferro no fim do passadiço
+TARGET_ROCK_FORMATION,Odd rock formation,Formação rochosa estranha
+TARGET_METAL_SHARD,Metal shard in the dust,Fragmento de metal na poeira
+TARGET_RUINED_WALL,Ruined wall,Muro em ruínas
+TARGET_BROKEN_TABLET,Broken carved tablet,Tábua entalhada partida
+TARGET_CUT_STONES,Cut stones in a row,Pedras talhadas em fileira
+TARGET_STONE_TOOL,Worked stone tool,Ferramenta de pedra lavrada

@@ -9,4 +9,5 @@ position_ly = Vector3i(-3000, 0, 700)
 origin_glyph = 31
 ring_status = 1
 is_guarded = true
+threat = 3
 id = &"world_buried"

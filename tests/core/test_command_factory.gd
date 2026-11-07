@@ -54,6 +54,12 @@ func _samples() -> Array[Command]:
 		UnassignStaffCommand.create(&"person_2"),
 		HireCommand.create(&"candidate_1"),
 		DismissCommand.create(&"person_2"),
+		RaiseWorldStatusCommand.create(&"world_0001", WorldsState.WorldStatus.PROBED),
+		RaiseWorldFactCommand.create(
+			WorldProgress.FactChange.create(
+				&"world_0001", WorldReport.Fact.LIFE, WorldReport.Confidence.FAIR, &"moth"
+			)
+		),
 	]
 
 
@@ -162,6 +168,8 @@ func test_defaults_are_registered_lazily() -> void:
 				&"note_address",
 				&"paint_corridor",
 				&"place_room",
+				&"raise_world_fact",
+				&"raise_world_status",
 				&"read_console",
 				&"set_charge_rate",
 				&"set_flag",
@@ -200,6 +208,8 @@ func test_register_type_adds_a_type() -> void:
 				&"paint_corridor",
 				&"ping",
 				&"place_room",
+				&"raise_world_fact",
+				&"raise_world_status",
 				&"read_console",
 				&"set_charge_rate",
 				&"set_flag",
@@ -239,6 +249,8 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"note_address",
 				&"paint_corridor",
 				&"place_room",
+				&"raise_world_fact",
+				&"raise_world_status",
 				&"read_console",
 				&"set_charge_rate",
 				&"set_flag",

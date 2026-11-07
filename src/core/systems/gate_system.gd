@@ -70,7 +70,7 @@ func _resolve(state: GameState, end_tick: int) -> void:
 	entry.world_id = answer["world_id"]
 	RingControl.finish_dial(gate, entry)
 	if DialOutcome.is_lock(outcome):
-		state.worlds.statuses[entry.world_id] = WorldsState.WorldStatus.LOCKED
+		WorldProgress.raise_status(state, entry.world_id, WorldsState.WorldStatus.LOCKED)
 		_drop_to_normal_speed(state.clock)
 	state.events.post(&"dial_resolved", [outcome as int, entry.address.key()])
 	state.address_book.record_dial(entry)

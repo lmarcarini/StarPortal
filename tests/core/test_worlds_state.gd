@@ -39,6 +39,7 @@ func test_dict_shape() -> void:
 				"statuses": {"abydos": "locked", "p3x_118": "locked"},
 				"consoles_read": {"abydos": true},
 				"horizon_records": {"abydos": true},
+				"reports": {},
 				"pole_camera_world_id": "p3x_118",
 				"pole_camera_ticks_left": 3,
 			}
@@ -87,7 +88,7 @@ func test_validate_errors() -> void:
 		["generator_version", "1", "generator_version"],
 		["statuses", [], "'statuses' is not an object"],
 		["statuses", {"abydos": "unknown"}, "status of 'abydos'"],
-		["statuses", {"abydos": "probed"}, "status of 'abydos'"],
+		["statuses", {"abydos": "explored"}, "status of 'abydos'"],
 		["statuses", {"abydos": 1}, "status of 'abydos'"],
 		["statuses", {"": "locked"}, "empty world id"],
 		["consoles_read", [], "'consoles_read' is not an object"],

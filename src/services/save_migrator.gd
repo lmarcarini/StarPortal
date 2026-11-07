@@ -5,19 +5,20 @@ extends RefCounted
 ## at version N + 1. Steps are pure: no side effects, no autoloads.
 ## M2, M2.5 (v12, docs/content/m25-lean-start.md section 7), M2.6 (v13,
 ## docs/content/m26-staff-and-money.md section 8) and M2.7 (v14,
-## docs/content/m27-daily-rhythm.md section 7) are clean breaks: saves older
+## docs/content/m27-daily-rhythm.md section 7) and M3 (v15,
+## docs/content/m3-beyond-the-ring.md section 9) are clean breaks: saves older
 ## than [constant OLDEST_VERSION] are not migrated but
 ## rejected with &"old_format_version" (owner ruling on card #133). Steps for later versions
 ## go in built_in_steps().
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 14
+const TARGET_VERSION: int = 15
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
-const OLDEST_VERSION: int = 14
+const OLDEST_VERSION: int = 15
 
 
-## Returns the built-in steps, keyed by the version they migrate from; none yet since the M2.7
+## Returns the built-in steps, keyed by the version they migrate from; none yet since the M3
 ## clean break. (A function, not a constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
 	var built_in: Dictionary[int, Callable] = {}

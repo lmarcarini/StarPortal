@@ -1,10 +1,31 @@
-[gd_resource type="Resource" script_class="WorldDef" format=3]
+[gd_resource type="Resource" script_class="WorldDef" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://src/content/world_def.gd" id="1_world"]
+[ext_resource type="Script" path="res://src/content/world_target_def.gd" id="2_target"]
+
+[sub_resource type="Resource" id="Target_0"]
+script = ExtResource("2_target")
+id = &"footprints"
+name_key = &"TARGET_STILLWATER_FOOTPRINTS"
+is_object = false
+
+[sub_resource type="Resource" id="Target_1"]
+script = ExtResource("2_target")
+id = &"iron_object"
+name_key = &"TARGET_STILLWATER_IRON_OBJECT"
+is_object = true
 
 [resource]
 script = ExtResource("1_world")
 name_key = &"WORLD_STILLWATER_NAME"
 position_ly = Vector3i(-918, 1286, 370)
 origin_glyph = 33
+biome = 3
+atmosphere = 2
+temperature_c = 11
+biohazard = 2
+life = 3
+structures = 3
+threat = 1
+targets = Array[ExtResource("2_target")]([SubResource("Target_0"), SubResource("Target_1")])
 id = &"world_stillwater"

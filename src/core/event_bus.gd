@@ -68,6 +68,14 @@ signal budget_changed(budget_k: int)
 ## the outbox).
 @warning_ignore("unused_signal")
 signal console_read(world_id: StringName)
+## Emitted when a world's state rises (WorldProgress), with the world id and the new
+## WorldsState.WorldStatus (posted through the outbox).
+@warning_ignore("unused_signal")
+signal world_status_changed(world_id: StringName, status: int)
+## Emitted when a World Report fact's confidence rises (WorldProgress), with the world id, the
+## WorldReport.Fact and the new WorldReport.Confidence (posted through the outbox).
+@warning_ignore("unused_signal")
+signal world_fact_raised(world_id: StringName, fact: int, confidence: int)
 
 ## Emitted when a construction site starts, with its site id (posted through the outbox).
 @warning_ignore("unused_signal")
