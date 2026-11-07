@@ -1,10 +1,10 @@
 class_name HireCommand
 extends Command
-## The player hires a candidate from the monthly list (docs/content/m26-staff-and-money.md
+## The player hires a candidate from the rolling candidate list (docs/content/m26-staff-and-money.md
 ## section 2): the fee (30 days' salary) is paid at once, a bed is reserved and the person
 ## joins the roster Unassigned, arriving after their pipeline's delay. Posts budget_changed,
 ## candidates_changed and staff_changed(&"hired", &"", 1).
-## Bible: docs/content/m26-staff-and-money.md section 2
+## Bible: docs/content/m26-staff-and-money.md section 2, m27-daily-rhythm.md section 3
 
 ## The command's stable type id.
 const TYPE: StringName = &"hire"

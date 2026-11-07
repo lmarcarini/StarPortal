@@ -65,6 +65,11 @@ func get_title_key() -> StringName:
 	return &"STAFF_TITLE"
 
 
+## "Personnel •" while a new candidate is unseen, else "Personnel".
+func get_tab_title() -> String:
+	return tr(get_title_key()) + (PersonnelBoard.DOT if _board.new_candidates else "")
+
+
 ## Returns the board, for tests.
 func get_board() -> PersonnelBoard:
 	return _board
@@ -83,7 +88,10 @@ func refresh() -> void:
 	var newest: int = state.recruitment.next_candidate_number - 1
 	if is_visible_in_tree() and _board.get_page() == PersonnelBoard.Page.CANDIDATES:
 		_seen_number = newest
-	_board.new_candidates = newest > _seen_number and not state.recruitment.candidates.is_empty()
+	var unseen: bool = newest > _seen_number and not state.recruitment.candidates.is_empty()
+	if unseen != _board.new_candidates:
+		_board.new_candidates = unseen
+		title_changed.emit()
 	_board.show_state(state)
 	var shown: StringName = _panel.get_id()
 	if _board.row_of(shown) == null:
