@@ -1,6 +1,6 @@
-## Tests for EconomySystem: month-end allocation and upkeep, half for rooms off, none for
+## Tests for EconomySystem: the daily allocation and upkeep, half for rooms off, none for
 ## rooms under construction, and budget_changed through a running Simulation.
-## Bible: docs/content/m2-base.md section 5
+## Bible: docs/content/m2-base.md section 5, docs/content/m27-daily-rhythm.md section 1
 extends GdUnitTestSuite
 
 
@@ -29,10 +29,11 @@ func _state() -> GameState:
 	return state
 
 
-func test_month_adds_allocation_and_subtracts_upkeep() -> void:
+func test_day_adds_allocation_and_subtracts_upkeep() -> void:
 	var state := _state()
-	EconomySystem.new(BalanceConfig.new(), _defs()).on_month(state)
-	assert_int(state.budget.funds_k).is_equal(6000 + 3000 - 210)
+	state.clock.tick = TimeMath.TICKS_PER_DAY
+	EconomySystem.new(BalanceConfig.new(), _defs()).on_day(state)
+	assert_int(state.budget.funds_k).is_equal(6000 + 100 - 210 / 30)
 	assert_array(state.events.drain()).is_not_empty()
 
 
@@ -44,17 +45,18 @@ func test_off_room_pays_half_and_unbuilt_pays_nothing() -> void:
 	var by_id: Dictionary[StringName, RoomDef] = {}
 	for def: RoomDef in _defs():
 		by_id[def.id] = def
-	assert_int(EconomySystem.monthly_upkeep_k(state.base, by_id)).is_equal(30 + 75)
+	assert_int(EconomySystem.upkeep_k(state.base, by_id)).is_equal(30 + 75)
 
 
 func test_upkeep_can_push_balance_negative() -> void:
 	var state := _state()
-	state.budget.funds_k = -3000
-	EconomySystem.new(BalanceConfig.new(), _defs()).on_month(state)
-	assert_int(state.budget.funds_k).is_equal(-210)
+	state.budget.funds_k = -100
+	state.clock.tick = TimeMath.TICKS_PER_DAY
+	EconomySystem.new(BalanceConfig.new(), _defs()).on_day(state)
+	assert_int(state.budget.funds_k).is_equal(-7)
 
 
-func test_simulation_posts_budget_changed_at_month_start() -> void:
+func test_simulation_posts_budget_changed_at_day_start() -> void:
 	var state := _state()
 	var systems: Array[SimSystem] = [EconomySystem.new(BalanceConfig.new(), _defs())]
 	var simulation := Simulation.new(state, systems)
@@ -62,10 +64,9 @@ func test_simulation_posts_budget_changed_at_month_start() -> void:
 	simulation.event_posted.connect(
 		func(event_name: StringName, args: Array) -> void: seen.append([event_name, args])
 	)
-	state.clock.tick = 31 * TimeMath.TICKS_PER_DAY - 1
+	state.clock.tick = TimeMath.TICKS_PER_DAY - 1
 	simulation.advance_tick()
-	assert_bool(TimeMath.is_month_start(state.clock.tick)).is_true()
-	assert_array(seen).contains([[&"budget_changed", [8790]]])
+	assert_array(seen).contains([[&"budget_changed", [6093]]])
 
 
 func test_lift_shaft_pays_once() -> void:
@@ -75,7 +76,7 @@ func test_lift_shaft_pays_once() -> void:
 	var by_id: Dictionary[StringName, RoomDef] = {}
 	for def: RoomDef in _defs():
 		by_id[def.id] = def
-	assert_int(EconomySystem.monthly_upkeep_k(state.base, by_id)).is_equal(210 + 10)
+	assert_int(EconomySystem.upkeep_k(state.base, by_id)).is_equal(210 + 10)
 
 
 ## A research upkeep override (Fuel contracts) replaces the def's upkeep, halved when off.
@@ -86,18 +87,18 @@ func test_upkeep_override() -> void:
 		by_id[def.id] = def
 	var unlocks := UnlockState.new()
 	unlocks.upkeep_overrides[&"room_plant"] = 20
-	var plain: int = EconomySystem.monthly_upkeep_k(state.base, by_id)
-	var cut: int = EconomySystem.monthly_upkeep_k(state.base, by_id, unlocks)
+	var plain: int = EconomySystem.upkeep_k(state.base, by_id)
+	var cut: int = EconomySystem.upkeep_k(state.base, by_id, unlocks)
 	assert_int(plain - cut).is_equal(by_id[&"room_plant"].upkeep_k - 20)
 
 
-## The lean start pays $190k a month; after Fuel contracts, $140k (m25-lean-start.md).
+## The lean start pays $190k per 30 days; after Fuel contracts, $140k (m25-lean-start.md).
 func test_starting_base_upkeep_is_190k() -> void:
 	var defs: GameDefs = GameDefs.from_registry(Registry)
 	var by_id: Dictionary[StringName, RoomDef] = {}
 	for def: RoomDef in defs.rooms:
 		by_id[def.id] = def
 	var state := GameState.new_game(1, defs.balance)
-	assert_int(EconomySystem.monthly_upkeep_k(state.base, by_id, state.unlocks)).is_equal(190)
+	assert_int(EconomySystem.upkeep_k(state.base, by_id, state.unlocks)).is_equal(190)
 	UnlockRules.apply_project(state.unlocks, &"fuel_contracts")
-	assert_int(EconomySystem.monthly_upkeep_k(state.base, by_id, state.unlocks)).is_equal(140)
+	assert_int(EconomySystem.upkeep_k(state.base, by_id, state.unlocks)).is_equal(140)

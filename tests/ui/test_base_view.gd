@@ -119,7 +119,7 @@ func test_a_room_under_construction_shows_its_progress() -> void:
 	var lines: Array[String] = _view.get_room_panel().lines()
 	assert_str(lines[1]).is_equal("Research Lab")
 	assert_str(lines[3]).is_equal("Draw 5 MW")
-	assert_str(lines[4]).is_equal("Upkeep $60k / month")
+	assert_str(lines[4]).is_equal("Upkeep $60k per 30 days")
 	assert_str(lines[5]).is_equal("Under construction: 75%, 2 h left")
 	var bar: SiteProgress = _view.get_plan().progress_of(room.id)
 	assert_float(bar.fraction).is_equal_approx(0.75, 0.001)

@@ -5,8 +5,6 @@
 [ext_resource type="PackedScene" path="res://src/ui/views/view_switcher.tscn" id="3_view_switcher"]
 [ext_resource type="Script" path="res://src/ui/money/money_label.gd" id="4_money"]
 [ext_resource type="Script" path="res://src/ui/money/confidence_readout.gd" id="5_confidence"]
-[ext_resource type="PackedScene" path="res://src/ui/money/month_report_notice.tscn" id="6_notice"]
-[ext_resource type="PackedScene" path="res://src/ui/money/month_report_panel.tscn" id="7_panel"]
 
 [node name="Shell" type="Control"]
 layout_mode = 3
@@ -40,13 +38,13 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MoneyLabel" type="Label" parent="TopBar/Margin/Row"]
+[node name="MoneyLabel" type="Button" parent="TopBar/Margin/Row"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
-horizontal_alignment = 2
-vertical_alignment = 1
 auto_translate_mode = 2
+flat = true
+alignment = 2
 script = ExtResource("4_money")
 
 [node name="ConfidenceReadout" type="Button" parent="TopBar/Margin/Row"]
@@ -98,14 +96,6 @@ grow_horizontal = 2
 grow_vertical = 0
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="MonthReportNotice" parent="." instance=ExtResource("6_notice")]
-unique_name_in_owner = true
-layout_mode = 1
-
-[node name="MonthReportPanel" parent="." instance=ExtResource("7_panel")]
-unique_name_in_owner = true
-layout_mode = 1
 
 [node name="ToastTimer" type="Timer" parent="."]
 unique_name_in_owner = true

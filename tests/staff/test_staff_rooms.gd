@@ -85,13 +85,16 @@ func test_quarters_needed_for_beds_stay_up() -> void:
 	assert_bool(DemolishRoomCommand.create(quarters.id).validate(game).is_ok).is_true()
 
 
-## The month-end charges room upkeep and the $145k of salaries.
-func test_month_end_pays_salaries() -> void:
+## The daily settlement charges room upkeep and the $145k of salaries per 30 days, with the
+## carry (m27-daily-rhythm.md section 1).
+func test_settlement_pays_salaries() -> void:
 	var game: GameState = ConstructionFixture.state()
 	var defs: Array[RoomDef] = []
 	defs.assign(game.room_defs.values())
 	var funds: int = game.budget.funds_k
-	var upkeep: int = EconomySystem.monthly_upkeep_k(game.base, game.room_defs, game.unlocks)
-	EconomySystem.new(game.balance, defs).on_month(game)
-	assert_int(game.budget.funds_k).is_equal(funds + 3000 - upkeep - 145)
+	var upkeep: int = EconomySystem.upkeep_k(game.base, game.room_defs, game.unlocks)
+	game.clock.tick = TimeMath.TICKS_PER_DAY
+	EconomySystem.new(game.balance, defs).on_day(game)
+	assert_int(game.budget.funds_k).is_equal(funds + 100 - (upkeep + 145) / 30)
+	assert_int(game.committee.cost_carry).is_equal((upkeep + 145) % 30)
 	assert_int(upkeep + 145).is_equal(335)

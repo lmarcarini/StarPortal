@@ -1,7 +1,8 @@
 ## Tests for the Personnel tab: the header, roster and candidate rows, hire, dismiss (hold),
 ## assign and unassign through the commands with refusals shown plainly, the Assign… list
 ## with its effect, refreshing while paused and on showing, the D-pad, (A), (B), (Y) and the
-## shoulders, and the layout at 1280 × 720 in en and pt_BR with the real fonts.
+## shoulders, the new-candidate dot and "Leaves in",
+## and the layout at 1280 × 720 in en and pt_BR with the real fonts.
 ## Bible: docs/content/m26-staff-and-money.md section 6
 extends GdUnitTestSuite
 
@@ -49,15 +50,13 @@ func _rows() -> Array[PersonnelRow]:
 
 func test_roster_and_header_from_the_start() -> void:
 	var board: PersonnelBoard = _view.get_board()
-	assert_array(board.header()).is_equal(
-		["PERSONNEL", "Staff 5 · Beds 5/6 · Salaries $145k/month"]
-	)
+	assert_array(board.header()).is_equal(["PERSONNEL", "Staff 5 · Beds 5/6 · Salaries $5k a day"])
 	assert_array(board.tab_titles()).is_equal(["Roster", "Candidates (4)"])
 	assert_int(_rows().size()).is_equal(5)
 	var first: Array[String] = _rows()[0].texts()
 	assert_str(first[1]).is_equal("Scientist")
 	assert_str(first[2]).is_equal("***")
-	assert_str(first[3]).is_equal("$30k/month")
+	assert_str(first[3]).is_equal("$30k / 30 d")
 	assert_str(first[4]).is_equal("Research Lab (Level 1)")
 	assert_str(_rows()[0].labels()[2].tooltip_text).is_equal("Skill 3")
 	var where: Array[String] = []
@@ -70,7 +69,30 @@ func test_candidates_show_fee_and_arrival() -> void:
 	_view.get_board().show_page(PersonnelBoard.Page.CANDIDATES)
 	assert_int(_rows().size()).is_equal(4)
 	assert_str(_rows()[0].texts()[0]).is_equal("Dr Ines Moreau")
-	assert_str(_rows()[0].texts()[4]).is_equal("Academia · fee $30k · arrives in 5 d")
+	assert_str(_rows()[0].texts()[4]).is_equal(
+		"Leaves in 3 d · Academia · Fee: 30 days' pay ($30k) · arrives in 5 d"
+	)
+
+
+## A new candidate puts a dot on the Candidates sub-tab while paused, until it is shown; the
+## countdown follows the day (docs/content/m27-daily-rhythm.md section 3).
+func test_new_candidate_dot_and_countdown() -> void:
+	var board: PersonnelBoard = _view.get_board()
+	_state().clock.tick = 3 * TimeMath.TICKS_PER_DAY
+	var defs: GameDefs = GameDefs.from_registry(Registry)
+	RecruitmentSystem.new(defs.balance, defs.roles, defs.staff_names).on_day(_state())
+	_state().events.drain()
+	EventBus.candidates_changed.emit()
+	assert_array(board.tab_titles()).is_equal(["Roster", "Candidates (4) •"])
+	assert_str(_view.get_tab_title()).is_equal("Personnel •")
+	var titles: Array[int] = [0]
+	_view.title_changed.connect(func() -> void: titles[0] += 1)
+	board.show_page(PersonnelBoard.Page.CANDIDATES)
+	assert_array(board.tab_titles()).is_equal(["Roster", "Candidates (4)"])
+	assert_str(_view.get_tab_title()).is_equal("Personnel")
+	assert_int(titles[0]).is_equal(1)
+	assert_str(_rows()[0].texts()[4]).starts_with("Leaves in 3 d · ")
+	assert_str(_rows()[3].texts()[4]).starts_with("Leaves in 12 d · ")
 
 
 func test_hire_then_no_free_bed_is_shown_plainly() -> void:

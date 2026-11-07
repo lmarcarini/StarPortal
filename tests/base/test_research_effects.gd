@@ -61,13 +61,13 @@ func test_second_plant() -> void:
 	_assert_cache_fresh(game)
 
 
-## R5: every diesel plant's upkeep drops from $150k to $100k a month.
+## R5: every diesel plant's upkeep drops from $150k to $100k per 30 days.
 func test_fuel_contracts() -> void:
 	var game: GameState = ResearchFixture.state()
-	var before: int = EconomySystem.monthly_upkeep_k(game.base, game.room_defs, game.unlocks)
+	var before: int = EconomySystem.upkeep_k(game.base, game.room_defs, game.unlocks)
 	ResearchFixture.finish(game, &"second_plant")
 	ResearchFixture.finish(game, &"fuel_contracts")
-	var after: int = EconomySystem.monthly_upkeep_k(game.base, game.room_defs, game.unlocks)
+	var after: int = EconomySystem.upkeep_k(game.base, game.room_defs, game.unlocks)
 	assert_int(before - after).is_equal(50)
 	_assert_cache_fresh(game)
 

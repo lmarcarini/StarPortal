@@ -13,6 +13,9 @@ extends GameView
 
 var _simulation: Simulation = null
 var _signature: int = 0
+## Highest candidate number the player has seen on the Candidates sub-tab; a higher one puts
+## the dot on it (docs/content/m27-daily-rhythm.md section 3).
+var _seen_number: int = 0
 ## The staff_changed reason the last hire or dismiss waits for, and the words it then shows.
 var _pending_reason: StringName = &""
 var _pending_key: StringName = &""
@@ -48,6 +51,7 @@ func _notification(what: int) -> void:
 ## Reads [param simulation]'s staff and candidates.
 func setup(simulation: Simulation) -> void:
 	_simulation = simulation
+	_seen_number = simulation.state.recruitment.next_candidate_number - 1
 	_panel.show_id(simulation.state, &"")
 	refresh()
 
@@ -59,6 +63,11 @@ func get_default_focus() -> Control:
 
 func get_title_key() -> StringName:
 	return &"STAFF_TITLE"
+
+
+## "Personnel •" while a new candidate is unseen, else "Personnel".
+func get_tab_title() -> String:
+	return tr(get_title_key()) + (PersonnelBoard.DOT if _board.new_candidates else "")
 
 
 ## Returns the board, for tests.
@@ -76,6 +85,13 @@ func refresh() -> void:
 	if _simulation == null:
 		return
 	var state: GameState = _simulation.state
+	var newest: int = state.recruitment.next_candidate_number - 1
+	if is_visible_in_tree() and _board.get_page() == PersonnelBoard.Page.CANDIDATES:
+		_seen_number = newest
+	var unseen: bool = newest > _seen_number and not state.recruitment.candidates.is_empty()
+	if unseen != _board.new_candidates:
+		_board.new_candidates = unseen
+		title_changed.emit()
 	_board.show_state(state)
 	var shown: StringName = _panel.get_id()
 	if _board.row_of(shown) == null:
@@ -223,7 +239,7 @@ func _on_event(reason: Variant = null, _b: Variant = null, _c: Variant = null) -
 		_panel.show_notice(tr(_pending_key))
 
 
-## While shown, redraws when an arrival's hours left change or someone arrives.
+## While shown, redraws when an arrival's hours left or the day change, or someone arrives.
 func _on_tick(_tick: int) -> void:
 	if _simulation != null and is_visible_in_tree():
 		if _staff_signature(_simulation.state) != _signature:
@@ -231,7 +247,11 @@ func _on_tick(_tick: int) -> void:
 
 
 static func _staff_signature(state: GameState) -> int:
-	var parts: Array[int] = [state.staff.people.size(), state.recruitment.candidates.size()]
+	var parts: Array[int] = [
+		state.staff.people.size(),
+		state.recruitment.candidates.size(),
+		TimeMath.day_index(state.clock.tick),
+	]
 	for person: PersonState in state.staff.people:
 		parts.append(ceili(maxi(0, person.arrives_tick - state.clock.tick) / 60.0))
 	return hash(parts)

@@ -18,7 +18,6 @@ const KINDS: Array[StringName] = [
 	&"power",
 	&"research",
 	&"staff",
-	&"month",
 	&"committee",
 ]
 

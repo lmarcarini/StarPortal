@@ -10,8 +10,6 @@ extends Node
 signal tick_advanced(tick: int)
 ## Emitted at the first tick of each day, with the new day's index.
 signal day_started(day_index: int)
-## Emitted at the first tick of a month, reporting the month that just ended.
-signal month_closed(year: int, month: int)
 ## Emitted when a submitted command fails validation.
 signal command_rejected(type: StringName, code: StringName)
 ## Emitted when the simulation asks the clock to pause.
@@ -118,19 +116,27 @@ signal research_done(project_id: StringName)
 ## (posted through the outbox).
 @warning_ignore("unused_signal")
 signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
-## Emitted after each month-end, with the year and month of the month-end date; the report is
-## state.committee.latest_report() (posted through the outbox). Non-blocking: nothing pauses.
+## Emitted whenever Committee Confidence changes (an event or the daily settlement's drift),
+## with the new value in tenths (posted through the outbox).
 @warning_ignore("unused_signal")
-signal month_report_filed(year: int, month: int)
-## Emitted when the Committee warns (MonthEnd: &"red_months" at three month-ends in the red
-## in a row, &"confidence_zero" at Confidence 0). A warning only: the game goes on (posted
-## through the outbox).
+signal confidence_changed(confidence_tenths: int)
+## Emitted when analysts file their reports (every 15th day), with how many filed (posted
+## through the outbox; logged).
+@warning_ignore("unused_signal")
+signal reports_filed(analysts: int)
+## Emitted when the Committee pays its commendation, with the amount in $k (posted through
+## the outbox; logged).
+@warning_ignore("unused_signal")
+signal committee_commendation(amount_k: int)
+## Emitted when the Committee warns (DailySettlement: &"red_days" every 7 settlements in a
+## row in the red, &"confidence_zero" when Confidence first reaches 0). A warning only: the
+## game goes on (posted through the outbox; logged).
 @warning_ignore("unused_signal")
 signal committee_warning(reason: StringName)
 ## Emitted on the tick a hired person arrives on base (RecruitmentSystem; logged).
 @warning_ignore("unused_signal")
 signal staff_arrived(person_id: StringName)
-## Emitted when the candidate list changes: a new monthly list or a hire.
+## Emitted when the candidate list changes: an arrival, a leaver or a hire.
 @warning_ignore("unused_signal")
 signal candidates_changed
 
@@ -141,7 +147,6 @@ signal candidates_changed
 const RESERVED_EVENT_NAMES: Array[StringName] = [
 	&"tick_advanced",
 	&"day_started",
-	&"month_closed",
 	&"command_rejected",
 	&"speed_changed",
 	&"paused_changed",
@@ -166,7 +171,6 @@ func bind_simulation(simulation: Simulation) -> void:
 		return
 	_simulation = simulation
 	simulation.day_started.connect(_on_day_started)
-	simulation.month_closed.connect(_on_month_closed)
 	simulation.command_rejected.connect(_on_command_rejected)
 	simulation.pause_requested.connect(_on_pause_requested)
 	simulation.event_posted.connect(_on_event_posted)
@@ -176,7 +180,6 @@ func _unbind_simulation() -> void:
 	if _simulation == null:
 		return
 	_simulation.day_started.disconnect(_on_day_started)
-	_simulation.month_closed.disconnect(_on_month_closed)
 	_simulation.command_rejected.disconnect(_on_command_rejected)
 	_simulation.pause_requested.disconnect(_on_pause_requested)
 	_simulation.event_posted.disconnect(_on_event_posted)
@@ -185,10 +188,6 @@ func _unbind_simulation() -> void:
 
 func _on_day_started(day_index: int) -> void:
 	day_started.emit(day_index)
-
-
-func _on_month_closed(year: int, month: int) -> void:
-	month_closed.emit(year, month)
 
 
 func _on_command_rejected(type: StringName, code: StringName) -> void:

@@ -1,7 +1,7 @@
 class_name PersonState
 extends RefCounted
 ## Saved state of one person on the roster (docs/content/m26-staff-and-money.md section 1): a
-## name, a role fixed for life, a skill from 1 to 5, a monthly salary, the room they work in
+## name, a role fixed for life, a skill from 1 to 5, a salary per 30 days, the room they work in
 ## (or none) and the tick they arrive on base. Points at its RoleDef and room by id.
 ## Saved shape: {"id", "name", "role", "skill", "salary_k", "room_id", "arrives_tick"}.
 ## Bible: docs/content/m26-staff-and-money.md sections 1 and 3, technical-architecture.md#data-model
@@ -21,7 +21,7 @@ var name: String = ""
 var role: StringName = &""
 ## Skill in the role, [constant MIN_SKILL] to [constant MAX_SKILL].
 var skill: int = MIN_SKILL
-## Monthly salary in $k, fixed at hiring (StaffRules.salary_for_skill()).
+## Salary per 30 days in $k, fixed at hiring (StaffRules.salary_for_skill()).
 var salary_k: int = 0
 ## Id of the room the person works in, or &"" when Unassigned.
 var room_id: StringName = &""

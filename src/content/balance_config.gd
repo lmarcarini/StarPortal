@@ -75,17 +75,17 @@ const BALANCE_ID: StringName = &"balance"
 @export_group("Money")
 ## Budget a new game starts with, in thousands of dollars (m25-lean-start.md section 1).
 @export var starting_budget_k: int = 6000
-## Allocation paid at each month-end at Committee Confidence 50, in thousands of dollars; the
-## paid amount scales with Confidence (m26-staff-and-money.md section 4).
-@export var monthly_allocation_k: int = 3000
-## Salary of a skill-0 person, in $k a month: salary = base + per skill × skill
+## Allocation paid at each daily settlement at Committee Confidence 50, in thousands of
+## dollars; the paid amount scales with Confidence (m27-daily-rhythm.md section 1).
+@export var daily_allocation_k: int = 100
+## Salary of a skill-0 person, in $k per 30 days: salary = base + per skill × skill
 ## (m26-staff-and-money.md section 1: skill 1 = $20k, skill 3 = $30k, skill 5 = $40k).
 @export var salary_base_k: int = 15
-## Salary added per skill point, in $k a month.
+## Salary added per skill point, in $k per 30 days.
 @export var salary_per_skill_k: int = 5
 
 @export_group("Recruitment")
-## Candidates on each monthly list (m26-staff-and-money.md section 2).
+## Candidates the rolling list holds (m27-daily-rhythm.md section 3).
 @export var candidates_per_list: int = 4
 ## Weights of a drawn candidate's skill 1 to 5, in percent (section 2: 10, 35, 35, 15, 5).
 @export var candidate_skill_weights: Array[int] = [10, 35, 35, 15, 5]

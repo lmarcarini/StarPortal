@@ -1,10 +1,11 @@
 class_name CandidateState
 extends RefCounted
-## Saved state of one candidate on the monthly list (docs/content/m26-staff-and-money.md
-## section 2): who they are, what they would cost and how long they take to arrive. Hiring
-## turns a candidate into a PersonState; the fee is one month's salary.
-## Saved shape: {"id", "name", "role", "skill", "salary_k", "arrival_ticks"}.
-## Bible: docs/content/m26-staff-and-money.md section 2, technical-architecture.md#data-model
+## Saved state of one candidate on the rolling list (docs/content/m27-daily-rhythm.md
+## section 3): who they are, what they would cost, how long they take to arrive and the day
+## they leave the list. Hiring turns a candidate into a PersonState; the fee is 30 days' salary.
+## Saved shape: {"id", "name", "role", "skill", "salary_k", "arrival_ticks", "leaves_day"}
+## ("leaves_day" may be missing from an older v14 save; it then reads as day 0).
+## Bible: docs/content/m27-daily-rhythm.md section 3, technical-architecture.md#data-model
 
 ## Saved keys, in to_dict() order.
 const _KEYS: Array[String] = ["id", "name", "role", "skill", "salary_k", "arrival_ticks"]
@@ -17,10 +18,13 @@ var name: String = ""
 var role: StringName = &""
 ## Skill in the role, PersonState.MIN_SKILL to PersonState.MAX_SKILL.
 var skill: int = PersonState.MIN_SKILL
-## Monthly salary in $k once hired; also the hiring fee.
+## Salary per 30 days in $k once hired; also the hiring fee.
 var salary_k: int = 0
 ## Ticks from hiring to arrival on base (the pipeline's delay).
 var arrival_ticks: int = 0
+## Day index (TimeMath.day_index()) on whose settlement the candidate leaves the list; fixed
+## at arrival (arrival day + RecruitmentRules.STAY_DAYS) and never moved.
+var leaves_day: int = 0
 
 
 ## Returns a candidate with the given values and an empty id (RecruitmentState.add_candidate()
@@ -45,6 +49,7 @@ func to_dict() -> Dictionary:
 		"skill": skill,
 		"salary_k": salary_k,
 		"arrival_ticks": arrival_ticks,
+		"leaves_day": leaves_day,
 	}
 
 
@@ -60,12 +65,14 @@ static func from_dict(data: Dictionary) -> CandidateState:
 	)
 	candidate.salary_k = RoomState.read_count(data.get("salary_k"))
 	candidate.arrival_ticks = RoomState.read_count(data.get("arrival_ticks"))
+	candidate.leaves_day = RoomState.read_count(data.get("leaves_day", 0))
 	return candidate
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: every key
 ## present; "id", "name" and "role" non-empty strings; "skill" a whole number in the skill
-## range; "salary_k" a whole number of at least 0 and "arrival_ticks" one of at least 1.
+## range; "salary_k" a whole number of at least 0, "arrival_ticks" one of at least 1, and
+## "leaves_day", when present, a whole number of at least 0.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _KEYS:
@@ -87,4 +94,6 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'salary_k' is not a whole number of at least 0")
 	if not (RoomState.is_count(data["arrival_ticks"]) and data["arrival_ticks"] >= 1):
 		errors.append("'arrival_ticks' is not a whole number of at least 1")
+	if data.has("leaves_day") and not RoomState.is_count(data["leaves_day"]):
+		errors.append("'leaves_day' is not a whole number of at least 0")
 	return errors

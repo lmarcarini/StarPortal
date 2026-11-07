@@ -1,7 +1,7 @@
 class_name RoomDef
 extends DefBase
 ## Definition of a room type the base can hold: its footprint in cells, whether it may be turned
-## a quarter turn, its build cost and time, its power draw or output, its monthly upkeep and
+## a quarter turn, its build cost and time, its power draw or output, its upkeep per 30 days and
 ## its text keys. Read only at runtime.
 ## Bible: game-design.md#base-building-and-power, technical-architecture.md#data-model,
 ## docs/content/m2-base.md (sections 1 and 3), docs/content/m26-staff-and-money.md section 3
@@ -24,7 +24,7 @@ extends DefBase
 @export var power_output_mw: float = 0.0
 ## Highest charge rate a room may be given, in MW (a Capacitor Bank); 0 when it does not charge.
 @export var max_charge_rate_mw: float = 0.0
-## Upkeep charged at each month-end, in thousands of dollars; at least 0.
+## Upkeep per 30 days (charged daily), in thousands of dollars; at least 0.
 @export var upkeep_k: int = 0
 ## Translation key of the room's name.
 @export var name_key: StringName = &""

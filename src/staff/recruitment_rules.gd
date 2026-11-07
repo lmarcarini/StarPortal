@@ -1,9 +1,11 @@
 class_name RecruitmentRules
 extends RefCounted
-## Pure rules of recruitment (docs/content/m26-staff-and-money.md section 2): the fixed first
-## list, the seeded monthly draw, fees, arrival delays, pipelines and the reasons a hire or a
+## Pure rules of recruitment (docs/content/m26-staff-and-money.md section 2,
+## m27-daily-rhythm.md section 3): the fixed first list, the seeded arrival every 3 days,
+## fees, arrival delays, pipelines and the reasons a hire or a
 ## dismissal is refused. No side effects; the generator is the caller's.
-## Bible: docs/content/m26-staff-and-money.md sections 2 and 7
+## Bible: docs/content/m26-staff-and-money.md sections 2 and 7,
+## docs/content/m27-daily-rhythm.md section 3
 
 ## Hire refusal: no candidate with that id on the list.
 const UNKNOWN_CANDIDATE: StringName = &"unknown_candidate"
@@ -22,7 +24,11 @@ const FIRST_LIST: Array = [
 	["Sgt Dan Kowalski", StartingStaff.ENGINEER, 3],
 	["Cpl Sara Lind", StartingStaff.ENGINEER, 3],
 ]
-## Roles every drawn list holds at least one of, in list order.
+## Days between two arrivals (docs/content/m27-daily-rhythm.md section 3).
+const ARRIVAL_EVERY_DAYS: int = 3
+## Days a candidate stays on the list: arrival day + STAY_DAYS is its leave day.
+const STAY_DAYS: int = 12
+## Roles every list holds at least one of, in list order.
 const REQUIRED_ROLES: Array[StringName] = [StartingStaff.SCIENTIST, StartingStaff.ENGINEER]
 ## Translation key of each role's pipeline.
 const PIPELINE_KEYS: Dictionary[StringName, StringName] = {
@@ -32,37 +38,51 @@ const PIPELINE_KEYS: Dictionary[StringName, StringName] = {
 }
 
 
-## The first list of a new game under [param balance] (no ids yet).
+## The first list of a new game under [param balance] (no ids yet), leaving on days 3, 6, 9
+## and 12.
 static func first_list(balance: BalanceConfig) -> Array[CandidateState]:
 	var list: Array[CandidateState] = []
-	for entry: Array in FIRST_LIST:
+	for index: int in FIRST_LIST.size():
+		var entry: Array = FIRST_LIST[index]
 		var display_name: String = entry[0]
 		var role: StringName = entry[1]
 		var skill: int = entry[2]
-		list.append(_candidate(balance, display_name, role, skill))
+		var candidate: CandidateState = _candidate(balance, display_name, role, skill)
+		candidate.leaves_day = (index + 1) * ARRIVAL_EVERY_DAYS
+		list.append(candidate)
 	return list
 
 
-## A list of balance.candidates_per_list candidates drawn with [param rng]: one of each
-## REQUIRED_ROLES first, then roles drawn from [param roles] (in the given order). For each
-## candidate the draws are, in order: the role (after the required slots only), the skill,
-## then the name
-## (StaffNames.draw()). Same generator state, same list.
-static func draw_list(
-	rng: RandomNumberGenerator,
-	balance: BalanceConfig,
-	roles: Array[RoleDef],
-	names: StaffNameListDef
-) -> Array[CandidateState]:
-	var list: Array[CandidateState] = []
+## The role of the candidate arriving on a list that holds [param list] (after leavers):
+## the first REQUIRED_ROLES role the list lacks, with no draw; otherwise one drawn from
+## [param roles] (in the given order) with one rng.randi_range(). Null with no roles.
+static func arrival_role(
+	rng: RandomNumberGenerator, roles: Array[RoleDef], list: Array[CandidateState]
+) -> RoleDef:
 	if roles.is_empty():
-		return list
-	for index: int in balance.candidates_per_list:
-		var role: RoleDef = _role_for_slot(rng, index, roles)
-		var skill: int = draw_skill(rng, balance.candidate_skill_weights)
-		var display_name: String = StaffNames.draw(rng, names, role)
-		list.append(_candidate(balance, display_name, role.id, skill))
-	return list
+		return null
+	for required: StringName in REQUIRED_ROLES:
+		if not list.any(func(c: CandidateState) -> bool: return c.role == required):
+			for role: RoleDef in roles:
+				if role.id == required:
+					return role
+	return roles[rng.randi_range(0, roles.size() - 1)]
+
+
+## A candidate of [param role] drawn with [param rng]: the skill, then the name
+## (StaffNames.draw()). No id or leave day yet. Same generator state, same candidate.
+static func draw_candidate(
+	rng: RandomNumberGenerator, balance: BalanceConfig, role: RoleDef, names: StaffNameListDef
+) -> CandidateState:
+	var skill: int = draw_skill(rng, balance.candidate_skill_weights)
+	var display_name: String = StaffNames.draw(rng, names, role)
+	return _candidate(balance, display_name, role.id, skill)
+
+
+## True when a candidate arrives on the settlement of day [param day]: every
+## ARRIVAL_EVERY_DAYS days after the first (4 Jan, 7 Jan, ...).
+static func is_arrival_day(day: int) -> bool:
+	return day > 0 and day % ARRIVAL_EVERY_DAYS == 0
 
 
 ## A skill from 1 drawn with [param rng] under [param weights] (weights[0] is skill 1); one
@@ -81,7 +101,7 @@ static func draw_skill(rng: RandomNumberGenerator, weights: Array[int]) -> int:
 	return PersonState.MAX_SKILL
 
 
-## The hiring fee of [param candidate] in $k: one month's salary.
+## The hiring fee of [param candidate] in $k: 30 days' salary.
 static func fee_k(candidate: CandidateState) -> int:
 	return candidate.salary_k
 
@@ -114,17 +134,6 @@ static func hire_error(state: GameState, candidate_id: StringName) -> StringName
 ## arriving or not).
 static func dismiss_error(state: GameState, person_id: StringName) -> StringName:
 	return UNKNOWN_PERSON if state.staff.find_person(person_id) == null else &""
-
-
-## Returns the role of list slot [param index]: a required role first, then one drawn.
-static func _role_for_slot(
-	rng: RandomNumberGenerator, index: int, roles: Array[RoleDef]
-) -> RoleDef:
-	if index < REQUIRED_ROLES.size():
-		for role: RoleDef in roles:
-			if role.id == REQUIRED_ROLES[index]:
-				return role
-	return roles[rng.randi_range(0, roles.size() - 1)]
 
 
 static func _candidate(

@@ -1,7 +1,7 @@
 class_name RoomPanel
 extends VBoxContainer
 ## The selected-room panel of the Base tab, read only: the room's name, size, power draw (or
-## output), monthly upkeep (with research overrides) and status, then its "now" line and, in
+## output), upkeep per 30 days (with research overrides) and status, then its "now" line and, in
 ## grey, its "later" line. With nothing selected it shows a hint. Under the lines, a hold
 ## button offers the room's action (Cancel a site, Demolish a room) with its refund, or why
 ## it is refused; the panel only emits [signal action_held].

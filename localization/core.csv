@@ -30,37 +30,60 @@ LOG_KIND_DOCUMENT,Documents,Documentos
 LOG_KIND_CONSOLE,Consoles,Consoles
 LOG_KIND_HORIZON,Horizon records,Registros do horizonte
 LOG_KIND_POWER,Power,Energia
-LOG_KIND_MONTH,Month-ends,Fechamentos do mês
-LOG_KIND_COMMITTEE,Committee,Comitê
-MONTH_REPORT_TITLE,Month-end report: Confidence {before} to {after},Relatório do mês: Confiança de {before} para {after}
-MONTH_REPORT_ALLOCATION,Allocation: {amount},Verba: {amount}
-MONTH_REPORT_UPKEEP,Room upkeep: {amount},Manutenção das salas: {amount}
-MONTH_REPORT_SALARIES,Salaries ({people} people): {amount},Salários ({people} pessoas): {amount}
-MONTH_REPORT_SALARIES_ONE,Salaries (1 person): {amount},Salários (1 pessoa): {amount}
-MONTH_REPORT_BALANCE,Balance: {before} to {after},Saldo: de {before} para {after}
-MONTH_REPORT_CONFIDENCE,Committee Confidence: {before} to {after},Confiança do Comitê: de {before} para {after}
-MONTH_CAUSE_LOCKED,New world locked: {worlds} {amount},Novo mundo conectado: {worlds} {amount}
-MONTH_CAUSE_SURVEYED,New world surveyed: {worlds} {amount},Novo mundo explorado: {worlds} {amount}
-MONTH_CAUSE_RESEARCH,Research finished ({count}) {amount},Pesquisas concluídas ({count}) {amount}
-MONTH_CAUSE_REPORTS,Reports filed ({count} analysts) {amount},Relatórios entregues ({count} analistas) {amount}
-MONTH_CAUSE_REPORTS_ONE,Reports filed (1 analyst) {amount},Relatórios entregues (1 analista) {amount}
-MONTH_CAUSE_WITHIN_BUDGET,Within budget {amount},Dentro do orçamento {amount}
-MONTH_CAUSE_IN_RED,In the red {amount},No vermelho {amount}
-MONTH_CAUSE_IDLE,Idle month {amount},Mês parado {amount}
-MONTH_CAUSE_CAP,Capped at {limit} a month {amount},Limite de {limit} por mês {amount}
-MONTH_REVIEW_PLEASED,Quarterly review: The Committee is pleased. Grant {amount},Revisão trimestral: o Comitê está satisfeito. Verba extra {amount}
-MONTH_REVIEW_NOTES,Quarterly review: The Committee notes your progress.,Revisão trimestral: o Comitê registra seu progresso.
-MONTH_REVIEW_QUESTIONS,Quarterly review: The Committee questions this programme.,Revisão trimestral: o Comitê questiona este programa.
-MONTH_REPORT_RED_MONTHS,Months in the red: {count} of {limit},Meses no vermelho: {count} de {limit}
-MONTH_REPORT_NEXT,Next allocation: {amount},Próxima verba: {amount}
-COMMITTEE_WARN_RED_MONTHS,Warning: {count} month-ends in a row in the red. The Committee is concerned about the budget.,Aviso: {count} fechamentos seguidos no vermelho. O Comitê está preocupado com o orçamento.
-COMMITTEE_WARN_CONFIDENCE_ZERO,Warning: Committee Confidence is 0. The Committee has lost faith in the programme.,Aviso: a Confiança do Comitê é 0. O Comitê perdeu a fé no programa.
-MONTH_CAUSE_BOUNDS,Kept within 0–100 {amount},Mantida entre 0 e 100 {amount}
 CONFIDENCE_READOUT,Conf. {value},Conf. {value}
-CONFIDENCE_READOUT_UP,Conf. {value} +{change},Conf. {value} +{change}
-CONFIDENCE_READOUT_DOWN,Conf. {value} -{change},Conf. {value} -{change}
-CONFIDENCE_TOOLTIP_NONE,Committee Confidence (0–100). It changes at each month-end; the report lists why.,Confiança do Comitê (0–100). Muda a cada fechamento do mês; o relatório explica por quê.
-MONTH_PANEL_TITLE,Month-end {date},Fechamento do mês {date}
-MONTH_PANEL_CLOSE,Close,Fechar
-MONTH_NOTICE_VIEW,View,Ver
-MONTH_NOTICE_DISMISS,Dismiss,Dispensar
+CONFIDENCE_READOUT_DRIFT,Conf. {value} {drift},Conf. {value} {drift}
+CONFIDENCE_TOOLTIP,Committee Confidence {value} (0–100). Today {drift}: {why}.,Confiança do Comitê {value} (0–100). Hoje {drift}: {why}.
+CONFIDENCE_DRIFT_SETTLING,settling toward 50,voltando para 50
+CONFIDENCE_DRIFT_STEADY,steady at 50,estável em 50
+CONFIDENCE_DRIFT_IN_RED,in the red,no vermelho
+CONFIDENCE_CAUSE_LOCKED,New world locked: {name}  {amount},Novo mundo conectado: {name}  {amount}
+CONFIDENCE_CAUSE_SURVEYED,New world surveyed: {name}  {amount},Novo mundo explorado: {name}  {amount}
+CONFIDENCE_CAUSE_RESEARCH,Research finished: {name}  {amount},Pesquisa concluída: {name}  {amount}
+CONFIDENCE_CAUSE_REPORTS,Reports filed ({count} analysts)  {amount},Relatórios entregues ({count} analistas)  {amount}
+CONFIDENCE_CAUSE_REPORTS_ONE,Reports filed (1 analyst)  {amount},Relatórios entregues (1 analista)  {amount}
+COMMITTEE_LOG_REPORTS,Reports filed ({count} analysts): Committee Confidence +{count}.,Relatórios entregues ({count} analistas): Confiança do Comitê +{count}.
+COMMITTEE_LOG_REPORTS_ONE,Reports filed (1 analyst): Committee Confidence +1.,Relatórios entregues (1 analista): Confiança do Comitê +1.
+COMMITTEE_COMMENDATION,Committee commendation: {amount}.,Elogio do Comitê: {amount}.
+COMMITTEE_WARN_RED_DAYS,{count} days in the red. The Committee is concerned.,{count} dias no vermelho. O Comitê está preocupado.
+LOG_KIND_COMMITTEE,Committee,Comitê
+COMMITTEE_WARN_CONFIDENCE_ZERO,Warning: Committee Confidence is 0. The Committee has lost faith in the programme.,Aviso: a Confiança do Comitê é 0. O Comitê perdeu a fé no programa.
+COMMAND_TITLE,Command,Comando
+COMMAND_HEADING,COMMAND,COMANDO
+COMMAND_FUNDS,Funds {funds} ({net} a day),Fundos {funds} ({net} por dia)
+COMMAND_CONFIDENCE_SHORT,Conf. {value},Conf. {value}
+COMMAND_MONEY,MONEY,DINHEIRO
+COMMAND_PER_DAY,per day,por dia
+COMMAND_PER_PERIOD,per 30 days,por 30 dias
+COMMAND_LINE_ALLOCATION,Allocation (Conf. {value}),Verba (Conf. {value})
+COMMAND_LINE_ROOM,{name} ×{count},{name} ×{count}
+COMMAND_LINE_OTHER,Other rooms ×{count},Outras salas ×{count}
+COMMAND_LINE_SALARIES,Salaries ({count} people),Salários ({count} pessoas)
+COMMAND_LINE_SALARIES_ONE,Salaries (1 person),Salários (1 pessoa)
+COMMAND_LINE_NET,Net,Saldo
+COMMAND_TREND,TREND   7 d {short}   30 d {long},TENDÊNCIA   7 d {short}   30 d {long}
+COMMAND_CAUSES,RECENT CAUSES,CAUSAS RECENTES
+COMMAND_CAUSES_NONE,No changes yet,Nenhuma mudança ainda
+COMMAND_WARNINGS,WARNINGS,AVISOS
+COMMAND_WARNINGS_NONE,none,nenhum
+COMMAND_COMMITTEE,COMMITTEE,COMITÊ
+COMMAND_CONFIDENCE,Confidence {value},Confiança {value}
+COMMAND_TODAY,Today {drift}: {why},Hoje {drift}: {why}
+COMMAND_COMMENDATION,Commendation,Elogio
+COMMAND_COMMENDATION_AT,At {at}: {amount},Aos {at}: {amount}
+COMMAND_COMMENDATION_PAID,Paid. Re-arms below {below}.,Pago. Rearma abaixo de {below}.
+COMMAND_LATER,"(Committee requests and factions: later)","(Pedidos do Comitê e facções: depois)"
+COMMAND_BREAKDOWN_CLOSE,(B) Close,(B) Fechar
+COMMAND_ALLOCATION_DETAIL,Base {base} × (0.5 + {value} ÷ 100) = {amount} a day,Base {base} × (0.5 + {value} ÷ 100) = {amount} por dia
+COMMAND_NET_DETAIL,"Allocation {income}, costs {costs}, per 30 days","Verba {income}, custos {costs}, por 30 dias"
+COMMAND_MONTH_1,Jan,jan
+COMMAND_MONTH_2,Feb,fev
+COMMAND_MONTH_3,Mar,mar
+COMMAND_MONTH_4,Apr,abr
+COMMAND_MONTH_5,May,mai
+COMMAND_MONTH_6,Jun,jun
+COMMAND_MONTH_7,Jul,jul
+COMMAND_MONTH_8,Aug,ago
+COMMAND_MONTH_9,Sep,set
+COMMAND_MONTH_10,Oct,out
+COMMAND_MONTH_11,Nov,nov
+COMMAND_MONTH_12,Dec,dez

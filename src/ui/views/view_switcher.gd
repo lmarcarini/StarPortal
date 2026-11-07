@@ -4,7 +4,7 @@ extends Control
 ## [GameView]; its id is its node name in snake_case ([code]GateRoom[/code] is
 ## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
 ## (view_next and view_previous wrap at the ends; view_gate_room, view_archive, view_base,
-## view_research, view_personnel)
+## view_research, view_personnel, view_command)
 ## and the gamepad shoulders switch views. A view that is not available
 ## ([method GameView.is_available]: the Research tab before a lab finishes) has its tab
 ## hidden, is skipped by view_next and view_previous, and its action does nothing.
@@ -34,6 +34,8 @@ const BASE: StringName = &"base"
 const RESEARCH: StringName = &"research"
 ## Id of the Personnel view.
 const PERSONNEL: StringName = &"personnel"
+## Id of the Command view.
+const COMMAND: StringName = &"command"
 
 const _ACTION_NEXT: StringName = &"view_next"
 const _ACTION_PREVIOUS: StringName = &"view_previous"
@@ -44,6 +46,7 @@ const _DIRECT_ACTIONS: Dictionary = {
 	&"view_base": BASE,
 	&"view_research": RESEARCH,
 	&"view_personnel": PERSONNEL,
+	&"view_command": COMMAND,
 }
 
 var _ids: Array[StringName] = []
@@ -143,6 +146,7 @@ func _collect_views() -> void:
 		_set_active(id, false)
 		_connect_view(view)
 		view.availability_changed.connect(_refresh_availability)
+		view.title_changed.connect(_refresh_titles)
 
 
 ## Listens to the requests of the views that make any: the Archive's unread count and the
@@ -205,9 +209,7 @@ func _refresh_availability() -> void:
 func _refresh_titles() -> void:
 	for index: int in _ids.size():
 		var view: GameView = _views[_ids[index]]
-		var archive: ArchiveView = view as ArchiveView
-		var title: String = archive.get_tab_title() if archive != null else tr(view.get_title_key())
-		_tabs.set_tab_title(index, title)
+		_tabs.set_tab_title(index, view.get_tab_title())
 
 
 ## Shows or hides the view [param view_id].

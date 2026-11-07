@@ -13,7 +13,7 @@ const EFFECT_UNLOCK_ROOM: StringName = &"unlock_room"
 const EFFECT_DIG_DEPTH: StringName = &"dig_depth"
 ## Effect: up to the whole number in the value of Capacitor Banks (never lowers it).
 const EFFECT_BANK_CAP: StringName = &"bank_cap"
-## Effect: every diesel Power Plant's monthly upkeep becomes the whole $k in the value.
+## Effect: every diesel Power Plant's upkeep per 30 days becomes the whole $k in the value.
 const EFFECT_PLANT_UPKEEP: StringName = &"plant_upkeep"
 ## The Power Plant's def id, the room EFFECT_PLANT_UPKEEP overrides.
 const PLANT_DEF: StringName = &"room_power_plant"
@@ -140,7 +140,7 @@ static func bank_count(base: BaseState) -> int:
 	return count
 
 
-## The monthly upkeep of a room of [param def] in $k under [param unlocks]: its override when
+## The upkeep per 30 days of a room of [param def] in $k under [param unlocks]: its override when
 ## research set one, else the def's upkeep_k.
 static func upkeep_k(unlocks: UnlockState, def: RoomDef) -> int:
 	return unlocks.upkeep_overrides.get(def.id, def.upkeep_k)
