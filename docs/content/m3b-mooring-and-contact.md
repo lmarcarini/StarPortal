@@ -106,7 +106,7 @@ one alone gives a clear "something is off" signal (ties, or one mark too many).
 | A long cut read as one | Four pairs of marks share a count; there is no order to dial |
 | The Chair kept, the Wedge dropped (35, 19, 3, 24, 22, 5, 33) | No gate (36.7 MWh); no point in space has this address |
 | A look-alike (see "Decoys") | No gate (36.7 MWh) |
-| Two neighbouring marks swapped (Ladder/Butterfly, Butterfly/Doorway, Doorway/Crown, Crown/Wedge) | No gate (36.7 MWh): these four are reserved, see "Decoys" |
+| Two neighbouring marks swapped (Ladder/Butterfly, Butterfly/Doorway, Doorway/Crown, Crown/Wedge), or the two "long and short" marks Butterfly and Crown swapped | No gate (36.7 MWh): these five are reserved, see "Decoys" |
 
 ### Where players get stuck, and the analyst's hints
 
@@ -181,12 +181,14 @@ most 1,500 ly), as in m15.
 | Crown and Wedge swapped (6 and 7 miscounted) | 35, 19, 3, 24, 22, 29, 5 | **Yes**: reserved |
 | Ladder and Butterfly swapped (3 and 4 miscounted) | 35, 19, 24, 3, 22, 5, 29 | **Yes**: reserved |
 | Doorway and Crown swapped (5 and 6 miscounted) | 35, 19, 3, 24, 5, 22, 29 | **Yes**: reserved |
+| Butterfly and Crown swapped (4 short and long-plus-1 confused) | 35, 19, 3, 5, 22, 24, 29 | **Yes**: reserved |
 
 The other neighbouring swaps (Stairs/Cactus, Cactus/Ladder, Wedge/Chair) are not real regions
 or not dialable with one bank. Every candidate region within one bank has some real swapped
 readings. Largest ball inside each reserved region (LP, Chebyshev centre, checked by computing
 the address of that point directly): Butterfly/Doorway 281 ly, Ladder/Butterfly 119 ly,
-Doorway/Crown 102 ly, Crown/Wedge 70 ly. **PO ruling:** the four marked "reserved" go on a reserved list: the world generator
+Doorway/Crown 102 ly, Crown/Wedge 70 ly, Butterfly/Crown 228 ly (centre (-5900, 1028, -666)).
+**PO ruling:** the five marked "reserved" go on a reserved list: the world generator
 refuses any candidate world whose address from CAIRN's origin is on it, and the validator checks
 that no world has one, so none can ever lock. **Card 19 may change
 `src/gate/world_generator.gd` for this.** Card 19 also notes that adding MOORING as an authored world
@@ -277,14 +279,14 @@ ordered list of (conditions, conversation); the first whose conditions pass runs
 
 | Channel | Order |
 | --- | --- |
-| Hail | K1 if `FlagIs(kindred_met, false)`; K3 if `FlagIs(k3_done, false)` and `WordKnown(buried_ring)`; K3r if `FlagIs(k3_done)` and `FlagIs(avoided_given, false)`; else K0 |
+| Hail | K1 if `FlagIs(kindred_met, false)`; K1r if `FlagIs(k1_started)` and `FlagIs(k1_done, false)`; K3 if `FlagIs(k3_done, false)` and `WordKnown(buried_ring)`; K3r if `FlagIs(k3_done)` and `FlagIs(avoided_given, false)`; else K0 |
 | Contact arrival | K2 if `FlagIs(k2_done, false)`; K2r if `FlagIs(k2_done)` and `FlagIs(heard_the_taking, false)`; else K0 |
 
 **No farming standing.** Each conversation sets its done flag on its first choice, the first
 one that can change standing, as K1 sets `kindred_met`: K1 `kindred_met`, K2 `k2_done`, K3
 `k3_done`. A conversation cut off after that choice is never run again from the start, so its
-opening standing cannot be earned twice. What the cut-off one had still to give comes from a
-short rerun (K2r, K3r below) whose only standing choice leads straight to its end node, so it
+opening standing cannot be earned twice (K1 also sets `k1_started` there). What the cut-off one
+had still to give comes from a short rerun (K1r, K2r, K3r below) whose only standing choice leads straight to its end node, so it
 cannot be cut off between the standing change and the end.
 
 `kindred_met` is set by K1 or K2, whichever comes first; that is also when MOORING becomes
@@ -308,11 +310,13 @@ n1  line   oda  2  "You came through the old ring. Are you people of the {w:buri
 n2  line   oda  1  "The {w:keepers} come at the {w:dark_moon}. Close your door before then."  -> c1
 c1  choice
     a "We come in peace. Who are the {w:keepers}?"
-      effects: ChangeStanding(kindred, +5), SetFlag(kindred_met)                    -> n3
+      effects: ChangeStanding(kindred, +5), SetFlag(kindred_met), SetFlag(k1_started) -> n3
     b "We found your anchor on the Still. We read the way home on it."
-      effects: ChangeStanding(kindred, +5), SetFlag(kindred_met), SetFlag(told_of_hook) -> n4
+      effects: ChangeStanding(kindred, +5), SetFlag(kindred_met), SetFlag(k1_started),
+               SetFlag(told_of_hook)                                                 -> n4
     c "Close the wormhole."
-      effects: ChangeStanding(kindred, -5), SetFlag(kindred_met), SetFlag(kindred_snubbed) -> e2
+      effects: ChangeStanding(kindred, -5), SetFlag(kindred_met), SetFlag(k1_started),
+               SetFlag(kindred_snubbed)                                              -> e2
 n3  line   oda  2  "Those who took us. If you stand against them, bring iron."  -> c2
 n4  line   oda  2  "Only kin and {w:keepers} read hooks. Kin bring the hook home. {w:keepers} do not."  -> c2
 c2  choice
@@ -327,7 +331,14 @@ e1  end    effects: SetFlag(k1_done), SetFlag(kindred_asked_for_iron),
 e2  end    effects: SetFlag(k1_done), UnlockCodexEntry(codex_kindred)
 ```
 
-About 9 minutes of line time. **Standing:** −5 to +10. **Gives:** contact, the first Kindred
+**K1r, the hail again** (hail when K1 was cut off after its first choice): n1r line oda 1 "The
+line went quiet. Speak again." → c2r, a choice that goes straight to e1: "We will come to your
+hearth, and talk" (+5 and `promised_visit`, only if `FlagIs(promised_visit, false)`; the same
+words without effects if it is already set) or "We are not ready to take sides" (no effects).
+With no line between its only standing choice and the end, it cannot be repeated for standing,
+and e1 still gives `kindred_asked_for_iron`, the Codex entries and the K1 transcript.
+
+About 6 minutes of line time. **Standing:** −5 to +10. **Gives:** contact, the first Kindred
 transcript (enough for Kindred lexicon I), three Codex entries, and the promise of a visit.
 
 ### K2: The hearth
@@ -387,12 +398,15 @@ the next choice: c2p (after n5) sets `k2_check_passed` on every option, c2f (aft
 `k2_check_passed` is what reveals `collar` and `home_mark` (section 4).
 
 **K2r, the hearth again** (Contact arrival when K2 was cut off after its first choice): n1r line
-oda 1 "You are back. Sit. Where were we?" → k1 check, then K2's n4 to e1p / n6 to e1f as above.
+oda 1 "You are back. Sit. Where were we?" → k1 check (**K2r repeats the skill check**, with the
+new team's leader; so a check failed in a cut-off K2 is retried on a later Contact expedition;
+PO ruling: accepted), then K2's n4 to e1p / n6 to e1f as above.
 No opening choice, so no opening standing again; c2p/c2f's standing leads straight to an end.
 Card 20 writes it from K2's own nodes.
 
-About 14 minutes of line time on the passed path. Send team guarantees only 10 more minutes of
-open wormhole, so a team sent near that limit can lose K2 to "(signal lost)". That is safe: the
+About 9 minutes of line time on the passed path (7 on the failed path). Send team guarantees 10
+more minutes of open wormhole, which covers K2 at reading pace, but a slow reader or a team sent
+right at the limit can still lose K2 to "(signal lost)". That is safe: the
 team stays on MOORING for the rest of its planned field days as on any Contact expedition (the
 village feeds and houses it; no field event comes of the cut-off) and returns as planned; the
 oral history and Codex entries are not given. The next Contact expedition runs K2r, which gives
@@ -445,7 +459,7 @@ itself if it is not yet open). K1 unlocks the base `codex_keepers`.
 or e2. Its only standing choice, c2b, is guarded by `council_asked`. So "Goodbye" or a cut-off in
 K3 only delays the avoided address; the next hail offers it again.
 
-About 11 minutes. **Standing:** −5 to +15. **Gives:** the kinship choice and the contested
+About 9 to 10 minutes. **Standing:** −5 to +15. **Gives:** the kinship choice and the contested
 Codex entry, the dark-moon timing (a flag M4's patrol request will read), and one address.
 
 **The avoided address (PO proposal).** `AddAddress` takes a world id; `keepers_avoided` is a
@@ -514,8 +528,8 @@ pencil turn to ink.
 | Kindred lexicon I | 1 Kindred transcript | $300k | 3 | 7.2 min | Words 5 to 12; level 2 |
 | Kindred lexicon II | Lexicon I and 2 Kindred transcripts | $500k | 4 | 9.6 min | Words 15 to 20; level 3 |
 
-**What counts as a transcript.** One per conversation id among K1, K2 (with K2r) and K3 (with
-K3r), counted when that conversation reaches an end node. K0 never counts, and a cut-off
+**What counts as a transcript (PO proposal, card M3-15).** One per conversation among K1, K2
+and K3; K1r, K2r and K3r count as K1, K2 and K3, counted when that conversation reaches an end node. K0 never counts, and a cut-off
 conversation does not count until it (or its rerun) ends. So lexicon II's two transcripts need
 two of K1, K2 and K3, and none can be farmed.
 
@@ -568,7 +582,7 @@ At 10×, from the end of M3a (STILLWATER probed, Expeditions unlocked, one bank 
 | Charge, lock STILLWATER, MOTH Look around and Close look (if not done in M3a) | 20 h | 2 min + 15 s |
 | Solve puzzle 5 (paused or not) | — | 8 to 15 min |
 | Charge, dial MOORING, pole camera, MOTH (Look around makes people seen) | 20 h | 2.5 min |
-| K1 on the same lock (9 min of lines, at 1×) | 10 min | 1 to 2 min of reading |
+| K1 on the same lock (6 min of lines, at 1×) | 10 min | 1 to 2 min of reading |
 | Kindred lexicon I, while the next charge runs | 3 days | 7.2 min |
 | Contact expedition: charge, send, 2 days in the field (K2 on arrival) | 20 h + 48 h | 2 + 4.8 min |
 | K3 hail after lexicon I (charge, lock) | 20 h | 2 min + 2 min of reading |
@@ -584,7 +598,7 @@ LOW worlds. Confidence: +5 First contact, +3 per finished project, +3 if a team 
 ## 7. Card notes
 
 - **Card 19 (MOORING content)** may change `src/gate/world_generator.gd`: a reserved-address
-  list (the four swapped readings in section 1, as addresses from CAIRN's origin) that the
+  list (the five swapped readings in section 1, as addresses from CAIRN's origin) that the
   generator refuses for any candidate world, and a validator check that no world has one. It
   also resolves the `keepers_avoided` slot with its fallbacks (section 3).
 - **Card M3-07 (#227)** writes STILLWATER's MOTH Look around line about the mark cut alone
@@ -593,18 +607,22 @@ LOW worlds. Confidence: +5 First contact, +3 per finished project, +3 if a team 
   iron hook (the flag is named on the recoverable target's data).
 - **Card 18** adds Codex entry parts (`codex_keepers_avoided`) and documents unlocking entries
   on first reading; **card 20** writes K2r and K3r from K2's and K3's nodes and both versions
-  of "The taking".
+  of "The taking", and K1r.
+- **Card M3-15** implements the transcript-counting rule (section 4): K1r, K2r and K3r count as
+  K1, K2 and K3; K0 never counts.
 
 **Missable, accepted.** `collar` and `home_mark` are revealed only by K2's passed check; a
 failed check leaves them in script for M3 (the short oral history leaves them out, so nothing
-the player holds stays unreadable). Everything else has a second source: the avoided address
-through K3r, the Kindred side of the contested entry through "The taking".
+the player holds stays unreadable), unless a K2 cut off after the check reruns as K2r and passes.
+Everything else has a second source: K1's end effects and transcript through K1r, K2's through
+K2r, the avoided address through K3r, the Kindred side of the contested entry through "The
+taking".
 
 ## 8. Open questions for the owner
 
 None. The names (MOORING, Oda, the Long Hearth, "the Still") and the reserved swapped readings
 are PO rulings. Everything else stands as a PO proposal unless the owner objects: the hail and
-arrival selectors with K2r and K3r, the `coast` biome, word entries generated outside the
+arrival selectors with K1r, K2r and K3r, the transcript-counting rule (card M3-15), the `coast` biome, word entries generated outside the
 twelve, documents unlocking Codex entries, Codex entry parts, the `anchor_recovered` flag on
 Recover, the K2 check-result flag, the two versions of "The taking", and the keepers' avoided
 world with its fallbacks.
