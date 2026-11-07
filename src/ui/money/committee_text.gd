@@ -37,14 +37,30 @@ static func signed_tenths(tenths: int) -> String:
 	return ("+" if tenths > 0 else "-") + shown
 
 
-## Today's drift for [param state]: what the next settlement applies with today's balance.
+## Today's drift for [param state]: what the next settlement applies, in its order (the
+## allocation and today's costs come first, so "in the red" means the balance after them).
 static func drift_of(state: GameState) -> int:
-	return ConfidenceRules.drift(state.committee.confidence, state.budget.funds_k < 0)
+	return ConfidenceRules.drift(state.committee.confidence, settles_in_red(state))
+
+
+## True when the next settlement leaves the balance below zero: today's funds, plus the
+## allocation at today's Confidence, less today's cost charge with the carry.
+static func settles_in_red(state: GameState) -> bool:
+	return settled_funds_k(state) < 0
+
+
+## The balance the next settlement would leave, before the commendation: funds + allocation
+## - today's charge (room upkeep and salaries per 30 days, with the carried remainder).
+static func settled_funds_k(state: GameState) -> int:
+	var charge: Vector2i = ConfidenceRules.daily_charge(
+		CommandLedger.costs_k(state), state.committee.cost_carry
+	)
+	return state.budget.funds_k + CommandLedger.allocation_k(state) - charge.x
 
 
 ## Why today's drift is what it is: "In the red", "Settling toward 50" or "Steady at 50".
 static func drift_reason(state: GameState) -> String:
-	if state.budget.funds_k < 0:
+	if settles_in_red(state):
 		return _tr(&"CONFIDENCE_DRIFT_IN_RED")
 	if drift_of(state) == 0:
 		return _tr(&"CONFIDENCE_DRIFT_STEADY")
