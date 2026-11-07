@@ -141,7 +141,7 @@ stay live.
 **Contents:**
 
 - **Funds** and today's net: "Funds $4,125k (+$95k a day)".
-- **Daily flows, at most 9 lines:** allocation; the **6 most expensive room types** today,
+- **Daily flows, at most 10 lines:** allocation; the **6 most expensive room types** today,
   each with its count ("Power Plant ×2"); **Other rooms** (the rest, with a count); salaries
   (with headcount); net. Each shows per day and per 30 days.
 - **Trend:** balance change over the last 7 and the last 30 days, and a 30-day balance
@@ -149,27 +149,28 @@ stay live.
   settlements have passed, the trend compares against the starting balance ($6,000k).
 - **Confidence:** the value with one decimal, today's drift and why ("−0.1 Settling toward
   50"), and a **rolling list of the last 10 causes** with dates ("9 Jan  New world locked:
-  SILL  +5"); 3 show, the rest scroll.
+  SILL  +5"); 2 show, the rest scroll.
 - **Next commendation:** "At 70: $1,000k" with a bar, or "Paid. Re-arms below 60."
-- **Warnings:** days in the red, Confidence 0.
+- **Warnings:** one row each when active (days in the red, Confidence 0), or one "none" row.
 
 **Layout at 1280 × 720** (same frame as Personnel: list area left, side panel right). Below
 the 56 px top bar and the ~40 px tab bar there are about 624 px: **19 rows of 32 px**. The
-left column uses **18** at most:
+left column uses **19** in the worst case (10 money lines, 2 causes, both warnings); the
+sketch shows 18 with no warning:
 
 ```
 +--------------------------------------------------------+-----------------+
 | COMMAND   Funds $4,125k   +$95k a day   Conf. 61.4     | COMMITTEE       | 1
 | MONEY                  per day     per 30 days         | Confidence 61.4 | 2
 |  Allocation (Conf. 61)   +111         +3,330           | Today -0.1      | 3
-|  Power Plant ×1           -5           -150            |  Settling       | 4
-|  Research Lab ×1          -2            -60            |   toward 50     | 5
-|  Control Room ×1          -1            -40            |                 | 6
-|  Capacitor Bank ×1        -0            -10            | Commendation    | 7
-|  Quarters ×1              -1            -10            | at 70: $1,000k  | 8
+|  Power Plant ×1         -5.0           -150            |  Settling       | 4
+|  Research Lab ×1        -2.0            -60            |   toward 50     | 5
+|  Control Room ×1        -1.3            -40            |                 | 6
+|  Capacitor Bank ×1      -0.3            -10            | Commendation    | 7
+|  Quarters ×1            -0.3            -10            | at 70: $1,000k  | 8
 |  Corridor ×12              0              0            | [#######---] 61 | 9
 |  Other rooms ×0            0              0            |                 | 10
-|  Salaries (7 people)      -7           -205            | (requests,      | 11
+|  Salaries (7 people)    -6.8           -205            | (requests,      | 11
 |  Net                     +95         +2,855            |  factions:      | 12
 | TREND   7 d -$410k   30 d +$1,330k                     |  later)         | 13
 |  ▁▂▂▃▃▄▂▁▁▂▃▄▅▅▆▆▇▅▅▆▆▇▇█▇▇▇██                       |                 | 14
@@ -180,8 +181,8 @@ left column uses **18** at most:
 +--------------------------------------------------------+-----------------+
 ```
 
-(Per-day figures in the sketch are the carried daily charge rounded; the per-30-days column
-is exact. Rows with ×0 are not shown, so a small base uses fewer rows.)
+(Per-day costs show one decimal, the per-30-days figure ÷ 30; the actual daily charge uses
+the carry of section 1. Rows with ×0 are not shown, so a small base uses fewer rows.)
 
 **Gamepad and mouse:** the money lines and the causes are **focusable rows**. Shoulder
 buttons reach the tab; D-pad moves between rows; **A on a money line** opens its breakdown
