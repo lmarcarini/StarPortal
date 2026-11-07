@@ -1,8 +1,10 @@
 class_name MoneyLabel
-extends Label
-## Top bar money display, read only: shows the budget as "$12,000k", in red below zero, and
-## updates on EventBus.budget_changed. The shell calls show_budget() after each start or load.
-## Bible: docs/content/m2-base.md section 5
+extends Button
+## Top bar money display: shows the budget as "$12,000k", in red below zero, and updates on
+## EventBus.budget_changed. The shell calls show_budget() after each start or load. It is a
+## flat focusable button: a click, (A) or Enter opens the Command tab (the shell connects
+## [signal BaseButton.pressed]).
+## Bible: docs/content/m2-base.md section 5, docs/content/m27-daily-rhythm.md section 4
 
 ## Font colour of a negative balance.
 const NEGATIVE_COLOR: Color = Color(0.9, 0.25, 0.2)
@@ -19,10 +21,11 @@ func _exit_tree() -> void:
 ## Shows [param budget_k] thousands of dollars, red when negative.
 func show_budget(budget_k: int) -> void:
 	text = format_k(budget_k)
-	if budget_k < 0:
-		add_theme_color_override(&"font_color", NEGATIVE_COLOR)
-	else:
-		remove_theme_color_override(&"font_color")
+	for color: StringName in [&"font_color", &"font_hover_color", &"font_focus_color"]:
+		if budget_k < 0:
+			add_theme_color_override(color, NEGATIVE_COLOR)
+		else:
+			remove_theme_color_override(color)
 
 
 ## Returns [param amount_k] as "$12,000k", or "-$240k" when negative.

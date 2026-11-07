@@ -47,3 +47,43 @@ COMMITTEE_COMMENDATION,Committee commendation: {amount}.,Elogio do Comitê: {amo
 COMMITTEE_WARN_RED_DAYS,{count} days in the red. The Committee is concerned.,{count} dias no vermelho. O Comitê está preocupado.
 LOG_KIND_COMMITTEE,Committee,Comitê
 COMMITTEE_WARN_CONFIDENCE_ZERO,Warning: Committee Confidence is 0. The Committee has lost faith in the programme.,Aviso: a Confiança do Comitê é 0. O Comitê perdeu a fé no programa.
+COMMAND_TITLE,Command,Comando
+COMMAND_HEADING,COMMAND,COMANDO
+COMMAND_FUNDS,Funds {funds} ({net} a day),Fundos {funds} ({net} por dia)
+COMMAND_CONFIDENCE_SHORT,Conf. {value},Conf. {value}
+COMMAND_MONEY,MONEY,DINHEIRO
+COMMAND_PER_DAY,per day,por dia
+COMMAND_PER_PERIOD,per 30 days,por 30 dias
+COMMAND_LINE_ALLOCATION,Allocation (Conf. {value}),Verba (Conf. {value})
+COMMAND_LINE_ROOM,{name} ×{count},{name} ×{count}
+COMMAND_LINE_OTHER,Other rooms ×{count},Outras salas ×{count}
+COMMAND_LINE_SALARIES,Salaries ({count} people),Salários ({count} pessoas)
+COMMAND_LINE_SALARIES_ONE,Salaries (1 person),Salários (1 pessoa)
+COMMAND_LINE_NET,Net,Saldo
+COMMAND_TREND,TREND   7 d {short}   30 d {long},TENDÊNCIA   7 d {short}   30 d {long}
+COMMAND_CAUSES,RECENT CAUSES,CAUSAS RECENTES
+COMMAND_CAUSES_NONE,No changes yet,Nenhuma mudança ainda
+COMMAND_WARNINGS,WARNINGS,AVISOS
+COMMAND_WARNINGS_NONE,none,nenhum
+COMMAND_COMMITTEE,COMMITTEE,COMITÊ
+COMMAND_CONFIDENCE,Confidence {value},Confiança {value}
+COMMAND_TODAY,Today {drift}: {why},Hoje {drift}: {why}
+COMMAND_COMMENDATION,Commendation,Elogio
+COMMAND_COMMENDATION_AT,At {at}: {amount},Aos {at}: {amount}
+COMMAND_COMMENDATION_PAID,Paid. Re-arms below {below}.,Pago. Rearma abaixo de {below}.
+COMMAND_LATER,"(Committee requests and factions: later)","(Pedidos do Comitê e facções: depois)"
+COMMAND_BREAKDOWN_CLOSE,(B) Close,(B) Fechar
+COMMAND_ALLOCATION_DETAIL,Base {base} × (0.5 + {value} ÷ 100) = {amount} a day,Base {base} × (0.5 + {value} ÷ 100) = {amount} por dia
+COMMAND_NET_DETAIL,"Allocation {income}, costs {costs}, per 30 days","Verba {income}, custos {costs}, por 30 dias"
+COMMAND_MONTH_1,Jan,jan
+COMMAND_MONTH_2,Feb,fev
+COMMAND_MONTH_3,Mar,mar
+COMMAND_MONTH_4,Apr,abr
+COMMAND_MONTH_5,May,mai
+COMMAND_MONTH_6,Jun,jun
+COMMAND_MONTH_7,Jul,jul
+COMMAND_MONTH_8,Aug,ago
+COMMAND_MONTH_9,Sep,set
+COMMAND_MONTH_10,Oct,out
+COMMAND_MONTH_11,Nov,nov
+COMMAND_MONTH_12,Dec,dez
