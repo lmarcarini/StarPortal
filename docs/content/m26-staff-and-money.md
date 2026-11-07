@@ -13,6 +13,8 @@ Units as before: money in $k, power in 5 MW blocks, one tick is one in-game minu
 
 ## 1. People
 
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 1: salaries are per 30 days, charged daily.
+
 **Roles in M2.6:** scientist, engineer and analyst. Each has a room to work in now.
 
 **Roles that wait:** medic (M3, with the Infirmary and injuries) and soldier (M3, with
@@ -46,6 +48,8 @@ Nothing is hidden: the player sees every field.
 ---
 
 ## 2. Recruitment
+
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 3; nothing here is monthly any more.
 
 **A monthly candidate list (PO proposal).** A new game starts with a list of **four
 candidates**, and on the 1st of each month, with the month-end report, the game draws a new
@@ -86,6 +90,8 @@ Confidence and bankruptcy (section 4).
 ---
 
 ## 3. Rooms and staff
+
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 2: analysts file +1 every 15 days.
 
 **Slots.** Each staffable room shows its slots on the plan and in its SELECTED panel. Only
 people of the matching role can fill a slot.
@@ -165,6 +171,8 @@ expeditions (M3)").
 
 ## 4. Money
 
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 1 and 2; nothing here is monthly any more.
+
 **Monthly upkeep** gains salaries. At 00:00 on the 1st of each month the game pays the
 allocation and charges room upkeep (half when off, as now) and all salaries, including people
 still arriving.
@@ -221,6 +229,8 @@ Confidence 0, gives a Log line and a message, not a game over. Ending the game c
 
 ## 5. Month-end report
 
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 5 (removed; replaced by the Command tab, section 4); nothing here is monthly any more.
+
 At each month-end the report is written to the Log and a **non-blocking message** appears
 ("Month-end report: Confidence 50 → 65"); the game **does not pause** (owner, 2026-11-02).
 Opening the message shows the report below; Close (B / Esc) dismisses it. It replaces the M2
@@ -253,6 +263,8 @@ review line is added under the Confidence block. There is no Settings toggle.
 ---
 
 ## 6. UI
+
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 4; nothing here is monthly any more.
 
 **A Personnel tab (F5), available from the start (PO proposal).** It follows the owner's
 ruling that research is a place of its own: staff are a list of people with a side panel,
@@ -297,6 +309,8 @@ an unstaffed lab or Workshop is visible at a glance.
 ---
 
 ## 7. Numbers
+
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 6 for the daily rework of these examples.
 
 **Starting staff: five (PO proposal).**
 
@@ -354,6 +368,8 @@ For B: no Quarters, + second Plant 150 + second Bank 10 = 420 (R5 brings each pl
 ---
 
 ## 8. Saves and owner decisions
+
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 7: saves move to v14.
 
 **Saves: clean break, v13.** The save gains the roster (people, assignments, arrival times),
 the candidate list and its random seed, Confidence, and months in the red.
