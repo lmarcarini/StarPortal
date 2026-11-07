@@ -1,8 +1,8 @@
 extends Control
 ## Main scene. Starts a new paused game, wires the time bar, quick save and quick load, the
-## autosave on each new day, the game views under the top bar and, in debug builds only, the
-## debug overlay and a button that submits a SetFlagCommand. Holds no game rules: it reads
-## state and sends commands.
+## autosave on each new day, the Committee's messages, the game views under the top bar and,
+## in debug builds only, the debug overlay and a button that submits a SetFlagCommand. Holds
+## no game rules: it reads state and sends commands.
 ## Bible: game-design.md#time-real-time-with-pause, game-design.md#core-loop,
 ## technical-architecture.md#architecture-overview
 
@@ -14,6 +14,8 @@ const QUICK_SLOT: StringName = &"quick"
 const DEBUG_FLAG_KEY: StringName = &"debug_counter"
 ## Seconds a toast stays on screen.
 const TOAST_SECONDS: float = 2.0
+## Seconds a Committee message (commendation, warning) stays on screen.
+const COMMITTEE_MESSAGE_SECONDS: float = 6.0
 
 const _DEBUG_OVERLAY_SCENE: String = "res://src/ui/debug/debug_overlay.tscn"
 const _ACTION_QUICK_SAVE: StringName = &"quick_save"
@@ -36,9 +38,6 @@ var _debug_flag_count: int = 0
 @onready var money_label: MoneyLabel = %MoneyLabel
 ## The Committee Confidence readout beside the funds.
 @onready var confidence_readout: ConfidenceReadout = %ConfidenceReadout
-## The non-blocking month-end message and the report window it opens.
-@onready var month_notice: MonthReportNotice = %MonthReportNotice
-@onready var month_panel: MonthReportPanel = %MonthReportPanel
 @onready var _quick_save_button: Button = %QuickSaveButton
 @onready var _quick_load_button: Button = %QuickLoadButton
 @onready var _debug_flag_button: Button = %DebugFlagButton
@@ -51,9 +50,6 @@ func _ready() -> void:
 	_quick_save_button.pressed.connect(quick_save)
 	_quick_load_button.pressed.connect(quick_load)
 	_toast_timer.timeout.connect(_toast.hide)
-	confidence_readout.report_requested.connect(open_month_report)
-	month_notice.view_requested.connect(open_month_report)
-	month_notice.focus_left.connect(confidence_readout.grab_focus)
 	_setup_debug_tools()
 	_start(GameState.new_game(_choose_seed(), Registry.balance()), true)
 	SimClock.pause()
@@ -66,10 +62,14 @@ func _ready() -> void:
 
 func _enter_tree() -> void:
 	EventBus.day_started.connect(_on_day_started)
+	EventBus.committee_commendation.connect(_on_commendation)
+	EventBus.committee_warning.connect(_on_committee_warning)
 
 
 func _exit_tree() -> void:
 	EventBus.day_started.disconnect(_on_day_started)
+	EventBus.committee_commendation.disconnect(_on_commendation)
+	EventBus.committee_warning.disconnect(_on_committee_warning)
 	if _simulation != null and SimClock.simulation == _simulation:
 		SimClock.stop()
 
@@ -114,12 +114,6 @@ func quick_load() -> void:
 		return
 	_bind_views(_simulation)
 	_show_toast(&"UI_LOADED")
-
-
-## Opens the latest month-end report over the running game; the clock is not paused. The
-## Confidence readout and the month-end message's View open it.
-func open_month_report() -> void:
-	month_panel.open(_simulation.state.committee.latest_report(), _simulation.state)
 
 
 ## Returns every button in focus order: the time bar's, the Confidence readout, then save,
@@ -202,14 +196,28 @@ func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
 	money_label.show_budget(simulation.state.budget.funds_k)
 	confidence_readout.setup(simulation.state)
-	month_notice.setup(simulation.state)
-	month_panel.close()
 
 
 func _show_toast(key: StringName) -> void:
-	_toast.text = tr(key)
+	show_message(tr(key), TOAST_SECONDS)
+
+
+## Shows [param line] in the toast for [param seconds]; the game never pauses for it. Used for
+## save results and the Committee's commendation and warnings
+## (docs/content/m27-daily-rhythm.md section 2).
+func show_message(line: String, seconds: float) -> void:
+	_toast.text = line
 	_toast.show()
-	_toast_timer.start(TOAST_SECONDS)
+	_toast_timer.start(seconds)
+
+
+func _on_commendation(amount_k: int) -> void:
+	show_message(CommitteeText.commendation_line(amount_k), COMMITTEE_MESSAGE_SECONDS)
+
+
+func _on_committee_warning(reason: StringName) -> void:
+	var days: int = 0 if _simulation == null else _simulation.state.committee.days_in_red
+	show_message(CommitteeText.warning_line(reason, days), COMMITTEE_MESSAGE_SECONDS)
 
 
 func _on_day_started(_day_index: int) -> void:

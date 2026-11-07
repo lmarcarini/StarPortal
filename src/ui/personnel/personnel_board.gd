@@ -1,7 +1,7 @@
 class_name PersonnelBoard
 extends VBoxContainer
 ## The left side of the Personnel tab (docs/content/m26-staff-and-money.md section 6): the
-## header ("PERSONNEL  Staff 5 · Beds 5/6 · Salaries $145k/month"), the Roster and
+## header ("PERSONNEL  Staff 5 · Beds 5/6 · Salaries $5k a day"), the Roster and
 ## Candidates (4) sub-tabs, and the list of the shown sub-tab, one [PersonnelRow] per person
 ## or candidate. The list scrolls past ten rows.
 ## Bible: docs/content/m26-staff-and-money.md section 6

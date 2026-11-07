@@ -81,7 +81,7 @@ static func draw_skill(rng: RandomNumberGenerator, weights: Array[int]) -> int:
 	return PersonState.MAX_SKILL
 
 
-## The hiring fee of [param candidate] in $k: one month's salary.
+## The hiring fee of [param candidate] in $k: 30 days' salary.
 static func fee_k(candidate: CandidateState) -> int:
 	return candidate.salary_k
 

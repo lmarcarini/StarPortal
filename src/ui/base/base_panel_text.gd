@@ -14,7 +14,7 @@ static func power(def: RoomDef) -> String:
 	return _tr(&"BASE_PANEL_NO_DRAW")
 
 
-## "Upkeep $60k / month", or "No upkeep" when [param upkeep_k] is 0.
+## "Upkeep $60k per 30 days", or "No upkeep" when [param upkeep_k] is 0.
 static func upkeep(upkeep_k: int) -> String:
 	if upkeep_k <= 0:
 		return _tr(&"BASE_PANEL_NO_UPKEEP")

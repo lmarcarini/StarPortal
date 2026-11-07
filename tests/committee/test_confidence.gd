@@ -1,163 +1,22 @@
-## Tests for Committee Confidence: each cause once (across mid-month reloads), the ±15 cap and
-## the 0..100 bounds line, the allocation formula, the quarterly review and grant, and the
-## warnings. The section 7 examples are in test_confidence_examples.gd.
-## Bible: docs/content/m26-staff-and-money.md sections 4, 5, 7 and 8
+## Tests for Committee Confidence events (applied at once, each once, across reloads), the
+## rolling cause list, the drift and allocation rules, the commendation and the saved shape.
+## The daily settlement over many days is in test_daily_settlement.gd.
+## Bible: docs/content/m27-daily-rhythm.md sections 1, 2 and 7
 extends GdUnitTestSuite
 
-## Tick of 1 February 00:00, the first month-end.
-const FEB_1: int = 31 * 1440
-## Tick of 1 April 00:00, a quarter month-end.
-const APR_1: int = (31 + 28 + 31) * 1440
 
-
-func _game(funds_k: int = 2390) -> GameState:
+func _game() -> GameState:
 	var game: GameState = ConstructionFixture.grown()
-	game.clock.tick = FEB_1
-	game.budget.funds_k = funds_k
+	game.clock.tick = 3 * TimeMath.TICKS_PER_DAY
 	game.events.drain()
 	return game
 
 
-func _finish_research(game: GameState, count: int) -> void:
-	for index: int in count:
-		game.research.done.append(StringName("project_%d" % index))
-
-
-func test_allocation_formula() -> void:
-	var expected: Dictionary[int, int] = {
-		0: 1500, 20: 2100, 35: 2550, 50: 3000, 64: 3420, 65: 3450, 80: 3900, 100: 4500
-	}
-	for confidence: int in expected:
-		assert_int(ConfidenceRules.allocation_k(3000, confidence)).is_equal(expected[confidence])
-
-
-func test_starting_confidence_is_50_and_idle_month_scores_minus_1() -> void:
-	var game := _game()
-	assert_int(game.committee.confidence).is_equal(50)
-	var report := MonthEnd.close(game, 3000, 270)
-	assert_int(report.allocation_k).is_equal(3000)
-	assert_array(report.applied_causes()).is_equal([&"reports", &"within_budget", &"idle"])
-	assert_int(report.confidence_after).is_equal(49)
-	assert_int(report.next_allocation_k).is_equal(2970)
-
-
-func test_each_cause_counts_once() -> void:
-	var game := _game()
-	game.worlds.statuses[&"sill"] = WorldsState.WorldStatus.LOCKED
-	game.worlds.horizon_records[&"sill"] = true
-	_finish_research(game, 1)
-	var first := MonthEnd.close(game, 3000, 0)
-	assert_int(first.amount_of(&"surveyed")).is_equal(2)
-	assert_array(first.locked_worlds).is_equal([&"sill"])
-	var second := MonthEnd.close(game, 3000, 0)
-	assert_int(second.count_of(&"locked")).is_equal(0)
-	assert_int(second.count_of(&"surveyed")).is_equal(0)
-	assert_int(second.count_of(&"research")).is_equal(0)
-	assert_int(second.amount_of(&"idle")).is_equal(-4)
-
-
-func test_analyst_counts_only_in_a_control_room_that_is_on() -> void:
-	var game := _game()
-	assert_int(ConfidenceRules.reporting_analysts(game)).is_equal(1)
-	for room: RoomState in game.base.rooms:
-		if room.def_id == &"room_control":
-			room.powered_on = false
-	assert_int(ConfidenceRules.reporting_analysts(game)).is_equal(0)
-
-
-func test_cap_down_and_bounds() -> void:
-	assert_int(ConfidenceRules.capped(-20)).is_equal(-15)
-	assert_int(ConfidenceRules.changed(5, -15)).is_equal(0)
-	assert_int(ConfidenceRules.changed(95, 15)).is_equal(100)
-
-
-func test_in_red_three_months_and_zero_only_warn() -> void:
-	var game := _game(-100000)
-	game.committee.confidence = 6
-	for month: int in 3:
-		var report := MonthEnd.close(game, 3000, 0)
-		assert_int(report.amount_of(&"in_red")).is_equal(-5)
-		assert_int(report.months_in_red).is_equal(month + 1)
-	var report := game.committee.latest_report()
-	assert_bool(report.warn_red_months).is_true()
-	assert_bool(report.warn_confidence_zero).is_true()
-	assert_int(game.committee.confidence).is_equal(0)
+func _names(game: GameState) -> Array[StringName]:
 	var names: Array[StringName] = []
 	for event: SimEvent in game.events.drain():
 		names.append(event.name)
-	assert_array(names).contains([&"committee_warning", &"month_report_filed"])
-	assert_array(names).not_contains([&"pause_requested"])
-	game.budget.funds_k = 100000
-	assert_int(MonthEnd.close(game, 3000, 0).months_in_red).is_equal(0)
-
-
-func test_quarterly_review_grant_after_budget_check() -> void:
-	var game := _game(-4000)
-	game.clock.tick = APR_1
-	game.committee.confidence = 75
-	var report := MonthEnd.close(game, 3000, 0)
-	var salaries: int = report.salaries_k
-	assert_int(report.amount_of(&"in_red")).is_equal(-5)
-	assert_int(report.confidence_after).is_equal(67)
-	assert_str(String(report.review)).is_equal("notes")
-	assert_int(report.grant_k).is_equal(0)
-	game.committee.confidence = 80
-	game.budget.funds_k = 0
-	var pleased := MonthEnd.close(game, 3000, 0)
-	assert_str(String(pleased.review)).is_equal("pleased")
-	assert_int(pleased.grant_k).is_equal(1000)
-	assert_int(game.budget.funds_k).is_equal(3900 - salaries + 1000)
-	assert_str(String(ConfidenceRules.review_of(29))).is_equal("questions")
-
-
-func test_no_review_outside_quarter_months() -> void:
-	var game := _game()
-	game.committee.confidence = 90
-	assert_str(String(MonthEnd.close(game, 3000, 0).review)).is_empty()
-
-
-func test_reports_kept_and_saved() -> void:
-	var game := _game()
-	game.worlds.statuses[&"sill"] = WorldsState.WorldStatus.LOCKED
-	for month: int in 8:
-		MonthEnd.close(game, 3000, 0)
-	assert_int(game.committee.reports.size()).is_equal(ConfidenceRules.REPORTS_KEPT)
-	var data: Dictionary = JSON.parse_string(JSON.stringify(game.to_dict()))
-	assert_array(GameState.validate_dict(data)).is_empty()
-	var loaded := GameState.from_dict(data)
-	assert_dict(loaded.committee.to_dict()).is_equal(game.committee.to_dict())
-
-
-func test_bad_committee_data_is_refused() -> void:
-	var data: Dictionary = CommitteeState.new().to_dict()
-	data["confidence"] = 101
-	assert_array(CommitteeState.validate_dict(data)).is_not_empty()
-	data = CommitteeState.new().to_dict()
-	data["reports"] = [{"year": 1}]
-	assert_array(CommitteeState.validate_dict(data)).is_not_empty()
-
-
-func test_bounds_line_when_the_range_cuts_the_change() -> void:
-	var game := _game()
-	game.committee.confidence = 3
-	var report := MonthEnd.close(game, 3000, 0)
-	assert_int(report.amount_of(&"idle") + report.amount_of(&"reports")).is_equal(-3)
-	assert_int(report.amount_of(&"within_budget")).is_equal(2)
-	assert_int(report.confidence_after).is_equal(2)
-	assert_int(report.amount_of(&"bounds")).is_equal(0)
-	game.committee.confidence = 0
-	var cut := MonthEnd.close(game, 3000, 0)
-	assert_int(cut.confidence_after).is_equal(0)
-	assert_int(cut.amount_of(&"bounds")).is_equal(1)
-	var total: int = 0
-	for amount: int in cut.amounts:
-		total += amount
-	assert_int(total).is_equal(cut.confidence_after - cut.confidence_before)
-	game.committee.confidence = 99
-	game.worlds.statuses[&"world_a"] = WorldsState.WorldStatus.LOCKED
-	var top := MonthEnd.close(game, 3000, 0)
-	assert_int(top.confidence_after).is_equal(100)
-	assert_int(top.amount_of(&"bounds")).is_equal(-7)
+	return names
 
 
 func _reloaded(game: GameState) -> GameState:
@@ -168,37 +27,126 @@ func _reloaded(game: GameState) -> GameState:
 	return loaded
 
 
-## A lock (day 5), a survey and a project (day 15), with a save and load on day 10 and day 20:
-## each counts once at the month-end, and never again after another reload.
-func test_mid_month_reloads_count_each_cause_once() -> void:
+func test_daily_allocation_formula() -> void:
+	var expected: Dictionary[int, int] = {
+		0: 50, 20: 70, 35: 85, 50: 100, 65: 115, 80: 130, 100: 150
+	}
+	for confidence: int in expected:
+		assert_int(ConfidenceRules.daily_allocation_k(100, confidence)).is_equal(
+			expected[confidence]
+		)
+
+
+func test_drift_settles_toward_50_and_falls_in_the_red() -> void:
+	assert_int(ConfidenceRules.drift(614, false)).is_equal(-1)
+	assert_int(ConfidenceRules.drift(386, false)).is_equal(1)
+	assert_int(ConfidenceRules.drift(500, false)).is_equal(0)
+	assert_int(ConfidenceRules.drift(500, true)).is_equal(-2)
+	assert_int(ConfidenceRules.changed(1, -2)).is_equal(0)
+	assert_int(ConfidenceRules.changed(995, 50)).is_equal(1000)
+
+
+func test_report_days_are_every_15th_day() -> void:
+	var days: Array[int] = []
+	for day: int in range(1, 61):
+		if ConfidenceRules.is_report_day(day):
+			days.append(day)
+	assert_array(days).is_equal([14, 29, 44, 59])
+
+
+func test_events_apply_at_once_and_count_once() -> void:
 	var game := _game()
-	game.clock.tick = 4 * 1440
 	game.worlds.statuses[&"world_sill"] = WorldsState.WorldStatus.LOCKED
-	game.clock.tick = 9 * 1440
-	game = _reloaded(game)
-	game.clock.tick = 14 * 1440
+	ConfidenceEvents.credit_new(game)
+	assert_int(game.committee.confidence).is_equal(550)
 	game.worlds.horizon_records[&"world_sill"] = true
 	game.research.done.append(&"excavation_survey")
-	game.clock.tick = 19 * 1440
-	game = _reloaded(game)
-	game.clock.tick = FEB_1
-	var report := MonthEnd.close(game, 3000, 0)
-	assert_int(report.amount_of(&"locked")).is_equal(5)
-	assert_int(report.amount_of(&"surveyed")).is_equal(2)
-	assert_int(report.amount_of(&"research")).is_equal(3)
-	game.clock.tick = FEB_1 + 9 * 1440
-	game = _reloaded(game)
-	var next := MonthEnd.close(game, 3000, 0)
-	assert_int(next.count_of(&"locked") + next.count_of(&"surveyed")).is_equal(0)
-	assert_int(next.count_of(&"research")).is_equal(0)
-	assert_int(next.amount_of(&"idle")).is_equal(-4)
+	ConfidenceEvents.credit_new(game)
+	assert_int(game.committee.confidence).is_equal(600)
+	ConfidenceEvents.credit_new(game)
+	assert_int(game.committee.confidence).is_equal(600)
+	assert_array(_names(game)).contains([&"confidence_changed"])
+	var causes: Array[StringName] = []
+	for cause: ConfidenceCause in game.committee.causes:
+		causes.append(cause.cause)
+	assert_array(causes).is_equal([&"locked", &"surveyed", &"research"])
+	assert_int(game.committee.causes[0].change).is_equal(50)
+	assert_str(String(game.committee.causes[0].subject)).is_equal("world_sill")
 
 
-func test_saved_report_confidence_out_of_range_is_refused() -> void:
-	var data: Dictionary = MonthReport.blank().to_dict()
-	assert_array(MonthReport.validate_dict(data)).is_empty()
-	data["confidence_after"] = 101
-	assert_array(MonthReport.validate_dict(data)).is_not_empty()
-	data["confidence_after"] = 50
-	data["confidence_before"] = -1
-	assert_array(MonthReport.validate_dict(data)).is_not_empty()
+func test_reload_never_counts_an_event_twice() -> void:
+	var game := _game()
+	game.worlds.statuses[&"world_sill"] = WorldsState.WorldStatus.LOCKED
+	ConfidenceEvents.credit_new(game)
+	game = _reloaded(game)
+	ConfidenceEvents.credit_new(game)
+	assert_int(game.committee.confidence).is_equal(550)
+	assert_int(game.committee.causes.size()).is_equal(1)
+
+
+func test_reports_need_an_analyst_in_a_control_room_that_is_on() -> void:
+	var game := _game()
+	ConfidenceEvents.file_reports(game)
+	assert_int(game.committee.confidence).is_equal(510)
+	assert_array(_names(game)).contains([&"reports_filed"])
+	for room: RoomState in game.base.rooms:
+		if room.def_id == &"room_control":
+			room.powered_on = false
+	ConfidenceEvents.file_reports(game)
+	assert_int(game.committee.confidence).is_equal(510)
+
+
+func test_cause_list_keeps_the_last_ten() -> void:
+	var game := _game()
+	for index: int in 12:
+		game.research.done.append(StringName("project_%d" % index))
+		ConfidenceEvents.credit_new(game)
+	assert_int(game.committee.causes.size()).is_equal(ConfidenceRules.CAUSES_KEPT)
+	assert_str(String(game.committee.causes[0].subject)).is_equal("project_2")
+
+
+func test_commendation_on_an_event_pays_once_and_rearms_below_60() -> void:
+	var game := _game()
+	var funds: int = game.budget.funds_k
+	game.committee.confidence = 690
+	ConfidenceEvents.raise(game, &"research", &"a", Vector2i(1, 30))
+	assert_int(game.budget.funds_k).is_equal(funds + 1000)
+	assert_array(_names(game)).contains([&"committee_commendation", &"budget_changed"])
+	ConfidenceEvents.raise(game, &"research", &"b", Vector2i(1, 30))
+	game.committee.confidence = 650
+	ConfidenceEvents.raise(game, &"research", &"c", Vector2i(1, 60))
+	assert_int(game.budget.funds_k).is_equal(funds + 1000)
+	game.committee.confidence = 599
+	ConfidenceEvents.check_commendation(game)
+	assert_bool(game.committee.commendation_paid).is_false()
+	ConfidenceEvents.raise(game, &"research", &"d", Vector2i(1, 110))
+	assert_int(game.budget.funds_k).is_equal(funds + 2000)
+
+
+func test_committee_state_round_trips() -> void:
+	var game := _game()
+	game.worlds.statuses[&"world_sill"] = WorldsState.WorldStatus.LOCKED
+	ConfidenceEvents.credit_new(game)
+	game.committee.cost_carry = 17
+	game.committee.days_in_red = 3
+	game.committee.zero_warned = true
+	game.committee.add_funds_record(-40)
+	var loaded := _reloaded(game)
+	assert_dict(loaded.committee.to_dict()).is_equal(game.committee.to_dict())
+
+
+func test_bad_committee_data_is_refused() -> void:
+	var cases: Array[Dictionary] = [
+		{"confidence": 1001},
+		{"confidence": 50.5},
+		{"cost_carry": 30},
+		{"commendation_paid": 1},
+		{"funds_history": [1, 2.5]},
+		{"causes": [{"tick": 0, "cause": "idle", "subject": "", "count": 1, "change": 1}]},
+		{"months_in_red": 0, "days_in_red": -1},
+	]
+	for change: Dictionary in cases:
+		var data: Dictionary = CommitteeState.new().to_dict()
+		data.merge(change, true)
+		assert_array(CommitteeState.validate_dict(data)).is_not_empty()
+	assert_array(CommitteeState.validate_dict(CommitteeState.new().to_dict())).is_empty()

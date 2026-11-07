@@ -2,7 +2,7 @@ class_name CandidateState
 extends RefCounted
 ## Saved state of one candidate on the monthly list (docs/content/m26-staff-and-money.md
 ## section 2): who they are, what they would cost and how long they take to arrive. Hiring
-## turns a candidate into a PersonState; the fee is one month's salary.
+## turns a candidate into a PersonState; the fee is 30 days' salary.
 ## Saved shape: {"id", "name", "role", "skill", "salary_k", "arrival_ticks"}.
 ## Bible: docs/content/m26-staff-and-money.md section 2, technical-architecture.md#data-model
 
@@ -17,7 +17,7 @@ var name: String = ""
 var role: StringName = &""
 ## Skill in the role, PersonState.MIN_SKILL to PersonState.MAX_SKILL.
 var skill: int = PersonState.MIN_SKILL
-## Monthly salary in $k once hired; also the hiring fee.
+## Salary per 30 days in $k once hired; also the hiring fee.
 var salary_k: int = 0
 ## Ticks from hiring to arrival on base (the pipeline's delay).
 var arrival_ticks: int = 0

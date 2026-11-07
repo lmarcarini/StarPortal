@@ -1,8 +1,8 @@
 class_name ArchiveLogRow
 extends Button
 ## One operations log entry: the in-game date and time, its kind as an icon (and as the
-## tooltip), one translated line (every line of the report for a month-end, the row growing to
-## fit) ("Dialed: No gate", "Locked SILL", "Received: Order No. 1") and,
+## tooltip), one translated line (the row growing to fit
+## a line that wraps) ("Dialed: No gate", "Locked SILL", "Received: Order No. 1") and,
 ## for a dial, the address as glyphs. The row is a focusable button so a gamepad can step
 ## through (and scroll) the log; pressing it does nothing. The static helpers word an entry for
 ## the row and for the search.
@@ -19,10 +19,9 @@ const KIND_KEYS: Array[StringName] = [
 	&"LOG_KIND_POWER",
 	&"LOG_KIND_RESEARCH",
 	&"LOG_KIND_STAFF",
-	&"LOG_KIND_MONTH",
 	&"LOG_KIND_COMMITTEE",
 ]
-## Height of a row of one line, and what each extra line (a month-end report) adds.
+## Height of a row of one line, and what each extra line adds.
 const _ROW_HEIGHT: float = 52.0
 const _LINE_HEIGHT: float = 22.0
 ## Line keys of the close reasons.
@@ -124,13 +123,8 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 			return line
 		&"staff":
 			return staff_line(entry.args)
-		&"month":
-			return "\n".join(MonthReportText.lines(MonthReport.from_dict(entry.args), state))
 		&"committee":
-			var months: int = type_convert(entry.args.get("months_in_red", 0), TYPE_INT)
-			return MonthReportText.warning_line(
-				StringName(str(entry.args.get("reason", ""))), months
-			)
+			return CommitteeText.log_line(entry.args)
 	return ""
 
 

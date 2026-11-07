@@ -52,7 +52,7 @@ var unlocks: UnlockState = UnlockState.new()
 var research: ResearchState = ResearchState.new()
 ## The roster: people, their rooms and the room types waiting to auto-staff.
 var staff: StaffState = StaffState.new()
-## Committee Confidence, months in the red and the last month-end reports.
+## Committee Confidence, the daily settlement's carry, balances, causes and warnings.
 var committee: CommitteeState = CommitteeState.new()
 ## The month's candidate list.
 var recruitment: RecruitmentState = RecruitmentState.new()

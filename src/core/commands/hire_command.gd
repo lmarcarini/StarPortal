@@ -1,7 +1,7 @@
 class_name HireCommand
 extends Command
 ## The player hires a candidate from the monthly list (docs/content/m26-staff-and-money.md
-## section 2): the fee (one month's salary) is paid at once, a bed is reserved and the person
+## section 2): the fee (30 days' salary) is paid at once, a bed is reserved and the person
 ## joins the roster Unassigned, arriving after their pipeline's delay. Posts budget_changed,
 ## candidates_changed and staff_changed(&"hired", &"", 1).
 ## Bible: docs/content/m26-staff-and-money.md section 2

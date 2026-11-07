@@ -68,7 +68,7 @@ static func beds_free(state: GameState) -> int:
 	return beds(state) - headcount(state)
 
 
-## [param person]'s monthly salary in $k (fixed at hiring).
+## [param person]'s salary in $k per 30 days (fixed at hiring).
 static func salary_k(person: PersonState) -> int:
 	return person.salary_k
 
@@ -78,9 +78,9 @@ static func salary_for_skill(balance: BalanceConfig, skill: int) -> int:
 	return balance.salary_base_k + balance.salary_per_skill_k * skill
 
 
-## Salaries charged at a month-end, in $k: everyone on the roster, arriving people included
-## (section 4).
-static func monthly_salaries_k(state: GameState) -> int:
+## Salaries per 30 days, in $k, charged daily: everyone on the roster, arriving people
+## included (m27-daily-rhythm.md section 1).
+static func salaries_k(state: GameState) -> int:
 	var total: int = 0
 	for person: PersonState in state.staff.people:
 		total += salary_k(person)

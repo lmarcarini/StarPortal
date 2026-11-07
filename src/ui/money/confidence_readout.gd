@@ -1,32 +1,33 @@
 class_name ConfidenceReadout
 extends Button
-## Top bar Committee Confidence readout, beside the funds: "Conf. 62 +4", the last
-## month-end's change, with a tooltip listing its causes. Red, with the warning in the
-## tooltip, while the Committee warns (Confidence 0, months in the red). Pressing it opens the
-## latest month-end report. Refreshes on each month-end, on showing and on a locale change, so
-## it is right while paused and after a load. Reads state only.
-## Bible: docs/content/m26-staff-and-money.md sections 4, 5 and 6
-
-## Emitted when the player asks for the latest report.
-signal report_requested
+## Top bar Committee Confidence readout, beside the funds: "Conf. 61 -0.1", the whole part of
+## Confidence and today's drift, with a tooltip giving the value with one decimal, why it
+## drifts and the last three causes. Red, with the warning in the tooltip, while the Committee
+## warns (Confidence 0, days in the red). Refreshes when Confidence or the funds change, on
+## showing and on a locale change, so it is right while paused and after a load. Reads state
+## only.
+## Bible: docs/content/m27-daily-rhythm.md sections 2 and 5
 
 ## Font colour while the Committee warns.
 const WARNING_COLOR: Color = Color(0.9, 0.25, 0.2)
+## Causes listed in the tooltip, newest first.
+const TOOLTIP_CAUSES: int = 3
 
 var _state: GameState = null
 
 
 func _ready() -> void:
-	pressed.connect(report_requested.emit)
 	refresh()
 
 
 func _enter_tree() -> void:
-	EventBus.month_report_filed.connect(_on_month_report_filed)
+	EventBus.confidence_changed.connect(_on_changed)
+	EventBus.budget_changed.connect(_on_changed)
 
 
 func _exit_tree() -> void:
-	EventBus.month_report_filed.disconnect(_on_month_report_filed)
+	EventBus.confidence_changed.disconnect(_on_changed)
+	EventBus.budget_changed.disconnect(_on_changed)
 
 
 func _notification(what: int) -> void:
@@ -35,22 +36,21 @@ func _notification(what: int) -> void:
 			refresh()
 
 
-## Reads Confidence and the latest report from [param state] (after a start or a load).
+## Reads Confidence from [param state] (after a start or a load).
 func setup(state: GameState) -> void:
 	_state = state
 	refresh()
 
 
-## Shows the current Confidence, its last change, the causes and any warning.
+## Shows the current Confidence, today's drift, the causes and any warning.
 func refresh() -> void:
 	if _state == null:
 		text = ""
 		tooltip_text = ""
 		return
-	var report: MonthReport = _state.committee.latest_report()
-	text = readout_text(_state.committee.confidence, report)
-	tooltip_text = tooltip_for(report, _state)
-	if is_warning(report, _state.committee.confidence):
+	text = readout_text(_state.committee.whole(), CommitteeText.drift_of(_state))
+	tooltip_text = tooltip_for(_state)
+	if is_warning(_state):
 		add_theme_color_override(&"font_color", WARNING_COLOR)
 		add_theme_color_override(&"font_hover_color", WARNING_COLOR)
 		add_theme_color_override(&"font_focus_color", WARNING_COLOR)
@@ -60,40 +60,61 @@ func refresh() -> void:
 		remove_theme_color_override(&"font_focus_color")
 
 
-## "Conf. 62 +4" (or "-4"; no change before the first month-end or for a flat month).
-static func readout_text(confidence: int, report: MonthReport) -> String:
-	var change: int = 0 if report == null else report.confidence_after - report.confidence_before
-	var key: StringName = &"CONFIDENCE_READOUT"
-	if change > 0:
-		key = &"CONFIDENCE_READOUT_UP"
-	elif change < 0:
-		key = &"CONFIDENCE_READOUT_DOWN"
-	return _tr(key).format({"value": confidence, "change": absi(change)})
+## "Conf. 61 -0.1" for [param confidence] whole points and a drift of [param drift] tenths;
+## "Conf. 50" with no drift.
+static func readout_text(confidence: int, drift: int) -> String:
+	if drift == 0:
+		return _tr(&"CONFIDENCE_READOUT").format({"value": confidence})
+	return _tr(&"CONFIDENCE_READOUT_DRIFT").format(
+		{"value": confidence, "drift": CommitteeText.signed_tenths(drift)}
+	)
 
 
-## The tooltip: the Confidence line and each cause of [param report], then the warnings.
-static func tooltip_for(report: MonthReport, state: GameState) -> String:
-	if report == null:
-		return _tr(&"CONFIDENCE_TOOLTIP_NONE")
+## The tooltip: Confidence with one decimal, today's drift and why, the last three causes,
+## then any warning.
+static func tooltip_for(state: GameState) -> String:
+	var committee: CommitteeState = state.committee
 	var lines: PackedStringArray = [
-		_tr(&"MONTH_REPORT_CONFIDENCE").format(
-			{"before": report.confidence_before, "after": report.confidence_after}
+		(
+			_tr(&"CONFIDENCE_TOOLTIP")
+			. format(
+				{
+					"value": CommitteeText.one_decimal(committee.confidence),
+					"drift": CommitteeText.signed_tenths(CommitteeText.drift_of(state)),
+					"why": CommitteeText.drift_reason(state),
+				}
+			)
 		)
 	]
-	for cause: StringName in report.applied_causes():
-		lines.append(MonthReportText.cause_line(report, cause, state))
-	lines.append_array(MonthReportPanel.warning_lines(report))
+	var shown: int = 0
+	for index: int in range(committee.causes.size() - 1, -1, -1):
+		if shown >= TOOLTIP_CAUSES:
+			break
+		lines.append(CommitteeText.cause_line(committee.causes[index], state))
+		shown += 1
+	lines.append_array(warning_lines(state))
 	return "\n".join(lines)
 
 
-## True while the Committee warns: Confidence 0 or the latest report's warnings.
-static func is_warning(report: MonthReport, confidence: int) -> bool:
-	if confidence <= ConfidenceRules.MIN:
-		return true
-	return report != null and (report.warn_red_months or report.warn_confidence_zero)
+## The warnings in force for [param state]: days in the red (from 7) and Confidence 0.
+static func warning_lines(state: GameState) -> PackedStringArray:
+	var committee: CommitteeState = state.committee
+	var out: PackedStringArray = []
+	if committee.days_in_red >= ConfidenceRules.RED_DAYS_WARNING:
+		out.append(
+			CommitteeText.warning_line(ConfidenceEvents.WARN_RED_DAYS, committee.days_in_red)
+		)
+	if committee.confidence <= ConfidenceRules.MIN:
+		out.append(CommitteeText.warning_line(ConfidenceEvents.WARN_CONFIDENCE_ZERO, 0))
+	return out
 
 
-func _on_month_report_filed(_year: int, _month: int) -> void:
+## True while the Committee warns: Confidence 0 or 7 or more days in the red.
+static func is_warning(state: GameState) -> bool:
+	return not warning_lines(state).is_empty()
+
+
+func _on_changed(_value: int) -> void:
 	refresh()
 
 
