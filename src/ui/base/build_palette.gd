@@ -6,7 +6,8 @@ extends VBoxContainer
 ## (one click), and under it the room's "now" line. A room research still locks shows greyed
 ## (disabled) and its line reads "Unlock: <project>"; staff-locked rooms are not offered.
 ## (B) or Esc on a palette button returns focus to the plan.
-## Bible: docs/content/m2-base.md sections 4 and 6; docs/content/m25-lean-start.md section 4
+## Bible: docs/content/m2-base.md sections 4 and 6; docs/content/m25-lean-start.md section 4;
+## docs/content/m26-staff-and-money.md section 3 (Quarters buildable from the start)
 
 ## Emitted when the player picks [param def_id] to place.
 signal room_picked(def_id: StringName)
@@ -20,6 +21,7 @@ const ROOMS: Array[StringName] = [
 	&"room_power_plant",
 	&"room_capacitor_bank",
 	&"room_research_lab",
+	&"room_quarters",
 	&"room_workshop",
 	&"room_lift",
 	&"room_stairs",

@@ -86,7 +86,6 @@ func test_research_locked_rooms_are_greyed_with_their_project() -> void:
 		assert_bool(button.disabled).override_failure_message(String(def_id)).is_true()
 		button.focus_entered.emit()
 		assert_str(palette.get_role()).is_equal(expected[def_id])
-	assert_object(palette.get_room_button(&"room_quarters")).is_null()
 	assert_object(palette.get_room_button(&"room_infirmary")).is_null()
 	assert_object(palette.first_button()).is_equal(palette.get_room_button(&"room_capacitor_bank"))
 
