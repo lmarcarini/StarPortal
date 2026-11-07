@@ -16,6 +16,12 @@ signal page_changed(page: Page)
 ## The two sub-tabs.
 enum Page { ROSTER, CANDIDATES }
 
+## Dot after the Candidates sub-tab title while a candidate has arrived unseen.
+const DOT: String = " •"
+
+## True while a candidate arrived since the Candidates sub-tab was last shown.
+var new_candidates: bool = false
+
 var _title: Label = _label(18)
 var _summary: Label = _label(16)
 var _tabs: TabBar = TabBar.new()
@@ -49,13 +55,15 @@ func _init() -> void:
 	add_child(_scroll)
 
 
-## Shows [param state]: the header, the sub-tab titles and the shown page's rows.
+## Shows [param state]: the header, the sub-tab titles (a dot on Candidates while
+## [member new_candidates]) and the shown page's rows.
 func show_state(state: GameState) -> void:
 	_title.text = tr(&"STAFF_HEADING")
 	_summary.text = PersonnelText.header(state)
 	_tabs.set_tab_title(Page.ROSTER, tr(&"STAFF_TAB_ROSTER"))
 	var count: int = state.recruitment.candidates.size()
-	_tabs.set_tab_title(Page.CANDIDATES, tr(&"STAFF_TAB_CANDIDATES").format({"n": count}))
+	var title: String = tr(&"STAFF_TAB_CANDIDATES").format({"n": count})
+	_tabs.set_tab_title(Page.CANDIDATES, title + (DOT if new_candidates else ""))
 	if get_page() == Page.ROSTER:
 		_show_rows(state.staff.people.size())
 		for index: int in _rows.size():
@@ -63,7 +71,7 @@ func show_state(state: GameState) -> void:
 	else:
 		_show_rows(count)
 		for index: int in _rows.size():
-			_rows[index].show_candidate(state.recruitment.candidates[index])
+			_rows[index].show_candidate(state, state.recruitment.candidates[index])
 
 
 ## The sub-tab shown.

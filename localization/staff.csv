@@ -14,6 +14,7 @@ STAFF_SELECTED,SELECTED,SELECIONADO
 STAFF_SKILL,Skill {n},Nível {n}
 STAFF_SALARY,{money} / 30 d,{money} / 30 d
 STAFF_UNASSIGNED,Unassigned,Sem posto
+STAFF_LEAVES,Leaves in {days} d,Sai em {days} d
 STAFF_ARRIVING,Arriving in {time},Chega em {time}
 STAFF_ROOM,{room} (Level {level}),{room} (Nível {level})
 STAFF_OFFER,{pipeline} · Fee: 30 days' pay ({fee}) · arrives in {time},{pipeline} · Taxa: 30 dias de salário ({fee}) · chega em {time}
