@@ -47,6 +47,8 @@ Nothing is hidden: the player sees every field.
 
 ## 2. Recruitment
 
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 3; nothing here is monthly any more.
+
 **A monthly candidate list (PO proposal).** A new game starts with a list of **four
 candidates**, and on the 1st of each month, with the month-end report, the game draws a new
 list of four. The list replaces the previous one;
@@ -165,6 +167,8 @@ expeditions (M3)").
 
 ## 4. Money
 
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 1 and 2; nothing here is monthly any more.
+
 **Monthly upkeep** gains salaries. At 00:00 on the 1st of each month the game pays the
 allocation and charges room upkeep (half when off, as now) and all salaries, including people
 still arriving.
@@ -221,6 +225,8 @@ Confidence 0, gives a Log line and a message, not a game over. Ending the game c
 
 ## 5. Month-end report
 
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 5 (removed; replaced by the Command tab, section 4); nothing here is monthly any more.
+
 At each month-end the report is written to the Log and a **non-blocking message** appears
 ("Month-end report: Confidence 50 → 65"); the game **does not pause** (owner, 2026-11-02).
 Opening the message shows the report below; Close (B / Esc) dismisses it. It replaces the M2
@@ -253,6 +259,8 @@ review line is added under the Confidence block. There is no Settings toggle.
 ---
 
 ## 6. UI
+
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 4; nothing here is monthly any more.
 
 **A Personnel tab (F5), available from the start (PO proposal).** It follows the owner's
 ruling that research is a place of its own: staff are a list of people with a side panel,
