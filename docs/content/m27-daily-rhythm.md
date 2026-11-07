@@ -285,15 +285,12 @@ Older saves get the existing "earlier build" message.
 
 ---
 
-## 8. Open questions for the owner
+## 8. Owner decisions (2026-11-07)
 
-1. **Commendation mark.** With mean reversion it comes in about the second month of steady
-   discovery, not the first. PO proposal: keep 70. Lower it to 65 if playtest shows it is
-   never seen.
-2. **Candidates every 3 days.** That is 10 a month instead of 4. PO proposal: keep, since each
-   only stays 12 days and beds still cap hiring; every 5 days if the list feels noisy.
+1. **Commendation mark:** stays at 70. No fine-tuning before playtest.
+2. **Candidates:** one new candidate every 3 days, list of 4.
 
-**Decided as PO proposals** (unless the owner objects): daily allocation $(50 + Confidence)k;
+**Also decided (PO proposals, owner did not object):** daily allocation $(50 + Confidence)k;
 costs per 30 days charged daily with a carried remainder; fee 30 days' pay; Confidence in
 tenths; events at once; reports every 15 days; drift 0.1 toward 50 while solvent, −0.2 in the
 red, no idle penalty; no cap; commendation at 70 (tested before drift), re-arms below 60; red
