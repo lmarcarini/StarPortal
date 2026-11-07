@@ -35,6 +35,9 @@ const ROOMS: Array[StringName] = [
 ## Extra lines shown under a room's "now" line on hover or focus, as {def id: text}; set by
 ## the Base view (the second Research Lab note, m25-lean-start.md section 3).
 var notes: Dictionary[StringName, String] = {}
+## The message line: the hint, and the Build and Cancel buttons while placing. The Base view
+## moves it out of the palette, so the Energy sub-tab shows it too.
+var message_line: HBoxContainer = HBoxContainer.new()
 
 var _rooms: HFlowContainer = HFlowContainer.new()
 var _dig: DigButton = DigButton.new()
@@ -57,7 +60,7 @@ func _init() -> void:
 	var title := Label.new()
 	title.text = "BASE_BUILD_TITLE"
 	_rooms.add_child(title)
-	var line := HBoxContainer.new()
+	var line := message_line
 	add_child(line)
 	_hint.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	_hint.size_flags_horizontal = SIZE_EXPAND_FILL

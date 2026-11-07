@@ -80,7 +80,8 @@ func show_dig(progress: SiteProgress) -> void:
 ## Rewrites the labels: the progress of a level being dug, and which level is shown.
 func refresh() -> void:
 	_label_next()
-	for index: int in level_count():
+	# A cancelled dig shortens the levels before the column is rebuilt.
+	for index: int in mini(level_count(), _levels.size()):
 		var button: Button = get_child(index) as Button
 		button.text = label_for(_levels[index], index + 1, _dig)
 		button.set_pressed_no_signal(index + 1 == _shown)

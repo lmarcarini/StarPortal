@@ -26,6 +26,8 @@ var _power: BaseViewPower = BaseViewPower.new()
 var _messages: BaseMessages = BaseMessages.new()
 ## The selected room's staff slots (card M2.6-09).
 var _slots: StaffSlots = StaffSlots.new()
+## The Build and Energy sub-tabs (card #206).
+var _tabs: BaseViewTabs = BaseViewTabs.new()
 
 @onready var _sub_tabs: BaseSubTabs = %SubTabs
 @onready var _levels: LevelTabs = %LevelTabs
@@ -37,7 +39,6 @@ var _slots: StaffSlots = StaffSlots.new()
 
 func _ready() -> void:
 	_levels.level_chosen.connect(_show_level)
-	_levels.dig_chosen.connect(_on_dig_chosen)
 	visibility_changed.connect(_on_visibility_changed)
 	_plan.selection_changed.connect(_on_selection_changed)
 	_panel.show_nothing()
@@ -45,8 +46,9 @@ func _ready() -> void:
 	_setup_power()
 	add_child(_messages)
 	_panel.add_child(_slots)
-	_sub_tabs.sub_tab_changed.connect(_on_sub_tab_changed)
-	_show_sub_tab()
+	_tabs.name = "Tabs"
+	add_child(_tabs)
+	_tabs.attach(_sub_tabs, _levels, _power, _build)
 
 
 func _enter_tree() -> void:
@@ -110,11 +112,10 @@ func get_sub_tabs() -> BaseSubTabs:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _build_input(event):
-		return
-	var shoulder: int = BaseSubTabs.shoulder_step(event)
-	if shoulder != 0 and is_visible_in_tree() and _sub_tabs.step(shoulder):
+	if is_visible_in_tree() and _tabs.handle_input(event):
 		get_viewport().set_input_as_handled()
+		return
+	if _build_input(event):
 		return
 	var step: int = _level_step(event)
 	if step == 0 or _simulation == null:
@@ -248,7 +249,7 @@ func place_capacitor_bank() -> void:
 		return
 	var base: BaseState = _simulation.state.base
 	_show_level(gate_level(base))
-	_close_energy_layer()
+	_sub_tabs.show_tab(BaseSubTabs.BUILD)
 	var spot: Vector2i = BaseSpots.bank_spot(base, _defs)
 	if spot != BaseSpots.NO_SPOT:
 		_build.place_at(StartingBase.CAPACITOR_BANK_DEF, spot)
@@ -271,48 +272,6 @@ func get_palette() -> BuildPalette:
 func _ready_build() -> void:
 	_build = BaseBuild.new(_plan, _palette, _panel)
 	_plan.selection_changed.connect(_build.show_action)
-	_palette.room_picked.connect(_close_energy_layer.unbind(1))
-	_power.layer.visibility_changed.connect(_on_energy_layer_toggled)
-
-
-## Placing a room closes the energy layer, so (A) on the plan builds and toggles nothing.
-func _close_energy_layer() -> void:
-	if _power.is_layer_on():
-		_power.toggle_layer()
-
-
-## Opening the energy layer puts the ghost away, so (A) toggles rooms and builds nothing; the
-## layer is the Energy sub-tab, so the bar and the Build controls follow it.
-func _on_energy_layer_toggled() -> void:
-	if _power.is_layer_on() and _build.get_ghost().is_placing():
-		_build.get_ghost().stop(true)
-	_show_sub_tab()
-
-
-## Picking a sub-tab turns the energy layer on for Energy and off for Build.
-func _on_sub_tab_changed(tab: StringName) -> void:
-	if (tab == BaseSubTabs.ENERGY) != _power.is_layer_on():
-		_power.toggle_layer()
-
-
-## Shows the sub-tab the energy layer stands for: Build (palette, ghost level tab) or Energy
-## (the panel's switch and charge control, see BaseViewPower). The power strip shows on both.
-func _show_sub_tab() -> void:
-	var energy: bool = _power.is_layer_on()
-	_sub_tabs.set_block_signals(true)
-	_sub_tabs.show_tab(BaseSubTabs.ENERGY if energy else BaseSubTabs.BUILD)
-	_sub_tabs.set_block_signals(false)
-	_palette.visible = not energy
-	_levels.next_tab.visible = not energy and _levels.has_next()
-
-
-## The ghost level tab: back to Build and onto the palette's Dig entry, which holds to dig.
-func _on_dig_chosen() -> void:
-	_sub_tabs.show_tab(BaseSubTabs.BUILD)
-	var dig: DigButton = _palette.get_dig_button()
-	if dig.visible:
-		dig.grab_focus()
-	_palette.show_message(dig.text if dig.get_reason().is_empty() else dig.get_reason())
 
 
 func _setup_build() -> void:
@@ -327,7 +286,7 @@ func _refresh_build() -> void:
 	_build.refresh()
 	var dig: DigButton = _palette.get_dig_button()
 	_levels.show_next(DigButton.next_level(state), not dig.disabled, dig.get_reason())
-	_show_sub_tab()
+	_tabs.show_sub_tab()
 
 
 ## Build, demolish, dig and money events redraw at once: while paused, commands apply

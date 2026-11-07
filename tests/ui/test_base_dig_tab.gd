@@ -104,6 +104,73 @@ func test_clicking_energy_turns_the_layer_on() -> void:
 	assert_bool(base.get_power().is_layer_on()).is_true()
 
 
+## Leaving Build with a palette button focused (P, or RB) never leaves focus on nothing.
+func test_switching_to_energy_keeps_focus() -> void:
+	var base: BaseView = await _open_base()
+	for leave: Callable in [_key.bind(KEY_P), _joypad.bind(JOY_BUTTON_RIGHT_SHOULDER)]:
+		base.get_sub_tabs().show_tab(BaseSubTabs.BUILD)
+		base.get_palette().first_button().grab_focus()
+		await leave.call()
+		assert_str(String(base.get_sub_tabs().shown())).is_equal("energy")
+		var owner: Control = _focus_owner()
+		assert_bool(owner != null and owner.is_visible_in_tree()).is_true()
+
+
+## Esc or (B) on the plan in Energy keeps focus on the plan, never the hidden palette.
+func test_cancel_on_the_plan_in_energy_keeps_focus() -> void:
+	var base: BaseView = await _open_base()
+	await _key(KEY_P)
+	base.get_plan().grab_focus()
+	await _key(KEY_ESCAPE)
+	assert_object(_focus_owner()).is_same(base.get_plan())
+	await _joypad(JOY_BUTTON_B)
+	assert_object(_focus_owner()).is_same(base.get_plan())
+
+
+## The message line (power news) shows on the Energy sub-tab too.
+func test_message_line_shows_on_energy() -> void:
+	var base: BaseView = await _open_base()
+	await _key(KEY_P)
+	var state: GameState = SimClock.simulation.state
+	var lab: RoomState = PowerFixture.lab(state)
+	EventBus.charging_lowered.emit(lab.id, 20)
+	var line: Control = base.get_palette().message_line
+	assert_bool(line.is_visible_in_tree()).is_true()
+	assert_str(base.get_palette().get_hint()).contains("20 MW")
+
+
+## Cancelling a dig with the tab shown rebuilds the level column without reading past it.
+func test_cancelling_a_dig_rebuilds_the_level_column() -> void:
+	var base: BaseView = await _open_base()
+	await _finish_survey()
+	await _key(KEY_F3)
+	var tabs: LevelTabs = _level_tabs(base)
+	var dig: DigButton = base.get_palette().get_dig_button()
+	dig.confirmed.emit()
+	await _runner.await_input_processed()
+	assert_int(tabs.level_count()).is_equal(2)
+	dig.confirmed.emit()
+	await _runner.await_input_processed()
+	assert_int(SimClock.simulation.state.base.digging_level()).is_equal(0)
+	assert_int(tabs.level_count()).is_equal(1)
+	assert_str(tabs.next_tab.text).is_equal("L2 +")
+
+
+## LevelTabs.refresh() with fewer levels than tabs (before the rebuild) labels what it can.
+func test_level_tabs_refresh_with_a_shorter_level_list() -> void:
+	var tabs := LevelTabs.new()
+	var levels: Array[LevelState] = [LevelState.new(), LevelState.new()]
+	tabs.show_levels(levels, 1)
+	levels.pop_back()
+	tabs.mark(1)
+	assert_bool((tabs.get_child(0) as Button).button_pressed).is_true()
+	tabs.free()
+
+
+func _focus_owner() -> Control:
+	return _shell.get_viewport().gui_get_focus_owner()
+
+
 func _open_base() -> BaseView:
 	await _key(KEY_F3)
 	return _shell.view_switcher.get_view(&"base") as BaseView
