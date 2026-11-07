@@ -1,9 +1,11 @@
 class_name BaseView
 extends GameView
-## The Base tab (F3): the level column, the plan of the shown level and the selected-room
-## panel (docs/content/m2-base.md section 6), with the power strip, switches and energy layer
-## of [BaseViewPower] above them and the build palette under them (building is wired in its
-## own section below, through [BaseBuild]). The base_level_up and base_level_down actions
+## The Base tab (F3): the [BaseSubTabs] bar (Build and Energy), the level column, the plan of
+## the shown level and the selected-room panel (docs/content/m2-base.md section 6). Build shows
+## the build palette under them (wired in its own section below, through [BaseBuild]) and the
+## ghost tab of the next level to dig; Energy is the energy layer of [BaseViewPower], with its
+## power strip, switches and charge control. P or View jumps between them, and the gamepad
+## shoulders step through them and then the main tabs. The base_level_up and base_level_down actions
 ## (PageUp and PageDown, (Y) and (X)) change level. The panel ends with the selected room's
 ## [StaffSlots].
 ## Bible: docs/content/m2-base.md section 6, game-design.md#base-building-and-power
@@ -25,6 +27,7 @@ var _messages: BaseMessages = BaseMessages.new()
 ## The selected room's staff slots (card M2.6-09).
 var _slots: StaffSlots = StaffSlots.new()
 
+@onready var _sub_tabs: BaseSubTabs = %SubTabs
 @onready var _levels: LevelTabs = %LevelTabs
 @onready var _heading: Label = %LevelHeading
 @onready var _plan: BasePlan = %Plan
@@ -34,12 +37,16 @@ var _slots: StaffSlots = StaffSlots.new()
 
 func _ready() -> void:
 	_levels.level_chosen.connect(_show_level)
+	_levels.dig_chosen.connect(_on_dig_chosen)
+	visibility_changed.connect(_on_visibility_changed)
 	_plan.selection_changed.connect(_on_selection_changed)
 	_panel.show_nothing()
 	_ready_build()
 	_setup_power()
 	add_child(_messages)
 	_panel.add_child(_slots)
+	_sub_tabs.sub_tab_changed.connect(_on_sub_tab_changed)
+	_show_sub_tab()
 
 
 func _enter_tree() -> void:
@@ -97,8 +104,17 @@ func get_room_panel() -> RoomPanel:
 	return _panel
 
 
+## Returns the sub-tab bar, for tests.
+func get_sub_tabs() -> BaseSubTabs:
+	return _sub_tabs
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if _build_input(event):
+		return
+	var shoulder: int = BaseSubTabs.shoulder_step(event)
+	if shoulder != 0 and is_visible_in_tree() and _sub_tabs.step(shoulder):
+		get_viewport().set_input_as_handled()
 		return
 	var step: int = _level_step(event)
 	if step == 0 or _simulation == null:
@@ -265,10 +281,39 @@ func _close_energy_layer() -> void:
 		_power.toggle_layer()
 
 
-## Opening the energy layer puts the ghost away, so (A) toggles rooms and builds nothing.
+## Opening the energy layer puts the ghost away, so (A) toggles rooms and builds nothing; the
+## layer is the Energy sub-tab, so the bar and the Build controls follow it.
 func _on_energy_layer_toggled() -> void:
 	if _power.is_layer_on() and _build.get_ghost().is_placing():
 		_build.get_ghost().stop(true)
+	_show_sub_tab()
+
+
+## Picking a sub-tab turns the energy layer on for Energy and off for Build.
+func _on_sub_tab_changed(tab: StringName) -> void:
+	if (tab == BaseSubTabs.ENERGY) != _power.is_layer_on():
+		_power.toggle_layer()
+
+
+## Shows the sub-tab the energy layer stands for: Build (palette, ghost level tab) or Energy
+## (power strip; the panel's switch and charge control, see BaseViewPower).
+func _show_sub_tab() -> void:
+	var energy: bool = _power.is_layer_on()
+	_sub_tabs.set_block_signals(true)
+	_sub_tabs.show_tab(BaseSubTabs.ENERGY if energy else BaseSubTabs.BUILD)
+	_sub_tabs.set_block_signals(false)
+	_palette.visible = not energy
+	_power.strip.visible = energy
+	_levels.next_tab.visible = not energy and _levels.has_next()
+
+
+## The ghost level tab: back to Build and onto the palette's Dig entry, which holds to dig.
+func _on_dig_chosen() -> void:
+	_sub_tabs.show_tab(BaseSubTabs.BUILD)
+	var dig: DigButton = _palette.get_dig_button()
+	if dig.visible:
+		dig.grab_focus()
+	_palette.show_message(dig.text if dig.get_reason().is_empty() else dig.get_reason())
 
 
 func _setup_build() -> void:
@@ -277,9 +322,13 @@ func _setup_build() -> void:
 
 ## Rebuilds the level column when a level was dug or dropped, then rereads the build controls.
 func _refresh_build() -> void:
-	if _simulation.state.base.levels.size() != _levels.get_child_count():
-		_levels.show_levels(_simulation.state.base.levels, _plan.level)
+	var state: GameState = _simulation.state
+	if state.base.levels.size() != _levels.level_count():
+		_levels.show_levels(state.base.levels, _plan.level)
 	_build.refresh()
+	var dig: DigButton = _palette.get_dig_button()
+	_levels.show_next(DigButton.next_level(state), not dig.disabled, dig.get_reason())
+	_show_sub_tab()
 
 
 ## Build, demolish, dig and money events redraw at once: while paused, commands apply
@@ -291,6 +340,7 @@ func _connect_build_events(on: bool) -> void:
 		EventBus.room_demolished,
 		EventBus.level_dug,
 		EventBus.budget_changed,
+		EventBus.research_done,
 	]
 	for event: Signal in signals:
 		if on:
@@ -311,6 +361,13 @@ func _on_power_changed() -> void:
 	_show_progress()
 	_levels.refresh()
 	_on_selection_changed(_plan.selected())
+
+
+## Ticks skip the tab while hidden, and research (an unlock) changes no part of the
+## signature: showing the tab rereads everything (the "no N2 after the research" fix).
+func _on_visibility_changed() -> void:
+	if is_visible_in_tree():
+		_on_build_event()
 
 
 func _on_build_event(_arg: Variant = null) -> void:
