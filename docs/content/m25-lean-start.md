@@ -121,6 +121,15 @@ palette says "One lab is enough until staff arrive.").
 for a lab with a standard crew. More, or more skilled, scientists shorten it; an empty lab
 works at a slow floor rate. Several labs then run several projects at once, one per lab.
 
+**Research unlocks the right to dig; the dig itself is built on the Base tab.** A project such
+as Excavation survey changes no level by itself. When it finishes, the Log says "Level 2 can
+now be dug from the Base tab.", and on the Base tab's **Build** sub-tab the next level is there
+to dig at once: a ghost level tab ("L2 +") and a "Dig Level 2" palette entry with its cost and
+time, held to dig like any construction. Before the research both are greyed, saying "Unlock:
+Excavation survey". Starting the dig turns the ghost tab into the level's tab with its
+progress ("L2 45%"); when the dig ends the tab shows the empty level. Construction upgrades
+(efficiency, more plants or banks, unlocking a room) stay on the Research tab.
+
 **The M2.5 list** (7 projects):
 
 | # | Project | Needs | Cost ($k) | Days | Unlocks |
