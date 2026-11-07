@@ -82,7 +82,6 @@ func _make_simulation(systems: Array[SimSystem] = [], is_paused: bool = false) -
 	var simulation := Simulation.new(GameState.new_game(1), systems)
 	simulation.state.clock.is_paused = is_paused
 	simulation.day_started.connect(_on_day_started)
-	simulation.month_closed.connect(_on_month_closed)
 	simulation.event_posted.connect(_on_event_posted)
 	simulation.pause_requested.connect(_on_pause_requested)
 	return simulation
@@ -90,10 +89,6 @@ func _make_simulation(systems: Array[SimSystem] = [], is_paused: bool = false) -
 
 func _on_day_started(day_index: int) -> void:
 	_log.append("day_started(%d)" % day_index)
-
-
-func _on_month_closed(year: int, month: int) -> void:
-	_log.append("month_closed(%d,%d)" % [year, month])
 
 
 func _on_event_posted(name: StringName, args: Array) -> void:
@@ -124,16 +119,14 @@ func test_events_emitted_last_in_order_once() -> void:
 	assert_array(_log.slice(5)).contains_exactly(["event(a_tick,[1440])", "event(b_tick,[1440])"])
 
 
-## Events come out after month_closed too.
-func test_events_emitted_after_month_closed() -> void:
+## A month boundary is an ordinary day: no month signal, events after day_started.
+func test_month_boundary_is_an_ordinary_day() -> void:
 	var events: Array[StringName] = [&"late"]
 	var systems: Array[SimSystem] = [PostOnceSystem.new(31 * DAY - 1, events)]
 	var simulation := _make_simulation(systems)
 	simulation.state.clock.tick = 31 * DAY - 1
 	simulation.advance_tick()
-	assert_array(_log).contains_exactly(
-		["day_started(31)", "month_closed(2026,1)", "event(late,[])"]
-	)
+	assert_array(_log).contains_exactly(["day_started(31)", "event(late,[])"])
 
 
 ## A command applied at once while paused has its events emitted from submit().

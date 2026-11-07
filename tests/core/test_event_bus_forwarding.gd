@@ -57,7 +57,6 @@ func test_reserved_names_are_the_bus_service_signals() -> void:
 	var expected: Array[StringName] = [
 		&"tick_advanced",
 		&"day_started",
-		&"month_closed",
 		&"command_rejected",
 		&"speed_changed",
 		&"paused_changed",
