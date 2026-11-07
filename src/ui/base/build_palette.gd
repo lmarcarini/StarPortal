@@ -5,7 +5,8 @@ extends VBoxContainer
 ## room's cost, build time and draw, or while placing the ghost's state and a Build button
 ## (one click), and under it the room's "now" line. A room research still locks shows greyed
 ## (disabled) and its line reads "Unlock: <project>"; staff-locked rooms are not offered.
-## (B) or Esc on a palette button returns focus to the plan.
+## While placing, the picked room's entry shows pressed (pressing it again puts the ghost away)
+## and a Cancel button sits next to Build. (B) or Esc on a palette button returns to the plan.
 ## Bible: docs/content/m2-base.md sections 4 and 6; docs/content/m25-lean-start.md section 4;
 ## docs/content/m26-staff-and-money.md section 3 (Quarters buildable from the start)
 
@@ -13,6 +14,8 @@ extends VBoxContainer
 signal room_picked(def_id: StringName)
 ## Emitted when the player presses the Build button while placing.
 signal build_held
+## Emitted when the player presses the Cancel button while placing.
+signal cancel_held
 ## Emitted when the player leaves the palette with (B) or Esc.
 signal back_requested
 
@@ -36,11 +39,13 @@ var _rooms: HFlowContainer = HFlowContainer.new()
 var _dig: DigButton = DigButton.new()
 var _hint: Label = Label.new()
 var _build: Button = Button.new()
+var _cancel: Button = Button.new()
 var _role: Label = Label.new()
 var _buttons: Dictionary[StringName, Button] = {}
 var _defs: Dictionary[StringName, RoomDef] = {}
 var _message: String = ""
 var _shown_unlocks: Array[StringName] = []
+var _picked: StringName = &""
 
 
 func _init() -> void:
@@ -63,6 +68,10 @@ func _init() -> void:
 	_build.pressed.connect(build_held.emit)
 	line.add_child(_dig)
 	line.add_child(_build)
+	_cancel.text = "BASE_BUILD_CANCEL_PLACING"
+	_cancel.visible = false
+	_cancel.pressed.connect(cancel_held.emit)
+	line.add_child(_cancel)
 	_role.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	_role.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_role.add_theme_font_size_override(&"font_size", 14)
@@ -86,6 +95,8 @@ func show_rooms(defs: Dictionary, unlocked: Array[StringName]) -> void:
 		var button := Button.new()
 		button.text = def.name_key
 		button.disabled = not def_id in unlocked
+		button.toggle_mode = true
+		button.set_pressed_no_signal(def_id == _picked)
 		button.pressed.connect(room_picked.emit.bind(def_id))
 		button.mouse_entered.connect(_show_summary.bind(def_id))
 		button.focus_entered.connect(_show_summary.bind(def_id))
@@ -126,6 +137,18 @@ func get_build_button() -> Button:
 	return _build
 
 
+## Returns the Cancel button shown while placing.
+func get_cancel_button() -> Button:
+	return _cancel
+
+
+## Shows the entry of [param def_id] pressed and the others not (&"" for none).
+func mark_picked(def_id: StringName) -> void:
+	_picked = def_id
+	for id: StringName in _buttons:
+		_buttons[id].set_pressed_no_signal(id == def_id)
+
+
 ## Returns the button of [param def_id], or null.
 func get_room_button(def_id: StringName) -> Button:
 	return _buttons.get(def_id)
@@ -155,6 +178,7 @@ func get_hint() -> String:
 func set_placing(on: bool, valid: bool) -> void:
 	_build.visible = on
 	_build.disabled = not valid
+	_cancel.visible = on
 	_dig.visible = not on
 
 

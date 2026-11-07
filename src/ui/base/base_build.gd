@@ -26,9 +26,10 @@ func _init(plan: BasePlan, palette: BuildPalette, panel: RoomPanel) -> void:
 	_palette = palette
 	_panel = panel
 	_plan.add_child(_ghost)
-	_palette.room_picked.connect(start_placing)
+	_palette.room_picked.connect(_on_room_picked)
 	_palette.build_held.connect(_ghost.confirm)
-	_palette.back_requested.connect(_plan.grab_focus)
+	_palette.cancel_held.connect(_leave_placing)
+	_palette.back_requested.connect(_leave_placing)
 	_palette.get_dig_button().command_held.connect(_submit_dig)
 	_panel.action_held.connect(_submit_action)
 	_ghost.build_held.connect(_submit_build)
@@ -57,6 +58,7 @@ func start_placing(def_id: StringName) -> void:
 	if _simulation == null:
 		return
 	_ghost.start(def_id, _plan.cursor)
+	_palette.mark_picked(def_id)
 	_plan.grab_focus()
 
 
@@ -195,6 +197,22 @@ func _on_checked(reason: String) -> void:
 	_palette.show_message(text)
 
 
+## The palette's entry: the one being placed puts the ghost away, any other starts placing it.
+func _on_room_picked(def_id: StringName) -> void:
+	if _ghost.is_placing() and _ghost.def_id == def_id:
+		_ghost.stop(true)
+		return
+	start_placing(def_id)
+
+
+## The palette's Cancel button, or (B) or Esc on the palette: puts the ghost away, back to the plan.
+func _leave_placing() -> void:
+	if _ghost.is_placing():
+		_ghost.stop(true)
+	_plan.grab_focus()
+
+
 func _on_cancelled() -> void:
+	_palette.mark_picked(&"")
 	_palette.set_placing(false, false)
 	_palette.show_message("")
