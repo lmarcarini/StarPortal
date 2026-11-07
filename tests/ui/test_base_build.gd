@@ -210,7 +210,7 @@ func test_dig_button_digs_and_cancels() -> void:
 	var dig: DigButton = _view.get_palette().get_dig_button()
 	assert_str(dig.text).is_equal("Dig Level 2: $1,500k, 3 d")
 	assert_bool(dig.disabled).is_true()
-	assert_str(dig.get_reason()).is_equal("Needs research: Excavation survey.")
+	assert_str(dig.get_reason()).is_equal("Unlock: Excavation survey")
 	UnlockRules.apply_project(_simulation.state.unlocks, &"excavation_survey")
 	_view.get_build().refresh()
 	assert_bool(dig.disabled).is_false()

@@ -115,9 +115,13 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 			)
 			if project == null:
 				return ""
-			return _tr(&"LOG_LINE_RESEARCH").format(
+			var line: String = _tr(&"LOG_LINE_RESEARCH").format(
 				{"name": _tr(project.name_key), "line": _tr(project.line_key)}
 			)
+			var level: int = first_dug_level(project.id)
+			if level > 0:
+				line += " " + _tr(&"LOG_LINE_RESEARCH_DIG").format({"n": level})
+			return line
 		&"staff":
 			return staff_line(entry.args)
 		&"month":
@@ -231,3 +235,25 @@ static func _world_name(world_id: StringName, state: GameState) -> String:
 
 static func _tr(key: StringName) -> String:
 	return String(TranslationServer.translate(key))
+
+
+## The first level research project [param project_id] lets the player dig (one past the
+## deepest any other project allows below its own depth), or 0 when it digs nothing.
+## Bible: docs/content/m25-lean-start.md section 3
+static func first_dug_level(project_id: StringName) -> int:
+	var depth: int = _dig_depth(project_id)
+	if depth == 0:
+		return 0
+	var below: int = 1
+	for other: StringName in UnlockRules.PROJECTS:
+		var other_depth: int = _dig_depth(other)
+		if other_depth < depth:
+			below = maxi(below, other_depth)
+	return below + 1
+
+
+static func _dig_depth(project_id: StringName) -> int:
+	for pair: Array in UnlockRules.PROJECTS.get(project_id, []):
+		if pair[0] == UnlockRules.EFFECT_DIG_DEPTH:
+			return type_convert(pair[1], TYPE_INT)
+	return 0

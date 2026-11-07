@@ -48,6 +48,16 @@ func setup(simulation: Simulation, defs: Dictionary) -> void:
 	refresh()
 
 
+## Returns the plan it builds on.
+func get_plan() -> BasePlan:
+	return _plan
+
+
+## Returns the build palette.
+func get_palette() -> BuildPalette:
+	return _palette
+
+
 ## Returns the placement ghost.
 func get_ghost() -> PlacementGhost:
 	return _ghost

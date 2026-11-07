@@ -155,3 +155,6 @@ STAFF_COUNT_ONE_ANALYST,1 analyst,1 analista
 LOG_KIND_STAFF,Staff,Pessoal
 LOG_LINE_STAFFED,{room} staffed: {people}.,{room} com equipe: {people}.
 LOG_LINE_STAFF_RELEASED,Staff unassigned from {room}: {count}.,Pessoal liberado de {room}: {count}.
+BASE_SUBTAB_BUILD,Build,Construir
+BASE_SUBTAB_ENERGY,Energy,Energia
+BASE_LEVEL_NEXT,L{n} +,N{n} +

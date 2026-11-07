@@ -1,9 +1,9 @@
 class_name BaseMessages
 extends Node
 ## Shows the simulation's building and power news on the Base tab's message line (the build
-## palette's hint): a finished room that lowered charging or stayed off
-## (docs/content/m25-lean-start.md section 3) and a lift segment refused for lack of funds
-## (section 2). The same finished-room lines go to the operations log (LogRules).
+## palette's hint, under the plan on both sub-tabs): a finished room that lowered charging or
+## stayed off (docs/content/m25-lean-start.md section 3) and a lift segment refused for lack
+## of funds (section 2). The same finished-room lines go to the operations log (LogRules).
 ## Bible: docs/content/m25-lean-start.md sections 2 and 3
 
 var _palette: BuildPalette = null
