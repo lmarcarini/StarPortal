@@ -4,10 +4,10 @@ extends GameView
 ## the shown level and the selected-room panel (docs/content/m2-base.md section 6). Build shows
 ## the build palette under them (wired in its own section below, through [BaseBuild]) and the
 ## ghost tab of the next level to dig; Energy is the energy layer of [BaseViewPower], with its
-## power strip, switches and charge control. P or View jumps between them, and the gamepad
-## shoulders step through them and then the main tabs. The base_level_up and base_level_down actions
-## (PageUp and PageDown, (Y) and (X)) change level. The panel ends with the selected room's
-## [StaffSlots].
+## switches and charge control; its power strip shows on both. P or View jumps between them,
+## the gamepad shoulders step through them and then the main tabs, and base_level_up and
+## base_level_down (PageUp and PageDown, (Y) and (X)) change level. The panel ends with the
+## selected room's [StaffSlots].
 ## Bible: docs/content/m2-base.md section 6, game-design.md#base-building-and-power
 
 ## Ticks of work per step of the progress bars: a tick redraws the tab only when a site's,
@@ -296,14 +296,13 @@ func _on_sub_tab_changed(tab: StringName) -> void:
 
 
 ## Shows the sub-tab the energy layer stands for: Build (palette, ghost level tab) or Energy
-## (power strip; the panel's switch and charge control, see BaseViewPower).
+## (the panel's switch and charge control, see BaseViewPower). The power strip shows on both.
 func _show_sub_tab() -> void:
 	var energy: bool = _power.is_layer_on()
 	_sub_tabs.set_block_signals(true)
 	_sub_tabs.show_tab(BaseSubTabs.ENERGY if energy else BaseSubTabs.BUILD)
 	_sub_tabs.set_block_signals(false)
 	_palette.visible = not energy
-	_power.strip.visible = energy
 	_levels.next_tab.visible = not energy and _levels.has_next()
 
 

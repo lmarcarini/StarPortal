@@ -80,6 +80,7 @@ func test_p_and_shoulders_switch_sub_tabs() -> void:
 	var sub_tabs: BaseSubTabs = base.get_sub_tabs()
 	assert_str(String(sub_tabs.shown())).is_equal("build")
 	assert_bool(base.get_palette().visible).is_true()
+	assert_bool(base.get_power().strip.visible).is_true()
 	await _key(KEY_P)
 	assert_str(String(sub_tabs.shown())).is_equal("energy")
 	assert_bool(base.get_power().is_layer_on()).is_true()
