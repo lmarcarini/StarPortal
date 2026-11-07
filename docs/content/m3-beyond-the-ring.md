@@ -240,8 +240,8 @@ Each names a role; the team's best person in that role rolls:
 > Success = 50% + 15% × (skill − difficulty), between 10% and 95%
 
 Difficulty is the event's own (1 to 4), +1 on MED worlds, +2 on HIGH, +1 if airless or below
-−20 °C. Success gives a finding or nothing bad; failure gives the event's setback: a lost half
-day, a light injury, a serious one (difficulty 4 only) or, on the worst events, a **missed
+−20 °C. Success gives a finding or nothing bad; failure gives the event's setback: a wasted day
+(no finding), a light injury, a serious one (difficulty 4 only) or, on the worst events, a **missed
 check-in**: the check-in it resolves at does not come (if that is the return, the team does not
 come home). Field events (card 11) only set this outcome; check-ins and rescue (card 10) act on
 it. The plan shows the risk from the report's threat and confidence. Field decisions
