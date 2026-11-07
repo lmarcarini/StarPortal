@@ -28,7 +28,7 @@ tick is one in-game minute; at 10× a day lasts 2.4 real minutes. Money in $k.
 | 5. Read | Threat, confidence, targets for a team | World Report (Archive, Worlds) |
 | 6. Plan | Objective and four people (whom the base loses) | Expeditions tab (F7) |
 | 7. Send | Send the team through the probing lock, or a later one | Ring action **Send team** |
-| 8. Check in | Nothing to answer: read the daily check-in; recall the team if wanted | Message, Log, Expeditions tab |
+| 8. Check in | Nothing to answer: read each check-in (every 24 h); recall the team if wanted | Message, Log, Expeditions tab |
 | 9. Return or rescue | After a missed check-in, charge, dial and signal within 3 days | Rescue alert, Gate Room |
 | 10. Use it | Read (Codex unlocks), dial new addresses, research the lexicon, heal | Archive, Research, Base |
 
@@ -42,17 +42,24 @@ such as STILLWATER. At 1× an in-game minute is a real second; a lock drops the 
 
 | Stretch | In game | At 1× | At 10× |
 | --- | --- | --- | --- |
-| Charge the bank from empty | 18.3 h | 18 min | 1.8 min |
-| At the open wormhole: pole camera 5, canister 10, MOTH 17, team walks through 10 (one after another; 33 MWh left after the lock covers the drain) | 42 min | 42 s | 42 s (held at 1×) |
-| Recover in the field (1 day, 1 check-in) | 24 h | 24 min | 2.4 min |
-| Survey in the field (2 days, 2 check-ins) | 48 h | 48 min | 4.8 min |
-| **Whole loop from an empty bank, Recover** | **43 h** | **43 min** | **about 5 min** |
-| **Whole loop from an empty bank, Survey** | **67 h** | **67 min** | **about 7 min** |
+| Charge the bank from empty to full | 20 h | 20 min | 2 min |
+| At the open wormhole: pole camera 5, canister 10, MOTH 17, then Send team (instant) | 32 min | 32 s | 32 s (held at 1×) |
+| Recover in the field (1 day; the return is its only check-in) | 24 h | 24 min | 2.4 min |
+| Survey in the field (2 days; a check-in at 24 h, the return at 48 h) | 48 h | 48 min | 4.8 min |
+| **Whole loop from an empty bank, Recover** | **44.5 h** | **about 45 min** | **about 5 min** |
+| **Whole loop from an empty bank, Survey** | **68.5 h** | **about 69 min** | **about 7 min** |
 | Rescue window | 72 h | 72 min | 7.2 min |
 
+**Lock energy.** A dial needs the full lock energy in the bank; the open wormhole then drains
+20 MWh an hour from what is left, plus live charging. A bank holding exactly the lock energy
+(366.6 MWh, 18.3 h from empty) is empty after the lock, so the wormhole closes almost at once
+unless charging is at least 20 MW. That is why the table charges to full: the 33.4 MWh left
+holds the wormhole for 100 minutes even with no charging, past the 60-minute limit.
+
 No other wait sits in the loop: the lent soldiers are there at the unlock and the team goes
-through the lock it was probed on. A rescue needs a fresh lock (18.3 h from empty at 20 MW),
-which fits the window at any charge rate above about 5.2 MW.
+through the lock it was probed on. A rescue needs a fresh lock plus 15 minutes of drain
+(371.6 MWh). Charge rates move in 5 MW steps, so from an empty bank it needs **10 MW** or more
+(37 h); 5 MW takes 74 h, past the window.
 
 ---
 
@@ -212,35 +219,44 @@ A Recover that fails, or a team recalled or lost before it, leaves the target wh
 another Recover can try again.
 
 **Departure.** With a plan ready, **Send team** appears among the Ring actions of a lock on that
-world: the lock it was probed on, if it is still open, or any later one. The team walks through
-in 10 minutes; the wormhole may then close.
+world: the lock it was probed on, if it is still open, or any later one. Transit is instant
+once sent, so a team is never cut off on the way; the wormhole may close right after. As a
+margin, Send team is refused unless the wormhole could stay open 10 more minutes, both on its
+charge (stored plus live charging against the drain) and on its 60-minute limit, with the
+reason shown: "Not enough open time to send a team (10 minutes needed)."
 
-**Check-ins are automatic.** At the first 09:00 at least 12 hours after departure, and each
-09:00 after, the team dials home: a Log line and a non-blocking message ("T-1 checked in from
+**Check-ins are automatic.** A team checks in **every 24 hours from departure** (+24 h, +48 h,
+...), and **the return is its final check-in**, at departure plus the objective's days. So a
+Recover (1 day) has only its return; a Survey or Contact (2 days) has one check-in, then the
+return. The team dials home: a Log line and a non-blocking message ("T-1 checked in from
 STILLWATER: one light injury."). No pause, no speed change, no answer, no energy from CAIRN; if
-the player's wormhole is open, it comes when it closes. The team returns the same way after the
-objective's days. **Recall team** (Expeditions tab) brings it home at the next check-in.
+the player's wormhole is open, the check-in comes when it closes. **Recall team** (Expeditions
+tab) turns the next due check-in into the return.
 
-**Risk model.** One field event per field day, drawn from a pool by objective, biome and threat,
-resolved before the check-in that reports it. Each names a role; the team's best person in that
-role rolls:
+**Risk model.** One field event per field day, drawn from a pool by objective, biome and threat.
+It resolves at the check-in that ends its day (for the last day, the return), which reports it.
+Each names a role; the team's best person in that role rolls:
 
 > Success = 50% + 15% × (skill − difficulty), between 10% and 95%
 
 Difficulty is the event's own (1 to 4), +1 on MED worlds, +2 on HIGH, +1 if airless or below
 −20 °C. Success gives a finding or nothing bad; failure gives the event's setback: a lost half
 day, a light injury, a serious one (difficulty 4 only) or, on the worst events, a **missed
-check-in**. The plan shows the risk from the report's threat and confidence. Field decisions
+check-in**: the check-in it resolves at does not come (if that is the return, the team does not
+come home). Field events (card 11) only set this outcome; check-ins and rescue (card 10) act on
+it. The plan shows the risk from the report's threat and confidence. Field decisions
 wait until after the loop iteration, since check-ins ask nothing.
 
 **Injuries; the Infirmary unlocks here (PO proposal).** Light 2 days, serious 8. A person hurt in
 the field stays with the team (serious counts as skill 1 in checks) and returns with it, then is
 off work: in an Infirmary that is on, if it has room (4 patients), recovery is 2× faster, 3×
-with a medic in it; otherwise they rest at normal speed. Healed, they return to their rooms. The Infirmary joins the Base build palette at the unlock,
-not research: $300k, 6 hours, 5 MW, upkeep $40k per 30 days, 2 medic slots. No one dies in the
+with a medic in it; otherwise they rest at normal speed. Healed, they return to their rooms.
+The Infirmary joins the Base build palette at the unlock, not research: $300k, 6 hours, 5 MW, upkeep $40k per 30 days, 2 medic slots. No one dies in the
 field in M3, except in a lost team.
 
-**Missed check-in and rescue.** When no check-in comes at 09:00, the game **pauses**, the speed
+**Missed check-in and rescue.** A missed check-in is a due check-in, or the return, that does
+not come; a team that comes home before any check-in fell due never opens a rescue. When one is
+missed, the game **pauses**, the speed
 is set to 1× for when it resumes, and a rescue alert opens with a **3-day** countdown (it stays
 on the top bar's alert stack). The rescue is a normal dial of the world at its normal lock
 energy, then the Ring action **Signal T-1**: the team reaches the Ring in 15 minutes and comes
@@ -249,7 +265,7 @@ through; closing early fails, and the player can try again within the window.
 The alert also forecasts the charge: the lock energy plus 15 minutes of drain, against the
 stored charge and the current charge rate.
 
-- **On time:** "Charge for the rescue dial: 371.6 MWh, ready in 18 h. Window: 72 h."
+- **On time:** "Charge for the rescue dial: 371.6 MWh, ready in 19 h. Window: 72 h."
 - **Too slow:** "At the current charge rate the bank will not be ready before the window
   closes," and a **Charge at maximum** button that sets every bank to its highest rate the
   supply allows (lowering nothing else). If even that is not enough: "Not enough even at
@@ -335,19 +351,19 @@ right. Rows are 32 px; the sheet fits without scrolling.
 +------------------------------------------------------------------------------+
 | top bar                                                                      |
 +-------------------------+----------------------------------+-----------------+
-| PLAN  T-1               | T-1 STILLWATER  Recover          | CHECK-IN 2 Jan  |
-| World  [STILLWATER   v] | 1 Jan 14:00      2 Jan 14:00     | 09:00 1 injured |
-| Threat LOW (fair)       | |=|---------o---------|          | "Anchor lifted  |
-| Objective               |  out      check-in    home       |  from the mud.  |
-|  ( ) Survey             |           2 Jan 09:00            |  Marks on the   |
-|  (o) Recover: iron obj. |                                  |  shank. Hale    |
-|  ( ) Contact: no people | LOG                              |  sprained a     |
-| Team                    | 1 Jan 14:10 Through to STILLW.   |  knee."         |
-|  Leader  Maj. Adair  3  | 2 Jan 09:00 Check-in, 1 injured  | Injured: Hale   |
+| PLAN  T-1               | T-1 STILLWATER  Survey           | CHECK-IN 2 Jan  |
+| World  [STILLWATER   v] | 1 Jan 14:00      3 Jan 14:00     | 14:00 1 injured |
+| Threat LOW (fair)       | |=|---------o---------|          | "Walked the     |
+| Objective               |  out      check-in    return     |  causeway to    |
+|  (o) Survey             |           2 Jan 14:00            |  the island.    |
+|  ( ) Recover: iron obj. |                                  |  Hale sprained  |
+|  ( ) Contact: no people | LOG                              |  a knee."       |
+| Team                    | 1 Jan 14:00 Through to STILLW.   |                 |
+|  Leader  Maj. Adair  3  | 2 Jan 14:00 Check-in, 1 injured  | Injured: Hale   |
 |  Science Dr Okafor   3  |                                  |  (light, 2 d)   |
 |  Soldier Sgt Hale    3  |                                  |                 |
 |  Special Medic Lund  2  |                                  | [Open report]   |
-| Risk LOW   1 day        |                                  |                 |
+| Risk LOW   2 days       |                                  |                 |
 | [Ready team]            | [Recall team]                    |                 |
 +-------------------------+----------------------------------+-----------------+
 ```
@@ -360,9 +376,9 @@ person injured). A ready plan adds **Send team** to that world's Ring actions.
 
 ```
 +------------------------------------------------------------------------------+
-| T-1 MISSED ITS 09:00 CHECK-IN (STILLWATER)          Window: 71 h 58 min      |
+| T-1 MISSED ITS CHECK-IN (STILLWATER)                Window: 71 h 58 min      |
 | Rescue: dial STILLWATER, then Signal T-1 from the Ring.                      |
-| Charge needed 371.6 MWh   Stored 120 MWh   Charging 3 MW: ready in 84 h      |
+| Charge needed 371.6 MWh   Stored 0 MWh   Charging 5 MW: ready in 74 h        |
 | At the current charge rate the bank will not be ready in time.               |
 | [Charge at maximum]      [Go to Gate Room]                         [Close]   |
 +------------------------------------------------------------------------------+
@@ -423,18 +439,18 @@ person injured). A ready plan adds **Send team** to that world's Ring actions.
 
 **Gamepad.** Shoulders reach every tab. Expeditions: D-pad moves; A opens a slot's roster or
 picks; Y readies the team. The rescue alert takes focus; A presses a button, B closes it (it
-stays on the alert stack). MOTH: D-pad picks a scan, A runs it, B recalls. Conversation: D-pad picks a choice, A says it; X on a word
-in script opens its pencil guess. Worlds: A on a world opens its record; **Plan expedition**
-opens F7 with that world chosen.
+stays on the alert stack). MOTH: D-pad picks a scan, A runs it, B recalls.
+Conversation: D-pad picks a choice, A says it; X on a word in script opens its pencil guess. Worlds: A on a world opens its record; **Plan expedition**
+opens F7 with that world chosen (the button belongs to card 12, the Expeditions tab).
 
 ---
 
 ## 8. Card plan
 
-Sizes are S (a day or less of agent work) or M; nothing is L. **The split falls at the first
-playable whole loop.** M3a ends with the playtest **"The first Threshold team"**: dial, probe,
-plan, send, daily check-ins, return or rescue, on the M1.5 worlds and procedural ones. M3b adds
-MOORING and contact.
+Sizes are S (a day or less of agent work) or M; nothing is L. "Needs" lists direct
+dependencies. **The split falls at the first playable whole loop.** M3a ends with the playtest
+**"The first Threshold team"**: dial, probe, plan, send, check-ins, return or rescue, on the
+M1.5 worlds and procedural ones. M3b adds MOORING and contact.
 
 **M3a: Probes and teams**
 
@@ -443,15 +459,15 @@ MOORING and contact.
 | M3-01 | This design | M | |
 | M3-03 | World facts and states (Probed, Surveyed, Contacted), derived facts for procedural worlds, authored fields, the world scene, save v15 | M | 01 |
 | M3-04 | Archive Worlds section and the World Report | M | 03 |
-| M3-05 | Probes sim: canister, MOTH (battery, scans, targets, losses, rack) | M | 03 |
-| M3-06 | MOTH scan screen and generated frames; the horizon photo reads the world scene | M | 05 |
+| M3-05 | Probes sim: canister, MOTH (battery, scans, targets, recoverable marks, losses, rack) | M | 03 |
+| M3-06 | MOTH scan screen and generated frames; the horizon photo reads the world scene | M | 03, 05 |
 | M3-07 | Content: World Report texts and biome templates; MOTH texts and targets for the four M1.5 worlds | S | 04, 05 |
-| M3-08 | Soldiers and medics, lent soldiers and replacements, injuries, recovery, the Infirmary | M | 01 |
-| M3-09 | Expedition sim: plans, team, objectives (Survey, Recover), departure, field days, return, room assignments | M | 03, 08 |
-| M3-10 | Check-ins and rescue sim: automatic check-ins, Recall, missed check-in, rescue window, Signal, charge forecast, lost team | M | 09 |
-| M3-11 | Field events: checks, setbacks, findings, the pool and its texts (about 15) | M | 09 |
-| M3-12 | Expeditions tab (F7) | M | 09, 10 |
-| M3-13 | Gate Room and alerts: Send team and Signal T-1 Ring actions, check-in messages, the rescue alert with Charge at maximum | M | 05, 10 |
+| M3-08 | Soldiers and medics, lent soldiers and replacements, injuries, recovery, the Infirmary and its unlock | M | 03 |
+| M3-09 | Expedition sim: plans, team, Survey and Recover, departure (instant, the 10-minute margin), field days, return, room assignments | M | 05, 08 |
+| M3-10 | Check-ins and rescue sim: check-ins every 24 h, the return as the last, Recall, missed check-in, rescue window, Signal, charge forecast, lost team | M | 09 |
+| M3-11 | Field events: checks, setbacks (the missed check-in through card 10's hook), findings, the pool and its texts (about 15) | M | 10 |
+| M3-12 | Expeditions tab (F7), and **Plan expedition** on the World Report | M | 04, 10 |
+| M3-13 | Gate Room and alerts: Send team and Signal T-1 Ring actions, check-in messages, the rescue alert with Charge at maximum | M | 10 |
 | M3-14 | Playtest guide: "The first Threshold team" | S | 06, 07, 11, 12, 13 |
 
 **M3b: MOORING and contact**
@@ -459,15 +475,16 @@ MOORING and contact.
 | Card | Title | Size | Needs |
 | --- | --- | --- | --- |
 | M3-02 | Design: puzzle 5 (the anchor's marks), MOORING, conversations K1 to K3, the lexicon | M | 01 |
-| M3-15 | Conversation engine: ConversationDef, conditions and effects, the panel, Hail, the Contact objective's arrival channel, transcripts, standing | M | 09 |
-| M3-16 | Partial translation: lexicon, word tokens, guesses, lexicon research | M | 15 |
-| M3-17 | Archive Codex section, contested entries side by side | M | 04, 16 |
-| M3-18 | Content: the anchor, puzzle 5, MOORING (world, scene, dossier, MOTH texts) | S | 02, 07 |
-| M3-19 | Content: K1 to K3, about 20 words, about 12 Codex entries | M | 02, 15, 16, 17 |
-| M3-20 | Playtest guide M3b | S | all |
+| M3-15 | Conversation format and sim: ConversationDef with line, choice, check and end nodes; conditions FlagIs and StandingAtLeast; effects ChangeStanding, SetFlag, AddDocument, AddAddress; live line timing and "(signal lost)"; the Contact objective; standing; transcripts recorded as paths; save | M | 09 |
+| M3-16 | Conversation UI: the panel and its gamepad paths, Hail through an open wormhole, the Contact arrival channel, the transcript view in the Archive | M | 13, 15 |
+| M3-17 | Partial translation: lexicon, word tokens, the WordKnown condition, guesses, lexicon research, newly readable transcripts | M | 16 |
+| M3-18 | Archive Codex section, the UnlockCodexEntry effect, contested entries side by side | M | 04, 17 |
+| M3-19 | Content: the anchor, puzzle 5, MOORING (world, scene, dossier, MOTH texts) | S | 02, 07 |
+| M3-20 | Content: K1 to K3, about 20 words, about 12 Codex entries | M | 02, 18, 19 |
+| M3-21 | Playtest guide M3b | S | 14, 20 |
 
-M3-02 can be written during M3a; the owner approves it before 18 and 19. In M3a, STILLWATER's
-iron object is already a target, but its marks arrive with 18. After M3: iterate the loop, then
+M3-02 can be written during M3a; the owner approves it before 19 and 20. In M3a, STILLWATER's
+iron object is already a target, but its marks arrive with 19. After M3: iterate the loop, then
 decide on the 3D feed.
 
 ---
