@@ -18,7 +18,7 @@ var rooms: Array[StringName] = []
 var dig_depth: int = 1
 ## Most Capacitor Banks (built, building or a site) the base may hold.
 var bank_cap: int = 1
-## Monthly upkeep in $k that replaces a RoomDef's upkeep_k, by room def id (Fuel contracts).
+## Upkeep per 30 days in $k that replaces a RoomDef's upkeep_k, by room def id (Fuel contracts).
 var upkeep_overrides: Dictionary[StringName, int] = {}
 
 

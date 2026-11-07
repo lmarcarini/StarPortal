@@ -4,10 +4,10 @@
 ## by the two starting scientists. SILL locks on time. In the Personnel tab (F5) the first
 ## candidate is hired with the Hire button and, on arrival, assigned to the lab with Assign…:
 ## the tech tree's Start then runs Excavation survey at 150% (total skill 9). The clock runs,
-## unpaused, to the 1 February month-end: the report arrives without a pause, with the
-## Confidence change and the next allocation its causes predict.
+## unpaused, to 1 February: every daily settlement arrives without a pause, and the lock and
+## the project raised Confidence at once (docs/content/m27-daily-rhythm.md sections 1 and 2).
 ## Bible: roadmap.md (M2 check), technical-architecture.md#testing-and-tooling,
-## docs/content/m26-staff-and-money.md sections 2 to 7
+## docs/content/m26-staff-and-money.md sections 2 to 7, docs/content/m27-daily-rhythm.md
 extends GdUnitTestSuite
 
 const M15Player := preload("res://tests/gate/m15_player.gd")
@@ -26,15 +26,15 @@ const LAB_ORIGIN: Vector2i = Vector2i(25, 5)
 const HIRED_NAME: String = "Dr Ines Moreau"
 ## Excavation survey's listed time, at a standard crew (total skill 6).
 const SURVEY_TICKS: int = 2 * TimeMath.TICKS_PER_DAY
-## The 1 February month-end.
-const MONTH_END_TICK: int = 31 * TimeMath.TICKS_PER_DAY
+## 1 February 00:00, the 31st daily settlement.
+const FEB_1_TICK: int = 31 * TimeMath.TICKS_PER_DAY
 ## Most ticks the test waits for anything.
 const MAX_WAIT_TICKS: int = 40 * TimeMath.TICKS_PER_DAY
 
 var _defs: GameDefs
 var _root: Control = null
 var _real_locale: String = ""
-## Month-end reports seen: {tick, paused}.
+## Daily settlements seen (budget_changed at a day start): {tick, paused}.
 var _reports: Array[Dictionary] = []
 var _pause_requests: int = 0
 var _simulation: Simulation = null
@@ -58,7 +58,7 @@ func after_test() -> void:
 	TranslationServer.set_locale(_real_locale)
 
 
-func test_new_game_to_first_month_report() -> void:
+func test_new_game_to_1_february() -> void:
 	var built: Result = GameSetup.build_new(GameState.new_game(SEED, _defs.balance), _defs)
 	assert_bool(built.is_ok).override_failure_message(str(built.error_code)).is_true()
 	var simulation: Simulation = built.value
@@ -72,7 +72,7 @@ func test_new_game_to_first_month_report() -> void:
 	var hired: StringName = await _hire_first_candidate(player)
 	await _assign_to_the_lab(player, hired)
 	await _start_survey_from_the_tree(player)
-	_month_end_report(player)
+	_settle_to_february(player)
 	assert_array(player.rejections).is_empty()
 
 
@@ -205,42 +205,41 @@ func _start_survey_from_the_tree(player: M15Player) -> void:
 	assert_int(_wait(player, done)).is_between(SURVEY_TICKS * 2 / 3, SURVEY_TICKS * 2 / 3 + 1)
 
 
-## With the clock running, the 1 February month-end files its report without pausing:
-## SILL +5, one project +3, one analyst +1, within budget +2 = +11, Confidence 61, next
-## allocation $3,330k; six people's salaries $175k.
-func _month_end_report(player: M15Player) -> void:
+## With the clock running to 1 February, every daily settlement arrives without a pause; SILL's
+## lock (+5) and the project (+3) are causes, the salaries are six people's $175k per 30 days
+## and Confidence is above 50.
+func _settle_to_february(player: M15Player) -> void:
 	var state: GameState = player.state()
 	state.clock.is_paused = false
 	player.simulation.pause_requested.connect(_on_pause_requested)
-	EventBus.month_report_filed.connect(_on_report)
-	var filed: Callable = func() -> bool: return not _reports.is_empty()
-	_wait(player, filed)
-	EventBus.month_report_filed.disconnect(_on_report)
-	assert_int(_reports[0]["tick"]).is_equal(MONTH_END_TICK)
-	assert_bool(_reports[0]["paused"]).is_false()
+	var settlements: int = 31 - TimeMath.day_index(state.clock.tick)
+	EventBus.budget_changed.connect(_on_budget_changed)
+	var reached: Callable = func() -> bool: return state.clock.tick >= FEB_1_TICK
+	_wait(player, reached)
+	EventBus.budget_changed.disconnect(_on_budget_changed)
+	assert_int(settlements).is_greater(10)
+	assert_int(_reports.size()).is_equal(settlements)
+	assert_int(_reports.back()["tick"]).is_equal(FEB_1_TICK)
+	assert_bool(_reports.back()["paused"]).is_false()
 	assert_int(_pause_requests).is_equal(0)
-	var report: MonthReport = state.committee.latest_report()
-	assert_int(report.confidence_before).is_equal(50)
-	assert_int(report.amount_of(&"locked")).is_equal(ConfidenceRules.LOCK)
-	assert_int(report.confidence_after).is_equal(61)
-	assert_int(state.committee.confidence).is_equal(61)
-	assert_int(report.allocation_k).is_equal(3000)
-	assert_int(report.next_allocation_k).is_equal(3330)
-	assert_int(report.people).is_equal(6)
-	assert_int(report.salaries_k).is_equal(175)
-	assert_int(report.funds_after_k).is_equal(
-		report.funds_before_k + report.allocation_k - report.upkeep_k - report.salaries_k
-	)
-	assert_int(state.budget.funds_k).is_equal(report.funds_after_k)
+	var changes: Dictionary[StringName, int] = {}
+	for cause: ConfidenceCause in state.committee.causes:
+		changes[cause.cause] = cause.change
+	assert_int(changes.get(ConfidenceRules.LOCKED, 0)).is_equal(ConfidenceRules.LOCK_CHANGE)
+	assert_int(changes.get(ConfidenceRules.RESEARCH, 0)).is_equal(ConfidenceRules.RESEARCH_CHANGE)
+	assert_int(StaffRules.headcount(state)).is_equal(6)
+	assert_int(StaffRules.salaries_k(state)).is_equal(175)
+	assert_int(state.committee.whole()).is_greater(50)
 
 
 func _on_pause_requested(_reason: StringName) -> void:
 	_pause_requests += 1
 
 
-func _on_report(_year: int, _month: int) -> void:
+func _on_budget_changed(_funds_k: int) -> void:
 	var clock: ClockState = _simulation.state.clock
-	_reports.append({"tick": clock.tick, "paused": clock.is_paused})
+	if TimeMath.is_day_start(clock.tick):
+		_reports.append({"tick": clock.tick, "paused": clock.is_paused})
 
 
 ## A drag on the plan from [param from] to [param to] with the mouse, through the ghost's GUI

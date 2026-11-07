@@ -91,7 +91,7 @@ func test_new_game_has_it() -> void:
 
 
 ## Starting draw with everything on is 5 MW of the plant's 30 (25 MW spare), and upkeep is
-## $190k a month (section 1).
+## $190k per 30 days (section 1).
 func test_starting_power_and_upkeep() -> void:
 	var state := GameState.new_game(7, _balance)
 	state.balance = _balance
@@ -99,9 +99,7 @@ func test_starting_power_and_upkeep() -> void:
 		state.room_defs[def_id] = _defs[def_id]
 	assert_float(PowerRules.supply_mw(state)).is_equal(30.0)
 	assert_float(PowerRules.spare_mw(state)).is_equal(25.0)
-	assert_int(EconomySystem.monthly_upkeep_k(state.base, state.room_defs, state.unlocks)).is_equal(
-		190
-	)
+	assert_int(EconomySystem.upkeep_k(state.base, state.room_defs, state.unlocks)).is_equal(190)
 	assert_int(state.budget.funds_k).is_equal(6000)
 
 

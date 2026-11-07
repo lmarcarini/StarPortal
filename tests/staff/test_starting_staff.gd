@@ -4,7 +4,7 @@
 extends GdUnitTestSuite
 
 
-## Five people with the section 7 names, roles, skills and salaries, $145k a month; the
+## Five people with the section 7 names, roles, skills and salaries, $145k per 30 days; the
 ## analyst in the Control Room, everyone else Unassigned and on base.
 func test_new_game_has_the_section_7_crew() -> void:
 	var game: GameState = ConstructionFixture.state()
@@ -23,7 +23,7 @@ func test_new_game_has_the_section_7_crew() -> void:
 			]
 		)
 	)
-	assert_int(StaffRules.monthly_salaries_k(game)).is_equal(145)
+	assert_int(StaffRules.salaries_k(game)).is_equal(145)
 	var control: RoomState = PowerFixture.first_room(game, &"room_control")
 	assert_array(StaffRules.assigned(game, control)).is_equal([game.staff.people[4]])
 	for index: int in 4:
@@ -71,7 +71,7 @@ func test_arriving_people_count_for_beds_and_salaries() -> void:
 	person.arrives_tick = 100
 	game.staff.add_person(person)
 	assert_int(StaffRules.beds_free(game)).is_equal(0)
-	assert_int(StaffRules.monthly_salaries_k(game)).is_equal(180)
+	assert_int(StaffRules.salaries_k(game)).is_equal(180)
 	assert_bool(person.is_on_base(game.clock.tick)).is_false()
 
 

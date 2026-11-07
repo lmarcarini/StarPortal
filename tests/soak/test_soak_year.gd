@@ -57,8 +57,8 @@ class SoakRun:
 	var month_close_pending: bool = false
 	## Ticks after which stored power was below 0 or above the capacity.
 	var power_out_of_bounds: int = 0
-	## Month closes after which the budget was below 0 or above the start plus a year's
-	## allocations (spending is validated, so only the month-end can break it).
+	## Month closes after which the budget was below 0 or above the start plus a year's top
+	## daily allocations and commendations, or the Committee state left its bounds.
 	var budget_out_of_bounds: int = 0
 
 	## Starts a run on a new game seeded with [param base_seed], built by GameSetup from
@@ -78,29 +78,28 @@ class SoakRun:
 		elif sums[PowerRules.DRAW] + PowerRules.charge_mw_of(state, sums) > sums[0]:
 			power_out_of_bounds += 1
 
-	## Counts the month close just run when the budget left 0 .. start + 12 top allocations and
-	## four grants, Confidence left 0..100, or the allocation paid differs from the formula at
-	## the Confidence before the month's change: the bot only spends what it has and the
-	## allocation out-runs the upkeep.
+	## Counts the month close just run when the budget left 0 .. start + a year of top daily
+	## allocations and a commendation a month, Confidence left 0..1000, the cost carry left
+	## 0..29 or the last recorded balance is not the day's (docs/content/m27-daily-rhythm.md
+	## sections 1 and 2): the bot only spends what it has and the allocation out-runs the costs.
 	func check_budget() -> void:
 		var state: GameState = simulation.state
 		var balance: BalanceConfig = state.balance
-		var top_k: int = ConfidenceRules.allocation_k(balance.monthly_allocation_k, 100)
+		var committee: CommitteeState = state.committee
+		var top_k: int = ConfidenceRules.daily_allocation_k(balance.daily_allocation_k, 100)
 		var most: int = (
-			balance.starting_budget_k + YEAR_MONTHS * top_k + 4 * ConfidenceRules.GRANT_K
+			balance.starting_budget_k
+			+ YEAR_DAYS * top_k
+			+ YEAR_MONTHS * ConfidenceRules.COMMENDATION_K
 		)
 		var funds: int = state.budget.funds_k
 		if funds < 0 or funds > most:
 			budget_out_of_bounds += 1
-		var confidence: int = state.committee.confidence
-		if confidence < 0 or confidence > 100:
+		if committee.confidence < ConfidenceRules.MIN or committee.confidence > ConfidenceRules.MAX:
 			budget_out_of_bounds += 1
-		var report: MonthReport = state.committee.latest_report()
-		var paid: int = -1 if report == null else report.allocation_k
-		var due: int = ConfidenceRules.allocation_k(
-			balance.monthly_allocation_k, -1 if report == null else report.confidence_before
-		)
-		if paid != due:
+		if committee.cost_carry < 0 or committee.cost_carry >= ConfidenceRules.PERIOD_DAYS:
+			budget_out_of_bounds += 1
+		if committee.funds_history.is_empty() or committee.funds_history.back() > funds:
 			budget_out_of_bounds += 1
 
 	## Makes [param next] the simulation this run plays and listens to its signals.

@@ -118,13 +118,21 @@ signal research_done(project_id: StringName)
 ## (posted through the outbox).
 @warning_ignore("unused_signal")
 signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
-## Emitted after each month-end, with the year and month of the month-end date; the report is
-## state.committee.latest_report() (posted through the outbox). Non-blocking: nothing pauses.
+## Emitted whenever Committee Confidence changes (an event or the daily settlement's drift),
+## with the new value in tenths (posted through the outbox).
 @warning_ignore("unused_signal")
-signal month_report_filed(year: int, month: int)
-## Emitted when the Committee warns (MonthEnd: &"red_months" at three month-ends in the red
-## in a row, &"confidence_zero" at Confidence 0). A warning only: the game goes on (posted
-## through the outbox).
+signal confidence_changed(confidence_tenths: int)
+## Emitted when analysts file their reports (every 15th day), with how many filed (posted
+## through the outbox; logged).
+@warning_ignore("unused_signal")
+signal reports_filed(analysts: int)
+## Emitted when the Committee pays its commendation, with the amount in $k (posted through
+## the outbox; logged).
+@warning_ignore("unused_signal")
+signal committee_commendation(amount_k: int)
+## Emitted when the Committee warns (DailySettlement: &"red_days" every 7 settlements in a
+## row in the red, &"confidence_zero" when Confidence first reaches 0). A warning only: the
+## game goes on (posted through the outbox; logged).
 @warning_ignore("unused_signal")
 signal committee_warning(reason: StringName)
 ## Emitted on the tick a hired person arrives on base (RecruitmentSystem; logged).

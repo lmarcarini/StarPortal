@@ -1,4 +1,4 @@
-## Tests for the v13 save of the roster: round trip, the v12 clean break, and the load-time id
+## Tests for the v14 save of the roster: round trip, the v13 clean break, and the load-time id
 ## checks against the content and the base (docs/content/m26-staff-and-money.md section 8,
 ## M2.5 follow-up #178).
 ## Bible: docs/content/m26-staff-and-money.md section 8, technical-architecture.md#save-system
@@ -40,7 +40,7 @@ func _data(state: GameState) -> Dictionary:
 	return JSON.parse_string(JSON.stringify(state.to_dict()))
 
 
-func test_v13_round_trips_the_roster() -> void:
+func test_v14_round_trips_the_roster() -> void:
 	var state: GameState = _state()
 	state.staff.auto_assign.erase(&"room_workshop")
 	assert_bool(_service.save_game(state, &"staff").is_ok).is_true()
@@ -52,11 +52,11 @@ func test_v13_round_trips_the_roster() -> void:
 	var file := FileAccess.open(_service.slot_path(&"staff"), FileAccess.READ)
 	var header: Dictionary = JSON.parse_string(file.get_as_text())
 	var version: float = header["format_version"]
-	assert_float(version).is_equal(13.0)
+	assert_float(version).is_equal(14.0)
 
 
-func test_v12_save_is_an_old_save() -> void:
-	var result: Result = SaveMigrator.migrate({"format_version": 12, "state": {}})
+func test_v13_save_is_an_old_save() -> void:
+	var result: Result = SaveMigrator.migrate({"format_version": 13, "state": {}})
 	assert_str(result.error_code).is_equal(&"old_format_version")
 
 

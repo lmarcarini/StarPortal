@@ -5,11 +5,13 @@
 ## its documents. The player paints a corridor and builds a Research Lab against it on Level 1 (it
 ## completes on, taking its 5 MW from charging: "Research Lab on: charging lowered to 20 MW",
 ## m25-lean-start.md section 3), is granted Excavation survey through
-## UnlockRules.apply_project() (no research system yet), digs Level 2, and the month-end pays the
-## allocation less the upkeep. Last, with the total charge rate lowered below the open
-## wormhole's 20 MWh/h drain, a lock closes when the capacitors run empty.
+## UnlockRules.apply_project() (no research system yet), digs Level 2, and the next daily
+## settlement pays the allocation less the day's share of the upkeep. Last, with the total
+## charge rate lowered below the open wormhole's 20 MWh/h drain, a lock closes when the
+## capacitors run empty.
 ## Bible: roadmap.md (M2 check), technical-architecture.md#testing-and-tooling,
-## docs/content/m2-base.md sections 2 to 5, docs/content/m25-lean-start.md sections 1 to 6
+## docs/content/m2-base.md sections 2 to 5, docs/content/m25-lean-start.md sections 1 to 6,
+## docs/content/m27-daily-rhythm.md section 1
 extends GdUnitTestSuite
 
 const M15Player := preload("res://tests/gate/m15_player.gd")
@@ -63,7 +65,7 @@ func test_new_game_to_month_end() -> void:
 	_lock_sill_and_send_camera(player)
 	_build_lab_with_corridor(player)
 	_dig_level_2(player)
-	_assert_month_end(player)
+	_assert_daily_settlement(player)
 	_assert_empty_capacitors_close(player)
 	assert_array(player.rejections).is_empty()
 
@@ -186,18 +188,20 @@ func _dig_level_2(player: M15Player) -> void:
 	assert_int(player.state().base.level_count).is_equal(2)
 
 
-## At the month-end the budget gains the $3,000k allocation less the upkeep: the starting
-## $190k, the bank's $10k and the lab's $60k (it is on); corridors pay nothing. The five
-## starting staff are paid $145k (m26-staff-and-money.md section 7).
-func _assert_month_end(player: M15Player) -> void:
-	var closes: Array[int] = []
-	player.simulation.month_closed.connect(
-		func(_year: int, _month: int) -> void: closes.append(player.state().clock.tick)
-	)
-	var funds: int = player.state().budget.funds_k
-	while closes.is_empty():
+## At the next daily settlement the budget gains $(50 + Confidence)k less a 30th of the costs
+## per 30 days, with the carry: the starting $190k, the bank's $10k and the lab's $60k (it is
+## on); corridors pay nothing. The five starting staff are paid $145k (m27-daily-rhythm.md
+## section 1).
+func _assert_daily_settlement(player: M15Player) -> void:
+	var state: GameState = player.state()
+	while not TimeMath.is_day_start(state.clock.tick + 1):
 		player.step()
-	assert_int(player.state().budget.funds_k).is_equal(funds + 3000 - (190 + 10 + 60) - 145)
+	var funds: int = state.budget.funds_k
+	var allocation: int = 50 + state.committee.whole()
+	var owed: int = (190 + 10 + 60) + 145 + state.committee.cost_carry
+	player.step()
+	assert_int(state.budget.funds_k).is_equal(funds + allocation - owed / 30)
+	assert_int(state.committee.cost_carry).is_equal(owed % 30)
 
 
 ## With the lab switched off and charging back at 25 MW, the charge out-runs the open

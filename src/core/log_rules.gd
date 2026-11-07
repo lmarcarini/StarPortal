@@ -34,24 +34,29 @@ static func entries_for(
 			return [LogEntry.create(tick, &"research", &"", {"project_id": _text(args)})]
 		&"staff_changed":
 			return _staff_entries(args, tick)
-		&"month_report_filed":
-			return _month_entries(state, tick)
-		&"committee_warning":
-			var details: Dictionary = {
-				"reason": _text(args), "months_in_red": state.committee.months_in_red
-			}
-			return [LogEntry.create(tick, &"committee", &"", details)]
+		&"reports_filed", &"committee_commendation", &"committee_warning":
+			return [_committee_entry(event_name, args, state, tick)]
 		&"staff_arrived":
 			return _arrival_entries(args, state, tick)
 	return []
 
 
-## The "month" entry of a month-end: the newest report's data (MonthReport.to_dict()).
-static func _month_entries(state: GameState, tick: int) -> Array[LogEntry]:
-	var report: MonthReport = state.committee.latest_report()
-	if report == null:
-		return []
-	return [LogEntry.create(tick, &"month", &"", report.to_dict())]
+## The "committee" entry of reports filed ("reason" "reports", "count" analysts), the
+## commendation ("reason" "commendation", "amount_k") or a warning ("reason" the warning,
+## "days" in the red in a row).
+static func _committee_entry(
+	event_name: StringName, args: Array, state: GameState, tick: int
+) -> LogEntry:
+	var value: int = args[0] if args.size() == 1 and args[0] is int else 0
+	var details: Dictionary = {}
+	match event_name:
+		&"reports_filed":
+			details = {"reason": "reports", "count": value}
+		&"committee_commendation":
+			details = {"reason": "commendation", "amount_k": value}
+		_:
+			details = {"reason": _text(args), "days": state.committee.days_in_red}
+	return LogEntry.create(tick, &"committee", &"", details)
 
 
 ## The "staff" entry of a staff_changed event that is logged: the first room of a type took

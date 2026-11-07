@@ -1,87 +1,86 @@
 class_name ConfidenceRules
 extends RefCounted
-## Pure rules of Committee Confidence (docs/content/m26-staff-and-money.md section 4): the
-## causes and their amounts, the ±15 monthly cap, the allocation formula, the quarterly review
-## and what counts as new this month. No side effects, no autoloads.
-## Bible: docs/content/m26-staff-and-money.md sections 4, 5 and 8
+## Pure rules of Committee Confidence and the daily settlement
+## (docs/content/m27-daily-rhythm.md sections 1 and 2): Confidence kept in tenths, the event
+## amounts, the daily drift, the daily allocation, the cost carry, the commendation and the
+## warning thresholds. No side effects, no autoloads.
+## Bible: docs/content/m27-daily-rhythm.md sections 1 and 2
 
-## Starting Confidence, and its bounds.
-const START: int = 50
+## Starting Confidence and its bounds, in tenths (50.0, 0.0 and 100.0).
+const START: int = 500
 const MIN: int = 0
-const MAX: int = 100
-## Largest change in one month, either way.
-const MONTHLY_CAP: int = 15
-## Causes, in report order. "cap" is the line that takes the excess over ±15 off; "bounds"
-## the part the 0..100 range cut.
-const CAUSES: Array[StringName] = [
-	&"locked",
-	&"surveyed",
-	&"research",
-	&"reports",
-	&"within_budget",
-	&"in_red",
-	&"idle",
-	&"cap",
-	&"bounds",
-]
-## Change per lock, survey, project and analyst, and per month for the month causes.
-const LOCK: int = 5
-const SURVEY: int = 2
-const RESEARCH: int = 3
-const REPORT: int = 1
-const WITHIN_BUDGET: int = 2
-const IN_RED: int = -5
-const IDLE: int = -4
-## Review keys: 70 or more, 30 to 69, below 30.
-const PLEASED: StringName = &"pleased"
-const NOTES: StringName = &"notes"
-const QUESTIONS: StringName = &"questions"
-const REVIEWS: Array[StringName] = [PLEASED, NOTES, QUESTIONS]
-## Confidence for the grant, and below which the Committee questions the programme.
-const GRANT_AT: int = 70
-const QUESTION_BELOW: int = 30
-## The review's one-off grant, in $k.
-const GRANT_K: int = 1000
-## Month-ends in a row in the red that raise the warning.
-const RED_MONTHS_WARNING: int = 3
-## Month-end reports kept in the save.
-const REPORTS_KEPT: int = 6
+const MAX: int = 1000
+## Tenths in one whole point.
+const TENTHS: int = 10
+## Event causes, as saved in the cause list.
+const LOCKED: StringName = &"locked"
+const SURVEYED: StringName = &"surveyed"
+const RESEARCH: StringName = &"research"
+const REPORTS: StringName = &"reports"
+const CAUSES: Array[StringName] = [LOCKED, SURVEYED, RESEARCH, REPORTS]
+## Change per lock, survey, project and analyst, in tenths.
+const LOCK_CHANGE: int = 50
+const SURVEY_CHANGE: int = 20
+const RESEARCH_CHANGE: int = 30
+const REPORT_CHANGE: int = 10
+## Daily drift in tenths: toward 50 while solvent, and in the red.
+const SETTLING_STEP: int = 1
+const IN_RED_STEP: int = -2
+## Reports are filed every this many days since the start (15 Jan, 30 Jan, ...).
+const REPORT_EVERY_DAYS: int = 15
+## Days the per-30-days figures (upkeep, salaries) cover.
+const PERIOD_DAYS: int = 30
+## Causes and daily balances kept in the save.
+const CAUSES_KEPT: int = 10
+const FUNDS_HISTORY_KEPT: int = 30
+## Commendation: paid on reaching this (tenths), re-armed below the second, amount in $k.
+const COMMENDATION_AT: int = 700
+const COMMENDATION_REARM_BELOW: int = 600
+const COMMENDATION_K: int = 1000
+## Settlements in a row in the red per warning.
+const RED_DAYS_WARNING: int = 7
+## The Confidence 0 warning re-arms above this (tenths).
+const ZERO_REARM_ABOVE: int = 100
 ## The room whose analysts file reports, and their role.
 const REPORT_ROOM: StringName = &"room_control"
 const ANALYST: StringName = &"role_analyst"
 
 
-## Allocation for [param confidence] with [param base_k] at 50:
-## base × (0.5 + Confidence ÷ 100), in $k (exact for $3,000k: 1,500 + 30 × Confidence).
-static func allocation_k(base_k: int, confidence: int) -> int:
+## The whole part of [param tenths] (what the top bar and the allocation use).
+static func whole(tenths: int) -> int:
+	return tenths / TENTHS
+
+
+## Daily allocation in $k with [param base_k] at Confidence 50 and [param confidence] whole
+## points: base × (0.5 + Confidence ÷ 100), i.e. $(50 + Confidence)k for a base of $100k.
+static func daily_allocation_k(base_k: int, confidence: int) -> int:
 	return base_k * (50 + confidence) / 100
 
 
-## [param total] limited to ±[constant MONTHLY_CAP].
-static func capped(total: int) -> int:
-	return clampi(total, -MONTHLY_CAP, MONTHLY_CAP)
+## [param tenths] after [param change], kept within 0..1000.
+static func changed(tenths: int, change: int) -> int:
+	return clampi(tenths + change, MIN, MAX)
 
 
-## [param confidence] after [param change], kept within 0..100.
-static func changed(confidence: int, change: int) -> int:
-	return clampi(confidence + change, MIN, MAX)
+## Today's drift in tenths for [param tenths] with the balance below zero when
+## [param in_red]: -0.2 in the red, else 0.1 toward 50.
+static func drift(tenths: int, in_red: bool) -> int:
+	if in_red:
+		return IN_RED_STEP
+	return signi(START - tenths) * SETTLING_STEP
 
 
-## True when the month-end on 1 [param month] holds a quarterly review (Jan, Apr, Jul, Oct).
-static func is_review_month(month: int) -> bool:
-	return month in [1, 4, 7, 10]
+## Today's cost charge for [param per_period_k] (costs per 30 days) and the saved
+## [param carry]: x is the charge in $k, y the new carry (0 to 29).
+static func daily_charge(per_period_k: int, carry: int) -> Vector2i:
+	var owed: int = per_period_k + carry
+	return Vector2i(owed / PERIOD_DAYS, owed % PERIOD_DAYS)
 
 
-## The review key for [param confidence] after the month's change.
-static func review_of(confidence: int) -> StringName:
-	if confidence >= GRANT_AT:
-		return PLEASED
-	return NOTES if confidence >= QUESTION_BELOW else QUESTIONS
-
-
-## The grant of review [param review], in $k.
-static func grant_k(review: StringName) -> int:
-	return GRANT_K if review == PLEASED else 0
+## True when the settlement of day [param day_index] (days since the start) files reports:
+## every 15th day, counting 1 January as day 1.
+static func is_report_day(day_index: int) -> bool:
+	return day_index > 0 and (day_index + 1) % REPORT_EVERY_DAYS == 0
 
 
 ## Analysts on base assigned to a built Control Room that is on.
@@ -102,16 +101,14 @@ static func locked_worlds(state: GameState) -> Array[StringName]:
 	for world_id: StringName in state.worlds.statuses:
 		if state.worlds.statuses[world_id] == WorldsState.WorldStatus.LOCKED:
 			ids.append(world_id)
-	ids.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
-	return ids
+	return sorted(ids)
 
 
 ## Every world surveyed (horizon record taken by the pole camera), in id order.
 static func surveyed_worlds(state: GameState) -> Array[StringName]:
 	var ids: Array[StringName] = []
 	ids.assign(state.worlds.horizon_records.keys())
-	ids.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
-	return ids
+	return sorted(ids)
 
 
 ## The ids of [param current] not in [param credited], in [param current]'s order.
@@ -121,3 +118,9 @@ static func new_ids(current: Array[StringName], credited: Array[StringName]) -> 
 		if not id in credited:
 			fresh.append(id)
 	return fresh
+
+
+## [param ids] sorted by name.
+static func sorted(ids: Array[StringName]) -> Array[StringName]:
+	ids.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
+	return ids
