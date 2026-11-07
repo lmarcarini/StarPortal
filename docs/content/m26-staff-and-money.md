@@ -13,6 +13,8 @@ Units as before: money in $k, power in 5 MW blocks, one tick is one in-game minu
 
 ## 1. People
 
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 1: salaries are per 30 days, charged daily.
+
 **Roles in M2.6:** scientist, engineer and analyst. Each has a room to work in now.
 
 **Roles that wait:** medic (M3, with the Infirmary and injuries) and soldier (M3, with
@@ -88,6 +90,8 @@ Confidence and bankruptcy (section 4).
 ---
 
 ## 3. Rooms and staff
+
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 2: analysts file +1 every 15 days.
 
 **Slots.** Each staffable room shows its slots on the plan and in its SELECTED panel. Only
 people of the matching role can fill a slot.
@@ -306,6 +310,8 @@ an unstaffed lab or Workshop is visible at a glance.
 
 ## 7. Numbers
 
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 6 for the daily rework of these examples.
+
 **Starting staff: five (PO proposal).**
 
 | Person | Role | Skill | Salary | Room |
@@ -362,6 +368,8 @@ For B: no Quarters, + second Plant 150 + second Bank 10 = 420 (R5 brings each pl
 ---
 
 ## 8. Saves and owner decisions
+
+> **Revised by M2.7:** see `docs/content/m27-daily-rhythm.md` section 7: saves move to v14.
 
 **Saves: clean break, v13.** The save gains the roster (people, assignments, arrival times),
 the candidate list and its random seed, Confidence, and months in the red.
