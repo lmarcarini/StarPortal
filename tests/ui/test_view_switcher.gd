@@ -35,11 +35,11 @@ func after_test() -> void:
 
 func test_starts_on_the_gate_room_with_translated_tabs() -> void:
 	assert_array(_switcher.get_view_ids()).is_equal(
-		[&"gate_room", &"archive", &"base", &"research", &"personnel"]
+		[&"gate_room", &"archive", &"base", &"research", &"personnel", &"command"]
 	)
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	var tabs: TabBar = _switcher.get_tab_bar()
-	assert_int(tabs.tab_count).is_equal(5)
+	assert_int(tabs.tab_count).is_equal(6)
 	assert_str(tabs.get_tab_title(0)).is_equal("Gate Room")
 	assert_str(tabs.get_tab_title(1)).is_equal("Archive")
 	assert_str(tabs.get_tab_title(2)).is_equal("Base")
@@ -63,7 +63,11 @@ func test_view_actions_switch_and_wrap() -> void:
 	await _press_action(&"view_next")
 	assert_str(String(_switcher.current_view_id())).is_equal("personnel")
 	await _press_action(&"view_next")
+	assert_str(String(_switcher.current_view_id())).is_equal("command")
+	await _press_action(&"view_next")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
+	await _press_action(&"view_previous")
+	assert_str(String(_switcher.current_view_id())).is_equal("command")
 	await _press_action(&"view_previous")
 	assert_str(String(_switcher.current_view_id())).is_equal("personnel")
 	await _press_action(&"view_previous")
@@ -81,7 +85,8 @@ func test_view_actions_switch_and_wrap() -> void:
 	await _press_action(&"view_gate_room")
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	var expected: Array[StringName] = [&"gate_room", &"archive", &"base", &"personnel"]
-	expected.append_array([&"gate_room", &"personnel", &"base", &"archive", &"gate_room"])
+	expected.append_array([&"command", &"gate_room", &"command", &"personnel", &"base"])
+	expected.append_array([&"archive", &"gate_room"])
 	expected.append_array([&"base", &"archive", &"gate_room"])
 	assert_array(_changes).is_equal(expected)
 
@@ -106,6 +111,8 @@ func test_default_keys_and_gamepad_shoulders_switch_views() -> void:
 	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _runner.simulate_key_pressed(KEY_F5)
 	assert_str(String(_switcher.current_view_id())).is_equal("personnel")
+	await _runner.simulate_key_pressed(KEY_F6)
+	assert_str(String(_switcher.current_view_id())).is_equal("command")
 
 
 func test_switching_focuses_the_new_views_default_control() -> void:
@@ -220,7 +227,7 @@ func test_setup_reaches_every_view_again_and_again() -> void:
 	switcher.get_node("%Views").add_child(spy)
 	await _run(switcher)
 	assert_array(_switcher.get_view_ids()).is_equal(
-		[&"gate_room", &"archive", &"base", &"research", &"personnel", &"spy"]
+		[&"gate_room", &"archive", &"base", &"research", &"personnel", &"command", &"spy"]
 	)
 	assert_bool(spy.visible).is_false()
 	var first := Simulation.new(GameState.new_game(1))

@@ -49,6 +49,8 @@ func _ready() -> void:
 	_apply_min_window_size()
 	_quick_save_button.pressed.connect(quick_save)
 	_quick_load_button.pressed.connect(quick_load)
+	money_label.pressed.connect(open_command)
+	confidence_readout.pressed.connect(open_command)
 	_toast_timer.timeout.connect(_toast.hide)
 	_setup_debug_tools()
 	_start(GameState.new_game(_choose_seed(), Registry.balance()), true)
@@ -116,12 +118,18 @@ func quick_load() -> void:
 	_show_toast(&"UI_LOADED")
 
 
-## Returns every button in focus order: the time bar's, the Confidence readout, then save,
-## load and (debug only) the flag button. Neighbours wrap around, so a gamepad reaches them
-## all; down from any of them is the view tabs.
+## Opens the Command tab (the funds and Conf. readouts in the top bar;
+## docs/content/m27-daily-rhythm.md section 4).
+func open_command() -> void:
+	view_switcher.show_view(ViewSwitcher.COMMAND)
+
+
+## Returns every button in focus order: the time bar's, the funds and Confidence readouts,
+## then save, load and (debug only) the flag button. Neighbours wrap around, so a gamepad
+## reaches them all; down from any of them is the view tabs.
 func get_focus_order() -> Array[Button]:
 	var buttons: Array[Button] = time_bar.get_buttons()
-	buttons.append_array([confidence_readout, _quick_save_button, _quick_load_button])
+	buttons.append_array([money_label, confidence_readout, _quick_save_button, _quick_load_button])
 	if _debug_flag_button != null:
 		buttons.append(_debug_flag_button)
 	return buttons

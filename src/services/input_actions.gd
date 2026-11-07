@@ -26,6 +26,7 @@ const ACTIONS: Array[StringName] = [
 	&"view_base",
 	&"view_research",
 	&"view_personnel",
+	&"view_command",
 	&"base_level_up",
 	&"base_level_down",
 	&"base_energy_layer",
@@ -144,6 +145,11 @@ const DEFAULTS: Dictionary = {
 	&"view_personnel":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F5}],
+		GAMEPAD: [],
+	},
+	&"view_command":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F6}],
 		GAMEPAD: [],
 	},
 	&"base_level_up":

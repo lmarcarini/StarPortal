@@ -181,7 +181,7 @@ func test_time_bar_text_comes_from_translation_keys() -> void:
 ## shown view, moves along the tabs to the other view and through it, and back up.
 func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void:
 	var buttons: Array[Button] = _shell.get_focus_order()
-	assert_int(buttons.size()).is_equal(7)
+	assert_int(buttons.size()).is_equal(8)
 	assert_object(_focus_owner()).is_same(buttons[0])
 	var visited: Array[Control] = []
 	for _step: int in buttons.size():
@@ -219,7 +219,7 @@ func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void
 
 
 func test_gamepad_a_presses_the_focused_button() -> void:
-	var quick_save: Button = _shell.get_focus_order()[4]
+	var quick_save: Button = _shell.get_focus_order()[5]
 	var presses: Array[int] = [0]
 	quick_save.pressed.connect(func() -> void: presses[0] += 1)
 	quick_save.grab_focus()
@@ -273,7 +273,7 @@ func test_debug_overlay_measures_ticks() -> void:
 func test_debug_flag_button_sets_flag_shown_in_state_tree() -> void:
 	var overlay: DebugOverlay = _shell.debug_overlay
 	overlay.toggle()
-	var button: Button = _shell.get_focus_order()[6]
+	var button: Button = _shell.get_focus_order()[7]
 	button.pressed.emit()
 	button.pressed.emit()
 	SimClock.step_ticks(1)
