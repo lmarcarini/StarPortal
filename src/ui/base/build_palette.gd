@@ -1,7 +1,8 @@
 class_name BuildPalette
 extends VBoxContainer
 ## The Base tab's build palette (docs/content/m2-base.md section 6): one button per buildable
-## room in catalogue order, the Dig button, then a line that shows the hovered or focused
+## room in catalogue order and the "Dig Level N" entry (greyed with "Unlock: <project>" while
+## research locks it; held to dig), then a line that shows the hovered or focused
 ## room's cost, build time and draw, or while placing the ghost's state and a Build button
 ## (one click), and under it the room's "now" line. A room research still locks shows greyed
 ## (disabled) and its line reads "Unlock: <project>"; staff-locked rooms are not offered.
@@ -66,7 +67,9 @@ func _init() -> void:
 	_build.text = "BASE_BUILD_BUILD"
 	_build.visible = false
 	_build.pressed.connect(build_held.emit)
-	line.add_child(_dig)
+	_rooms.add_child(_dig)
+	_dig.mouse_entered.connect(_show_dig_summary)
+	_dig.focus_entered.connect(_show_dig_summary)
 	line.add_child(_build)
 	_cancel.text = "BASE_BUILD_CANCEL_PLACING"
 	_cancel.visible = false
@@ -103,6 +106,7 @@ func show_rooms(defs: Dictionary, unlocked: Array[StringName]) -> void:
 		button.gui_input.connect(_on_button_input)
 		_rooms.add_child(button)
 		_buttons[def_id] = button
+	_rooms.move_child(_dig, -1)
 	_refresh_hint()
 
 
@@ -191,6 +195,12 @@ func _show_summary(def_id: StringName) -> void:
 		if not note.is_empty():
 			_role.text = "%s\n%s" % [_role.text, note]
 		_role.visible = not _role.text.is_empty()
+
+
+## Hovering or focusing the Dig entry: its reason ("Unlock: Excavation survey") under the hint.
+func _show_dig_summary() -> void:
+	_role.text = _dig.get_reason()
+	_role.visible = not _role.text.is_empty()
 
 
 static func _offered(def_id: StringName, unlocked: Array[StringName]) -> bool:

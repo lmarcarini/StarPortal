@@ -30,6 +30,8 @@ func before_test() -> void:
 	_runner = scene_runner(_root)
 	_view.setup(_simulation)
 	_power = _view.get_power()
+	# The switch and charge control live on the Energy sub-tab (card #206).
+	_view.get_sub_tabs().show_tab(BaseSubTabs.ENERGY)
 	await _runner.await_input_processed()
 
 
@@ -106,6 +108,7 @@ func test_charge_control_steps_and_refuses() -> void:
 
 
 func test_energy_layer_action_click_and_dpad() -> void:
+	_view.get_sub_tabs().show_tab(BaseSubTabs.BUILD)
 	assert_bool(_power.is_layer_on()).is_false()
 	await _press_action(&"base_energy_layer")
 	assert_bool(_power.is_layer_on()).is_true()
@@ -138,7 +141,6 @@ func test_energy_layer_action_click_and_dpad() -> void:
 
 func test_layout_fits_in_both_languages() -> void:
 	var bank: RoomState = PowerFixture.add_bank(_simulation.state, 20)
-	_power.toggle_layer()
 	for locale: String in ["en", "pt_BR"]:
 		TranslationServer.set_locale(locale)
 		for room_id: StringName in [bank.id, &""]:

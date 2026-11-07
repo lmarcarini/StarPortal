@@ -3,8 +3,9 @@ extends HoldButton
 ## The palette's Dig button (docs/content/m2-base.md section 4): "Dig Level 2 · $1,500k ·
 ## 3 d", held to dig. While a level is being dug it offers to cancel the dig with its 50%
 ## refund instead, its tooltip showing the dig's progress ("Digging Level 4: 45%, 2 d left");
-## past the last level allowed it is disabled. A refused dig shows why in its
-## tooltip and in [method get_reason]. It changes no state: it emits [signal command_held].
+## past the last level allowed it is disabled. A refused dig shows why in its tooltip and in
+## [method get_reason]; one research still locks reads "Unlock: Excavation survey". It
+## changes no state: it emits [signal command_held].
 ## Bible: docs/content/m2-base.md section 4
 
 ## Emitted when a hold confirms; [param command] digs or cancels the dig.
@@ -68,7 +69,20 @@ func get_reason() -> String:
 	return _reason
 
 
+## The level the Base tab offers to dig next in [param state] (its ghost level tab), or 0
+## while a dig runs or when no research will ever allow another.
+static func next_level(state: GameState) -> int:
+	if state.balance == null or state.base.digging_level() != 0:
+		return 0
+	var result: CommandResult = DigLevelCommand.new().validate(state)
+	if result.error_code == &"level_limit":
+		return 0
+	return state.base.level_count + 1
+
+
 func _reason_of(result: CommandResult, state: GameState) -> String:
+	if result.error_code == &"needs_research":
+		return BasePanelText.unlock(StringName(result.detail))
 	var cost_k: int = DigLevelCommand.cost_k(state, state.base.level_count + 1)
 	return BuildText.reason(result, state, cost_k)
 

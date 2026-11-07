@@ -21,7 +21,8 @@ var _signature: int = 0
 
 
 ## Puts the strip at the top of [param column], the controls at the end of [param panel] and
-## the layer over [param plan].
+## the layer over [param plan]. The switch and charge control show only with the layer on (the
+## Energy sub-tab).
 func attach(column: Control, plan: BasePlan, panel: Control) -> void:
 	_plan = plan
 	column.add_child(strip)
@@ -119,7 +120,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _show_selection() -> void:
 	room_switch.visible = false
 	charge.visible = false
-	if _simulation == null:
+	if _simulation == null or not layer.visible:
 		return
 	var state: GameState = _simulation.state
 	var room: RoomState = state.base.find_room(_selected)
