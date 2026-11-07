@@ -60,11 +60,11 @@ a glyph-like line drawing in the place it sits, with its row of cuts)
 | --- | --- | --- |
 | Stock, left end | Two long rails leaning together, joined by short crossbars | 3 short |
 | Stock, right end | A tall frame with a slab swung half open and a dot near its edge | 1 long |
-| Shank, top | A flat band with three tall points rising from it | 1 long, 1 short |
-| Shank, middle | Square notches climbing to one side | 1 short |
-| Shank, low | A body with two pairs of wings | 4 short |
-| Crown, where the arms meet, inside a punched circle | A seat with a straight back and four legs | 1 long, 3 short |
-| Left arm | A thick triangle, broad at one end and thin at the other | 1 long, 2 short |
+| Shank, top | A flat band with three tall points rising from it, a notch between each pair | 1 long, 1 short |
+| Shank, middle | A line climbing in square steps from lower left to upper right | 1 short |
+| Shank, low | Two pairs of pointed flaps, the upper pair larger, either side of a short upright line | 4 short |
+| Crown, where the arms meet, inside a punched circle | A tall back leaning slightly away from a flat seat on two upright supports | 1 long, 3 short |
+| Left arm | A thin triangle lying flat, with a square corner at its lower right | 1 long, 2 short |
 | Right arm (under the water) | A tall upright stroke with two arms bending upward | 2 short |
 
 The tracing shows the cuts plainly: short cuts are about a finger wide apart; a long cut is
@@ -74,8 +74,11 @@ three times the length of a short one.
 
 - Order No. 1 (puzzle 1): the sill stone's seven carvings, then "the eighth is the Ring's own
   mark, which the console sets."
-- STILLWATER's MOTH Look around (section 2, MOTH texts): "On the flat stone before the Ring,
-  one mark cut alone: a seat with a straight back."
+- STILLWATER's MOTH Look around report, kept in the Archive as the MOTH report document: "On
+  the flat stone before the Ring, one mark cut alone: a tall back leaning away from a flat
+  seat." **Card M3-07 (#227) writes this line** into STILLWATER's Look around text (the PO adds
+  it to that card); it is the only clue that the Chair is STILLWATER's own mark besides the
+  circle and the count.
 - The dial console: seal 8 always shows CAIRN's own mark and cannot be changed.
 
 ### Solution
@@ -99,11 +102,11 @@ one alone gives a clear "something is off" signal (ties, or one mark too many).
 
 | Wrong reading | What happens |
 | --- | --- |
-| By position, top to bottom (Ladder first) | The console will not turn: every address not starting with the Stairs needs more than one bank. No charge spent |
+| By position, top to bottom (Ladder first) | Every address not starting with the Stairs needs more than 400 MWh: with one bank the console will not turn and nothing is spent; with more banks charged, the dial most likely gives No gate |
 | A long cut read as one | Four pairs of marks share a count; there is no order to dial |
 | The Chair kept, the Wedge dropped (35, 19, 3, 24, 22, 5, 33) | No gate (36.7 MWh); no point in space has this address |
 | A look-alike (see "Decoys") | No gate (36.7 MWh) |
-| Butterfly and Doorway swapped, or Crown and Wedge swapped | No gate (36.7 MWh); see "Decoys" for why these two need the generator's help |
+| Two neighbouring marks swapped (Ladder/Butterfly, Butterfly/Doorway, Doorway/Crown, Crown/Wedge) | No gate (36.7 MWh): these four are reserved, see "Decoys" |
 
 ### Where players get stuck, and the analyst's hints
 
@@ -112,7 +115,7 @@ one alone gives a clear "something is off" signal (ties, or one mark too many).
 | Not finding the puzzle | "The dossier saw something iron at the causeway's end. The MOTH could get close." | "Fly the MOTH on STILLWATER: Look around, then a Close look at the iron object." |
 | Reading by position | "Each mark has its own row of cuts. What could they be for?" | "The cuts count the marks in order. Start with the mark that has one cut." |
 | The long cut | "Every count appears once. Four marks have only short cuts." | "A long cut is five, as in a tally. Long and three short is eight." |
-| Eight marks, seven slots | "Order No. 1: the eighth is the Ring's own mark." | "The circled seat is the Chair, cut alone before STILLWATER's Ring: its own mark. Leave it out; the console sets CAIRN's." |
+| Eight marks, seven slots | "Order No. 1: the eighth is the Ring's own mark." | "The circled chair is the Chair, cut alone before STILLWATER's Ring: its own mark. Leave it out; the console sets CAIRN's." |
 | "These are MILESTONE's carvings" | "Neighbouring worlds share carvings. Is the order the same?" | "Six of the seven are MILESTONE's, in another order, with the Crown. It is another world nearby." |
 | After a No gate | "Count the cuts again on the long rows." | "Stairs, Cactus, Ladder, Butterfly, Doorway, Crown, Wedge." |
 
@@ -127,9 +130,9 @@ seven are followed by the Chair, as on the anchor.
 A team that recovers the anchor brings it home: an object document with three images (whole,
 the crown circle, the stock) and the Codex entry "The iron hook". Its text adds one thing the
 drone could not see: on the underside of the stock, scratched rather than punched, "OF THE LONG
-HEARTH" in plain capitals, a drifted English spelling the analyst notes ("hearth" spelt
-*harth*). The Recover also sets the flag `anchor_recovered` (card 19 puts it on the target's
-data), which K2 reads. A recovered anchor stays a document; its marks stay readable in 5B.
+HARTH" in plain capitals, a drifted English spelling the analyst notes ("hearth" spelt
+*harth*). The Recover also sets the flag `anchor_recovered`, which K2 reads: **the Recover
+simulation, card M3-09 (#229), sets it** (a flag named on the recoverable target's data). A recovered anchor stays a document; its marks stay readable in 5B.
 
 ### Position and checks
 
@@ -174,14 +177,19 @@ most 1,500 ly), as in m15.
 | Candle for Butterfly | 35, 19, 3, 34, 22, 5, 29 | No |
 | Chair for Doorway | 35, 19, 3, 24, 33, 5, 29 | No |
 | Tent for Wedge | 35, 19, 3, 24, 22, 5, 18 | No |
-| Butterfly and Doorway swapped (4 short read as long) | 35, 19, 3, 22, 24, 5, 29 | **Yes** |
-| Crown and Wedge swapped (6 and 7 miscounted) | 35, 19, 3, 24, 22, 29, 5 | **Yes** |
+| Butterfly and Doorway swapped (4 short read as long) | 35, 19, 3, 22, 24, 5, 29 | **Yes**: reserved |
+| Crown and Wedge swapped (6 and 7 miscounted) | 35, 19, 3, 24, 22, 29, 5 | **Yes**: reserved |
+| Ladder and Butterfly swapped (3 and 4 miscounted) | 35, 19, 24, 3, 22, 5, 29 | **Yes**: reserved |
+| Doorway and Crown swapped (5 and 6 miscounted) | 35, 19, 3, 24, 5, 22, 29 | **Yes**: reserved |
 
-Every candidate region within one bank has at least two swaps of neighbouring seals that are
-real regions; this answer's two are the least likely misreads (a long cut against four short
-ones, and one short cut more or less after a long one). **PO proposal:** card 19 adds these two
-to a reserved list that the world generator rejects from CAIRN's origin and the validator
-checks, so neither can ever lock. Card 19 also notes that adding MOORING as an authored world
+The other neighbouring swaps (Stairs/Cactus, Cactus/Ladder, Wedge/Chair) are not real regions
+or not dialable with one bank. Every candidate region within one bank has some real swapped
+readings. Largest ball inside each reserved region (LP, Chebyshev centre, checked by computing
+the address of that point directly): Butterfly/Doorway 281 ly, Ladder/Butterfly 119 ly,
+Doorway/Crown 102 ly, Crown/Wedge 70 ly. **PO ruling:** the four marked "reserved" go on a reserved list: the world generator
+refuses any candidate world whose address from CAIRN's origin is on it, and the validator checks
+that no world has one, so none can ever lock. **Card 19 may change
+`src/gate/world_generator.gd` for this.** Card 19 also notes that adding MOORING as an authored world
 changes the procedural galaxy for a given seed; the v15 clean break covers it.
 
 ---
@@ -269,8 +277,15 @@ ordered list of (conditions, conversation); the first whose conditions pass runs
 
 | Channel | Order |
 | --- | --- |
-| Hail | K1 if `FlagIs(kindred_met, false)`; K3 if `FlagIs(k3_done, false)` and `WordKnown(buried_ring)`; else K0 |
-| Contact arrival | K2 if `FlagIs(k2_done, false)`; else K0 |
+| Hail | K1 if `FlagIs(kindred_met, false)`; K3 if `FlagIs(k3_done, false)` and `WordKnown(buried_ring)`; K3r if `FlagIs(k3_done)` and `FlagIs(avoided_given, false)`; else K0 |
+| Contact arrival | K2 if `FlagIs(k2_done, false)`; K2r if `FlagIs(k2_done)` and `FlagIs(heard_the_taking, false)`; else K0 |
+
+**No farming standing.** Each conversation sets its done flag on its first choice, the first
+one that can change standing, as K1 sets `kindred_met`: K1 `kindred_met`, K2 `k2_done`, K3
+`k3_done`. A conversation cut off after that choice is never run again from the start, so its
+opening standing cannot be earned twice. What the cut-off one had still to give comes from a
+short rerun (K2r, K3r below) whose only standing choice leads straight to its end node, so it
+cannot be cut off between the standing change and the end.
 
 `kindred_met` is set by K1 or K2, whichever comes first; that is also when MOORING becomes
 Contacted and First contact (+5 Confidence) is earned. A conversation cut off by "(signal
@@ -279,7 +294,8 @@ first hail cut off after that choice still counts as contact. Hail is shown only
 when life is "people" on the World Report.
 
 **K0, the hearth is busy** (a fallback, 1 minute): line "The hearth-keeper is at the boats.
-Come back when you have something new to say." → end (no effects).
+Come back when you have something new to say." → end (no effects). K0 is not a transcript
+(see section 4).
 
 ### K1: First hail
 
@@ -327,40 +343,60 @@ n1  line   oda  2  "You came. Sit by the fire. Say who you are."  -> c1
 c1  choice
     a "Your door was closed on us before. We would like to start again."
       conditions: FlagIs(kindred_snubbed)
-      effects: ChangeStanding(kindred, +5), SetFlag(kindred_met)                     -> n2
+      effects: ChangeStanding(kindred, +5), SetFlag(kindred_met), SetFlag(k2_done)  -> n2
     b "We bring back what is yours."   (show locked)
       conditions: FlagIs(anchor_recovered)
-      effects: ChangeStanding(kindred, +10), SetFlag(kindred_met), SetFlag(hook_returned) -> n3
+      effects: ChangeStanding(kindred, +10), SetFlag(kindred_met), SetFlag(k2_done),
+               SetFlag(hook_returned)                                                -> n3
     c "We are from the world your anchor led us from. We want to learn."
-      effects: SetFlag(kindred_met)                                                 -> n2
+      effects: SetFlag(kindred_met), SetFlag(k2_done)                               -> n2
 n2  line   oda  2  "Then learn. Every child here learns the {w:taking} first."  -> k1
-n3  line   oda  2  "The Long Hearth's hook. A man died on the Still when the {w:keepers} came. We never fetched it."  -> k1
+n3  line   oda  2  "The Long Hearth's hook. We leave a hook on the Still so the way home is never lost. You carried it home instead. That is a kin thing."  -> k1
 k1  check  leader, difficulty 2   pass -> n4   fail -> n6
 n4  line   oda  4  "Long ago the {w:keepers} took our people through the {w:buried_ring}. They wore the {w:collar}. When the
                     {w:hungry_silence} came, the {w:keepers} closed that ring with earth and left. We stayed. We are still here."  -> n5
-n5  line   oda  1  "The hook is the {w:home_mark}'s road. Every boat keeps it. We will not forget it again."  -> c2
-n6  line   oda  2  "Your leader talks like a {w:keepers} tax-man. Eat. Rest. We talk tomorrow, maybe."  -> c2
-c2  choice
+n5  line   oda  1  "The hook is the {w:home_mark}'s road. Every boat keeps it. We will not forget it again."  -> c2p
+n6  line   oda  2  "Your leader talks like a {w:keepers} tax-man. Eat. Rest. We talk tomorrow, maybe."  -> c2f
+c2p choice
     a "We will help you, if we can."   conditions: StandingAtLeast(kindred, 5)
-      effects: ChangeStanding(kindred, +5), SetFlag(offered_help)                    -> e1
-    b "Thank you for the fire."                                                     -> e1
+      effects: ChangeStanding(kindred, +5), SetFlag(offered_help), SetFlag(k2_check_passed) -> e1p
+    b "Thank you for the fire."
+      effects: SetFlag(k2_check_passed)                                              -> e1p
     c "We need to look around the village. Our soldiers will go first."
-      effects: ChangeStanding(kindred, -5), SetFlag(soldiers_first)                  -> e1
-e1  end    effects: SetFlag(k2_done), SetFlag(heard_the_taking),
-                    AddDocument(doc_oral_the_taking), UnlockCodexEntry(codex_the_taking),
-                    UnlockCodexEntry(codex_hearth_keeper), UnlockCodexEntry(codex_kindred)
+      effects: ChangeStanding(kindred, -5), SetFlag(soldiers_first), SetFlag(k2_check_passed) -> e1p
+c2f choice
+    (the same three options, without SetFlag(k2_check_passed))                       -> e1f
+e1p end    effects: SetFlag(heard_the_taking), AddDocument(doc_oral_the_taking_long),
+                    UnlockCodexEntry(codex_the_taking), UnlockCodexEntry(codex_hearth_keeper),
+                    UnlockCodexEntry(codex_kindred)
+e1f end    effects: SetFlag(heard_the_taking), AddDocument(doc_oral_the_taking_short),
+                    UnlockCodexEntry(codex_the_taking), UnlockCodexEntry(codex_hearth_keeper),
+                    UnlockCodexEntry(codex_kindred)
 ```
 
 `AddDocument` from an expedition conversation is held until the team returns (card 15), so the
-oral history arrives on return as section 5 of m3 says. On a failed check the oral history is
-shorter (the same document id; card 20 picks the text by
-reading `FlagIs(k2_check_passed)`).
+oral history arrives on return as section 5 of m3 says. **Short and long oral histories:** two
+documents, two end nodes; no new mechanism. `doc_oral_the_taking_long` (passed check) is the
+full text; `doc_oral_the_taking_short` (failed check) leaves out the paragraph with `collar` and
+`home_mark`. Both are titled "The taking", and both unlock `codex_buried_ring_kindred` on first
+reading (card 18's document unlock), a second source for the Kindred side of the contested
+entry.
 
 **Recording the check result.** Lines carry no effects, so the passed path records itself in
-the next choice: card 20 writes c2 twice, c2p after n5 (every option also sets
-`SetFlag(k2_check_passed)`) and c2f after n6 (as shown). The graph shows c2 once for reading.
+the next choice: c2p (after n5) sets `k2_check_passed` on every option, c2f (after n6) does not.
+`k2_check_passed` is what reveals `collar` and `home_mark` (section 4).
 
-About 14 minutes of line time on the passed path. **Standing:** −5 to +15 (+5 or +10 opening,
+**K2r, the hearth again** (Contact arrival when K2 was cut off after its first choice): n1r line
+oda 1 "You are back. Sit. Where were we?" → k1 check, then K2's n4 to e1p / n6 to e1f as above.
+No opening choice, so no opening standing again; c2p/c2f's standing leads straight to an end.
+Card 20 writes it from K2's own nodes.
+
+About 14 minutes of line time on the passed path. Send team guarantees only 10 more minutes of
+open wormhole, so a team sent near that limit can lose K2 to "(signal lost)". That is safe: the
+team stays on MOORING for the rest of its planned field days as on any Contact expedition (the
+village feeds and houses it; no field event comes of the cut-off) and returns as planned; the
+oral history and Codex entries are not given. The next Contact expedition runs K2r, which gives
+them. A K2 cut off before its first choice simply runs again in full. **Standing:** −5 to +15 (+5 or +10 opening,
 +5 help; −5 for soldiers first). **Gives:** contact if it is the first, the oral history "The
 taking" (long version on a pass, which reveals `collar` and `home_mark`), two Codex entries.
 
@@ -375,37 +411,52 @@ n1  line   oda  1  "You again. Your words are better. Someone has been listening
 n2  line   oda  2  "Are you people of the {w:buried_ring}? Say it plainly this time."  -> c1
 c1  choice
     a "Yes. We are people of the {w:buried_ring}."   conditions: WordKnown(buried_ring)
-      effects: ChangeStanding(kindred, +10), SetFlag(kindred_kin),
+      effects: ChangeStanding(kindred, +10), SetFlag(k3_done), SetFlag(kindred_kin),
                UnlockCodexEntry(codex_buried_ring_kindred)                            -> n3
     b "We come from where that ring was buried. We did not know you were taken."
       conditions: WordKnown(buried_ring)
-      effects: ChangeStanding(kindred, +5), UnlockCodexEntry(codex_buried_ring_kindred) -> n3
+      effects: ChangeStanding(kindred, +5), SetFlag(k3_done),
+               UnlockCodexEntry(codex_buried_ring_kindred)                            -> n3
     c "We would rather not say where we come from."
-      effects: ChangeStanding(kindred, -5)                                           -> n4
+      effects: ChangeStanding(kindred, -5), SetFlag(k3_done)                         -> n4
 n3  line   oda  2  "Then you are kin, and kin are told. The {w:dark_moon} is four nights from this one. Do not be here."  -> n5
 n4  line   oda  1  "Then you are guests. Guests are told this much: do not be here at the {w:dark_moon}."  -> n5
 n5  line   oda  2  "The post by the ring counts them. When the hole is cut, the {w:keepers} walk the rings."  -> c2
 c2  choice
     a "Is there anywhere the {w:keepers} do not go?"
       effects: SetFlag(asked_avoided)                                                -> n6
-    b "Tell your {w:moot} we want to talk."   (show locked)
+    b "Tell your {w:moot} we want to talk."   (hidden when its conditions fail)
       conditions: FlagIs(kindred_kin), StandingAtLeast(kindred, 20), FlagIs(council_asked, false)
       effects: ChangeStanding(kindred, +5), SetFlag(council_asked)                   -> n7
     c "Goodbye, Oda."                                                                -> e1
 n6  line   oda  2  "One. The {w:keepers} say a {w:sleeper} lies there and must not wake. We do not fish it. Here is its hook."  -> e2
 n7  line   oda  1  "There is no {w:moot}. Not for a long time. Maybe there will be."  -> c2
-e1  end    effects: SetFlag(k3_done), SetFlag(kindred_dark_moon_told)
-e2  end    effects: SetFlag(k3_done), SetFlag(kindred_dark_moon_told),
-                    AddAddress(keepers_avoided), UnlockCodexEntry(codex_keepers)
+e1  end    effects: SetFlag(kindred_dark_moon_told)
+e2  end    effects: SetFlag(kindred_dark_moon_told), SetFlag(avoided_given),
+                    AddAddress(keepers_avoided), UnlockCodexEntry(codex_keepers_avoided)
 ```
+
+`codex_keepers_avoided` is a **part** of entry 7, not a new entry: card 18 lets an entry have
+parts with their own ids, each appended to the entry when unlocked (and unlocking the entry
+itself if it is not yet open). K1 unlocks the base `codex_keepers`.
+
+**K3r, the post** (hail after K3 ended without the question, or was cut off): n1r line oda 1
+"The post has another notch. Ask, if you came to ask." → K3's c2 (options a, b, c) → n6/n7 → e1
+or e2. Its only standing choice, c2b, is guarded by `council_asked`. So "Goodbye" or a cut-off in
+K3 only delays the avoided address; the next hail offers it again.
 
 About 11 minutes. **Standing:** −5 to +15. **Gives:** the kinship choice and the contested
 Codex entry, the dark-moon timing (a flag M4's patrol request will read), and one address.
 
 **The avoided address (PO proposal).** `AddAddress` takes a world id; `keepers_avoided` is a
 named slot resolved when the galaxy is generated: the open, unguarded procedural world within
-one bank (reach worlds) nearest to MOORING. It arrives in the Address Book written for CAIRN,
-source "K3 transcript". It is an ordinary procedural world in M3; the "sleeper" is a hook for
+one bank (reach worlds) nearest to MOORING. **Fallbacks:** if no reach world is open and
+unguarded, the nearest reach world of any status; if there is no reach world at all, the
+nearest procedural world to MOORING. The slot is resolved once per seed and never empty. It
+arrives in the Address Book written for CAIRN, source "K3 transcript". **If the player already
+has that address** (from a console scan or anywhere else), `AddAddress` adds no second entry:
+it adds "K3 transcript" to the entry's sources and marks it "the keepers avoid this world", and
+the Log says so. It is an ordinary procedural world in M3; the "sleeper" is a hook for
 the Murmur arc, nothing more yet.
 
 **Standing over M3b:** from −15 (snub, no help, evasive) to +40 (visit promised, hook returned,
@@ -437,8 +488,8 @@ three to four blocks each, in the Kindred accent colour.
 | 10 | `ring_walk` | ring-walk (to travel by Ring) | ▜▞▙ | Level 2 | oral history |
 | 11 | `high_keeper` | high keeper | ▙▛▜ | Level 2 | oral history |
 | 12 | `counting_stone` | counting-stone (a Ring's dial) | ▟▜▛ | Level 2 | oral history |
-| 13 | `collar` | collar (worn by the taken) | ▛▙▞ | `FlagIs(k2_check_passed)` | K2 |
-| 14 | `home_mark` | home-mark (a Ring's own glyph) | ▜▚▛ | `FlagIs(k2_check_passed)` | K2 |
+| 13 | `collar` | collar (worn by the taken) | ▛▙▞ | `FlagIs(k2_check_passed)` | K2, long oral history |
+| 14 | `home_mark` | home-mark (a Ring's own glyph) | ▜▚▛ | `FlagIs(k2_check_passed)` | K2, long oral history |
 | 15 | `hungry_silence` | Hungry Silence | ▓▒▓ | Level 3 | K2, oral history |
 | 16 | `makers` | Makers | ▛▟▞▚ | Level 3 | oral history |
 | 17 | `sanction` | sanction (leave to dial) | ▞▛▙ | Level 3 | oral history |
@@ -463,6 +514,11 @@ pencil turn to ink.
 | Kindred lexicon I | 1 Kindred transcript | $300k | 3 | 7.2 min | Words 5 to 12; level 2 |
 | Kindred lexicon II | Lexicon I and 2 Kindred transcripts | $500k | 4 | 9.6 min | Words 15 to 20; level 3 |
 
+**What counts as a transcript.** One per conversation id among K1, K2 (with K2r) and K3 (with
+K3r), counted when that conversation reaches an end node. K0 never counts, and a cut-off
+conversation does not count until it (or its rerun) ends. So lexicon II's two transcripts need
+two of K1, K2 and K3, and none can be farmed.
+
 Each finish marks the holding transcripts "newly readable" with a Log line per word. Research
 finished counts for Confidence as any project.
 
@@ -483,10 +539,10 @@ effect `UnlockCodexEntry`.
 | 4 | C. Dunmore | People | Folder 2 (puzzle 3) | Directorate liaison, 1959; Commission secretary, 1961 |
 | 5 | Oda, hearth-keeper | People | K1 or K2 | Keeper of the Long Hearth on MOORING; speaks for her village, not for all Kindred |
 | 6 | The Kindred | Peoples | K1 or K2 | Human, taken long ago; fishers and traders; fear the dark moon |
-| 7 | The keepers | Peoples | K1; extended by K3 | Named only as heard: they took the Kindred, walk the rings at the dark moon, avoid one world |
+| 7 | The keepers | Peoples | K1; part `codex_keepers_avoided` from K3 e2 | Named only as heard: they took the Kindred, walk the rings at the dark moon, avoid one world |
 | 8 | Gallow | Places | Commission Order No. 1 | The salt-works valley where the Ring was found in 1958 |
 | 9 | The Buried Ring (Directorate) | Places | Order No. 1 | Earth's Ring as the Directorate's file tells it (contested, below) |
-| 10 | The Buried Ring (Kindred) | Places | K3 `UnlockCodexEntry(codex_buried_ring_kindred)` | The same Ring as the Kindred remember it |
+| 10 | The Buried Ring (Kindred) | Places | K3 c1a or c1b; or reading "The taking" (either version) | The same Ring as the Kindred remember it |
 | 11 | The Taking | Events | K2 | The Kindred account of being taken through Earth's Ring |
 | 12 | The iron hook | Objects | Recover (5C) | The Long Hearth's anchor, the way home cut into its iron |
 
@@ -525,28 +581,41 @@ LOW worlds. Confidence: +5 First contact, +3 per finished project, +3 if a team 
 
 ---
 
-## 7. Open questions for the owner
+## 7. Card notes
 
-1. **Names.** MOORING (delegated to the PO in m3), Oda the hearth-keeper and the Long Hearth
-   (her village), and "the Still" for STILLWATER in Kindred speech. Approve or rename.
-2. **The keepers' avoided world.** A procedural world chosen at generation as the reach world
-   nearest MOORING, with the "sleeper" as an unexplained Murmur hook. Keep it that small, or
-   hold the address until M4 gives it a story?
-3. **Reserved decoys.** The world generator would reject two near-miss addresses (puzzle 5's
-   swapped readings) so they never lock. Accept, or prefer a different puzzle position with
-   more look-alike glyphs instead?
+- **Card 19 (MOORING content)** may change `src/gate/world_generator.gd`: a reserved-address
+  list (the four swapped readings in section 1, as addresses from CAIRN's origin) that the
+  generator refuses for any candidate world, and a validator check that no world has one. It
+  also resolves the `keepers_avoided` slot with its fallbacks (section 3).
+- **Card M3-07 (#227)** writes STILLWATER's MOTH Look around line about the mark cut alone
+  before the Ring (section 1, "What the player holds").
+- **Card M3-09 (#229)** sets `anchor_recovered` when the Recover simulation brings back the
+  iron hook (the flag is named on the recoverable target's data).
+- **Card 18** adds Codex entry parts (`codex_keepers_avoided`) and documents unlocking entries
+  on first reading; **card 20** writes K2r and K3r from K2's and K3's nodes and both versions
+  of "The taking".
 
-Everything else here stands as a PO proposal unless the owner objects: the hail selector, the
-`coast` biome, word entries generated outside the twelve, documents unlocking Codex entries,
-the `anchor_recovered` flag on Recover, and the K2 check-result flag.
+**Missable, accepted.** `collar` and `home_mark` are revealed only by K2's passed check; a
+failed check leaves them in script for M3 (the short oral history leaves them out, so nothing
+the player holds stays unreadable). Everything else has a second source: the avoided address
+through K3r, the Kindred side of the contested entry through "The taking".
+
+## 8. Open questions for the owner
+
+None. The names (MOORING, Oda, the Long Hearth, "the Still") and the reserved swapped readings
+are PO rulings. Everything else stands as a PO proposal unless the owner objects: the hail and
+arrival selectors with K2r and K3r, the `coast` biome, word entries generated outside the
+twelve, documents unlocking Codex entries, Codex entry parts, the `anchor_recovered` flag on
+Recover, the K2 check-result flag, the two versions of "The taking", and the keepers' avoided
+world with its fallbacks.
 
 ## New names
 
 | Name | What it is | Status |
 | --- | --- | --- |
-| MOORING | World 5, the Kindred village | New (delegated) |
+| MOORING | World 5, the Kindred village | New (PO-decided) |
 | The iron hook | The Long Hearth's anchor on STILLWATER | New |
-| Oda | The hearth-keeper | New |
-| The Long Hearth | Oda's village on MOORING | New |
-| The Still | Kindred name for STILLWATER | New |
+| Oda | The hearth-keeper | New (PO-decided) |
+| The Long Hearth | Oda's village on MOORING | New (PO-decided) |
+| The Still | Kindred name for STILLWATER | New (PO-decided) |
 | The keepers | Kindred name for the Ossar (unnamed as Ossar in M3) | From m3 |
