@@ -4,7 +4,8 @@ extends Control
 ## when the placement command would be accepted, red with the first broken rule's reason otherwise.
 ## It follows the mouse and the plan's cell cursor. Q, E or a shoulder button turns it; one left
 ## click, Enter or (A) builds it at once (no hold), and the ghost stays out to place another; Esc,
-## (B) or a right click leaves placing. A corridor is painted as an L-shaped run from a start cell
+## (B), a right click, the palette's Cancel button or its selected entry leave placing, and so do
+## switching level and hiding the tab. A corridor is painted as an L-shaped run from a start cell
 ## to the cursor: press, drag and release with the mouse (a click builds one cell), or press Enter
 ## or (A) to set the start, move the cursor and press again to build; Esc or (B) first clears the
 ## start. With no start the ghost is the one cell under the pointer or cursor.
@@ -41,6 +42,8 @@ var _start: Vector2i = _NO_START
 ## True when the run leaves its start along the column first (the first move off it was vertical).
 var _column_first: bool = false
 var _cursor: Vector2i = Vector2i.ZERO
+## The plan's level when placing started: showing another level puts the ghost away.
+var _level: int = 0
 
 
 ## Attaches the ghost to [param plan] (as its child) to place rooms in [param state].
@@ -67,6 +70,7 @@ func start(room_def: StringName, cell: Vector2i) -> void:
 	_painting = false
 	_start = _NO_START
 	_set_placing(true)
+	_level = _plan.level if _plan != null else 0
 	move_to(cell)
 
 
@@ -199,6 +203,9 @@ func recheck() -> void:
 
 
 func _process(_delta: float) -> void:
+	if _plan != null and _plan.level != _level:
+		stop(true)
+		return
 	if _plan != null and _plan.cursor != _cursor:
 		_cursor = _plan.cursor
 		move_to(_cursor)
@@ -210,6 +217,13 @@ func follow(cell: Vector2i) -> void:
 	_cursor = cell
 	move_to(cell)
 	_plan.queue_redraw()
+
+
+func _notification(what: int) -> void:
+	if what != NOTIFICATION_VISIBILITY_CHANGED or not is_inside_tree():
+		return
+	if is_placing() and not is_visible_in_tree():
+		stop(true)
 
 
 func _input(event: InputEvent) -> void:
