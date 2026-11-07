@@ -6,8 +6,6 @@ extends RefCounted
 
 ## Emitted at the first tick of each day, with the new day's index.
 signal day_started(day_index: int)
-## Emitted at the first tick of a month, reporting the month that just ended.
-signal month_closed(year: int, month: int)
 ## Forwarded from the command queue when a command fails validation.
 signal command_rejected(type: StringName, code: StringName)
 ## Emitted when a system asks the clock to pause, e.g. &"incoming_wormhole". Systems and
@@ -67,9 +65,8 @@ func submit(command: Command) -> CommandResult:
 	return result
 
 
-## Runs one tick: flush commands, tick each system, advance the clock, run day and month
-## hooks and emit their signals when the new tick starts a day or month, then emit the
-## tick's events last.
+## Runs one tick: flush commands, tick each system, advance the clock, run the day hooks
+## and emit day_started when the new tick starts a day, then emit the tick's events last.
 func advance_tick() -> void:
 	commands.flush(state)
 	for system: SimSystem in _systems:
@@ -78,8 +75,6 @@ func advance_tick() -> void:
 	var new_tick: int = state.clock.tick
 	if TimeMath.is_day_start(new_tick):
 		_start_day(new_tick)
-	if TimeMath.is_month_start(new_tick):
-		_close_month(new_tick)
 	_emit_events()
 
 
@@ -87,13 +82,6 @@ func _start_day(new_tick: int) -> void:
 	for system: SimSystem in _systems:
 		system.on_day(state)
 	day_started.emit(TimeMath.day_index(new_tick))
-
-
-func _close_month(new_tick: int) -> void:
-	for system: SimSystem in _systems:
-		system.on_month(state)
-	var ended: Dictionary = TimeMath.date_of(new_tick - 1)
-	month_closed.emit(ended["year"], ended["month"])
 
 
 # Drains until the outbox stays empty. A nested call (a handler submitting while paused)

@@ -85,7 +85,7 @@ const BALANCE_ID: StringName = &"balance"
 @export var salary_per_skill_k: int = 5
 
 @export_group("Recruitment")
-## Candidates on each monthly list (m26-staff-and-money.md section 2).
+## Candidates the rolling list holds (m27-daily-rhythm.md section 3).
 @export var candidates_per_list: int = 4
 ## Weights of a drawn candidate's skill 1 to 5, in percent (section 2: 10, 35, 35, 15, 5).
 @export var candidate_skill_weights: Array[int] = [10, 35, 35, 15, 5]

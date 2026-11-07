@@ -75,7 +75,19 @@ static func room_name(state: GameState, room: RoomState) -> String:
 	return _tr(&"STAFF_ROOM").format({"room": name, "level": room.level})
 
 
-## "Academia · fee $30k · arrives in 3 d" for [param candidate].
+## "Leaves in 5 d · Academia · Fee: 30 days' pay ($30k) · arrives in 3 d" for
+## [param candidate] in [param state] (docs/content/m27-daily-rhythm.md section 3).
+static func candidate_line(state: GameState, candidate: CandidateState) -> String:
+	return "%s · %s" % [leaves(state, candidate), offer(candidate)]
+
+
+## "Leaves in 5 d": whole days from today to [param candidate]'s leave day in [param state].
+static func leaves(state: GameState, candidate: CandidateState) -> String:
+	var days: int = maxi(0, candidate.leaves_day - TimeMath.day_index(state.clock.tick))
+	return _tr(&"STAFF_LEAVES").format({"days": days})
+
+
+## "Academia · Fee: 30 days' pay ($30k) · arrives in 3 d" for [param candidate].
 static func offer(candidate: CandidateState) -> String:
 	return (
 		_tr(&"STAFF_OFFER")

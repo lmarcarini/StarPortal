@@ -2,7 +2,8 @@ class_name PersonnelRow
 extends PanelContainer
 ## One 48 px row of the Personnel tab (docs/content/m26-staff-and-money.md section 6): a
 ## person (name, role, skill stars, salary, room or "Arriving in …") or a candidate (name,
-## role, stars, salary, pipeline, fee and arrival time). The stars' tooltip gives the skill
+## role, stars, salary, days until leaving, pipeline, fee,
+## arrival time). The stars' tooltip gives the skill
 ## as a number. The row takes focus (D-pad, click); focusing it emits [signal chosen], and
 ## (A) or Enter on it emits [signal activated].
 ## Bible: docs/content/m26-staff-and-money.md section 6
@@ -52,11 +53,11 @@ func show_person(state: GameState, person: PersonState) -> void:
 	modulate = Color(1, 1, 1, 0.6) if not person.is_on_base(state.clock.tick) else Color.WHITE
 
 
-## Shows [param candidate].
-func show_candidate(candidate: CandidateState) -> void:
+## Shows [param candidate] as it stands in [param state] ("Leaves in 5 d · ...").
+func show_candidate(state: GameState, candidate: CandidateState) -> void:
 	id = candidate.id
 	_fill(candidate.name, candidate.role, candidate.skill, candidate.salary_k)
-	_where.text = PersonnelText.offer(candidate)
+	_where.text = PersonnelText.candidate_line(state, candidate)
 	modulate = Color.WHITE
 
 

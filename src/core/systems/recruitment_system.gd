@@ -1,12 +1,13 @@
 class_name RecruitmentSystem
 extends SimSystem
-## Recruitment over time (docs/content/m26-staff-and-money.md section 2): on the 1st of each
-## month a new candidate list replaces the old one (unhired candidates leave), drawn with the
-## system's own seeded stream; and each hired person posts staff_arrived(person id) on the
-## tick they arrive, which writes the Log line "Dr Ana Ferreira (Scientist, skill 4) has
-## arrived.". Arrival itself needs no change: a person is on base once
-## PersonState.arrives_tick is reached.
-## Bible: docs/content/m26-staff-and-money.md section 2
+## Recruitment over time (docs/content/m27-daily-rhythm.md section 3): at each daily
+## settlement, candidates whose leave day has come leave the list; every third day
+## (RecruitmentRules.is_arrival_day()) one candidate arrives, drawn with the system's own seeded
+## stream, replacing the oldest when the list is full, and leaving 12 days later. A change posts
+## candidates_changed (no message, no Log line). Each hired person posts staff_arrived(person
+## id) on the tick they arrive, which writes the Log line "Dr Ana Ferreira (Scientist, skill 4)
+## has arrived.".
+## Bible: docs/content/m27-daily-rhythm.md section 3, m26-staff-and-money.md section 2
 
 ## Id of the system and of its random stream.
 const ID: StringName = &"recruitment"
@@ -40,10 +41,27 @@ func tick(state: GameState) -> void:
 			state.events.post(&"staff_arrived", [person.id])
 
 
-## Draws the month's list (RecruitmentRules.draw_list()) and posts candidates_changed.
-func on_month(state: GameState) -> void:
-	if _names == null:
-		return
+## Removes the candidates leaving today, adds today's arrival (if any) and posts
+## candidates_changed when the list changed.
+func on_day(state: GameState) -> void:
+	var day: int = TimeMath.day_index(state.clock.tick)
+	var changed: bool = state.recruitment.remove_leaving(day) > 0
+	if _names != null and RecruitmentRules.is_arrival_day(day):
+		changed = _arrive(state, day) or changed
+	if changed:
+		state.events.post(&"candidates_changed", [])
+
+
+func _arrive(state: GameState, day: int) -> bool:
+	if _roles.is_empty():
+		return false
 	var rng: RandomNumberGenerator = state.random.stream(ID)
-	state.recruitment.replace_list(RecruitmentRules.draw_list(rng, _balance, _roles, _names))
-	state.events.post(&"candidates_changed", [])
+	if state.recruitment.candidates.size() >= _balance.candidates_per_list:
+		state.recruitment.remove_oldest()
+	var role: RoleDef = RecruitmentRules.arrival_role(rng, _roles, state.recruitment.candidates)
+	if role == null:
+		return false
+	var candidate: CandidateState = RecruitmentRules.draw_candidate(rng, _balance, role, _names)
+	candidate.leaves_day = day + RecruitmentRules.STAY_DAYS
+	state.recruitment.add_candidate(candidate)
+	return true

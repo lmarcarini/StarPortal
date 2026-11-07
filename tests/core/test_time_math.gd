@@ -44,33 +44,26 @@ func test_day_index_counts_whole_days() -> void:
 	assert_int(TimeMath.day_index(31 * DAY + 5)).is_equal(31)
 
 
-## Tick 31 x 1440 is February 1 and starts a month; the day before does not.
-func test_february_first_is_month_start() -> void:
+## Tick 31 x 1440 is February 1.
+func test_february_first_date() -> void:
 	assert_dict(TimeMath.date_of(31 * DAY)).is_equal(_date(2026, 2, 1, Vector2i(0, 0)))
-	assert_bool(TimeMath.is_month_start(31 * DAY)).is_true()
-	assert_bool(TimeMath.is_month_start(30 * DAY)).is_false()
-	assert_bool(TimeMath.is_month_start(31 * DAY + 1)).is_false()
 
 
-## Tick 0 starts both a day and a month.
-func test_tick_zero_is_day_and_month_start() -> void:
+## Tick 0 starts a day.
+func test_tick_zero_is_day_start() -> void:
 	assert_bool(TimeMath.is_day_start(0)).is_true()
-	assert_bool(TimeMath.is_month_start(0)).is_true()
 
 
 ## 2026 is not a leap year: February 28 is followed by March 1.
 func test_non_leap_february_has_28_days() -> void:
 	assert_dict(TimeMath.date_of(58 * DAY)).is_equal(_date(2026, 2, 28, Vector2i(0, 0)))
 	assert_dict(TimeMath.date_of(59 * DAY)).is_equal(_date(2026, 3, 1, Vector2i(0, 0)))
-	assert_bool(TimeMath.is_month_start(59 * DAY)).is_true()
 
 
-## 2028 is a leap year: 2028-02-29 exists and is not a month start; March 1 follows it.
+## 2028 is a leap year: 2028-02-29 exists; March 1 follows it.
 func test_leap_day_2028_02_29() -> void:
 	var leap_tick: int = LEAP_DAY_INDEX * DAY
 	assert_dict(TimeMath.date_of(leap_tick)).is_equal(_date(2028, 2, 29, Vector2i(0, 0)))
 	assert_bool(TimeMath.is_day_start(leap_tick)).is_true()
-	assert_bool(TimeMath.is_month_start(leap_tick)).is_false()
 	assert_dict(TimeMath.date_of(leap_tick + DAY)).is_equal(_date(2028, 3, 1, Vector2i(0, 0)))
-	assert_bool(TimeMath.is_month_start(leap_tick + DAY)).is_true()
 	assert_int(TimeMath.day_index(leap_tick + 90)).is_equal(LEAP_DAY_INDEX)

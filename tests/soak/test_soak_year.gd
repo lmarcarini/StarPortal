@@ -47,13 +47,14 @@ class SoakRun:
 	var bot: SoakBot = SoakBot.new()
 	## Number of day_started events seen.
 	var days_started: int = 0
-	## Every month_closed event, in order: {year, month, tick}.
+	## Every month boundary (a day_started on the 1st; the engine has no month hook), in order:
+	## {year, month (the one that ended), tick}.
 	var months_closed: Array[Dictionary] = []
 	## Every command_rejected event: {type, code}.
 	var rejections: Array[Dictionary] = []
 	## Number of times play switched to a freshly loaded Simulation.
 	var switches: int = 0
-	## True from a month_closed event until the run handles it after the tick.
+	## True from a month boundary until the run handles it after the tick.
 	var month_close_pending: bool = false
 	## Ticks after which stored power was below 0 or above the capacity.
 	var power_out_of_bounds: int = 0
@@ -102,18 +103,23 @@ class SoakRun:
 		if committee.funds_history.is_empty() or committee.funds_history.back() > funds:
 			budget_out_of_bounds += 1
 
+	## True when [param tick] is midnight on the 1st of a month.
+	static func is_month_start(tick: int) -> bool:
+		return TimeMath.is_day_start(tick) and TimeMath.date_of(tick)["day"] == 1
+
 	## Makes [param next] the simulation this run plays and listens to its signals.
 	func attach(next: Simulation) -> void:
 		simulation = next
 		simulation.day_started.connect(_on_day_started)
-		simulation.month_closed.connect(_on_month_closed)
 		simulation.command_rejected.connect(_on_command_rejected)
 
 	func _on_day_started(_day_index: int) -> void:
 		days_started += 1
-
-	func _on_month_closed(year: int, month: int) -> void:
-		months_closed.append({"year": year, "month": month, "tick": simulation.state.clock.tick})
+		var tick: int = simulation.state.clock.tick
+		if not is_month_start(tick):
+			return
+		var ended: Dictionary = TimeMath.date_of(tick - 1)
+		months_closed.append({"year": ended["year"], "month": ended["month"], "tick": tick})
 		month_close_pending = true
 
 	func _on_command_rejected(type: StringName, code: StringName) -> void:
@@ -151,7 +157,7 @@ func test_year_with_monthly_save_and_load_matches_uninterrupted_run() -> void:
 
 ## Returns the one-line report printed after the runs: duration and what was observed.
 func _summary(elapsed_msec: int) -> String:
-	var template := "soak: %d ticks x 2 runs in %.2f s; %d day_started, %d month_closed, "
+	var template := "soak: %d ticks x 2 runs in %.2f s; %d day_started, %d month boundaries, "
 	template += "%d reloads, %d commands (%d while paused), %d pauses; %d dials (%d locks), "
 	template += "%d closes, %d consoles read, %d pole cameras, %d book entries; "
 	template += "%d picked (%d from the book, %d targets, %d dropped); "
@@ -335,7 +341,7 @@ func _expected_month_closes() -> Array[Dictionary]:
 	var closes: Array[Dictionary] = []
 	for day: int in range(1, YEAR_DAYS + 1):
 		var tick: int = day * TimeMath.TICKS_PER_DAY
-		if not TimeMath.is_month_start(tick):
+		if not SoakRun.is_month_start(tick):
 			continue
 		var ended: Dictionary = TimeMath.date_of(tick - 1)
 		closes.append({"year": ended["year"], "month": ended["month"], "tick": tick})

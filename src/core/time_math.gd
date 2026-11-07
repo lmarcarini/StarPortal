@@ -36,10 +36,3 @@ static func day_index(tick: int) -> int:
 ## Returns true when [param tick] is the first minute of a day.
 static func is_day_start(tick: int) -> bool:
 	return tick % TICKS_PER_DAY == 0
-
-
-## Returns true when [param tick] is the first minute of a month.
-static func is_month_start(tick: int) -> bool:
-	if not is_day_start(tick):
-		return false
-	return date_of(tick)["day"] == 1

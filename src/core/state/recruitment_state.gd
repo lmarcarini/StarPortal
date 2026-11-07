@@ -1,11 +1,11 @@
 class_name RecruitmentState
 extends RefCounted
-## Saved state of recruitment (docs/content/m26-staff-and-money.md section 2): this month's
+## Saved state of recruitment (docs/content/m27-daily-rhythm.md section 3): the rolling
 ## candidate list and the number of the next candidate id. People hired and still arriving
 ## live on the roster (StaffState, PersonState.arrives_tick), so they are saved there.
 ## Only HireCommand and RecruitmentSystem change it.
 ## Saved shape: {"candidates": [CandidateState...], "next_candidate_number"}.
-## Bible: docs/content/m26-staff-and-money.md sections 2 and 8,
+## Bible: docs/content/m27-daily-rhythm.md section 3, m26-staff-and-money.md section 8,
 ## technical-architecture.md#data-model
 
 ## The candidates on offer, in list order.
@@ -21,6 +21,31 @@ func replace_list(fresh: Array[CandidateState]) -> void:
 		candidate.id = StringName("candidate_%d" % next_candidate_number)
 		next_candidate_number += 1
 		candidates.append(candidate)
+
+
+## Adds [param candidate] at the end of the list with the next free id.
+func add_candidate(candidate: CandidateState) -> void:
+	candidate.id = StringName("candidate_%d" % next_candidate_number)
+	next_candidate_number += 1
+	candidates.append(candidate)
+
+
+## Removes every candidate whose leave day is [param day] or earlier; returns how many left.
+func remove_leaving(day: int) -> int:
+	var before: int = candidates.size()
+	candidates.assign(candidates.filter(func(c: CandidateState) -> bool: return c.leaves_day > day))
+	return before - candidates.size()
+
+
+## Removes the oldest candidate (earliest leave day; first in list order on a tie), if any.
+func remove_oldest() -> void:
+	if candidates.is_empty():
+		return
+	var oldest: int = 0
+	for index: int in candidates.size():
+		if candidates[index].leaves_day < candidates[oldest].leaves_day:
+			oldest = index
+	candidates.remove_at(oldest)
 
 
 ## Returns the candidate with id [param candidate_id], or null.

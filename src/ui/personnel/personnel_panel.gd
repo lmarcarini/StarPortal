@@ -127,7 +127,7 @@ func _show_person(person: PersonState) -> void:
 
 func _show_candidate(candidate: CandidateState) -> void:
 	_fill(candidate.name, candidate.role, candidate.skill, candidate.salary_k)
-	_where.text = PersonnelText.offer(candidate)
+	_where.text = PersonnelText.candidate_line(_state, candidate)
 	_hire.text = tr(&"STAFF_HIRE").format(
 		{"fee": MoneyLabel.format_k(RecruitmentRules.fee_k(candidate))}
 	)

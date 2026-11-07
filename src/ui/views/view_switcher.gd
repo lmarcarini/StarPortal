@@ -146,6 +146,7 @@ func _collect_views() -> void:
 		_set_active(id, false)
 		_connect_view(view)
 		view.availability_changed.connect(_refresh_availability)
+		view.title_changed.connect(_refresh_titles)
 
 
 ## Listens to the requests of the views that make any: the Archive's unread count and the
@@ -208,9 +209,7 @@ func _refresh_availability() -> void:
 func _refresh_titles() -> void:
 	for index: int in _ids.size():
 		var view: GameView = _views[_ids[index]]
-		var archive: ArchiveView = view as ArchiveView
-		var title: String = archive.get_tab_title() if archive != null else tr(view.get_title_key())
-		_tabs.set_tab_title(index, title)
+		_tabs.set_tab_title(index, view.get_tab_title())
 
 
 ## Shows or hides the view [param view_id].

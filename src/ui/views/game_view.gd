@@ -10,6 +10,8 @@ extends Control
 ## Emitted when [method is_available] may have changed; the switcher then shows or hides
 ## the view's tab.
 signal availability_changed
+## Emitted when [method get_tab_title] may have changed; the switcher then rereads it.
+signal title_changed
 
 ## Called by the switcher before the view is shown, and again after a load with the new
 ## [param simulation]. The view drops anything it read from the previous one.
@@ -20,6 +22,11 @@ signal availability_changed
 
 ## Returns the translation key of the view's tab title.
 @abstract func get_title_key() -> StringName
+
+
+## Returns the translated tab title; a view may add to it (a count, a dot).
+func get_tab_title() -> String:
+	return tr(get_title_key())
 
 
 ## False while the view's tab is hidden (the Research tab before a lab finishes). The
