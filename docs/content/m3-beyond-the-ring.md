@@ -252,7 +252,7 @@ the field stays with the team (serious counts as skill 1 in checks) and returns 
 off work: in an Infirmary that is on, if it has room (4 patients), recovery is 2× faster, 3×
 with a medic in it; otherwise they rest at normal speed. Healed, they return to their rooms.
 The Infirmary joins the Base build palette at the unlock, not research: $300k, 6 hours, 5 MW, upkeep $40k per 30 days, 2 medic slots. No one dies in the
-field in M3, except in a lost team.
+field in M3 except through a missed check-in: in a rescue, or in a lost team.
 
 **Missed check-in and rescue.** A missed check-in is a due check-in, or the return, that does
 not come; a team that comes home before any check-in fell due never opens a rescue. When one is
@@ -261,6 +261,21 @@ is set to 1× for when it resumes, and a rescue alert opens with a **3-day** cou
 on the top bar's alert stack). The rescue is a normal dial of the world at its normal lock
 energy, then the Ring action **Signal T-1**: the team reaches the Ring in 15 minutes and comes
 through; closing early fails, and the player can try again within the window.
+
+**A rescue is not a sure thing (owner, 2026-11-07).** Whether everyone comes back depends on
+what is on the world. When the team reaches the Ring after a Signal, each member rolls to have
+survived (seeded):
+
+> Survival = 95% (LOW true threat), 85% (MED) or 70% (HIGH); −10% if airless or below −20 °C;
+> −15% for a member seriously injured; −5% per full day since the missed check-in; +5% for
+> each soldier on the team who survived, rolled first (at most +10%). Between 10% and 99%.
+
+Those who survived come through as above; the rest are **deceased**: they leave the roster, a
+Log line names each ("Sgt Owen Hale (T-1) did not survive on STILLWATER."), Confidence −3 each,
+and a lent soldier is replaced as for a lost one. If nobody survived, the Signal gets no answer
+after its 15 minutes: "No answer from T-1." The team is lost (below) and the window closes.
+The rescue alert says plainly that the outcome is not certain and that waiting lowers the odds;
+it shows no percentages, only the world's threat as the report knows it.
 
 The alert also forecasts the charge: the lock energy plus 15 minutes of drain, against the
 stored charge and the current charge rate.
@@ -282,6 +297,7 @@ addresses, findings, standing and Confidence. New causes, applied at once (M2.7 
 | New world surveyed (team) | +3 |
 | First contact with a people (once per people, at the first conversation) | +5 |
 | Team lost | −10 |
+| Member deceased in a rescue | −3 each |
 
 Artefact states and fates wait for M4: a recovered object is a document, and some unlock a
 research project.
@@ -464,7 +480,7 @@ M1.5 worlds and procedural ones. M3b adds MOORING and contact.
 | M3-07 | Content: World Report texts and biome templates; MOTH texts and targets for the four M1.5 worlds | S | 04, 05 |
 | M3-08 | Soldiers and medics, lent soldiers and replacements, injuries, recovery, the Infirmary and its unlock | M | 03 |
 | M3-09 | Expedition sim: plans, team, Survey and Recover, departure (instant, the 10-minute margin), field days, return, room assignments | M | 05, 08 |
-| M3-10 | Check-ins and rescue sim: check-ins every 24 h, the return as the last, Recall, missed check-in, rescue window, Signal, charge forecast, lost team | M | 09 |
+| M3-10 | Check-ins and rescue sim: check-ins every 24 h, the return as the last, Recall, missed check-in, rescue window, Signal, charge forecast, survival rolls and deceased members, lost team | M | 09 |
 | M3-11 | Field events: checks, setbacks (the missed check-in through card 10's hook), findings, the pool and its texts (about 15) | M | 10 |
 | M3-12 | Expeditions tab (F7), and **Plan expedition** on the World Report | M | 04, 10 |
 | M3-13 | Gate Room and alerts: Send team and Signal T-1 Ring actions, check-in messages, the rescue alert with Charge at maximum | M | 10 |
@@ -489,7 +505,7 @@ decide on the 3D feed.
 
 ---
 
-## 9. Saves and open questions
+## 9. Saves and owner decisions
 
 **Saves: clean break, v15** (after M2.7's v14): world states and report fields, the MOTH rack
 and probes in flight, new roles, injuries and lent-soldier replacements, the expedition (plan,
@@ -498,14 +514,13 @@ guesses, Codex entries and standing. Older saves get the "earlier build" message
 
 Everything else marked as a PO proposal or ruling above stands unless the owner objects.
 
-**Open questions for the owner.**
+**Owner decisions (2026-11-07).**
 
-1. **The MOTH.** A 2D scan screen in M3 and the real-time 3D feed as its own milestone after the
-   loop iteration (about 12 to 14 cards plus art)? PO proposal: yes.
-2. **Rescue.** Dial and **Signal** the team within 3 days, rather than sending a second team?
-   PO proposal: yes for M3; rescue teams with M4.
-3. **Infirmary.** Built from the Base palette when Expeditions unlock, rather than researched?
-   PO proposal: yes, in line with "constructions in the Base tab".
+1. **The MOTH:** a 2D scan screen in M3; the real-time 3D camera feed comes later as its own
+   milestone.
+2. **Rescue:** dial and Signal within 3 days, as proposed, but success depends on the world and
+   some of the team may not have survived (section 4, "A rescue is not a sure thing").
+3. **Infirmary:** built from the Base palette when Expeditions unlock.
 
 ---
 
