@@ -7,16 +7,16 @@ STAFF_HIRE_ERR_NO_FREE_BED,No free bed. Build Quarters.,Sem cama livre. Construa
 STAFF_HIRE_ERR_NO_MONEY,Not enough money,Dinheiro insuficiente
 STAFF_TITLE,Personnel,Pessoal
 STAFF_HEADING,PERSONNEL,PESSOAL
-STAFF_HEADER,Staff {staff} · Beds {used}/{beds} · Salaries {salaries}/month,Equipe {staff} · Camas {used}/{beds} · Salários {salaries}/mês
+STAFF_HEADER,Staff {staff} · Beds {used}/{beds} · Salaries {salaries} a day,Equipe {staff} · Camas {used}/{beds} · Salários {salaries} por dia
 STAFF_TAB_ROSTER,Roster,Equipe
 STAFF_TAB_CANDIDATES,Candidates ({n}),Candidatos ({n})
 STAFF_SELECTED,SELECTED,SELECIONADO
 STAFF_SKILL,Skill {n},Nível {n}
-STAFF_SALARY,{money}/month,{money}/mês
+STAFF_SALARY,{money} / 30 d,{money} / 30 d
 STAFF_UNASSIGNED,Unassigned,Sem posto
 STAFF_ARRIVING,Arriving in {time},Chega em {time}
 STAFF_ROOM,{room} (Level {level}),{room} (Nível {level})
-STAFF_OFFER,{pipeline} · fee {fee} · arrives in {time},{pipeline} · taxa {fee} · chega em {time}
+STAFF_OFFER,{pipeline} · Fee: 30 days' pay ({fee}) · arrives in {time},{pipeline} · Taxa: 30 dias de salário ({fee}) · chega em {time}
 STAFF_ROOM_SLOTS,{room}: {used}/{slots},{room}: {used}/{slots}
 STAFF_EFFECT_SPEED,speed {before}% to {after}%,velocidade de {before}% para {after}%
 STAFF_EFFECT_BUILD,building +{before}% to +{after}%,obras de +{before}% para +{after}%

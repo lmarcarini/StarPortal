@@ -43,7 +43,7 @@ BASE_PANEL_SIZE,Size {w} × {h} cells,Tamanho {w} × {h} células
 BASE_PANEL_DRAW,Draw {mw} MW,Consumo {mw} MW
 BASE_PANEL_OUTPUT,Output +{mw} MW,Geração +{mw} MW
 BASE_PANEL_NO_DRAW,No power draw,Sem consumo de energia
-BASE_PANEL_UPKEEP,Upkeep ${k}k / month,Manutenção ${k} mil / mês
+BASE_PANEL_UPKEEP,Upkeep ${k}k per 30 days,Manutenção ${k} mil a cada 30 dias
 BASE_PANEL_NO_UPKEEP,No upkeep,Sem manutenção
 BASE_STATUS_ON,On,Ligada
 BASE_STATUS_OFF,Off,Desligada

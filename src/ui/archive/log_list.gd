@@ -17,7 +17,8 @@ const _LOGGED_EVENTS: Dictionary[StringName, int] = {
 	&"console_read": 1,
 	&"horizon_record_taken": 1,
 	&"capacitors_installed": 1,
-	&"month_report_filed": 2,
+	&"reports_filed": 1,
+	&"committee_commendation": 1,
 	&"committee_warning": 1,
 }
 

@@ -1,7 +1,7 @@
 class_name PersonnelText
 extends RefCounted
 ## Text of the Personnel tab (docs/content/m26-staff-and-money.md section 6): the header
-## ("Staff 5 · Beds 5/6 · Salaries $145k/month"), a person's role, skill stars, salary and
+## ("Staff 5 · Beds 5/6 · Salaries $5k a day"), a person's role, skill stars, salary and
 ## room ("Research Lab", "Unassigned", "Arriving in 3 d 4 h"), a candidate's pipeline, fee and
 ## arrival time, a room on the Assign… list with its slots and effect, and a refused hire,
 ## dismiss or assign in plain words. Pure: reads the state, never changes it.
@@ -11,7 +11,8 @@ extends RefCounted
 const STAR: String = "*"
 
 
-## "Staff 5 · Beds 5/6 · Salaries $145k/month" for [param state].
+## "Staff 5 · Beds 5/6 · Salaries $5k a day" for [param state]: salaries per 30 days ÷ 30,
+## rounded (docs/content/m27-daily-rhythm.md section 5).
 static func header(state: GameState) -> String:
 	return (
 		_tr(&"STAFF_HEADER")
@@ -20,7 +21,7 @@ static func header(state: GameState) -> String:
 				"staff": StaffRules.headcount(state),
 				"used": StaffRules.headcount(state),
 				"beds": StaffRules.beds(state),
-				"salaries": MoneyLabel.format_k(StaffRules.monthly_salaries_k(state)),
+				"salaries": MoneyLabel.format_k(daily_k(StaffRules.salaries_k(state))),
 			}
 		)
 	)
@@ -43,7 +44,12 @@ static func skill(skill_level: int) -> String:
 	return _tr(&"STAFF_SKILL").format({"n": skill_level})
 
 
-## "$30k/month" for [param salary_k].
+## [param per_period_k] (an amount per 30 days) as a daily amount, rounded to whole $k.
+static func daily_k(per_period_k: int) -> int:
+	return roundi(float(per_period_k) / ConfidenceRules.PERIOD_DAYS)
+
+
+## "$30k / 30 d" (per 30 days) for [param salary_k].
 static func salary(salary_k: int) -> String:
 	return _tr(&"STAFF_SALARY").format({"money": MoneyLabel.format_k(salary_k)})
 

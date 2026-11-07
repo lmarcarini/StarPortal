@@ -112,7 +112,7 @@ func test_panel_upkeep_uses_the_fuel_contracts_override() -> void:
 	UnlockRules.apply_project(_simulation.state.unlocks, &"fuel_contracts")
 	_view.get_plan().select(&"")
 	_view.get_plan().select(plant.id)
-	assert_str(_view.get_room_panel().lines()[4]).is_equal("Upkeep $100k / month")
+	assert_str(_view.get_room_panel().lines()[4]).is_equal("Upkeep $100k per 30 days")
 
 
 func test_longest_lines_fit_1280_by_720_in_both_languages() -> void:
