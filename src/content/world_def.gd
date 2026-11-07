@@ -24,6 +24,10 @@ enum Life { UNKNOWN, NONE, PLANTS, ANIMALS, PEOPLE }
 enum Structures { UNKNOWN, NONE, RUINS, WORKED_STONE, SETTLEMENT }
 ## How dangerous the far side is. UNKNOWN is only ever shown, never a world's true value.
 enum Threat { UNKNOWN, LOW, MED, HIGH }
+## The colour of the sky over the far Ring, as a picture shows it.
+enum Sky { BLACK, VIOLET, PALE, BLUE, OVERCAST, OCHRE, GREEN }
+## The sun as a picture shows it; HIDDEN behind cloud or below the horizon.
+enum Sun { HIDDEN, WHITE, YELLOW, ORANGE, RED }
 
 ## Translation key of the world's name.
 @export var name_key: StringName
@@ -45,6 +49,10 @@ enum Threat { UNKNOWN, LOW, MED, HIGH }
 @export var biome: Biome = Biome.BARREN
 ## The air.
 @export var atmosphere: Atmosphere = Atmosphere.NONE
+## The sky, as the world's dossier describes it.
+@export var sky: Sky = Sky.BLACK
+## The sun, as the world's dossier describes it.
+@export var sun: Sun = Sun.WHITE
 ## Surface temperature at the Ring, in whole degrees Celsius.
 @export var temperature_c: int = 0
 ## Background radiation.

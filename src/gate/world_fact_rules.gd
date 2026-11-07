@@ -6,8 +6,9 @@ extends RefCounted
 ##
 ## Procedural distribution: biome uniform over the five; true threat HIGH when guarded, else MED
 ## for about 15% and LOW for the rest; life from the biome (never PEOPLE in M3); structures none
-## 60%, ruins 30%, worked stone 10%; 0 to 2 targets from the structures' pool; atmosphere,
-## temperature, radiation and biohazard follow the biome and the life.
+## 60%, ruins 30%, worked stone 10%; 0 to 2 targets from the structures' pool; sky and sun
+## follow the atmosphere; atmosphere, temperature, radiation and biohazard follow the biome
+## and the life.
 ## Bible: docs/content/m3-beyond-the-ring.md section 3 (procedural worlds, authored worlds)
 
 ## Percent of unguarded procedural worlds whose true threat is MED.
@@ -20,6 +21,18 @@ const _A := WorldDef.Atmosphere
 const _L := WorldDef.Life
 const _S := WorldDef.Structures
 const _H := WorldDef.Biohazard
+const _K := WorldDef.Sky
+const _U := WorldDef.Sun
+
+## Skies per atmosphere (indexed by WorldDef.Atmosphere).
+const _SKY_BY_AIR: Array = [
+	[_K.BLACK, _K.BLACK, _K.VIOLET],
+	[_K.PALE, _K.VIOLET, _K.PALE],
+	[_K.BLUE, _K.BLUE, _K.PALE, _K.OVERCAST],
+	[_K.OCHRE, _K.GREEN, _K.OVERCAST],
+]
+## Suns a clear sky can show.
+const _SUNS: Array = [_U.WHITE, _U.WHITE, _U.YELLOW, _U.YELLOW, _U.ORANGE, _U.RED]
 
 ## Per biome (indexed by WorldDef.Biome): the atmospheres, lives and base temperature (°C).
 const _AIR_BY_BIOME: Array = [
@@ -97,6 +110,9 @@ static func derive(world_id: StringName, guarded: bool) -> WorldFacts:
 	var facts := WorldFacts.new()
 	facts.biome = roll(id, "biome", _B.size()) as WorldDef.Biome
 	facts.atmosphere = _pick(id, "air", _AIR_BY_BIOME, facts.biome) as WorldDef.Atmosphere
+	facts.world_id = world_id
+	facts.sky = _pick(id, "sky", _SKY_BY_AIR, facts.atmosphere) as WorldDef.Sky
+	facts.sun = _sun(id, facts.sky)
 	facts.temperature_c = (
 		_BASE_TEMPERATURE_C[facts.biome]
 		+ roll(id, "temperature", 2 * _TEMPERATURE_SPREAD_C + 1)
@@ -133,6 +149,13 @@ static func _pick(id: String, salt: String, table: Array, row: int) -> int:
 	var options: Array = table[row]
 	var value: int = options[roll(id, salt, options.size())]
 	return value
+
+
+static func _sun(id: String, sky: WorldDef.Sky) -> WorldDef.Sun:
+	if sky == WorldDef.Sky.OVERCAST:
+		return WorldDef.Sun.HIDDEN
+	var sun: int = _SUNS[roll(id, "sun", _SUNS.size())]
+	return sun as WorldDef.Sun
 
 
 static func _radiation(id: String) -> WorldDef.Radiation:

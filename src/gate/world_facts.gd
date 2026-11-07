@@ -5,10 +5,16 @@ extends RefCounted
 ## worlds derive theirs from the world id (WorldFactRules). Derived data, never saved.
 ## Bible: docs/content/m3-beyond-the-ring.md section 2 (World Report fields) and section 3
 
+## The world's id; a picture seeds its variation from it.
+var world_id: StringName = &""
 ## The land.
 var biome: WorldDef.Biome = WorldDef.Biome.BARREN
 ## The air.
 var atmosphere: WorldDef.Atmosphere = WorldDef.Atmosphere.NONE
+## The sky over the Ring.
+var sky: WorldDef.Sky = WorldDef.Sky.BLACK
+## The sun as seen from the Ring.
+var sun: WorldDef.Sun = WorldDef.Sun.WHITE
 ## Surface temperature at the Ring, in whole degrees Celsius.
 var temperature_c: int = 0
 ## Background radiation.
@@ -29,7 +35,10 @@ var targets: Array[WorldTarget] = []
 ## Returns the facts of the authored world [param def].
 static func from_def(def: WorldDef) -> WorldFacts:
 	var facts := WorldFacts.new()
+	facts.world_id = def.id
 	facts.biome = def.biome
+	facts.sky = def.sky
+	facts.sun = def.sun
 	facts.atmosphere = def.atmosphere
 	facts.temperature_c = def.temperature_c
 	facts.radiation = def.radiation
@@ -55,7 +64,11 @@ func find_target(target_id: StringName) -> WorldTarget:
 ## Returns the scene every picture of this world reads.
 func scene() -> WorldScene:
 	var world_scene := WorldScene.new()
+	world_scene.world_id = world_id
+	world_scene.variation_seed = ConsoleLog.stable_hash(String(world_id))
 	world_scene.biome = biome
+	world_scene.sky = sky
+	world_scene.sun = sun
 	world_scene.atmosphere = atmosphere
 	world_scene.life = life
 	world_scene.structures = structures
