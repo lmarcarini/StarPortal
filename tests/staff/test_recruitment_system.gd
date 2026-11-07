@@ -64,7 +64,7 @@ func test_thirty_days_roll_the_list() -> void:
 		assert_int(candidate.arrival_ticks).is_equal(days * 1440)
 
 
-func test_arrival_replaces_the_oldest_and_posts_no_log() -> void:
+func test_day_three_arrival_follows_a_leaver_and_logs_nothing() -> void:
 	_game.clock.tick = 3 * TimeMath.TICKS_PER_DAY
 	_system.on_day(_game)
 	var list: Array[CandidateState] = _game.recruitment.candidates
