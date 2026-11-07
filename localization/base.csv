@@ -58,14 +58,15 @@ BASE_STATUS_SITE,Marked site,Local demarcado
 BASE_BUILD_TITLE,BUILD,CONSTRUIR
 BASE_BUILD_HINT,"Pick a room, or (B) on the plan to reach this palette.","Escolha uma sala, ou (B) na planta para chegar a esta paleta."
 BASE_BUILD_BUILD,Build,Construir
+BASE_BUILD_CANCEL_PLACING,Cancel,Cancelar
 BASE_BUILD_DAYS,{n} d,{n} d
 BASE_BUILD_HOURS,{n} h,{n} h
 BASE_BUILD_MINUTES,{n} min,{n} min
 BASE_BUILD_SUMMARY,"{name}: {cost}, {time}. {power}.","{name}: {cost}, {time}. {power}."
 BASE_BUILD_SUMMARY_CELL,"{name}: {cost} and {time} per cell.","{name}: {cost} e {time} por célula."
-BASE_BUILD_PLACING,"{name}: {cost}, {time}. Q or E rotates; click or (A) builds; Esc or (B) leaves.","{name}: {cost}, {time}. Q ou E gira; clique ou (A) constrói; Esc ou (B) sai."
-BASE_BUILD_CORRIDOR_START,"{name}: {cost}, {time}. Drag to paint, or Enter or (A) sets the start; Esc or (B) leaves.","{name}: {cost}, {time}. Arraste para pintar, ou Enter ou (A) marca o início; Esc ou (B) sai."
-BASE_BUILD_CORRIDOR_END,"{name}: {cost}, {time}. Move to the end; release, Enter or (A) builds; Esc or (B) clears the start.","{name}: {cost}, {time}. Mova até o fim; soltar, Enter ou (A) constrói; Esc ou (B) limpa o início."
+BASE_BUILD_PLACING,"{name}: {cost}, {time}. Q or E rotates; click or (A) builds; right-click, Esc or (B) cancels.","{name}: {cost}, {time}. Q ou E gira; clique ou (A) constrói; botão direito, Esc ou (B) cancela."
+BASE_BUILD_CORRIDOR_START,"{name}: {cost}, {time}. Drag to paint, or Enter or (A) sets the start; right-click, Esc or (B) cancels.","{name}: {cost}, {time}. Arraste para pintar, ou Enter ou (A) marca o início; botão direito, Esc ou (B) cancela."
+BASE_BUILD_CORRIDOR_END,"{name}: {cost}, {time}. Move to the end; release, Enter or (A) builds; Esc or (B) clears the start; right-click cancels.","{name}: {cost}, {time}. Mova até o fim; soltar, Enter ou (A) constrói; Esc ou (B) limpa o início; botão direito cancela."
 BASE_BUILD_STARTED,{name}: construction started ({cost}).,{name}: obra iniciada ({cost}).
 BASE_BUILD_CANCEL,Cancel (hold): refund {refund},Cancelar (segure): reembolso {refund}
 BASE_BUILD_CANCELLED,{extra} site cancelled. Refund +{refund}.,Obra de {extra} cancelada. Reembolso +{refund}.
