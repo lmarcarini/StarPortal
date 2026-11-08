@@ -69,7 +69,7 @@ func test_events_apply_at_once_and_count_once() -> void:
 	var causes: Array[StringName] = []
 	for cause: ConfidenceCause in game.committee.causes:
 		causes.append(cause.cause)
-	assert_array(causes).is_equal([&"locked", &"surveyed", &"research"])
+	assert_array(causes).is_equal([&"locked", &"horizon_record", &"research"])
 	assert_int(game.committee.causes[0].change).is_equal(50)
 	assert_str(String(game.committee.causes[0].subject)).is_equal("world_sill")
 

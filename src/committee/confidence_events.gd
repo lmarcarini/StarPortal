@@ -1,10 +1,12 @@
 class_name ConfidenceEvents
 extends RefCounted
 ## Confidence events, applied at once (docs/content/m27-daily-rhythm.md section 2): a new world
-## locked (+5), a new world surveyed (+2), a research project finished (+3) and reports filed
-## (+1 per analyst every 15th day). Each adds a cause to the rolling list, posts
-## confidence_changed and checks the commendation: $1,000k the first time Confidence reaches
-## 70, re-armed below 60. Called only from EconomySystem and DailySettlement.
+## locked (+5), a horizon record taken (+2), a research project finished (+3) and reports filed
+## (+1 per analyst every 15th day); a team's survey of a new world (+3,
+## docs/content/m3-beyond-the-ring.md section 4) raises its own cause through [method raise].
+## Each adds a cause to the rolling list, posts confidence_changed and checks the commendation:
+## $1,000k the first time Confidence reaches 70, re-armed below 60. Called only from
+## EconomySystem, DailySettlement and ExpeditionSystem (through ExpeditionReturns).
 ## Bible: docs/content/m27-daily-rhythm.md section 2
 
 ## committee_warning reasons.
@@ -24,7 +26,7 @@ static func credit_new(state: GameState) -> void:
 		var surveys: Array[StringName] = ConfidenceRules.new_ids(
 			ConfidenceRules.surveyed_worlds(state), committee.credited_surveys
 		)
-		_credit_all(state, ConfidenceRules.SURVEYED, surveys, committee.credited_surveys)
+		_credit_all(state, ConfidenceRules.HORIZON_RECORD, surveys, committee.credited_surveys)
 	if state.research.done.size() > committee.credited_research.size():
 		var projects: Array[StringName] = ConfidenceRules.new_ids(
 			state.research.done, committee.credited_research
@@ -85,8 +87,8 @@ static func _change_of(cause: StringName) -> int:
 	match cause:
 		ConfidenceRules.LOCKED:
 			return ConfidenceRules.LOCK_CHANGE
-		ConfidenceRules.SURVEYED:
-			return ConfidenceRules.SURVEY_CHANGE
+		ConfidenceRules.HORIZON_RECORD:
+			return ConfidenceRules.HORIZON_CHANGE
 		ConfidenceRules.RESEARCH:
 			return ConfidenceRules.RESEARCH_CHANGE
 	return ConfidenceRules.REPORT_CHANGE

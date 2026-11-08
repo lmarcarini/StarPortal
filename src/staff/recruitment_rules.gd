@@ -154,9 +154,11 @@ static func hire_error(state: GameState, candidate_id: StringName) -> StringName
 
 
 ## Why [param person_id] cannot be dismissed, or &"" when they can (anyone on the roster,
-## arriving or not).
+## arriving or not, except a member of the planned or away expedition team).
 static func dismiss_error(state: GameState, person_id: StringName) -> StringName:
-	return UNKNOWN_PERSON if state.staff.find_person(person_id) == null else &""
+	if state.staff.find_person(person_id) == null:
+		return UNKNOWN_PERSON
+	return StaffRules.ON_EXPEDITION if StaffRules.is_on_team(state, person_id) else &""
 
 
 static func _candidate(

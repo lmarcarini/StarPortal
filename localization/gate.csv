@@ -193,3 +193,4 @@ MOTH_SKY_BLUE,A clear blue sky.,Um céu azul e limpo.
 MOTH_SKY_OVERCAST,"Low, even cloud; no sun.",Nuvens baixas e uniformes; sem sol.
 MOTH_SKY_OCHRE,"An ochre haze, thick with dust.","Uma névoa ocre, carregada de poeira."
 MOTH_SKY_GREEN,A sickly green sky.,Um céu verde e doentio.
+EXPEDITION_NOT_ENOUGH_TIME,Not enough open time to send a team (10 minutes needed).,Tempo aberto insuficiente para enviar uma equipe (são necessários 10 minutos).
