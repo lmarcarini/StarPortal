@@ -9,8 +9,8 @@ const PHOTO_KINDS: Array[String] = ["sky", "close_look"]
 
 ## Errors for saved probes [param data], empty when valid: the canister's two fields both set
 ## (a world id and 1 to CANISTER_TICKS ticks) or both unset; "moth" null or valid MothRun data;
-## "rack" from 0 to RACK_SIZE and, with the drone out and the reorders, never more than
-## RACK_SIZE drones; "reorders" whole ticks; "photos" objects with a world id, a kind, a target
+## "rack" from 0 to RACK_SIZE and, with the drone out and the reorders, exactly RACK_SIZE
+## drones; "reorders" whole ticks; "photos" objects with a world id, a kind, a target
 ## id string and a tick; "ring_scanned" an object of world ids mapped to true.
 static func errors(data: Dictionary) -> Array[String]:
 	var found: Array[String] = []
@@ -67,8 +67,8 @@ static func _rack_errors(data: Dictionary, is_moth_out: bool) -> Array[String]:
 		return found
 	var rack_count: int = type_convert(rack, TYPE_INT)
 	var total: int = rack_count + reorder_list.size() + (1 if is_moth_out else 0)
-	if total > MothRules.RACK_SIZE:
-		found.append("more than %d MOTHs in the rack, out and on order" % MothRules.RACK_SIZE)
+	if total != MothRules.RACK_SIZE:
+		found.append("not exactly %d MOTHs in the rack, out and on order" % MothRules.RACK_SIZE)
 	return found
 
 

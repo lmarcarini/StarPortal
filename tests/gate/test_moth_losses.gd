@@ -88,7 +88,7 @@ func _shoot_down_after_sky(start: WorldReport.Confidence) -> GameState:
 
 
 ## Saving and loading mid-scan gives the same run as never saving: same losses, battery,
-## reports and rack, on a MED world with several rolls.
+## reports and rack, on a HIGH world with several rolls.
 func test_deterministic_across_save_and_load() -> void:
 	for base_seed: int in range(1, 30):
 		var straight: GameState = _play(base_seed, false)

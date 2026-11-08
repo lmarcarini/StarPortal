@@ -52,8 +52,13 @@ class SoakRun:
 	var months_closed: Array[Dictionary] = []
 	## Every command_rejected event: {type, code}.
 	var rejections: Array[Dictionary] = []
-	## Number of times play switched to a freshly loaded Simulation.
+	## Number of times play switched to a freshly loaded Simulation at a month close, and
+	## extra switches taken while a MOTH scan ran.
 	var switches: int = 0
+	var mid_scan_switches: int = 0
+	## Probe outcomes seen (SoakProbes): event name, or "moth_lost:<reason>" and
+	## "moth_scan_finished:<scan name>", to count.
+	var probe_outcomes: Dictionary[String, int] = {}
 	## True from a month boundary until the run handles it after the tick.
 	var month_close_pending: bool = false
 	## Ticks after which stored power was below 0 or above the capacity.
@@ -112,6 +117,12 @@ class SoakRun:
 		simulation = next
 		simulation.day_started.connect(_on_day_started)
 		simulation.command_rejected.connect(_on_command_rejected)
+		simulation.event_posted.connect(_on_event_posted)
+
+	func _on_event_posted(event_name: StringName, args: Array) -> void:
+		var key: String = SoakProbes.outcome_key(event_name, args)
+		if not key.is_empty():
+			probe_outcomes[key] = probe_outcomes.get(key, 0) + 1
 
 	func _on_day_started(_day_index: int) -> void:
 		days_started += 1
@@ -149,6 +160,7 @@ func test_year_with_monthly_save_and_load_matches_uninterrupted_run() -> void:
 	for run: SoakRun in [_uninterrupted, _reloaded]:
 		_assert_run_events(run, expected_days, expected_closes)
 	assert_int(_reloaded.switches).is_equal(YEAR_MONTHS)
+	assert_int(_reloaded.mid_scan_switches).is_greater(0)
 	assert_dict(_reloaded.simulation.state.to_dict()).is_equal(
 		_uninterrupted.simulation.state.to_dict()
 	)
@@ -208,6 +220,8 @@ func _play(run: SoakRun, reload_each_month: bool) -> void:
 			continue
 		run.simulation.advance_tick()
 		run.check_power()
+		if reload_each_month and _wants_mid_scan_reload(run):
+			_reload(run, true)
 		if not run.month_close_pending:
 			continue
 		run.month_close_pending = false
@@ -216,9 +230,18 @@ func _play(run: SoakRun, reload_each_month: bool) -> void:
 			_reload(run)
 
 
+## True when a MOTH scan is running and the run has had fewer mid-scan reloads than month
+## closes: about one extra save and load per month, taken mid-scan.
+func _wants_mid_scan_reload(run: SoakRun) -> bool:
+	var moth: MothRun = run.simulation.state.probes.moth
+	var is_scanning: bool = moth != null and moth.is_scanning()
+	return is_scanning and run.mid_scan_switches < run.months_closed.size()
+
+
 ## Saves the run's state, loads it into a new Simulation and switches the run to it, then
-## checks the run now drives the loaded copy rather than the original.
-func _reload(run: SoakRun) -> void:
+## checks the run now drives the loaded copy rather than the original. [param mid_scan]
+## counts it as an extra mid-scan reload rather than a month close's.
+func _reload(run: SoakRun, mid_scan: bool = false) -> void:
 	var before: Dictionary = run.simulation.state.to_dict()
 	var saved: Result = _service.save_game(run.simulation.state, SLOT)
 	assert_bool(saved.is_ok).override_failure_message(str(saved.error_code)).is_true()
@@ -234,7 +257,10 @@ func _reload(run: SoakRun) -> void:
 	run.attach(copy)
 	assert_object(run.simulation).is_same(copy)
 	assert_object(run.simulation).is_not_same(original)
-	run.switches += 1
+	if mid_scan:
+		run.mid_scan_switches += 1
+	else:
+		run.switches += 1
 
 
 ## Checks [param run] saw the day starts and month closes TimeMath predicts, no rejected
@@ -258,6 +284,7 @@ func _assert_run_events(
 	assert_int(run.bot.charge_sets).is_equal(1)
 	_assert_run_base(run)
 	_assert_run_ring(run)
+	_assert_run_probes(run)
 	var commands: int = run.bot.commands_submitted
 	assert_int(commands).is_between(15 * YEAR_DAYS, 25 * YEAR_DAYS)
 	assert_int(run.bot.commands_while_paused).is_greater(0)
@@ -355,3 +382,13 @@ func _remove_dir(path: String) -> void:
 	for file_name: String in dir.get_files():
 		DirAccess.remove_absolute(path.path_join(file_name))
 	DirAccess.remove_absolute(path)
+
+
+## Checks [param run] saw every probe outcome at least once.
+func _assert_run_probes(run: SoakRun) -> void:
+	for key: String in SoakProbes.OUTCOMES:
+		(
+			assert_int(run.probe_outcomes.get(key, 0))
+			. override_failure_message("no %s in %s" % [key, run.probe_outcomes])
+			. is_greater(0)
+		)

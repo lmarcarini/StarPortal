@@ -124,6 +124,7 @@ static func derive(world_id: StringName, guarded: bool) -> WorldFacts:
 	var structures: int = _STRUCTURES_BY_TENTH[roll(id, "structures", 10)]
 	facts.structures = structures as WorldDef.Structures
 	facts.threat = threat_for(id, guarded)
+	facts.is_guarded = guarded
 	facts.targets = _targets(id, facts.structures)
 	return facts
 

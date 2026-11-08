@@ -45,6 +45,9 @@ func test_validation() -> void:
 	data = _busy_probes().to_dict()
 	data["rack"] = 1
 	assert_array(ProbesState.validate_dict(data)).is_not_empty()
+	data["rack"] = 0
+	data["reorders"] = []
+	assert_array(ProbesState.validate_dict(data)).is_not_empty()
 	data = _busy_probes().to_dict()
 	data["photos"] = [{"world_id": "a", "kind": "selfie", "target_id": "", "tick": 1}]
 	assert_array(ProbesState.validate_dict(data)).is_not_empty()
@@ -69,6 +72,7 @@ func test_good_threat_carries_reasons() -> void:
 	var state := GameState.new_game(1)
 	var facts := WorldFacts.new()
 	facts.threat = WorldDef.Threat.HIGH
+	facts.is_guarded = true
 	facts.life = WorldDef.Life.ANIMALS
 	assert_bool(WorldProgress.raise_threat_good(state, &"w", &"team", facts)).is_true()
 	var report: WorldReport = state.worlds.report_of(&"w")
@@ -81,3 +85,6 @@ func test_good_threat_carries_reasons() -> void:
 	data["threat"]["confidence"] = "fair"
 	assert_array(WorldReport.validate_dict("w", data)).is_not_empty()
 	assert_array(ThreatReasons.of(WorldFacts.new())).contains_exactly([&"THREAT_REASON_NONE"])
+	var unguarded := WorldFacts.new()
+	unguarded.threat = WorldDef.Threat.HIGH
+	assert_array(ThreatReasons.of(unguarded)).not_contains([&"THREAT_REASON_GUARDED"])

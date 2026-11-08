@@ -15,7 +15,7 @@ const HOT_LIMIT_C: int = 45
 ## nothing on the world is dangerous.
 static func of(facts: WorldFacts) -> Array[StringName]:
 	var reasons: Array[StringName] = []
-	if facts.threat == WorldDef.Threat.HIGH:
+	if facts.is_guarded:
 		reasons.append(&"THREAT_REASON_GUARDED")
 	if facts.life == WorldDef.Life.ANIMALS:
 		reasons.append(&"THREAT_REASON_ANIMALS")
