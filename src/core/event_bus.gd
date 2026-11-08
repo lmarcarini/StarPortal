@@ -115,6 +115,16 @@ signal moth_lost(world_id: StringName, reason: StringName)
 ## the outbox).
 @warning_ignore("unused_signal")
 signal moth_delivered(rack: int)
+## Emitted when an expedition is planned, with the world id (posted through the outbox).
+@warning_ignore("unused_signal")
+signal expedition_planned(world_id: StringName)
+## Emitted when a team goes through the Ring, with the world id (posted through the outbox).
+@warning_ignore("unused_signal")
+signal team_sent(world_id: StringName)
+## Emitted when a team comes home, with the world id, its ExpeditionState.Objective and whether
+## the objective succeeded (posted through the outbox).
+@warning_ignore("unused_signal")
+signal team_returned(world_id: StringName, objective: int, success: bool)
 
 ## Emitted when a construction site starts, with its site id (posted through the outbox).
 @warning_ignore("unused_signal")

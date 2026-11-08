@@ -23,6 +23,7 @@ const _SECTIONS: Array[String] = [
 	"committee",
 	"recruitment",
 	"probes",
+	"expedition",
 ]
 
 ## The simulation clock.
@@ -59,6 +60,8 @@ var committee: CommitteeState = CommitteeState.new()
 var recruitment: RecruitmentState = RecruitmentState.new()
 ## The sample canister, the MOTH run, the rack and the probe photos.
 var probes: ProbesState = ProbesState.new()
+## The expedition: plan, team away and documents brought back.
+var expedition: ExpeditionState = ExpeditionState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -122,6 +125,7 @@ func to_dict() -> Dictionary:
 		"committee": committee.to_dict(),
 		"recruitment": recruitment.to_dict(),
 		"probes": probes.to_dict(),
+		"expedition": expedition.to_dict(),
 	}
 
 
@@ -146,6 +150,7 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.committee = CommitteeState.from_dict(_dict_or_empty(data.get("committee")))
 	state.recruitment = RecruitmentState.from_dict(_dict_or_empty(data.get("recruitment")))
 	state.probes = ProbesState.from_dict(_dict_or_empty(data.get("probes")))
+	state.expedition = ExpeditionState.from_dict(_dict_or_empty(data.get("expedition")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -159,8 +164,8 @@ static func from_dict(data: Dictionary) -> GameState:
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
 ## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book",
-## "operations_log", "unlocks", "research", "staff", "committee", "recruitment" and "probes"
-## must be
+## "operations_log", "unlocks", "research", "staff", "committee", "recruitment", "probes" and
+## "expedition" must be
 ## objects, the sub-states must pass their own validate_dict(), and
 ## every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
@@ -238,6 +243,8 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return RecruitmentState.validate_dict(section)
 		"probes":
 			return ProbesState.validate_dict(section)
+		"expedition":
+			return ExpeditionState.validate_dict(section)
 	return []
 
 

@@ -37,6 +37,7 @@ CONFIDENCE_DRIFT_SETTLING,settling toward 50,voltando para 50
 CONFIDENCE_DRIFT_STEADY,steady at 50,estável em 50
 CONFIDENCE_DRIFT_IN_RED,in the red,no vermelho
 CONFIDENCE_CAUSE_LOCKED,New world locked: {name}  {amount},Novo mundo conectado: {name}  {amount}
+CONFIDENCE_CAUSE_HORIZON_RECORD,Horizon record taken: {name}  {amount},Registro do horizonte obtido: {name}  {amount}
 CONFIDENCE_CAUSE_SURVEYED,New world surveyed: {name}  {amount},Novo mundo explorado: {name}  {amount}
 CONFIDENCE_CAUSE_RESEARCH,Research finished: {name}  {amount},Pesquisa concluída: {name}  {amount}
 CONFIDENCE_CAUSE_REPORTS,Reports filed ({count} analysts)  {amount},Relatórios entregues ({count} analistas)  {amount}

@@ -9,6 +9,7 @@ extends RefCounted
 ## Line key of each cause.
 const CAUSE_KEYS: Dictionary[StringName, StringName] = {
 	&"locked": &"CONFIDENCE_CAUSE_LOCKED",
+	&"horizon_record": &"CONFIDENCE_CAUSE_HORIZON_RECORD",
 	&"surveyed": &"CONFIDENCE_CAUSE_SURVEYED",
 	&"research": &"CONFIDENCE_CAUSE_RESEARCH",
 	&"reports": &"CONFIDENCE_CAUSE_REPORTS",
