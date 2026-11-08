@@ -1,22 +1,17 @@
 extends RefCounted
-## Seeded stand-in player for the soak test. It sets random flags through SetFlagCommand about 20
-## times per in-game day, pauses and resumes the clock at random, and adds and releases named system
-## holds through TimeControl (a dozen or so per month). Before anything else on the Ring it builds
-## the first Capacitor Bank as a room on the nearest valid spot to the Gate Room (PlaceRoomCommand),
-## leaves the Ring alone until it is built, then gives it all the spare supply as its charge rate
-## once (SetChargeRateCommand). It then works the Ring on every call with no command waiting: with
-## the Ring idle and no address picked it picks one (a console's Address Book entry the bank can
-## power sometimes, a real world's true address now and then, otherwise a random well-formed one
-## whose seal 1 the bank can reach); once the bank holds that address's lock energy it dials it
-## directly (an address the bank can never charge is just dropped). When a wormhole opens it reads
-## the far Ring's console (ReadConsoleCommand) if that console is unread, which fills the Address
-## Book, then extends the pole camera (ExtendPoleCameraCommand) if the world's horizon record is not
-## taken, works the probes (SoakProbes), and closes the wormhole once both are done.
-## Once the bank charges it builds on: a corridor run off the Level 1 spine and a Research Lab
-## against it. When the lab stands off (the bank holds the spare supply), it lowers the bank's
-## charge rate by just enough and switches the lab on. It then researches R1-R6 in list order
-## (StartResearchCommand), each as soon as it may start, and digs each extra level as soon as
-## research and money allow (DigLevelCommand), one at a time (m25-lean-start.md section 3).
+## Seeded stand-in player for the soak test. It sets random flags (SetFlagCommand) about 20 times
+## a day, pauses and resumes at random, and adds and releases system holds (TimeControl), a dozen
+## or so a month. First it builds the first Capacitor Bank on the nearest valid spot to the Gate
+## Room, waits for it, then gives it all the spare supply as its charge rate once. It then works
+## the Ring on every call with no command waiting: with the Ring idle and no address picked it
+## picks one (a console's Address Book entry the bank can power sometimes, a real world's true
+## address now and then, a missing team's world first, otherwise a random well-formed one whose
+## seal 1 the bank can reach) and dials it once charged (one it can never charge is dropped). On
+## a lock it reads an unread console, extends the pole camera for a record not taken, works the
+## probes (SoakProbes) and expeditions (SoakExpeditions), then closes the wormhole.
+## Once the bank charges it builds a corridor off the Level 1 spine and a Research Lab, lowers
+## the bank's charge rate by just enough to switch the lab on, researches R1-R6 in list order
+## as each may start, and digs each extra level as research and money allow, one at a time.
 ## Every random draw comes from the run's own GameState stream &"soak_bot", so two runs from
 ## the same seed act identically, and a saved and reloaded state carries the stream on. The
 ## picked address is the bot's own, not game state: it carries on across reloads with the bot.
@@ -103,13 +98,14 @@ var research_started: int = 0
 ## Hires and dismissals, and assignments of arrived hires, the bot sent (SoakStaff).
 var staff_moves: int = 0
 var staff_assigns: int = 0
+## Teams sent and rescues worked (SoakExpeditions; it also dials a missing team's world).
+var expeditions := SoakExpeditions.new()
 
 var _next_action_tick: int = 0
 ## The address the bot will dial next, or null.
 var _picked: GateAddress = null
 ## Clock tick before which the picked address cannot be charged yet: the bot skips asking
-## until then (with the Ring idle nothing drains the capacitors; the charge falls only while a
-## wormhole is open and total charging is below its 20 MWh/h drain).
+## until then (with the Ring idle only an open wormhole drains the capacitors).
 var _check_at_tick: int = 0
 
 
@@ -196,7 +192,7 @@ func _work_wormhole(simulation: Simulation) -> void:
 	elif not worlds.is_horizon_record_taken(gate.connected_world_id):
 		simulation.submit(ExtendPoleCameraCommand.new())
 		cameras_extended += 1
-	elif SoakProbes.work(simulation):
+	elif SoakProbes.work(simulation) or expeditions.work(simulation):
 		return
 	elif state.clock.tick - gate.lock_started_tick >= CLOSE_AFTER_TICKS:
 		simulation.submit(CloseWormholeCommand.new())
@@ -204,6 +200,9 @@ func _work_wormhole(simulation: Simulation) -> void:
 
 
 func _pick_address(state: GameState, rng: RandomNumberGenerator) -> void:
+	_picked = SoakExpeditions.rescue_address(state)
+	if _picked != null:
+		return
 	var origin: int = state.galaxy.home().origin_glyph
 	var first_glyphs: Array[int] = _reachable_first_glyphs(state)
 	var roll: float = rng.randf()

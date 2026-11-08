@@ -74,7 +74,7 @@ func test_team_comes_through_fifteen_minutes_after_the_signal() -> void:
 	_simulation.advance_tick()
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.IDLE)
 	assert_int(_on_roster(team)).is_equal(4)
-	assert_array(_reasons()).is_equal(["missed", "rescued"])
+	assert_array(_reasons()).is_equal(["departed", "missed", "rescued"])
 
 
 func test_deceased_leave_with_confidence_and_a_log_line_each() -> void:
@@ -84,7 +84,7 @@ func test_deceased_leave_with_confidence_and_a_log_line_each() -> void:
 	RescueFixture.signal_team(_simulation)
 	Fixture.advance(_simulation, ExpeditionRescue.SIGNAL_TICKS + 1)
 	assert_int(_on_roster(team)).is_equal(2)
-	assert_array(_reasons()).is_equal(["missed", "deceased", "deceased", "rescued"])
+	assert_array(_reasons()).is_equal(["departed", "missed", "deceased", "deceased", "rescued"])
 	var cause: ConfidenceCause = _state.committee.causes.back()
 	assert_str(String(cause.cause)).is_equal(String(ConfidenceRules.DECEASED))
 	assert_int(cause.count).is_equal(2)
@@ -99,7 +99,7 @@ func test_nobody_surviving_is_no_answer_and_a_lost_team() -> void:
 	Fixture.advance(_simulation, ExpeditionRescue.SIGNAL_TICKS + 1)
 	assert_int(_on_roster(team)).is_equal(0)
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.IDLE)
-	assert_array(_reasons()).is_equal(["missed", "no_answer"])
+	assert_array(_reasons()).is_equal(["departed", "missed", "no_answer"])
 	var cause: ConfidenceCause = _state.committee.causes.back()
 	assert_str(String(cause.cause)).is_equal(String(ConfidenceRules.TEAM_LOST))
 	assert_str(ExpeditionLogText.line({"reason": "no_answer"}, "")).is_equal(
@@ -117,7 +117,7 @@ func test_window_running_out_loses_the_team() -> void:
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.IDLE)
 	assert_int(_on_roster(team)).is_equal(0)
 	assert_int(_state.committee.confidence).is_equal(confidence - 100)
-	assert_array(_reasons()).is_equal(["missed", "lost"])
+	assert_array(_reasons()).is_equal(["departed", "missed", "lost"])
 	assert_array(_state.staff.lent_due).has_size(1)
 
 

@@ -46,7 +46,7 @@ func test_check_in_posts_and_logs_without_pausing() -> void:
 	assert_bool(_events.has(ExpeditionSystem.CHECKED_IN_EVENT)).is_true()
 	assert_array(_pauses).is_empty()
 	assert_int(_state.clock.speed_index).is_equal(3)
-	assert_array(_expedition_lines()).is_equal(["checked_in"])
+	assert_array(_expedition_lines()).is_equal(["departed", "checked_in"])
 	var entry: LogEntry = _state.operations_log.entries.back()
 	assert_int(entry.args["light"]).is_equal(1)
 	assert_str(ExpeditionLogText.injuries(entry.args)).is_equal(tr(&"TEAM_INJURY_LIGHT_ONE"))
@@ -80,6 +80,7 @@ func test_recall_turns_the_next_check_in_into_the_return() -> void:
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.IDLE)
 	assert_bool(_events.has(ExpeditionSystem.RETURNED_EVENT)).is_true()
 	assert_bool(_events.has(ExpeditionSystem.CHECKED_IN_EVENT)).is_false()
+	assert_array(_expedition_lines()).is_equal(["departed", "returned"])
 	assert_int(_state.worlds.status_of(Fixture.WORLD_ID)).is_equal(WorldsState.WorldStatus.PROBED)
 	assert_array(_state.expedition.documents).is_empty()
 
@@ -96,7 +97,7 @@ func test_missed_check_in_pauses_at_normal_speed_and_opens_the_window() -> void:
 	assert_array(_pauses).is_equal([ExpeditionRescue.PAUSE_REASON])
 	assert_int(_state.clock.speed_index).is_equal(ClockState.NORMAL_SPEED_INDEX)
 	assert_bool(_events.has(ExpeditionSystem.CHECKED_IN_EVENT)).is_false()
-	assert_array(_expedition_lines()).is_equal(["missed"])
+	assert_array(_expedition_lines()).is_equal(["departed", "missed"])
 	assert_array(plan.away_ids()).has_size(4)
 	assert_str(String(Fixture.survey(_state).validate(_state).error_code)).is_equal(
 		String(ExpeditionRules.BUSY)

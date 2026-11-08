@@ -120,7 +120,9 @@ class SoakRun:
 		simulation.event_posted.connect(_on_event_posted)
 
 	func _on_event_posted(event_name: StringName, args: Array) -> void:
-		var key: String = SoakProbes.outcome_key(event_name, args)
+		var key: String = (
+			SoakProbes.outcome_key(event_name, args) + SoakExpeditions.outcome_key(event_name, args)
+		)
 		if not key.is_empty():
 			probe_outcomes[key] = probe_outcomes.get(key, 0) + 1
 
@@ -386,7 +388,7 @@ func _remove_dir(path: String) -> void:
 
 ## Checks [param run] saw every probe outcome at least once.
 func _assert_run_probes(run: SoakRun) -> void:
-	for key: String in SoakProbes.OUTCOMES:
+	for key: String in SoakProbes.OUTCOMES + SoakExpeditions.OUTCOMES:
 		(
 			assert_int(run.probe_outcomes.get(key, 0))
 			. override_failure_message("no %s in %s" % [key, run.probe_outcomes])

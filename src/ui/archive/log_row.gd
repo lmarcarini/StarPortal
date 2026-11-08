@@ -20,6 +20,7 @@ const KIND_KEYS: Array[StringName] = [
 	&"LOG_KIND_RESEARCH",
 	&"LOG_KIND_STAFF",
 	&"LOG_KIND_COMMITTEE",
+	&"LOG_KIND_EXPEDITION",
 ]
 ## Height of a row of one line, and what each extra line adds.
 const _ROW_HEIGHT: float = 52.0

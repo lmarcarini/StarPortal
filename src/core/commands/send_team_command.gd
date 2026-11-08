@@ -4,7 +4,8 @@ extends Command
 ## section 4, Departure): the team goes through at once, so it is never cut off on the way.
 ## Refused unless the wormhole could stay open MARGIN_TICKS more minutes, on its charge and on
 ## its time limit, with ExpeditionRules.NOT_ENOUGH_TIME_TEXT as the detail. The team keeps its
-## rooms but is out of them until the return (StaffRules.working()). Posts team_sent(world id).
+## rooms but is out of them until the return (StaffRules.working()). Posts team_sent(world id,
+## objective, team names).
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
 
 ## The command's stable type id.
@@ -35,7 +36,10 @@ func validate(state: GameState) -> CommandResult:
 func apply(state: GameState) -> void:
 	state.expedition.mode = ExpeditionState.Mode.AWAY
 	state.expedition.departed_tick = state.clock.tick
-	state.events.post(&"team_sent", [state.expedition.world_id])
+	var plan: ExpeditionState = state.expedition
+	state.events.post(
+		&"team_sent", [plan.world_id, plan.objective, ExpeditionSystem.team_names(state)]
+	)
 
 
 ## Returns JSON-safe data: just the type.
