@@ -37,6 +37,8 @@ candidate_skill_weights = Array[int]([10, 35, 35, 15, 5])
 hire_arrival_days = Dictionary[StringName, int]({
 &"role_analyst": 7,
 &"role_engineer": 3,
-&"role_scientist": 5
+&"role_medic": 5,
+&"role_scientist": 5,
+&"role_soldier": 3
 })
 id = &"balance"

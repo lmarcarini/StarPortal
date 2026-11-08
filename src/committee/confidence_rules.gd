@@ -89,7 +89,7 @@ static func reporting_analysts(state: GameState) -> int:
 	for room: RoomState in state.base.rooms:
 		if room.def_id != REPORT_ROOM or not room.is_built() or not room.powered_on:
 			continue
-		for person: PersonState in StaffRules.assigned(state, room):
+		for person: PersonState in StaffRules.working(state, room):
 			if person.role == ANALYST and person.is_on_base(state.clock.tick):
 				count += 1
 	return count

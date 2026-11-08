@@ -3,7 +3,8 @@ extends SimSystem
 ## Recruitment over time (docs/content/m27-daily-rhythm.md section 3): at each daily
 ## settlement, candidates whose leave day has come leave the list; every third day
 ## (RecruitmentRules.is_arrival_day()) one candidate arrives, drawn with the system's own seeded
-## stream, replacing the oldest when the list is full, and leaving 12 days later. A change posts
+## stream (soldiers and medics only from the Expeditions unlock, one arrival in four,
+## m3-beyond-the-ring.md section 4), replacing the oldest when the list is full, and leaving 12 days later. A change posts
 ## candidates_changed (no message, no Log line). Each hired person posts staff_arrived(person
 ## id) on the tick they arrive, which writes the Log line "Dr Ana Ferreira (Scientist, skill 4)
 ## has arrived.".
@@ -14,6 +15,7 @@ const ID: StringName = &"recruitment"
 
 var _balance: BalanceConfig
 var _roles: Array[RoleDef] = []
+var _expedition_roles: Array[RoleDef] = []
 var _names: StaffNameListDef
 
 
@@ -22,8 +24,14 @@ var _names: StaffNameListDef
 ## [param names].
 func _init(balance: BalanceConfig, roles: Array[RoleDef], names: StaffNameListDef) -> void:
 	_balance = balance
-	_roles.assign(roles)
-	_roles.sort_custom(func(a: RoleDef, b: RoleDef) -> bool: return String(a.id) < String(b.id))
+	for role: RoleDef in roles:
+		if role.id in RecruitmentRules.EXPEDITION_ROLES:
+			_expedition_roles.append(role)
+		else:
+			_roles.append(role)
+	var by_id: Callable = func(a: RoleDef, b: RoleDef) -> bool: return String(a.id) < String(b.id)
+	_roles.sort_custom(by_id)
+	_expedition_roles.sort_custom(by_id)
 	_names = names
 
 
@@ -58,7 +66,12 @@ func _arrive(state: GameState, day: int) -> bool:
 	var rng: RandomNumberGenerator = state.random.stream(ID)
 	if state.recruitment.candidates.size() >= _balance.candidates_per_list:
 		state.recruitment.remove_oldest()
-	var role: RoleDef = RecruitmentRules.arrival_role(rng, _roles, state.recruitment.candidates)
+	var list: Array[CandidateState] = state.recruitment.candidates
+	var role: RoleDef = null
+	if ExpeditionUnlock.is_unlocked(state):
+		role = RecruitmentRules.unlocked_arrival_role(rng, _roles, _expedition_roles, list)
+	else:
+		role = RecruitmentRules.arrival_role(rng, _roles, list)
 	if role == null:
 		return false
 	var candidate: CandidateState = RecruitmentRules.draw_candidate(rng, _balance, role, _names)

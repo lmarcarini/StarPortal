@@ -133,6 +133,11 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 static func staff_line(args: Dictionary) -> String:
 	if str(args.get("reason", "")) == "arrived":
 		return arrival_line(args)
+	if str(args.get("reason", "")) == "lent":
+		return (
+			_tr(&"LOG_LINE_STAFF_LENT")
+			. format({"name": str(args.get("name", "")), "skill": type_convert(args.get("skill", 0), TYPE_INT)})
+		)
 	var def: RoomDef = Registry.get_def(StringName(str(args.get("room", "")))) as RoomDef
 	var room: String = "" if def == null else _tr(def.name_key)
 	var count: int = type_convert(args.get("count", 0), TYPE_INT)

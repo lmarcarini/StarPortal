@@ -36,8 +36,8 @@ static func entries_for(
 			return _staff_entries(args, tick)
 		&"reports_filed", &"committee_commendation", &"committee_warning":
 			return [_committee_entry(event_name, args, state, tick)]
-		&"staff_arrived":
-			return _arrival_entries(args, state, tick)
+		&"staff_arrived", ExpeditionUnlock.LENT_EVENT:
+			return _arrival_entries(args, state, tick, event_name != &"staff_arrived")
 	return []
 
 
@@ -73,13 +73,16 @@ static func _staff_entries(args: Array, tick: int) -> Array[LogEntry]:
 
 
 ## The "staff" entry of a hired person's arrival: "reason" "arrived", "name", "role" (role
-## id) and "skill", read from the roster when the event is emitted.
-static func _arrival_entries(args: Array, state: GameState, tick: int) -> Array[LogEntry]:
+## id) and "skill", read from the roster when the event is emitted. A soldier the Directorate
+## lends ([param lent]) gets "reason" "lent" instead (m3-beyond-the-ring.md section 4).
+static func _arrival_entries(
+	args: Array, state: GameState, tick: int, lent: bool
+) -> Array[LogEntry]:
 	var person: PersonState = state.staff.find_person(StringName(_text(args)))
 	if person == null:
 		return []
 	var details: Dictionary = {
-		"reason": "arrived", "name": person.name, "role": String(person.role), "skill": person.skill
+		"reason": "lent" if lent else "arrived", "name": person.name, "role": String(person.role), "skill": person.skill
 	}
 	return [LogEntry.create(tick, &"staff", &"", details)]
 
