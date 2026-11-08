@@ -4,7 +4,8 @@ extends SimSystem
 ## settlement, candidates whose leave day has come leave the list; every third day
 ## (RecruitmentRules.is_arrival_day()) one candidate arrives, drawn with the system's own seeded
 ## stream (soldiers and medics only from the Expeditions unlock, one arrival in four,
-## m3-beyond-the-ring.md section 4), replacing the oldest when the list is full, and leaving 12 days later. A change posts
+## m3-beyond-the-ring.md section 4), replacing the oldest when the list is full, and leaving 12
+## days later. A change posts
 ## candidates_changed (no message, no Log line). Each hired person posts staff_arrived(person
 ## id) on the tick they arrive, which writes the Log line "Dr Ana Ferreira (Scientist, skill 4)
 ## has arrived.".

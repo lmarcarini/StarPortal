@@ -45,9 +45,7 @@ static func check_skill(person: PersonState) -> int:
 
 ## Recovery speed of every injured person on base in [param state], by person id; people in
 ## [param away] (on an expedition) are skipped and recover nothing.
-static func speeds(
-	state: GameState, away: Array[StringName] = []
-) -> Dictionary[StringName, int]:
+static func speeds(state: GameState, away: Array[StringName] = []) -> Dictionary[StringName, int]:
 	var result: Dictionary[StringName, int] = {}
 	var places: Array[int] = _infirmary_places(state)
 	for person: PersonState in state.staff.people:

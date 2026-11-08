@@ -82,7 +82,10 @@ static func _arrival_entries(
 	if person == null:
 		return []
 	var details: Dictionary = {
-		"reason": "lent" if lent else "arrived", "name": person.name, "role": String(person.role), "skill": person.skill
+		"reason": "lent" if lent else "arrived",
+		"name": person.name,
+		"role": String(person.role),
+		"skill": person.skill
 	}
 	return [LogEntry.create(tick, &"staff", &"", details)]
 

@@ -67,8 +67,9 @@ func test_unlock_lends_two_soldiers_at_once_without_beds() -> void:
 	assert_bool(ExpeditionUnlock.unlock(_game)).is_true()
 	assert_bool(ExpeditionUnlock.unlock(_game)).is_false()
 	var lent: Array[PersonState] = _lent()
-	assert_array(lent.map(func(p: PersonState) -> String: return p.name)).is_equal(
-		["Maj. Ruth Adair", "Sgt Owen Hale"]
+	(
+		assert_array(lent.map(func(p: PersonState) -> String: return p.name))
+		. is_equal(["Maj. Ruth Adair", "Sgt Owen Hale"])
 	)
 	for person: PersonState in lent:
 		assert_str(String(person.role)).is_equal("role_soldier")
@@ -78,7 +79,9 @@ func test_unlock_lends_two_soldiers_at_once_without_beds() -> void:
 	assert_int(StaffRules.headcount(_game)).is_equal(headcount + 2)
 	var pay: int = StaffRules.salary_for_skill(_defs.balance, 3)
 	assert_int(StaffRules.salaries_k(_game)).is_equal(salaries + 2 * pay)
-	assert_array(_event_names()).is_equal([ExpeditionUnlock.LENT_EVENT, ExpeditionUnlock.LENT_EVENT])
+	assert_array(_event_names()).is_equal(
+		[ExpeditionUnlock.LENT_EVENT, ExpeditionUnlock.LENT_EVENT]
+	)
 
 
 func test_lost_lent_soldier_is_replaced_7_days_later_with_a_log_line() -> void:
@@ -165,6 +168,4 @@ func test_new_roles_have_pipelines_and_arrival_days() -> void:
 	assert_int(RecruitmentRules.arrival_ticks(_defs.balance, StartingStaff.SOLDIER)).is_equal(
 		3 * DAY
 	)
-	assert_int(RecruitmentRules.arrival_ticks(_defs.balance, StartingStaff.MEDIC)).is_equal(
-		5 * DAY
-	)
+	assert_int(RecruitmentRules.arrival_ticks(_defs.balance, StartingStaff.MEDIC)).is_equal(5 * DAY)

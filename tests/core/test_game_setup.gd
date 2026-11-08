@@ -42,7 +42,16 @@ func test_build_from_real_content_runs_both_systems() -> void:
 	for system: SimSystem in simulation._systems:
 		ids.append(system.get_id())
 	assert_array(ids).is_equal(
-		[&"power", &"gate", &"documents", &"economy", &"construction", &"research", &"recruitment", &"staff_care"]
+		[
+			&"power",
+			&"gate",
+			&"documents",
+			&"economy",
+			&"construction",
+			&"research",
+			&"recruitment",
+			&"staff_care"
+		]
 	)
 	for index: int in 60:
 		simulation.advance_tick()

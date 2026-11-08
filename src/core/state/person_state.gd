@@ -6,7 +6,8 @@ extends RefCounted
 ## M3 adds whether the Directorate lent them (no bed) and their injury with the recovery left.
 ## Saved shape: {"id", "name", "role", "skill", "salary_k", "room_id", "arrives_tick", "lent",
 ## "injury", "recovery_left"}.
-## Bible: docs/content/m26-staff-and-money.md sections 1 and 3, technical-architecture.md#data-model,
+## Bible: docs/content/m26-staff-and-money.md sections 1 and 3,
+## technical-architecture.md#data-model,
 ## docs/content/m3-beyond-the-ring.md section 4 (lent soldiers, injuries)
 
 ## How hurt a person is (section 4): light heals in 2 days, serious in 8 (at 1x).
@@ -18,7 +19,15 @@ const MIN_SKILL: int = 1
 const MAX_SKILL: int = 5
 ## Saved keys, in to_dict() order.
 const _KEYS: Array[String] = [
-	"id", "name", "role", "skill", "salary_k", "room_id", "arrives_tick", "lent", "injury",
+	"id",
+	"name",
+	"role",
+	"skill",
+	"salary_k",
+	"room_id",
+	"arrives_tick",
+	"lent",
+	"injury",
 	"recovery_left"
 ]
 ## Saved names of the injuries, indexed by Injury value.
@@ -98,7 +107,8 @@ static func from_dict(data: Dictionary) -> PersonState:
 ## present; "lent" a bool; "injury" "none", "light" or "serious"; "id", "name" and "role"
 ## non-empty strings; "room_id" a string; "skill" a whole
 ## number from [constant MIN_SKILL] to [constant MAX_SKILL]; "salary_k", "arrives_tick" and
-## "recovery_left" whole numbers of at least 0. Role and room ids are checked against the content and the base
+## "recovery_left" whole numbers of at least 0. Role and room ids are checked against the
+## content and the base
 ## by StaffSaveChecks.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
