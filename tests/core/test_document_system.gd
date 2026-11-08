@@ -316,5 +316,14 @@ func test_documents_system_runs_after_gate() -> void:
 	for system: SimSystem in simulation._systems:
 		ids.append(system.get_id())
 	assert_array(ids).is_equal(
-		[&"power", &"gate", &"documents", &"economy", &"construction", &"research", &"recruitment"]
+		[
+			&"power",
+			&"gate",
+			&"documents",
+			&"probes",
+			&"economy",
+			&"construction",
+			&"research",
+			&"recruitment"
+		]
 	)

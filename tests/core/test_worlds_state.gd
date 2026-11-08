@@ -40,6 +40,7 @@ func test_dict_shape() -> void:
 				"consoles_read": {"abydos": true},
 				"horizon_records": {"abydos": true},
 				"reports": {},
+				"targets": {},
 				"pole_camera_world_id": "p3x_118",
 				"pole_camera_ticks_left": 3,
 			}
