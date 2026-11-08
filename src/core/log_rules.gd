@@ -38,7 +38,34 @@ static func entries_for(
 			return [_committee_entry(event_name, args, state, tick)]
 		&"staff_arrived", ExpeditionUnlock.LENT_EVENT:
 			return _arrival_entries(args, state, tick, event_name != &"staff_arrived")
+		&"team_checked_in", &"check_in_missed", &"member_deceased", &"team_lost", &"team_rescued":
+			return _expedition_entries(event_name, args, tick)
 	return []
+
+
+## The "expedition" entry of a check-in ("reason" "checked_in", "light", "serious"), a missed
+## check-in ("missed"), a member deceased in a rescue ("deceased", "name"), a team rescued
+## ("rescued", "survivors") or lost ("lost" or "no_answer"); the world is the team's
+## (m3-beyond-the-ring.md section 4).
+static func _expedition_entries(event_name: StringName, args: Array, tick: int) -> Array[LogEntry]:
+	if args.is_empty():
+		return []
+	var world: StringName = StringName(
+		str(args[-1] if event_name == &"member_deceased" else args[0])
+	)
+	var details: Dictionary = {}
+	match event_name:
+		&"team_checked_in":
+			details = {"reason": "checked_in", "light": args[1], "serious": args[2]}
+		&"check_in_missed":
+			details = {"reason": "missed"}
+		&"member_deceased":
+			details = {"reason": "deceased", "name": str(args[0])}
+		&"team_rescued":
+			details = {"reason": "rescued", "survivors": args[1]}
+		_:
+			details = {"reason": "lost" if str(args[1]) == "window" else "no_answer"}
+	return [LogEntry.create(tick, &"expedition", world, details)]
 
 
 ## The "committee" entry of reports filed ("reason" "reports", "count" analysts), the

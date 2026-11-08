@@ -39,7 +39,7 @@ static var slot_roles: Dictionary[String, Array] = {
 static func plan_error(state: GameState, plan: ExpeditionState, team: Dictionary) -> StringName:
 	if not ExpeditionUnlock.is_unlocked(state):
 		return LOCKED
-	if state.expedition.mode == ExpeditionState.Mode.AWAY:
+	if state.expedition.is_out():
 		return BUSY
 	var error: StringName = objective_error(state, plan)
 	if not error.is_empty():

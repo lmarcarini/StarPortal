@@ -13,6 +13,8 @@ const CAUSE_KEYS: Dictionary[StringName, StringName] = {
 	&"surveyed": &"CONFIDENCE_CAUSE_SURVEYED",
 	&"research": &"CONFIDENCE_CAUSE_RESEARCH",
 	&"reports": &"CONFIDENCE_CAUSE_REPORTS",
+	&"team_lost": &"CONFIDENCE_CAUSE_TEAM_LOST",
+	&"deceased": &"CONFIDENCE_CAUSE_DECEASED",
 }
 ## Line key of each committee_warning reason.
 const WARNING_KEYS: Dictionary[StringName, StringName] = {
