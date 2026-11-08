@@ -21,6 +21,14 @@ const _FNV_PRIME: int = 1099511628211
 ## distance (ties by id), excluding CAIRN and authored worlds; the count (2..4) comes from a stable
 ## hash of the world id, so it never changes between runs. Empty when the world is unknown.
 static func listed_worlds(world_id: StringName, galaxy: GalaxyCatalogue) -> Array[StringName]:
+	return nearest_worlds(world_id, galaxy, entry_count(world_id))
+
+
+## The [param count] procedural worlds nearest to [param world_id] by distance (ties by id),
+## excluding CAIRN and authored worlds: the console's log read deeper (the MOTH Ring scan).
+static func nearest_worlds(
+	world_id: StringName, galaxy: GalaxyCatalogue, count: int
+) -> Array[StringName]:
 	var listed: Array[StringName] = []
 	var origin: WorldRecord = galaxy.get_world(world_id)
 	if origin == null:
@@ -32,7 +40,7 @@ static func listed_worlds(world_id: StringName, galaxy: GalaxyCatalogue) -> Arra
 		var distance: int = AddressRule.squared_distance(record.position_ly, origin.position_ly)
 		candidates.append([distance, String(record.id)])
 	candidates.sort_custom(_nearer_first)
-	for index: int in mini(entry_count(world_id), candidates.size()):
+	for index: int in mini(count, candidates.size()):
 		listed.append(StringName(str(candidates[index][1])))
 	return listed
 

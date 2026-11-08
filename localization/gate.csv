@@ -123,3 +123,11 @@ TARGET_RUINED_WALL,Ruined wall,Muro em ruínas
 TARGET_BROKEN_TABLET,Broken carved tablet,Tábua entalhada partida
 TARGET_CUT_STONES,Cut stones in a row,Pedras talhadas em fileira
 TARGET_STONE_TOOL,Worked stone tool,Ferramenta de pedra lavrada
+THREAT_REASON_GUARDED,Armed guards at the Ring,Guardas armados junto ao Anel
+THREAT_REASON_ANIMALS,Large animals nearby,Animais grandes por perto
+THREAT_REASON_PEOPLE,People who may not welcome us,Pessoas que talvez não nos recebam bem
+THREAT_REASON_BIOHAZARD,Biological hazard in soil and water,Risco biológico no solo e na água
+THREAT_REASON_TOXIC_AIR,Toxic air,Ar tóxico
+THREAT_REASON_RADIATION,Raised radiation,Radiação elevada
+THREAT_REASON_TEMPERATURE,Extreme temperature,Temperatura extrema
+THREAT_REASON_NONE,Nothing dangerous found,Nada perigoso encontrado

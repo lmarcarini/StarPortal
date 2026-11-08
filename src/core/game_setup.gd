@@ -3,13 +3,13 @@ extends RefCounted
 ## Builds a runnable Simulation around a new or loaded GameState: regenerates the galaxy from
 ## the state's saved seed and generator version, sets the state's transient balance and
 ## galaxy, and adds the systems in the bible's fixed tick order (power, gate, documents,
-## economy, construction, research, recruitment).
+## probes, economy, construction, research, recruitment).
 ## Bible: technical-architecture.md#simulation-clock-and-commands,
 ## technical-architecture.md#save-system, technical-architecture.md#data-model
 
 
 ## Returns a Result whose value is a Simulation over [param state] with
-## [PowerSystem, GateSystem, DocumentSystem, EconomySystem,
+## [PowerSystem, GateSystem, DocumentSystem, ProbeSystem, EconomySystem,
 ## ConstructionSystem, ResearchSystem, RecruitmentSystem], after setting [code]state.balance[/code],
 ## [code]state.room_defs[/code], [code]state.research_defs[/code] and
 ## [code]state.galaxy[/code] from [param defs]. Fails,
@@ -42,6 +42,7 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 		PowerSystem.new(defs.balance),
 		GateSystem.new(),
 		DocumentSystem.new(defs.documents),
+		ProbeSystem.new(),
 		EconomySystem.new(defs.balance, defs.rooms),
 		ConstructionSystem.new(),
 		ResearchSystem.new(),

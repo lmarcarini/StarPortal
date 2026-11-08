@@ -63,6 +63,35 @@ static func raise_fact(state: GameState, change: FactChange) -> bool:
 	return true
 
 
+## Raises the threat of [param world_id] to GOOD from [param source] (a team's survey), with
+## the reasons ThreatReasons gives for [param facts], stored in the world report. Returns false,
+## changing nothing, when the threat is already GOOD.
+static func raise_threat_good(
+	state: GameState, world_id: StringName, source: StringName, facts: WorldFacts
+) -> bool:
+	var change := FactChange.create(
+		world_id, WorldReport.Fact.THREAT, WorldReport.Confidence.GOOD, source
+	)
+	if not raise_fact(state, change):
+		return false
+	state.worlds.reports[world_id].entry_of(WorldReport.Fact.THREAT).reasons = (ThreatReasons.of(
+		facts
+	))
+	return true
+
+
+## Raises target [param target_id] of [param world_id] to [param target_state] (a Close look
+## marks an object RECOVERABLE; a Recover marks it RECOVERED) and posts
+## world_target_changed(world id, target id, state). Returns false when it is not higher.
+static func raise_target(
+	state: GameState, world_id: StringName, target_id: StringName, target_state: TargetStates.State
+) -> bool:
+	if not state.worlds.targets.raise(world_id, target_id, target_state):
+		return false
+	state.events.post(&"world_target_changed", [world_id, target_id, target_state as int])
+	return true
+
+
 ## One requested rise of a report fact: which world, which fact, to what confidence, and the
 ## source that raised it.
 class FactChange:

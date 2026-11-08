@@ -10,6 +10,9 @@ var id: StringName
 var name_key: StringName
 ## True for an object a Close look can mark recoverable.
 var is_object: bool = false
+## Document of the target's marks or inscription a Close look copies into the Archive; &""
+## when it has none. Procedural targets have none.
+var marks_document_id: StringName = &""
 
 
 ## Returns a target with [param target_id], [param key] and [param object].

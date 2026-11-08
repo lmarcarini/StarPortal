@@ -10,3 +10,6 @@ extends Resource
 @export var name_key: StringName
 ## True for an object a Close look can mark recoverable; false for a feature of the land.
 @export var is_object: bool = false
+## Document a MOTH Close look copies into the Archive: the target's marks or inscription
+## (e.g. the anchor's marks, card M3-19); &"" when it has none.
+@export var marks_document_id: StringName = &""

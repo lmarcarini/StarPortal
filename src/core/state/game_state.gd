@@ -22,6 +22,7 @@ const _SECTIONS: Array[String] = [
 	"staff",
 	"committee",
 	"recruitment",
+	"probes",
 ]
 
 ## The simulation clock.
@@ -56,6 +57,8 @@ var staff: StaffState = StaffState.new()
 var committee: CommitteeState = CommitteeState.new()
 ## The rolling candidate list.
 var recruitment: RecruitmentState = RecruitmentState.new()
+## The sample canister, the MOTH run, the rack and the probe photos.
+var probes: ProbesState = ProbesState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -118,6 +121,7 @@ func to_dict() -> Dictionary:
 		"staff": staff.to_dict(),
 		"committee": committee.to_dict(),
 		"recruitment": recruitment.to_dict(),
+		"probes": probes.to_dict(),
 	}
 
 
@@ -141,6 +145,7 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.staff = StaffState.from_dict(_dict_or_empty(data.get("staff")))
 	state.committee = CommitteeState.from_dict(_dict_or_empty(data.get("committee")))
 	state.recruitment = RecruitmentState.from_dict(_dict_or_empty(data.get("recruitment")))
+	state.probes = ProbesState.from_dict(_dict_or_empty(data.get("probes")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -154,7 +159,8 @@ static func from_dict(data: Dictionary) -> GameState:
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
 ## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book",
-## "operations_log", "unlocks", "research", "staff", "committee" and "recruitment" must be
+## "operations_log", "unlocks", "research", "staff", "committee", "recruitment" and "probes"
+## must be
 ## objects, the sub-states must pass their own validate_dict(), and
 ## every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
@@ -230,6 +236,8 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return CommitteeState.validate_dict(section)
 		"recruitment":
 			return RecruitmentState.validate_dict(section)
+		"probes":
+			return ProbesState.validate_dict(section)
 	return []
 
 

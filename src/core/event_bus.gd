@@ -76,6 +76,45 @@ signal world_status_changed(world_id: StringName, status: int)
 ## WorldReport.Fact and the new WorldReport.Confidence (posted through the outbox).
 @warning_ignore("unused_signal")
 signal world_fact_raised(world_id: StringName, fact: int, confidence: int)
+## Emitted when a target's saved state rises (WorldProgress.raise_target), with the world id,
+## target id and TargetStates.State (posted through the outbox).
+@warning_ignore("unused_signal")
+signal world_target_changed(world_id: StringName, target_id: StringName, state: int)
+## Emitted when a sample canister is thrown through, with the world id (posted through the
+## outbox).
+@warning_ignore("unused_signal")
+signal canister_launched(world_id: StringName)
+## Emitted when the canister is reeled back, with the world id and its WorldDef.Biohazard
+## (posted through the outbox).
+@warning_ignore("unused_signal")
+signal canister_returned(world_id: StringName, biohazard: int)
+## Emitted when the wormhole closes with the canister out, with the world id (posted through
+## the outbox).
+@warning_ignore("unused_signal")
+signal canister_lost(world_id: StringName)
+## Emitted when a MOTH is sent through, with the world id (posted through the outbox).
+@warning_ignore("unused_signal")
+signal moth_launched(world_id: StringName)
+## Emitted when the MOTH starts a scan, with the MothRules.Scan and the target id (posted
+## through the outbox).
+@warning_ignore("unused_signal")
+signal moth_scan_started(scan: int, target_id: StringName)
+## Emitted when the MOTH finishes a scan, with the MothRules.Scan and the target id (posted
+## through the outbox).
+@warning_ignore("unused_signal")
+signal moth_scan_finished(scan: int, target_id: StringName)
+## Emitted when a recalled MOTH is back in the rack, with the world id (posted through the
+## outbox).
+@warning_ignore("unused_signal")
+signal moth_recalled(world_id: StringName)
+## Emitted when the MOTH is lost ("SIGNAL LOST"), with the world id and the reason:
+## &"shot_down", &"battery" or &"wormhole_closed" (posted through the outbox).
+@warning_ignore("unused_signal")
+signal moth_lost(world_id: StringName, reason: StringName)
+## Emitted when a replacement MOTH arrives, with the drones now in the rack (posted through
+## the outbox).
+@warning_ignore("unused_signal")
+signal moth_delivered(rack: int)
 
 ## Emitted when a construction site starts, with its site id (posted through the outbox).
 @warning_ignore("unused_signal")
