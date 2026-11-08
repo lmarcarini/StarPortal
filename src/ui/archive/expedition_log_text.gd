@@ -17,6 +17,7 @@ const LINE_KEYS: Dictionary[String, StringName] = {
 	"no_answer": &"LOG_LINE_TEAM_NO_ANSWER",
 	"departed": &"LOG_LINE_TEAM_DEPARTED",
 	"returned": &"LOG_LINE_TEAM_RETURNED",
+	"prologue": &"LOG_LINE_PROLOGUE_COMPLETE",
 }
 
 

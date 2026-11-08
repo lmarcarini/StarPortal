@@ -158,7 +158,9 @@ func _connect_events(on: bool) -> void:
 			event.disconnect(_on_event)
 
 
-func _on_event(_a: Variant = null, _b: Variant = null, _c: Variant = null) -> void:
+func _on_event(
+	_a: Variant = null, _b: Variant = null, _c: Variant = null, _d: Variant = null
+) -> void:
 	_update_availability()
 	if is_visible_in_tree():
 		refresh()

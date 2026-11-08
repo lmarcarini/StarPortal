@@ -73,6 +73,7 @@ func _enter_tree() -> void:
 	EventBus.committee_commendation.connect(_on_commendation)
 	EventBus.committee_warning.connect(_on_committee_warning)
 	EventBus.team_checked_in.connect(_on_team_checked_in)
+	EventBus.prologue_completed.connect(_on_prologue_completed)
 
 
 func _exit_tree() -> void:
@@ -80,6 +81,7 @@ func _exit_tree() -> void:
 	EventBus.committee_commendation.disconnect(_on_commendation)
 	EventBus.committee_warning.disconnect(_on_committee_warning)
 	EventBus.team_checked_in.disconnect(_on_team_checked_in)
+	EventBus.prologue_completed.disconnect(_on_prologue_completed)
 	if _simulation != null and SimClock.simulation == _simulation:
 		SimClock.stop()
 
@@ -251,12 +253,18 @@ func _relink_top_bar() -> void:
 	_link_focus(get_focus_order(), view_switcher.get_tab_bar())
 
 
-func _on_team_checked_in(world_id: StringName, light: int, serious: int) -> void:
+func _on_team_checked_in(world_id: StringName, light: int, serious: int, _day: String) -> void:
 	if _simulation == null:
 		return
 	var world: String = AddressBookText.name_of_world(world_id, _simulation.state)
 	var args: Dictionary = {"reason": "checked_in", "light": light, "serious": serious}
 	show_message(ExpeditionLogText.line(args, world), COMMITTEE_MESSAGE_SECONDS)
+
+
+## The Prologue ends at the first team's return home (docs/content/m3-beyond-the-ring.md
+## section 1): a message that never pauses.
+func _on_prologue_completed(_world_id: StringName) -> void:
+	show_message(tr(&"LOG_LINE_PROLOGUE_COMPLETE"), COMMITTEE_MESSAGE_SECONDS)
 
 
 func _show_toast(key: StringName) -> void:

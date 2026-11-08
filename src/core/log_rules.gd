@@ -40,6 +40,12 @@ static func entries_for(
 			return _arrival_entries(args, state, tick, event_name != &"staff_arrived")
 		&"team_sent", &"team_returned":
 			return [_trip_entry(event_name, args, tick)]
+		ExpeditionSystem.PROLOGUE_EVENT:
+			return [
+				LogEntry.create(
+					tick, &"expedition", StringName(_text(args)), {"reason": "prologue"}
+				)
+			]
 		ExpeditionFieldDay.EVENT:
 			return [_field_event_entry(args, tick)]
 		&"team_checked_in", &"check_in_missed", &"member_deceased", &"team_lost", &"team_rescued":

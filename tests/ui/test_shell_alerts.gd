@@ -28,7 +28,7 @@ func after_test() -> void:
 
 func test_a_check_in_shows_as_a_message_and_the_alert_stack_is_in_the_top_bar() -> void:
 	var home: StringName = SimClock.simulation.state.galaxy.home().id
-	EventBus.team_checked_in.emit(home, 1, 0)
+	EventBus.team_checked_in.emit(home, 1, 0, "injury")
 	assert_str(_shell.get_toast_text()).starts_with("T-1 checked in from ")
 	assert_str(_shell.get_toast_text()).ends_with(": one light injury.")
 	assert_bool(SimClock.simulation.state.clock.is_paused).is_true()

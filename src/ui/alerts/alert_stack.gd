@@ -21,11 +21,15 @@ func _init() -> void:
 func _enter_tree() -> void:
 	EventBus.tick_advanced.connect(_on_event)
 	EventBus.check_in_missed.connect(_on_event)
+	EventBus.team_rescued.connect(_on_event)
+	EventBus.team_lost.connect(_on_event)
 
 
 func _exit_tree() -> void:
 	EventBus.tick_advanced.disconnect(_on_event)
 	EventBus.check_in_missed.disconnect(_on_event)
+	EventBus.team_rescued.disconnect(_on_event)
+	EventBus.team_lost.disconnect(_on_event)
 
 
 func _notification(what: int) -> void:
@@ -59,5 +63,5 @@ func _on_rescue_pressed() -> void:
 		_alert.open()
 
 
-func _on_event(_value: Variant = null) -> void:
+func _on_event(_a: Variant = null, _b: Variant = null) -> void:
 	refresh()

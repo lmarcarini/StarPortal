@@ -80,7 +80,7 @@ func test_recall_turns_the_next_check_in_into_the_return() -> void:
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.IDLE)
 	assert_bool(_events.has(ExpeditionSystem.RETURNED_EVENT)).is_true()
 	assert_bool(_events.has(ExpeditionSystem.CHECKED_IN_EVENT)).is_false()
-	assert_array(_expedition_lines()).is_equal(["departed", "returned"])
+	assert_array(_expedition_lines()).is_equal(["departed", "returned", "prologue"])
 	assert_int(_state.worlds.status_of(Fixture.WORLD_ID)).is_equal(WorldsState.WorldStatus.PROBED)
 	assert_array(_state.expedition.documents).is_empty()
 
