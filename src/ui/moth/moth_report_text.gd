@@ -59,5 +59,38 @@ static func sky_key(facts: WorldFacts) -> StringName:
 	return StringName("MOTH_SKY_" + _SKY_NAMES[facts.sky])
 
 
+## The text of the scan [param run] finished last on [param facts]: the Look around, the Close
+## look of its target or the Sky line; "" before any or for a Ring or Recall.
+static func finished_text(run: MothRun, facts: WorldFacts) -> String:
+	if run == null or facts == null or run.done.is_empty():
+		return ""
+	var last: String = run.done[run.done.size() - 1]
+	if last == MothRules.SCAN_NAMES[MothRules.Scan.LOOK_AROUND]:
+		return look_around(facts)
+	if last == MothRules.SCAN_NAMES[MothRules.Scan.SKY]:
+		return _tr(sky_key(facts))
+	var prefix: String = MothRules.SCAN_NAMES[MothRules.Scan.CLOSE_LOOK] + ":"
+	if not last.begins_with(prefix):
+		return ""
+	var target: WorldTarget = facts.find_target(StringName(last.trim_prefix(prefix)))
+	return _tr(close_look_key(target)) if target != null else ""
+
+
+## The report's description of [param facts] as [param report] knows it: the biome and sky
+## lines once the air is known, then the life and structures lines once each is known.
+static func report_lines(facts: WorldFacts, report: WorldReport) -> String:
+	var parts: PackedStringArray = []
+	if WorldReportRules.is_known(report, WorldReport.Fact.ATMOSPHERE):
+		parts.append(_tr(biome_key(facts)))
+		parts.append(_tr(sky_key(facts)))
+	var life: int = WorldReportRules.shown_category(facts, report, WorldReport.Fact.LIFE)
+	if life > WorldDef.Life.UNKNOWN:
+		parts.append(_tr(StringName("MOTH_LIFE_" + _LIFE_NAMES[life])))
+	var built: int = WorldReportRules.shown_category(facts, report, WorldReport.Fact.STRUCTURES)
+	if built > WorldDef.Structures.UNKNOWN:
+		parts.append(_tr(StringName("MOTH_STRUCTURES_" + _STRUCTURE_NAMES[built])))
+	return " ".join(parts)
+
+
 static func _tr(key: StringName) -> String:
 	return String(TranslationServer.translate(key))

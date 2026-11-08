@@ -33,6 +33,7 @@ var _grid: GridContainer = GridContainer.new()
 var _values: Dictionary[WorldReport.Fact, Label] = {}
 var _notes: Dictionary[WorldReport.Fact, Label] = {}
 var _plan: Button = Button.new()
+var _description: Label = Label.new()
 
 
 func _init() -> void:
@@ -53,6 +54,9 @@ func _init() -> void:
 	_grid.columns = 3
 	_grid.add_theme_constant_override(&"h_separation", 12)
 	layout.add_child(_grid)
+	_description.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	layout.add_child(_description)
 	_plan.text = &"WORLD_PLAN_EXPEDITION"
 	_plan.disabled = true
 	_plan.tooltip_text = &"WORLD_PLAN_EXPEDITION_LATER"
@@ -83,6 +87,7 @@ func show_world(world_id: StringName, state: GameState) -> void:
 	for fact: WorldReport.Fact in FACT_ORDER:
 		_values[fact].text = WorldReportText.value(facts, report, fact)
 		_notes[fact].text = WorldReportText.note(report, fact)
+	_description.text = MothReportText.report_lines(facts, report)
 	var address: GateAddress = WorldReportText.address_of(world_id, state)
 	if is_node_ready():
 		_strip.setup(address)
@@ -96,6 +101,7 @@ func clear() -> void:
 	_title.text = ""
 	_status.text = ""
 	_address_row.visible = false
+	_description.text = ""
 	_set_shown(false)
 
 
@@ -112,6 +118,11 @@ func get_value_text(fact: WorldReport.Fact) -> String:
 ## Returns the confidence and source shown for [param fact], "" while unknown.
 func get_note_text(fact: WorldReport.Fact) -> String:
 	return _notes[fact].text
+
+
+## Returns the label with the report's description lines.
+func get_description_label() -> Label:
+	return _description
 
 
 ## Returns the address strip.
@@ -148,4 +159,5 @@ func _build_rows() -> void:
 func _set_shown(is_shown: bool) -> void:
 	_empty.visible = not is_shown
 	_grid.visible = is_shown
+	_description.visible = is_shown
 	_plan.visible = is_shown

@@ -97,3 +97,18 @@ func test_the_screen_fits_live_and_lost(
 	await get_tree().process_frame
 	assert_int(_view.get_moth_screen().get_phase()).is_equal(MothScreen.Phase.LOST)
 	_assert_screen_fits(locale)
+
+
+## The longest finished-scan text (STILLWATER's Look around) fits under the frame.
+@warning_ignore("unused_parameter")
+func test_the_longest_scan_text_fits(
+	locale: String, test_parameters: Array = [["en"], ["pt_BR"]]  # gdlint: ignore=unused-argument
+) -> void:
+	await _build(locale)
+	var screen: MothScreen = _view.get_moth_screen()
+	assert_str(screen.get_result_label().text).is_not_empty()
+	screen.get_result_label().text = tr(&"MOTH_LOOK_STILLWATER")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_assert_screen_fits(locale)
+	assert_float(screen.get_frame().size.y).is_greater(200.0)
