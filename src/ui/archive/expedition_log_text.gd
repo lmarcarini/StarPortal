@@ -52,7 +52,23 @@ static func field_event_line(args: Dictionary) -> String:
 		return ""
 	var part: String = "SUCCESS" if str(args.get("outcome", "")) == "finding" else "FAILURE"
 	var text: String = _tr(StringName(def.text_key(part))).format({"name": str(args.get("name"))})
+	var injury: StringName = injury_key(def, str(args.get("outcome", "")))
+	if not injury.is_empty():
+		text = "%s: %s." % [text.trim_suffix("."), _tr(injury)]
 	return "%s: %s" % [_tr(StringName(def.text_key("TITLE"))), text]
+
+
+## The key of the injury a field event actually caused, from the saved [param outcome] ("light"
+## or "serious"): FIELD_OUTCOME_MEDIC when a medic turned [param def]'s serious setback light;
+## empty for other outcomes.
+static func injury_key(def: FieldEventDef, outcome: String) -> StringName:
+	if outcome == "serious":
+		return &"FIELD_OUTCOME_SERIOUS"
+	if outcome != "light":
+		return &""
+	if def.setback == FieldEventDef.Setback.SERIOUS:
+		return &"FIELD_OUTCOME_MEDIC"
+	return &"FIELD_OUTCOME_LIGHT"
 
 
 ## The team's injuries in [param args] ("light", "serious"): "one light injury", "no

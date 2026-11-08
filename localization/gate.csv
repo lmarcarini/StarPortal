@@ -210,22 +210,22 @@ FIELD_EVENT_DUST_FRONT_SUCCESS,"The team sheltered and logged the front: wind an
 FIELD_EVENT_DUST_FRONT_FAILURE,"A dust front pinned the team down; the day was lost.","Uma frente de poeira prendeu a equipe; o dia foi perdido."
 FIELD_EVENT_LOOSE_SCREE_TITLE,Loose scree,Cascalho solto
 FIELD_EVENT_LOOSE_SCREE_SUCCESS,"The team crossed a scree slope safely and found a better route back to the Ring.","A equipe atravessou uma encosta de cascalho em segurança e achou um caminho melhor de volta ao Anel."
-FIELD_EVENT_LOOSE_SCREE_FAILURE,"The scree gave way under {name}: a light injury.","O cascalho cedeu sob {name}: um ferimento leve."
+FIELD_EVENT_LOOSE_SCREE_FAILURE,"The scree gave way under {name}.","O cascalho cedeu sob {name}."
 FIELD_EVENT_SPORE_BLOOM_TITLE,Spore bloom,Nuvem de esporos
 FIELD_EVENT_SPORE_BLOOM_SUCCESS,"Masks on in time: the team sealed spore samples for the lab.","Máscaras a tempo: a equipe lacrou amostras de esporos para o laboratório."
-FIELD_EVENT_SPORE_BLOOM_FAILURE,"{name} breathed in spores before the masks went on: a light injury.","{name} inalou esporos antes das máscaras: um ferimento leve."
+FIELD_EVENT_SPORE_BLOOM_FAILURE,"{name} breathed in spores before the masks went on.","{name} inalou esporos antes das máscaras."
 FIELD_EVENT_THIN_ICE_TITLE,Thin ice,Gelo fino
 FIELD_EVENT_THIN_ICE_SUCCESS,"The ice was sounded and crossed; a core sample came back with it.","O gelo foi sondado e atravessado; uma amostra de núcleo veio junto."
-FIELD_EVENT_THIN_ICE_FAILURE,"The ice broke under {name}: a light injury.","O gelo quebrou sob {name}: um ferimento leve."
+FIELD_EVENT_THIN_ICE_FAILURE,"The ice broke under {name}.","O gelo quebrou sob {name}."
 FIELD_EVENT_FALSE_BEARINGS_TITLE,False bearings,Rumos falsos
 FIELD_EVENT_FALSE_BEARINGS_SUCCESS,"The compass drifted, but the stars fixed the team's position: a cleaner survey map.","A bússola desviou, mas as estrelas fixaram a posição da equipe: um mapa de levantamento mais limpo."
 FIELD_EVENT_FALSE_BEARINGS_FAILURE,"The team walked in circles on false bearings; the day was lost.","A equipe andou em círculos com rumos falsos; o dia foi perdido."
 FIELD_EVENT_BURIED_CHAMBER_TITLE,Buried chamber,Câmara soterrada
 FIELD_EVENT_BURIED_CHAMBER_SUCCESS,"The team shored up a buried chamber and mapped its walls on the way to the target.","A equipe escorou uma câmara soterrada e mapeou suas paredes a caminho do alvo."
-FIELD_EVENT_BURIED_CHAMBER_FAILURE,"The chamber roof came down on {name}: a serious injury.","O teto da câmara desabou sobre {name}: um ferimento grave."
+FIELD_EVENT_BURIED_CHAMBER_FAILURE,"The chamber roof came down on {name}.","O teto da câmara desabou sobre {name}."
 FIELD_EVENT_STALKERS_TITLE,Stalkers,Perseguidores
 FIELD_EVENT_STALKERS_SUCCESS,"Something large followed the team all day; the soldiers kept it off and noted its tracks.","Algo grande seguiu a equipe o dia todo; os soldados o mantiveram longe e anotaram seus rastros."
-FIELD_EVENT_STALKERS_FAILURE,"Something large came out of cover at {name}: a serious injury.","Algo grande saiu do esconderijo contra {name}: um ferimento grave."
+FIELD_EVENT_STALKERS_FAILURE,"Something large came out of cover at {name}.","Algo grande saiu do esconderijo contra {name}."
 FIELD_EVENT_WATCHERS_TITLE,Watchers,Observadores
 FIELD_EVENT_WATCHERS_SUCCESS,"Armed watchers shadowed the camp; the team slipped past them and saw where they came from.","Observadores armados rondaram o acampamento; a equipe passou por eles e viu de onde vinham."
 FIELD_EVENT_WATCHERS_FAILURE,"Armed watchers cut the team off from the Ring: no check-in.","Observadores armados isolaram a equipe do Anel: sem contato."
@@ -298,3 +298,6 @@ EXPEDITION_CHECK_IN_TITLE,CHECK-IN  {date},CONTATO  {date}
 EXPEDITION_CHECK_IN_TITLE_NONE,CHECK-IN  none yet,CONTATO  nenhum ainda
 EXPEDITION_INJURED_LIGHT,"Injured: {name} (light, {time})","Ferido: {name} (leve, {time})"
 EXPEDITION_INJURED_SERIOUS,"Injured: {name} (serious, {time})","Ferido: {name} (grave, {time})"
+FIELD_OUTCOME_LIGHT,a light injury,um ferimento leve
+FIELD_OUTCOME_SERIOUS,a serious injury,um ferimento grave
+FIELD_OUTCOME_MEDIC,"a serious injury, kept light by the medic","um ferimento grave, mantido leve pelo médico"

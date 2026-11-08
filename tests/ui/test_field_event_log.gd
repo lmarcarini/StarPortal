@@ -123,3 +123,23 @@ func test_departure_and_return_write_log_lines() -> void:
 	assert_str(ExpeditionLogText.line(back.args, "STILLWATER")).is_equal(
 		"T-1 came home from STILLWATER (recovery): %s, Dr Ana Reis." % NAME
 	)
+
+
+## The Log names the injury the event actually caused: serious, or kept light by a medic.
+func test_injury_line_follows_the_actual_severity() -> void:
+	var cases: Array = [
+		["en", "serious", "a serious injury"],
+		["en", "light", "a serious injury, kept light by the medic"],
+		["pt_BR", "serious", "um ferimento grave"],
+		["pt_BR", "light", "um ferimento grave, mantido leve pelo médico"],
+	]
+	for case: Array in cases:
+		var locale: String = case[0]
+		var outcome: String = case[1]
+		TranslationServer.set_locale(locale)
+		var entry: LogEntry = (
+			LogRules.entries_for(ExpeditionFieldDay.EVENT, _args(&"stalkers", outcome), null, 5)[0]
+		)
+		var line: String = ExpeditionLogText.line(entry.args, "")
+		assert_str(line).ends_with(": %s." % case[2])
+		assert_int(line.countn("grave") + line.countn("serious")).is_equal(1)
