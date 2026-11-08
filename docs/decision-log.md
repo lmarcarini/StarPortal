@@ -294,3 +294,10 @@ Each entry has four fields:
 - **Reason:** Roadmap M3, shaped for the owner's planned iteration on core mechanics after this milestone. Owner decisions 2026-11-07: 3D feed later; rescue as proposed, but its success depends on what is on the world and some of the team may not survive; Infirmary from the Base tab.
 - **Bible section:** [game-design.md#personnel-military-and-expeditions](bible/game-design.md#personnel-military-and-expeditions); details in [content/m3-beyond-the-ring.md](content/m3-beyond-the-ring.md)
 
+
+## 2026-11-08 — Soak time budget raised to 150 s
+
+- **Date:** 2026-11-08
+- **Decision:** The soak test's time ceiling (`BUDGET_MSEC` in tests/soak/test_soak_year.gd) rises from 90 s to 150 s. A normal run now takes about 80 s (88 s wall time with startup) after the M3 probe and expedition systems, and more M3 systems are coming.
+- **Reason:** PO ruling on PR #240 (card #229): the old ceiling left about 1 s of headroom. The budget is a ceiling for slow or shared machines, not a target.
+- **Bible section:** [technical-architecture.md](bible/technical-architecture.md) (tests); process only.

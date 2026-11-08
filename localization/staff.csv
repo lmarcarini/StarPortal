@@ -46,3 +46,4 @@ LOG_LINE_STAFF_LENT,"The Directorate lends {name} (Soldier, skill {skill}).","A 
 STAFF_INJURED_LIGHT,Light injury: {time} to recover,Ferimento leve: {time} para se recuperar
 STAFF_INJURED_SERIOUS,Serious injury: {time} to recover,Ferimento grave: {time} para se recuperar
 STAFF_LENT,Lent,Cedido
+STAFF_ERR_ON_EXPEDITION,On the expedition team: change the plan first.,Na equipe da expedição: altere o plano primeiro.

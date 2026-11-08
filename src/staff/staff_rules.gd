@@ -17,6 +17,9 @@ const NOT_BUILT: StringName = &"not_built"
 const WRONG_ROLE: StringName = &"wrong_role"
 ## Refusal: every slot of the room is taken.
 const ROOM_FULL: StringName = &"room_full"
+## Refusal: the person is on the planned or away expedition team
+## (docs/content/m3-beyond-the-ring.md section 4).
+const ON_EXPEDITION: StringName = &"on_expedition"
 
 
 ## Staff slots of [param room] in [param state]: its RoomDef's staff_slots, 0 for an unknown
@@ -120,6 +123,8 @@ static func assign_error(
 		return UNKNOWN_ROOM
 	if not person.is_on_base(state.clock.tick):
 		return NOT_ON_BASE
+	if is_on_team(state, person_id):
+		return ON_EXPEDITION
 	if not PowerRules.is_standing(room):
 		return NOT_BUILT
 	if slots(state, room) == 0 or slot_role(state, room) != person.role:
@@ -129,10 +134,17 @@ static func assign_error(
 	return &""
 
 
-## Why [param person_id] cannot be unassigned, or &"": only an unknown person. Unassigning
-## someone already Unassigned is allowed (no change).
+## Why [param person_id] cannot be unassigned, or &"": an unknown person, or one on the
+## expedition team. Unassigning someone already Unassigned is allowed (no change).
 static func unassign_error(state: GameState, person_id: StringName) -> StringName:
-	return UNKNOWN_PERSON if state.staff.find_person(person_id) == null else &""
+	if state.staff.find_person(person_id) == null:
+		return UNKNOWN_PERSON
+	return ON_EXPEDITION if is_on_team(state, person_id) else &""
+
+
+## True when [param person_id] is on [param state]'s planned or away expedition team.
+static func is_on_team(state: GameState, person_id: StringName) -> bool:
+	return person_id in state.expedition.member_ids()
 
 
 ## The Unassigned people on base with role [param role], in roster order.

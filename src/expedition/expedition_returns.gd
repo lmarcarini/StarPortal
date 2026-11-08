@@ -11,8 +11,6 @@ extends RefCounted
 
 ## Source id of every report fact a team raises.
 const SOURCE: StringName = &"team"
-## Confidence of a team survey, in tenths: +3.
-const SURVEY_CHANGE: int = 30
 ## Chance in percent that a survey of ruins finds an address.
 const RUINS_ADDRESS_PERCENT: int = 30
 ## The anchor: STILLWATER's iron object (docs/content/m3-beyond-the-ring.md section 3).
@@ -48,7 +46,7 @@ static func _is_recover(plan: ExpeditionState) -> bool:
 static func _survey(state: GameState, world_id: StringName, rng: RandomNumberGenerator) -> void:
 	if WorldProgress.raise_status(state, world_id, WorldsState.WorldStatus.SURVEYED):
 		ConfidenceEvents.raise(
-			state, ConfidenceRules.SURVEYED, world_id, Vector2i(1, SURVEY_CHANGE)
+			state, ConfidenceRules.SURVEYED, world_id, Vector2i(1, ConfidenceRules.SURVEY_CHANGE)
 		)
 	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, world_id)
 	if facts != null:

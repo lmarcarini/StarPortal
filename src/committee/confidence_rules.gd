@@ -14,13 +14,17 @@ const MAX: int = 1000
 const TENTHS: int = 10
 ## Event causes, as saved in the cause list.
 const LOCKED: StringName = &"locked"
+## A horizon record taken by the pole camera (+2, "Horizon record taken").
+const HORIZON_RECORD: StringName = &"horizon_record"
+## A team's survey of a new world (+3, "New world surveyed"; m3 section 4).
 const SURVEYED: StringName = &"surveyed"
 const RESEARCH: StringName = &"research"
 const REPORTS: StringName = &"reports"
-const CAUSES: Array[StringName] = [LOCKED, SURVEYED, RESEARCH, REPORTS]
-## Change per lock, survey, project and analyst, in tenths.
+const CAUSES: Array[StringName] = [LOCKED, HORIZON_RECORD, SURVEYED, RESEARCH, REPORTS]
+## Change per lock, horizon record, team survey, project and analyst, in tenths.
 const LOCK_CHANGE: int = 50
-const SURVEY_CHANGE: int = 20
+const HORIZON_CHANGE: int = 20
+const SURVEY_CHANGE: int = 30
 const RESEARCH_CHANGE: int = 30
 const REPORT_CHANGE: int = 10
 ## Daily drift in tenths: toward 50 while solvent, and in the red.

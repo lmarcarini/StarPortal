@@ -38,7 +38,7 @@ func get_type() -> StringName:
 
 
 ## Refuses with StaffRules.assign_error(): &"unknown_person", &"unknown_room", &"not_on_base",
-## &"not_built", &"wrong_role" or &"room_full".
+## &"on_expedition", &"not_built", &"wrong_role" or &"room_full".
 func validate(state: GameState) -> CommandResult:
 	var error: StringName = StaffRules.assign_error(state, person_id, room_id)
 	if not error.is_empty():

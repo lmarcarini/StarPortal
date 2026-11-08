@@ -34,7 +34,8 @@ func get_type() -> StringName:
 	return TYPE
 
 
-## Refuses an unknown person (&"unknown_person").
+## Refuses an unknown person (&"unknown_person") and a member of the expedition team
+## (&"on_expedition").
 func validate(state: GameState) -> CommandResult:
 	var error: StringName = RecruitmentRules.dismiss_error(state, person_id)
 	if not error.is_empty():

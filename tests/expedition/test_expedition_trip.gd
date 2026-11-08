@@ -63,6 +63,8 @@ func test_survey_brings_back_state_report_and_confidence() -> void:
 	assert_str(_state.expedition.documents[0]["kind"]).is_equal("survey_report")
 	var cause: ConfidenceCause = _state.committee.causes.back()
 	assert_str(String(cause.cause)).is_equal("surveyed")
+	assert_bool(ConfidenceRules.CAUSES.has(ConfidenceRules.HORIZON_RECORD)).is_true()
+	assert_str(String(ConfidenceRules.HORIZON_RECORD)).is_not_equal("surveyed")
 	assert_int(cause.change).is_equal(30)
 	assert_bool(_state.committee.confidence >= confidence + 29).is_true()
 	var after: int = _state.committee.confidence
@@ -120,6 +122,23 @@ func test_team_does_not_recover_from_injuries_away() -> void:
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.IDLE)
 	Fixture.advance(_simulation, 1)
 	assert_bool(member.recovery_left < left).is_true()
+
+
+func test_team_cannot_be_dismissed_or_reassigned() -> void:
+	assert_bool(_simulation.submit(Fixture.survey(_state)).is_ok).is_true()
+	var member: StringName = _state.expedition.member_ids()[0]
+	var room: StringName = _state.base.rooms[0].id
+	for command: Command in [
+		DismissCommand.create(member),
+		UnassignStaffCommand.create(member),
+		AssignStaffCommand.create(member, room),
+	]:
+		assert_str(String(command.validate(_state).error_code)).is_equal("on_expedition")
+	ProbeFixture.open(_simulation)
+	_simulation.submit(SendTeamCommand.new())
+	assert_str(String(DismissCommand.create(member).validate(_state).error_code)).is_equal(
+		"on_expedition"
+	)
 
 
 func test_plan_refused_while_away() -> void:
