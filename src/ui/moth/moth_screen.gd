@@ -27,6 +27,7 @@ var _frame := MothFrame.new()
 var _battery_bar := ProgressBar.new()
 var _battery_label := Label.new()
 var _recall_note := Label.new()
+var _result := Label.new()
 var _recall_button := Button.new()
 var _close_button := Button.new()
 
@@ -39,8 +40,14 @@ func _init() -> void:
 	row.add_theme_constant_override(&"separation", 12)
 	add_child(row)
 	row.add_child(_scans)
-	_frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(_frame)
+	var middle := VBoxContainer.new()
+	middle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(middle)
+	_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	middle.add_child(_frame)
+	_result.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	middle.add_child(_result)
 	row.add_child(_build_battery())
 	_scans.scan_requested.connect(_on_scan_requested)
 	_recall_button.pressed.connect(recall)
@@ -139,6 +146,11 @@ func get_frame() -> MothFrame:
 	return _frame
 
 
+## Returns the label under the frame with the text of the last finished scan.
+func get_result_label() -> Label:
+	return _result
+
+
 ## Returns the RECALL button.
 func get_recall_button() -> Button:
 	return _recall_button
@@ -195,6 +207,9 @@ func _show_live(state: GameState) -> void:
 	_recall_button.visible = true
 	_recall_button.disabled = not can_recall
 	_close_button.visible = false
+	_result.text = MothReportText.finished_text(
+		run, WorldFactRules.facts_for_id(state.galaxy, run.world_id)
+	)
 	var scene: WorldScene = SceneNow.of(state, run.world_id)
 	var header: String = (
 		"%s   %s" % [MothText.rec(run.battery_left), MothText.world_name(state, run.world_id)]
@@ -211,6 +226,7 @@ func _show_live(state: GameState) -> void:
 
 func _show_lost(state: GameState) -> void:
 	_scans.visible = false
+	_result.text = ""
 	_battery_bar.value = 0
 	_battery_label.text = MothText.battery_left(_lost_battery)
 	_recall_note.text = ""

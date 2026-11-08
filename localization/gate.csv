@@ -153,6 +153,46 @@ THREAT_REASON_TOXIC_AIR,Toxic air,Ar tóxico
 THREAT_REASON_RADIATION,Raised radiation,Radiação elevada
 THREAT_REASON_TEMPERATURE,Extreme temperature,Temperatura extrema
 THREAT_REASON_NONE,Nothing dangerous found,Nada perigoso encontrado
+REPORT_BIOME_BARREN_1,"Bare rock and grit to the horizon, scoured smooth by nothing the camera can see.","Rocha nua e cascalho até o horizonte, polidos por algo que a câmera não vê."
+REPORT_BIOME_BARREN_2,A dead plain of broken stone. Nothing casts a shadow but the Ring.,Uma planície morta de pedra partida. Nada faz sombra além do Anel.
+REPORT_BIOME_ICE_1,"Ice in every direction, blue where the wind has cut it.","Gelo em todas as direções, azul onde o vento o cortou."
+REPORT_BIOME_ICE_2,A white waste of packed snow and pressure ridges.,Um ermo branco de neve compactada e cristas de pressão.
+REPORT_BIOME_DESERT_1,"Dunes of fine sand, rippled by a steady wind.","Dunas de areia fina, onduladas por um vento constante."
+REPORT_BIOME_DESERT_2,Cracked hardpan and low dunes under a hard light.,Chão rachado e dunas baixas sob uma luz dura.
+REPORT_BIOME_STEPPE_1,"Open grassland, rolling to low hills.","Campo aberto, ondulando até colinas baixas."
+REPORT_BIOME_STEPPE_2,"Short grass and scrub over a wide, flat plain.",Capim curto e arbustos numa planície larga e plana.
+REPORT_BIOME_FOREST_1,Tall trees close around the Ring; the canopy hides the sky.,Árvores altas cercam o Anel; a copa esconde o céu.
+REPORT_BIOME_FOREST_2,"Dense woodland, thick with undergrowth and still air.","Mata densa, cheia de vegetação rasteira e ar parado."
+MOTH_LIFE_NONE,No sign of life.,Nenhum sinal de vida.
+MOTH_LIFE_PLANTS,"Plants, but nothing that moves.","Plantas, mas nada que se mova."
+MOTH_LIFE_ANIMALS,"Animals: tracks, and movement at the edge of the frame.",Animais: rastros e movimento na borda do quadro.
+MOTH_LIFE_PEOPLE,"People: smoke, paths and voices on the microphone.","Pessoas: fumaça, trilhas e vozes no microfone."
+MOTH_STRUCTURES_NONE,Nothing built.,Nada construído.
+MOTH_STRUCTURES_RUINS,"Ruins: fallen walls, long abandoned.","Ruínas: muros caídos, abandonados há muito."
+MOTH_STRUCTURES_WORKED_STONE,Worked stone: someone cut and set it.,Pedra trabalhada: alguém a cortou e assentou.
+MOTH_STRUCTURES_SETTLEMENT,A settlement: roofs and fences in the distance.,Um povoado: telhados e cercas ao longe.
+MOTH_LOOK_SILL,"Red rock shelf under a black sky. No life, no air to speak of. The flat slab before the Ring is the only thing anyone made.","Plataforma de rocha vermelha sob um céu negro. Sem vida, quase sem ar. A laje plana diante do Anel é a única coisa que alguém fez."
+MOTH_LOOK_LINTEL,"Grey grit and a black sky. Nothing lives here. A disc of stone stands on edge near the Ring, carved on its face.","Cascalho cinzento e céu negro. Nada vive aqui. Um disco de pedra está de pé perto do Anel, entalhado na face."
+MOTH_LOOK_MILESTONE,"The drone climbs the ice cut and the wind takes it sideways. No life. Steps in the wall, and at the top a ring of bronze pegs in the ice.","O drone sobe o corte de gelo e o vento o empurra de lado. Sem vida. Degraus na parede e, no alto, um círculo de estacas de bronze no gelo."
+MOTH_LOOK_STILLWATER,"Still lake, low cloud, reeds and insects. Bare footprints in the mud by the Ring. On the flat stone before the Ring, one mark cut alone: a tall back leaning away from a flat seat. At the causeway's end, something iron lies half sunk.","Lago parado, nuvens baixas, juncos e insetos. Pegadas descalças na lama junto ao Anel. Na pedra plana diante do Anel, uma marca entalhada sozinha: um encosto alto inclinado para trás sobre um assento plano. No fim do passadiço, algo de ferro jaz meio afundado."
+MOTH_CLOSE_SILL_SLAB,"A slab of the same red rock, cut flat and level. Worn smooth where feet once stood.","Uma laje da mesma rocha vermelha, cortada plana e nivelada. Gasta onde pés pisaram."
+MOTH_CLOSE_LINTEL_DISC,"Seven carvings ring the disc's face, each in its own cell. The grit has not touched them.","Sete entalhes circundam a face do disco, cada um em seu compartimento. O cascalho não os tocou."
+MOTH_CLOSE_MILESTONE_BRONZE_PEGS,"Bronze pegs, green at the tips, driven deep in a circle. Rope marks round each one.","Estacas de bronze, verdes nas pontas, cravadas fundo em círculo. Marcas de corda em cada uma."
+MOTH_CLOSE_STILLWATER_FOOTPRINTS,"Bare feet, human, a day or two old. They go down to the water and come back.","Pés descalços, humanos, de um ou dois dias. Descem até a água e voltam."
+MOTH_CLOSE_STILLWATER_IRON_OBJECT,"An iron hook, heavier than a man, two arms curving from a shank. Marks cut along it.","Um gancho de ferro, mais pesado que um homem, dois braços curvos saindo de uma haste. Marcas entalhadas ao longo dele."
+MOTH_CLOSE_ROCK_FORMATION,"Stacked stones, balanced too well for chance.","Pedras empilhadas, equilibradas bem demais para ser acaso."
+MOTH_CLOSE_METAL_SHARD,"A bent shard of bright metal, not rusted.","Um fragmento torto de metal brilhante, sem ferrugem."
+MOTH_CLOSE_RUINED_WALL,"Dressed blocks, fallen outward. Moss in the joints.","Blocos aparelhados, caídos para fora. Musgo nas juntas."
+MOTH_CLOSE_BROKEN_TABLET,"Half a tablet, cut with marks in rows.","Metade de uma tabuleta, com marcas entalhadas em fileiras."
+MOTH_CLOSE_CUT_STONES,"Squared stones set in a line, edge to edge.","Pedras esquadrejadas postas em linha, borda com borda."
+MOTH_CLOSE_STONE_TOOL,"A worked blade of stone, its edge still sharp.","Uma lâmina de pedra lascada, o gume ainda afiado."
+MOTH_SKY_BLACK,"Black sky, stars by day.","Céu negro, estrelas de dia."
+MOTH_SKY_VIOLET,A thin violet sky.,Um céu violeta e ralo.
+MOTH_SKY_PALE,"A pale, washed-out sky.",Um céu pálido e desbotado.
+MOTH_SKY_BLUE,A clear blue sky.,Um céu azul e limpo.
+MOTH_SKY_OVERCAST,"Low, even cloud; no sun.",Nuvens baixas e uniformes; sem sol.
+MOTH_SKY_OCHRE,"An ochre haze, thick with dust.","Uma névoa ocre, carregada de poeira."
+MOTH_SKY_GREEN,A sickly green sky.,Um céu verde e doentio.
 EXPEDITION_NOT_ENOUGH_TIME,Not enough open time to send a team (10 minutes needed).,Tempo aberto insuficiente para enviar uma equipe (são necessários 10 minutos).
 LOG_LINE_TEAM_CHECKED_IN,T-1 checked in from {world}: {injuries}.,T-1 fez contato de {world}: {injuries}.
 LOG_LINE_TEAM_MISSED,"T-1 missed its check-in from {world}. Rescue window: 72 h.","T-1 não fez contato de {world}. Janela de resgate: 72 h."
