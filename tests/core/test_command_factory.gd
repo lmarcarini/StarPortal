@@ -60,6 +60,10 @@ func _samples() -> Array[Command]:
 				&"world_0001", WorldReport.Fact.LIFE, WorldReport.Confidence.FAIR, &"moth"
 			)
 		),
+		LaunchCanisterCommand.new(),
+		LaunchMothCommand.new(),
+		MothScanCommand.create(MothRules.Scan.CLOSE_LOOK, &"iron_object"),
+		MothScanCommand.create(MothRules.Scan.RECALL),
 	]
 
 
@@ -164,7 +168,10 @@ func test_defaults_are_registered_lazily() -> void:
 				&"dismiss",
 				&"extend_pole_camera",
 				&"hire",
+				&"launch_canister",
+				&"launch_moth",
 				&"mark_document_read",
+				&"moth_scan",
 				&"note_address",
 				&"paint_corridor",
 				&"place_room",
@@ -203,7 +210,10 @@ func test_register_type_adds_a_type() -> void:
 				&"dismiss",
 				&"extend_pole_camera",
 				&"hire",
+				&"launch_canister",
+				&"launch_moth",
 				&"mark_document_read",
+				&"moth_scan",
 				&"note_address",
 				&"paint_corridor",
 				&"ping",
@@ -245,7 +255,10 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"dismiss",
 				&"extend_pole_camera",
 				&"hire",
+				&"launch_canister",
+				&"launch_moth",
 				&"mark_document_read",
+				&"moth_scan",
 				&"note_address",
 				&"paint_corridor",
 				&"place_room",

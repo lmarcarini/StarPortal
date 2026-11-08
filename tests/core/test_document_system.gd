@@ -320,6 +320,7 @@ func test_documents_system_runs_after_gate() -> void:
 			&"power",
 			&"gate",
 			&"documents",
+			&"probes",
 			&"economy",
 			&"construction",
 			&"research",

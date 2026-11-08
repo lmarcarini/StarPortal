@@ -25,6 +25,8 @@ var biohazard: WorldDef.Biohazard = WorldDef.Biohazard.NONE
 var life: WorldDef.Life = WorldDef.Life.NONE
 ## True structures; never UNKNOWN.
 var structures: WorldDef.Structures = WorldDef.Structures.NONE
+## True when armed guards hold the Ring (WorldRecord.is_guarded): a reason a good threat shows.
+var is_guarded: bool = false
 ## True threat; never UNKNOWN. Read it only through WorldReportRules, which narrows it by
 ## confidence, so the player never sees it unnarrowed.
 var threat: WorldDef.Threat = WorldDef.Threat.LOW
@@ -46,10 +48,11 @@ static func from_def(def: WorldDef) -> WorldFacts:
 	facts.life = def.life
 	facts.structures = def.structures
 	facts.threat = def.threat
+	facts.is_guarded = def.is_guarded
 	for target_def: WorldTargetDef in def.targets:
-		facts.targets.append(
-			WorldTarget.create(target_def.id, target_def.name_key, target_def.is_object)
-		)
+		var target := WorldTarget.create(target_def.id, target_def.name_key, target_def.is_object)
+		target.marks_document_id = target_def.marks_document_id
+		facts.targets.append(target)
 	return facts
 
 

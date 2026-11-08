@@ -46,6 +46,7 @@ func test_build_from_real_content_runs_both_systems() -> void:
 			&"power",
 			&"gate",
 			&"documents",
+			&"probes",
 			&"economy",
 			&"construction",
 			&"research",
@@ -105,6 +106,7 @@ func test_transient_references_are_never_saved() -> void:
 				"staff",
 				"committee",
 				"recruitment",
+				"probes",
 			]
 		)
 	)

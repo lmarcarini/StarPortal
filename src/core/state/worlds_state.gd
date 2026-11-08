@@ -6,7 +6,8 @@ extends RefCounted
 ## way through the open wormhole.
 ## Saved shape: {"galaxy_seed": decimal string, "generator_version", "statuses":
 ## {world id: status name}, "consoles_read": {world id: true}, "horizon_records":
-## {world id: true}, "reports": {world id: WorldReport data}, "pole_camera_world_id": world id
+## {world id: true}, "reports": {world id: WorldReport data}, "targets": TargetStates data,
+## "pole_camera_world_id": world id
 ## or "", "pole_camera_ticks_left"}. The seed
 ## is a string because it can exceed 2^53. The pole camera is out exactly when both its fields
 ## are set (a world id and at least 1 tick left); otherwise "" and 0.
@@ -37,6 +38,8 @@ var horizon_records: Dictionary[StringName, bool] = {}
 ## What the base knows of each world's report facts, by world id; a world with no entry knows
 ## nothing (every fact at NONE). Read it through report_of().
 var reports: Dictionary[StringName, WorldReport] = {}
+## Targets marked recoverable or recovered (saved here, never on the shared WorldTarget).
+var targets: TargetStates = TargetStates.new()
 ## The world the pole camera is extending into, or &"" while it is in.
 var pole_camera_world_id: StringName = &""
 ## Ticks until the extending pole camera takes the horizon record; 0 while it is in.
@@ -93,6 +96,7 @@ func to_dict() -> Dictionary:
 		"consoles_read": _id_set_to_dict(consoles_read),
 		"horizon_records": _id_set_to_dict(horizon_records),
 		"reports": _reports_to_dict(),
+		"targets": targets.to_dict(),
 		"pole_camera_world_id": String(pole_camera_world_id),
 		"pole_camera_ticks_left": pole_camera_ticks_left,
 	}
@@ -108,6 +112,10 @@ static func from_dict(data: Dictionary) -> WorldsState:
 	worlds.consoles_read = _id_set_from(data.get("consoles_read"))
 	worlds.horizon_records = _id_set_from(data.get("horizon_records"))
 	worlds.reports = _reports_from(data.get("reports"))
+	var target_data: Variant = data.get("targets", {})
+	if target_data is Dictionary:
+		var target_dict: Dictionary = target_data
+		worlds.targets = TargetStates.from_dict(target_dict)
 	worlds.pole_camera_world_id = StringName(str(data.get("pole_camera_world_id", "")))
 	worlds.pole_camera_ticks_left = type_convert(data.get("pole_camera_ticks_left", 0), TYPE_INT)
 	var status_data: Variant = data.get("statuses", {})
@@ -125,8 +133,9 @@ static func from_dict(data: Dictionary) -> WorldsState:
 ## "galaxy_seed" a 64-bit integer written as a canonical decimal string; "generator_version"
 ## a whole number from 0 to 2^53; "statuses" an object mapping non-empty world ids to a
 ## status name other than "unknown"; "reports" an object mapping non-empty world ids to valid
-## WorldReport data; "consoles_read" and "horizon_records" objects mapping
-## non-empty world ids to true; "pole_camera_world_id" a string and "pole_camera_ticks_left" a
+## WorldReport data; "targets" valid TargetStates data; "consoles_read" and
+## "horizon_records" objects mapping non-empty world ids to true; "pole_camera_world_id" a
+## string and "pole_camera_ticks_left" a
 ## whole number from 0 to 2^53, both set or both unset ("" and 0).
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
@@ -148,6 +157,13 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	errors.append_array(_validate_id_set(data, "consoles_read"))
 	errors.append_array(_validate_id_set(data, "horizon_records"))
 	errors.append_array(_validate_reports(data))
+	if not data.has("targets"):
+		errors.append("missing 'targets'")
+	elif not data["targets"] is Dictionary:
+		errors.append("'targets' is not an object")
+	else:
+		var target_data: Dictionary = data["targets"]
+		errors.append_array(TargetStates.validate_dict(target_data))
 	errors.append_array(_validate_pole_camera(data))
 	return errors
 

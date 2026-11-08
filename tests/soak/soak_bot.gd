@@ -11,7 +11,7 @@ extends RefCounted
 ## directly (an address the bank can never charge is just dropped). When a wormhole opens it reads
 ## the far Ring's console (ReadConsoleCommand) if that console is unread, which fills the Address
 ## Book, then extends the pole camera (ExtendPoleCameraCommand) if the world's horizon record is not
-## taken, and closes the wormhole once the camera is back and open a few ticks. Staff: SoakStaff.
+## taken, works the probes (SoakProbes), and closes the wormhole once both are done.
 ## Once the bank charges it builds on: a corridor run off the Level 1 spine and a Research Lab
 ## against it. When the lab stands off (the bank holds the spare supply), it lowers the bank's
 ## charge rate by just enough and switches the lab on. It then researches R1-R6 in list order
@@ -32,9 +32,9 @@ const MAX_ACTION_GAP: int = 143
 const PAUSE_CHANCE: float = 0.1
 ## Chance, per paused action, that the bot resumes; otherwise it submits a command.
 const RESUME_CHANCE: float = 0.4
-## Chance that a running action adds a hold instead of submitting a command.
+## Chances that a running action adds a hold instead of submitting a command, and, per paused
+## (not held) action, that the bot adds a hold (checked after resume).
 const HOLD_CHANCE: float = 0.02
-## Chance, per paused (not held) action, that the bot adds a hold; checked after resume.
 const PAUSED_HOLD_CHANCE: float = 0.05
 ## Chances, per held action, that the bot releases a hold, adds another one, or makes a
 ## player pause/resume request (which only sets the mode after the hold); otherwise it
@@ -42,9 +42,8 @@ const PAUSED_HOLD_CHANCE: float = 0.05
 const RELEASE_CHANCE: float = 0.4
 const EXTRA_HOLD_CHANCE: float = 0.1
 const HELD_REQUEST_CHANCE: float = 0.15
-## Hold reasons the bot uses.
 const HOLD_REASONS: Array[StringName] = [&"soak_hold_a", &"soak_hold_b", &"soak_hold_c"]
-## Number of distinct flag keys the bot writes: soak_flag_0 to soak_flag_<n - 1>.
+## Number of distinct flag keys (soak_flag_0 to soak_flag_<n - 1>); hold reasons above.
 const FLAG_KEY_COUNT: int = 16
 ## Largest magnitude of a random int flag value.
 const MAX_INT_VALUE: int = 1000000
@@ -67,9 +66,8 @@ const CLOSE_AFTER_TICKS: int = 5
 var commands_submitted: int = 0
 ## Commands submitted while the clock was paused (they apply at once).
 var commands_while_paused: int = 0
-## Times the bot paused the clock.
+## Times the bot paused and resumed the clock.
 var pauses: int = 0
-## Times the bot resumed the clock.
 var resumes: int = 0
 ## Holds the bot added (duplicates, which are no-ops, not counted).
 var holds_added: int = 0
@@ -198,6 +196,8 @@ func _work_wormhole(simulation: Simulation) -> void:
 	elif not worlds.is_horizon_record_taken(gate.connected_world_id):
 		simulation.submit(ExtendPoleCameraCommand.new())
 		cameras_extended += 1
+	elif SoakProbes.work(simulation):
+		return
 	elif state.clock.tick - gate.lock_started_tick >= CLOSE_AFTER_TICKS:
 		simulation.submit(CloseWormholeCommand.new())
 		closes += 1
