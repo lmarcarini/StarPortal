@@ -38,9 +38,43 @@ static func entries_for(
 			return [_committee_entry(event_name, args, state, tick)]
 		&"staff_arrived", ExpeditionUnlock.LENT_EVENT:
 			return _arrival_entries(args, state, tick, event_name != &"staff_arrived")
+		&"team_sent", &"team_returned":
+			return [_trip_entry(event_name, args, tick)]
+		ExpeditionFieldDay.EVENT:
+			return [_field_event_entry(args, tick)]
 		&"team_checked_in", &"check_in_missed", &"member_deceased", &"team_lost", &"team_rescued":
 			return _expedition_entries(event_name, args, tick)
 	return []
+
+
+## The "expedition" entry of a departure ("reason" "departed") or a normal return ("returned",
+## with "success"): the team's world, "objective" (its saved name) and "team" (names in slot
+## order, joined by ", "; log arguments hold no string lists), so past trips can be grouped
+## (m3-beyond-the-ring.md section 4).
+static func _trip_entry(event_name: StringName, args: Array, tick: int) -> LogEntry:
+	var saved: int = type_convert(args[1], TYPE_INT)
+	var objective: int = clampi(saved, 0, ExpeditionState.OBJECTIVE_NAMES.size() - 1)
+	var team: Array = args[-1]
+	var details: Dictionary = {
+		"reason": "departed" if event_name == &"team_sent" else "returned",
+		"objective": ExpeditionState.OBJECTIVE_NAMES[objective],
+		"team": ", ".join(PackedStringArray(team)),
+	}
+	if event_name == &"team_returned":
+		details["success"] = args[2] == true
+	return LogEntry.create(tick, &"expedition", StringName(str(args[0])), details)
+
+
+## The "expedition" entry of a field event ("reason" "field_event", "event_id", "outcome",
+## "name" of who rolled) on the team's world (m3-beyond-the-ring.md section 4, Risk model).
+static func _field_event_entry(args: Array, tick: int) -> LogEntry:
+	var details: Dictionary = {
+		"reason": "field_event",
+		"event_id": str(args[1]),
+		"outcome": str(args[2]),
+		"name": str(args[3]),
+	}
+	return LogEntry.create(tick, &"expedition", StringName(str(args[0])), details)
 
 
 ## The "expedition" entry of a check-in ("reason" "checked_in", "light", "serious"), a missed
@@ -57,6 +91,7 @@ static func _expedition_entries(event_name: StringName, args: Array, tick: int) 
 	match event_name:
 		&"team_checked_in":
 			details = {"reason": "checked_in", "light": args[1], "serious": args[2]}
+			details["day"] = str(args[3]) if args.size() > 3 else "finding"
 		&"check_in_missed":
 			details = {"reason": "missed"}
 		&"member_deceased":

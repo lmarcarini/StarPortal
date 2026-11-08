@@ -20,13 +20,18 @@ static func state() -> GameState:
 	return game
 
 
-## Returns a Simulation over [param game] with the systems an expedition needs.
-static func simulation(game: GameState) -> Simulation:
+## Returns a Simulation over [param game] with the systems an expedition needs. Field days pass
+## without incident unless [param field_events] (then ExpeditionFieldDay draws and rolls them).
+static func simulation(game: GameState, field_events: bool = false) -> Simulation:
+	var expedition := ExpeditionSystem.new()
+	if not field_events:
+		expedition.resolve_day = func(_s: GameState, _d: int, _r: RandomNumberGenerator) -> String:
+			return ExpeditionState.DAY_OK
 	var systems: Array[SimSystem] = [
 		PowerSystem.new(game.balance),
 		GateSystem.new(),
 		ProbeSystem.new(),
-		ExpeditionSystem.new(),
+		expedition,
 		StaffCareSystem.new(),
 	]
 	return Simulation.new(game, systems)

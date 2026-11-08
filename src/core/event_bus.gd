@@ -118,17 +118,26 @@ signal moth_delivered(rack: int)
 ## Emitted when an expedition is planned, with the world id (posted through the outbox).
 @warning_ignore("unused_signal")
 signal expedition_planned(world_id: StringName)
-## Emitted when a team goes through the Ring, with the world id (posted through the outbox).
+## Emitted when a team goes through the Ring, with the world id, the objective
+## (ExpeditionState.Objective) and the team's names in slot order (posted through the outbox).
 @warning_ignore("unused_signal")
-signal team_sent(world_id: StringName)
+signal team_sent(world_id: StringName, objective: int, team: Array)
 ## Emitted when a team comes home, with the world id, its ExpeditionState.Objective and whether
-## the objective succeeded (posted through the outbox).
+## the objective succeeded, and the team's names in slot order (posted through the outbox).
 @warning_ignore("unused_signal")
-signal team_returned(world_id: StringName, objective: int, success: bool)
+signal team_returned(world_id: StringName, objective: int, success: bool, team: Array)
 ## Emitted at a check-in that is not the return, with the world id and the team's light and
-## serious injuries (posted through the outbox).
+## serious injuries and what the day brought ("finding", "injury" or "wasted") (posted through
+## the outbox).
 @warning_ignore("unused_signal")
-signal team_checked_in(world_id: StringName, light: int, serious: int)
+signal team_checked_in(world_id: StringName, light: int, serious: int, day: String)
+## Emitted when a field event resolves at a check-in, with the world id, the event id and the
+## outcome ("finding" or a FieldEventDef setback name) and the name of who rolled ("" if no one)
+## (posted through the outbox).
+@warning_ignore("unused_signal")
+signal field_event_resolved(
+	world_id: StringName, event_id: StringName, outcome: String, person_name: String
+)
 ## Emitted when the player recalls the team, with the world id (posted through the outbox).
 @warning_ignore("unused_signal")
 signal team_recalled(world_id: StringName)
