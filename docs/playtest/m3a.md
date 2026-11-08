@@ -12,7 +12,7 @@ M3b (MOORING and contact) is held until after this playtest, so your notes shape
 ## What changed since M2.7
 
 - **Ring actions** on an open wormhole now include **Throw the sample canister ($10k)**
-  (biohazard in 10 min) and **Send the MOTH** (2 drones in the rack).
+  (biohazard in 10 min) and **Send the MOTH** ("2 in the rack").
 - The **MOTH scan screen** opens over the Gate Room: **Look around**, **Close look** at each
   target, **Sky** and **Ring**, each costing battery minutes (20 in all). **RECALL** brings
   the drone home; on dangerous worlds it can be brought down. A lost drone is replaced in a
