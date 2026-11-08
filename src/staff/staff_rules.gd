@@ -41,6 +41,16 @@ static func assigned(state: GameState, room: RoomState) -> Array[PersonState]:
 	return found
 
 
+## The people of [param room] at work: assigned() less the injured, who are off work until
+## healed and then return (docs/content/m3-beyond-the-ring.md section 4).
+static func working(state: GameState, room: RoomState) -> Array[PersonState]:
+	var found: Array[PersonState] = []
+	for person: PersonState in assigned(state, room):
+		if not person.is_injured():
+			found.append(person)
+	return found
+
+
 ## Slots of [param room] still free: slots() less assigned(), at least 0.
 static func free_slots(state: GameState, room: RoomState) -> int:
 	return maxi(0, slots(state, room) - assigned(state, room).size())
@@ -62,10 +72,16 @@ static func headcount(state: GameState) -> int:
 	return state.staff.people.size()
 
 
-## Beds left: beds() less headcount(). Negative only after beds were lost by hand-edited data;
+## Beds taken: people on the roster, counting those still arriving, except lent soldiers, who
+## are billeted off-base (docs/content/m3-beyond-the-ring.md section 4).
+static func beds_used(state: GameState) -> int:
+	return state.staff.people.filter(func(p: PersonState) -> bool: return not p.lent).size()
+
+
+## Beds left: beds() less beds_used(). Negative only after beds were lost by hand-edited data;
 ## hiring (card M2.6-06) is refused at 0 or less.
 static func beds_free(state: GameState) -> int:
-	return beds(state) - headcount(state)
+	return beds(state) - beds_used(state)
 
 
 ## [param person]'s salary in $k per 30 days (fixed at hiring).

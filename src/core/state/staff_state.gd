@@ -4,12 +4,14 @@ extends RefCounted
 ## the roster, the next person number and the room types still waiting to auto-staff their
 ## first room. Only commands and SimSystem.tick() change it, through StaffRules' callers:
 ## AssignStaffCommand, UnassignStaffCommand, DemolishRoomCommand and StaffAutoAssign.
-## Saved shape: {"people": [PersonState...], "next_person_number", "auto_assign": [def id...]}.
+## M3 adds the ticks lent-soldier replacements are due (m3-beyond-the-ring.md section 4).
+## Saved shape: {"people": [PersonState...], "next_person_number", "auto_assign": [def id...],
+## "lent_due": [tick...]}.
 ## Bible: docs/content/m26-staff-and-money.md sections 1, 3, 7 and 8,
 ## technical-architecture.md#data-model
 
 ## Saved keys, in to_dict() order.
-const _KEYS: Array[String] = ["people", "next_person_number", "auto_assign"]
+const _KEYS: Array[String] = ["people", "next_person_number", "auto_assign", "lent_due"]
 
 ## Everyone on the roster, on base or arriving, in the order they joined.
 var people: Array[PersonState] = []
@@ -19,6 +21,9 @@ var next_person_number: int = 1
 ## (section 7: the first Research Lab and the first Workshop). A def leaves the list when its
 ## first room finishes.
 var auto_assign: Array[StringName] = []
+## Ticks on which the Directorate lends a replacement soldier, one entry per lost lent soldier,
+## in the order they were lost (ExpeditionUnlock.lose_person()).
+var lent_due: Array[int] = []
 
 
 ## Adds [param person] with the next free id and returns it.
@@ -57,6 +62,7 @@ func to_dict() -> Dictionary:
 		"people": people_data,
 		"next_person_number": next_person_number,
 		"auto_assign": auto_data,
+		"lent_due": lent_due.duplicate(),
 	}
 
 
@@ -72,13 +78,17 @@ static func from_dict(data: Dictionary) -> StaffState:
 	for entry: Variant in _array_or_empty(data.get("auto_assign")):
 		if entry is String and not StringName(str(entry)) in staff.auto_assign:
 			staff.auto_assign.append(StringName(str(entry)))
+	for entry: Variant in _array_or_empty(data.get("lent_due")):
+		if RoomState.is_count(entry):
+			staff.lent_due.append(RoomState.read_count(entry))
 	return staff
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: every key
 ## present; "people" an array of valid people with unique ids, each "person_<n>" below
 ## "next_person_number" (a whole number of at least 1); "auto_assign" an array of distinct
-## non-empty strings. Ids against the content and the base: StaffSaveChecks.
+## non-empty strings; "lent_due" an array of whole numbers of at least 0. Ids against the
+## content and the base: StaffSaveChecks.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _KEYS:
@@ -91,6 +101,9 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'next_person_number' is not a whole number of at least 1")
 	errors.append_array(_people_errors(data["people"]))
 	errors.append_array(_auto_errors(data["auto_assign"]))
+	var due: Array = _array_or_empty(data["lent_due"])
+	if not data["lent_due"] is Array or not due.all(RoomState.is_count):
+		errors.append("'lent_due' is not an array of whole numbers of at least 0")
 	if errors.is_empty():
 		errors.append_array(_id_errors(from_dict(data)))
 	return errors

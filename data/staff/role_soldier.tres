@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RoleDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/role_def.gd" id="1_role"]
+
+; docs/content/m3-beyond-the-ring.md section 4.
+[resource]
+script = ExtResource("1_role")
+name_key = &"STAFF_ROLE_SOLDIER"
+count_key = &"STAFF_COUNT_SOLDIER"
+count_one_key = &"STAFF_COUNT_ONE_SOLDIER"
+titles = Array[String](["Lt", "Sgt", "Cpl"])
+id = &"role_soldier"

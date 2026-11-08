@@ -35,7 +35,13 @@ const PIPELINE_KEYS: Dictionary[StringName, StringName] = {
 	StartingStaff.SCIENTIST: &"STAFF_PIPELINE_ACADEMIA",
 	StartingStaff.ENGINEER: &"STAFF_PIPELINE_MILITARY",
 	StartingStaff.ANALYST: &"STAFF_PIPELINE_INTELLIGENCE",
+	StartingStaff.SOLDIER: &"STAFF_PIPELINE_MILITARY",
+	StartingStaff.MEDIC: &"STAFF_PIPELINE_ACADEMIA",
 }
+## Roles that join the draw only from the Expeditions unlock (m3-beyond-the-ring.md section 4).
+const EXPEDITION_ROLES: Array[StringName] = [StartingStaff.SOLDIER, StartingStaff.MEDIC]
+## From the unlock, one arrival in this many is a soldier or medic.
+const EXPEDITION_ROLE_ODDS: int = 4
 
 
 ## The first list of a new game under [param balance] (no ids yet), leaving on days 3, 6, 9
@@ -67,6 +73,23 @@ static func arrival_role(
 				if role.id == required:
 					return role
 	return roles[rng.randi_range(0, roles.size() - 1)]
+
+
+## The role of a drawn arrival after the Expeditions unlock: the first missing REQUIRED_ROLES
+## role (no draw), else one in EXPEDITION_ROLE_ODDS a role of [param expedition] and otherwise
+## arrival_role() over [param base]; draws with [param rng] only. Null with no roles.
+static func unlocked_arrival_role(
+	rng: RandomNumberGenerator,
+	base: Array[RoleDef],
+	expedition: Array[RoleDef],
+	list: Array[CandidateState]
+) -> RoleDef:
+	for required: StringName in REQUIRED_ROLES:
+		if not list.any(func(c: CandidateState) -> bool: return c.role == required):
+			return arrival_role(rng, base, list)
+	if not expedition.is_empty() and rng.randi_range(1, EXPEDITION_ROLE_ODDS) == 1:
+		return expedition[rng.randi_range(0, expedition.size() - 1)]
+	return arrival_role(rng, base, list)
 
 
 ## A candidate of [param role] drawn with [param rng]: the skill, then the name

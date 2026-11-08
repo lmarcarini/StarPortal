@@ -81,10 +81,14 @@ func test_invalid_spots_say_why() -> void:
 
 ## A new game's palette can pick only the Capacitor Bank, Research Lab, Quarters and Corridor
 ## (m25-lean-start.md section 1, m26-staff-and-money.md section 3); research-locked rooms
-## show disabled until research adds them.
+## show disabled until research adds them. The Infirmary is not shown at all until the
+## Expeditions unlock, and no research unlocks it (m3-beyond-the-ring.md section 9).
 func test_palette_offers_only_unlocked_rooms() -> void:
 	var palette: BuildPalette = _view.get_palette()
 	for def_id: StringName in BuildPalette.ROOMS:
+		if def_id == ExpeditionUnlock.INFIRMARY_DEF:
+			assert_object(palette.get_room_button(def_id)).is_null()
+			continue
 		var wanted: bool = (
 			def_id
 			in [&"room_capacitor_bank", &"room_research_lab", &"room_quarters", &"room_corridor"]
@@ -92,10 +96,12 @@ func test_palette_offers_only_unlocked_rooms() -> void:
 		var button: Button = palette.get_room_button(def_id)
 		assert_object(button).override_failure_message(String(def_id)).is_not_null()
 		assert_bool(not button.disabled).override_failure_message(String(def_id)).is_equal(wanted)
+	ConstructionFixture.unlock_all(_simulation.state)
+	_view.get_build().refresh()
+	assert_object(palette.get_room_button(ExpeditionUnlock.INFIRMARY_DEF)).is_null()
 	await _unlock_everything()
 	for def_id: StringName in BuildPalette.ROOMS:
 		assert_bool(palette.get_room_button(def_id).disabled).is_false()
-	assert_object(palette.get_room_button(&"room_infirmary")).is_null()
 
 
 ## A lift ghost on an existing shaft shows what the command charges: the segment price and
@@ -118,9 +124,11 @@ func test_lift_ghost_on_a_shaft_shows_the_segment_price() -> void:
 	assert_int(ghost.build_ticks()).is_equal(240)
 
 
-## Every research unlock, and an empty dug Level 2 below, then a refresh.
+## Every research unlock, the Expeditions unlock (the Infirmary), and an empty dug Level 2
+## below, then a refresh.
 func _unlock_everything() -> void:
 	ConstructionFixture.unlock_all(_simulation.state)
+	ExpeditionUnlock.unlock(_simulation.state)
 	_simulation.state.budget.funds_k = 100000
 	_simulation.state.base.levels.append(LevelState.new())
 	_view.get_build().refresh()

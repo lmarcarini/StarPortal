@@ -82,7 +82,7 @@ static func scientist_skill(state: GameState, standing: bool = false) -> int:
 		if room.def_id != LAB_DEF:
 			continue
 		if PowerRules.is_running(room, def) or (standing and PowerRules.is_standing(room)):
-			for person: PersonState in StaffRules.assigned(state, room):
+			for person: PersonState in StaffRules.working(state, room):
 				total += person.skill
 	return total
 

@@ -3,15 +3,35 @@ extends RefCounted
 ## Saved state of one person on the roster (docs/content/m26-staff-and-money.md section 1): a
 ## name, a role fixed for life, a skill from 1 to 5, a salary per 30 days, the room they work in
 ## (or none) and the tick they arrive on base. Points at its RoleDef and room by id.
-## Saved shape: {"id", "name", "role", "skill", "salary_k", "room_id", "arrives_tick"}.
-## Bible: docs/content/m26-staff-and-money.md sections 1 and 3, technical-architecture.md#data-model
+## M3 adds whether the Directorate lent them (no bed) and their injury with the recovery left.
+## Saved shape: {"id", "name", "role", "skill", "salary_k", "room_id", "arrives_tick", "lent",
+## "injury", "recovery_left"}.
+## Bible: docs/content/m26-staff-and-money.md sections 1 and 3,
+## technical-architecture.md#data-model,
+## docs/content/m3-beyond-the-ring.md section 4 (lent soldiers, injuries)
+
+## How hurt a person is (section 4): light heals in 2 days, serious in 8 (at 1x).
+enum Injury { NONE, LIGHT, SERIOUS }
 
 ## Lowest skill.
 const MIN_SKILL: int = 1
 ## Highest skill.
 const MAX_SKILL: int = 5
 ## Saved keys, in to_dict() order.
-const _KEYS: Array[String] = ["id", "name", "role", "skill", "salary_k", "room_id", "arrives_tick"]
+const _KEYS: Array[String] = [
+	"id",
+	"name",
+	"role",
+	"skill",
+	"salary_k",
+	"room_id",
+	"arrives_tick",
+	"lent",
+	"injury",
+	"recovery_left"
+]
+## Saved names of the injuries, indexed by Injury value.
+const INJURY_NAMES: Array[String] = ["none", "light", "serious"]
 
 ## Unique id on the roster, e.g. &"person_1"; never reused.
 var id: StringName = &""
@@ -27,6 +47,12 @@ var salary_k: int = 0
 var room_id: StringName = &""
 ## Tick the person arrives on base; at or before the clock's tick they are on base.
 var arrives_tick: int = 0
+## True for a soldier the Directorate lent: billeted off-base, so no bed (section 4).
+var lent: bool = false
+## The person's injury; NONE when well.
+var injury: Injury = Injury.NONE
+## Recovery left, in ticks at normal (1x) speed; 0 when well.
+var recovery_left: int = 0
 
 
 ## True when the person has a room.
@@ -49,7 +75,15 @@ func to_dict() -> Dictionary:
 		"salary_k": salary_k,
 		"room_id": String(room_id),
 		"arrives_tick": arrives_tick,
+		"lent": lent,
+		"injury": INJURY_NAMES[injury],
+		"recovery_left": recovery_left,
 	}
+
+
+## True while the person is injured (off work until healed).
+func is_injured() -> bool:
+	return injury != Injury.NONE
 
 
 ## Builds a PersonState from saved [param data] (whole floats become ints). Missing or
@@ -63,13 +97,18 @@ static func from_dict(data: Dictionary) -> PersonState:
 	person.salary_k = RoomState.read_count(data.get("salary_k"))
 	person.room_id = StringName(str(data.get("room_id", "")))
 	person.arrives_tick = RoomState.read_count(data.get("arrives_tick"))
+	person.lent = data.get("lent") == true
+	person.injury = maxi(0, INJURY_NAMES.find(str(data.get("injury", "none")))) as Injury
+	person.recovery_left = RoomState.read_count(data.get("recovery_left"))
 	return person
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: every key
-## present; "id", "name" and "role" non-empty strings; "room_id" a string; "skill" a whole
-## number from [constant MIN_SKILL] to [constant MAX_SKILL]; "salary_k" and "arrives_tick"
-## whole numbers of at least 0. Role and room ids are checked against the content and the base
+## present; "lent" a bool; "injury" "none", "light" or "serious"; "id", "name" and "role"
+## non-empty strings; "room_id" a string; "skill" a whole
+## number from [constant MIN_SKILL] to [constant MAX_SKILL]; "salary_k", "arrives_tick" and
+## "recovery_left" whole numbers of at least 0. Role and room ids are checked against the
+## content and the base
 ## by StaffSaveChecks.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
@@ -86,7 +125,11 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	var skill_ok: bool = RoomState.is_count(data["skill"])
 	if not (skill_ok and data["skill"] >= MIN_SKILL and data["skill"] <= MAX_SKILL):
 		errors.append("'skill' is not a whole number from %d to %d" % [MIN_SKILL, MAX_SKILL])
-	for key: String in ["salary_k", "arrives_tick"]:
+	for key: String in ["salary_k", "arrives_tick", "recovery_left"]:
 		if not RoomState.is_count(data[key]):
 			errors.append("'%s' is not a whole number of at least 0" % key)
+	if not data["lent"] is bool:
+		errors.append("'lent' is not a bool")
+	if not str(data["injury"]) in INJURY_NAMES or not data["injury"] is String:
+		errors.append("'injury' is not one of %s" % ", ".join(INJURY_NAMES))
 	return errors

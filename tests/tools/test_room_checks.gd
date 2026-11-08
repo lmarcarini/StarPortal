@@ -100,7 +100,7 @@ func test_catalogue_numbers() -> void:
 		&"room_quarters": [3, 2, true, 150, 120, 0.0, 0.0, 0.0, 10],
 		&"room_research_lab": [4, 3, true, 800, 480, 5.0, 0.0, 0.0, 60],
 		&"room_workshop": [5, 4, true, 700, 360, 5.0, 0.0, 0.0, 50],
-		&"room_infirmary": [4, 3, true, 500, 5760, 5.0, 0.0, 0.0, 40],
+		&"room_infirmary": [4, 3, true, 300, 360, 5.0, 0.0, 0.0, 40],
 		&"room_lift": [2, 2, false, 400, 240, 0.0, 0.0, 0.0, 10],
 		&"room_stairs": [2, 1, true, 100, 120, 0.0, 0.0, 0.0, 0],
 		&"room_corridor": [1, 1, false, 5, 10, 0.0, 0.0, 0.0, 0],

@@ -144,6 +144,13 @@ signal committee_warning(reason: StringName)
 ## Emitted on the tick a hired person arrives on base (RecruitmentSystem; logged).
 @warning_ignore("unused_signal")
 signal staff_arrived(person_id: StringName)
+## Emitted when the Directorate lends a soldier, at the Expeditions unlock or as a replacement
+## (ExpeditionUnlock; logged).
+@warning_ignore("unused_signal")
+signal soldier_lent(person_id: StringName)
+## Emitted when an injured person heals and goes back to work (StaffCareSystem).
+@warning_ignore("unused_signal")
+signal staff_healed(person_id: StringName)
 ## Emitted when the candidate list changes: an arrival, a leaver or a hire.
 @warning_ignore("unused_signal")
 signal candidates_changed
