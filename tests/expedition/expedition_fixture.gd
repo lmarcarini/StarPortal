@@ -56,9 +56,7 @@ static func team(game: GameState) -> Dictionary:
 
 ## A Survey plan of the open world with team().
 static func survey(game: GameState) -> PlanExpeditionCommand:
-	return PlanExpeditionCommand.create(
-		ExpeditionState.Objective.SURVEY, WORLD_ID, &"", team(game)
-	)
+	return PlanExpeditionCommand.create(ExpeditionState.Objective.SURVEY, WORLD_ID, &"", team(game))
 
 
 ## A Recover plan of the anchor with team().

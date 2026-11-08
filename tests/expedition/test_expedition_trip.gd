@@ -26,11 +26,9 @@ func _send(plan: PlanExpeditionCommand) -> void:
 
 
 func _assigned_member() -> PersonState:
-	for person_id: StringName in _state.expedition.member_ids():
-		var person: PersonState = _state.staff.find_person(person_id)
-		if person.is_assigned():
-			return person
-	return null
+	var person: PersonState = _state.staff.find_person(_state.expedition.member_ids()[1])
+	person.room_id = _state.base.rooms[0].id
+	return person
 
 
 func test_team_out_of_its_room_and_back_on_return() -> void:
@@ -55,9 +53,7 @@ func test_survey_brings_back_state_report_and_confidence() -> void:
 	var confidence: int = _state.committee.confidence
 	_send(Fixture.survey(_state))
 	Fixture.advance(_simulation, 2 * DAY + 1)
-	assert_int(_state.worlds.status_of(Fixture.WORLD_ID)).is_equal(
-		WorldsState.WorldStatus.SURVEYED
-	)
+	assert_int(_state.worlds.status_of(Fixture.WORLD_ID)).is_equal(WorldsState.WorldStatus.SURVEYED)
 	var report: WorldReport = _state.worlds.report_of(Fixture.WORLD_ID)
 	assert_int(report.confidence_of(WorldReport.Fact.THREAT)).is_equal(WorldReport.Confidence.GOOD)
 	assert_int(report.confidence_of(WorldReport.Fact.BIOHAZARD)).is_equal(
@@ -110,9 +106,7 @@ func test_recovering_the_anchor_sets_the_flag() -> void:
 	)
 	assert_bool(ExpeditionReturns.apply(_state, RandomNumberGenerator.new())).is_true()
 	assert_bool(_state.flags[ExpeditionReturns.ANCHOR_FLAG]).is_true()
-	assert_int(_state.worlds.targets.state_of(world, target)).is_equal(
-		TargetStates.State.RECOVERED
-	)
+	assert_int(_state.worlds.targets.state_of(world, target)).is_equal(TargetStates.State.RECOVERED)
 
 
 func test_team_does_not_recover_from_injuries_away() -> void:

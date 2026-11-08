@@ -58,7 +58,8 @@ func test_slots_take_their_roles() -> void:
 
 func test_injured_member_refused() -> void:
 	var command: PlanExpeditionCommand = Fixture.survey(_state)
-	InjuryRules.injure(_state.staff.find_person(command.team["soldier"]), PersonState.Injury.LIGHT)
+	var soldier_id: StringName = command.team["soldier"]
+	InjuryRules.injure(_state.staff.find_person(soldier_id), PersonState.Injury.LIGHT)
 	assert_str(_error(command)).is_equal("member_injured")
 
 
@@ -77,7 +78,8 @@ func test_plan_sets_the_plan_and_round_trips() -> void:
 	assert_bool(_simulation.submit(command).is_ok).is_true()
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.PLANNED)
 	assert_int(_state.expedition.member_ids().size()).is_equal(4)
-	var rebuilt: Result = CommandFactory.from_dict(JSON.parse_string(JSON.stringify(command.to_dict())))
+	var data: Dictionary = JSON.parse_string(JSON.stringify(command.to_dict()))
+	var rebuilt: Result = CommandFactory.from_dict(data)
 	assert_bool(rebuilt.is_ok).is_true()
 	var again: PlanExpeditionCommand = rebuilt.value
 	assert_dict(again.to_dict()).is_equal(command.to_dict())
@@ -110,9 +112,9 @@ func test_send_refused_near_the_time_limit() -> void:
 func test_send_refused_on_low_charge() -> void:
 	_simulation.submit(Fixture.survey(_state))
 	ProbeFixture.open(_simulation)
-	var net: float = (
-		PowerRules.charge_mw(_state) - PowerMath.drain_mw(_state.gate, _state.balance)
-	)
+	for bank_id: StringName in _state.power.charge_rates:
+		_state.power.charge_rates[bank_id] = 0
+	var net: float = PowerRules.charge_mw(_state) - PowerMath.drain_mw(_state.gate, _state.balance)
 	assert_float(net).is_less(0.0)
 	_state.power.stored_mwh = -net / 60.0 * 10.0 + 0.001
 	assert_int(ExpeditionRules.open_ticks_left(_state)).is_equal(10)

@@ -41,11 +41,12 @@ static func from_dict(data: Dictionary) -> Result:
 	var members: Variant = data.get("team")
 	if objective < 0 or not world is String or not target is String or not members is Dictionary:
 		return Result.fail(&"malformed_command", "plan_expedition needs an objective and a team")
+	var team_data: Dictionary = members
 	var command := create(
 		objective as ExpeditionState.Objective,
 		StringName(str(world)),
 		StringName(str(target)),
-		members
+		team_data
 	)
 	return Result.ok(command)
 

@@ -59,7 +59,8 @@ func test_bad_data_refused() -> void:
 	data["day_results"] = ["ok"]
 	cases.append(data)
 	data = _json(_away().to_dict())
-	data["team"].erase("soldier")
+	var team: Dictionary = data["team"]
+	team.erase("soldier")
 	cases.append(data)
 	data = _json(_away().to_dict())
 	data["target_id"] = ""

@@ -56,7 +56,7 @@ static func _idle_errors(data: Dictionary, objective: int) -> Array[String]:
 		and str(data["target_id"]).is_empty()
 		and team.is_empty()
 		and results.is_empty()
-		and is_equal_approx(float(data["departed_tick"]), -1.0)
+		and _is_unset(data["departed_tick"])
 	)
 	return [] if is_clear else ["an idle expedition has a plan or a trip set"]
 
@@ -85,7 +85,7 @@ static func _trip_errors(data: Dictionary, mode: int, objective: int) -> Array[S
 	var results: Array = data["day_results"]
 	var is_away: bool = mode == ExpeditionState.Mode.AWAY
 	var found: Array[String] = []
-	if is_away == is_equal_approx(float(data["departed_tick"]), -1.0):
+	if is_away == _is_unset(data["departed_tick"]):
 		found.append("'departed_tick' is set exactly while away")
 	if not results.all(func(result: Variant) -> bool: return result is String):
 		return found + ["'day_results' is not an array of results"]
@@ -103,10 +103,12 @@ static func _document_errors(documents: Variant) -> Array[String]:
 	var found: Array[String] = []
 	var list: Array = documents
 	for index: int in list.size():
-		var entry: Variant = list[index]
+		if not list[index] is Dictionary:
+			found.append("document %d is not an object" % index)
+			continue
+		var entry: Dictionary = list[index]
 		var is_valid: bool = (
-			entry is Dictionary
-			and entry.get("world_id") is String
+			entry.get("world_id") is String
 			and not str(entry["world_id"]).is_empty()
 			and ExpeditionState.DOCUMENT_KINDS.has(entry.get("kind"))
 			and entry.get("target_id") is String
@@ -116,3 +118,8 @@ static func _document_errors(documents: Variant) -> Array[String]:
 		if not is_valid:
 			found.append("document %d is not a world id, kind, target id and tick" % index)
 	return found
+
+
+static func _is_unset(tick: Variant) -> bool:
+	var number: float = tick
+	return is_equal_approx(number, -1.0)

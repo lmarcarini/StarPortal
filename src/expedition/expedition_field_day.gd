@@ -7,10 +7,7 @@ extends RefCounted
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
 
 
-## The result (an ExpeditionState.DAY_RESULTS entry) of field day [param day] (0-based) of
-## [param state]'s expedition, drawn with [param rng], the expedition's seeded generator.
-@warning_ignore("unused_parameter")
-static func resolve(  # gdlint: ignore=unused-argument
-	state: GameState, day: int, rng: RandomNumberGenerator
-) -> String:
+## The result (an ExpeditionState.DAY_RESULTS entry) of field day [param _day] (0-based) of
+## [param _state]'s expedition, drawn with [param _rng], the expedition's seeded generator.
+static func resolve(_state: GameState, _day: int, _rng: RandomNumberGenerator) -> String:
 	return ExpeditionState.DAY_OK

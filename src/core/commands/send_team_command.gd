@@ -10,7 +10,6 @@ extends Command
 ## The command's stable type id.
 const TYPE: StringName = &"send_team"
 
-
 ## Rebuilds a command from its to_dict() data; it has no fields, so it always succeeds.
 @warning_ignore("unused_parameter")
 static func from_dict(data: Dictionary) -> Result:  # gdlint: ignore=unused-argument
