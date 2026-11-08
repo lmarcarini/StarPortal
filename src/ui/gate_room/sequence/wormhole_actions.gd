@@ -5,11 +5,14 @@ extends VBoxContainer
 ## record taken" and View the horizon photo; it says so at once, the same frame), Read the far
 ## Ring's console (ConsoleFinds), Read in the Archive (only when this lock delivered documents),
 ## Open the Address Book, Send the MOTH (posts a LaunchMothCommand; the MothScreen opens over the
-## Gate Room; disabled with the reason when the rack is empty or a MOTH is out) and Close the
-## wormhole (hold to confirm, posts a CloseWormholeCommand). Changes no state itself beyond
-## submitting those commands.
+## Gate Room; disabled with the reason when the rack is empty or a MOTH is out), the canister and
+## team actions (RingTeamActions: Throw the sample canister, Send team, Signal T-1) and Close the
+## wormhole (hold to confirm, posts a CloseWormholeCommand). With the MOTH out or the canister
+## away, the first hold only warns that closing loses it; a second hold closes. Changes no state
+## itself beyond submitting those commands.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
-## game-design.md#base-building-and-power (the pole camera, horizon record)
+## game-design.md#base-building-and-power (the pole camera, horizon record),
+## docs/content/m3-beyond-the-ring.md sections 2, 4 and 7
 
 ## The player asked to see the Address Book.
 signal book_requested
@@ -23,6 +26,9 @@ signal camera_extended
 signal photo_requested
 
 var _simulation: Simulation = null
+var _team_actions := RingTeamActions.new()
+var _close_warning := Label.new()
+var _is_close_warned: bool = false
 
 @onready var _camera_button: Button = %PoleCameraButton
 @onready var _camera_progress: ProgressBar = %CameraProgress
@@ -44,12 +50,22 @@ func _ready() -> void:
 	_close_button.confirmed.connect(_on_close_confirmed)
 	_moth_button.pressed.connect(_on_moth_pressed)
 	_console.focus_changed.connect(focus_changed.emit)
+	_team_actions.focus_changed.connect(focus_changed.emit)
+	add_child(_team_actions)
+	move_child(_team_actions, _close_button.get_index())
+	_close_warning.visible = false
+	_close_warning.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_close_warning.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_close_warning.add_theme_font_size_override(&"font_size", 13)
+	add_child(_close_warning)
+	move_child(_close_warning, _close_button.get_index())
 
 
 ## Connects the panel to [param simulation].
 func setup(simulation: Simulation) -> void:
 	_simulation = simulation
 	_console.setup(simulation)
+	_team_actions.setup(simulation)
 
 
 ## Shows the actions for the open wormhole of [param state].
@@ -60,6 +76,8 @@ func render(state: GameState) -> void:
 	_archive_button.visible = not WormholeText.new_documents(state).is_empty()
 	_console.render()
 	_show_moth(state)
+	_team_actions.render(state)
+	_show_close_warning(state)
 
 
 ## Returns the buttons that can take focus now, in order.
@@ -75,6 +93,7 @@ func get_focusables() -> Array[Control]:
 	found.append(_book_button)
 	if not _moth_button.disabled:
 		found.append(_moth_button)
+	found.append_array(_team_actions.get_focusables())
 	found.append(_close_button)
 	return found
 
@@ -112,6 +131,16 @@ func get_book_button() -> Button:
 ## Returns the Send the MOTH button.
 func get_moth_button() -> Button:
 	return _moth_button
+
+
+## Returns the canister and team actions.
+func get_team_actions() -> RingTeamActions:
+	return _team_actions
+
+
+## Returns the warning that closing now loses the MOTH or the canister; "" while not shown.
+func get_close_warning() -> String:
+	return _close_warning.text if _close_warning.visible else ""
 
 
 ## Returns the Close the wormhole hold button.
@@ -161,9 +190,29 @@ func _on_archive_pressed() -> void:
 		archive_requested.emit(document_ids[0])
 
 
+## Closes the wormhole; with something to lose and no warning shown yet, warns instead.
 func _on_close_confirmed() -> void:
-	if _simulation != null:
-		_simulation.submit(CloseWormholeCommand.new())
+	if _simulation == null:
+		return
+	if not _is_close_warned and not RingActionText.close_warning(_simulation.state).is_empty():
+		_is_close_warned = true
+		_show_close_warning(_simulation.state)
+		return
+	_is_close_warned = false
+	_simulation.submit(CloseWormholeCommand.new())
+
+
+## Shows the close warning once it was given, while something is still at risk; when nothing
+## is, drops it and the button reads Close the wormhole again.
+func _show_close_warning(state: GameState) -> void:
+	var warning: String = RingActionText.close_warning(state)
+	if warning.is_empty():
+		_is_close_warned = false
+	_close_warning.visible = _is_close_warned
+	_close_warning.text = warning
+	_close_button.text = (
+		&"GATE_WORMHOLE_CLOSE_ANYWAY" if _is_close_warned else &"GATE_WORMHOLE_CLOSE"
+	)
 
 
 ## Shows Send the MOTH for [param state]: enabled with the drones in the rack, else disabled

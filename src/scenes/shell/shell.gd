@@ -1,10 +1,13 @@
 extends Control
 ## Main scene. Starts a new paused game, wires the time bar, quick save and quick load, the
 ## autosave on each new day, the Committee's messages, the game views under the top bar and,
-## in debug builds only, the debug overlay and a button that submits a SetFlagCommand. Holds
-## no game rules: it reads state and sends commands.
+## in debug builds only, the debug overlay and a button that submits a SetFlagCommand. It also
+## hosts the rescue alert over the current tab (not modal) with its entry on the top bar's alert
+## stack, and shows each team check-in as a message that never pauses. Holds no game rules: it
+## reads state and sends commands.
 ## Bible: game-design.md#time-real-time-with-pause, game-design.md#core-loop,
-## technical-architecture.md#architecture-overview
+## technical-architecture.md#architecture-overview,
+## docs/content/m3-beyond-the-ring.md sections 4 and 7
 
 ## Smallest window size the game supports, in pixels.
 const MIN_WINDOW_SIZE: Vector2i = Vector2i(1280, 720)
@@ -29,6 +32,8 @@ var debug_overlay: DebugOverlay = null
 
 var _simulation: Simulation = null
 var _debug_flag_count: int = 0
+var _rescue_alert := RescueAlert.new()
+var _alert_stack := AlertStack.new()
 
 ## The time bar at the top of the screen.
 @onready var time_bar: TimeBar = %TimeBar
@@ -52,6 +57,7 @@ func _ready() -> void:
 	money_label.pressed.connect(open_command)
 	confidence_readout.pressed.connect(open_command)
 	_toast_timer.timeout.connect(_toast.hide)
+	_add_alerts()
 	_setup_debug_tools()
 	_start(GameState.new_game(_choose_seed(), Registry.balance()), true)
 	SimClock.pause()
@@ -66,12 +72,14 @@ func _enter_tree() -> void:
 	EventBus.day_started.connect(_on_day_started)
 	EventBus.committee_commendation.connect(_on_commendation)
 	EventBus.committee_warning.connect(_on_committee_warning)
+	EventBus.team_checked_in.connect(_on_team_checked_in)
 
 
 func _exit_tree() -> void:
 	EventBus.day_started.disconnect(_on_day_started)
 	EventBus.committee_commendation.disconnect(_on_commendation)
 	EventBus.committee_warning.disconnect(_on_committee_warning)
+	EventBus.team_checked_in.disconnect(_on_team_checked_in)
 	if _simulation != null and SimClock.simulation == _simulation:
 		SimClock.stop()
 
@@ -124,11 +132,23 @@ func open_command() -> void:
 	view_switcher.show_view(ViewSwitcher.COMMAND)
 
 
-## Returns every button in focus order: the time bar's, the funds and Confidence readouts,
+## Returns the rescue alert.
+func get_rescue_alert() -> RescueAlert:
+	return _rescue_alert
+
+
+## Returns the top bar's alert stack.
+func get_alert_stack() -> AlertStack:
+	return _alert_stack
+
+
+## Returns every button in focus order: the time bar's, the alert stack's (skipped while
+## hidden), the funds and Confidence readouts,
 ## then save, load and (debug only) the flag button. Neighbours wrap around, so a gamepad
 ## reaches them all; down from any of them is the view tabs.
 func get_focus_order() -> Array[Button]:
 	var buttons: Array[Button] = time_bar.get_buttons()
+	buttons.append(_alert_stack.get_rescue_button())
 	buttons.append_array([money_label, confidence_readout, _quick_save_button, _quick_load_button])
 	if _debug_flag_button != null:
 		buttons.append(_debug_flag_button)
@@ -202,8 +222,32 @@ static func _link_focus(buttons: Array[Button], below: Control) -> void:
 ## and after a quick load.
 func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
+	_rescue_alert.setup(simulation)
 	money_label.show_budget(simulation.state.budget.funds_k)
 	confidence_readout.setup(simulation.state)
+
+
+## Puts the alert stack in the top bar after the time bar, and the rescue alert over the top
+## of the current tab, below the tab bar.
+func _add_alerts() -> void:
+	var row: Node = time_bar.get_parent()
+	row.add_child(_alert_stack)
+	row.move_child(_alert_stack, time_bar.get_index() + 1)
+	add_child(_rescue_alert)
+	_rescue_alert.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_rescue_alert.offset_left = 16.0
+	_rescue_alert.offset_right = -16.0
+	_rescue_alert.offset_top = view_switcher.offset_top + 48.0
+	_rescue_alert.gate_room_requested.connect(view_switcher.show_view.bind(ViewSwitcher.GATE_ROOM))
+	_alert_stack.setup(_rescue_alert)
+
+
+func _on_team_checked_in(world_id: StringName, light: int, serious: int) -> void:
+	if _simulation == null:
+		return
+	var world: String = AddressBookText.name_of_world(world_id, _simulation.state)
+	var args: Dictionary = {"reason": "checked_in", "light": light, "serious": serious}
+	show_message(ExpeditionLogText.line(args, world), COMMITTEE_MESSAGE_SECONDS)
 
 
 func _show_toast(key: StringName) -> void:

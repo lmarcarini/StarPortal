@@ -266,3 +266,32 @@ EXPEDITION_CHECK_IN_TITLE,CHECK-IN  {date},CONTATO  {date}
 EXPEDITION_CHECK_IN_TITLE_NONE,CHECK-IN  none yet,CONTATO  nenhum ainda
 EXPEDITION_INJURED_LIGHT,"Injured: {name} (light, {time})","Ferido: {name} (leve, {time})"
 EXPEDITION_INJURED_SERIOUS,"Injured: {name} (serious, {time})","Ferido: {name} (grave, {time})"
+GATE_WORMHOLE_CANISTER,Throw the sample canister ($10k),Lançar a cápsula de amostra ($10k)
+GATE_WORMHOLE_CANISTER_NOTE,Soil and water tested for biohazard in 10 min.,Solo e água testados para risco biológico em 10 min.
+GATE_WORMHOLE_CANISTER_OUT,The canister is out: reeled back in {left}.,A cápsula está do outro lado: recolhida em {left}.
+GATE_WORMHOLE_CANISTER_FUNDS,Not enough money for a canister.,Dinheiro insuficiente para uma cápsula.
+GATE_WORMHOLE_SEND_TEAM,Send team,Enviar equipe
+GATE_WORMHOLE_TEAM_NOTE,"T-1 to {world}: {objective}, {days} days.","T-1 para {world}: {objective}, {days} dias."
+GATE_WORMHOLE_SIGNAL,Signal T-1,Sinalizar T-1
+GATE_WORMHOLE_SIGNAL_NOTE,T-1 reaches the Ring 15 min after the Signal. Keep the wormhole open.,A T-1 chega ao Anel 15 min após o sinal. Mantenha o buraco de minhoca aberto.
+GATE_WORMHOLE_SIGNAL_WAITING,Signal sent: T-1 reaches the Ring in {left}.,Sinal enviado: a T-1 chega ao Anel em {left}.
+GATE_WORMHOLE_CLOSE_WARNING,Closing now loses {what}. Hold again to close.,Fechar agora perde {what}. Segure de novo para fechar.
+GATE_WORMHOLE_LOSES_MOTH,the MOTH,o MOTH
+GATE_WORMHOLE_LOSES_CANISTER,the canister and its result,a cápsula e seu resultado
+GATE_WORMHOLE_LOSES_BOTH,"the MOTH, and the canister and its result","o MOTH, e a cápsula e seu resultado"
+GATE_WORMHOLE_CLOSE_ANYWAY,Close and lose it (hold),Fechar e perder (segure)
+RESCUE_ALERT_TITLE,T-1 MISSED ITS CHECK-IN ({world}),T-1 NÃO FEZ CONTATO ({world})
+RESCUE_ALERT_WINDOW,Window: {time},Janela: {time}
+RESCUE_ALERT_SIGNALLED,Signal sent: T-1 reaches the Ring in {left}. Keep the wormhole open.,Sinal enviado: a T-1 chega ao Anel em {left}. Mantenha o buraco de minhoca aberto.
+RESCUE_ALERT_ODDS,"Threat {threat}. Whether everyone comes back is not certain, and waiting lowers the odds.","Ameaça {threat}. Não é certo que todos voltem, e esperar diminui as chances."
+RESCUE_ALERT_CHARGE,Charge needed {needed}   Stored {stored}   Charging {rate} MW: {ready},Carga necessária {needed}   Armazenada {stored}   Carregando {rate} MW: {ready}
+RESCUE_ALERT_READY_IN,ready in {time},pronta em {time}
+RESCUE_ALERT_READY_NOW,ready now,pronta agora
+RESCUE_ALERT_NEVER,never ready at this rate,nunca fica pronta nesse ritmo
+RESCUE_ALERT_ON_TIME,"Charge for the rescue dial: {needed}, {ready}. Window: {window}.","Carga para a discagem de resgate: {needed}, {ready}. Janela: {window}."
+RESCUE_ALERT_TOO_SLOW,At the current charge rate the bank will not be ready before the window closes.,No ritmo de carga atual o banco não estará pronto antes de a janela fechar.
+RESCUE_ALERT_NOT_ENOUGH,Not enough even at maximum. Switch rooms off in the Base.,Insuficiente mesmo no máximo. Desligue salas na Base.
+RESCUE_ALERT_CHARGE_MAX,Charge at maximum,Carregar no máximo
+RESCUE_ALERT_GO_GATE,Go to Gate Room,Ir para a Sala do Portal
+RESCUE_ALERT_CLOSE,Close,Fechar
+ALERT_RESCUE_ENTRY,T-1 missing  {time},T-1 sumida  {time}
