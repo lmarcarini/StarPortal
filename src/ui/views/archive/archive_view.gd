@@ -15,6 +15,8 @@ extends GameView
 ## The number of unread documents may have changed (a document arrived or was read, or a new
 ## simulation was bound); [method get_tab_title] has the new title.
 signal unread_changed
+## The World Report's **Plan expedition** was pressed, for [param world_id].
+signal plan_requested(world_id: StringName)
 
 const _TITLE_KEY: StringName = &"ARCHIVE_TITLE"
 const _TITLE_UNREAD_KEY: StringName = &"ARCHIVE_TITLE_UNREAD"
@@ -62,6 +64,9 @@ func _ready() -> void:
 	_sections.tab_changed.connect(_link_sections.unbind(1))
 	_log.link_up(_sections.get_tab_bar())
 	_worlds.link_up(_sections.get_tab_bar())
+	_worlds.plan_requested.connect(
+		func(world_id: StringName) -> void: plan_requested.emit(world_id)
+	)
 	_link_sections()
 	_link_filter()
 

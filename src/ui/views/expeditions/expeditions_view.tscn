@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/views/expeditions/expeditions_view.gd" id="1_view"]
+[ext_resource type="Script" path="res://src/ui/expeditions/plan_sheet.gd" id="2_sheet"]
+[ext_resource type="Script" path="res://src/ui/expeditions/trip_panel.gd" id="3_trip"]
+[ext_resource type="Script" path="res://src/ui/expeditions/check_in_panel.gd" id="4_check_in"]
+
+[node name="ExpeditionsView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_view")
+
+[node name="Columns" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="Sheet" type="VBoxContainer" parent="Columns"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+script = ExtResource("2_sheet")
+
+[node name="Trip" type="VBoxContainer" parent="Columns"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("3_trip")
+
+[node name="CheckIn" type="VBoxContainer" parent="Columns"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+script = ExtResource("4_check_in")

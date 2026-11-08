@@ -50,6 +50,7 @@ WORLD_REPORT_EMPTY,Choose a world to read its report.,Escolha um mundo para ler 
 WORLD_ADDRESS,Address,Endereço
 WORLD_PLAN_EXPEDITION,Plan expedition,Planejar expedição
 WORLD_PLAN_EXPEDITION_LATER,Expeditions are not open yet.,As expedições ainda não estão abertas.
+WORLD_PLAN_EXPEDITION_NOT_PROBED,Probe the world first.,Sonde o mundo primeiro.
 WORLD_STATUS_UNKNOWN,UNKNOWN,DESCONHECIDO
 WORLD_STATUS_LOCKED,LOCKED,CONECTADO
 WORLD_STATUS_PROBED,PROBED,SONDADO

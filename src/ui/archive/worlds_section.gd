@@ -4,8 +4,11 @@ extends HBoxContainer
 ## sorted by name, beside the World Report of the chosen world. It refreshes when a world's state
 ## or a report fact rises (also while paused) and whenever it is shown. Mouse: click a row.
 ## Gamepad: D-pad through the rows, A opens the report, Right reaches **Plan expedition**.
-## Reads state only.
+## **Plan expedition** re-emits as [signal plan_requested]. Reads state only.
 ## Bible: docs/content/m3-beyond-the-ring.md section 7 (World Report; gamepad: Worlds)
+
+## Emitted when the report's **Plan expedition** is pressed, with its world.
+signal plan_requested(world_id: StringName)
 
 const _LIST_WIDTH: float = 300.0
 
@@ -35,6 +38,9 @@ func _init() -> void:
 	scroll.add_child(column)
 	add_child(scroll)
 	add_child(_report)
+	_report.plan_requested.connect(
+		func(world_id: StringName) -> void: plan_requested.emit(world_id)
+	)
 	visibility_changed.connect(_on_visibility_changed)
 
 

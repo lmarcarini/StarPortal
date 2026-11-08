@@ -205,3 +205,64 @@ TEAM_INJURY_LIGHT_ONE,one light injury,um ferimento leve
 TEAM_INJURY_LIGHT,{count} light injuries,{count} ferimentos leves
 TEAM_INJURY_SERIOUS_ONE,one serious injury,um ferimento grave
 TEAM_INJURY_SERIOUS,{count} serious injuries,{count} ferimentos graves
+EXPEDITION_TITLE,Expeditions,Expedições
+EXPEDITION_PLAN_TITLE,PLAN  T-1,PLANO  T-1
+EXPEDITION_WORLD,World,Mundo
+EXPEDITION_THREAT,Threat,Ameaça
+EXPEDITION_THREAT_VALUE,{threat} ({confidence}),{threat} ({confidence})
+EXPEDITION_OBJECTIVE,Objective,Objetivo
+EXPEDITION_OBJECTIVE_NONE,None,Nenhum
+EXPEDITION_OBJECTIVE_SURVEY,Survey,Levantamento
+EXPEDITION_OBJECTIVE_RECOVER,Recover,Recuperar
+EXPEDITION_RECOVER_TARGET,Recover: {target},Recuperar: {target}
+EXPEDITION_TEAM,Team,Equipe
+EXPEDITION_SLOT_LEADER,Leader,Líder
+EXPEDITION_SLOT_SCIENTIST,Science,Ciência
+EXPEDITION_SLOT_SOLDIER,Soldier,Soldado
+EXPEDITION_SLOT_SPECIALIST,Special,Especialista
+EXPEDITION_SLOT_EMPTY,(empty),(vazio)
+EXPEDITION_INJURED,injured,ferido
+EXPEDITION_LOSS_RESEARCH,Research {before}% to {after}%,Pesquisa {before}% to {after}%
+EXPEDITION_LOSS_BUILD,Building +{before}% to +{after}%,Obras +{before}% to +{after}%
+EXPEDITION_RISK,Risk {risk}   {days} days,Risco {risk}   {days} dias
+EXPEDITION_READY,Ready team,Preparar equipe
+EXPEDITION_PLAN_READY,Team ready: Send team from the Ring when that world is open.,Equipe pronta: envie a equipe pelo Anel quando esse mundo estiver aberto.
+EXPEDITION_TEAM_OUT,T-1 is out: plan the next expedition when it is back.,T-1 está fora: planeje a próxima expedição quando ela voltar.
+EXPEDITION_ERR_EXPEDITIONS_LOCKED,Expeditions are not open yet.,As expedições ainda não estão abertas.
+EXPEDITION_ERR_EXPEDITION_AWAY,A team is already out.,Uma equipe já está fora.
+EXPEDITION_ERR_UNKNOWN_OBJECTIVE,Pick an objective.,Escolha um objetivo.
+EXPEDITION_ERR_WORLD_NOT_PROBED,The world is not Probed.,O mundo não foi sondado.
+EXPEDITION_ERR_TARGET_NOT_RECOVERABLE,That target cannot be recovered.,Esse alvo não pode ser recuperado.
+EXPEDITION_ERR_TEAM_INCOMPLETE,A team slot is empty.,Há uma vaga vazia na equipe.
+EXPEDITION_ERR_DUPLICATE_MEMBER,Someone is in two slots.,Alguém está em duas vagas.
+EXPEDITION_ERR_WRONG_ROLE,Someone is in a slot of another role.,Alguém está numa vaga de outra função.
+EXPEDITION_ERR_MEMBER_INJURED,A team member is injured.,Um membro da equipe está ferido.
+EXPEDITION_ERR_UNKNOWN_PERSON,A team member is no longer on the roster.,Um membro da equipe não está mais no quadro.
+EXPEDITION_ERR_NOT_ON_BASE,A team member is not on base yet.,Um membro da equipe ainda não chegou à base.
+EXPEDITION_ERR_TEAM_NOT_AWAY,No team is out to recall.,Nenhuma equipe está fora para chamar de volta.
+EXPEDITION_ERR_TEAM_ALREADY_RECALLED,T-1 is already recalled.,T-1 já foi chamada de volta.
+EXPEDITION_ERR_OTHER,Can't do that now.,Não é possível agora.
+EXPEDITION_TRIP_HEADER,T-1  {world}  {objective},T-1  {world}  {objective}
+EXPEDITION_NONE_AWAY,No team away.,Nenhuma equipe fora.
+EXPEDITION_NEXT_CHECK_IN,Next check-in {date},Próximo contato {date}
+EXPEDITION_NEXT_RETURN,Return {date},Retorno {date}
+EXPEDITION_TIMELINE_OUT,Out  {date},Saída  {date}
+EXPEDITION_TIMELINE_CHECK_IN,Check-in  {date},Contato  {date}
+EXPEDITION_TIMELINE_RETURN,Return  {date},Retorno  {date}
+EXPEDITION_TIMELINE_RECALLED,Recalled: back at the next check-in ({date}).,Chamada de volta: retorna no próximo contato ({date}).
+EXPEDITION_TIMELINE_MISSED,Missed its check-in  {date},Não fez contato  {date}
+EXPEDITION_TIMELINE_RESCUE,"Rescue: dial {world}, then Signal T-1 from the Ring.","Resgate: disque {world} e depois Sinalizar T-1 pelo Anel."
+EXPEDITION_TIMELINE_WINDOW,Window closes  {date},A janela fecha  {date}
+EXPEDITION_MARK_DONE,done,feito
+EXPEDITION_MARK_NEXT,next,próximo
+EXPEDITION_LOG,LOG,REGISTRO
+EXPEDITION_LOG_NONE,Nothing yet.,Nada ainda.
+EXPEDITION_RECALL,Recall team,Chamar equipe de volta
+EXPEDITION_PAST,PAST EXPEDITIONS,EXPEDIÇÕES ANTERIORES
+EXPEDITION_PAST_NONE,None yet.,Nenhuma ainda.
+EXPEDITION_PAST_SURVEY,Survey report from {world},Relatório de levantamento de {world}
+EXPEDITION_PAST_OBJECT,Object recovered from {world},Objeto recuperado de {world}
+EXPEDITION_CHECK_IN_TITLE,CHECK-IN  {date},CONTATO  {date}
+EXPEDITION_CHECK_IN_TITLE_NONE,CHECK-IN  none yet,CONTATO  nenhum ainda
+EXPEDITION_INJURED_LIGHT,"Injured: {name} (light, {time})","Ferido: {name} (leve, {time})"
+EXPEDITION_INJURED_SERIOUS,"Injured: {name} (serious, {time})","Ferido: {name} (grave, {time})"
