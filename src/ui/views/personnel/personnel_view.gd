@@ -254,6 +254,7 @@ static func _staff_signature(state: GameState) -> int:
 	]
 	for person: PersonState in state.staff.people:
 		parts.append(ceili(maxi(0, person.arrives_tick - state.clock.tick) / 60.0))
+		parts.append(ceili(person.recovery_left / 60.0))
 	return hash(parts)
 
 

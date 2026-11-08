@@ -12,6 +12,10 @@ const SCIENTIST: StringName = &"role_scientist"
 const ENGINEER: StringName = &"role_engineer"
 ## Analyst role id.
 const ANALYST: StringName = &"role_analyst"
+## Soldier role id (M3, docs/content/m3-beyond-the-ring.md section 4).
+const SOLDIER: StringName = &"role_soldier"
+## Medic role id (M3, section 4).
+const MEDIC: StringName = &"role_medic"
 ## Room def ids whose first finished room takes the Unassigned people of its role.
 const AUTO_ASSIGN_DEFS: Array[StringName] = [&"room_research_lab", &"room_workshop"]
 ## Def id of the room the analyst starts in.

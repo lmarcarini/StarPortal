@@ -50,7 +50,8 @@ func test_build_from_real_content_runs_both_systems() -> void:
 			&"economy",
 			&"construction",
 			&"research",
-			&"recruitment"
+			&"recruitment",
+			&"staff_care"
 		]
 	)
 	for index: int in 60:

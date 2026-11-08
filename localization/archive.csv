@@ -43,3 +43,60 @@ LOG_LINE_DOCUMENT,Received: {title},Recebido: {title}
 LOG_LINE_CONSOLE,Read the console of {world},Leu o console de {world}
 LOG_LINE_HORIZON,Horizon record taken: {world},Registro do horizonte obtido: {world}
 LOG_LINE_POWER,Capacitor bank installed: {capacity},Banco de capacitores instalado: {capacity}
+ARCHIVE_SECTION_WORLDS,Worlds,Mundos
+WORLD_LIST_EMPTY,No world known yet. Lock a world to start its report.,Nenhum mundo conhecido ainda. Conecte-se a um mundo para começar o relatório.
+WORLD_ROW,{world}  ·  {status},{world}  ·  {status}
+WORLD_REPORT_EMPTY,Choose a world to read its report.,Escolha um mundo para ler o relatório.
+WORLD_ADDRESS,Address,Endereço
+WORLD_PLAN_EXPEDITION,Plan expedition,Planejar expedição
+WORLD_PLAN_EXPEDITION_LATER,Expeditions are not open yet.,As expedições ainda não estão abertas.
+WORLD_STATUS_UNKNOWN,UNKNOWN,DESCONHECIDO
+WORLD_STATUS_LOCKED,LOCKED,CONECTADO
+WORLD_STATUS_PROBED,PROBED,SONDADO
+WORLD_STATUS_SURVEYED,SURVEYED,EXPLORADO
+WORLD_STATUS_CONTACTED,CONTACTED,CONTATADO
+WORLD_CONFIDENCE_NONE,none,nenhuma
+WORLD_CONFIDENCE_POOR,poor,baixa
+WORLD_CONFIDENCE_FAIR,fair,razoável
+WORLD_CONFIDENCE_GOOD,good,boa
+WORLD_FACT_ATMOSPHERE,Atmosphere,Atmosfera
+WORLD_FACT_TEMPERATURE,Temperature,Temperatura
+WORLD_FACT_RADIATION,Radiation,Radiação
+WORLD_FACT_BIOHAZARD,Biohazard,Risco biológico
+WORLD_FACT_LIFE,Life,Vida
+WORLD_FACT_STRUCTURES,Structures,Estruturas
+WORLD_FACT_TARGETS,Targets,Alvos
+WORLD_FACT_THREAT,Threat,Ameaça
+WORLD_FACT_NOTE,confidence {confidence} ({source}),confiança {confidence} ({source})
+WORLD_SOURCE_DATE,{source} {day} {month},{source} {day} {month}
+WORLD_SOURCE_POLE_CAMERA,pole camera,câmera de haste
+WORLD_SOURCE_CANISTER,canister,cápsula
+WORLD_SOURCE_MOTH,MOTH,MOTH
+WORLD_SOURCE_TEAM,team,equipe
+WORLD_SOURCE_CONSOLE,console,console
+WORLD_VALUE_UNKNOWN,unknown,desconhecido
+WORLD_TEMPERATURE,{value} °C,{value} °C
+WORLD_ATMOSPHERE_NONE,none,nenhuma
+WORLD_ATMOSPHERE_THIN,thin,rarefeita
+WORLD_ATMOSPHERE_BREATHABLE,breathable,respirável
+WORLD_ATMOSPHERE_TOXIC,toxic,tóxica
+WORLD_RADIATION_NORMAL,normal,normal
+WORLD_RADIATION_RAISED,raised,elevada
+WORLD_RADIATION_HIGH,high,alta
+WORLD_BIOHAZARD_NONE,none,nenhum
+WORLD_BIOHAZARD_LOW,low,baixo
+WORLD_BIOHAZARD_HIGH,high,alto
+WORLD_LIFE_NONE,none,nenhuma
+WORLD_LIFE_PLANTS,plants,plantas
+WORLD_LIFE_ANIMALS,animals,animais
+WORLD_LIFE_PEOPLE,people,pessoas
+WORLD_STRUCTURES_NONE,none,nenhuma
+WORLD_STRUCTURES_RUINS,ruins,ruínas
+WORLD_STRUCTURES_WORKED_STONE,worked stone,pedra trabalhada
+WORLD_STRUCTURES_SETTLEMENT,settlement,povoado
+WORLD_TARGETS_NONE,none seen,nenhum visto
+WORLD_THREAT_UNKNOWN,UNKNOWN,DESCONHECIDA
+WORLD_THREAT_LOW,LOW,BAIXA
+WORLD_THREAT_MED,MED,MÉDIA
+WORLD_THREAT_HIGH,HIGH,ALTA
+WORLD_THREAT_RANGE,{low}–{high},{low}–{high}

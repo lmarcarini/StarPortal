@@ -90,11 +90,13 @@ const BALANCE_ID: StringName = &"balance"
 ## Weights of a drawn candidate's skill 1 to 5, in percent (section 2: 10, 35, 35, 15, 5).
 @export var candidate_skill_weights: Array[int] = [10, 35, 35, 15, 5]
 ## Days from hiring to arrival per role id, i.e. per pipeline (section 2: Academia 5,
-## Military 3, Intelligence 7).
+## Military 3, Intelligence 7; M3: soldier 3, medic 5).
 @export var hire_arrival_days: Dictionary[StringName, int] = {
 	&"role_scientist": 5,
 	&"role_engineer": 3,
 	&"role_analyst": 7,
+	&"role_soldier": 3,
+	&"role_medic": 5,
 }
 
 

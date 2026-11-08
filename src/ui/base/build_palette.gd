@@ -20,13 +20,15 @@ signal cancel_held
 ## Emitted when the player leaves the palette with (B) or Esc.
 signal back_requested
 
-## Buildable rooms, in palette order.
+## Buildable rooms, in palette order. The Infirmary shows only from the Expeditions unlock
+## (m3-beyond-the-ring.md section 9): no research unlocks it.
 const ROOMS: Array[StringName] = [
 	&"room_power_plant",
 	&"room_capacitor_bank",
 	&"room_research_lab",
 	&"room_quarters",
 	&"room_workshop",
+	&"room_infirmary",
 	&"room_lift",
 	&"room_stairs",
 	&"room_corridor",

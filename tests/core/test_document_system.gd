@@ -324,6 +324,7 @@ func test_documents_system_runs_after_gate() -> void:
 			&"economy",
 			&"construction",
 			&"research",
-			&"recruitment"
+			&"recruitment",
+			&"staff_care"
 		]
 	)

@@ -19,7 +19,7 @@ static func header(state: GameState) -> String:
 		. format(
 			{
 				"staff": StaffRules.headcount(state),
-				"used": StaffRules.headcount(state),
+				"used": StaffRules.beds_used(state),
 				"beds": StaffRules.beds(state),
 				"salaries": MoneyLabel.format_k(daily_k(StaffRules.salaries_k(state))),
 			}
@@ -55,8 +55,22 @@ static func salary(salary_k: int) -> String:
 
 
 ## Where [param person] is in [param state]: the room's name, "Unassigned", or
-## "Arriving in 3 d 4 h".
+## "Arriving in 3 d 4 h"; an injury first ("Light injury: 1 d 4 h to recover · Workshop", at
+## 1x) and "Lent" last for a lent soldier (m3-beyond-the-ring.md section 4).
 static func where(state: GameState, person: PersonState) -> String:
+	var parts: Array[String] = []
+	if person.is_injured():
+		var key: StringName = &"STAFF_INJURED_LIGHT"
+		if person.injury == PersonState.Injury.SERIOUS:
+			key = &"STAFF_INJURED_SERIOUS"
+		parts.append(_tr(key).format({"time": ResearchText.duration(person.recovery_left)}))
+	parts.append(_place(state, person))
+	if person.lent:
+		parts.append(_tr(&"STAFF_LENT"))
+	return " · ".join(parts)
+
+
+static func _place(state: GameState, person: PersonState) -> String:
 	var now: int = state.clock.tick
 	if not person.is_on_base(now):
 		var left: String = ResearchText.duration(person.arrives_tick - now)

@@ -21,7 +21,7 @@ ROOM_WORKSHOP_NAME,Workshop,Oficina
 ROOM_WORKSHOP_NOW,"While on, sites and digs finish faster: 10% empty, 25% with two engineers.","Ligada, as obras e escavações terminam mais rápido: 10% vazia, 25% com dois engenheiros."
 ROOM_WORKSHOP_LATER,Builds prototypes and equipment.,Constrói protótipos e equipamentos.
 ROOM_INFIRMARY_NAME,Infirmary,Enfermaria
-ROOM_INFIRMARY_NOW,Opens when staff arrive.,Abre quando a equipe chegar.
+ROOM_INFIRMARY_NOW,"Injured staff recover 2x faster, 3x with a medic. Holds 4 patients.","Feridos se recuperam 2x mais rápido, 3x com um médico. Atende 4 pacientes."
 ROOM_LIFT_NAME,Lift,Elevador
 ROOM_LIFT_NOW,Joins every level through the same 2 × 2 cells.,Liga todos os níveis pelas mesmas células 2 × 2.
 ROOM_LIFT_LATER,Moves squads faster than stairs.,Leva esquadrões mais rápido que a escada.
@@ -146,12 +146,18 @@ BASE_MSG_LIFT_SEGMENT_REFUSED,Lift not extended to Level {n}: needs {cost}. Buil
 STAFF_ROLE_SCIENTIST,Scientist,Cientista
 STAFF_ROLE_ENGINEER,Engineer,Engenheiro
 STAFF_ROLE_ANALYST,Analyst,Analista
+STAFF_ROLE_SOLDIER,Soldier,Soldado
+STAFF_ROLE_MEDIC,Medic,Médico
 STAFF_COUNT_SCIENTIST,{count} scientists,{count} cientistas
 STAFF_COUNT_ENGINEER,{count} engineers,{count} engenheiros
 STAFF_COUNT_ANALYST,{count} analysts,{count} analistas
+STAFF_COUNT_SOLDIER,{count} soldiers,{count} soldados
+STAFF_COUNT_MEDIC,{count} medics,{count} médicos
 STAFF_COUNT_ONE_SCIENTIST,1 scientist,1 cientista
 STAFF_COUNT_ONE_ENGINEER,1 engineer,1 engenheiro
 STAFF_COUNT_ONE_ANALYST,1 analyst,1 analista
+STAFF_COUNT_ONE_SOLDIER,1 soldier,1 soldado
+STAFF_COUNT_ONE_MEDIC,1 medic,1 médico
 LOG_KIND_STAFF,Staff,Pessoal
 LOG_LINE_STAFFED,{room} staffed: {people}.,{room} com equipe: {people}.
 LOG_LINE_STAFF_RELEASED,Staff unassigned from {room}: {count}.,Pessoal liberado de {room}: {count}.

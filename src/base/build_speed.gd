@@ -43,7 +43,7 @@ static func bonus(state: GameState) -> int:
 	for room: RoomState in state.base.rooms:
 		if room.def_id == WORKSHOP_DEF and PowerRules.is_running(room, def):
 			running = true
-			for person: PersonState in StaffRules.assigned(state, room):
+			for person: PersonState in StaffRules.working(state, room):
 				skill += person.skill
 	if not running:
 		return 0
