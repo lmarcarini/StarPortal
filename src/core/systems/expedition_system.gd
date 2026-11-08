@@ -11,7 +11,8 @@ extends SimSystem
 ## last day) and goes back to the rooms it kept; the plan clears.
 ## Events: team_checked_in(world id, light injuries, serious injuries, day summary),
 ## team_sent (SendTeamCommand) and team_returned(world id, objective, success,
-## team names), and ExpeditionRescue's.
+## team names), prologue_completed(world id) once at the first return (section 1), and
+## ExpeditionRescue's.
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
 
 ## Id of the system and of its random stream.
@@ -20,6 +21,10 @@ const ID: StringName = &"expedition"
 const RETURNED_EVENT: StringName = &"team_returned"
 ## Event posted at a check-in that is not the return.
 const CHECKED_IN_EVENT: StringName = &"team_checked_in"
+## Event posted once, at the first team's first return home (not a rescue): the Prologue ends.
+const PROLOGUE_EVENT: StringName = &"prologue_completed"
+## Flag set (true) once the Prologue has ended.
+const PROLOGUE_FLAG: StringName = &"prologue_complete"
 
 ## Resolves a field day: (state, day, rng) -> an ExpeditionState.DAY_RESULTS entry. Tests may
 ## replace it; the game uses ExpeditionFieldDay.resolve.
@@ -79,6 +84,9 @@ func _return(state: GameState, rng: RandomNumberGenerator) -> void:
 		success = ExpeditionReturns.apply(state, rng)
 	plan.clear()
 	state.events.post(RETURNED_EVENT, [world_id, objective, success, team])
+	if state.flags.get(PROLOGUE_FLAG, false) != true:
+		state.flags[PROLOGUE_FLAG] = true
+		state.events.post(PROLOGUE_EVENT, [world_id])
 
 
 ## The names of [param state]'s team in slot order (people no longer on the roster skipped).

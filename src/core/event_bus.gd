@@ -160,6 +160,10 @@ signal member_deceased(person_name: String, world_id: StringName)
 ## through the outbox).
 @warning_ignore("unused_signal")
 signal team_rescued(world_id: StringName, survivors: int)
+## Emitted once, when the first team comes home through its own check-ins (not a rescue), with
+## the world id: the Prologue ends (posted through the outbox).
+@warning_ignore("unused_signal")
+signal prologue_completed(world_id: StringName)
 ## Emitted when a team is lost, with the world id and the reason, &"window" or &"no_answer"
 ## (posted through the outbox).
 @warning_ignore("unused_signal")

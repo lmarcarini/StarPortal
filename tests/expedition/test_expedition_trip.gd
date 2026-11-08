@@ -20,7 +20,8 @@ func before_test() -> void:
 
 
 func _send(plan: PlanExpeditionCommand) -> void:
-	assert_bool(_simulation.submit(plan).is_ok).is_true()
+	var planned: CommandResult = _simulation.submit(plan)
+	assert_bool(planned.is_ok).override_failure_message(str(planned.error_code)).is_true()
 	ProbeFixture.open(_simulation)
 	assert_bool(_simulation.submit(SendTeamCommand.new()).is_ok).is_true()
 
@@ -145,3 +146,25 @@ func test_plan_refused_while_away() -> void:
 	_send(Fixture.survey(_state))
 	var result: CommandResult = Fixture.survey(_state).validate(_state)
 	assert_str(String(result.error_code)).is_equal("expedition_away")
+
+
+func test_first_return_ends_the_prologue_once() -> void:
+	var posted: Array[StringName] = []
+	_simulation.event_posted.connect(
+		func(event_name: StringName, _args: Array) -> void: posted.append(event_name)
+	)
+	for trip: int in 2:
+		_send(Fixture.survey(_state))
+		Fixture.advance(_simulation, _state.expedition.days() * DAY + 1)
+		_simulation.submit(CloseWormholeCommand.new())
+		assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.IDLE)
+	assert_int(posted.count(ExpeditionSystem.PROLOGUE_EVENT)).is_equal(1)
+	assert_bool(_state.flags.get(ExpeditionSystem.PROLOGUE_FLAG, false)).is_true()
+	var lines: Array[LogEntry] = []
+	for entry: LogEntry in _state.operations_log.entries:
+		if entry.args.get("reason", "") == "prologue":
+			lines.append(entry)
+	assert_int(lines.size()).is_equal(1)
+	assert_str(ExpeditionLogText.line(lines[0].args, "SILL")).is_equal(
+		"Prologue complete: the first Threshold team is home."
+	)

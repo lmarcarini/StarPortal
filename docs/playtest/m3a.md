@@ -26,6 +26,7 @@ M3b (MOORING and contact) is held until after this playtest, so your notes shape
 - **Soldiers and medics** now turn up among the candidates.
 - Teams **check in every 24 hours** by themselves; a missed check-in opens a **rescue alert**
   with a 72-hour window. Closing a wormhole with a probe out now warns you first.
+- The **Prologue ends** when your first team comes home, with a message and a Log line.
 
 ## 1. Start a new game
 
@@ -81,7 +82,8 @@ Run at 10×. After 24 hours a message says "T-1 checked in from SILL …" with a
 the game doesn't pause. On the Expeditions tab, the middle shows the timeline ("Next
 check-in …", **Recall team**) and the right the latest **CHECK-IN**. Try **Recall team** on a
 later trip if you want to see it. At 48 hours the team comes home, SILL becomes **SURVEYED**,
-and **PAST EXPEDITIONS** lists "Survey report from SILL".
+and **PAST EXPEDITIONS** lists "Survey report from SILL". Your first team home ends the
+Prologue: a message and a Log line say "Prologue complete: the first Threshold team is home."
 
 ## 8. Heal and hire
 

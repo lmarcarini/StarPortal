@@ -6,9 +6,9 @@
 ## soldiers. The World Report (Archive, Worlds) shows the threat and its Plan expedition opens
 ## the Expeditions tab (F7) on SILL; four slots are picked and Ready team plans the Survey; the
 ## Ring action Send team sends T-1 through the same lock. The team checks in (a message, the
-## check-in panel) and comes home with SILL Surveyed. A second Survey, whose first check-in is
-## forced missed, pauses the game and opens the rescue alert; Go to Gate Room, a new lock and
-## Signal T-1 bring the team home and close the window.
+## check-in panel) and comes home with SILL Surveyed, ending the Prologue (once). A second
+## Survey, whose first check-in is forced missed, pauses the game and opens the rescue alert;
+## Go to Gate Room, a new lock and Signal T-1 bring the team home and close the window.
 ## Bible: docs/content/m3-beyond-the-ring.md sections 1, 2, 4 and 7,
 ## technical-architecture.md#testing-and-tooling
 extends GdUnitTestSuite
@@ -201,6 +201,13 @@ func _check_in_and_come_home(player: M15Player) -> void:
 	assert_str(_expeditions().get_check_in().texts()[0]).starts_with("CHECK-IN  ")
 	_wait(player, func() -> bool: return state.expedition.mode == ExpeditionState.Mode.IDLE)
 	assert_bool(state.worlds.has_reached(SILL, WorldsState.WorldStatus.SURVEYED)).is_true()
+	var prologue: String = "Prologue complete: the first Threshold team is home."
+	assert_str(_shell.get_toast_text()).is_equal(prologue)
+	assert_bool(state.flags.get(ExpeditionSystem.PROLOGUE_FLAG, false)).is_true()
+	var lines: Array = state.operations_log.entries.filter(
+		func(e: LogEntry) -> bool: return e.args.get("reason", "") == "prologue"
+	)
+	assert_int(lines.size()).is_equal(1)
 	await _key(KEY_F7)
 	assert_str(_expeditions().get_trip().texts()[5]).contains("Survey report")
 
@@ -240,12 +247,14 @@ func _rescue(player: M15Player) -> void:
 	await UiInput.click(signal_button)
 	assert_int(state.expedition.signal_tick).is_equal(state.clock.tick)
 	_wait(player, func() -> bool: return state.expedition.mode == ExpeditionState.Mode.IDLE)
-	# The top bar's alert stack redraws on SimClock's tick_advanced, which player.step() skips.
-	SimClock.step_ticks(1)
 	await _runner.await_input_processed()
 	assert_bool(_shell.get_rescue_alert().visible).is_false()
 	assert_bool(_shell.get_alert_stack().get_rescue_button().visible).is_false()
 	assert_bool(player.close_wormhole()).is_true()
+	var prologues: Array = state.operations_log.entries.filter(
+		func(e: LogEntry) -> bool: return e.args.get("reason", "") == "prologue"
+	)
+	assert_int(prologues.size()).is_equal(1)
 
 
 func _gate_room() -> GateRoomView:
