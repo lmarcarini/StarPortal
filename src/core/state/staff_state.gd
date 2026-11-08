@@ -101,7 +101,8 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'next_person_number' is not a whole number of at least 1")
 	errors.append_array(_people_errors(data["people"]))
 	errors.append_array(_auto_errors(data["auto_assign"]))
-	if not data["lent_due"] is Array or not (data["lent_due"] as Array).all(RoomState.is_count):
+	var due: Array = _array_or_empty(data["lent_due"])
+	if not data["lent_due"] is Array or not due.all(RoomState.is_count):
 		errors.append("'lent_due' is not an array of whole numbers of at least 0")
 	if errors.is_empty():
 		errors.append_array(_id_errors(from_dict(data)))

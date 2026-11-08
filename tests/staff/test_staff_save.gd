@@ -72,9 +72,9 @@ func _errors_after(edit: Callable) -> Array[String]:
 
 func test_unknown_role_is_rejected() -> void:
 	var errors: Array[String] = _errors_after(
-		func(data: Dictionary) -> void: data["staff"]["people"][0]["role"] = "role_medic"
+		func(data: Dictionary) -> void: data["staff"]["people"][0]["role"] = "role_cook"
 	)
-	assert_str("; ".join(errors)).contains("unknown role 'role_medic'")
+	assert_str("; ".join(errors)).contains("unknown role 'role_cook'")
 
 
 func test_unknown_room_def_is_rejected() -> void:

@@ -81,7 +81,8 @@ static func _infirmary_places(state: GameState) -> Array[int]:
 	for room: RoomState in state.base.rooms:
 		if room.def_id != ExpeditionUnlock.INFIRMARY_DEF:
 			continue
-		if not PowerRules.is_running(room, state.room_defs.get(room.def_id)):
+		var def: RoomDef = state.room_defs.get(room.def_id)
+		if not PowerRules.is_running(room, def):
 			continue
 		var medic: bool = StaffRules.working(state, room).any(
 			func(p: PersonState) -> bool: return p.role == StartingStaff.MEDIC
