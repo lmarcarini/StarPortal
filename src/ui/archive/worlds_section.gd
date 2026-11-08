@@ -137,11 +137,14 @@ func _rebuild(ids: Array[StringName]) -> void:
 
 func _row_text(world_id: StringName) -> String:
 	var state: GameState = _simulation.state
-	return tr(&"WORLD_ROW").format(
-		{
-			"world": AddressBookText.name_of_world(world_id, state),
-			"status": WorldReportText.status_name(state.worlds.status_of(world_id)),
-		}
+	return (
+		tr(&"WORLD_ROW")
+		. format(
+			{
+				"world": AddressBookText.name_of_world(world_id, state),
+				"status": WorldReportText.status_name(state.worlds.status_of(world_id)),
+			}
+		)
 	)
 
 

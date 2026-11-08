@@ -156,7 +156,7 @@ static func source(entry: WorldReport.Entry) -> String:
 	var key: StringName = _SOURCE_KEYS.get(entry.source, &"")
 	var name: String = String(entry.source) if key.is_empty() else _tr(key)
 	var date: Dictionary = TimeMath.date_of(entry.tick)
-	var month: String = _tr(StringName("COMMAND_MONTH_%d" % int(date["month"])))
+	var month: String = _tr(StringName("COMMAND_MONTH_%d" % date["month"]))
 	return _tr(&"WORLD_SOURCE_DATE").format({"source": name, "day": date["day"], "month": month})
 
 

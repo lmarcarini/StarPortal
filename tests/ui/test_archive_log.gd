@@ -72,8 +72,8 @@ func _lines() -> Array[String]:
 ## The Archive has a Documents and a Log section; the Log lists every entry newest first.
 func test_log_lists_every_entry_newest_first() -> void:
 	var sections: TabContainer = _view.get_node("%Sections") as TabContainer
-	assert_int(sections.get_tab_count()).is_equal(2)
-	assert_str(sections.get_tab_bar().tr(sections.get_tab_title(1))).is_equal("Log")
+	assert_int(sections.get_tab_count()).is_equal(3)
+	assert_str(sections.get_tab_bar().tr(sections.get_tab_title(2))).is_equal("Log")
 	var entries: Array[LogEntry] = _player.state().operations_log.entries
 	assert_int(_list().get_rows().size()).is_equal(entries.size())
 	var lines: Array[String] = _lines()
@@ -136,12 +136,13 @@ func test_new_entries_appear_at_the_top() -> void:
 	assert_str(_list().get_rows()[0].get_line_text()).starts_with("Received: ")
 
 
-## Gamepad: Right from the section tabs opens the Log; Down reaches the kind filter, Right the
+## Gamepad: Right twice from the section tabs (past Worlds) opens the Log; Down reaches the kind filter, Right the
 ## search, Down the rows; Up and Left lead back the same way.
 func test_gamepad_reaches_the_log() -> void:
 	_view.show_section(false)
 	await UiInput.settle(_view)
 	var tabs: TabBar = (_view.get_node("%Sections") as TabContainer).get_tab_bar()
+	await UiInput.pad(tabs, JOY_BUTTON_DPAD_RIGHT)
 	await UiInput.pad(tabs, JOY_BUTTON_DPAD_RIGHT)
 	assert_bool(_list().is_visible_in_tree()).is_true()
 	var filter: Control = _list().get_filter_button()
