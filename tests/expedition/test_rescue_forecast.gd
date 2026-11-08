@@ -54,7 +54,7 @@ func test_charge_at_maximum_raises_banks_and_lowers_nothing() -> void:
 	_state.power.charge_rates[_bank] = 5
 	var spare: float = PowerRules.spare_mw(_state)
 	var rates: Dictionary[StringName, int] = RescueForecast.max_rates(_state)
-	var expected: int = mini(30, 5 + floori(spare))
+	var expected: int = 5 + RescueForecast.raise_mw(25, floori(spare))
 	assert_int(rates[_bank]).is_equal(expected)
 	var command := ChargeAtMaximumCommand.new()
 	assert_bool(command.validate(_state).is_ok).is_true()
@@ -64,6 +64,14 @@ func test_charge_at_maximum_raises_banks_and_lowers_nothing() -> void:
 	assert_str(String(command.validate(Fixture.state()).error_code)).is_equal(
 		String(ChargeAtMaximumCommand.NO_RESCUE)
 	)
+
+
+func test_charge_at_maximum_moves_in_five_megawatt_blocks() -> void:
+	assert_int(RescueForecast.raise_mw(30, 27)).is_equal(25)
+	assert_int(RescueForecast.raise_mw(25, 100)).is_equal(25)
+	assert_int(RescueForecast.raise_mw(30, 4)).is_equal(0)
+	assert_int(RescueForecast.raise_mw(12, 40)).is_equal(10)
+	assert_int(RescueForecast.max_rates(_state)[_bank] % 5).is_equal(0)
 
 
 func test_not_enough_even_at_maximum() -> void:

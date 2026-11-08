@@ -12,6 +12,8 @@ extends RefCounted
 const ON_TIME: StringName = &"on_time"
 ## Too slow at the current rate, but Charge at maximum makes it in time.
 const TOO_SLOW: StringName = &"too_slow"
+## Charge rates move in blocks of this many MW (docs/content/m3-beyond-the-ring.md section 1).
+const RATE_STEP_MW: int = 5
 ## Not in time even at maximum.
 const NOT_ENOUGH: StringName = &"not_enough"
 
@@ -65,8 +67,8 @@ static func max_charge_mw(state: GameState) -> float:
 	return total
 
 
-## Charge at maximum: the rate of every standing bank, each raised in room order to its
-## maximum or as far as the whole MW of spare supply left allow; never lowered.
+## Charge at maximum: the rate of every standing bank, each raised in room order by whole
+## RATE_STEP_MW blocks to its maximum or as far as the spare supply left allows; never lowered.
 static func max_rates(state: GameState) -> Dictionary[StringName, int]:
 	var rates: Dictionary[StringName, int] = {}
 	var spare: int = floori(PowerRules.spare_mw(state))
@@ -75,10 +77,17 @@ static func max_rates(state: GameState) -> Dictionary[StringName, int]:
 		if not PowerRules.is_bank(def) or not PowerRules.is_standing(room):
 			continue
 		var rate: int = state.power.charge_rates.get(room.id, 0)
-		var raise: int = clampi(floori(def.max_charge_rate_mw) - rate, 0, spare)
+		var raise: int = raise_mw(floori(def.max_charge_rate_mw) - rate, spare)
 		spare -= raise
 		rates[room.id] = rate + raise
 	return rates
+
+
+## The raise of a bank with [param headroom_mw] left below its maximum given [param spare_mw]
+## of spare supply: the largest whole RATE_STEP_MW block within both (27 MW spare gives 25).
+static func raise_mw(headroom_mw: int, spare_mw: int) -> int:
+	var room_left: int = clampi(headroom_mw, 0, maxi(spare_mw, 0))
+	return room_left - room_left % RATE_STEP_MW
 
 
 static func _in_time(ticks: int, left: int) -> bool:
