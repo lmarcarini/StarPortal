@@ -96,7 +96,8 @@ func test_lock_alone_delivers_nothing() -> void:
 
 
 ## Extending delivers both of the world's documents in id order on the camera's fifth tick, after
-## horizon_record_taken and the report's four world_fact_raised, each posted once, with one pause request; the record is marked taken.
+## horizon_record_taken and the report's four world_fact_raised, each posted once, with one
+## pause request; the record is marked taken.
 func test_extending_delivers_the_worlds_documents_once() -> void:
 	_dial(DialFixture.OPEN_ID)
 	_events.clear()
