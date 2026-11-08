@@ -35,16 +35,17 @@ func after_test() -> void:
 
 func test_starts_on_the_gate_room_with_translated_tabs() -> void:
 	assert_array(_switcher.get_view_ids()).is_equal(
-		[&"gate_room", &"archive", &"base", &"research", &"personnel", &"command"]
+		[&"gate_room", &"archive", &"base", &"research", &"personnel", &"command", &"expeditions"]
 	)
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	var tabs: TabBar = _switcher.get_tab_bar()
-	assert_int(tabs.tab_count).is_equal(6)
+	assert_int(tabs.tab_count).is_equal(7)
 	assert_str(tabs.get_tab_title(0)).is_equal("Gate Room")
 	assert_str(tabs.get_tab_title(1)).is_equal("Archive")
 	assert_str(tabs.get_tab_title(2)).is_equal("Base")
 	assert_str(tabs.get_tab_title(3)).is_equal("Research")
 	assert_bool(tabs.is_tab_hidden(3)).is_true()
+	assert_bool(tabs.is_tab_hidden(6)).is_true()
 	TranslationServer.set_locale("pt_BR")
 	await _runner.simulate_frames(2)
 	assert_str(tabs.get_tab_title(0)).is_equal("Sala do Portal")
@@ -226,8 +227,20 @@ func test_setup_reaches_every_view_again_and_again() -> void:
 	spy.name = "Spy"
 	switcher.get_node("%Views").add_child(spy)
 	await _run(switcher)
-	assert_array(_switcher.get_view_ids()).is_equal(
-		[&"gate_room", &"archive", &"base", &"research", &"personnel", &"command", &"spy"]
+	(
+		assert_array(_switcher.get_view_ids())
+		. is_equal(
+			[
+				&"gate_room",
+				&"archive",
+				&"base",
+				&"research",
+				&"personnel",
+				&"command",
+				&"expeditions",
+				&"spy",
+			]
+		)
 	)
 	assert_bool(spy.visible).is_false()
 	var first := Simulation.new(GameState.new_game(1))

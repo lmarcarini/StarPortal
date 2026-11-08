@@ -161,6 +161,31 @@ func test_fits_the_minimum_window(
 	assert_float(needed.x).is_less_equal(VIEW_SIZE.x)
 	assert_float(needed.y).is_less_equal(VIEW_SIZE.y)
 	assert_array(_problems(_worlds())).is_empty()
+	_report().get_description_label().text = _longest_description()
+	await UiInput.settle(_view)
+	needed = _worlds().get_combined_minimum_size()
+	assert_float(needed.y).is_less_equal(VIEW_SIZE.y)
+	assert_array(_problems(_worlds())).is_empty()
+
+
+## The longest description the report can show: the longest line of each kind, joined.
+func _longest_description() -> String:
+	var parts: PackedStringArray = []
+	for prefix: String in ["REPORT_BIOME_", "MOTH_SKY_", "MOTH_LIFE_", "MOTH_STRUCTURES_"]:
+		parts.append(_longest_with(prefix))
+	return " ".join(parts)
+
+
+func _longest_with(prefix: String) -> String:
+	var longest: String = ""
+	var translation: Translation = TranslationServer.get_translation_object(
+		TranslationServer.get_locale()
+	)
+	for key: StringName in translation.get_message_list():
+		var text: String = tr(key)
+		if String(key).begins_with(prefix) and text.length() > longest.length():
+			longest = text
+	return longest
 
 
 ## Visible single-line labels and buttons narrower than their text, or with a character the
