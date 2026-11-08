@@ -32,9 +32,9 @@ const MAX_ACTION_GAP: int = 143
 const PAUSE_CHANCE: float = 0.1
 ## Chance, per paused action, that the bot resumes; otherwise it submits a command.
 const RESUME_CHANCE: float = 0.4
-## Chance that a running action adds a hold instead of submitting a command.
+## Chances that a running action adds a hold instead of submitting a command, and, per paused
+## (not held) action, that the bot adds a hold (checked after resume).
 const HOLD_CHANCE: float = 0.02
-## Chance, per paused (not held) action, that the bot adds a hold; checked after resume.
 const PAUSED_HOLD_CHANCE: float = 0.05
 ## Chances, per held action, that the bot releases a hold, adds another one, or makes a
 ## player pause/resume request (which only sets the mode after the hold); otherwise it
@@ -66,9 +66,8 @@ const CLOSE_AFTER_TICKS: int = 5
 var commands_submitted: int = 0
 ## Commands submitted while the clock was paused (they apply at once).
 var commands_while_paused: int = 0
-## Times the bot paused the clock.
+## Times the bot paused and resumed the clock.
 var pauses: int = 0
-## Times the bot resumed the clock.
 var resumes: int = 0
 ## Holds the bot added (duplicates, which are no-ops, not counted).
 var holds_added: int = 0

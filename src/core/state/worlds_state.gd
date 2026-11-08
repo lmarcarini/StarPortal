@@ -157,8 +157,10 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	errors.append_array(_validate_id_set(data, "consoles_read"))
 	errors.append_array(_validate_id_set(data, "horizon_records"))
 	errors.append_array(_validate_reports(data))
-	if not data.get("targets") is Dictionary:
-		errors.append("'targets' is missing or not an object")
+	if not data.has("targets"):
+		errors.append("missing 'targets'")
+	elif not data["targets"] is Dictionary:
+		errors.append("'targets' is not an object")
 	else:
 		var target_data: Dictionary = data["targets"]
 		errors.append_array(TargetStates.validate_dict(target_data))

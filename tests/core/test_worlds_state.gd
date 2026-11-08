@@ -99,6 +99,8 @@ func test_validate_errors() -> void:
 		["horizon_records", [], "'horizon_records' is not an object"],
 		["horizon_records", {"abydos": false}, "horizon_records of 'abydos'"],
 		["horizon_records", {"": true}, "empty world id"],
+		["targets", [], "'targets' is not an object"],
+		["targets", {"abydos": {"iron": "lost"}}, "target abydos/iron"],
 		["pole_camera_world_id", 5, "'pole_camera_world_id' is not a string"],
 		["pole_camera_world_id", "", "not both set"],
 		["pole_camera_ticks_left", 0, "not both set"],
