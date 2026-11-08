@@ -142,13 +142,14 @@ func get_alert_stack() -> AlertStack:
 	return _alert_stack
 
 
-## Returns every button in focus order: the time bar's, the alert stack's (skipped while
-## hidden), the funds and Confidence readouts,
+## Returns every button in focus order: the time bar's, the alert stack's (while shown), the
+## funds and Confidence readouts,
 ## then save, load and (debug only) the flag button. Neighbours wrap around, so a gamepad
 ## reaches them all; down from any of them is the view tabs.
 func get_focus_order() -> Array[Button]:
 	var buttons: Array[Button] = time_bar.get_buttons()
-	buttons.append(_alert_stack.get_rescue_button())
+	if _alert_stack.get_rescue_button().visible:
+		buttons.append(_alert_stack.get_rescue_button())
 	buttons.append_array([money_label, confidence_readout, _quick_save_button, _quick_load_button])
 	if _debug_flag_button != null:
 		buttons.append(_debug_flag_button)
@@ -240,6 +241,14 @@ func _add_alerts() -> void:
 	_rescue_alert.offset_top = view_switcher.offset_top + 48.0
 	_rescue_alert.gate_room_requested.connect(view_switcher.show_view.bind(ViewSwitcher.GATE_ROOM))
 	_alert_stack.setup(_rescue_alert)
+	_rescue_alert.changed.connect(_relink_top_bar)
+
+
+## Links the top bar's buttons again once the alert stack's entry shows or hides.
+func _relink_top_bar() -> void:
+	if not is_node_ready():
+		return
+	_link_focus(get_focus_order(), view_switcher.get_tab_bar())
 
 
 func _on_team_checked_in(world_id: StringName, light: int, serious: int) -> void:
