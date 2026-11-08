@@ -96,7 +96,7 @@ func test_lock_alone_delivers_nothing() -> void:
 
 
 ## Extending delivers both of the world's documents in id order on the camera's fifth tick, after
-## horizon_record_taken, each posted once, with one pause request; the record is marked taken.
+## horizon_record_taken and the report's four world_fact_raised, each posted once, with one pause request; the record is marked taken.
 func test_extending_delivers_the_worlds_documents_once() -> void:
 	_dial(DialFixture.OPEN_ID)
 	_events.clear()
@@ -107,8 +107,19 @@ func test_extending_delivers_the_worlds_documents_once() -> void:
 	var record_tick: int = _state.clock.tick
 	_run(1)
 	assert_array(_state.archive.received).is_equal([&"doc_a_open", &"doc_b_open"])
-	assert_array(_events).is_equal(
-		[&"horizon_record_taken", &"document_received", &"document_received"]
+	(
+		assert_array(_events)
+		. is_equal(
+			[
+				&"horizon_record_taken",
+				&"world_fact_raised",
+				&"world_fact_raised",
+				&"world_fact_raised",
+				&"world_fact_raised",
+				&"document_received",
+				&"document_received",
+			]
+		)
 	)
 	assert_array(_pauses).is_equal([&"document_received"])
 	assert_int(_state.archive.received_tick[&"doc_a_open"]).is_equal(record_tick)
