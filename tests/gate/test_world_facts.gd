@@ -98,6 +98,15 @@ func test_authored_worlds() -> void:
 	var milestone: WorldFacts = WorldFactRules.facts_for_id(galaxy, &"world_milestone")
 	assert_int(milestone.threat).is_equal(WorldDef.Threat.MED)
 	assert_object(milestone.find_target(&"bronze_pegs")).is_not_null()
+	assert_int(stillwater.biohazard).is_equal(WorldDef.Biohazard.NONE)
+	assert_int(stillwater.sky).is_equal(WorldDef.Sky.OVERCAST)
+	var lintel: WorldFacts = WorldFactRules.facts_for_id(galaxy, &"world_lintel")
+	assert_int(lintel.temperature_c).is_equal(-70)
+	assert_int(lintel.radiation).is_equal(WorldDef.Radiation.RAISED)
+	assert_int(lintel.sky).is_equal(WorldDef.Sky.BLACK)
+	var sill: WorldFacts = WorldFactRules.facts_for_id(galaxy, &"world_sill")
+	assert_int(sill.sky).is_equal(WorldDef.Sky.VIOLET)
+	assert_int(sill.sun).is_equal(WorldDef.Sun.ORANGE)
 	for id: StringName in [&"world_sill", &"world_lintel"]:
 		var facts: WorldFacts = WorldFactRules.facts_for_id(galaxy, id)
 		assert_int(facts.threat).is_equal(WorldDef.Threat.LOW)
@@ -110,9 +119,27 @@ func test_scene_mirrors_facts() -> void:
 	var scene: WorldScene = facts.scene()
 	assert_int(scene.biome).is_equal(facts.biome)
 	assert_int(scene.atmosphere).is_equal(facts.atmosphere)
+	assert_int(scene.sky).is_equal(facts.sky)
+	assert_int(scene.sun).is_equal(facts.sun)
+	assert_str(scene.world_id).is_equal(&"world_0042")
+	assert_int(scene.variation_seed).is_equal(ConsoleLog.stable_hash("world_0042"))
 	assert_int(scene.life).is_equal(facts.life)
 	assert_int(scene.structures).is_equal(facts.structures)
 	assert_int(scene.targets.size()).is_equal(facts.targets.size())
+
+
+## Procedural skies follow the air (airless never blue, overcast hides the sun), and two
+## worlds always differ by their scene's seed.
+func test_procedural_sky_and_seed() -> void:
+	var seeds: Dictionary[int, bool] = {}
+	for index: int in 500:
+		var facts := WorldFactRules.derive(StringName("world_%04d" % index), false)
+		if facts.atmosphere == WorldDef.Atmosphere.NONE:
+			assert_int(facts.sky).is_not_equal(WorldDef.Sky.BLUE)
+		if facts.sky == WorldDef.Sky.OVERCAST:
+			assert_int(facts.sun).is_equal(WorldDef.Sun.HIDDEN)
+		seeds[facts.scene().variation_seed] = true
+	assert_int(seeds.size()).is_equal(500)
 
 
 ## A WorldDef reports an UNKNOWN true fact, a guarded world not HIGH and repeated targets.

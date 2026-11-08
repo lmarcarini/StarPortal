@@ -8,6 +8,12 @@ extends RefCounted
 ## Bible: docs/content/m3-beyond-the-ring.md section 3 (a world's state never goes down) and
 ## section 2 (confidence only goes up)
 
+## Source id of the pole camera's horizon record.
+const POLE_CAMERA_SOURCE: StringName = &"pole_camera"
+## Confidence the horizon record gives the facts its sampling line measures (atmosphere,
+## temperature, radiation): FAIR, a direct reading shown as its true value.
+const POLE_CAMERA_CONFIDENCE: WorldReport.Confidence = WorldReport.Confidence.FAIR
+
 
 ## Raises [param world_id] to [param status] in [param state] and posts world_status_changed.
 ## Returns false, changing nothing, when the status is not higher than the current one.
@@ -19,6 +25,25 @@ static func raise_status(
 	state.worlds.statuses[world_id] = status
 	state.events.post(&"world_status_changed", [world_id, status as int])
 	return true
+
+
+## Records what the horizon record of [param world_id] tells: atmosphere, temperature and
+## radiation to POLE_CAMERA_CONFIDENCE and the threat to POOR ("poor (horizon record)"), each
+## only if higher. Call when the pole camera takes the record.
+static func record_horizon(state: GameState, world_id: StringName) -> void:
+	var measured: Array[WorldReport.Fact] = [
+		WorldReport.Fact.ATMOSPHERE, WorldReport.Fact.TEMPERATURE, WorldReport.Fact.RADIATION
+	]
+	for fact: WorldReport.Fact in measured:
+		raise_fact(
+			state, FactChange.create(world_id, fact, POLE_CAMERA_CONFIDENCE, POLE_CAMERA_SOURCE)
+		)
+	raise_fact(
+		state,
+		FactChange.create(
+			world_id, WorldReport.Fact.THREAT, WorldReport.Confidence.POOR, POLE_CAMERA_SOURCE
+		)
+	)
 
 
 ## Raises [param change]'s fact of its world to its confidence, stamped with the current tick,

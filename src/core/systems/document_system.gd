@@ -13,8 +13,9 @@ extends SimSystem
 ## power); otherwise one tick of its extension passes, and on the last one the record is taken.
 ## A camera sent at the start of tick T takes the record on tick T + EXTEND_TICKS - 1.
 ## [br][br]
-## Posts horizon_record_taken(world id) for each record, then document_received(document id)
-## for each delivery, and one pause_requested(&"document_received") on a tick with any.
+## The record raises the world's report through WorldProgress.record_horizon (atmosphere,
+## temperature, radiation; threat to POOR). Posts horizon_record_taken(world id) for each
+## record, then document_received(document id) for each delivery, and one pause_requested(&"document_received") on a tick with any.
 ## Bible: technical-architecture.md#narrative-and-event-scripting,
 ## gate-and-address-spec.md#where-addresses-come-from,
 ## game-design.md#base-building-and-power (the pole camera, horizon record)
@@ -56,6 +57,7 @@ func tick(state: GameState) -> void:
 	worlds.retract_pole_camera()
 	worlds.horizon_records[world_id] = true
 	state.events.post(&"horizon_record_taken", [world_id])
+	WorldProgress.record_horizon(state, world_id)
 	if _deliver_first_lock_documents(state, world_id):
 		state.events.post(&"pause_requested", [PAUSE_REASON])
 

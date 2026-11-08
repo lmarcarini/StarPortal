@@ -117,6 +117,26 @@ func test_extending_delivers_the_worlds_documents_once() -> void:
 	assert_array(GameState.validate_dict(_state.to_dict())).is_empty()
 
 
+## The record raises the world's report: atmosphere, temperature and radiation to the pole
+## camera's confidence and the threat to POOR, all from the pole camera; a second record changes
+## nothing (m3-beyond-the-ring.md section 2).
+func test_record_raises_the_report() -> void:
+	_dial(DialFixture.OPEN_ID)
+	_extend()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
+	var report: WorldReport = _state.worlds.report_of(DialFixture.OPEN_ID)
+	for fact: WorldReport.Fact in [
+		WorldReport.Fact.ATMOSPHERE, WorldReport.Fact.TEMPERATURE, WorldReport.Fact.RADIATION
+	]:
+		assert_int(report.confidence_of(fact)).is_equal(WorldProgress.POLE_CAMERA_CONFIDENCE)
+		assert_str(report.entry_of(fact).source).is_equal(WorldProgress.POLE_CAMERA_SOURCE)
+	assert_int(report.confidence_of(WorldReport.Fact.THREAT)).is_equal(WorldReport.Confidence.POOR)
+	assert_int(report.confidence_of(WorldReport.Fact.LIFE)).is_equal(WorldReport.Confidence.NONE)
+	var before: Dictionary = _state.worlds.to_dict()
+	WorldProgress.record_horizon(_state, DialFixture.OPEN_ID)
+	assert_dict(_state.worlds.to_dict()).is_equal(before)
+
+
 ## A document of another world, or with NEVER, does not arrive.
 func test_other_worlds_and_never_do_not_arrive() -> void:
 	_dial(DialFixture.OPEN_ID)
