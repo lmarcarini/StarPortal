@@ -136,7 +136,8 @@ func test_new_entries_appear_at_the_top() -> void:
 	assert_str(_list().get_rows()[0].get_line_text()).starts_with("Received: ")
 
 
-## Gamepad: Right twice from the section tabs (past Worlds) opens the Log; Down reaches the kind filter, Right the
+## Gamepad: Right twice from the section tabs (past Worlds) opens the Log; Down reaches the
+## kind filter, Right the
 ## search, Down the rows; Up and Left lead back the same way.
 func test_gamepad_reaches_the_log() -> void:
 	_view.show_section(false)
