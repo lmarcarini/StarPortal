@@ -222,8 +222,8 @@ EXPEDITION_SLOT_SOLDIER,Soldier,Soldado
 EXPEDITION_SLOT_SPECIALIST,Special,Especialista
 EXPEDITION_SLOT_EMPTY,(empty),(vazio)
 EXPEDITION_INJURED,injured,ferido
-EXPEDITION_LOSS_RESEARCH,Research {before}% → {after}%,Pesquisa {before}% → {after}%
-EXPEDITION_LOSS_BUILD,Building +{before}% → +{after}%,Obras +{before}% → +{after}%
+EXPEDITION_LOSS_RESEARCH,Research {before}% to {after}%,Pesquisa {before}% to {after}%
+EXPEDITION_LOSS_BUILD,Building +{before}% to +{after}%,Obras +{before}% to +{after}%
 EXPEDITION_RISK,Risk {risk}   {days} days,Risco {risk}   {days} dias
 EXPEDITION_READY,Ready team,Preparar equipe
 EXPEDITION_PLAN_READY,Team ready: Send team from the Ring when that world is open.,Equipe pronta: envie a equipe pelo Anel quando esse mundo estiver aberto.

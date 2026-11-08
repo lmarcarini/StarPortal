@@ -82,7 +82,7 @@ static func risk_level(state: GameState, world_id: StringName) -> int:
 	return reading.high
 
 
-## A roster option for a slot: "Dr Okafor  3 · Research 150% → 100%".
+## A roster option for a slot: "Dr Okafor  3 · Research 150% to 100%".
 static func member_option(state: GameState, person: PersonState) -> String:
 	var text: String = "%s  %d" % [person.name, person.skill]
 	if person.is_injured():
@@ -91,8 +91,8 @@ static func member_option(state: GameState, person: PersonState) -> String:
 	return text if loss.is_empty() else "%s · %s" % [text, loss]
 
 
-## What the base loses while [param person] is away: "Research 150% → 100%" for a scientist in
-## a Research Lab, "Building +27% → +22%" for an engineer in a Workshop, else "".
+## What the base loses while [param person] is away: "Research 150% to 100%" for a scientist in
+## a Research Lab, "Building +27% to +22%" for an engineer in a Workshop, else "".
 static func base_loss(state: GameState, person: PersonState) -> String:
 	var room: RoomState = state.base.find_room(person.room_id)
 	if room == null:

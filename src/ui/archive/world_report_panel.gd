@@ -4,8 +4,8 @@ extends PanelContainer
 ## then every report fact as the player may see it (unknown, a range or a value) with its
 ## confidence and source, and **Plan expedition**: enabled once Expeditions unlock on a world
 ## Probed or beyond, it emits [signal plan_requested] (the switcher opens the Expeditions tab
-## with the world chosen); otherwise it is greyed with the reason. Values come only through WorldReportText, which reads
-## WorldReportRules. Reads state only.
+## with the world chosen); otherwise it is greyed with the reason. Values come only through
+## WorldReportText, which reads WorldReportRules. Reads state only.
 ## Bible: docs/content/m3-beyond-the-ring.md section 2 (World Report fields), section 7
 ## (World Report sketch; gamepad)
 

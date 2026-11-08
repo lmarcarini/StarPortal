@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-11-08" name="report_1" tests="45" failures="2" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="test_expeditions_view" package="tests/ui" timestamp="2026-11-08T06:33:55" hostname="localhost" tests="12" failures="2" errors="0" skipped="0" flaky="0" time="0.575">
+		<testcase name="test_sheet_shows_the_world_threat_and_risk_and_refuses_an_empty_team" classname="test_expeditions_view" time="0.050">
+		</testcase>
+		<testcase name="test_slot_rosters_are_filtered_by_role" classname="test_expeditions_view" time="0.038">
+		</testcase>
+		<testcase name="test_injured_member_is_refused_with_the_reason" classname="test_expeditions_view" time="0.022">
+		</testcase>
+		<testcase name="test_click_ready_team_plans_the_expedition" classname="test_expeditions_view" time="0.044">
+		</testcase>
+		<testcase name="test_gamepad_path_opens_a_roster_and_y_readies_the_team" classname="test_expeditions_view" time="0.077">
+		</testcase>
+		<testcase name="test_team_away_shows_the_timeline_and_recall" classname="test_expeditions_view" time="0.059">
+		</testcase>
+		<testcase name="test_check_in_refreshes_while_paused_and_on_showing" classname="test_expeditions_view" time="0.054">
+		</testcase>
+		<testcase name="test_past_shows_what_came_back_and_who_did_not" classname="test_expeditions_view" time="0.023">
+		</testcase>
+		<testcase name="test_tab_appears_when_expeditions_unlock" classname="test_expeditions_view" time="0.032">
+		</testcase>
+		<testcase name="test_plan_world_chooses_it" classname="test_expeditions_view" time="0.032">
+		</testcase>
+		<testcase name="test_fits_the_minimum_window:0 (&apos;en&apos;)" classname="test_expeditions_view" time="0.078">
+			<failure message="FAILED: res://tests/ui/test_expeditions_view.gd:221" type="FAILURE">
+<![CDATA[
+missing glyph '
+' in 'Out  1 Jan 00:02
+Check-in  2 Jan 00:02  done
+Return  3 Jan 00:02  next'
+	at '_assert_glyphs' in res://tests/ui/test_expeditions_view.gd:221
+	at '_assert_glyphs' in res://tests/ui/test_expeditions_view.gd:209
+	at '_assert_glyphs' in res://tests/ui/test_expeditions_view.gd:209
+	at '_assert_glyphs' in res://tests/ui/test_expeditions_view.gd:209
+	at 'test_fits_the_minimum_window' in res://tests/ui/test_expeditions_view.gd:204
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/ui/test_expeditions_view.gd:221" type="FAILURE">
+<![CDATA[
+missing glyph '
+' in 'Out  1 Jan 00:02
+Check-in  2 Jan 00:02  done
+Return  3 Jan 00:02  next'
+	at '_assert_glyphs' in res://tests/ui/test_expeditions_view.gd:221
+	at '_assert_glyphs' in res://tests/ui/test_expeditions_view.gd:209
+	at '_assert_glyphs' in res://tests/ui/test_expeditions_view.gd:209
+	at '_assert_glyphs' in res://tests/ui/test_expeditions_view.gd:209
+	at 'test_fits_the_minimum_window' in res://tests/ui/test_expeditions_view.gd:204
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="test_view_switcher" package="tests/ui" timestamp="2026-11-08T06:33:56" hostname="localhost" tests="13" failures="0" errors="0" skipped="0" flaky="0" time="2.499">
+		<testcase name="test_starts_on_the_gate_room_with_translated_tabs" classname="test_view_switcher" time="0.277">
+		</testcase>
+		<testcase name="test_view_actions_switch_and_wrap" classname="test_view_switcher" time="0.332">
+		</testcase>
+		<testcase name="test_default_keys_and_gamepad_shoulders_switch_views" classname="test_view_switcher" time="0.185">
+		</testcase>
+		<testcase name="test_switching_focuses_the_new_views_default_control" classname="test_view_switcher" time="0.138">
+		</testcase>
+		<testcase name="test_clicking_a_tab_switches_and_focuses_the_view" classname="test_view_switcher" time="0.125">
+		</testcase>
+		<testcase name="test_moving_along_the_focused_tabs_keeps_focus_on_them" classname="test_view_switcher" time="0.232">
+		</testcase>
+		<testcase name="test_only_the_shown_view_is_visible_focusable_and_processing" classname="test_view_switcher" time="0.110">
+		</testcase>
+		<testcase name="test_view_action_on_an_axis_fires_once_per_pull" classname="test_view_switcher" time="0.157">
+		</testcase>
+		<testcase name="test_showing_a_view_restores_only_what_hiding_changed" classname="test_view_switcher" time="0.107">
+		</testcase>
+		<testcase name="test_hidden_view_keeps_its_nodes" classname="test_view_switcher" time="0.110">
+		</testcase>
+		<testcase name="test_unknown_view_changes_nothing" classname="test_view_switcher" time="0.109">
+		</testcase>
+		<testcase name="test_setup_reaches_every_view_again_and_again" classname="test_view_switcher" time="0.386">
+		</testcase>
+		<testcase name="test_archive_view_holds_the_list_and_the_reader" classname="test_view_switcher" time="0.135">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="test_translations" package="tests/localization" timestamp="2026-11-08T06:33:58" hostname="localhost" tests="12" failures="0" errors="0" skipped="0" flaky="0" time="0.240">
+		<testcase name="test_header_lists_keys_then_locales" classname="test_translations" time="0.015">
+		</testcase>
+		<testcase name="test_keys_are_upper_snake_and_unique" classname="test_translations" time="0.017">
+		</testcase>
+		<testcase name="test_duplicate_key_across_tables_is_reported" classname="test_translations" time="0.006">
+		</testcase>
+		<testcase name="test_every_key_has_every_locale" classname="test_translations" time="0.057">
+		</testcase>
+		<testcase name="test_placeholders_match_between_locales" classname="test_translations" time="0.038">
+		</testcase>
+		<testcase name="test_multiplier_fills_named_placeholder" classname="test_translations" time="0.006">
+		</testcase>
+		<testcase name="test_every_table_is_registered" classname="test_translations" time="0.007">
+		</testcase>
+		<testcase name="test_every_table_imports_both_outputs" classname="test_translations" time="0.014">
+		</testcase>
+		<testcase name="test_known_key_translates_in_both_locales" classname="test_translations" time="0.006">
+		</testcase>
+		<testcase name="test_pseudolocalization_settings" classname="test_translations" time="0.006">
+		</testcase>
+		<testcase name="test_scenes_use_only_translation_keys" classname="test_translations" time="0.017">
+		</testcase>
+		<testcase name="test_scene_scan_flags_plain_text" classname="test_translations" time="0.006">
+		</testcase>
+	</testsuite>
+	<testsuite id="3" name="test_font_glyphs" package="tests/localization" timestamp="2026-11-08T06:33:58" hostname="localhost" tests="1" failures="0" errors="0" skipped="0" flaky="0" time="0.030">
+		<testcase name="test_every_string_uses_only_characters_the_default_font_draws" classname="test_font_glyphs" time="0.020">
+		</testcase>
+	</testsuite>
+	<testsuite id="4" name="test_archive_worlds" package="tests/ui" timestamp="2026-11-08T06:33:58" hostname="localhost" tests="7" failures="0" errors="0" skipped="0" flaky="0" time="0.690">
+		<testcase name="test_worlds_lists_the_locked_world" classname="test_archive_worlds" time="0.032">
+		</testcase>
+		<testcase name="test_report_shows_facts_through_the_rules" classname="test_archive_worlds" time="0.032">
+		</testcase>
+		<testcase name="test_refreshes_while_paused" classname="test_archive_worlds" time="0.060">
+		</testcase>
+		<testcase name="test_mouse_opens_a_report" classname="test_archive_worlds" time="0.049">
+		</testcase>
+		<testcase name="test_gamepad_path" classname="test_archive_worlds" time="0.108">
+		</testcase>
+		<testcase name="test_fits_the_minimum_window:0 (&apos;en&apos;)" classname="test_archive_worlds" time="0.074">
+		</testcase>
+		<testcase name="test_fits_the_minimum_window:1 (&apos;pt_BR&apos;)" classname="test_archive_worlds" time="0.062">
+		</testcase>
+	</testsuite>
+</testsuites>
