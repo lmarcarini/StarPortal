@@ -111,6 +111,8 @@ func _play(base_seed: int, reload: bool) -> GameState:
 		var loaded: GameState = GameState.from_dict(data_dict)
 		loaded.balance = state.balance
 		loaded.galaxy = state.galaxy
+		loaded.room_defs = state.room_defs
+		loaded.research_defs = state.research_defs
 		state = loaded
 		simulation = ProbeFixture.simulation(state)
 	ProbeFixture.advance(simulation, 2)

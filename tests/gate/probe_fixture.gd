@@ -29,17 +29,22 @@ static func set_threat(game: GameState, threat: WorldDef.Threat) -> void:
 	game.galaxy.get_world(WORLD_ID).authored_facts.threat = threat
 
 
-## Returns the dial fixture's galaxy plus EXTRA_WORLDS procedural worlds near the open world,
-## whose facts are hand-set.
+## Returns the dial fixture's galaxy plus EXTRA_WORLDS procedural worlds, each by an anchor the
+## dial fixture leaves free, with the open world's facts hand-set.
 static func galaxy() -> GalaxyCatalogue:
 	var base: GalaxyCatalogue = DialFixture.galaxy()
 	var worlds: Array[WorldRecord] = base.all_worlds().duplicate()
 	var open: WorldRecord = base.get_world(WORLD_ID)
+	var anchors: Array[Vector3i] = base.anchors_ly()
+	var anchor_index: int = 2
 	for index: int in EXTRA_WORLDS:
+		while anchor_index % 4 == 1 or anchor_index == base.home().origin_glyph:
+			anchor_index += 1
 		var record := WorldRecord.new()
 		record.id = StringName("world_extra_%d" % index)
-		record.position_ly = open.position_ly + Vector3i(10 * (index + 1), 0, 0)
+		record.position_ly = anchors[anchor_index] + DialFixture.NEAR_OFFSET_LY
 		worlds.append(record)
+		anchor_index += 1
 	open.authored_facts = facts()
 	return GalaxyCatalogue.build(worlds, base.anchors_ly())
 
@@ -69,8 +74,11 @@ static func simulation(game: GameState) -> Simulation:
 static func open(simulation: Simulation) -> void:
 	var address: GateAddress = DialFixture.address_of(simulation.state.galaxy, WORLD_ID)
 	simulation.submit(DialCommand.create(address))
-	while simulation.state.gate.mode != GateState.RingMode.LOCKED:
+	for attempt: int in 20:
+		if simulation.state.gate.mode == GateState.RingMode.LOCKED:
+			return
 		simulation.advance_tick()
+	assert(false, "the fixture world did not lock")
 
 
 ## Submits [param command] and asserts nothing: returns its result.
