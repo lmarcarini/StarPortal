@@ -1,7 +1,8 @@
 class_name ExpeditionLogText
 extends RefCounted
 ## Words an "expedition" Log entry (docs/content/m3-beyond-the-ring.md section 4) in the
-## current locale: "T-1 checked in from STILLWATER: one light injury.", a missed check-in, a
+## current locale: a field event (its title and text), "T-1 checked in from STILLWATER (a
+## finding): one light injury.", a missed check-in, a
 ## member who did not survive a rescue, a rescued team, and a lost team ("No answer from T-1."
 ## when nobody answered the Signal).
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
@@ -19,6 +20,8 @@ const LINE_KEYS: Dictionary[String, StringName] = {
 
 ## The line of an "expedition" entry's [param args] on the world named [param world].
 static func line(args: Dictionary, world: String) -> String:
+	if str(args.get("reason", "")) == "field_event":
+		return field_event_line(args)
 	var key: StringName = LINE_KEYS.get(str(args.get("reason", "")), &"")
 	if key.is_empty():
 		return ""
@@ -30,9 +33,21 @@ static func line(args: Dictionary, world: String) -> String:
 				"name": str(args.get("name", "")),
 				"survivors": type_convert(args.get("survivors", 0), TYPE_INT),
 				"injuries": injuries(args),
+				"day": _tr(StringName("TEAM_DAY_" + str(args.get("day", "finding")).to_upper())),
 			}
 		)
 	)
+
+
+## The line of a field event: its title, then its success text (the finding) or its failure
+## text naming who rolled: "Thin ice: The ice broke under Dr Ana Reis: a light injury."
+static func field_event_line(args: Dictionary) -> String:
+	var def: FieldEventDef = FieldEvents.find(StringName(str(args.get("event_id", ""))))
+	if def == null:
+		return ""
+	var part: String = "SUCCESS" if str(args.get("outcome", "")) == "finding" else "FAILURE"
+	var text: String = _tr(StringName(def.text_key(part))).format({"name": str(args.get("name"))})
+	return "%s: %s" % [_tr(StringName(def.text_key("TITLE"))), text]
 
 
 ## The team's injuries in [param args] ("light", "serious"): "one light injury", "no

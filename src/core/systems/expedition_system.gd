@@ -9,8 +9,8 @@ extends SimSystem
 ## ExpeditionRescue opens the rescue window and runs it until the team is home or lost. On
 ## return the team brings back what ExpeditionReturns gives (nothing when recalled before its
 ## last day) and goes back to the rooms it kept; the plan clears.
-## Events: team_checked_in(world id, light injuries, serious injuries), team_returned(world id,
-## objective, success), and ExpeditionRescue's.
+## Events: team_checked_in(world id, light injuries, serious injuries, day summary),
+## team_returned(world id, objective, success), and ExpeditionRescue's.
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
 
 ## Id of the system and of its random stream.
@@ -42,21 +42,30 @@ func tick(state: GameState) -> void:
 	if state.gate.mode == GateState.RingMode.LOCKED:
 		return
 	var rng: RandomNumberGenerator = state.random.stream(ID)
+	var hurt_before: Vector2i = _injuries(state)
 	var result: String = resolve_day.call(state, plan.day_results.size(), rng)
 	plan.day_results.append(result)
 	if result == ExpeditionState.DAY_MISSED:
 		ExpeditionRescue.miss(state)
 	elif plan.day_results.size() < plan.days() and not plan.recalled:
-		_check_in(state)
+		_check_in(state, _day_summary(result, _injuries(state) != hurt_before))
 	else:
 		_return(state, rng)
 
 
 ## A check-in that is not the return: a Log line and a non-blocking message with the team's
 ## injuries; no pause, no speed change.
-func _check_in(state: GameState) -> void:
+func _check_in(state: GameState, day: String) -> void:
 	var counts: Vector2i = _injuries(state)
-	state.events.post(CHECKED_IN_EVENT, [state.expedition.world_id, counts.x, counts.y])
+	state.events.post(CHECKED_IN_EVENT, [state.expedition.world_id, counts.x, counts.y, day])
+
+
+## What a field day brought, for its check-in: "wasted", "injury" (someone was hurt) or
+## "finding".
+static func _day_summary(result: String, hurt: bool) -> String:
+	if result == ExpeditionState.DAY_WASTED:
+		return "wasted"
+	return "injury" if hurt else "finding"
 
 
 func _return(state: GameState, rng: RandomNumberGenerator) -> void:

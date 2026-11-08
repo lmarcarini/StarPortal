@@ -6,8 +6,8 @@ extends RefCounted
 ## event's role rolls (FieldCheck). Success gives the event's finding or nothing bad; failure
 ## its setback: a wasted day, a light or serious injury to the roller (a medic on the team
 ## turns a serious one into a light one), or a missed check-in. Posts
-## field_event_resolved(world id, event id, outcome) with outcome "finding" or a setback name
-## (FieldEventDef.SETBACK_NAMES). Call only from SimSystem.tick().
+## field_event_resolved(world id, event id, outcome, roller name) with outcome "finding" or a
+## setback name (FieldEventDef.SETBACK_NAMES). Call only from SimSystem.tick().
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
 
 ## Event posted for each field event resolved.
@@ -34,7 +34,8 @@ static func resolve(state: GameState, _day: int, rng: RandomNumberGenerator) -> 
 	var outcome: String = FINDING
 	if not FieldCheck.succeeds(rng.randi_range(0, 99), percent):
 		outcome = _apply_setback(def.setback, roller, members)
-	state.events.post(EVENT, [plan.world_id, def.id, outcome])
+	var person_name: String = "" if roller == null else roller.name
+	state.events.post(EVENT, [plan.world_id, def.id, outcome, person_name])
 	return _day_result(outcome)
 
 
