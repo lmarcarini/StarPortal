@@ -86,8 +86,8 @@ class SoakRun:
 
 	## Counts the month close just run when the budget left 0 .. start + a year of top daily
 	## allocations and a commendation a month, Confidence left 0..1000, the cost carry left
-	## 0..29 or the last recorded balance is not the day's (docs/content/m27-daily-rhythm.md
-	## sections 1 and 2): the bot only spends what it has and the allocation out-runs the costs.
+	## 0..29, the last recorded balance is not the day's or the roster outgrew its beds
+	## (docs/content/m27-daily-rhythm.md sections 1 and 2): the bot only spends what it has.
 	func check_budget() -> void:
 		var state: GameState = simulation.state
 		var balance: BalanceConfig = state.balance
@@ -106,6 +106,8 @@ class SoakRun:
 		if committee.cost_carry < 0 or committee.cost_carry >= ConfidenceRules.PERIOD_DAYS:
 			budget_out_of_bounds += 1
 		if committee.funds_history.is_empty() or committee.funds_history.back() > funds:
+			budget_out_of_bounds += 1
+		if StaffRules.beds_free(state) < 0 or state.staff.people.size() < 1:
 			budget_out_of_bounds += 1
 
 	## True when [param tick] is midnight on the 1st of a month.
