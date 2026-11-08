@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://src/ui/archive/document_reader.tscn" id="3_reader"]
 [ext_resource type="PackedScene" path="res://src/ui/archive/image_viewer.tscn" id="4_viewer"]
 [ext_resource type="PackedScene" path="res://src/ui/archive/log_list.tscn" id="5_log"]
+[ext_resource type="Script" path="res://src/ui/archive/worlds_section.gd" id="6_worlds"]
 
 [node name="ArchiveView" type="Control"]
 layout_mode = 3
@@ -51,11 +52,18 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
+[node name="Worlds" type="HBoxContainer" parent="Sections"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+script = ExtResource("6_worlds")
+metadata/_tab_index = 1
+
 [node name="LogList" parent="Sections" instance=ExtResource("5_log")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-metadata/_tab_index = 1
+metadata/_tab_index = 2
 
 [node name="ImageViewer" parent="." instance=ExtResource("4_viewer")]
 unique_name_in_owner = true
