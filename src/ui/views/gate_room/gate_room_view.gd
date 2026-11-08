@@ -17,6 +17,8 @@ extends GameView
 ## ask to read a new document in the Archive, the view passes the request on to the switcher.
 ## Left of the Ring (where the dialing caption shows while dialing) it hosts the horizon photo;
 ## extending the pole camera plays a short cue on the Ring and refreshes the photo at once.
+## While a MOTH is out (or its SIGNAL LOST waits to be closed) the MOTH scan screen covers the
+## view and holds focus.
 ## Bible: gate-and-address-spec.md#the-dial-console,
 ## gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole, game-design.md#core-loop,
 ## technical-architecture.md#input-accessibility-and-localisation
@@ -30,6 +32,7 @@ const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
 
 var _photo := HorizonPhoto.new()
 var _camera_cue := CameraCue.new()
+var _moth := MothScreen.new()
 
 @onready var _console: DialConsole = %DialConsole
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
@@ -55,6 +58,8 @@ func _ready() -> void:
 	var wormhole: WormholeScreen = _overlays.get_wormhole_screen()
 	wormhole.camera_extended.connect(_on_camera_extended)
 	wormhole.photo_requested.connect(_photo.toggle_enlarged)
+	add_child(_moth)
+	_moth.changed.connect(_on_moth_changed)
 
 
 func _enter_tree() -> void:
@@ -77,6 +82,7 @@ func setup(simulation: Simulation) -> void:
 	_ring.setup(simulation.state.gate.mode)
 	_overlays.setup(simulation)
 	_photo.setup(simulation)
+	_moth.setup(simulation)
 
 
 ## Returns the dial console.
@@ -109,6 +115,11 @@ func get_camera_cue() -> CameraCue:
 	return _camera_cue
 
 
+## Returns the MOTH scan screen.
+func get_moth_screen() -> MothScreen:
+	return _moth
+
+
 ## Returns the overlays (dialing sequence, result card, wormhole screen).
 func get_overlays() -> GateOverlays:
 	return _overlays
@@ -117,6 +128,8 @@ func get_overlays() -> GateOverlays:
 ## Returns the open overlay's button; else the Ring while a wormhole is open; else the Dial
 ## button while it can be pressed, else the first glyph of the palette.
 func get_default_focus() -> Control:
+	if _moth.is_open():
+		return _moth.get_default_focus()
 	var overlay_focus: Control = _overlays.get_default_focus()
 	if overlay_focus != null:
 		return overlay_focus
@@ -143,7 +156,9 @@ func _ensure_focus() -> void:
 		var is_stuck: bool = focused is BaseButton and (focused as BaseButton).disabled
 		is_stuck = is_stuck or not focused.is_visible_in_tree()
 		is_stuck = is_stuck or focused.focus_mode == Control.FOCUS_NONE
-		if _overlays.is_open():
+		if _moth.is_open():
+			is_stuck = is_stuck or not _moth.is_ancestor_of(focused)
+		elif _overlays.is_open():
 			is_stuck = not _overlays.holds(focused)
 		if not is_ancestor_of(focused) or not is_stuck:
 			return
@@ -185,4 +200,8 @@ func _on_dial_started(_address_key: String) -> void:
 
 
 func _on_dial_resolved(_outcome: int, _address_key: String) -> void:
+	_ensure_focus.call_deferred()
+
+
+func _on_moth_changed() -> void:
 	_ensure_focus.call_deferred()

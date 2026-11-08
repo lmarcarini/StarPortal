@@ -75,17 +75,15 @@ func test_a_lock_shows_the_destination_time_drain_bank_and_actions() -> void:
 				"Read the far Ring's console",
 				tr(&"GATE_CONSOLE_HINT"),
 				"Open the Address Book",
-				"Send a probe",
-				"Probes are not ready yet.",
+				"Send the MOTH",
+				"2 in the rack",
 			]
 		)
 	)
 	assert_array(texts).not_contains([tr(&"GATE_MEANING_HOSTILE_LOCK")])
 	assert_bool(_screen().get_actions().get_close_button().disabled).is_false()
 	assert_bool(_screen().get_console().get_read_button().disabled).is_false()
-	var later: Button = _screen().find_child("ProbeButton", true, false) as Button
-	assert_bool(later.disabled).is_true()
-	assert_int(later.focus_mode).is_equal(Control.FOCUS_NONE)
+	assert_bool(_screen().get_actions().get_moth_button().disabled).is_false()
 
 
 func test_a_hostile_lock_warns_that_the_far_side_is_guarded() -> void:

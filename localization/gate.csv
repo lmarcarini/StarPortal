@@ -55,8 +55,30 @@ GATE_WORMHOLE_CAMERA_DONE,Horizon record taken,Registro do horizonte obtido
 GATE_WORMHOLE_CAMERA_PROGRESS,Horizon record in {left},Registro do horizonte em {left}
 GATE_HORIZON_PHOTO_CAPTION,Horizon record · {world} · {date},Registro do horizonte · {world} · {date}
 GATE_WORMHOLE_VIEW_PHOTO,View the horizon photo,Ver a foto do horizonte
-GATE_WORMHOLE_SEND_PROBE,Send a probe,Enviar uma sonda
-GATE_WORMHOLE_PROBES_LATER,Probes are not ready yet.,As sondas ainda não estão prontas.
+GATE_WORMHOLE_SEND_MOTH,Send the MOTH,Enviar o MOTH
+GATE_WORMHOLE_MOTH_RACK,{count} in the rack,{count} no suporte
+GATE_WORMHOLE_MOTH_OUT,The MOTH is out.,O MOTH está do outro lado.
+GATE_WORMHOLE_MOTH_EMPTY,The rack is empty: a replacement is on order.,O suporte está vazio: uma reposição foi encomendada.
+MOTH_SCANS,SCANS,VARREDURAS
+MOTH_SCAN_LOOK_AROUND,Look around,Olhar em volta
+MOTH_SCAN_CLOSE_LOOK,Close look,Olhar de perto
+MOTH_SCAN_CLOSE_LOOK_AT,Close look: {target},Olhar de perto: {target}
+MOTH_SCAN_SKY,Sky,Céu
+MOTH_SCAN_RING,Ring,Anel
+MOTH_SCAN_RECALL,Recall,Chamar de volta
+MOTH_SCAN_DONE,{minutes} · done,{minutes} · feito
+MOTH_SCAN_RUNNING,{minutes} · scanning,{minutes} · varrendo
+MOTH_SCANNING,[ SCANNING: {what} ],[ VARRENDO: {what} ]
+MOTH_REC,REC {time},REC {time}
+MOTH_BATTERY,BATTERY,BATERIA
+MOTH_BATTERY_LEFT,{minutes} min left,{minutes} min restantes
+MOTH_RECALL_NEEDS,Recall needs {minutes} min,Chamar de volta exige {minutes} min
+MOTH_RECALL,RECALL,CHAMAR DE VOLTA
+MOTH_CLOSE,Close,Fechar
+MOTH_SIGNAL_LOST,SIGNAL LOST,SINAL PERDIDO
+MOTH_LOST_SHOT_DOWN,The drone was brought down. Its finished scans are kept.,O drone foi derrubado. As varreduras concluídas foram mantidas.
+MOTH_LOST_BATTERY,The battery ran out. Its finished scans are kept.,A bateria acabou. As varreduras concluídas foram mantidas.
+MOTH_LOST_WORMHOLE,The wormhole closed with the drone on the far side.,O buraco de minhoca fechou com o drone do outro lado.
 GATE_WORMHOLE_RING_HINT,Click the Ring for its actions.,Clique no Anel para ver as ações.
 GATE_WORMHOLE_HIDE_HINT,Click the Ring again to hide them.,Clique no Anel de novo para escondê-las.
 GATE_CONSOLE_HINT,"Copies the far Ring's log of recent dials into the Address Book: two to four nearby addresses, already written for CAIRN.","Copia o registro de discagens recentes do Anel distante para o Livro de Endereços: de dois a quatro endereços próximos, já escritos para a CAIRN."

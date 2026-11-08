@@ -4,9 +4,10 @@ extends VBoxContainer
 ## ExtendPoleCameraCommand; while the camera goes through it shows its progress, then "Horizon
 ## record taken" and View the horizon photo; it says so at once, the same frame), Read the far
 ## Ring's console (ConsoleFinds), Read in the Archive (only when this lock delivered documents),
-## Open the Address Book, Send a probe (disabled: probes are not
-## ready yet) and Close the wormhole (hold to confirm, posts a CloseWormholeCommand). Changes no
-## state itself beyond submitting those commands.
+## Open the Address Book, Send the MOTH (posts a LaunchMothCommand; the MothScreen opens over the
+## Gate Room; disabled with the reason when the rack is empty or a MOTH is out) and Close the
+## wormhole (hold to confirm, posts a CloseWormholeCommand). Changes no state itself beyond
+## submitting those commands.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## game-design.md#base-building-and-power (the pole camera, horizon record)
 
@@ -30,6 +31,8 @@ var _simulation: Simulation = null
 @onready var _console: ConsoleFinds = %ConsoleFinds
 @onready var _archive_button: Button = %ArchiveButton
 @onready var _book_button: Button = %BookButton
+@onready var _moth_button: Button = %MothButton
+@onready var _moth_note: Label = %MothNote
 @onready var _close_button: HoldButton = %CloseButton
 
 
@@ -39,6 +42,7 @@ func _ready() -> void:
 	_photo_button.pressed.connect(photo_requested.emit)
 	_book_button.pressed.connect(book_requested.emit)
 	_close_button.confirmed.connect(_on_close_confirmed)
+	_moth_button.pressed.connect(_on_moth_pressed)
 	_console.focus_changed.connect(focus_changed.emit)
 
 
@@ -55,6 +59,7 @@ func render(state: GameState) -> void:
 	_show_camera(state.worlds, state.gate.connected_world_id)
 	_archive_button.visible = not WormholeText.new_documents(state).is_empty()
 	_console.render()
+	_show_moth(state)
 
 
 ## Returns the buttons that can take focus now, in order.
@@ -68,6 +73,8 @@ func get_focusables() -> Array[Control]:
 	if _archive_button.visible:
 		found.append(_archive_button)
 	found.append(_book_button)
+	if not _moth_button.disabled:
+		found.append(_moth_button)
 	found.append(_close_button)
 	return found
 
@@ -100,6 +107,11 @@ func get_archive_button() -> Button:
 ## Returns the Open the Address Book button.
 func get_book_button() -> Button:
 	return _book_button
+
+
+## Returns the Send the MOTH button.
+func get_moth_button() -> Button:
+	return _moth_button
 
 
 ## Returns the Close the wormhole hold button.
@@ -152,3 +164,25 @@ func _on_archive_pressed() -> void:
 func _on_close_confirmed() -> void:
 	if _simulation != null:
 		_simulation.submit(CloseWormholeCommand.new())
+
+
+## Shows Send the MOTH for [param state]: enabled with the drones in the rack, else disabled
+## with the reason (the MOTH is out, or the rack is empty until the replacement arrives).
+func _show_moth(state: GameState) -> void:
+	var is_ok: bool = LaunchMothCommand.new().validate(state).is_ok
+	_moth_button.disabled = not is_ok
+	_moth_button.focus_mode = Control.FOCUS_ALL if is_ok else Control.FOCUS_NONE
+	var note: String = tr(&"GATE_WORMHOLE_MOTH_RACK").format({"count": state.probes.rack})
+	if state.probes.is_moth_out():
+		note = tr(&"GATE_WORMHOLE_MOTH_OUT")
+	elif state.probes.rack <= 0:
+		note = tr(&"GATE_WORMHOLE_MOTH_EMPTY")
+	_moth_note.text = note
+
+
+func _on_moth_pressed() -> void:
+	if _simulation == null or _moth_button.disabled:
+		return
+	_simulation.submit(LaunchMothCommand.new())
+	render(_simulation.state)
+	focus_changed.emit()

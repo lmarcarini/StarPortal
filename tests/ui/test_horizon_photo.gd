@@ -147,4 +147,5 @@ func test_the_photo_fits_beside_the_ring(
 
 
 func _params_of(world_id: StringName) -> Array:
-	return HorizonPhotoRules.params_for(world_id).to_array()
+	var scene: WorldScene = SceneNow.of(_simulation.state, world_id)
+	return ScenePhotoRules.params_for(scene).to_array()
