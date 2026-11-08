@@ -21,7 +21,7 @@ const _A := WorldDef.Atmosphere
 const _L := WorldDef.Life
 const _S := WorldDef.Structures
 const _H := WorldDef.Biohazard
-const _K := WorldDef.Sky
+const _K := WorldDef.SkyColour
 const _U := WorldDef.Sun
 
 ## Skies per atmosphere (indexed by WorldDef.Atmosphere).
@@ -111,7 +111,7 @@ static func derive(world_id: StringName, guarded: bool) -> WorldFacts:
 	facts.biome = roll(id, "biome", _B.size()) as WorldDef.Biome
 	facts.atmosphere = _pick(id, "air", _AIR_BY_BIOME, facts.biome) as WorldDef.Atmosphere
 	facts.world_id = world_id
-	facts.sky = _pick(id, "sky", _SKY_BY_AIR, facts.atmosphere) as WorldDef.Sky
+	facts.sky = _pick(id, "sky", _SKY_BY_AIR, facts.atmosphere) as WorldDef.SkyColour
 	facts.sun = _sun(id, facts.sky)
 	facts.temperature_c = (
 		_BASE_TEMPERATURE_C[facts.biome]
@@ -151,8 +151,8 @@ static func _pick(id: String, salt: String, table: Array, row: int) -> int:
 	return value
 
 
-static func _sun(id: String, sky: WorldDef.Sky) -> WorldDef.Sun:
-	if sky == WorldDef.Sky.OVERCAST:
+static func _sun(id: String, sky: WorldDef.SkyColour) -> WorldDef.Sun:
+	if sky == WorldDef.SkyColour.OVERCAST:
 		return WorldDef.Sun.HIDDEN
 	var sun: int = _SUNS[roll(id, "sun", _SUNS.size())]
 	return sun as WorldDef.Sun

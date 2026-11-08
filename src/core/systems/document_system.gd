@@ -15,7 +15,8 @@ extends SimSystem
 ## [br][br]
 ## The record raises the world's report through WorldProgress.record_horizon (atmosphere,
 ## temperature, radiation; threat to POOR). Posts horizon_record_taken(world id) for each
-## record, then document_received(document id) for each delivery, and one pause_requested(&"document_received") on a tick with any.
+## record, then document_received(document id) for each delivery, and one
+## pause_requested(&"document_received") on a tick with any.
 ## Bible: technical-architecture.md#narrative-and-event-scripting,
 ## gate-and-address-spec.md#where-addresses-come-from,
 ## game-design.md#base-building-and-power (the pole camera, horizon record)

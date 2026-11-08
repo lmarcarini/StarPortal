@@ -15,7 +15,7 @@ var variation_seed: int = 0
 ## The land.
 var biome: WorldDef.Biome = WorldDef.Biome.BARREN
 ## The sky's colour.
-var sky: WorldDef.Sky = WorldDef.Sky.BLACK
+var sky: WorldDef.SkyColour = WorldDef.SkyColour.BLACK
 ## The sun.
 var sun: WorldDef.Sun = WorldDef.Sun.WHITE
 ## The air.

@@ -12,7 +12,7 @@ var biome: WorldDef.Biome = WorldDef.Biome.BARREN
 ## The air.
 var atmosphere: WorldDef.Atmosphere = WorldDef.Atmosphere.NONE
 ## The sky over the Ring.
-var sky: WorldDef.Sky = WorldDef.Sky.BLACK
+var sky: WorldDef.SkyColour = WorldDef.SkyColour.BLACK
 ## The sun as seen from the Ring.
 var sun: WorldDef.Sun = WorldDef.Sun.WHITE
 ## Surface temperature at the Ring, in whole degrees Celsius.

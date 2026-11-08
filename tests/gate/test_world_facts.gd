@@ -99,13 +99,13 @@ func test_authored_worlds() -> void:
 	assert_int(milestone.threat).is_equal(WorldDef.Threat.MED)
 	assert_object(milestone.find_target(&"bronze_pegs")).is_not_null()
 	assert_int(stillwater.biohazard).is_equal(WorldDef.Biohazard.NONE)
-	assert_int(stillwater.sky).is_equal(WorldDef.Sky.OVERCAST)
+	assert_int(stillwater.sky).is_equal(WorldDef.SkyColour.OVERCAST)
 	var lintel: WorldFacts = WorldFactRules.facts_for_id(galaxy, &"world_lintel")
 	assert_int(lintel.temperature_c).is_equal(-70)
 	assert_int(lintel.radiation).is_equal(WorldDef.Radiation.RAISED)
-	assert_int(lintel.sky).is_equal(WorldDef.Sky.BLACK)
+	assert_int(lintel.sky).is_equal(WorldDef.SkyColour.BLACK)
 	var sill: WorldFacts = WorldFactRules.facts_for_id(galaxy, &"world_sill")
-	assert_int(sill.sky).is_equal(WorldDef.Sky.VIOLET)
+	assert_int(sill.sky).is_equal(WorldDef.SkyColour.VIOLET)
 	assert_int(sill.sun).is_equal(WorldDef.Sun.ORANGE)
 	for id: StringName in [&"world_sill", &"world_lintel"]:
 		var facts: WorldFacts = WorldFactRules.facts_for_id(galaxy, id)
@@ -135,8 +135,8 @@ func test_procedural_sky_and_seed() -> void:
 	for index: int in 500:
 		var facts := WorldFactRules.derive(StringName("world_%04d" % index), false)
 		if facts.atmosphere == WorldDef.Atmosphere.NONE:
-			assert_int(facts.sky).is_not_equal(WorldDef.Sky.BLUE)
-		if facts.sky == WorldDef.Sky.OVERCAST:
+			assert_int(facts.sky).is_not_equal(WorldDef.SkyColour.BLUE)
+		if facts.sky == WorldDef.SkyColour.OVERCAST:
 			assert_int(facts.sun).is_equal(WorldDef.Sun.HIDDEN)
 		seeds[facts.scene().variation_seed] = true
 	assert_int(seeds.size()).is_equal(500)

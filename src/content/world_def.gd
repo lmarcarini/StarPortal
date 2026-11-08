@@ -25,7 +25,7 @@ enum Structures { UNKNOWN, NONE, RUINS, WORKED_STONE, SETTLEMENT }
 ## How dangerous the far side is. UNKNOWN is only ever shown, never a world's true value.
 enum Threat { UNKNOWN, LOW, MED, HIGH }
 ## The colour of the sky over the far Ring, as a picture shows it.
-enum Sky { BLACK, VIOLET, PALE, BLUE, OVERCAST, OCHRE, GREEN }
+enum SkyColour { BLACK, VIOLET, PALE, BLUE, OVERCAST, OCHRE, GREEN }
 ## The sun as a picture shows it; HIDDEN behind cloud or below the horizon.
 enum Sun { HIDDEN, WHITE, YELLOW, ORANGE, RED }
 
@@ -50,7 +50,7 @@ enum Sun { HIDDEN, WHITE, YELLOW, ORANGE, RED }
 ## The air.
 @export var atmosphere: Atmosphere = Atmosphere.NONE
 ## The sky, as the world's dossier describes it.
-@export var sky: Sky = Sky.BLACK
+@export var sky: SkyColour = SkyColour.BLACK
 ## The sun, as the world's dossier describes it.
 @export var sun: Sun = Sun.WHITE
 ## Surface temperature at the Ring, in whole degrees Celsius.
