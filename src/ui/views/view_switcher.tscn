@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://src/ui/views/research/research_view.tscn" id="5_research"]
 [ext_resource type="PackedScene" path="res://src/ui/views/personnel/personnel_view.tscn" id="6_personnel"]
 [ext_resource type="PackedScene" path="res://src/ui/views/command/command_view.tscn" id="7_command"]
+[ext_resource type="PackedScene" path="res://src/ui/views/expeditions/expeditions_view.tscn" id="8_expeditions"]
 
 [node name="ViewSwitcher" type="Control"]
 layout_mode = 3
@@ -56,4 +57,7 @@ layout_mode = 1
 layout_mode = 1
 
 [node name="Command" parent="Layout/Views" instance=ExtResource("7_command")]
+layout_mode = 1
+
+[node name="Expeditions" parent="Layout/Views" instance=ExtResource("8_expeditions")]
 layout_mode = 1

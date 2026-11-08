@@ -2,11 +2,15 @@ class_name WorldReportPanel
 extends PanelContainer
 ## One world's World Report: its name and state, its address when the Address Book holds it,
 ## then every report fact as the player may see it (unknown, a range or a value) with its
-## confidence and source, and a **Plan expedition** slot (disabled until the Expeditions tab,
-## card M3-12, fills it). Values come only through WorldReportText, which reads
+## confidence and source, and **Plan expedition**: enabled once Expeditions unlock on a world
+## Probed or beyond, it emits [signal plan_requested] (the switcher opens the Expeditions tab
+## with the world chosen); otherwise it is greyed with the reason. Values come only through WorldReportText, which reads
 ## WorldReportRules. Reads state only.
 ## Bible: docs/content/m3-beyond-the-ring.md section 2 (World Report fields), section 7
 ## (World Report sketch; gamepad)
+
+## Emitted when **Plan expedition** is pressed, with the world shown.
+signal plan_requested(world_id: StringName)
 
 ## Facts in the order the report lists them.
 const FACT_ORDER: Array[WorldReport.Fact] = [
@@ -60,6 +64,7 @@ func _init() -> void:
 	_plan.text = &"WORLD_PLAN_EXPEDITION"
 	_plan.disabled = true
 	_plan.tooltip_text = &"WORLD_PLAN_EXPEDITION_LATER"
+	_plan.pressed.connect(func() -> void: plan_requested.emit(_world_id))
 	_plan.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	layout.add_child(_plan)
 	_build_rows()
@@ -92,6 +97,7 @@ func show_world(world_id: StringName, state: GameState) -> void:
 	if is_node_ready():
 		_strip.setup(address)
 	_address_row.visible = address != null
+	_show_plan(world_id, state)
 	_set_shown(true)
 
 
@@ -130,7 +136,7 @@ func get_address_strip() -> AddressStrip:
 	return _strip
 
 
-## Returns the **Plan expedition** button (a placeholder until the Expeditions tab).
+## Returns the **Plan expedition** button.
 func get_plan_button() -> Button:
 	return _plan
 
@@ -161,3 +167,15 @@ func _set_shown(is_shown: bool) -> void:
 	_grid.visible = is_shown
 	_description.visible = is_shown
 	_plan.visible = is_shown
+
+
+## Enables Plan expedition once Expeditions unlock on a world Probed or beyond; else greys it
+## with the reason.
+func _show_plan(world_id: StringName, state: GameState) -> void:
+	var tooltip: StringName = &""
+	if not ExpeditionUnlock.is_unlocked(state):
+		tooltip = &"WORLD_PLAN_EXPEDITION_LATER"
+	elif not state.worlds.has_reached(world_id, WorldsState.WorldStatus.PROBED):
+		tooltip = &"WORLD_PLAN_EXPEDITION_NOT_PROBED"
+	_plan.disabled = not tooltip.is_empty()
+	_plan.tooltip_text = tooltip

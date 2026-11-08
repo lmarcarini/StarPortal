@@ -4,7 +4,7 @@ extends Control
 ## [GameView]; its id is its node name in snake_case ([code]GateRoom[/code] is
 ## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
 ## (view_next and view_previous wrap at the ends; view_gate_room, view_archive, view_base,
-## view_research, view_personnel, view_command)
+## view_research, view_personnel, view_command, view_expeditions)
 ## and the gamepad shoulders switch views. A view that is not available
 ## ([method GameView.is_available]: the Research tab before a lab finishes) has its tab
 ## hidden, is skipped by view_next and view_previous, and its action does nothing.
@@ -16,6 +16,7 @@ extends Control
 ## reports them. When the Gate Room asks for a document (Read in the Archive on the wormhole
 ## screen), the switcher opens the Archive with that document selected. When the Gate Room
 ## asks to build the first Capacitor Bank, it opens the Base with the bank's ghost placed.
+## When the World Report asks to plan an expedition, it opens Expeditions with that world chosen.
 ## The switcher holds no game state: it passes the simulation down and forgets it.
 ## Bible: game-design.md#core-loop, technical-architecture.md#signals-and-scenes,
 ## technical-architecture.md#input-accessibility-and-localisation
@@ -36,6 +37,8 @@ const RESEARCH: StringName = &"research"
 const PERSONNEL: StringName = &"personnel"
 ## Id of the Command view.
 const COMMAND: StringName = &"command"
+## Id of the Expeditions view.
+const EXPEDITIONS: StringName = &"expeditions"
 
 const _ACTION_NEXT: StringName = &"view_next"
 const _ACTION_PREVIOUS: StringName = &"view_previous"
@@ -47,6 +50,7 @@ const _DIRECT_ACTIONS: Dictionary = {
 	&"view_research": RESEARCH,
 	&"view_personnel": PERSONNEL,
 	&"view_command": COMMAND,
+	&"view_expeditions": EXPEDITIONS,
 }
 
 var _ids: Array[StringName] = []
@@ -154,6 +158,7 @@ func _collect_views() -> void:
 func _connect_view(view: GameView) -> void:
 	if view is ArchiveView:
 		(view as ArchiveView).unread_changed.connect(_refresh_titles)
+		(view as ArchiveView).plan_requested.connect(_on_plan_requested)
 	elif view is GateRoomView:
 		(view as GateRoomView).archive_requested.connect(_on_archive_requested)
 		(view as GateRoomView).capacitor_bank_requested.connect(_on_capacitor_bank_requested)
@@ -284,3 +289,14 @@ func _on_capacitor_bank_requested() -> void:
 		return
 	show_view(BASE)
 	base.place_capacitor_bank()
+
+
+## Opens Expeditions with [param world_id] chosen on the plan sheet.
+func _on_plan_requested(world_id: StringName) -> void:
+	if not _views.has(EXPEDITIONS):
+		return
+	var expeditions: ExpeditionsView = _views[EXPEDITIONS] as ExpeditionsView
+	if expeditions == null or not expeditions.is_available():
+		return
+	expeditions.plan_world(world_id)
+	show_view(EXPEDITIONS)
