@@ -125,6 +125,36 @@ signal team_sent(world_id: StringName)
 ## the objective succeeded (posted through the outbox).
 @warning_ignore("unused_signal")
 signal team_returned(world_id: StringName, objective: int, success: bool)
+## Emitted at a check-in that is not the return, with the world id and the team's light and
+## serious injuries (posted through the outbox).
+@warning_ignore("unused_signal")
+signal team_checked_in(world_id: StringName, light: int, serious: int)
+## Emitted when the player recalls the team, with the world id (posted through the outbox).
+@warning_ignore("unused_signal")
+signal team_recalled(world_id: StringName)
+## Emitted when a team misses a check-in and the rescue window opens, with the world id
+## (posted through the outbox).
+@warning_ignore("unused_signal")
+signal check_in_missed(world_id: StringName)
+## Emitted when Signal T-1 is sent, with the world id (posted through the outbox).
+@warning_ignore("unused_signal")
+signal rescue_signal_sent(world_id: StringName)
+## Emitted when the wormhole closes before the signalled team reached the Ring, with the world
+## id (posted through the outbox).
+@warning_ignore("unused_signal")
+signal rescue_signal_failed(world_id: StringName)
+## Emitted for each team member who did not survive a rescue, with the name and the world id
+## (posted through the outbox).
+@warning_ignore("unused_signal")
+signal member_deceased(person_name: String, world_id: StringName)
+## Emitted when a rescued team comes through, with the world id and the survivors (posted
+## through the outbox).
+@warning_ignore("unused_signal")
+signal team_rescued(world_id: StringName, survivors: int)
+## Emitted when a team is lost, with the world id and the reason, &"window" or &"no_answer"
+## (posted through the outbox).
+@warning_ignore("unused_signal")
+signal team_lost(world_id: StringName, reason: StringName)
 
 ## Emitted when a construction site starts, with its site id (posted through the outbox).
 @warning_ignore("unused_signal")

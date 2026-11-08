@@ -6,7 +6,8 @@ extends RefCounted
 ## docs/content/m3-beyond-the-ring.md section 4) raises its own cause through [method raise].
 ## Each adds a cause to the rolling list, posts confidence_changed and checks the commendation:
 ## $1,000k the first time Confidence reaches 70, re-armed below 60. Called only from
-## EconomySystem, DailySettlement and ExpeditionSystem (through ExpeditionReturns).
+## EconomySystem, DailySettlement and ExpeditionSystem (through ExpeditionReturns and
+## ExpeditionRescue: a team lost -10, a member deceased in a rescue -3 each).
 ## Bible: docs/content/m27-daily-rhythm.md section 2
 
 ## committee_warning reasons.

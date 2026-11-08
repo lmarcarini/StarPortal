@@ -40,6 +40,8 @@ CONFIDENCE_CAUSE_LOCKED,New world locked: {name}  {amount},Novo mundo conectado:
 CONFIDENCE_CAUSE_HORIZON_RECORD,Horizon record taken: {name}  {amount},Registro do horizonte obtido: {name}  {amount}
 CONFIDENCE_CAUSE_SURVEYED,New world surveyed: {name}  {amount},Novo mundo explorado: {name}  {amount}
 CONFIDENCE_CAUSE_RESEARCH,Research finished: {name}  {amount},Pesquisa concluída: {name}  {amount}
+CONFIDENCE_CAUSE_TEAM_LOST,Team lost: {name}  {amount},Equipe perdida: {name}  {amount}
+CONFIDENCE_CAUSE_DECEASED,Team members lost in a rescue: {name} ({count})  {amount},Membros da equipe perdidos em um resgate: {name} ({count})  {amount}
 CONFIDENCE_CAUSE_REPORTS,Reports filed ({count} analysts)  {amount},Relatórios entregues ({count} analistas)  {amount}
 CONFIDENCE_CAUSE_REPORTS_ONE,Reports filed (1 analyst)  {amount},Relatórios entregues (1 analista)  {amount}
 COMMITTEE_LOG_REPORTS,Reports filed ({count} analysts): Committee Confidence +{count}.,Relatórios entregues ({count} analistas): Confiança do Comitê +{count}.

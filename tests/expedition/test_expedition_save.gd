@@ -73,3 +73,50 @@ func test_bad_data_refused() -> void:
 	cases.append(data)
 	for index: int in cases.size():
 		assert_array(ExpeditionState.validate_dict(cases[index])).is_not_empty()
+
+
+func _missing() -> ExpeditionState:
+	var expedition: ExpeditionState = _away()
+	expedition.mode = ExpeditionState.Mode.MISSING
+	expedition.day_results.append(ExpeditionState.DAY_MISSED)
+	expedition.missed_tick = 120 + Fixture.DAY
+	expedition.signal_tick = 120 + Fixture.DAY + 30
+	return expedition
+
+
+func test_missing_team_round_trips() -> void:
+	var data: Dictionary = _json(_missing().to_dict())
+	assert_array(ExpeditionState.validate_dict(data)).is_empty()
+	var loaded: ExpeditionState = ExpeditionState.from_dict(data)
+	assert_dict(loaded.to_dict()).is_equal(_missing().to_dict())
+	assert_array(loaded.away_ids()).has_size(4)
+	var recalled: ExpeditionState = _away()
+	recalled.recalled = true
+	assert_array(ExpeditionState.validate_dict(_json(recalled.to_dict()))).is_empty()
+
+
+func test_bad_rescue_data_refused() -> void:
+	var cases: Array[Dictionary] = []
+	var data: Dictionary = _json(_missing().to_dict())
+	data["missed_tick"] = -1
+	cases.append(data)
+	data = _json(_missing().to_dict())
+	data["day_results"] = []
+	cases.append(data)
+	data = _json(_missing().to_dict())
+	data["recalled"] = true
+	cases.append(data)
+	data = _json(_missing().to_dict())
+	data["signal_tick"] = 3
+	cases.append(data)
+	data = _json(_away().to_dict())
+	data["missed_tick"] = 5
+	cases.append(data)
+	data = _json(_away().to_dict())
+	data["day_results"] = ["missed"]
+	cases.append(data)
+	data = _json(_away().to_dict())
+	data["recalled"] = "yes"
+	cases.append(data)
+	for index: int in cases.size():
+		assert_array(ExpeditionState.validate_dict(cases[index])).is_not_empty()

@@ -20,13 +20,21 @@ const HORIZON_RECORD: StringName = &"horizon_record"
 const SURVEYED: StringName = &"surveyed"
 const RESEARCH: StringName = &"research"
 const REPORTS: StringName = &"reports"
-const CAUSES: Array[StringName] = [LOCKED, HORIZON_RECORD, SURVEYED, RESEARCH, REPORTS]
+## A team lost (-10) and a member deceased in a rescue (-3 each; m3 section 4).
+const TEAM_LOST: StringName = &"team_lost"
+const DECEASED: StringName = &"deceased"
+const CAUSES: Array[StringName] = [
+	LOCKED, HORIZON_RECORD, SURVEYED, RESEARCH, REPORTS, TEAM_LOST, DECEASED
+]
 ## Change per lock, horizon record, team survey, project and analyst, in tenths.
 const LOCK_CHANGE: int = 50
 const HORIZON_CHANGE: int = 20
 const SURVEY_CHANGE: int = 30
 const RESEARCH_CHANGE: int = 30
 const REPORT_CHANGE: int = 10
+## Change for a lost team and per member deceased, in tenths.
+const TEAM_LOST_CHANGE: int = -100
+const DECEASED_CHANGE: int = -30
 ## Daily drift in tenths: toward 50 while solvent, and in the red.
 const SETTLING_STEP: int = 1
 const IN_RED_STEP: int = -2

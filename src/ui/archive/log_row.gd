@@ -125,6 +125,8 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 			return staff_line(entry.args)
 		&"committee":
 			return CommitteeText.log_line(entry.args)
+		&"expedition":
+			return ExpeditionLogText.line(entry.args, world)
 	return ""
 
 

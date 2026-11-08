@@ -6,29 +6,35 @@ extends RefCounted
 ## RandomState. Check-ins (card M3-10) and field events (card M3-11) extend the timeline: a
 ## check-in falls every 24 hours from departure and the return is the last
 ## ([method check_in_ticks]); each field day leaves one entry in [member day_results].
-## Saved shape: {"mode": "idle" | "planned" | "away", "objective": "none" | "survey" |
+## A missed check-in (card M3-10) turns AWAY into MISSING: the rescue window opens at
+## [member missed_tick] and a Signal waits from [member signal_tick].
+## Saved shape: {"mode": "idle" | "planned" | "away" | "missing", "objective": "none" | "survey" |
 ## "recover", "world_id", "target_id", "team": {slot: person id}, "departed_tick" (-1 unless
-## away), "day_results": ["ok" | "wasted"], "documents": [{"world_id", "kind": "survey_report"
-## or "object", "target_id", "tick"}]}.
+## away or missing), "day_results": ["ok" | "wasted" | "missed"], "recalled" (bool, only while
+## away), "missed_tick" and "signal_tick" (-1, or ticks while missing), "documents":
+## [{"world_id", "kind": "survey_report" or "object", "target_id", "tick"}]}.
 ## Bible: docs/content/m3-beyond-the-ring.md section 4 (Expeditions) and section 9 (saves)
 
 ## IDLE: no plan. PLANNED: a plan is ready to send. AWAY: the team is through the Ring.
-enum Mode { IDLE, PLANNED, AWAY }
+## MISSING: the team missed a check-in; the rescue window is open.
+enum Mode { IDLE, PLANNED, AWAY, MISSING }
 ## What the team goes to do; Contact comes with card M3-13.
 enum Objective { NONE, SURVEY, RECOVER }
 
 ## Saved names of the modes, indexed by Mode value.
-const MODE_NAMES: Array[String] = ["idle", "planned", "away"]
+const MODE_NAMES: Array[String] = ["idle", "planned", "away", "missing"]
 ## Saved names of the objectives, indexed by Objective value.
 const OBJECTIVE_NAMES: Array[String] = ["none", "survey", "recover"]
 ## Field days of each objective, indexed by Objective value.
 const OBJECTIVE_DAYS: Array[int] = [0, 2, 1]
 ## Team slots, in order.
 const SLOTS: Array[String] = ["leader", "scientist", "soldier", "specialist"]
-## Field day results: nothing went wrong, or the day was wasted (no finding).
+## Field day results: nothing went wrong, the day was wasted (no finding), or the check-in
+## that ends it does not come (a field event's worst setback; card M3-11 sets it).
 const DAY_OK: String = "ok"
 const DAY_WASTED: String = "wasted"
-const DAY_RESULTS: Array[String] = [DAY_OK, DAY_WASTED]
+const DAY_MISSED: String = "missed"
+const DAY_RESULTS: Array[String] = [DAY_OK, DAY_WASTED, DAY_MISSED]
 ## Kinds of expedition document.
 const DOCUMENT_KINDS: Array[String] = ["survey_report", "object"]
 
@@ -46,6 +52,12 @@ var team: Dictionary[String, StringName] = {}
 var departed_tick: int = -1
 ## One entry per field day resolved since departure (DAY_RESULTS).
 var day_results: Array[String] = []
+## True once Recall team turned the next due check-in into the return (AWAY only).
+var recalled: bool = false
+## Tick of the missed check-in that opened the rescue window; -1 unless MISSING.
+var missed_tick: int = -1
+## Tick Signal T-1 was given on an open wormhole; -1 when no Signal is waiting.
+var signal_tick: int = -1
 ## Documents teams brought back, oldest first.
 var documents: Array[Dictionary] = []
 
@@ -64,9 +76,14 @@ func member_ids() -> Array[StringName]:
 	return ids
 
 
-## The people out of CAIRN: the team while AWAY, else none.
+## True while a team is through the Ring: AWAY or MISSING.
+func is_out() -> bool:
+	return mode == Mode.AWAY or mode == Mode.MISSING
+
+
+## The people out of CAIRN: the team while AWAY or MISSING, else none.
 func away_ids() -> Array[StringName]:
-	if mode != Mode.AWAY:
+	if not is_out():
 		return []
 	return member_ids()
 
@@ -110,6 +127,9 @@ func clear() -> void:
 	team.clear()
 	departed_tick = -1
 	day_results.clear()
+	recalled = false
+	missed_tick = -1
+	signal_tick = -1
 
 
 ## Records a document of [param kind] brought back from [param world] at [param tick].
@@ -132,6 +152,9 @@ func to_dict() -> Dictionary:
 		"team": team_data,
 		"departed_tick": departed_tick,
 		"day_results": day_results.duplicate(),
+		"recalled": recalled,
+		"missed_tick": missed_tick,
+		"signal_tick": signal_tick,
 		"documents": documents.duplicate(true),
 	}
 
@@ -155,6 +178,9 @@ static func from_dict(data: Dictionary) -> ExpeditionState:
 		var result_list: Array = results
 		for result: Variant in result_list:
 			expedition.day_results.append(str(result))
+	expedition.recalled = data.get("recalled", false) == true
+	expedition.missed_tick = type_convert(data.get("missed_tick", -1), TYPE_INT)
+	expedition.signal_tick = type_convert(data.get("signal_tick", -1), TYPE_INT)
 	var documents_data: Variant = data.get("documents", [])
 	if documents_data is Array:
 		var document_list: Array = documents_data

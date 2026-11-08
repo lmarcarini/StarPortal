@@ -8,7 +8,9 @@ extends RefCounted
 ## while idle nothing else set; while planned or away an objective, a world, a target exactly
 ## for a Recover and a team of four distinct person ids in the four slots; "departed_tick" a
 ## tick exactly while away, else -1; "day_results" fewer than the objective's days and only
-## while away; "documents" objects with a world id, a kind, a target id and a tick.
+## while away or missing ("missed" only as the last, exactly while missing); "recalled" a bool,
+## true only while away; "missed_tick" a tick exactly while missing, "signal_tick" -1 or a tick
+## from it, only while missing; "documents" objects with a world id, a kind, a target id and a tick.
 static func errors(data: Dictionary) -> Array[String]:
 	var mode: int = ExpeditionState.MODE_NAMES.find(data.get("mode"))
 	var objective: int = ExpeditionState.OBJECTIVE_NAMES.find(data.get("objective"))
@@ -24,8 +26,11 @@ static func errors(data: Dictionary) -> Array[String]:
 		found.append("'team' is not an object")
 	if not data.get("day_results") is Array:
 		found.append("'day_results' is not an array")
-	if not (JsonLimits.is_exact_int(data.get("departed_tick")) and data["departed_tick"] >= -1):
-		found.append("'departed_tick' is not -1 or a tick")
+	for key: String in ["departed_tick", "missed_tick", "signal_tick"]:
+		if not (JsonLimits.is_exact_int(data.get(key)) and data[key] >= -1):
+			found.append("'%s' is not -1 or a tick" % key)
+	if not data.get("recalled") is bool:
+		found.append("'recalled' is not a bool")
 	if not found.is_empty():
 		return found
 	found.append_array(_document_errors(data.get("documents")))
@@ -57,6 +62,7 @@ static func _idle_errors(data: Dictionary, objective: int) -> Array[String]:
 		and team.is_empty()
 		and results.is_empty()
 		and _is_unset(data["departed_tick"])
+		and _rescue_unset(data)
 	)
 	return [] if is_clear else ["an idle expedition has a plan or a trip set"]
 
@@ -83,18 +89,46 @@ static func _plan_errors(data: Dictionary, objective: int) -> Array[String]:
 
 static func _trip_errors(data: Dictionary, mode: int, objective: int) -> Array[String]:
 	var results: Array = data["day_results"]
-	var is_away: bool = mode == ExpeditionState.Mode.AWAY
-	var found: Array[String] = []
+	var is_missing: bool = mode == ExpeditionState.Mode.MISSING
+	var is_away: bool = mode == ExpeditionState.Mode.AWAY or is_missing
+	var found: Array[String] = _rescue_errors(data, mode)
 	if is_away == _is_unset(data["departed_tick"]):
-		found.append("'departed_tick' is set exactly while away")
+		found.append("'departed_tick' is set exactly while away or missing")
 	if not results.all(func(result: Variant) -> bool: return result is String):
 		return found + ["'day_results' is not an array of results"]
 	if not results.all(func(result: String) -> bool: return result in ExpeditionState.DAY_RESULTS):
 		found.append("'day_results' is not an array of %s" % str(ExpeditionState.DAY_RESULTS))
 	var limit: int = ExpeditionState.OBJECTIVE_DAYS[objective] if is_away else 1
-	if results.size() >= limit:
+	if results.size() >= limit + (1 if is_missing else 0):
 		found.append("'day_results' has more field days than the trip")
+	var missed_at: int = results.find(ExpeditionState.DAY_MISSED)
+	var missed_last: bool = missed_at >= 0 and missed_at == results.size() - 1
+	if is_missing != missed_last or results.count(ExpeditionState.DAY_MISSED) > 1:
+		found.append("'day_results' ends with one \"missed\" exactly while missing")
 	return found
+
+
+## Errors of the recall and rescue fields for [param mode].
+static func _rescue_errors(data: Dictionary, mode: int) -> Array[String]:
+	var found: Array[String] = []
+	if data["recalled"] == true and mode != ExpeditionState.Mode.AWAY:
+		found.append("'recalled' is true only while away")
+	var is_missing: bool = mode == ExpeditionState.Mode.MISSING
+	if is_missing == _is_unset(data["missed_tick"]):
+		found.append("'missed_tick' is set exactly while missing")
+	var signal_tick: float = data["signal_tick"]
+	var missed_tick: float = data["missed_tick"]
+	if not _is_unset(signal_tick) and (not is_missing or signal_tick < missed_tick):
+		found.append("'signal_tick' is set only while missing, from 'missed_tick'")
+	return found
+
+
+static func _rescue_unset(data: Dictionary) -> bool:
+	return (
+		data["recalled"] == false
+		and _is_unset(data["missed_tick"])
+		and _is_unset(data["signal_tick"])
+	)
 
 
 static func _document_errors(documents: Variant) -> Array[String]:

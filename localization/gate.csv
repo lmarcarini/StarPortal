@@ -154,3 +154,14 @@ THREAT_REASON_RADIATION,Raised radiation,Radiação elevada
 THREAT_REASON_TEMPERATURE,Extreme temperature,Temperatura extrema
 THREAT_REASON_NONE,Nothing dangerous found,Nada perigoso encontrado
 EXPEDITION_NOT_ENOUGH_TIME,Not enough open time to send a team (10 minutes needed).,Tempo aberto insuficiente para enviar uma equipe (são necessários 10 minutos).
+LOG_LINE_TEAM_CHECKED_IN,T-1 checked in from {world}: {injuries}.,T-1 fez contato de {world}: {injuries}.
+LOG_LINE_TEAM_MISSED,"T-1 missed its check-in from {world}. Rescue window: 72 h.","T-1 não fez contato de {world}. Janela de resgate: 72 h."
+LOG_LINE_TEAM_DECEASED,{name} (T-1) did not survive on {world}.,{name} (T-1) não sobreviveu em {world}.
+LOG_LINE_TEAM_RESCUED,T-1 came through from {world}: {survivors} back.,T-1 atravessou de {world}: {survivors} de volta.
+LOG_LINE_TEAM_LOST,T-1 is lost on {world}: the rescue window closed.,T-1 está perdida em {world}: a janela de resgate fechou.
+LOG_LINE_TEAM_NO_ANSWER,No answer from T-1.,Sem resposta de T-1.
+TEAM_INJURY_NONE,no injuries,sem ferimentos
+TEAM_INJURY_LIGHT_ONE,one light injury,um ferimento leve
+TEAM_INJURY_LIGHT,{count} light injuries,{count} ferimentos leves
+TEAM_INJURY_SERIOUS_ONE,one serious injury,um ferimento grave
+TEAM_INJURY_SERIOUS,{count} serious injuries,{count} ferimentos graves
