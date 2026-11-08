@@ -52,7 +52,7 @@ func test_v14_round_trips_the_roster() -> void:
 	var file := FileAccess.open(_service.slot_path(&"staff"), FileAccess.READ)
 	var header: Dictionary = JSON.parse_string(file.get_as_text())
 	var version: float = header["format_version"]
-	assert_float(version).is_equal(14.0)
+	assert_float(version).is_equal(float(SaveMigrator.TARGET_VERSION))
 
 
 func test_v13_save_is_an_old_save() -> void:

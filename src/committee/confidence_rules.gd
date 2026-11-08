@@ -99,7 +99,7 @@ static func reporting_analysts(state: GameState) -> int:
 static func locked_worlds(state: GameState) -> Array[StringName]:
 	var ids: Array[StringName] = []
 	for world_id: StringName in state.worlds.statuses:
-		if state.worlds.statuses[world_id] == WorldsState.WorldStatus.LOCKED:
+		if state.worlds.has_reached(world_id, WorldsState.WorldStatus.LOCKED):
 			ids.append(world_id)
 	return sorted(ids)
 

@@ -96,7 +96,8 @@ func test_lock_alone_delivers_nothing() -> void:
 
 
 ## Extending delivers both of the world's documents in id order on the camera's fifth tick, after
-## horizon_record_taken, each posted once, with one pause request; the record is marked taken.
+## horizon_record_taken and the report's four world_fact_raised, each posted once, with one
+## pause request; the record is marked taken.
 func test_extending_delivers_the_worlds_documents_once() -> void:
 	_dial(DialFixture.OPEN_ID)
 	_events.clear()
@@ -107,14 +108,45 @@ func test_extending_delivers_the_worlds_documents_once() -> void:
 	var record_tick: int = _state.clock.tick
 	_run(1)
 	assert_array(_state.archive.received).is_equal([&"doc_a_open", &"doc_b_open"])
-	assert_array(_events).is_equal(
-		[&"horizon_record_taken", &"document_received", &"document_received"]
+	(
+		assert_array(_events)
+		. is_equal(
+			[
+				&"horizon_record_taken",
+				&"world_fact_raised",
+				&"world_fact_raised",
+				&"world_fact_raised",
+				&"world_fact_raised",
+				&"document_received",
+				&"document_received",
+			]
+		)
 	)
 	assert_array(_pauses).is_equal([&"document_received"])
 	assert_int(_state.archive.received_tick[&"doc_a_open"]).is_equal(record_tick)
 	assert_bool(_state.worlds.is_horizon_record_taken(DialFixture.OPEN_ID)).is_true()
 	assert_bool(_state.worlds.is_pole_camera_out()).is_false()
 	assert_array(GameState.validate_dict(_state.to_dict())).is_empty()
+
+
+## The record raises the world's report: atmosphere, temperature and radiation to the pole
+## camera's confidence and the threat to POOR, all from the pole camera; a second record changes
+## nothing (m3-beyond-the-ring.md section 2).
+func test_record_raises_the_report() -> void:
+	_dial(DialFixture.OPEN_ID)
+	_extend()
+	_run(ExtendPoleCameraCommand.EXTEND_TICKS)
+	var report: WorldReport = _state.worlds.report_of(DialFixture.OPEN_ID)
+	for fact: WorldReport.Fact in [
+		WorldReport.Fact.ATMOSPHERE, WorldReport.Fact.TEMPERATURE, WorldReport.Fact.RADIATION
+	]:
+		assert_int(report.confidence_of(fact)).is_equal(WorldProgress.POLE_CAMERA_CONFIDENCE)
+		assert_str(report.entry_of(fact).source).is_equal(WorldProgress.POLE_CAMERA_SOURCE)
+	assert_int(report.confidence_of(WorldReport.Fact.THREAT)).is_equal(WorldReport.Confidence.POOR)
+	assert_int(report.confidence_of(WorldReport.Fact.LIFE)).is_equal(WorldReport.Confidence.NONE)
+	var before: Dictionary = _state.worlds.to_dict()
+	WorldProgress.record_horizon(_state, DialFixture.OPEN_ID)
+	assert_dict(_state.worlds.to_dict()).is_equal(before)
 
 
 ## A document of another world, or with NEVER, does not arrive.

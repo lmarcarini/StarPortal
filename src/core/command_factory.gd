@@ -73,6 +73,8 @@ static func register_defaults() -> void:
 	_types[UnassignStaffCommand.TYPE] = UnassignStaffCommand
 	_types[HireCommand.TYPE] = HireCommand
 	_types[DismissCommand.TYPE] = DismissCommand
+	_types[RaiseWorldStatusCommand.TYPE] = RaiseWorldStatusCommand
+	_types[RaiseWorldFactCommand.TYPE] = RaiseWorldFactCommand
 
 
 ## Drops every registration, so tests can restore a clean registry. The built-in types are

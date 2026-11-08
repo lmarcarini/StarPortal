@@ -1,10 +1,27 @@
-[gd_resource type="Resource" script_class="WorldDef" format=3]
+[gd_resource type="Resource" script_class="WorldDef" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/content/world_def.gd" id="1_world"]
+[ext_resource type="Script" path="res://src/content/world_target_def.gd" id="2_target"]
+
+[sub_resource type="Resource" id="Target_0"]
+script = ExtResource("2_target")
+id = &"bronze_pegs"
+name_key = &"TARGET_MILESTONE_BRONZE_PEGS"
+is_object = true
 
 [resource]
 script = ExtResource("1_world")
 name_key = &"WORLD_MILESTONE_NAME"
 position_ly = Vector3i(-5568, 2636, 200)
 origin_glyph = 0
+biome = 1
+sky = 2
+sun = 1
+atmosphere = 1
+temperature_c = -38
+biohazard = 1
+life = 1
+structures = 3
+threat = 2
+targets = Array[ExtResource("2_target")]([SubResource("Target_0")])
 id = &"world_milestone"

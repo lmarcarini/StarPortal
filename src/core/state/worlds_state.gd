@@ -6,19 +6,23 @@ extends RefCounted
 ## way through the open wormhole.
 ## Saved shape: {"galaxy_seed": decimal string, "generator_version", "statuses":
 ## {world id: status name}, "consoles_read": {world id: true}, "horizon_records":
-## {world id: true}, "pole_camera_world_id": world id or "", "pole_camera_ticks_left"}. The seed
+## {world id: true}, "reports": {world id: WorldReport data}, "pole_camera_world_id": world id
+## or "", "pole_camera_ticks_left"}. The seed
 ## is a string because it can exceed 2^53. The pole camera is out exactly when both its fields
 ## are set (a world id and at least 1 tick left); otherwise "" and 0.
 ## Bible: technical-architecture.md#data-model, technical-architecture.md#save-system,
 ## gate-and-address-spec.md#where-addresses-come-from (Ring consoles),
-## game-design.md#base-building-and-power (the pole camera, horizon record)
+## game-design.md#base-building-and-power (the pole camera, horizon record),
+## docs/content/m3-beyond-the-ring.md section 3 (world states) and section 9 (saves)
 
-## What the base knows about a world. UNKNOWN is never stored; more statuses arrive with
-## probing (M3).
-enum WorldStatus { UNKNOWN, LOCKED }
+## How far the base has come with a world, in order; a world's status never goes down
+## (raise it through WorldProgress). UNKNOWN is never stored. LOCKED: first lock. PROBED: first
+## finished or lost MOTH run. SURVEYED: a team's Survey returned. CONTACTED: the first
+## conversation with its people ended.
+enum WorldStatus { UNKNOWN, LOCKED, PROBED, SURVEYED, CONTACTED }
 
 ## Saved names of the statuses, indexed by WorldStatus value.
-const _STATUS_NAMES: Array[String] = ["unknown", "locked"]
+const STATUS_NAMES: Array[String] = ["unknown", "locked", "probed", "surveyed", "contacted"]
 
 ## Seed of the galaxy: RandomState.derive_seed(base seed, &"galaxy").
 var galaxy_seed: int = 0
@@ -30,6 +34,9 @@ var statuses: Dictionary[StringName, WorldStatus] = {}
 var consoles_read: Dictionary[StringName, bool] = {}
 ## Worlds whose horizon record the pole camera has taken, by world id; always true.
 var horizon_records: Dictionary[StringName, bool] = {}
+## What the base knows of each world's report facts, by world id; a world with no entry knows
+## nothing (every fact at NONE). Read it through report_of().
+var reports: Dictionary[StringName, WorldReport] = {}
 ## The world the pole camera is extending into, or &"" while it is in.
 var pole_camera_world_id: StringName = &""
 ## Ticks until the extending pole camera takes the horizon record; 0 while it is in.
@@ -39,6 +46,17 @@ var pole_camera_ticks_left: int = 0
 ## Returns the status of [param world_id]; UNKNOWN when none is stored.
 func status_of(world_id: StringName) -> WorldStatus:
 	return statuses.get(world_id, WorldStatus.UNKNOWN)
+
+
+## True when [param world_id] has reached at least [param status].
+func has_reached(world_id: StringName, status: WorldStatus) -> bool:
+	return status_of(world_id) >= status
+
+
+## Returns the report of [param world_id]; an empty one (not stored) when nothing is known.
+func report_of(world_id: StringName) -> WorldReport:
+	var report: WorldReport = reports.get(world_id)
+	return report if report != null else WorldReport.new()
 
 
 ## True when the console of [param world_id] has been read.
@@ -67,13 +85,14 @@ func retract_pole_camera() -> void:
 func to_dict() -> Dictionary:
 	var status_data: Dictionary = {}
 	for world_id: StringName in statuses:
-		status_data[String(world_id)] = _STATUS_NAMES[statuses[world_id]]
+		status_data[String(world_id)] = STATUS_NAMES[statuses[world_id]]
 	return {
 		"galaxy_seed": str(galaxy_seed),
 		"generator_version": generator_version,
 		"statuses": status_data,
 		"consoles_read": _id_set_to_dict(consoles_read),
 		"horizon_records": _id_set_to_dict(horizon_records),
+		"reports": _reports_to_dict(),
 		"pole_camera_world_id": String(pole_camera_world_id),
 		"pole_camera_ticks_left": pole_camera_ticks_left,
 	}
@@ -88,6 +107,7 @@ static func from_dict(data: Dictionary) -> WorldsState:
 	worlds.generator_version = type_convert(data.get("generator_version", 0), TYPE_INT)
 	worlds.consoles_read = _id_set_from(data.get("consoles_read"))
 	worlds.horizon_records = _id_set_from(data.get("horizon_records"))
+	worlds.reports = _reports_from(data.get("reports"))
 	worlds.pole_camera_world_id = StringName(str(data.get("pole_camera_world_id", "")))
 	worlds.pole_camera_ticks_left = type_convert(data.get("pole_camera_ticks_left", 0), TYPE_INT)
 	var status_data: Variant = data.get("statuses", {})
@@ -95,7 +115,7 @@ static func from_dict(data: Dictionary) -> WorldsState:
 		return worlds
 	var status_dict: Dictionary = status_data
 	for world_id: Variant in status_dict:
-		var status := _STATUS_NAMES.find(str(status_dict[world_id]))
+		var status := STATUS_NAMES.find(str(status_dict[world_id]))
 		if status > WorldStatus.UNKNOWN:
 			worlds.statuses[StringName(str(world_id))] = status as WorldStatus
 	return worlds
@@ -104,7 +124,8 @@ static func from_dict(data: Dictionary) -> WorldsState:
 ## Returns human-readable errors for saved [param data], empty when it is valid:
 ## "galaxy_seed" a 64-bit integer written as a canonical decimal string; "generator_version"
 ## a whole number from 0 to 2^53; "statuses" an object mapping non-empty world ids to a
-## status name other than "unknown"; "consoles_read" and "horizon_records" objects mapping
+## status name other than "unknown"; "reports" an object mapping non-empty world ids to valid
+## WorldReport data; "consoles_read" and "horizon_records" objects mapping
 ## non-empty world ids to true; "pole_camera_world_id" a string and "pole_camera_ticks_left" a
 ## whole number from 0 to 2^53, both set or both unset ("" and 0).
 static func validate_dict(data: Dictionary) -> Array[String]:
@@ -126,8 +147,51 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append_array(_validate_statuses(status_dict))
 	errors.append_array(_validate_id_set(data, "consoles_read"))
 	errors.append_array(_validate_id_set(data, "horizon_records"))
+	errors.append_array(_validate_reports(data))
 	errors.append_array(_validate_pole_camera(data))
 	return errors
+
+
+## Errors for "reports" of [param data].
+static func _validate_reports(data: Dictionary) -> Array[String]:
+	if not data.has("reports"):
+		return ["missing 'reports'"]
+	if not data["reports"] is Dictionary:
+		return ["'reports' is not an object"]
+	var errors: Array[String] = []
+	var report_dict: Dictionary = data["reports"]
+	for world_id: Variant in report_dict:
+		if str(world_id).is_empty():
+			errors.append("'reports' has an empty world id")
+		elif not report_dict[world_id] is Dictionary:
+			errors.append("report of '%s' is not an object" % world_id)
+		else:
+			var report_data: Dictionary = report_dict[world_id]
+			errors.append_array(WorldReport.validate_dict(str(world_id), report_data))
+	return errors
+
+
+## Returns the reports with at least one known fact as JSON-safe data.
+func _reports_to_dict() -> Dictionary:
+	var data: Dictionary = {}
+	for world_id: StringName in reports:
+		var report_data: Dictionary = reports[world_id].to_dict()
+		if not report_data.is_empty():
+			data[String(world_id)] = report_data
+	return data
+
+
+## Returns the reports in [param value] when it is a Dictionary; unreadable ones are dropped.
+static func _reports_from(value: Variant) -> Dictionary[StringName, WorldReport]:
+	var result: Dictionary[StringName, WorldReport] = {}
+	if not value is Dictionary:
+		return result
+	var report_dict: Dictionary = value
+	for world_id: Variant in report_dict:
+		if report_dict[world_id] is Dictionary:
+			var report_data: Dictionary = report_dict[world_id]
+			result[StringName(str(world_id))] = WorldReport.from_dict(report_data)
+	return result
 
 
 ## Errors for the set of world ids at [param key] of [param data]: an object mapping non-empty
@@ -177,8 +241,8 @@ static func _validate_statuses(status_dict: Dictionary) -> Array[String]:
 		var status: Variant = status_dict[world_id]
 		if str(world_id).is_empty():
 			errors.append("a status has an empty world id")
-		elif not status is String or _STATUS_NAMES.find(status) <= WorldStatus.UNKNOWN:
-			errors.append("status of '%s' is not one of %s" % [world_id, _STATUS_NAMES.slice(1)])
+		elif not status is String or STATUS_NAMES.find(status) <= WorldStatus.UNKNOWN:
+			errors.append("status of '%s' is not one of %s" % [world_id, STATUS_NAMES.slice(1)])
 	return errors
 
 

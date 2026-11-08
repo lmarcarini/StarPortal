@@ -22,6 +22,9 @@ var is_guarded: bool = false
 var is_authored: bool = false
 ## True only for the home Ring (CAIRN), which is always authored.
 var is_home: bool = false
+## The authored facts of an authored world; null for a procedural world, whose facts
+## WorldFactRules derives from its id. Read facts through WorldFactRules.facts_of().
+var authored_facts: WorldFacts = null
 
 
 ## Returns a record copying the authored world [param def].
@@ -34,4 +37,5 @@ static func from_def(def: WorldDef) -> WorldRecord:
 	record.is_guarded = def.is_guarded
 	record.is_authored = true
 	record.is_home = def.is_home
+	record.authored_facts = WorldFacts.from_def(def)
 	return record
