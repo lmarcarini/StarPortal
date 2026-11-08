@@ -10,7 +10,8 @@ extends SimSystem
 ## return the team brings back what ExpeditionReturns gives (nothing when recalled before its
 ## last day) and goes back to the rooms it kept; the plan clears.
 ## Events: team_checked_in(world id, light injuries, serious injuries, day summary),
-## team_returned(world id, objective, success), and ExpeditionRescue's.
+## team_sent (SendTeamCommand) and team_returned(world id, objective, success,
+## team names), and ExpeditionRescue's.
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
 
 ## Id of the system and of its random stream.
@@ -72,11 +73,22 @@ func _return(state: GameState, rng: RandomNumberGenerator) -> void:
 	var plan: ExpeditionState = state.expedition
 	var world_id: StringName = plan.world_id
 	var objective: int = plan.objective
+	var team: Array[String] = team_names(state)
 	var success: bool = false
 	if plan.day_results.size() >= plan.days():
 		success = ExpeditionReturns.apply(state, rng)
 	plan.clear()
-	state.events.post(RETURNED_EVENT, [world_id, objective, success])
+	state.events.post(RETURNED_EVENT, [world_id, objective, success, team])
+
+
+## The names of [param state]'s team in slot order (people no longer on the roster skipped).
+static func team_names(state: GameState) -> Array[String]:
+	var names: Array[String] = []
+	for person_id: StringName in state.expedition.member_ids():
+		var person: PersonState = state.staff.find_person(person_id)
+		if person != null:
+			names.append(person.name)
+	return names
 
 
 ## (light, serious) injuries among [param state]'s team.

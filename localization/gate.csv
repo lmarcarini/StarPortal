@@ -193,3 +193,7 @@ TEAM_DAY_FINDING,a finding,uma descoberta
 TEAM_DAY_INJURY,an injury,um ferimento
 TEAM_DAY_WASTED,a wasted day,um dia perdido
 LOG_KIND_EXPEDITION,Expeditions,Expedições
+LOG_LINE_TEAM_DEPARTED,T-1 went through to {world} ({objective}): {team}.,T-1 atravessou para {world} ({objective}): {team}.
+LOG_LINE_TEAM_RETURNED,T-1 came home from {world} ({objective}): {team}.,T-1 voltou de {world} ({objective}): {team}.
+TEAM_OBJECTIVE_SURVEY,survey,exploração
+TEAM_OBJECTIVE_RECOVER,recovery,recuperação

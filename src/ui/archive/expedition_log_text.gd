@@ -15,6 +15,8 @@ const LINE_KEYS: Dictionary[String, StringName] = {
 	"rescued": &"LOG_LINE_TEAM_RESCUED",
 	"lost": &"LOG_LINE_TEAM_LOST",
 	"no_answer": &"LOG_LINE_TEAM_NO_ANSWER",
+	"departed": &"LOG_LINE_TEAM_DEPARTED",
+	"returned": &"LOG_LINE_TEAM_RETURNED",
 }
 
 
@@ -33,6 +35,9 @@ static func line(args: Dictionary, world: String) -> String:
 				"name": str(args.get("name", "")),
 				"survivors": type_convert(args.get("survivors", 0), TYPE_INT),
 				"injuries": injuries(args),
+				"objective":
+				_tr(StringName("TEAM_OBJECTIVE_" + str(args.get("objective", "")).to_upper())),
+				"team": str(args.get("team", "")),
 				"day": _tr(StringName("TEAM_DAY_" + str(args.get("day", "finding")).to_upper())),
 			}
 		)

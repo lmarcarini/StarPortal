@@ -106,3 +106,20 @@ func test_longest_pt_br_line_fits_a_log_row() -> void:
 		)
 		. is_less_equal(label.size.x + 1.0)
 	)
+
+
+func test_departure_and_return_write_log_lines() -> void:
+	TranslationServer.set_locale("en")
+	var team: Array[String] = [NAME, "Dr Ana Reis"]
+	var sent: LogEntry = LogRules.entries_for(&"team_sent", [WORLD, 1, team], null, 5)[0]
+	assert_str(String(sent.world_id)).is_equal(String(WORLD))
+	assert_str(sent.args["objective"]).is_equal("survey")
+	assert_str(ExpeditionLogText.line(sent.args, "STILLWATER")).is_equal(
+		"T-1 went through to STILLWATER (survey): %s, Dr Ana Reis." % NAME
+	)
+	var back: LogEntry = LogRules.entries_for(&"team_returned", [WORLD, 2, true, team], null, 9)[0]
+	assert_bool(back.args["success"]).is_true()
+	assert_array(LogEntry.validate_dict(back.to_dict())).is_empty()
+	assert_str(ExpeditionLogText.line(back.args, "STILLWATER")).is_equal(
+		"T-1 came home from STILLWATER (recovery): %s, Dr Ana Reis." % NAME
+	)
