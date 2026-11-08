@@ -42,11 +42,13 @@ static func assigned(state: GameState, room: RoomState) -> Array[PersonState]:
 
 
 ## The people of [param room] at work: assigned() less the injured, who are off work until
-## healed and then return (docs/content/m3-beyond-the-ring.md section 4).
+## healed, and the team away, who keep the room until they return
+## (docs/content/m3-beyond-the-ring.md section 4).
 static func working(state: GameState, room: RoomState) -> Array[PersonState]:
 	var found: Array[PersonState] = []
+	var away: Array[StringName] = state.expedition.away_ids()
 	for person: PersonState in assigned(state, room):
-		if not person.is_injured():
+		if not person.is_injured() and not person.id in away:
 			found.append(person)
 	return found
 

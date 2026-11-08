@@ -78,6 +78,8 @@ static func register_defaults() -> void:
 	_types[LaunchCanisterCommand.TYPE] = LaunchCanisterCommand
 	_types[LaunchMothCommand.TYPE] = LaunchMothCommand
 	_types[MothScanCommand.TYPE] = MothScanCommand
+	_types[PlanExpeditionCommand.TYPE] = PlanExpeditionCommand
+	_types[SendTeamCommand.TYPE] = SendTeamCommand
 
 
 ## Drops every registration, so tests can restore a clean registry. The built-in types are
