@@ -2,15 +2,16 @@ class_name ExpeditionRescue
 extends RefCounted
 ## A missed check-in and the rescue (docs/content/m3-beyond-the-ring.md section 4, Missed
 ## check-in and rescue; A rescue is not a sure thing, owner 2026-11-07), run by
-## ExpeditionSystem. A missed check-in pauses the game (pause_requested), sets the speed to 1×
-## for when it resumes and opens a WINDOW_DAYS window. Signal T-1 on a wormhole open to the world brings the
-## team to the Ring SIGNAL_TICKS later; closing it before fails the Signal. On arrival each
-## member rolls to have survived (SurvivalRules): the deceased leave the roster (Confidence -3
-## each), the rest come home; if nobody survived there is no answer and the team is lost, as
-## when the window runs out (all four leave, Confidence -10). Lost people go through
-## ExpeditionUnlock.lose_person (lent soldiers are replaced). Call only from SimSystem.tick().
-## Events: check_in_missed(world id), rescue_signal_failed(world id), member_deceased(name,
-## world id), team_rescued(world id, survivors), team_lost(world id, reason).
+## ExpeditionSystem. A missed check-in pauses the game (pause_requested), sets the speed to
+## 1× for when it resumes and opens a WINDOW_DAYS window. Signal T-1 on a wormhole open to the
+## world brings the team to the Ring SIGNAL_TICKS later; closing it before fails the Signal.
+## On arrival each member rolls to have survived (SurvivalRules): the deceased leave the
+## roster (Confidence -3 each), the rest come home; if nobody survived there is no answer and
+## the team is lost, as when the window runs out (all four leave, Confidence -10). Lost
+## people go through ExpeditionUnlock.lose_person (lent soldiers are replaced). Call only
+## from SimSystem.tick(). Events: check_in_missed(world id), rescue_signal_failed(world id),
+## member_deceased(name, world id), team_rescued(world id, survivors), team_lost(world id,
+## reason).
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
 
 ## Days the rescue window stays open.
