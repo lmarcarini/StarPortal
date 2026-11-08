@@ -53,16 +53,15 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "GATE_WORMHOLE_OPEN_BOOK"
 
-[node name="ProbeButton" type="Button" parent="."]
+[node name="MothButton" type="Button" parent="."]
+unique_name_in_owner = true
 layout_mode = 2
-focus_mode = 0
-disabled = true
-text = "GATE_WORMHOLE_SEND_PROBE"
+text = "GATE_WORMHOLE_SEND_MOTH"
 
-[node name="ProbeNote" type="Label" parent="."]
+[node name="MothNote" type="Label" parent="."]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
-text = "GATE_WORMHOLE_PROBES_LATER"
 autowrap_mode = 3
 
 [node name="CloseButton" parent="." instance=ExtResource("3_hold")]

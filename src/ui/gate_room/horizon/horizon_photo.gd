@@ -3,7 +3,9 @@ extends Control
 ## The horizon photograph beside the Ring, a polaroid-like card drawn in code (about 320 x 220).
 ## While the pole camera goes through it shows "The pole camera is going through…" with a
 ## progress bar, after a short flash (softer with reduced flashing). Once the connected world's
-## horizon record is taken it shows the photo (HorizonPhotoRules, the same for the same world)
+## horizon record is taken it shows the photo generated from the world scene as it stands now
+## (SceneNow and ScenePhotoRules: a recovered object no longer appears; the same scene gives the
+## same photo)
 ## captioned "Horizon record · <world or Unknown world> · <date>", and keeps it while the
 ## wormhole is open; closed, it hides. Clicking it, or A / Enter with it focused, enlarges it;
 ## again, or B / Escape, shrinks it back. Reads the simulation only; changes no state.
@@ -30,7 +32,6 @@ const _BAR: Color = Color(0.85, 0.7, 0.35)
 var _simulation: Simulation = null
 var _phase: Phase = Phase.HIDDEN
 var _params: HorizonPhotoRules.Params = null
-var _world_id: StringName = &""
 var _caption: String = ""
 var _progress: float = 0.0
 var _flash: float = 0.0
@@ -50,6 +51,7 @@ func _enter_tree() -> void:
 	EventBus.horizon_record_taken.connect(_on_record_taken)
 	EventBus.wormhole_closed.connect(_on_wormhole_closed)
 	EventBus.dial_resolved.connect(_on_dial_resolved)
+	EventBus.world_target_changed.connect(_on_target_changed)
 
 
 func _exit_tree() -> void:
@@ -57,6 +59,7 @@ func _exit_tree() -> void:
 	EventBus.horizon_record_taken.disconnect(_on_record_taken)
 	EventBus.wormhole_closed.disconnect(_on_wormhole_closed)
 	EventBus.dial_resolved.disconnect(_on_dial_resolved)
+	EventBus.world_target_changed.disconnect(_on_target_changed)
 
 
 func _notification(what: int) -> void:
@@ -220,8 +223,10 @@ func _set_phase(phase: Phase) -> void:
 
 func _show_photo(state: GameState) -> void:
 	var world_id: StringName = state.gate.connected_world_id
-	if world_id != _world_id or _params == null:
-		_world_id = world_id
+	var scene: WorldScene = SceneNow.of(state, world_id)
+	if scene != null:
+		_params = ScenePhotoRules.params_for(scene)
+	else:
 		_params = HorizonPhotoRules.params_for(world_id)
 	_caption = HorizonPhotoText.caption(state, world_id)
 
@@ -259,4 +264,8 @@ func _on_record_taken(_world_id_taken: StringName) -> void:
 
 
 func _on_wormhole_closed(_reason: StringName) -> void:
+	refresh()
+
+
+func _on_target_changed(_world: StringName, _target: StringName, _state: int) -> void:
 	refresh()

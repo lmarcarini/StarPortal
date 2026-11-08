@@ -9,8 +9,8 @@ extends RefCounted
 ## Bible: game-design.md#base-building-and-power (pole camera, horizon record),
 ## art-and-audio.md (event-horizon blue)
 
-## Silhouette kinds.
-enum Silhouette { ROCK, RUIN, RING }
+## Silhouette kinds. OBJECT is a world target that is an object (ScenePhotoRules).
+enum Silhouette { ROCK, RUIN, RING, OBJECT }
 
 ## Hues (0 to 1) of the blue band skies never use.
 const BLUE_HUE_MIN: float = 0.5
@@ -36,6 +36,10 @@ class Params:
 	var silhouette_kinds: Array[Silhouette] = []
 	var silhouette_x: Array[float] = []
 	var silhouette_height: Array[float] = []
+	## The world target each silhouette shows, &"" for scenery (ScenePhotoRules).
+	var silhouette_targets: Array[StringName] = []
+	## Small marks of life (plants, animals) on the ground, and their seed.
+	var life_marks: int = 0
 	## Haze over the horizon, 0 to 1.
 	var haze: float = 0.0
 	var sun_color: Color = Color.WHITE
@@ -54,6 +58,8 @@ class Params:
 			silhouette_kinds,
 			silhouette_x,
 			silhouette_height,
+			silhouette_targets,
+			life_marks,
 			haze,
 			sun_color,
 			suns,
@@ -104,6 +110,7 @@ static func _add_silhouettes(params: Params, rng: RandomNumberGenerator) -> void
 		var slot: float = (index + rng.randf_range(0.15, 0.85)) / float(count)
 		params.silhouette_x.append(slot)
 		params.silhouette_height.append(rng.randf_range(0.08, 0.26))
+		params.silhouette_targets.append(&"")
 
 
 static func _add_suns(params: Params, rng: RandomNumberGenerator) -> void:

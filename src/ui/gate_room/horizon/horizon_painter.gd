@@ -8,6 +8,9 @@ extends RefCounted
 const _SKY_BANDS: int = 12
 const _SILHOUETTE_COLOR: Color = Color(0.07, 0.07, 0.08)
 const _RING_POINTS: int = 24
+const _OBJECT_COLOR: Color = Color(0.32, 0.2, 0.14)
+const _OBJECT_RIM: Color = Color(0.62, 0.42, 0.28)
+const _LIFE_COLOR: Color = Color(0.12, 0.2, 0.1)
 
 
 ## Draws the photo of [param params] on [param canvas] inside [param rect].
@@ -55,6 +58,12 @@ static func _paint_ground(
 			params.ground.darkened(0.25) if index % 2 == 0 else params.ground.lightened(0.15)
 		)
 		canvas.draw_rect(Rect2(x, y, width, 1.0 + depth * 3.0), tone)
+	for index: int in params.life_marks:
+		var y: float = lerpf(horizon_y + 3.0, bottom - 2.0, rng.randf())
+		var depth: float = (y - horizon_y) / maxf(bottom - horizon_y, 1.0)
+		var x: float = rect.position.x + rng.randf() * rect.size.x
+		var tall: float = 2.0 + depth * 8.0
+		canvas.draw_rect(Rect2(x, y - tall, 1.0 + depth * 2.0, tall), _LIFE_COLOR)
 
 
 ## [param item] is [Params, silhouette index], to stay within four arguments.
@@ -84,6 +93,10 @@ static func _paint_silhouette(
 				canvas.draw_rect(
 					Rect2(left, horizon_y - tall, column, tall + 1.0), _SILHOUETTE_COLOR
 				)
+		HorizonPhotoRules.Silhouette.OBJECT:
+			var block := Rect2(x - height * 0.3, horizon_y - height, height * 0.6, height + 1.0)
+			canvas.draw_rect(block, _OBJECT_COLOR)
+			canvas.draw_rect(block, _OBJECT_RIM, false, maxf(height * 0.08, 1.0))
 		HorizonPhotoRules.Silhouette.RING:
 			var radius: float = height * 0.5
 			var center := Vector2(x, horizon_y - radius)
