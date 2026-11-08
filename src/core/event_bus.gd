@@ -129,6 +129,10 @@ signal team_returned(world_id: StringName, objective: int, success: bool)
 ## serious injuries (posted through the outbox).
 @warning_ignore("unused_signal")
 signal team_checked_in(world_id: StringName, light: int, serious: int)
+## Emitted when a field event resolves at a check-in, with the world id, the event id and the
+## outcome ("finding" or a FieldEventDef setback name) (posted through the outbox).
+@warning_ignore("unused_signal")
+signal field_event_resolved(world_id: StringName, event_id: StringName, outcome: String)
 ## Emitted when the player recalls the team, with the world id (posted through the outbox).
 @warning_ignore("unused_signal")
 signal team_recalled(world_id: StringName)
