@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="FactionMetCondition" format=3]
+
+[ext_resource type="Script" path="res://src/content/story/conditions/faction_met_condition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+faction = &"faction_a"

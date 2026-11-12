@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="NoDialSinceCondition" format=3]
+
+[ext_resource type="Script" path="res://src/content/story/conditions/no_dial_since_condition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+flag = &"flag_a"

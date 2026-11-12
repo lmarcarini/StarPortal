@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ChangeStandingEffect" format=3]
+
+[ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+faction = &"faction_a"
+delta = -2
+hidden = true
