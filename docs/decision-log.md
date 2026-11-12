@@ -301,3 +301,16 @@ Each entry has four fields:
 - **Decision:** The soak test's time ceiling (`BUDGET_MSEC` in tests/soak/test_soak_year.gd) rises from 90 s to 150 s. A normal run now takes about 80 s (88 s wall time with startup) after the M3 probe and expedition systems, and more M3 systems are coming.
 - **Reason:** PO ruling on PR #240 (card #229): the old ceiling left about 1 s of headroom. The budget is a ceiling for slow or shared machines, not a target.
 - **Bible section:** [technical-architecture.md](bible/technical-architecture.md) (tests); process only.
+
+- **Date:** 2026-11-11
+- **Decision:** New phase order from M4: core systems (M4a Factions and contact, M4b Artefacts and technology), then M5 Refinement, M6 Interface, M7 Graphics, M8 Content, M9 Release. Content in M4 is only what is needed to test by hand; pt_BR strings for test content copy the English with an `[EN]` prefix. M3b (puzzle 5, MOORING, K1 to K3) is parked for M8. The open follow-up issues are consolidated in #249.
+- **Reason:** Owner, 2026-11-11: earlier milestones mixed content with core functionality.
+- **Bible section:** [roadmap.md#milestones](bible/roadmap.md#milestones), [m4-core-systems.md](content/m4-core-systems.md)
+
+
+## 2026-11-12 — M4 core systems design approved
+
+- **Date:** 2026-11-12
+- **Decision:** The M4 core-systems design (factions, conversations, requests, artefacts, modifiers, scalable tech tree, phase order) is approved. Incursions and failure states become a short M4c after M4b. A hostile incoming wormhole sends nothing through in M4. Gate Room holding never goes over capacity: an artefact arriving while holding is full waits at the gate and the player retrieves it when there is room; no Confidence cost.
+- **Reason:** Owner review of PR #251 (card #250), section 10 answers.
+- **Bible section:** [content/m4-core-systems.md](content/m4-core-systems.md)
