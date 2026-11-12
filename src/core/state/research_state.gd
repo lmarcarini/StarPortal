@@ -3,11 +3,12 @@ extends RefCounted
 ## Saved state of research (docs/content/m25-lean-start.md section 3): the project running,
 ## if any, how far it has got, and the projects done. Only StartResearchCommand,
 ## CancelResearchCommand and ResearchSystem change it.
-## Saved shape: {"active": project id or "", "ticks_done": whole number, "done": [project id...]}.
+## Saved shape: {"active": project id or "", "ticks_done": whole number, "done": [project id...],
+## "queue": [project id...], "revealed": [project id...]}.
 ## Bible: docs/content/m25-lean-start.md section 3, technical-architecture.md#data-model
 
 ## Saved keys, in to_dict() order.
-const _KEYS: Array[String] = ["active", "ticks_done", "done"]
+const _KEYS: Array[String] = ["active", "ticks_done", "done", "queue", "revealed"]
 
 ## The project running (paid for), or &"" when none.
 var active: StringName = &""
@@ -15,6 +16,10 @@ var active: StringName = &""
 var ticks_done: int = 0
 ## Projects finished, in the order they finished; no duplicates.
 var done: Array[StringName] = []
+## Projects waiting to start after the active one, in order; no duplicates.
+var queue: Array[StringName] = []
+## Hidden projects revealed so far; no duplicates.
+var revealed: Array[StringName] = []
 
 
 ## True when a project is running.
@@ -32,7 +37,13 @@ func to_dict() -> Dictionary:
 	var done_data: Array = []
 	for project_id: StringName in done:
 		done_data.append(String(project_id))
-	return {"active": String(active), "ticks_done": ticks_done, "done": done_data}
+	return {
+		"active": String(active),
+		"ticks_done": ticks_done,
+		"done": done_data,
+		"queue": SaveFields.write_ids(queue),
+		"revealed": SaveFields.write_ids(revealed),
+	}
 
 
 ## Builds a ResearchState from saved [param data] (whole floats become ints). Unreadable
@@ -50,12 +61,15 @@ static func from_dict(data: Dictionary) -> ResearchState:
 			var project_id := StringName(str(entry))
 			if entry is String and not project_id.is_empty() and not project_id in research.done:
 				research.done.append(project_id)
+	research.queue = SaveFields.read_ids(data.get("queue"))
+	research.revealed = SaveFields.read_ids(data.get("revealed"))
 	return research
 
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: every key
 ## present; "active" a string, not one of "done"; "ticks_done" a whole number of at least 0,
-## and 0 when "active" is empty; "done" an array of distinct non-empty strings.
+## and 0 when "active" is empty; "done", "queue" and "revealed" arrays of distinct non-empty
+## strings.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _KEYS:
@@ -70,6 +84,8 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	elif data["active"] is String and str(data["active"]).is_empty() and data["ticks_done"] != 0:
 		errors.append("'ticks_done' is not 0 with no active project")
 	errors.append_array(_done_errors(data["done"], data["active"]))
+	errors.append_array(SaveFields.id_list_errors(data["queue"], "queue"))
+	errors.append_array(SaveFields.id_list_errors(data["revealed"], "revealed"))
 	return errors
 
 

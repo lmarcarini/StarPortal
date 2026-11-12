@@ -109,6 +109,10 @@ func test_transient_references_are_never_saved() -> void:
 				"recruitment",
 				"probes",
 				"expedition",
+				"factions",
+				"conversations",
+				"requests",
+				"artefacts",
 			]
 		)
 	)

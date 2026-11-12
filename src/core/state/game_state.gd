@@ -24,6 +24,10 @@ const _SECTIONS: Array[String] = [
 	"recruitment",
 	"probes",
 	"expedition",
+	"factions",
+	"conversations",
+	"requests",
+	"artefacts",
 ]
 
 ## The simulation clock.
@@ -62,6 +66,14 @@ var recruitment: RecruitmentState = RecruitmentState.new()
 var probes: ProbesState = ProbesState.new()
 ## The expedition: plan, team away and documents brought back.
 var expedition: ExpeditionState = ExpeditionState.new()
+## Faction standings, met factions, causes and pending contacts.
+var factions: FactionsState = FactionsState.new()
+## The running conversation, transcripts and run counts.
+var conversations: ConversationsState = ConversationsState.new()
+## Every request instance.
+var requests: RequestsState = RequestsState.new()
+## Every artefact held.
+var artefacts: ArtefactsState = ArtefactsState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -126,6 +138,10 @@ func to_dict() -> Dictionary:
 		"recruitment": recruitment.to_dict(),
 		"probes": probes.to_dict(),
 		"expedition": expedition.to_dict(),
+		"factions": factions.to_dict(),
+		"conversations": conversations.to_dict(),
+		"requests": requests.to_dict(),
+		"artefacts": artefacts.to_dict(),
 	}
 
 
@@ -151,6 +167,10 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.recruitment = RecruitmentState.from_dict(_dict_or_empty(data.get("recruitment")))
 	state.probes = ProbesState.from_dict(_dict_or_empty(data.get("probes")))
 	state.expedition = ExpeditionState.from_dict(_dict_or_empty(data.get("expedition")))
+	state.factions = FactionsState.from_dict(_dict_or_empty(data.get("factions")))
+	state.conversations = ConversationsState.from_dict(_dict_or_empty(data.get("conversations")))
+	state.requests = RequestsState.from_dict(_dict_or_empty(data.get("requests")))
+	state.artefacts = ArtefactsState.from_dict(_dict_or_empty(data.get("artefacts")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -164,8 +184,8 @@ static func from_dict(data: Dictionary) -> GameState:
 
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
 ## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book",
-## "operations_log", "unlocks", "research", "staff", "committee", "recruitment", "probes" and
-## "expedition" must be
+## "operations_log", "unlocks", "research", "staff", "committee", "recruitment", "probes",
+## "expedition", "factions", "conversations", "requests" and "artefacts" must be
 ## objects, the sub-states must pass their own validate_dict(), and
 ## every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
@@ -200,6 +220,7 @@ static func validate_dict(data: Dictionary, defs: GameDefs = null) -> Array[Stri
 		errors.append_array(_ring_tick_errors(clock_data, gate_data))
 		var now: float = clock_data["tick"]
 		errors.append_array(_record_tick_errors(now, data))
+		errors.append_array(_m4_tick_errors(SaveFields.read_int(clock_data["tick"]), data))
 		errors.append_array(StaffSaveChecks.roster_errors(data))
 	if errors.is_empty() and defs != null:
 		errors.append_array(StaffSaveChecks.content_errors(data, defs))
@@ -245,7 +266,39 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 			return ProbesState.validate_dict(section)
 		"expedition":
 			return ExpeditionState.validate_dict(section)
+	return _m4_section_errors(key, section)
+
+
+## Errors of the M4 sections (factions, conversations, requests, artefacts).
+static func _m4_section_errors(key: String, section: Dictionary) -> Array[String]:
+	match key:
+		"factions":
+			return FactionsState.validate_dict(section)
+		"conversations":
+			return ConversationsState.validate_dict(section)
+		"requests":
+			return RequestsState.validate_dict(section)
+		"artefacts":
+			return ArtefactsState.validate_dict(section)
 	return []
+
+
+## Errors for M4 ticks of valid [param data] later than [param now], prefixed by section.
+static func _m4_tick_errors(now: int, data: Dictionary) -> Array[String]:
+	var errors: Array[String] = []
+	var factions_data: Dictionary = data["factions"]
+	var conversations_data: Dictionary = data["conversations"]
+	var requests_data: Dictionary = data["requests"]
+	var artefacts_data: Dictionary = data["artefacts"]
+	for error: String in FactionsState.tick_errors(factions_data, now):
+		errors.append("factions: " + error)
+	for error: String in ConversationsState.tick_errors(conversations_data, now):
+		errors.append("conversations: " + error)
+	for error: String in RequestsState.tick_errors(requests_data, now):
+		errors.append("requests: " + error)
+	for error: String in ArtefactsState.tick_errors(artefacts_data, now):
+		errors.append("artefacts: " + error)
+	return errors
 
 
 ## Errors for Ring and Dial Log ticks later than the clock tick, in valid

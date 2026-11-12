@@ -36,18 +36,20 @@ func test_game_state_needs_research() -> void:
 
 ## validate_dict() rejects missing keys and bad values.
 func test_validate_dict() -> void:
-	var good: Dictionary = {"active": "", "ticks_done": 0, "done": ["bank_array"]}
+	var good: Dictionary = {
+		"active": "", "ticks_done": 0, "done": ["bank_array"], "queue": [], "revealed": []
+	}
 	assert_array(ResearchState.validate_dict(good)).is_empty()
-	assert_array(ResearchState.validate_dict({})).has_size(3)
+	assert_array(ResearchState.validate_dict({})).has_size(5)
 	var cases: Array[Dictionary] = [
-		{"active": 3, "ticks_done": 0, "done": []},
-		{"active": "a", "ticks_done": -1, "done": []},
-		{"active": "a", "ticks_done": 1.5, "done": []},
-		{"active": "", "ticks_done": 5, "done": []},
-		{"active": "", "ticks_done": 0, "done": "x"},
-		{"active": "", "ticks_done": 0, "done": ["a", "a"]},
-		{"active": "", "ticks_done": 0, "done": [""]},
-		{"active": "a", "ticks_done": 0, "done": ["a"]},
+		{"active": 3, "ticks_done": 0, "done": [], "queue": [], "revealed": []},
+		{"active": "a", "ticks_done": -1, "done": [], "queue": [], "revealed": []},
+		{"active": "a", "ticks_done": 1.5, "done": [], "queue": [], "revealed": []},
+		{"active": "", "ticks_done": 5, "done": [], "queue": [], "revealed": []},
+		{"active": "", "ticks_done": 0, "done": "x", "queue": [], "revealed": []},
+		{"active": "", "ticks_done": 0, "done": ["a", "a"], "queue": [], "revealed": []},
+		{"active": "", "ticks_done": 0, "done": [""], "queue": [], "revealed": []},
+		{"active": "a", "ticks_done": 0, "done": ["a"], "queue": [], "revealed": []},
 	]
 	for data: Dictionary in cases:
 		(
