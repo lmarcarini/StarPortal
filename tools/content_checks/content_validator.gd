@@ -50,6 +50,7 @@ static func _check_content(registry: RegistryScript) -> Array[String]:
 	errors.append_array(ContentCheckRooms.check(rooms))
 	errors.append_array(_check_research(registry))
 	errors.append_array(ContentCheckStory.check_registry(registry))
+	errors.append_array(_check_factions(registry))
 	var field: AnchorFieldDef = ContentSource.home_field(registry)
 	for def: DefBase in registry.get_all_of(AnchorFieldDef):
 		var each: AnchorFieldDef = def as AnchorFieldDef
@@ -77,6 +78,17 @@ static func _check_research(registry: RegistryScript) -> Array[String]:
 	var errors: Array[String] = ContentCheckResearch.check(research, research_keys)
 	errors.append_array(ContentCheckResearch.check_categories(research, categories, research_keys))
 	return errors
+
+
+## The checks across factions (the Committee, contacts).
+static func _check_factions(registry: RegistryScript) -> Array[String]:
+	var factions: Array[FactionDef] = []
+	var known: Dictionary[StringName, DefBase] = {}
+	for def: DefBase in registry.get_all_of(DefBase):
+		known[def.id] = def
+		if def is FactionDef:
+			factions.append(def as FactionDef)
+	return ContentCheckFactions.check(factions, known)
 
 
 ## The document checks: answers, reach, keys in both locales, pairs, far-side readings, decoys.

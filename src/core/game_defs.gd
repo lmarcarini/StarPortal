@@ -23,13 +23,20 @@ var documents: Array[DocumentDef] = []
 var research: Array[ResearchDef] = []
 ## Every staff role, in Registry load order (sorted by path).
 var roles: Array[RoleDef] = []
+## Every faction, in Registry load order (sorted by path).
+var factions: Array[FactionDef] = []
+## Every request, in Registry load order (sorted by path).
+var requests: Array[RequestDef] = []
+## Every artefact, in Registry load order (sorted by path).
+var artefacts: Array[ArtefactDef] = []
 ## The staff name list (&"staff_names"), or null.
 var staff_names: StaffNameListDef = null
 
 
 ## Returns the definitions loaded by [param registry], the Registry autoload passed in: the
 ## balance, the home anchor field (&"anchors_home"), every WorldDef, every RoomDef, every
-## DocumentDef, every ResearchDef, every RoleDef and the staff name list. Missing ones stay
+## DocumentDef, every ResearchDef, every RoleDef, every FactionDef, RequestDef and ArtefactDef
+## and the staff name list. Missing ones stay
 ## null or empty; GameSetup.build() reports them.
 static func from_registry(registry: Node) -> GameDefs:
 	var defs := GameDefs.new()
@@ -59,7 +66,21 @@ static func from_registry(registry: Node) -> GameDefs:
 	for def: Variant in roles:
 		if def is RoleDef:
 			defs.roles.append(def)
+	_append_story_defs(registry, defs)
 	var names_def: Variant = registry.call(&"get_def", StaffNameListDef.NAMES_ID)
 	if names_def is StaffNameListDef:
 		defs.staff_names = names_def
 	return defs
+
+
+## Appends every FactionDef, RequestDef and ArtefactDef of [param registry] to [param defs].
+static func _append_story_defs(registry: Node, defs: GameDefs) -> void:
+	for def: Variant in registry.call(&"get_all_of", FactionDef):
+		if def is FactionDef:
+			defs.factions.append(def)
+	for def: Variant in registry.call(&"get_all_of", RequestDef):
+		if def is RequestDef:
+			defs.requests.append(def)
+	for def: Variant in registry.call(&"get_all_of", ArtefactDef):
+		if def is ArtefactDef:
+			defs.artefacts.append(def)

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ArtefactDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/artefact_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name_key = &"A"
+description_key = &"B"
+storage = &"shelf"
+hazard_chance_pct = 20
+id = &"artefact_odd"

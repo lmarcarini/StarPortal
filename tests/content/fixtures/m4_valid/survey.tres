@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="RequestDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/request_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/conditions/faction_met_condition.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="3"]
+
+[sub_resource type="Resource" id="c1"]
+script = ExtResource("2")
+faction = &"faction_kindred"
+
+[sub_resource type="Resource" id="e1"]
+script = ExtResource("3")
+faction = &"faction_committee"
+delta = 5
+
+[resource]
+script = ExtResource("1")
+faction = &"faction_committee"
+title_key = &"REQ_SURVEY"
+text_key = &"REQ_SURVEY_TEXT"
+objective = Array[Resource]([SubResource("c1")])
+deadline_days = 10
+offer_days = 3
+reward = Array[Resource]([SubResource("e1")])
+id = &"request_survey"

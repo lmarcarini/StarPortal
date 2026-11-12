@@ -13,3 +13,5 @@ extends Resource
 ## Document a MOTH Close look copies into the Archive: the target's marks or inscription
 ## (e.g. the anchor's marks, card M3-19); &"" when it has none.
 @export var marks_document_id: StringName = &""
+## Id of the ArtefactDef a team recovering this target also gets; &"" when none.
+@export var artefact_id: StringName = &""

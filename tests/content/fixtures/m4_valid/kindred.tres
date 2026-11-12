@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FactionDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/faction_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+kind = &"alien"
+name_key = &"FACTION_KINDRED"
+accent = Color(0.2, 0.6, 0.4, 1)
+start_standing = 10
+id = &"faction_kindred"
