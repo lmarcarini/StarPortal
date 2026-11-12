@@ -6,7 +6,8 @@ extends RefCounted
 ## Saved shape: {"mode": "idle" | "dialing" | "locked", "current_address": address or null,
 ## "dial_started_tick", "lock_energy_mwh": ExactFloat string, "connected_world_id",
 ## "lock_started_tick",
-## "is_hostile", "dial_log": [DialLogEntry]}. Unset ticks are -1.
+## "is_hostile", "dial_log": [DialLogEntry], "incoming": {} | {"faction", "conversation",
+## "until_tick"}}. Unset ticks are -1.
 ## Bible: technical-architecture.md#data-model, technical-architecture.md#state-machines,
 ## gate-and-address-spec.md#dialing-outcomes-and-energy, gate-and-address-spec.md#player-tools
 
@@ -53,6 +54,16 @@ var lock_started_tick: int = -1
 var is_hostile: bool = false
 ## Every dial attempt, oldest first.
 var dial_log: Array[DialLogEntry] = []
+## An incoming wormhole waiting for Answer or Ignore: faction, conversation and the tick it
+## gives up; &"" / −1 when none.
+var incoming_faction: StringName = &""
+var incoming_conversation: StringName = &""
+var incoming_until_tick: int = -1
+
+
+## True while an incoming wormhole waits for an answer.
+func has_incoming() -> bool:
+	return not incoming_faction.is_empty()
 
 
 ## Returns JSON-safe data for saving. The mode is a lowercase name; a missing address is null.
@@ -70,6 +81,17 @@ func to_dict() -> Dictionary:
 		"lock_started_tick": lock_started_tick,
 		"is_hostile": is_hostile,
 		"dial_log": log_data,
+		"incoming": _incoming_to_dict(),
+	}
+
+
+func _incoming_to_dict() -> Dictionary:
+	if not has_incoming():
+		return {}
+	return {
+		"faction": String(incoming_faction),
+		"conversation": String(incoming_conversation),
+		"until_tick": incoming_until_tick,
 	}
 
 
@@ -96,6 +118,11 @@ static func from_dict(data: Dictionary) -> GateState:
 		gate.is_hostile = hostile
 	for item: Dictionary in _dicts_in(data.get("dial_log")):
 		gate.dial_log.append(DialLogEntry.from_dict(item))
+	var incoming_data: Dictionary = SaveFields.dict_or_empty(data.get("incoming"))
+	if not incoming_data.is_empty():
+		gate.incoming_faction = SaveFields.read_id(incoming_data.get("faction"))
+		gate.incoming_conversation = SaveFields.read_id(incoming_data.get("conversation"))
+		gate.incoming_until_tick = SaveFields.read_int(incoming_data.get("until_tick"), -1)
 	return gate
 
 
@@ -109,9 +136,32 @@ static func from_dict(data: Dictionary) -> GateState:
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors := _field_errors(data)
 	errors.append_array(_list_errors(data, "dial_log", DialLogEntry.validate_dict))
+	errors.append_array(_incoming_errors(data))
 	if not errors.is_empty():
 		return errors
 	return _mode_errors(data)
+
+
+## Errors of "incoming": an object, empty or with a faction, a conversation and a tick.
+static func _incoming_errors(data: Dictionary) -> Array[String]:
+	var errors: Array[String] = []
+	if not data.has("incoming"):
+		errors.append("missing 'incoming'")
+		return errors
+	if not data["incoming"] is Dictionary:
+		errors.append("'incoming' is not an object")
+		return errors
+	var incoming: Dictionary = data["incoming"]
+	if incoming.is_empty():
+		return errors
+	errors.append_array(SaveFields.missing(incoming, ["faction", "conversation", "until_tick"]))
+	if not errors.is_empty():
+		return errors
+	var ok: bool = SaveFields.is_id(incoming["faction"])
+	ok = ok and SaveFields.is_id(incoming["conversation"])
+	if not ok or not SaveFields.is_tick(incoming["until_tick"]):
+		errors.append("'incoming' is not {faction, conversation, until_tick}")
+	return errors
 
 
 ## Type errors of every field except the Dial Log.

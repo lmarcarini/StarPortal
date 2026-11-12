@@ -195,6 +195,10 @@ func test_to_dict_sections() -> void:
 				"recruitment",
 				"probes",
 				"expedition",
+				"factions",
+				"conversations",
+				"requests",
+				"artefacts",
 			]
 		)
 	)

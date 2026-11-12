@@ -55,11 +55,13 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 
 ## Like build(), for a new game: also delivers every AT_START document to the Archive at the
 ## clock's tick, in id order, posting document_received for each (emitted with the next
-## tick's events). Only new games go through here, so a loaded game never re-delivers.
+## tick's events). Only new games go through here, so a loaded game never re-delivers. Also
+## sets the factions' starting standings and meets the Earth factions (FactionsState.starting).
 static func build_new(state: GameState, defs: GameDefs) -> Result:
 	var built: Result = build(state, defs)
 	if built.is_ok:
 		DocumentSystem.deliver_start_documents(state, defs.documents)
+		state.factions = FactionsState.starting(defs.factions)
 	return built
 
 

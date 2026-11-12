@@ -75,6 +75,7 @@ func test_defaults_and_dict_shape() -> void:
 				"lock_started_tick": -1,
 				"is_hostile": false,
 				"dial_log": [],
+				"incoming": {},
 			}
 		)
 	)

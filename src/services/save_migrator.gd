@@ -13,16 +13,40 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 15
+const TARGET_VERSION: int = 16
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
 const OLDEST_VERSION: int = 15
 
 
-## Returns the built-in steps, keyed by the version they migrate from; none yet since the M3
-## clean break. (A function, not a constant: a Callable is not a constant expression.)
+## Returns the built-in steps, keyed by the version they migrate from. (A function, not a
+## constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
-	var built_in: Dictionary[int, Callable] = {}
+	var built_in: Dictionary[int, Callable] = {15: _v15_to_v16}
 	return built_in
+
+
+## v15 → v16 (M4, docs/content/m4-core-systems.md section 9): adds the empty factions,
+## conversations, requests and artefacts sections, an empty research queue and revealed list
+## and no incoming wormhole. Factions start empty in an old save (no standings, none met).
+static func _v15_to_v16(data: Dictionary) -> Dictionary:
+	var out: Dictionary = data.duplicate(true)
+	if not out.get("state") is Dictionary:
+		return out
+	var state: Dictionary = out["state"]
+	state["factions"] = FactionsState.new().to_dict()
+	state["conversations"] = ConversationsState.new().to_dict()
+	state["requests"] = RequestsState.new().to_dict()
+	state["artefacts"] = ArtefactsState.new().to_dict()
+	for key: String in ["research", "gate"]:
+		if not state.get(key) is Dictionary:
+			continue
+		var section: Dictionary = state[key]
+		if key == "research":
+			section["queue"] = []
+			section["revealed"] = []
+		else:
+			section["incoming"] = {}
+	return out
 
 
 ## Returns [param data] migrated to [constant TARGET_VERSION] with the built-in steps.
