@@ -52,6 +52,7 @@ Each condition has a **reason key** for the UI ("Requires Kindred standing 25").
 | `OfferRequest(request)` | creates a request offer (section 4) |
 | `GiveArtefact(artefact)` / `TakeArtefact(artefact)` | an artefact arrives in Gate Room holding / one is handed over |
 | `UnlockResearch(project)` / `CompleteResearch(project)` | reveals a hidden project / marks it done for free |
+| `StudyArtefact(artefact)` | marks the held artefact Studied (the end effect of a study project) |
 | `Modifier(key, amount)` | only valid on research and artefacts: a lasting modifier (section 6) |
 
 An effect can be marked **hidden**: it still happens, but previews show "?" instead of it. That is
@@ -297,3 +298,7 @@ version itself and says so in its PR.
    able to send something through? Proposal: not in M4.
 3. **Over-capacity holding** costs Confidence. Alternative: block new artefacts. Proposal: keep
    the cost (nothing is ever lost).
+
+## 11. Cards
+
+M4a: #252 to #271 (M4-01 to M4-20). M4b: #272 to #287 (M4-21 to M4-36). Each card is self-contained and links back here.
