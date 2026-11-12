@@ -2,7 +2,7 @@
 
 ## Milestones
 
-The Ring is built first, because if finding and dialing an address is not fun, nothing else matters. Everything after that is built around it.
+The Ring is built first, because if finding and dialing an address is not fun, nothing else matters. Everything after that is built around it. From M4 the order is fixed (owner, 2026-11-11): core systems first, then refinement, interface, graphics, and content last.
 
 | Milestone | Builds | Done when |
 | --- | --- | --- |
@@ -15,11 +15,12 @@ The Ring is built first, because if finding and dialing an address is not fun, n
 | M2.5 The Base, revised | After the M2 playtest: a lean start (one level, three rooms), one-click building with much shorter build times, a Research Lab and Research tab (F4) with seven projects that unlock deeper levels, lifts, plants, banks and the Workshop, room roles in the palette, power in 5 MW blocks, no reserved capacitor site, clearer no-power indicators | A new player builds a bank, dials SILL and researches their way to a second level within the first in-game month |
 | M2.6 Staff and the Committee | After the M2.5 playtest: corridor painting fixed, progress bars on sites and digs, research as a tech tree with category sub-tabs. Then staff and money: a starting crew of five, monthly candidates and hiring, staff slots (scientists speed research, engineers crew the Workshop; plants need no staff), beds and Quarters, salaries, Committee Confidence driving the allocation, a quarterly grant, a non-pausing month-end report, the Personnel tab (F5) | A 30-day run balances power, staff and money with real trade-offs, and the month-end report explains every change in Confidence |
 | M3 Beyond the Ring | Probes, drone feed, World Reports, expeditions, check-ins, the contact (conversation) system with partial translation and transcripts, the Codex, and a minimal faction standing (one number per faction, no thresholds or requests) | A full dial, probe, expedition and return loop works |
-| M4 Consequences | Research, artefacts, tech tree, factions (thresholds, requests, ripples, diplomacy; conversations gain OfferRequest), incursions, failure states | Every failure state can be triggered and every transformation completed |
-| M5 Vertical slice | Prologue and Arc 1, full gamepad play, core accessibility options, Claude-generated Blender art for a few rooms | A new player finishes Arc 1 and wants to continue |
-| M6 Middle arcs | Arcs 2 to 4, Continuity, the Ossar, nine seals | Each arc's rule change and setback works |
-| M7 Late arcs | Arcs 5 to 7, the Murmur, the Keystone, endings | The campaign can be finished, with every ending reachable |
-| M8 Release | Balance, final art, audio, Brazilian Portuguese, full accessibility pass, performance, sandbox mode, Steam build if the game earns it | Meets the performance targets and passes a full playthrough |
+| M4 Core systems | The last core mechanisms, with minimal test content (docs/content/m4-core-systems.md). M4a Factions and contact: conditions and effects, factions and standing (the Committee's is Confidence), conversations by hail, incoming wormhole and phone, transcripts, requests with deadlines, rewards and penalties. M4b Artefacts and technology: artefacts in holding, Vault and Containment, hazards, modifiers, a data-driven tech tree with requirements, a queue and a view for hundreds of projects | Every system can be exercised by hand with the test content, and the flow tests pass |
+| M5 Refinement | Iterating on the core systems from the owner's playtests; the refinement backlog (#249); balance; incursions and failure states if the owner agrees | The owner signs off the core loop's feel |
+| M6 Interface | Redesign of every screen and panel, full gamepad play, rebinding, core accessibility options | A new player can use every system without help |
+| M7 Graphics | Claude-generated Blender art for rooms, the Ring and worlds, fonts, effects, audio | The game looks and sounds like the bible |
+| M8 Content | Prologue and Arcs 1 to 7, factions' arcs, puzzles (including parked M3b: puzzle 5, MOORING, K1 to K3), partial translation and lexicons, the tech tree's real projects, endings | The campaign can be finished, with every ending reachable |
+| M9 Release | Balance, Brazilian Portuguese, full accessibility pass, performance, sandbox mode, Steam build if the game earns it | Meets the performance targets and passes a full playthrough |
 
 ## Working process
 
