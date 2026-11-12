@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="StandingBelowCondition" format=3]
+
+[ext_resource type="Script" path="res://src/content/story/conditions/standing_below_condition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+faction = &"faction_a"
+amount = 25

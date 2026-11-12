@@ -1,0 +1,26 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://tests/content/fixtures/story/story_fixture_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/conditions/standing_at_least_condition.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="3"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="4"]
+
+[sub_resource type="Resource" id="c1"]
+script = ExtResource("2")
+faction = &"faction_a"
+amount = 25
+
+[sub_resource type="Resource" id="e1"]
+script = ExtResource("3")
+faction = &"faction_a"
+delta = 2
+
+[sub_resource type="Resource" id="e2"]
+script = ExtResource("4")
+flag = &"met"
+
+[resource]
+script = ExtResource("1")
+conditions = Array[Resource]([SubResource("c1")])
+effects = Array[Resource]([SubResource("e1"), SubResource("e2")])
+id = &"owner_good"

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ResearchDoneCondition" format=3]
+
+[ext_resource type="Script" path="res://src/content/story/conditions/research_done_condition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+project = &"project_a"
