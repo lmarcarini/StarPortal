@@ -181,9 +181,10 @@ modifiers while housed, and an optional **hazard**.
 target whose `WorldTargetDef.artefact_id` names one.
 
 **Holding.** A new artefact arrives in **Gate Room holding** (on the Ring floor, capacity 2 from
-balance). There it is inert. If holding is full, an arriving artefact still arrives (nothing is
-lost), but holding shows "over capacity" and the Committee loses 1 Confidence a day until it is
-cleared: huge objects on the Ring floor are noticed.
+balance). There it is inert. Holding can never go over capacity. If holding is full, an arriving
+artefact **waits at the gate**: it is kept, listed as "at the gate", and cannot be housed or
+studied. When holding has a free place, the player **retrieves** it into holding (nothing is ever
+lost, and there is no Confidence cost).
 
 **Housing.** Storage rooms are new rooms with **artefact slots**:
 
@@ -292,12 +293,12 @@ version itself and says so in its PR.
 
 ## 10. Open questions for the owner
 
-1. **Incursions and failure states** were in the old M4. They are core too, but not in this
-   request. Proposal: a short M4c after M4b, or the first thing in Refinement.
-2. **Ignore an incoming wormhole** costs standing −2. Without a Shutter, should a hostile one be
-   able to send something through? Proposal: not in M4.
-3. **Over-capacity holding** costs Confidence. Alternative: block new artefacts. Proposal: keep
-   the cost (nothing is ever lost).
+1. **Incursions and failure states** — *Owner decision 2026-11-12:* a short M4c after M4b.
+2. **Ignore an incoming wormhole** costs standing −2. *Owner decision 2026-11-12:* a hostile
+   wormhole cannot send anything through in M4.
+3. **Over-capacity holding** — *Owner decision 2026-11-12:* holding cannot go over capacity;
+   an artefact that arrives while holding is full waits at the gate and can be retrieved once
+   there is room. No Confidence cost.
 
 ## 11. Cards
 
