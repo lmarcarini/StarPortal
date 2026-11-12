@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArtefactDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/artefact_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/modifier_effect.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/effects/change_money_effect.gd" id="3"]
+
+[sub_resource type="Resource" id="m1"]
+script = ExtResource("2")
+key = &"research_speed_pct"
+amount = 10
+
+[sub_resource type="Resource" id="h1"]
+script = ExtResource("3")
+amount_k = -50
+
+[resource]
+script = ExtResource("1")
+name_key = &"ARTEFACT_RELIC"
+description_key = &"ARTEFACT_RELIC_TEXT"
+storage = &"containment"
+modifiers = Array[ExtResource("2")]([SubResource("m1")])
+hazard_chance_pct = 5
+hazard = Array[Resource]([SubResource("h1")])
+id = &"artefact_relic"

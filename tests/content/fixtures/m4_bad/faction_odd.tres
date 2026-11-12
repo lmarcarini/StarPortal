@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="FactionDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/faction_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+kind = &"robot"
+name_key = &"X"
+start_standing = 150
+id = &"faction_odd"

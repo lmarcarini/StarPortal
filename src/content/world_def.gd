@@ -67,12 +67,28 @@ enum Sun { HIDDEN, WHITE, YELLOW, ORANGE, RED }
 @export var threat: Threat = Threat.LOW
 ## Named things a team or the MOTH can go to, in the order a Look around lists them.
 @export var targets: Array[WorldTargetDef] = []
+## Id of the FactionDef that holds this world; &"" when no faction does.
+@export var controller: StringName = &""
+
+
+## The controller faction and the artefacts of the targets, when set.
+func get_references() -> Array[StringName]:
+	var found: Array[StringName] = []
+	if not controller.is_empty():
+		found.append(controller)
+	for target: WorldTargetDef in targets:
+		if target != null and not target.artefact_id.is_empty():
+			found.append(target.artefact_id)
+	return found
 
 
 ## Returns the problems of the authored facts: an UNKNOWN true value, a guarded world whose
-## threat is not HIGH, and a target with an empty or repeated id or an empty name key.
-func get_content_errors(_defs: Dictionary[StringName, DefBase]) -> Array[String]:
+## threat is not HIGH, and a target with an empty or repeated id or an empty name key, a
+## controller that is not a faction or a target artefact that is not an artefact.
+func get_content_errors(defs: Dictionary[StringName, DefBase]) -> Array[String]:
 	var errors: Array[String] = []
+	if defs.has(controller) and not defs[controller] is FactionDef:
+		errors.append("controller '%s' is not a faction" % controller)
 	var unknowns: Array[bool] = [
 		biohazard == Biohazard.UNKNOWN,
 		life == Life.UNKNOWN,
@@ -91,4 +107,9 @@ func get_content_errors(_defs: Dictionary[StringName, DefBase]) -> Array[String]
 			errors.append("target %s is repeated" % target.id)
 		else:
 			seen[target.id] = true
+		if target != null and defs.has(target.artefact_id):
+			if not defs[target.artefact_id] is ArtefactDef:
+				errors.append(
+					"target %s: '%s' is not an artefact" % [target.id, target.artefact_id]
+				)
 	return errors
