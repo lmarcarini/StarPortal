@@ -77,6 +77,7 @@ func _enter_tree() -> void:
 	EventBus.team_checked_in.connect(_on_team_checked_in)
 	EventBus.prologue_completed.connect(_on_prologue_completed)
 	EventBus.request_changed.connect(_on_request_changed)
+	EventBus.artefact_hazard.connect(_on_artefact_hazard)
 
 
 func _exit_tree() -> void:
@@ -86,6 +87,7 @@ func _exit_tree() -> void:
 	EventBus.team_checked_in.disconnect(_on_team_checked_in)
 	EventBus.prologue_completed.disconnect(_on_prologue_completed)
 	EventBus.request_changed.disconnect(_on_request_changed)
+	EventBus.artefact_hazard.disconnect(_on_artefact_hazard)
 	if _simulation != null and SimClock.simulation == _simulation:
 		SimClock.stop()
 
@@ -322,3 +324,8 @@ func _on_request_changed(uid: int, to: int) -> void:
 	var record: RequestRecord = RequestRules.find(_simulation.state, uid)
 	if record != null:
 		show_message(RequestLog.line({"request_id": String(record.request), "state": to}), 4.0)
+
+
+## A non-pausing message when an artefact's hazard strikes.
+func _on_artefact_hazard(artefact_id: StringName) -> void:
+	show_message(ArtefactText.hazard_line(artefact_id), 4.0)

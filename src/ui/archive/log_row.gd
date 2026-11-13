@@ -136,6 +136,8 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 				Registry.get_def(StringName(str(entry.args.get("faction_id", "")))) as FactionDef
 			)
 			var name: String = "" if faction == null else _tr(faction.name_key)
+			if entry.args.get("reason", "") == "hazard":
+				return ArtefactText.hazard_line(StringName(str(entry.args.get("artefact_id", ""))))
 			if entry.args.get("reason", "") == "debug":
 				return _tr(&"LOG_LINE_DEBUG").format({"line": str(entry.args.get("line", ""))})
 			if entry.args.has("request_id"):
