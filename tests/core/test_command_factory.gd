@@ -39,6 +39,8 @@ func _samples() -> Array[Command]:
 		ChooseOptionCommand.new(2),
 		EndConversationCommand.new(),
 		HailCommand.new(),
+		AnswerIncomingCommand.new(),
+		IgnoreIncomingCommand.new(),
 		DeliverDocumentCommand.create(&"doc_survey_note_1958"),
 		MarkDocumentReadCommand.create(&"doc_survey_note_1958"),
 		NoteAddressCommand.create("3-17-0-22-9-14-30-5", "dead world, safe"),
@@ -170,6 +172,7 @@ func test_defaults_are_registered_lazily() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"answer_incoming",
 				&"assign_staff",
 				&"cancel_build",
 				&"cancel_research",
@@ -185,6 +188,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"extend_pole_camera",
 				&"hail",
 				&"hire",
+				&"ignore_incoming",
 				&"launch_canister",
 				&"launch_moth",
 				&"mark_document_read",
@@ -220,6 +224,7 @@ func test_register_type_adds_a_type() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"answer_incoming",
 				&"assign_staff",
 				&"cancel_build",
 				&"cancel_research",
@@ -235,6 +240,7 @@ func test_register_type_adds_a_type() -> void:
 				&"extend_pole_camera",
 				&"hail",
 				&"hire",
+				&"ignore_incoming",
 				&"launch_canister",
 				&"launch_moth",
 				&"mark_document_read",
@@ -273,6 +279,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"answer_incoming",
 				&"assign_staff",
 				&"cancel_build",
 				&"cancel_research",
@@ -288,6 +295,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"extend_pole_camera",
 				&"hail",
 				&"hire",
+				&"ignore_incoming",
 				&"launch_canister",
 				&"launch_moth",
 				&"mark_document_read",

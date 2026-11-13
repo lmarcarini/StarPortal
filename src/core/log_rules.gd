@@ -34,6 +34,12 @@ static func entries_for(
 			return [
 				LogEntry.create(tick, &"faction", StringName(_text(args)), {"reason": "no_answer"})
 			]
+		&"incoming_ignored":
+			return [
+				LogEntry.create(
+					tick, &"faction", &"", {"faction_id": _text(args), "reason": "ignored"}
+				)
+			]
 		&"call_missed":
 			return [
 				LogEntry.create(

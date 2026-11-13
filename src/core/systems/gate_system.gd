@@ -27,6 +27,8 @@ extends SimSystem
 const REASON_TIMEOUT: StringName = &"timeout"
 ## Close reason when the open wormhole drained the capacitors empty.
 const REASON_POWER: StringName = &"power"
+## Pause reason when an incoming wormhole activates the Ring.
+const INCOMING_PAUSE: StringName = &"incoming_wormhole"
 
 
 ## Returns the system id, &"gate".
@@ -42,6 +44,8 @@ func tick(state: GameState) -> void:
 		return
 	var end_tick: int = state.clock.tick + 1
 	match state.gate.mode:
+		GateState.RingMode.IDLE:
+			_run_incoming(state)
 		GateState.RingMode.DIALING:
 			if end_tick - state.gate.dial_started_tick >= state.balance.dial_duration_ticks:
 				_resolve(state, end_tick)
@@ -80,7 +84,7 @@ func _resolve(state: GameState, end_tick: int) -> void:
 ## Returns why the open wormhole closes as [param end_tick] begins, or &"" when it stays open.
 ## Power is checked first: the capacitors are empty (docs/content/m2-base.md section 3).
 func _close_reason(state: GameState, end_tick: int) -> StringName:
-	if state.power.stored_mwh <= 0.0:
+	if state.power.stored_mwh <= 0.0 and not state.gate.is_incoming_lock():
 		return REASON_POWER
 	if end_tick - state.gate.lock_started_tick >= state.balance.max_open_ticks:
 		return REASON_TIMEOUT
@@ -91,3 +95,27 @@ func _close_reason(state: GameState, end_tick: int) -> StringName:
 func _drop_to_normal_speed(clock: ClockState) -> void:
 	if clock.speed_index > ClockState.NORMAL_SPEED_INDEX:
 		clock.speed_index = ClockState.NORMAL_SPEED_INDEX
+
+
+## While IDLE: an incoming wormhole that waited too long is ignored; with none waiting and no
+## conversation running, the oldest pending incoming contact activates the Ring from the far
+## side for incoming_answer_minutes and asks for a pause.
+func _run_incoming(state: GameState) -> void:
+	var gate: GateState = state.gate
+	if gate.has_incoming():
+		if state.clock.tick >= gate.incoming_until_tick:
+			IncomingRules.ignore(state)
+		return
+	if state.conversations.active != null:
+		return
+	var index: int = ContactRules.next_pending(state, &"incoming")
+	if index < 0:
+		return
+	var contact: PendingContact = state.factions.pending[index]
+	state.factions.pending.remove_at(index)
+	gate.incoming_faction = contact.faction
+	gate.incoming_conversation = contact.conversation
+	# One tick is one minute.
+	gate.incoming_until_tick = state.clock.tick + state.balance.incoming_answer_minutes
+	state.events.post(&"incoming_wormhole", [contact.faction])
+	state.events.post(Simulation.PAUSE_EVENT, [INCOMING_PAUSE])

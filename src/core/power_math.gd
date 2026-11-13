@@ -18,9 +18,10 @@ const _ROUNDING: float = 3.0e-16
 
 
 ## Returns the power the open wormhole draws, in MW: the 8-seal drain while the Ring is
-## LOCKED, otherwise 0.
+## LOCKED by our dial, otherwise 0 (an answered incoming wormhole is held open from the far
+## side, m4-core-systems.md section 3).
 static func drain_mw(gate: GateState, balance: BalanceConfig) -> float:
-	if gate.mode != GateState.RingMode.LOCKED:
+	if gate.mode != GateState.RingMode.LOCKED or gate.is_incoming_lock():
 		return 0.0
 	return balance.open_drain_mw_8
 
