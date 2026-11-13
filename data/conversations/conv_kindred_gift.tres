@@ -1,0 +1,63 @@
+[gd_resource type="Resource" script_class="ConversationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/conversation_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/conditions/standing_at_least_condition.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/conversation_node_def.gd" id="3"]
+[ext_resource type="Script" path="res://src/content/conversation_choice_def.gd" id="4"]
+[ext_resource type="Script" path="res://src/content/story/effects/change_money_effect.gd" id="5"]
+[ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="6"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+faction = &"faction_kindred"
+amount = 25
+
+[sub_resource type="Resource" id="r2"]
+script = ExtResource("3")
+id = &"l1"
+speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+text_key = &"CONV_KINDRED_GIFT_1"
+minutes = 2
+next = &"ask"
+
+[sub_resource type="Resource" id="r3"]
+script = ExtResource("5")
+amount_k = 300
+
+[sub_resource type="Resource" id="r4"]
+script = ExtResource("4")
+text_key = &"CONV_KINDRED_GIFT_FUNDS"
+effects = Array[Resource]([SubResource("r3")])
+next = &"end"
+
+[sub_resource type="Resource" id="r5"]
+script = ExtResource("6")
+faction = &"faction_kindred"
+delta = 5
+
+[sub_resource type="Resource" id="r6"]
+script = ExtResource("4")
+text_key = &"CONV_KINDRED_GIFT_FRIENDSHIP"
+effects = Array[Resource]([SubResource("r5")])
+next = &"end"
+
+[sub_resource type="Resource" id="r7"]
+script = ExtResource("3")
+id = &"ask"
+kind = 1
+choices = Array[Resource]([SubResource("r4"), SubResource("r6")])
+
+[sub_resource type="Resource" id="r8"]
+script = ExtResource("3")
+id = &"end"
+kind = 2
+
+[resource]
+script = ExtResource("1")
+faction = &"faction_kindred"
+channels = Array[StringName]([&"incoming"])
+conditions = Array[Resource]([SubResource("r1")])
+priority = 5
+start = &"l1"
+nodes = Array[Resource]([SubResource("r2"), SubResource("r7"), SubResource("r8")])
+id = &"conv_kindred_gift"

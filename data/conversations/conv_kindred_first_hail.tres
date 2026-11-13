@@ -1,0 +1,73 @@
+[gd_resource type="Resource" script_class="ConversationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/conversation_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/conversation_node_def.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/conversation_choice_def.gd" id="3"]
+[ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="4"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+id = &"l1"
+speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+text_key = &"CONV_KINDRED_FIRST_1"
+minutes = 2
+next = &"ask"
+
+[sub_resource type="Resource" id="r2"]
+script = ExtResource("4")
+faction = &"faction_kindred"
+delta = 5
+
+[sub_resource type="Resource" id="r3"]
+script = ExtResource("3")
+text_key = &"CONV_KINDRED_FIRST_PEACE"
+effects = Array[Resource]([SubResource("r2")])
+next = &"end_warm"
+
+[sub_resource type="Resource" id="r4"]
+script = ExtResource("4")
+faction = &"faction_kindred"
+delta = -5
+
+[sub_resource type="Resource" id="r5"]
+script = ExtResource("3")
+text_key = &"CONV_KINDRED_FIRST_DEMAND"
+effects = Array[Resource]([SubResource("r4")])
+next = &"end_cold"
+
+[sub_resource type="Resource" id="r6"]
+script = ExtResource("2")
+id = &"ask"
+kind = 1
+choices = Array[Resource]([SubResource("r3"), SubResource("r5")])
+
+[sub_resource type="Resource" id="r7"]
+script = ExtResource("2")
+id = &"end_warm"
+speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+text_key = &"CONV_KINDRED_FIRST_WARM"
+minutes = 2
+next = &"end"
+
+[sub_resource type="Resource" id="r8"]
+script = ExtResource("2")
+id = &"end_cold"
+speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+text_key = &"CONV_KINDRED_FIRST_COLD"
+minutes = 2
+next = &"end"
+
+[sub_resource type="Resource" id="r9"]
+script = ExtResource("2")
+id = &"end"
+kind = 2
+
+[resource]
+script = ExtResource("1")
+faction = &"faction_kindred"
+channels = Array[StringName]([&"wormhole"])
+priority = 10
+start = &"l1"
+nodes = Array[Resource]([SubResource("r1"), SubResource("r6"), SubResource("r7"), SubResource("r8"), SubResource("r9")])
+id = &"conv_kindred_first_hail"
+once = true

@@ -151,7 +151,7 @@ func test_previews() -> void:
 	var standing := ChangeStandingEffect.new()
 	standing.faction = &"faction_kindred"
 	standing.delta = 10
-	assert_str(StoryText.preview(standing)).is_equal("faction_kindred standing +10")
+	assert_str(StoryText.preview(standing)).is_equal("The Kindred standing +10")
 	var money := ChangeMoneyEffect.new()
 	money.amount_k = 500
 	assert_str(StoryText.preview(money)).contains("500")

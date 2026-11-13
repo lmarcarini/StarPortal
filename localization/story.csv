@@ -49,3 +49,14 @@ COMMAND_TITLE_NEW,{title} (!),{title} (!)
 COMMAND_SUBTAB_FACTIONS,Factions,[EN] Factions
 FACTION_STANDING_LINE,Standing {value}  {attitude}  Open requests: {requests},[EN] Standing {value}  {attitude}  Open requests: {requests}
 CAUSE_GIFT,Gift,[EN] Gift
+FACTION_COMMITTEE,The Committee,[EN] The Committee
+FACTION_KINDRED,The Kindred,[EN] The Kindred
+FACTION_OSSAR,The Ossar,[EN] The Ossar
+REQ_SURVEY_HEARTH,Survey HEARTH,[EN] Survey HEARTH
+REQ_SURVEY_HEARTH_TEXT,The Committee wants a team's survey of HEARTH within ten days.,[EN] The Committee wants a team's survey of HEARTH within ten days.
+REQ_KINDRED_RESEARCH,Finish the capacitor lattice,[EN] Finish the capacitor lattice
+REQ_KINDRED_RESEARCH_TEXT,The Kindred will trust us more once we master the capacitor lattice.,[EN] The Kindred will trust us more once we master the capacitor lattice.
+REQ_KINDRED_HANDOVER,Return the relic,[EN] Return the relic
+REQ_KINDRED_HANDOVER_TEXT,The Kindred ask for a relic taken from their world.,[EN] The Kindred ask for a relic taken from their world.
+REQ_OSSAR_CLOSED,Keep the Ring closed,[EN] Keep the Ring closed
+REQ_OSSAR_CLOSED_TEXT,The Ossar demand that no wormhole open from Earth for five days.,[EN] The Ossar demand that no wormhole open from Earth for five days.

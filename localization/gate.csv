@@ -339,3 +339,8 @@ GATE_INCOMING_IGNORE,Ignore,Ignorar
 GATE_INCOMING_TIME,{minutes} min to answer,{minutes} min para atender
 LOG_LINE_INCOMING_IGNORED,Ignored an incoming wormhole from {name}.,Ignoramos um buraco de minhoca de {name}.
 CAUSE_INCOMING_IGNORED,Incoming wormhole ignored,Buraco de minhoca ignorado
+WORLD_HEARTH_NAME,HEARTH,HEARTH
+WORLD_TOLLGATE_NAME,TOLLGATE,TOLLGATE
+TARGET_HEARTH_LONGHOUSE,the longhouse,a casa comprida
+TARGET_TOLLGATE_WATCHPOST,the watchpost,o posto de vigia
+TARGET_TOLLGATE_EFFIGY,the effigy,a efígie

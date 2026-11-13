@@ -110,7 +110,8 @@ func test_save_while_waiting() -> void:
 
 
 func test_world_falls_back_to_the_conversation() -> void:
-	_state.galaxy.get_world(WORLD).controller = &""
+	for record: WorldRecord in _state.galaxy.all_worlds():
+		record.controller = &""
 	var def: ConversationDef = _state.conversation_defs[ConversationTests.CONV]
 	def.worlds = [&"world_x"]
 	assert_str(String(IncomingRules.world_of(_state, KINDRED, def.id))).is_equal("world_x")

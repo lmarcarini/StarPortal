@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="WorldDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/world_def.gd" id="1_world"]
+[ext_resource type="Script" path="res://src/content/world_target_def.gd" id="2_target"]
+
+[sub_resource type="Resource" id="Target_0"]
+script = ExtResource("2_target")
+id = &"watchpost"
+name_key = &"TARGET_TOLLGATE_WATCHPOST"
+is_object = false
+
+[sub_resource type="Resource" id="Target_1"]
+script = ExtResource("2_target")
+id = &"effigy"
+name_key = &"TARGET_TOLLGATE_EFFIGY"
+is_object = true
+
+[resource]
+script = ExtResource("1_world")
+name_key = &"WORLD_TOLLGATE_NAME"
+position_ly = Vector3i(-3500, 700, -400)
+origin_glyph = 23
+biome = 3
+sky = 2
+sun = 1
+atmosphere = 2
+temperature_c = 14
+biohazard = 1
+life = 1
+structures = 3
+threat = 2
+targets = Array[ExtResource("2_target")]([SubResource("Target_0"), SubResource("Target_1")])
+controller = &"faction_ossar"
+id = &"world_tollgate"

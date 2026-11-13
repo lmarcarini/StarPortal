@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="ConversationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/conversation_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/conversation_node_def.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="3"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+id = &"l1"
+speaker_key = &"CONV_SPEAKER_OSSAR"
+text_key = &"CONV_OSSAR_HAIL_1"
+minutes = 2
+next = &"l2"
+
+[sub_resource type="Resource" id="r2"]
+script = ExtResource("2")
+id = &"l2"
+speaker_key = &"CONV_SPEAKER_OSSAR"
+text_key = &"CONV_OSSAR_HAIL_2"
+minutes = 2
+next = &"end"
+
+[sub_resource type="Resource" id="r3"]
+script = ExtResource("3")
+faction = &"faction_ossar"
+delta = -5
+
+[sub_resource type="Resource" id="r4"]
+script = ExtResource("2")
+id = &"end"
+kind = 2
+effects = Array[Resource]([SubResource("r3")])
+
+[resource]
+script = ExtResource("1")
+faction = &"faction_ossar"
+channels = Array[StringName]([&"wormhole"])
+priority = 5
+start = &"l1"
+nodes = Array[Resource]([SubResource("r1"), SubResource("r2"), SubResource("r4")])
+id = &"conv_ossar_hail"

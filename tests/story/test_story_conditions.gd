@@ -127,7 +127,7 @@ func test_reason_lines() -> void:
 	var condition := StandingAtLeastCondition.new()
 	condition.faction = &"faction_kindred"
 	condition.amount = 25
-	assert_str(StoryText.reason(condition)).is_equal("Requires faction_kindred standing 25")
+	assert_str(StoryText.reason(condition)).is_equal("Requires The Kindred standing 25")
 	var world := WorldStatusAtLeastCondition.new()
 	world.world = &"world_lintel"
 	world.status = WorldStatusAtLeastCondition.WorldStatus.PROBED
