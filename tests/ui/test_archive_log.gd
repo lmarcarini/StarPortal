@@ -72,7 +72,7 @@ func _lines() -> Array[String]:
 ## The Archive has a Documents and a Log section; the Log lists every entry newest first.
 func test_log_lists_every_entry_newest_first() -> void:
 	var sections: TabContainer = _view.get_node("%Sections") as TabContainer
-	assert_int(sections.get_tab_count()).is_equal(3)
+	assert_int(sections.get_tab_count()).is_equal(4)
 	assert_str(sections.get_tab_bar().tr(sections.get_tab_title(2))).is_equal("Log")
 	var entries: Array[LogEntry] = _player.state().operations_log.entries
 	assert_int(_list().get_rows().size()).is_equal(entries.size())

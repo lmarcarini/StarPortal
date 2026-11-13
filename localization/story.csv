@@ -64,3 +64,22 @@ LOG_LINE_DEBUG,(debug) {line},(debug) {line}
 DEBUG_CAUSE,(debug),(debug)
 COMMAND_LINE_MODIFIERS,Modifiers,[EN] Modifiers
 LOG_LINE_ARTEFACT_HAZARD,Hazard: {name} acted up outside Containment.,[EN] Hazard: {name} acted up outside Containment.
+ARTEFACT_HEADER,Holding {held}/{capacity}  At the gate: {gate},[EN] Holding {held}/{capacity}  At the gate: {gate}
+ARTEFACT_WHILE_ON,While on: {effects},[EN] While on: {effects}
+ARTEFACT_HAZARD,Hazard: {chance}% a day outside Containment,[EN] Hazard: {chance}% a day outside Containment
+ARTEFACT_AT_GATE,waiting at the gate,[EN] waiting at the gate
+ARTEFACT_IN_HOLDING,in Gate Room holding,[EN] in Gate Room holding
+ARTEFACT_IN_ROOM,in {room},[EN] in {room}
+ARTEFACT_STATE_RECOVERED,Recovered,[EN] Recovered
+ARTEFACT_STATE_HOUSED,Housed,[EN] Housed
+ARTEFACT_STATE_STUDIED,Studied,[EN] Studied
+ARTEFACT_RETRIEVE,Retrieve,[EN] Retrieve
+ARTEFACT_HOUSE,House in {room},[EN] House in {room}
+ARTEFACT_REMOVE,Remove to holding,[EN] Remove to holding
+ARTEFACT_REFUSED_HOLDING_FULL,Holding is full.,[EN] Holding is full.
+ARTEFACT_REFUSED_ROOM_FULL,That room is full.,[EN] That room is full.
+ARTEFACT_REFUSED_WRONG_CLASS,It needs Containment.,[EN] It needs Containment.
+ARTEFACT_REFUSED_NOT_BUILT,The room is not built yet.,[EN] The room is not built yet.
+ARCHIVE_SECTION_ARTEFACTS,Artefacts,[EN] Artefacts
+GATE_ARTEFACTS_BUTTON,Artefacts: {header},[EN] Artefacts: {header}
+ROOM_ARTEFACTS_HOUSED,Housed: {names},[EN] Housed: {names}
