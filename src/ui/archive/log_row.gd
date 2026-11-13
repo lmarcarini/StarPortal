@@ -136,6 +136,8 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 				Registry.get_def(StringName(str(entry.args.get("faction_id", "")))) as FactionDef
 			)
 			var name: String = "" if faction == null else _tr(faction.name_key)
+			if entry.args.get("reason", "") == "missed":
+				return _tr(&"LOG_LINE_CALL_MISSED").format({"name": name})
 			return _tr(&"LOG_LINE_FACTION_MET").format({"name": name})
 	return ""
 

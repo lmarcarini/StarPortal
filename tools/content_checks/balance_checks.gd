@@ -23,6 +23,9 @@ const POSITIVE: Array[StringName] = [
 	&"starting_levels",
 	&"lift_segment_cost_k",
 	&"lift_segment_ticks",
+	&"faction_contact_days",
+	&"phone_expiry_days",
+	&"incoming_answer_minutes",
 ]
 ## Tunables that must be finite and at least zero.
 const NON_NEGATIVE: Array[StringName] = [&"starting_capacity_mwh"]

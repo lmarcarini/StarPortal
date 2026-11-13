@@ -235,6 +235,12 @@ signal artefact_taken(artefact_id: StringName)
 ## Emitted when every held instance of an artefact becomes Studied, with its id (outbox).
 @warning_ignore("unused_signal")
 signal artefact_studied(artefact_id: StringName)
+## Emitted when a faction queues a contact, with its id (outbox).
+@warning_ignore("unused_signal")
+signal contact_pending(faction: StringName)
+## Emitted when an unanswered phone call expires, with the faction id (outbox; logged).
+@warning_ignore("unused_signal")
+signal call_missed(faction: StringName)
 ## Emitted when a hail gets no answer, with the world id (outbox; logged "No answer.").
 @warning_ignore("unused_signal")
 signal hail_unanswered(world_id: StringName)
