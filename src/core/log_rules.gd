@@ -34,6 +34,8 @@ static func entries_for(
 			return [
 				LogEntry.create(tick, &"faction", StringName(_text(args)), {"reason": "no_answer"})
 			]
+		&"request_changed":
+			return RequestLog.entries(args, state, tick)
 		&"incoming_ignored":
 			return [
 				LogEntry.create(

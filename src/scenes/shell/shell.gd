@@ -76,6 +76,7 @@ func _enter_tree() -> void:
 	EventBus.committee_warning.connect(_on_committee_warning)
 	EventBus.team_checked_in.connect(_on_team_checked_in)
 	EventBus.prologue_completed.connect(_on_prologue_completed)
+	EventBus.request_changed.connect(_on_request_changed)
 
 
 func _exit_tree() -> void:
@@ -84,6 +85,7 @@ func _exit_tree() -> void:
 	EventBus.committee_warning.disconnect(_on_committee_warning)
 	EventBus.team_checked_in.disconnect(_on_team_checked_in)
 	EventBus.prologue_completed.disconnect(_on_prologue_completed)
+	EventBus.request_changed.disconnect(_on_request_changed)
 	if _simulation != null and SimClock.simulation == _simulation:
 		SimClock.stop()
 
@@ -310,3 +312,13 @@ func _on_day_started(_day_index: int) -> void:
 func _on_debug_flag_pressed() -> void:
 	_debug_flag_count += 1
 	_simulation.submit(SetFlagCommand.create(DEBUG_FLAG_KEY, _debug_flag_count))
+
+
+## A non-pausing message when a request is fulfilled or fails.
+func _on_request_changed(uid: int, to: int) -> void:
+	var fulfilled: int = RequestRecord.RequestState.FULFILLED
+	if _simulation == null or (to != fulfilled and to != RequestRecord.RequestState.FAILED):
+		return
+	var record: RequestRecord = RequestRules.find(_simulation.state, uid)
+	if record != null:
+		show_message(RequestLog.line({"request_id": String(record.request), "state": to}), 4.0)

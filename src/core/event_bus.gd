@@ -220,6 +220,8 @@ signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
 @warning_ignore_start("unused_signal")
 ## Emitted when a story effect offers a request, with the new request's uid (outbox).
 signal request_offered(uid: int)
+## A request changed state (RequestRecord.RequestState as int).
+signal request_changed(uid: int, state: int)
 ## Emitted when an artefact arrives (in holding or waiting at the gate), with its uid
 ## (outbox).
 signal artefact_arrived(uid: int)

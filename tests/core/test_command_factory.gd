@@ -39,6 +39,8 @@ func _samples() -> Array[Command]:
 		ChooseOptionCommand.new(2),
 		EndConversationCommand.new(),
 		HailCommand.new(),
+		AcceptRequestCommand.new(3),
+		DeclineRequestCommand.new(4),
 		AnswerCallCommand.new(),
 		AnswerIncomingCommand.new(),
 		IgnoreIncomingCommand.new(),
@@ -173,6 +175,7 @@ func test_defaults_are_registered_lazily() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"accept_request",
 				&"answer_call",
 				&"answer_incoming",
 				&"assign_staff",
@@ -181,6 +184,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"charge_at_maximum",
 				&"choose_option",
 				&"close_wormhole",
+				&"decline_request",
 				&"deliver_document",
 				&"demolish_room",
 				&"dial",
@@ -226,6 +230,7 @@ func test_register_type_adds_a_type() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"accept_request",
 				&"answer_call",
 				&"answer_incoming",
 				&"assign_staff",
@@ -234,6 +239,7 @@ func test_register_type_adds_a_type() -> void:
 				&"charge_at_maximum",
 				&"choose_option",
 				&"close_wormhole",
+				&"decline_request",
 				&"deliver_document",
 				&"demolish_room",
 				&"dial",
@@ -282,6 +288,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"accept_request",
 				&"answer_call",
 				&"answer_incoming",
 				&"assign_staff",
@@ -290,6 +297,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"charge_at_maximum",
 				&"choose_option",
 				&"close_wormhole",
+				&"decline_request",
 				&"deliver_document",
 				&"demolish_room",
 				&"dial",

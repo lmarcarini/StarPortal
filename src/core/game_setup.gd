@@ -51,6 +51,7 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 		PowerSystem.new(defs.balance),
 		GateSystem.new(),
 		ConversationSystem.new(),
+		RequestSystem.new(),
 		DocumentSystem.new(defs.documents),
 		ProbeSystem.new(),
 		ExpeditionSystem.new(),
