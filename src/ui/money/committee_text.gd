@@ -15,6 +15,7 @@ const CAUSE_KEYS: Dictionary[StringName, StringName] = {
 	&"reports": &"CONFIDENCE_CAUSE_REPORTS",
 	&"team_lost": &"CONFIDENCE_CAUSE_TEAM_LOST",
 	&"deceased": &"CONFIDENCE_CAUSE_DECEASED",
+	&"story": &"CONFIDENCE_CAUSE_STORY",
 }
 ## Line key of each committee_warning reason.
 const WARNING_KEYS: Dictionary[StringName, StringName] = {
@@ -122,6 +123,8 @@ static func _subject_name(cause: ConfidenceCause, state: GameState) -> String:
 	if cause.cause == ConfidenceRules.RESEARCH:
 		var project: ResearchDef = Registry.get_def(cause.subject) as ResearchDef
 		return String(cause.subject) if project == null else _tr(project.name_key)
+	if cause.cause == ConfidenceRules.STORY:
+		return _tr(cause.subject)
 	if state == null:
 		return String(cause.subject)
 	return AddressBookText.name_of_world(cause.subject, state)
