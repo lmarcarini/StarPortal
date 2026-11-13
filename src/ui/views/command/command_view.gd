@@ -10,6 +10,11 @@ extends GameView
 ## "(!)" while an offer has not been seen in Requests.
 ## Bible: docs/content/m27-daily-rhythm.md section 4
 
+## Sub-tabs.
+const OVERVIEW: int = 0
+const REQUESTS: int = 1
+const FACTIONS: int = 2
+
 var _simulation: Simulation = null
 ## Index of the money line whose breakdown is shown, or -1.
 var _breakdown: int = -1
@@ -19,6 +24,8 @@ var _subtabs := HBoxContainer.new()
 var _overview_button := Button.new()
 var _requests_button := Button.new()
 var _requests := RequestsPanel.new()
+var _factions_button := Button.new()
+var _factions := FactionsPanel.new()
 
 @onready var _board: CommandBoard = %Board
 @onready var _panel: CommandPanel = %Panel
@@ -28,21 +35,24 @@ func _ready() -> void:
 	_board.line_activated.connect(open_breakdown)
 	visibility_changed.connect(_on_visibility_changed)
 	_subtabs.position = Vector2(16, 8)
-	for button: Button in [_overview_button, _requests_button]:
+	for button: Button in [_overview_button, _requests_button, _factions_button]:
 		button.toggle_mode = true
 		_subtabs.add_child(button)
 	_overview_button.text = &"COMMAND_SUBTAB_OVERVIEW"
 	_requests_button.text = &"COMMAND_SUBTAB_REQUESTS"
-	_overview_button.pressed.connect(show_requests.bind(false))
-	_requests_button.pressed.connect(show_requests.bind(true))
+	_factions_button.text = &"COMMAND_SUBTAB_FACTIONS"
+	_overview_button.pressed.connect(show_subtab.bind(OVERVIEW))
+	_requests_button.pressed.connect(show_subtab.bind(REQUESTS))
+	_factions_button.pressed.connect(show_subtab.bind(FACTIONS))
 	add_child(_subtabs)
-	_requests.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_requests.offset_left = 16.0
-	_requests.offset_top = 52.0
-	_requests.offset_right = -16.0
-	_requests.offset_bottom = -8.0
-	add_child(_requests)
-	show_requests(false)
+	for panel: Control in [_requests, _factions]:
+		panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		panel.offset_left = 16.0
+		panel.offset_top = 52.0
+		panel.offset_right = -16.0
+		panel.offset_bottom = -8.0
+		add_child(panel)
+	show_subtab(OVERVIEW)
 
 
 func _enter_tree() -> void:
@@ -64,6 +74,7 @@ func setup(simulation: Simulation) -> void:
 	_breakdown = -1
 	_seen_uid = -1
 	_requests.setup(simulation)
+	_factions.setup(simulation)
 	refresh()
 
 
@@ -96,13 +107,27 @@ func has_new_offer() -> bool:
 
 ## Shows the Requests sub-tab ([param on]) or the Overview.
 func show_requests(on: bool) -> void:
-	(get_node(^"Columns") as Control).visible = not on
-	_requests.visible = on
-	_overview_button.button_pressed = not on
-	_requests_button.button_pressed = on
-	if on:
+	show_subtab(REQUESTS if on else OVERVIEW)
+
+
+## Shows sub-tab [param index]: OVERVIEW, REQUESTS or FACTIONS.
+func show_subtab(index: int) -> void:
+	(get_node(^"Columns") as Control).visible = index == OVERVIEW
+	_requests.visible = index == REQUESTS
+	_factions.visible = index == FACTIONS
+	_overview_button.button_pressed = index == OVERVIEW
+	_requests_button.button_pressed = index == REQUESTS
+	_factions_button.button_pressed = index == FACTIONS
+	if index == REQUESTS:
 		_mark_seen()
 		_requests.refresh()
+	elif index == FACTIONS:
+		_factions.refresh()
+
+
+## Returns the Factions panel.
+func get_factions() -> FactionsPanel:
+	return _factions
 
 
 ## Returns the Requests panel.
@@ -193,6 +218,8 @@ func _connect_events(on: bool) -> void:
 		EventBus.research_done,
 		EventBus.request_offered,
 		EventBus.request_changed,
+		EventBus.standing_changed,
+		EventBus.faction_met,
 	]
 	for event: Signal in signals:
 		if on:
@@ -207,6 +234,8 @@ func _on_event(_a: Variant = null, _b: Variant = null, _c: Variant = null) -> vo
 		refresh()
 		if _requests.visible:
 			_requests.refresh()
+		if _factions.visible:
+			_factions.refresh()
 
 
 ## Events are skipped while the tab is hidden, so showing it rereads everything.
