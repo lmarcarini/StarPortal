@@ -34,6 +34,7 @@ var _simulation: Simulation = null
 var _debug_flag_count: int = 0
 var _rescue_alert := RescueAlert.new()
 var _alert_stack := AlertStack.new()
+var _conversation := ConversationPanel.new()
 
 ## The time bar at the top of the screen.
 @onready var time_bar: TimeBar = %TimeBar
@@ -58,6 +59,7 @@ func _ready() -> void:
 	confidence_readout.pressed.connect(open_command)
 	_toast_timer.timeout.connect(_toast.hide)
 	_add_alerts()
+	add_child(_conversation)
 	_setup_debug_tools()
 	_start(GameState.new_game(_choose_seed(), Registry.balance()), true)
 	SimClock.pause()
@@ -137,6 +139,11 @@ func open_command() -> void:
 ## Returns the rescue alert.
 func get_rescue_alert() -> RescueAlert:
 	return _rescue_alert
+
+
+## Returns the conversation panel.
+func get_conversation_panel() -> ConversationPanel:
+	return _conversation
 
 
 ## Returns the top bar's alert stack.
@@ -226,6 +233,7 @@ static func _link_focus(buttons: Array[Button], below: Control) -> void:
 func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
 	_rescue_alert.setup(simulation)
+	_conversation.setup(simulation)
 	money_label.show_budget(simulation.state.budget.funds_k)
 	confidence_readout.setup(simulation.state)
 

@@ -31,6 +31,10 @@ const ACTIONS: Array[StringName] = [
 	&"base_level_up",
 	&"base_level_down",
 	&"base_energy_layer",
+	&"dialog_choice_1",
+	&"dialog_choice_2",
+	&"dialog_choice_3",
+	&"dialog_choice_4",
 ]
 
 ## Gamepad bindings added to Godot's built-in UI actions at start-up, as {action: [encoded]},
@@ -172,6 +176,27 @@ const DEFAULTS: Dictionary = {
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_P}],
 		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_BACK}],
+	},
+	# The conversation panel's answers 1 to 4 (a gamepad picks them by focus and (A)).
+	&"dialog_choice_1":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_1}],
+		GAMEPAD: [],
+	},
+	&"dialog_choice_2":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_2}],
+		GAMEPAD: [],
+	},
+	&"dialog_choice_3":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_3}],
+		GAMEPAD: [],
+	},
+	&"dialog_choice_4":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_4}],
+		GAMEPAD: [],
 	},
 }
 
