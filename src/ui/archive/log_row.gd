@@ -130,6 +130,8 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 		&"expedition":
 			return ExpeditionLogText.line(entry.args, world)
 		&"faction":
+			if entry.args.get("reason", "") == "no_answer":
+				return _tr(&"LOG_LINE_HAIL_NO_ANSWER").format({"world": world})
 			var faction: FactionDef = (
 				Registry.get_def(StringName(str(entry.args.get("faction_id", "")))) as FactionDef
 			)

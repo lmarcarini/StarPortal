@@ -331,3 +331,5 @@ ALERT_RESCUE_ENTRY,T-1 missing  {time},T-1 sumida  {time}
 FIELD_OUTCOME_LIGHT,a light injury,um ferimento leve
 FIELD_OUTCOME_SERIOUS,a serious injury,um ferimento grave
 FIELD_OUTCOME_MEDIC,"a serious injury, kept light by the medic","um ferimento grave, mantido leve pelo médico"
+GATE_WORMHOLE_HAIL,Hail,Saudar
+LOG_LINE_HAIL_NO_ANSWER,Hailed {world}: no answer.,Saudamos {world}: sem resposta.
