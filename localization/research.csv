@@ -42,3 +42,10 @@ RESEARCH_CAT_STAFF,Staff,Pessoal
 RESEARCH_EMPTY,Nothing to research yet,Nada para pesquisar ainda
 RESEARCH_STUB,from {name},de {name}
 LOG_LINE_RESEARCH_DIG,Level {n} can now be dug from the Base tab.,O Nível {n} já pode ser escavado na aba Base.
+RESEARCH_CAPACITOR_LATTICE_NAME,Capacitor lattice,Treliça de capacitores
+RESEARCH_CAPACITOR_LATTICE_LINE,Banks charge 25% faster.,Os bancos carregam 25% mais rápido.
+RESEARCH_CONTAINMENT_NAME,Containment,Contenção
+RESEARCH_CONTAINMENT_LINE,Unlocks the Containment room for dangerous artefacts.,Libera a sala de Contenção para artefatos perigosos.
+RESEARCH_CAT_DEFENCE,Defence,Defesa
+RESEARCH_CAT_LIFE,Life and language,Vida e linguagem
+RESEARCH_ERR_REQUIREMENT,{reason},{reason}

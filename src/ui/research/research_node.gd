@@ -49,7 +49,8 @@ func show_project(state: GameState, def: ResearchDef) -> void:
 	project_id = def.id
 	_name.text = tr(def.name_key)
 	var kind: ResearchText.Kind = ResearchText.kind(state, def)
-	_detail.text = tr(def.line_key) if def.is_locked() else _cost(state, def)
+	var reason: String = ResearchText.lock_reason(state, def)
+	_detail.text = reason if not reason.is_empty() else _cost(state, def)
 	_state.text = ResearchText.state_word(state, def)
 	_bar.visible = kind == ResearchText.Kind.ACTIVE
 	if _bar.visible:

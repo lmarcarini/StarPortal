@@ -23,8 +23,7 @@ const MIN_SPEED: int = 3
 const MAX_SPEED: int = 24
 
 
-## Every ResearchDef of [param state], projects and locked slots, in list order (by order,
-## then id).
+## Every ResearchDef of [param state], in list order (by order, then id).
 static func projects(state: GameState) -> Array[ResearchDef]:
 	var list: Array[ResearchDef] = []
 	list.assign(state.research_defs.values())
@@ -42,17 +41,18 @@ static func has_lab_on(state: GameState) -> bool:
 	return false
 
 
-## Whether [param project_id] may start now: ok, or failed with &"unknown_project",
-## &"project_locked" (detail: the lock), &"project_done", &"needs_lab" ("Needs a Research Lab
+## Whether [param project_id] may start now: ok, or failed with &"unknown_project" (also for a
+## hidden project not yet visible), &"project_done", &"needs_lab" ("Needs a Research Lab
 ## that is on."), &"research_running" (detail: the running project; "One project at a
-## time."), &"needs_project" (detail: the first unmet need) or &"insufficient_funds"
+## time."), &"needs_project" (detail: the first unmet need), &"requirement_unmet" (detail:
+## the project; first_failing() gives the condition) or &"insufficient_funds"
 ## (detail: the cost in $k).
 static func can_start(state: GameState, project_id: StringName) -> CommandResult:
 	var def: ResearchDef = state.research_defs.get(project_id)
 	if def == null:
 		return CommandResult.fail(&"unknown_project", String(project_id))
-	if def.is_locked():
-		return CommandResult.fail(&"project_locked", String(def.lock))
+	if not is_visible(state, def):
+		return CommandResult.fail(&"unknown_project", String(project_id))
 	if state.research.is_done(project_id):
 		return CommandResult.fail(&"project_done", String(project_id))
 	if not has_lab_on(state):
@@ -62,10 +62,44 @@ static func can_start(state: GameState, project_id: StringName) -> CommandResult
 	for need: StringName in def.needs:
 		if not state.research.is_done(need):
 			return CommandResult.fail(&"needs_project", String(need))
+	if first_failing(state, def) != null:
+		return CommandResult.fail(&"requirement_unmet", String(project_id))
 	var funds_error: StringName = state.budget.spend_error(def.cost_k)
 	if not funds_error.is_empty():
 		return CommandResult.fail(funds_error, "%d" % def.cost_k)
 	return CommandResult.ok()
+
+
+## The first of [param def]'s requires that does not hold in [param state], or null.
+static func first_failing(state: GameState, def: ResearchDef) -> ConditionDef:
+	var failing: Array[ConditionDef] = StoryRules.failing(state, def.requires)
+	return null if failing.is_empty() else failing[0]
+
+
+## True when [param def]'s needs are done and its requires hold in [param state].
+static func is_available(state: GameState, def: ResearchDef) -> bool:
+	for need: StringName in def.needs:
+		if not state.research.is_done(need):
+			return false
+	return first_failing(state, def) == null
+
+
+## True when [param def] is drawn: shown locked, available, revealed, done or running.
+static func is_visible(state: GameState, def: ResearchDef) -> bool:
+	if not def.is_hidden() or state.research.is_done(def.id):
+		return true
+	if state.research.active == def.id or state.research.revealed.has(def.id):
+		return true
+	return is_available(state, def)
+
+
+## The visible projects of [param state], in list order.
+static func visible_projects(state: GameState) -> Array[ResearchDef]:
+	var found: Array[ResearchDef] = []
+	for def: ResearchDef in projects(state):
+		if is_visible(state, def):
+			found.append(def)
+	return found
 
 
 ## Ticks of work [param def] needs: its days in ticks, the time at 100% (a standard crew).

@@ -45,18 +45,10 @@ static func content_errors(data: Dictionary, defs: GameDefs) -> Array[String]:
 	return errors
 
 
-static func _research_errors(research: ResearchState, defs: GameDefs) -> Array[String]:
-	var known: Dictionary[StringName, bool] = {}
-	for def: ResearchDef in defs.research:
-		if not def.is_locked():
-			known[def.id] = true
-	var errors: Array[String] = []
-	if research.is_running() and not known.has(research.active):
-		errors.append("research: unknown project '%s'" % research.active)
-	for project_id: StringName in research.done:
-		if not known.has(project_id):
-			errors.append("research: done has unknown project '%s'" % project_id)
-	return errors
+## Research ids the content no longer has are not errors: GameSetup.build() drops them on load
+## (M4-29), so an old save still loads.
+static func _research_errors(_research: ResearchState, _defs: GameDefs) -> Array[String]:
+	return []
 
 
 static func _people_errors(

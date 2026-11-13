@@ -35,8 +35,7 @@ func _init() -> void:
 ## Shows [param category]'s part of [param state]'s research; rebuilds the nodes when the
 ## category changes.
 func show_category(state: GameState, category: StringName) -> void:
-	var defs: Array[ResearchDef] = []
-	defs.assign(state.research_defs.values())
+	var defs: Array[ResearchDef] = ResearchRules.visible_projects(state)
 	if category != _category or _cells.size() != ResearchTreeLayout.cells(defs, category).size():
 		_rebuild(state, defs, category)
 	for id: StringName in _nodes:

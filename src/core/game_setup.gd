@@ -50,6 +50,7 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	state.research_defs.clear()
 	for def: ResearchDef in defs.research:
 		state.research_defs[def.id] = def
+	_drop_unknown_research(state)
 	state.galaxy = build_galaxy(state.worlds.galaxy_seed, defs)
 	var systems: Array[SimSystem] = [
 		PowerSystem.new(defs.balance),
@@ -105,3 +106,16 @@ static func _missing_content(defs: GameDefs) -> String:
 	if homes != 1:
 		return "%d home worlds, not 1" % homes
 	return ""
+
+
+## Drops research ids [param state]'s content no longer has (an old save after a content
+## change): from done, queue and revealed, and the active project with its progress.
+static func _drop_unknown_research(state: GameState) -> void:
+	var research: ResearchState = state.research
+	for list: Array[StringName] in [research.done, research.queue, research.revealed]:
+		for project_id: StringName in list.duplicate():
+			if not state.research_defs.has(project_id):
+				list.erase(project_id)
+	if research.is_running() and not state.research_defs.has(research.active):
+		research.active = &""
+		research.ticks_done = 0

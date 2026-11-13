@@ -4,12 +4,12 @@ extends RefCounted
 ## ResearchDefs, now that their effects live only in data (M4-21).
 
 
-## Every open (not locked) project's unlock pairs, by id, in list order.
+## Every M2.5 project (orders 1 to 7)'s unlock pairs, by id, in list order.
 static func projects() -> Dictionary:
 	var defs: Array[ResearchDef] = []
 	for def: DefBase in Registry.get_all_of(ResearchDef):
 		var research: ResearchDef = def
-		if not research.is_locked():
+		if research.order <= 7:
 			defs.append(research)
 	defs.sort_custom(func(a: ResearchDef, b: ResearchDef) -> bool: return a.order < b.order)
 	var found: Dictionary = {}
