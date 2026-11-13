@@ -266,15 +266,18 @@ static func first_dug_level(project_id: StringName) -> int:
 	if depth == 0:
 		return 0
 	var below: int = 1
-	for other: StringName in UnlockRules.PROJECTS:
-		var other_depth: int = _dig_depth(other)
+	for other: DefBase in Registry.get_all_of(ResearchDef):
+		var other_depth: int = _dig_depth(other.id)
 		if other_depth < depth:
 			below = maxi(below, other_depth)
 	return below + 1
 
 
 static func _dig_depth(project_id: StringName) -> int:
-	for pair: Array in UnlockRules.PROJECTS.get(project_id, []):
-		if pair[0] == UnlockRules.EFFECT_DIG_DEPTH:
-			return type_convert(pair[1], TYPE_INT)
+	var def: ResearchDef = Registry.get_def(project_id) as ResearchDef
+	if def == null:
+		return 0
+	for effect: EffectDef in def.effects:
+		if effect is DigDepthEffect:
+			return (effect as DigDepthEffect).levels
 	return 0

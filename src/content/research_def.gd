@@ -18,7 +18,7 @@ const LOCKS: Array[StringName] = [&"alien_find", &"staff"]
 ## Ids of the projects that must be done before this one starts.
 @export var needs: Array[StringName] = []
 ## The unlocks, each an [effect id, value] pair for UnlockRules.apply_to_game().
-@export var effects: Array = []
+@export var effects: Array[EffectDef] = []
 ## Empty for a project; one of [constant LOCKS] for a later slot.
 @export var lock: StringName = &""
 ## Id of the ResearchCategoryDef whose sub-tab shows this project or slot.

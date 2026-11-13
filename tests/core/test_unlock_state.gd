@@ -18,8 +18,8 @@ func test_new_game_unlocks() -> void:
 ## Every field survives a JSON round trip of the whole game, which validates.
 func test_round_trip_in_game_state() -> void:
 	var state := GameState.new_game(3, BalanceConfig.new())
-	for project_id: StringName in UnlockRules.PROJECTS:
-		UnlockRules.apply_project(state.unlocks, project_id)
+	for project_id: StringName in UnlockFixture.projects():
+		UnlockFixture.apply_project(state.unlocks, project_id)
 	var data: Dictionary = JSON.parse_string(JSON.stringify(state.to_dict()))
 	assert_array(GameState.validate_dict(data)).is_empty()
 	var loaded := GameState.from_dict(data)

@@ -87,8 +87,8 @@ func test_room_switched() -> void:
 ## plant built once Second plant is done.
 func test_unlock_effects() -> void:
 	PowerRules.totals(_state)
-	for project_id: StringName in UnlockRules.PROJECTS:
-		for pair: Array in UnlockRules.PROJECTS[project_id]:
+	for project_id: StringName in UnlockFixture.projects():
+		for pair: Array in UnlockFixture.projects()[project_id]:
 			var effect: StringName = pair[0]
 			assert_bool(UnlockRules.apply_to_game(_state, effect, pair[1])).is_true()
 			assert_int(_state.power.totals_revision).is_equal(-1)

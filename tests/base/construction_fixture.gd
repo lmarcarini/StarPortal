@@ -15,7 +15,7 @@ const GROWN_LIFT: Vector2i = Vector2i(32, 14)
 const GROWN_QUARTERS: Vector2i = Vector2i(12, 13)
 
 
-## A new game with the real balance, the starting base and every real RoomDef.
+## A new game with the real balance, the starting base, every real RoomDef and ResearchDef.
 static func state() -> GameState:
 	var balance: BalanceConfig = load("res://data/balance/balance_config.tres")
 	var game := GameState.new_game(1, balance)
@@ -24,14 +24,15 @@ static func state() -> GameState:
 		if file.ends_with(".tres"):
 			var def: RoomDef = load(ROOM_DIR + file)
 			game.room_defs[def.id] = def
+	game.research_defs = UnlockFixture.research()
 	return game
 
 
-## [param game] after every M2.5 project (UnlockRules.PROJECTS): every room but the
+## [param game] after every M2.5 project (UnlockFixture.projects()): every room but the
 ## staff-locked ones, digging down to Level 4, three banks and the fuel contract.
 static func unlock_all(game: GameState) -> GameState:
-	for project_id: StringName in UnlockRules.PROJECTS:
-		UnlockRules.apply_project(game.unlocks, project_id)
+	for project_id: StringName in UnlockFixture.projects():
+		UnlockFixture.apply_project(game.unlocks, project_id)
 	return game
 
 

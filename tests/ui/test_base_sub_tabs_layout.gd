@@ -35,7 +35,7 @@ func test_sub_tabs_ghost_tab_and_dig_entry_fit_in_both_languages() -> void:
 	for locale: String in ["en", "pt_BR"]:
 		TranslationServer.set_locale(locale)
 		await _check(locale + " locked")
-		UnlockRules.apply_project(_simulation.state.unlocks, &"excavation_survey")
+		UnlockFixture.apply_project(_simulation.state.unlocks, &"excavation_survey")
 		_simulation.state.budget.funds_k = 100000
 		_view.get_build().refresh()
 		await _check(locale + " unlocked")

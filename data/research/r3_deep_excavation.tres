@@ -1,15 +1,20 @@
 [gd_resource type="Resource" script_class="ResearchDef" format=3]
 
 [ext_resource type="Script" path="res://src/content/research_def.gd" id="1_research"]
+[ext_resource type="Script" path="res://src/content/story/effects/dig_depth_effect.gd" id="10_fx"]
 
 ; docs/content/m25-lean-start.md section 3.
+[sub_resource type="Resource" id="fx_0"]
+script = ExtResource("10_fx")
+levels = 4
+
 [resource]
 script = ExtResource("1_research")
 order = 3
 cost_k = 800
 days = 4
 needs = Array[StringName]([&"lift_shaft"])
-effects = [[&"dig_depth", 4]]
+effects = Array[Resource]([SubResource("fx_0")])
 category = &"research_construction"
 name_key = &"RESEARCH_DEEP_EXCAVATION_NAME"
 line_key = &"RESEARCH_DEEP_EXCAVATION_LINE"

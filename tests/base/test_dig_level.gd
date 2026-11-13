@@ -7,7 +7,7 @@ extends GdUnitTestSuite
 
 func _surveyed() -> GameState:
 	var game := ConstructionFixture.state()
-	UnlockRules.apply_project(game.unlocks, &"excavation_survey")
+	UnlockFixture.apply_project(game.unlocks, &"excavation_survey")
 	return game
 
 
@@ -56,7 +56,7 @@ func test_one_dig_at_a_time_and_three_extra_levels() -> void:
 	var refused: CommandResult = DigLevelCommand.new().validate(game)
 	assert_str(refused.error_code).is_equal("needs_research")
 	assert_str(refused.detail).is_equal("deep_excavation")
-	UnlockRules.apply_project(game.unlocks, &"deep_excavation")
+	UnlockFixture.apply_project(game.unlocks, &"deep_excavation")
 	assert_bool(ConstructionFixture.run(game, DigLevelCommand.new()).is_ok).is_true()
 	ConstructionFixture.advance(game, system, 4 * 1440)
 	assert_bool(ConstructionFixture.run(game, DigLevelCommand.new()).is_ok).is_true()

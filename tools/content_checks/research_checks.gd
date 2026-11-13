@@ -1,8 +1,8 @@
 class_name ContentCheckResearch
 extends RefCounted
 ## Content checks for the research definitions (docs/content/m25-lean-start.md section 3):
-## every effect is an [effect id, value] pair UnlockRules accepts, the open projects are
-## exactly UnlockRules.PROJECTS with the same effects, list orders are unique, a project's
+## every unlock effect has a value UnlockRules accepts (effects live only in the defs, M4),
+## list orders are unique, a project's
 ## needs come earlier in the list, every name and line key is in [param keys], and every def
 ## is in a known category (check_categories). Needs that point at missing or locked defs are
 ## the Registry's checks (ResearchDef). Pure; returns one line per problem.
@@ -50,9 +50,6 @@ static func check(research: Array[ResearchDef], keys: Dictionary[String, bool]) 
 				errors.append("research %s: text key '%s' is in no table" % [def.id, key])
 	for def: ResearchDef in research:
 		errors.append_array(_project_errors(def, by_id))
-	for project_id: StringName in UnlockRules.PROJECTS:
-		if not by_id.has(project_id):
-			errors.append("research %s: in UnlockRules.PROJECTS but has no def" % project_id)
 	return errors
 
 
@@ -60,28 +57,28 @@ static func _project_errors(
 	def: ResearchDef, by_id: Dictionary[StringName, ResearchDef]
 ) -> Array[String]:
 	var errors: Array[String] = []
-	for pair: Variant in def.effects:
-		if not effect_ok(pair):
-			errors.append("research %s: bad effect %s" % [def.id, str(pair)])
+	for effect: EffectDef in def.effects:
+		if not effect_ok(effect):
+			errors.append("research %s: bad effect %s" % [def.id, _describe(effect)])
 	for need: StringName in def.needs:
 		if by_id.has(need) and by_id[need].order >= def.order:
 			errors.append("research %s: needs %s, which comes later in the list" % [def.id, need])
-	if def.is_locked():
-		return errors
-	if not UnlockRules.PROJECTS.has(def.id):
-		errors.append("research %s: not in UnlockRules.PROJECTS" % def.id)
-	elif str(UnlockRules.PROJECTS[def.id]) != str(def.effects):
-		errors.append("research %s: effects differ from UnlockRules.PROJECTS" % def.id)
 	return errors
 
 
-## True when [param pair] is an [effect id, value] pair UnlockRules.apply() accepts.
-static func effect_ok(pair: Variant) -> bool:
-	if not pair is Array:
+## True when [param effect] is a story effect, and an unlock effect's value is one
+## UnlockRules.apply() accepts.
+static func effect_ok(effect: EffectDef) -> bool:
+	if effect == null:
 		return false
-	var entry: Array = pair
-	if entry.size() != 2:
-		return false
-	if not (entry[0] is StringName or entry[0] is String):
-		return false
-	return UnlockRules.apply(UnlockState.new(), StringName(str(entry[0])), entry[1])
+	var pair: Array = UnlockRules.unlock_pair(effect)
+	if pair.is_empty():
+		return true
+	var effect_id: StringName = pair[0]
+	return UnlockRules.apply(UnlockState.new(), effect_id, pair[1])
+
+
+static func _describe(effect: EffectDef) -> String:
+	if effect == null:
+		return "<empty>"
+	return str(UnlockRules.unlock_pair(effect))

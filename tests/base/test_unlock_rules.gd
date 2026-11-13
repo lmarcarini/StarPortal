@@ -52,7 +52,7 @@ func test_bank_cap() -> void:
 	var second: CommandResult = BaseRules.can_build_room(_game, &"room_capacitor_bank")
 	assert_str(String(second.error_code)).is_equal("bank_cap")
 	assert_str(second.detail).is_equal("bank_array")
-	UnlockRules.apply_project(_game.unlocks, &"bank_array")
+	UnlockFixture.apply_project(_game.unlocks, &"bank_array")
 	_game.base.add_room(&"room_capacitor_bank", 1, Vector2i(0, 0))
 	assert_bool(BaseRules.can_build_room(_game, &"room_capacitor_bank").is_ok).is_true()
 	var third: RoomState = _game.base.add_room(&"room_capacitor_bank", 1, Vector2i(4, 0))
@@ -66,11 +66,11 @@ func test_bank_cap() -> void:
 ## Digging: Level 2 after Excavation survey, Levels 3 and 4 after Deep excavation, then none.
 func test_can_dig() -> void:
 	assert_str(BaseRules.can_dig(_game).detail).is_equal("excavation_survey")
-	UnlockRules.apply_project(_game.unlocks, &"excavation_survey")
+	UnlockFixture.apply_project(_game.unlocks, &"excavation_survey")
 	assert_bool(BaseRules.can_dig(_game).is_ok).is_true()
 	_game.base.levels.append(LevelState.new())
 	assert_str(BaseRules.can_dig(_game).detail).is_equal("deep_excavation")
-	UnlockRules.apply_project(_game.unlocks, &"deep_excavation")
+	UnlockFixture.apply_project(_game.unlocks, &"deep_excavation")
 	_game.base.levels.append(LevelState.new())
 	assert_bool(BaseRules.can_dig(_game).is_ok).is_true()
 	_game.base.levels.append(LevelState.new())
@@ -96,14 +96,14 @@ func test_apply_effects() -> void:
 	assert_bool(UnlockRules.apply(unlocks, UnlockRules.EFFECT_BANK_CAP, -1)).is_false()
 	assert_bool(UnlockRules.apply(unlocks, UnlockRules.EFFECT_BANK_CAP, 2.5)).is_false()
 	assert_bool(UnlockRules.apply(unlocks, UnlockRules.EFFECT_UNLOCK_ROOM, "")).is_false()
-	assert_bool(UnlockRules.apply_project(unlocks, &"nope")).is_false()
+	assert_bool(UnlockFixture.apply_project(unlocks, &"nope")).is_false()
 	assert_dict(unlocks.to_dict()).is_equal(before)
 
 
 ## The seven projects of section 3, and every project has a translated name.
 func test_projects() -> void:
 	(
-		assert_array(UnlockRules.PROJECTS.keys())
+		assert_array(UnlockFixture.projects().keys())
 		. is_equal(
 			[
 				&"excavation_survey",
@@ -116,7 +116,7 @@ func test_projects() -> void:
 			]
 		)
 	)
-	for project_id: StringName in UnlockRules.PROJECTS:
+	for project_id: StringName in UnlockFixture.projects():
 		var key: StringName = UnlockRules.project_name_key(project_id)
 		assert_str(TranslationServer.translate(key)).is_not_equal(String(key))
 

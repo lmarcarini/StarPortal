@@ -3,6 +3,7 @@ extends RefCounted
 ## Pure rules of what research unlocks (docs/content/m25-lean-start.md sections 1-3): the
 ## effects a project applies to an UnlockState, the M2.5 projects' effects, and whether a room
 ## may be built or a level dug, with the reason when not. Never touches a Node or an autoload.
+## The effects themselves live in each ResearchDef (UnlockRoomEffect and friends, M4).
 ## [method apply] and [method apply_project] change only the UnlockState they are given; call
 ## them from Command.apply() or SimSystem.tick() (the research card), or from a test or bot.
 ## Bible: docs/content/m25-lean-start.md sections 1-3
@@ -20,17 +21,6 @@ const PLANT_DEF: StringName = &"room_power_plant"
 ## Rooms that stay locked until M3: no research unlocks them (Quarters is unlocked from the
 ## start in M2.6, docs/content/m26-staff-and-money.md section 3).
 const STAFF_LOCKED: Array[StringName] = [&"room_infirmary"]
-## The M2.5 projects R1-R7 in list order, by id: each an array of [effect, value] pairs. The
-## research card owns costs, days and prerequisites; this is only what finishing one unlocks.
-const PROJECTS: Dictionary = {
-	&"excavation_survey": [[&"dig_depth", 2], [&"unlock_room", &"room_stairs"]],
-	&"lift_shaft": [[&"unlock_room", &"room_lift"]],
-	&"deep_excavation": [[&"dig_depth", 4]],
-	&"second_plant": [[&"unlock_room", &"room_power_plant"]],
-	&"fuel_contracts": [[&"plant_upkeep", 100]],
-	&"bank_array": [[&"bank_cap", 3]],
-	&"field_engineering": [[&"unlock_room", &"room_workshop"]],
-}
 
 
 ## Applies one [param effect] with [param value] to [param unlocks]. Returns false, changing
@@ -59,14 +49,25 @@ static func apply(unlocks: UnlockState, effect: StringName, value: Variant) -> b
 	return true
 
 
-## Applies every effect of the project [param project_id] (a key of [constant PROJECTS]) to
-## [param unlocks]. Returns false, changing nothing, for an unknown project.
-static func apply_project(unlocks: UnlockState, project_id: StringName) -> bool:
-	if not PROJECTS.has(project_id):
+## The [effect id, value] pair of an unlock [param effect] (UnlockRoomEffect, DigDepthEffect,
+## BankCapEffect, PlantUpkeepEffect), or [] for any other effect.
+static func unlock_pair(effect: EffectDef) -> Array:
+	if effect != null and effect.has_method(&"unlock_pair"):
+		var pair: Array = effect.call(&"unlock_pair")
+		return pair
+	return []
+
+
+## Applies every unlock effect of [param project] to [param unlocks] (others are skipped).
+## Returns false, changing nothing, for a null project.
+static func apply_project(unlocks: UnlockState, project: ResearchDef) -> bool:
+	if project == null:
 		return false
-	for pair: Array in PROJECTS[project_id]:
-		var effect: StringName = pair[0]
-		apply(unlocks, effect, pair[1])
+	for effect: EffectDef in project.effects:
+		var pair: Array = unlock_pair(effect)
+		if not pair.is_empty():
+			var effect_id: StringName = pair[0]
+			apply(unlocks, effect_id, pair[1])
 	return true
 
 
@@ -75,12 +76,20 @@ static func project_name_key(project_id: StringName) -> StringName:
 	return StringName("RESEARCH_%s_NAME" % String(project_id).to_upper())
 
 
-## The first project whose [param effect] covers [param value] (the room id for
-## EFFECT_UNLOCK_ROOM, at least the number for the others), or &"" when none does.
-static func project_for(effect: StringName, value: Variant) -> StringName:
-	for project_id: StringName in PROJECTS:
-		for pair: Array in PROJECTS[project_id]:
-			if pair[0] != effect:
+## The first project of [param research] (in list order) whose [param effect] covers
+## [param value] (the room id for EFFECT_UNLOCK_ROOM, at least the number for the others), or
+## &"" when none does.
+static func project_for(
+	research: Dictionary[StringName, ResearchDef], effect: StringName, value: Variant
+) -> StringName:
+	var ordered: Array[ResearchDef] = []
+	ordered.assign(research.values())
+	ordered.sort_custom(func(a: ResearchDef, b: ResearchDef) -> bool: return a.order < b.order)
+	for def: ResearchDef in ordered:
+		var project_id: StringName = def.id
+		for effect_def: EffectDef in def.effects:
+			var pair: Array = unlock_pair(effect_def)
+			if pair.is_empty() or pair[0] != effect:
 				continue
 			if effect == EFFECT_UNLOCK_ROOM and str(pair[1]) == str(value):
 				return project_id
@@ -103,7 +112,7 @@ static func can_build_room(state: GameState, def_id: StringName) -> CommandResul
 	if not state.unlocks.has_room(def_id):
 		if def_id in STAFF_LOCKED:
 			return CommandResult.fail(&"needs_staff", String(def_id))
-		var project: StringName = project_for(EFFECT_UNLOCK_ROOM, def_id)
+		var project: StringName = project_for(state.research_defs, EFFECT_UNLOCK_ROOM, def_id)
 		if project.is_empty():
 			return CommandResult.fail(&"not_buildable", String(def_id))
 		return CommandResult.fail(&"needs_research", String(project))
@@ -112,7 +121,8 @@ static func can_build_room(state: GameState, def_id: StringName) -> CommandResul
 		and bank_count(state.base) >= state.unlocks.bank_cap
 	):
 		return CommandResult.fail(
-			&"bank_cap", String(project_for(EFFECT_BANK_CAP, state.unlocks.bank_cap + 1))
+			&"bank_cap",
+			String(project_for(state.research_defs, EFFECT_BANK_CAP, state.unlocks.bank_cap + 1))
 		)
 	return CommandResult.ok()
 
@@ -124,7 +134,7 @@ static func can_dig(state: GameState) -> CommandResult:
 	var next: int = state.base.level_count + 1
 	if next <= state.unlocks.dig_depth:
 		return CommandResult.ok()
-	var project: StringName = project_for(EFFECT_DIG_DEPTH, next)
+	var project: StringName = project_for(state.research_defs, EFFECT_DIG_DEPTH, next)
 	if project.is_empty():
 		return CommandResult.fail(&"level_limit")
 	return CommandResult.fail(&"needs_research", String(project))

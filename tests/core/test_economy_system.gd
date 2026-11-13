@@ -100,5 +100,5 @@ func test_starting_base_upkeep_is_190k() -> void:
 		by_id[def.id] = def
 	var state := GameState.new_game(1, defs.balance)
 	assert_int(EconomySystem.upkeep_k(state.base, by_id, state.unlocks)).is_equal(190)
-	UnlockRules.apply_project(state.unlocks, &"fuel_contracts")
+	UnlockFixture.apply_project(state.unlocks, &"fuel_contracts")
 	assert_int(EconomySystem.upkeep_k(state.base, by_id, state.unlocks)).is_equal(140)
