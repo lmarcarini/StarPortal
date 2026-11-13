@@ -51,6 +51,7 @@ static func _check_content(registry: RegistryScript) -> Array[String]:
 	errors.append_array(_check_research(registry))
 	errors.append_array(ContentCheckStory.check_registry(registry))
 	errors.append_array(_check_factions(registry))
+	errors.append_array(_check_conversations(registry))
 	var field: AnchorFieldDef = ContentSource.home_field(registry)
 	for def: DefBase in registry.get_all_of(AnchorFieldDef):
 		var each: AnchorFieldDef = def as AnchorFieldDef
@@ -78,6 +79,20 @@ static func _check_research(registry: RegistryScript) -> Array[String]:
 	var errors: Array[String] = ContentCheckResearch.check(research, research_keys)
 	errors.append_array(ContentCheckResearch.check_categories(research, categories, research_keys))
 	return errors
+
+
+## The checks of conversations: nested conditions and effects, and text keys.
+static func _check_conversations(registry: RegistryScript) -> Array[String]:
+	var conversations: Array[ConversationDef] = []
+	var known: Dictionary[StringName, DefBase] = {}
+	for def: DefBase in registry.get_all_of(DefBase):
+		known[def.id] = def
+		if def is ConversationDef:
+			conversations.append(def as ConversationDef)
+	var table: Dictionary[String, PackedStringArray] = ContentCheckDocuments.read_table(
+		ContentCheckConversations.TABLE
+	)
+	return ContentCheckConversations.check(conversations, known, table)
 
 
 ## The checks across factions (the Committee, contacts).
