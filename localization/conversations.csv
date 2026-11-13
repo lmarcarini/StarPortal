@@ -1,2 +1,4 @@
 keys,en,pt_BR
 CONV_SIGNAL_LOST,(signal lost),[EN] (signal lost)
+CONV_LINE,{speaker}: {text},{speaker}: {text}
+CONV_CLOSE,Close,Fechar
