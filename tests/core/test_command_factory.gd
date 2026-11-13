@@ -39,6 +39,7 @@ func _samples() -> Array[Command]:
 		ChooseOptionCommand.new(2),
 		EndConversationCommand.new(),
 		HailCommand.new(),
+		AnswerCallCommand.new(),
 		AnswerIncomingCommand.new(),
 		IgnoreIncomingCommand.new(),
 		DeliverDocumentCommand.create(&"doc_survey_note_1958"),
@@ -172,6 +173,7 @@ func test_defaults_are_registered_lazily() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"answer_call",
 				&"answer_incoming",
 				&"assign_staff",
 				&"cancel_build",
@@ -224,6 +226,7 @@ func test_register_type_adds_a_type() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"answer_call",
 				&"answer_incoming",
 				&"assign_staff",
 				&"cancel_build",
@@ -279,6 +282,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 		assert_array(CommandFactory.registered_types())
 		. contains_exactly(
 			[
+				&"answer_call",
 				&"answer_incoming",
 				&"assign_staff",
 				&"cancel_build",
