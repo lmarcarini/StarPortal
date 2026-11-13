@@ -38,6 +38,8 @@ var _values: Dictionary[WorldReport.Fact, Label] = {}
 var _notes: Dictionary[WorldReport.Fact, Label] = {}
 var _plan: Button = Button.new()
 var _description: Label = Label.new()
+var _held_row: HBoxContainer = HBoxContainer.new()
+var _held_by: Label = Label.new()
 
 
 func _init() -> void:
@@ -55,6 +57,13 @@ func _init() -> void:
 	_empty.text = &"WORLD_REPORT_EMPTY"
 	layout.add_child(_empty)
 	layout.add_child(_address_row)
+	var held_label := Label.new()
+	held_label.text = &"WORLD_HELD_BY"
+	_held_row.add_child(held_label)
+	_held_by.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_held_row.add_child(_held_by)
+	_held_row.visible = false
+	layout.add_child(_held_row)
 	_grid.columns = 3
 	_grid.add_theme_constant_override(&"h_separation", 12)
 	layout.add_child(_grid)
@@ -97,6 +106,7 @@ func show_world(world_id: StringName, state: GameState) -> void:
 	if is_node_ready():
 		_strip.setup(address)
 	_address_row.visible = address != null
+	_show_held_by(world_id, state)
 	_show_plan(world_id, state)
 	_set_shown(true)
 
@@ -107,6 +117,7 @@ func clear() -> void:
 	_title.text = ""
 	_status.text = ""
 	_address_row.visible = false
+	_held_row.visible = false
 	_description.text = ""
 	_set_shown(false)
 
@@ -137,6 +148,11 @@ func get_address_strip() -> AddressStrip:
 
 
 ## Returns the **Plan expedition** button.
+func get_held_by_label() -> Label:
+	return _held_by
+
+
+## Returns the Plan expedition button.
 func get_plan_button() -> Button:
 	return _plan
 
@@ -179,3 +195,13 @@ func _show_plan(world_id: StringName, state: GameState) -> void:
 		tooltip = &"WORLD_PLAN_EXPEDITION_NOT_PROBED"
 	_plan.disabled = not tooltip.is_empty()
 	_plan.tooltip_text = tooltip
+
+
+## Shows "Held by" with the faction's name in its accent colour, or hides the row.
+func _show_held_by(world_id: StringName, state: GameState) -> void:
+	var held: Dictionary = WorldReportText.held_by(world_id, state)
+	var name: String = held["name"]
+	_held_by.text = name
+	var accent: Color = held["accent"]
+	_held_by.add_theme_color_override(&"font_color", accent)
+	_held_row.visible = not name.is_empty()

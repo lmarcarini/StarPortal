@@ -69,3 +69,18 @@ static func shown_targets(facts: WorldFacts, report: WorldReport) -> Array[World
 	if not is_known(report, WorldReport.Fact.TARGETS):
 		return []
 	return facts.targets.duplicate()
+
+
+## The faction that holds [param world_id], once the player has met it and the world is Probed
+## or beyond; &"" otherwise and for every procedural world (m4-core-systems.md section 2).
+static func controller(state: GameState, world_id: StringName) -> StringName:
+	if state.galaxy == null:
+		return &""
+	var record: WorldRecord = state.galaxy.get_world(world_id)
+	if record == null or record.controller.is_empty():
+		return &""
+	if not state.factions.met.has(record.controller):
+		return &""
+	if state.worlds.status_of(world_id) < WorldsState.WorldStatus.PROBED:
+		return &""
+	return record.controller

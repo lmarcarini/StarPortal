@@ -34,6 +34,9 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	state.room_defs.clear()
 	for def: RoomDef in defs.rooms:
 		state.room_defs[def.id] = def
+	state.faction_defs.clear()
+	for faction: FactionDef in defs.factions:
+		state.faction_defs[faction.id] = faction
 	state.request_defs.clear()
 	for request: RequestDef in defs.requests:
 		state.request_defs[request.id] = request
