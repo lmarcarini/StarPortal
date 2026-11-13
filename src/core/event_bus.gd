@@ -227,6 +227,8 @@ signal request_changed(uid: int, state: int)
 ## Emitted when an artefact arrives (in holding or waiting at the gate), with its uid
 ## (outbox).
 signal artefact_arrived(uid: int)
+## An artefact was housed, taken back to holding or retrieved from the gate.
+signal artefact_moved(uid: int)
 ## Emitted when a hidden research project is revealed, with its id (outbox).
 signal research_revealed(project_id: StringName)
 ## Emitted when a story effect sets a flag, with its name (outbox).

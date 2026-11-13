@@ -106,6 +106,8 @@ func to_dict() -> Dictionary:
 func _protection_error(state: GameState, room: RoomState, def: RoomDef) -> StringName:
 	if def.fixed:
 		return &"fixed_room"
+	if ArtefactRules.slots_used(state, ArtefactRules.room_uid_of(room.id)) > 0:
+		return &"holds_artefacts"
 	if def.power_output_mw > 0.0 and _plants_left(state) <= 1:
 		return &"last_plant"
 	if def.beds > 0 and StaffRules.beds_free(state) < def.beds:

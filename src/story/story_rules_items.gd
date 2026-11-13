@@ -43,7 +43,8 @@ static func offer_request(state: GameState, request: StringName) -> int:
 	return record.uid
 
 
-## Appends a RECOVERED [param artefact] in Gate Room holding and posts artefact_arrived.
+## Appends a RECOVERED [param artefact] in Gate Room holding (waiting at the gate when holding
+## is full) and posts artefact_arrived.
 ## Returns the uid, or −1 for an empty id.
 static func give_artefact(state: GameState, artefact: StringName) -> int:
 	if artefact.is_empty():
@@ -53,6 +54,8 @@ static func give_artefact(state: GameState, artefact: StringName) -> int:
 	state.artefacts.next_uid += 1
 	record.artefact = artefact
 	record.arrived_tick = state.clock.tick
+	if ArtefactRules.holding(state).size() >= ArtefactRules.capacity(state):
+		record.room_uid = ArtefactRecord.AT_GATE
 	state.artefacts.items.append(record)
 	state.events.post(&"artefact_arrived", [record.uid])
 	return record.uid
@@ -70,7 +73,7 @@ static func _take_artefact(state: GameState, artefact: StringName) -> bool:
 static func _study_artefact(state: GameState, artefact: StringName) -> bool:
 	var found: bool = false
 	for record: ArtefactRecord in state.artefacts.items:
-		if record.artefact == artefact:
+		if record.artefact == artefact and record.room_uid != ArtefactRecord.AT_GATE:
 			record.state = ArtefactRecord.ArtefactState.STUDIED
 			found = true
 	if found:

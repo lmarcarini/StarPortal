@@ -89,3 +89,7 @@ static func _recover(state: GameState, world_id: StringName, target_id: StringNa
 	state.expedition.add_document("object", world_id, target_id, state.clock.tick)
 	if is_anchor(world_id, target_id):
 		state.flags[ANCHOR_FLAG] = true
+	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, world_id)
+	var target: WorldTarget = null if facts == null else facts.find_target(target_id)
+	if target != null and not target.artefact_id.is_empty():
+		StoryRulesItems.give_artefact(state, target.artefact_id)

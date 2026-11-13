@@ -13,6 +13,8 @@ var is_object: bool = false
 ## Document of the target's marks or inscription a Close look copies into the Archive; &""
 ## when it has none. Procedural targets have none.
 var marks_document_id: StringName = &""
+## Id of the ArtefactDef recovering this target also gives; &"" when none (M4).
+var artefact_id: StringName = &""
 
 
 ## Returns a target with [param target_id], [param key] and [param object].

@@ -52,6 +52,7 @@ static func from_def(def: WorldDef) -> WorldFacts:
 	for target_def: WorldTargetDef in def.targets:
 		var target := WorldTarget.create(target_def.id, target_def.name_key, target_def.is_object)
 		target.marks_document_id = target_def.marks_document_id
+		target.artefact_id = target_def.artefact_id
 		facts.targets.append(target)
 	return facts
 
