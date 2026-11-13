@@ -26,6 +26,7 @@ var _power: BaseViewPower = BaseViewPower.new()
 var _messages: BaseMessages = BaseMessages.new()
 ## The selected room's staff slots (card M2.6-09).
 var _slots: StaffSlots = StaffSlots.new()
+var _room_artefacts := ArtefactPanel.new()
 ## The Build and Energy sub-tabs (card #206).
 var _tabs: BaseViewTabs = BaseViewTabs.new()
 
@@ -46,6 +47,8 @@ func _ready() -> void:
 	_setup_power()
 	add_child(_messages)
 	_panel.add_child(_slots)
+	_room_artefacts.visible = false
+	_panel.add_child(_room_artefacts)
 	_tabs.name = "Tabs"
 	add_child(_tabs)
 	_tabs.attach(_sub_tabs, _levels, _power, _build)
@@ -80,6 +83,7 @@ func setup(simulation: Simulation) -> void:
 	_power.setup(simulation)
 	_messages.setup(_palette, simulation.state)
 	_slots.setup(simulation)
+	_room_artefacts.setup(simulation)
 	_refresh_lab_note()
 
 
@@ -99,6 +103,20 @@ func get_plan() -> BasePlan:
 ## Returns the selected room's staff slots, for tests.
 func get_staff_slots() -> StaffSlots:
 	return _slots
+
+
+## Returns the selected storage room's artefacts (hidden for other rooms).
+func get_room_artefacts() -> ArtefactPanel:
+	return _room_artefacts
+
+
+## Shows the artefacts of [param room] and those it could take, when it is a storage room.
+func _show_room_artefacts(room: RoomState) -> void:
+	var def: RoomDef = null if room == null else _def(room.def_id)
+	_room_artefacts.visible = def != null and def.artefact_slots > 0
+	if _room_artefacts.visible:
+		_room_artefacts.room_filter = ArtefactRules.room_uid_of(room.id)
+		_room_artefacts.refresh()
 
 
 ## Returns the selected-room panel, for tests.
@@ -199,6 +217,7 @@ func _on_selection_changed(selected: StringName) -> void:
 		return
 	_slots.show_room(selected)
 	var room: RoomState = _simulation.state.base.find_room(selected)
+	_show_room_artefacts(room)
 	var def: RoomDef = null
 	if room != null:
 		def = _def(room.def_id)

@@ -33,7 +33,11 @@ const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
 var _photo := HorizonPhoto.new()
 var _camera_cue := CameraCue.new()
 var _moth := MothScreen.new()
+var _simulation: Simulation = null
 var _incoming := IncomingBanner.new()
+var _artefacts_button := Button.new()
+var _artefacts_box := PanelContainer.new()
+var _artefacts := ArtefactPanel.new()
 
 @onready var _console: DialConsole = %DialConsole
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
@@ -62,6 +66,7 @@ func _ready() -> void:
 	add_child(_moth)
 	_incoming.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	add_child(_incoming)
+	_add_artefacts()
 	_moth.changed.connect(_on_moth_changed)
 
 
@@ -69,16 +74,21 @@ func _enter_tree() -> void:
 	EventBus.wormhole_closed.connect(_on_focus_may_be_lost)
 	EventBus.dial_started.connect(_on_dial_started)
 	EventBus.dial_resolved.connect(_on_dial_resolved)
+	EventBus.artefact_arrived.connect(_on_artefact_event)
+	EventBus.artefact_moved.connect(_on_artefact_event)
 
 
 func _exit_tree() -> void:
 	EventBus.wormhole_closed.disconnect(_on_focus_may_be_lost)
 	EventBus.dial_started.disconnect(_on_dial_started)
 	EventBus.dial_resolved.disconnect(_on_dial_resolved)
+	EventBus.artefact_arrived.disconnect(_on_artefact_event)
+	EventBus.artefact_moved.disconnect(_on_artefact_event)
 
 
 ## Passes [param simulation] to every panel; the console's slots are emptied.
 func setup(simulation: Simulation) -> void:
+	_simulation = simulation
 	_gauge.setup(simulation)
 	_console.setup(simulation)
 	_drawer.setup(simulation)
@@ -87,6 +97,8 @@ func setup(simulation: Simulation) -> void:
 	_photo.setup(simulation)
 	_moth.setup(simulation)
 	_incoming.setup(simulation)
+	_artefacts.setup(simulation)
+	_show_artefacts_button()
 
 
 ## Returns the incoming wormhole banner.
@@ -214,3 +226,42 @@ func _on_dial_resolved(_outcome: int, _address_key: String) -> void:
 
 func _on_moth_changed() -> void:
 	_ensure_focus.call_deferred()
+
+
+## The Gate Room's artefact strip: a button naming holding and the gate, opening the list.
+func _add_artefacts() -> void:
+	_artefacts_button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_artefacts_button.position = Vector2(16, 16)
+	_artefacts_button.toggle_mode = true
+	_artefacts_button.toggled.connect(func(on: bool) -> void: _artefacts_box.visible = on)
+	add_child(_artefacts_button)
+	_artefacts_box.visible = false
+	_artefacts_box.position = Vector2(16, 56)
+	_artefacts_box.custom_minimum_size = Vector2(520, 0)
+	_artefacts_box.add_child(_artefacts)
+	add_child(_artefacts_box)
+
+
+func _show_artefacts_button() -> void:
+	if _simulation == null:
+		return
+	var state: GameState = _simulation.state
+	_artefacts_button.visible = not state.artefacts.items.is_empty()
+	_artefacts_button.text = tr(&"GATE_ARTEFACTS_BUTTON").format(
+		{"header": ArtefactText.header(state)}
+	)
+	_artefacts.refresh()
+
+
+## Returns the Gate Room's artefact button.
+func get_artefacts_button() -> Button:
+	return _artefacts_button
+
+
+## Returns the Gate Room's artefact list.
+func get_artefacts() -> ArtefactPanel:
+	return _artefacts
+
+
+func _on_artefact_event(_uid: int) -> void:
+	_show_artefacts_button()

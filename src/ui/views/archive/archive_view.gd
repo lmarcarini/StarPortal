@@ -38,6 +38,8 @@ var _image_return: Control = null
 ## the unread count changes.
 var _unread_on_tick: bool = false
 
+var _artefacts := ArtefactPanel.new()
+
 @onready var _sections: TabContainer = %Sections
 @onready var _columns: Control = %Columns
 @onready var _log: LogList = %LogList
@@ -50,6 +52,13 @@ var _unread_on_tick: bool = false
 
 
 func _ready() -> void:
+	var scroll := ScrollContainer.new()
+	scroll.name = "Artefacts"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_artefacts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(_artefacts)
+	_sections.add_child(scroll)
+	_sections.set_tab_title(_sections.get_tab_count() - 1, &"ARCHIVE_SECTION_ARTEFACTS")
 	for index: int in _SECTION_KEYS.size():
 		_sections.set_tab_title(index, _SECTION_KEYS[index])
 	_secondary.set_secondary(true)
@@ -89,6 +98,7 @@ func setup(simulation: Simulation) -> void:
 	_list.setup(simulation)
 	_log.setup(simulation)
 	_worlds.setup(simulation)
+	_artefacts.setup(simulation)
 	_viewer.close()
 	_menu.hide()
 	close_beside()
@@ -161,6 +171,16 @@ func show_worlds() -> void:
 ## Returns the Worlds section.
 func get_worlds() -> WorldsSection:
 	return _worlds
+
+
+## Shows the Artefacts section.
+func show_artefacts() -> void:
+	_sections.current_tab = _sections.get_tab_count() - 1
+
+
+## Returns the Artefacts section.
+func get_artefacts() -> ArtefactPanel:
+	return _artefacts
 
 
 ## Returns the operations log list.

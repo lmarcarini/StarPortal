@@ -68,7 +68,7 @@ func _report() -> WorldReportPanel:
 ## The Archive has Documents, Worlds and Log; Worlds lists SILL with its state.
 func test_worlds_lists_the_locked_world() -> void:
 	var sections: TabContainer = _view.get_node("%Sections") as TabContainer
-	assert_int(sections.get_tab_count()).is_equal(3)
+	assert_int(sections.get_tab_count()).is_equal(4)
 	assert_str(sections.tr(sections.get_tab_title(1))).is_equal("Worlds")
 	assert_bool(_worlds().get_world_ids().has(SILL)).is_true()
 	var row: Button = _worlds().get_rows()[_worlds().get_world_ids().find(SILL)]
