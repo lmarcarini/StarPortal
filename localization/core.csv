@@ -100,3 +100,4 @@ ATTITUDE_FRIENDLY,Friendly,Amistoso
 ATTITUDE_ALLIED,Allied,Aliado
 LOG_LINE_CALL_MISSED,Missed a call from {name}. Committee Confidence -1.,Ligação perdida de {name}. Confiança do Comitê -1.
 CAUSE_CALL_MISSED,Missed call,Ligação perdida
+UI_CALL_WAITING,Call waiting: {name},Ligação em espera: {name}

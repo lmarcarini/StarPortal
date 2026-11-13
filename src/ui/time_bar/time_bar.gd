@@ -5,13 +5,16 @@ extends HBoxContainer
 ## only; it never polls. The time actions (time_toggle_pause, time_faster, time_slower) are
 ## read in _input, before the GUI, so Space pauses instead of pressing the focused button,
 ## and once per press ([method InputActions.is_new_press]), so one trigger pull steps the
-## speed once.
+## speed once. A "call waiting" lamp (a button naming the faction) shows while an Earth
+## faction's phone call waits; pressing it answers the call (m4-core-systems.md section 3).
 ## Bible: game-design.md#time-real-time-with-pause,
 ## technical-architecture.md#architecture-overview
 
 const _ACTION_TOGGLE_PAUSE: StringName = &"time_toggle_pause"
 const _ACTION_FASTER: StringName = &"time_faster"
 const _ACTION_SLOWER: StringName = &"time_slower"
+
+var _call_button := Button.new()
 
 @onready var _pause_button: Button = %PauseButton
 @onready var _slower_button: Button = %SlowerButton
@@ -24,6 +27,10 @@ func _ready() -> void:
 	_pause_button.pressed.connect(SimClock.toggle_pause)
 	_slower_button.pressed.connect(SimClock.slower)
 	_faster_button.pressed.connect(SimClock.faster)
+	_call_button.visible = false
+	_call_button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_call_button.pressed.connect(_on_call_pressed)
+	add_child(_call_button)
 	refresh()
 
 
@@ -31,12 +38,20 @@ func _enter_tree() -> void:
 	EventBus.tick_advanced.connect(_on_tick_advanced)
 	EventBus.speed_changed.connect(_on_speed_changed)
 	EventBus.paused_changed.connect(_on_paused_changed)
+	EventBus.contact_pending.connect(_on_call_changed)
+	EventBus.call_missed.connect(_on_call_changed)
+	EventBus.conversation_started.connect(_on_conversation_changed)
+	EventBus.conversation_ended.connect(_on_conversation_changed)
 
 
 func _exit_tree() -> void:
 	EventBus.tick_advanced.disconnect(_on_tick_advanced)
 	EventBus.speed_changed.disconnect(_on_speed_changed)
 	EventBus.paused_changed.disconnect(_on_paused_changed)
+	EventBus.contact_pending.disconnect(_on_call_changed)
+	EventBus.call_missed.disconnect(_on_call_changed)
+	EventBus.conversation_started.disconnect(_on_conversation_changed)
+	EventBus.conversation_ended.disconnect(_on_conversation_changed)
 
 
 func _input(event: InputEvent) -> void:
@@ -67,11 +82,34 @@ func refresh() -> void:
 		return
 	_show_date(clock.tick)
 	_show_speed(clock)
+	_show_call(SimClock.simulation.state)
 
 
-## Returns the buttons in focus order: pause, slower, faster.
+## Returns the buttons in focus order: pause, slower, faster, and the call lamp when lit.
 func get_buttons() -> Array[Button]:
-	return [_pause_button, _slower_button, _faster_button]
+	var found: Array[Button] = [_pause_button, _slower_button, _faster_button]
+	if _call_button.visible:
+		found.append(_call_button)
+	return found
+
+
+## Returns the call waiting lamp.
+func get_call_button() -> Button:
+	return _call_button
+
+
+## Lights the lamp with the caller's name while a phone call waits; disabled while another
+## conversation runs.
+func _show_call(state: GameState) -> void:
+	var index: int = ContactRules.next_pending(state, &"phone")
+	_call_button.visible = index >= 0
+	if index < 0:
+		return
+	var faction_id: StringName = state.factions.pending[index].faction
+	var faction: FactionDef = state.faction_defs.get(faction_id)
+	var name: String = String(faction_id) if faction == null else tr(faction.name_key)
+	_call_button.text = tr(&"UI_CALL_WAITING").format({"name": name})
+	_call_button.disabled = state.conversations.active != null
 
 
 func _get_clock() -> ClockState:
@@ -115,4 +153,18 @@ func _on_speed_changed(_speed_index: int) -> void:
 
 
 func _on_paused_changed(_is_paused: bool) -> void:
+	refresh()
+
+
+func _on_call_pressed() -> void:
+	if SimClock.simulation != null:
+		SimClock.simulation.submit(AnswerCallCommand.new())
+		refresh()
+
+
+func _on_call_changed(_faction: StringName) -> void:
+	refresh()
+
+
+func _on_conversation_changed(_first: Variant, _second: Variant) -> void:
 	refresh()
