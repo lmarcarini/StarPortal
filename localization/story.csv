@@ -46,3 +46,6 @@ REQUEST_REWARD,Reward: {effects},[EN] Reward: {effects}
 REQUEST_PENALTY,Penalty: {effects},[EN] Penalty: {effects}
 REQUEST_ON_DECLINE,If declined: {effects},[EN] If declined: {effects}
 COMMAND_TITLE_NEW,{title} (!),{title} (!)
+COMMAND_SUBTAB_FACTIONS,Factions,[EN] Factions
+FACTION_STANDING_LINE,Standing {value}  {attitude}  Open requests: {requests},[EN] Standing {value}  {attitude}  Open requests: {requests}
+CAUSE_GIFT,Gift,[EN] Gift
