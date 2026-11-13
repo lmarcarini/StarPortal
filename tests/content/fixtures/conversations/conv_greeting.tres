@@ -1,0 +1,64 @@
+[gd_resource type="Resource" script_class="ConversationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/conversation_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/conversation_node_def.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/conversation_choice_def.gd" id="3"]
+[ext_resource type="Script" path="res://src/content/story/conditions/standing_at_least_condition.gd" id="4"]
+[ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="5"]
+
+[sub_resource type="Resource" id="e1"]
+script = ExtResource("5")
+faction = &"faction_kindred"
+delta = 5
+
+[sub_resource type="Resource" id="c1"]
+script = ExtResource("4")
+faction = &"faction_kindred"
+amount = 50
+
+[sub_resource type="Resource" id="ch1"]
+script = ExtResource("3")
+text_key = &"CONV_TEST_ANSWER_FRIEND"
+conditions = Array[Resource]([SubResource("c1")])
+show_locked = true
+next = &"end_good"
+
+[sub_resource type="Resource" id="ch2"]
+script = ExtResource("3")
+text_key = &"CONV_TEST_ANSWER_BYE"
+next = &"end"
+
+[sub_resource type="Resource" id="n1"]
+script = ExtResource("2")
+id = &"hello"
+speaker_key = &"CONV_TEST_ELDER"
+text_key = &"CONV_TEST_HELLO"
+minutes = 2
+next = &"ask"
+
+[sub_resource type="Resource" id="n2"]
+script = ExtResource("2")
+id = &"ask"
+kind = 1
+choices = Array[ExtResource("3")]([SubResource("ch1"), SubResource("ch2")])
+
+[sub_resource type="Resource" id="n3"]
+script = ExtResource("2")
+id = &"end_good"
+kind = 2
+effects = Array[Resource]([SubResource("e1")])
+
+[sub_resource type="Resource" id="n4"]
+script = ExtResource("2")
+id = &"end"
+kind = 2
+
+[resource]
+script = ExtResource("1")
+faction = &"faction_kindred"
+channels = Array[StringName]([&"wormhole", &"incoming"])
+priority = 5
+once = true
+start = &"hello"
+nodes = Array[ExtResource("2")]([SubResource("n1"), SubResource("n2"), SubResource("n3"), SubResource("n4")])
+id = &"conv_greeting"

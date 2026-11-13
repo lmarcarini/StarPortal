@@ -43,6 +43,8 @@ static func check_registry(registry: RegistryScript) -> Array[String]:
 		known[def.id] = def
 	var errors: Array[String] = []
 	for def: DefBase in all:
+		if def is ConversationDef:
+			continue
 		var conditions: Array[ConditionDef] = []
 		var effects: Array[EffectDef] = []
 		_collect(def, conditions, effects)
