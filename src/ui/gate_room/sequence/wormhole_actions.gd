@@ -29,6 +29,7 @@ var _simulation: Simulation = null
 var _team_actions := RingTeamActions.new()
 var _close_warning := Label.new()
 var _is_close_warned: bool = false
+var _hail_button: Button = Button.new()
 
 @onready var _camera_button: Button = %PoleCameraButton
 @onready var _camera_progress: ProgressBar = %CameraProgress
@@ -49,6 +50,10 @@ func _ready() -> void:
 	_book_button.pressed.connect(book_requested.emit)
 	_close_button.confirmed.connect(_on_close_confirmed)
 	_moth_button.pressed.connect(_on_moth_pressed)
+	_hail_button.text = &"GATE_WORMHOLE_HAIL"
+	_hail_button.pressed.connect(_on_hail_pressed)
+	add_child(_hail_button)
+	move_child(_hail_button, _moth_button.get_index())
 	_console.focus_changed.connect(focus_changed.emit)
 	_team_actions.focus_changed.connect(focus_changed.emit)
 	add_child(_team_actions)
@@ -76,6 +81,7 @@ func render(state: GameState) -> void:
 	_archive_button.visible = not WormholeText.new_documents(state).is_empty()
 	_console.render()
 	_show_moth(state)
+	_hail_button.visible = GateQueries.can_hail(state)
 	_team_actions.render(state)
 	_show_close_warning(state)
 
@@ -91,6 +97,8 @@ func get_focusables() -> Array[Control]:
 	if _archive_button.visible:
 		found.append(_archive_button)
 	found.append(_book_button)
+	if _hail_button.visible:
+		found.append(_hail_button)
 	if not _moth_button.disabled:
 		found.append(_moth_button)
 	found.append_array(_team_actions.get_focusables())
@@ -126,6 +134,11 @@ func get_archive_button() -> Button:
 ## Returns the Open the Address Book button.
 func get_book_button() -> Button:
 	return _book_button
+
+
+## Returns the Hail button (shown only when GateQueries.can_hail()).
+func get_hail_button() -> Button:
+	return _hail_button
 
 
 ## Returns the Send the MOTH button.
@@ -233,5 +246,13 @@ func _on_moth_pressed() -> void:
 	if _simulation == null or _moth_button.disabled:
 		return
 	_simulation.submit(LaunchMothCommand.new())
+	render(_simulation.state)
+	focus_changed.emit()
+
+
+func _on_hail_pressed() -> void:
+	if _simulation == null or not _hail_button.visible:
+		return
+	_simulation.submit(HailCommand.new())
 	render(_simulation.state)
 	focus_changed.emit()

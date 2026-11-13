@@ -51,3 +51,22 @@ static func open_ticks_left(state: GameState) -> int:
 		return 0
 	var open_for: int = state.clock.tick - gate.lock_started_tick
 	return maxi(state.balance.max_open_ticks - open_for, 0)
+
+
+## The faction holding the world the Ring is locked to (WorldRecord.controller), or &"".
+static func locked_faction(state: GameState) -> StringName:
+	if state.galaxy == null:
+		return &""
+	var record: WorldRecord = state.galaxy.get_world(state.gate.connected_world_id)
+	return &"" if record == null else record.controller
+
+
+## True when the player can hail: the Ring is locked to a world with a controller or with
+## people, and no conversation is running (m4-core-systems.md section 3).
+static func can_hail(state: GameState) -> bool:
+	if state.gate.mode != GateState.RingMode.LOCKED or state.conversations.active != null:
+		return false
+	if not locked_faction(state).is_empty():
+		return true
+	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, state.gate.connected_world_id)
+	return facts != null and facts.life == WorldDef.Life.PEOPLE

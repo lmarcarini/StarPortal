@@ -235,6 +235,9 @@ signal artefact_taken(artefact_id: StringName)
 ## Emitted when every held instance of an artefact becomes Studied, with its id (outbox).
 @warning_ignore("unused_signal")
 signal artefact_studied(artefact_id: StringName)
+## Emitted when a hail gets no answer, with the world id (outbox; logged "No answer.").
+@warning_ignore("unused_signal")
+signal hail_unanswered(world_id: StringName)
 ## Emitted when a conversation starts, with its id and channel (outbox).
 @warning_ignore("unused_signal")
 signal conversation_started(conversation_id: StringName, channel: StringName)
