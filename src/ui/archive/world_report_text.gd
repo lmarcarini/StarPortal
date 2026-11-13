@@ -170,5 +170,15 @@ static func address_of(world_id: StringName, state: GameState) -> GateAddress:
 	return null
 
 
+## The "Held by" row of [param world_id]: the faction's name and accent colour, or an empty
+## name when it is not known (WorldReportRules.controller).
+static func held_by(world_id: StringName, state: GameState) -> Dictionary:
+	var faction_id: StringName = WorldReportRules.controller(state, world_id)
+	var faction: FactionDef = state.faction_defs.get(faction_id)
+	if faction == null:
+		return {"name": "", "accent": Color.WHITE}
+	return {"name": _tr(faction.name_key), "accent": faction.accent}
+
+
 static func _tr(key: StringName) -> String:
 	return String(TranslationServer.translate(key))
