@@ -24,7 +24,8 @@ func test_kind_keys() -> void:
 		"ARCHIVE_KIND_ARTEFACT"
 	)
 	assert_str(String(DocumentText.kind_key(99))).is_equal("ARCHIVE_KIND_NOTE")
-	assert_int(DocumentText.KIND_KEYS.size()).is_equal(DocumentDef.Kind.size())
+	assert_int(DocumentText.KIND_KEYS.size()).is_equal(DocumentDef.Kind.size() + 1)
+	assert_int(DocumentText.TRANSCRIPT_KIND).is_equal(DocumentDef.Kind.size())
 
 
 func test_title_and_source_fall_back() -> void:

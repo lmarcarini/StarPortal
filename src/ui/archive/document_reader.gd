@@ -52,6 +52,17 @@ func show_document(document_id: StringName, def: DocumentDef, received_tick: int
 	_scroll.scroll_vertical = 0
 
 
+## Shows the transcript [param document_id] titled [param title_text], its [param lines] as
+## the body, received at [param received_tick].
+func show_transcript(
+	document_id: StringName, title_text: String, lines: Array[String], received_tick: int
+) -> void:
+	show_document(document_id, null, received_tick)
+	_title.text = title_text
+	_body.text = "\n\n".join(lines)
+	_body.visible = not lines.is_empty()
+
+
 ## Shows no document.
 func clear() -> void:
 	show_document(&"", null, 0)

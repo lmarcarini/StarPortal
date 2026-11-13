@@ -235,7 +235,13 @@ func _def_of(document_id: StringName) -> DocumentDef:
 func _show_in(reader: DocumentReader, document_id: StringName) -> void:
 	var archive: ArchiveState = _simulation.state.archive
 	var tick: int = archive.received_tick.get(document_id, 0)
-	reader.show_document(document_id, _def_of(document_id), tick)
+	var record: TranscriptRecord = TranscriptText.record_of(_simulation.state, document_id)
+	if record != null:
+		var lines: Array[String] = TranscriptText.lines(_simulation.state, record)
+		var title: String = TranscriptText.title(_simulation.state, record)
+		reader.show_transcript(document_id, title, lines, tick)
+	else:
+		reader.show_document(document_id, _def_of(document_id), tick)
 	if archive.is_read(document_id):
 		return
 	if not _simulation.submit(MarkDocumentReadCommand.create(document_id)).is_ok:
