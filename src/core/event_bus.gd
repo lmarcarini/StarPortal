@@ -235,6 +235,19 @@ signal artefact_taken(artefact_id: StringName)
 ## Emitted when every held instance of an artefact becomes Studied, with its id (outbox).
 @warning_ignore("unused_signal")
 signal artefact_studied(artefact_id: StringName)
+## Emitted when a conversation starts, with its id and channel (outbox).
+@warning_ignore("unused_signal")
+signal conversation_started(conversation_id: StringName, channel: StringName)
+## Emitted when the running conversation shows a line, with the node id (outbox).
+@warning_ignore("unused_signal")
+signal conversation_line(node_id: StringName)
+## Emitted when the running conversation waits at a choice (outbox).
+@warning_ignore("unused_signal")
+signal conversation_choices
+## Emitted when a conversation ends, with its transcript uid and whether it was cut off
+## (outbox).
+@warning_ignore("unused_signal")
+signal conversation_ended(transcript_uid: int, cut_off: bool)
 ## Emitted when a faction's standing changes, with its id, the new standing and the change
 ## applied (posted through the outbox; the Committee posts confidence_changed too).
 @warning_ignore("unused_signal")

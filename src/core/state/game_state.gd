@@ -91,6 +91,8 @@ var research_defs: Dictionary[StringName, ResearchDef] = {}
 var request_defs: Dictionary[StringName, RequestDef] = {}
 ## Every FactionDef by id, read only. Transient: GameSetup.build() sets it.
 var faction_defs: Dictionary[StringName, FactionDef] = {}
+## Every ConversationDef by id, read only. Transient: GameSetup.build() sets it.
+var conversation_defs: Dictionary[StringName, ConversationDef] = {}
 
 
 ## Returns a fresh campaign state seeded with [param base_seed]. The galaxy seed is

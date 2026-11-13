@@ -55,6 +55,8 @@ static func register_defaults() -> void:
 	_types[SetFlagCommand.TYPE] = SetFlagCommand
 	_types[DialCommand.TYPE] = DialCommand
 	_types[CloseWormholeCommand.TYPE] = CloseWormholeCommand
+	_types[ChooseOptionCommand.TYPE] = ChooseOptionCommand
+	_types[EndConversationCommand.TYPE] = EndConversationCommand
 	_types[DeliverDocumentCommand.TYPE] = DeliverDocumentCommand
 	_types[MarkDocumentReadCommand.TYPE] = MarkDocumentReadCommand
 	_types[NoteAddressCommand.TYPE] = NoteAddressCommand
