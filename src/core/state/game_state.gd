@@ -91,6 +91,10 @@ var research_defs: Dictionary[StringName, ResearchDef] = {}
 var request_defs: Dictionary[StringName, RequestDef] = {}
 ## Every FactionDef by id, read only. Transient: GameSetup.build() sets it.
 var faction_defs: Dictionary[StringName, FactionDef] = {}
+## Every ArtefactDef by id, read only. Transient: GameSetup.build() sets it.
+var artefact_defs: Dictionary[StringName, ArtefactDef] = {}
+## The summed modifiers (M4). Transient: ModifierRules rebuilds it when a source changes.
+var modifiers: ModifierCache = ModifierCache.new()
 ## Every ConversationDef by id, read only. Transient: GameSetup.build() sets it.
 var conversation_defs: Dictionary[StringName, ConversationDef] = {}
 
