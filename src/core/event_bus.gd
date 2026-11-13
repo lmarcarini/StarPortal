@@ -216,55 +216,50 @@ signal research_done(project_id: StringName)
 ## (posted through the outbox).
 @warning_ignore("unused_signal")
 signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
+# M4 factions, conversations, requests and artefacts (posted through the outbox).
+@warning_ignore_start("unused_signal")
 ## Emitted when a story effect offers a request, with the new request's uid (outbox).
-@warning_ignore("unused_signal")
 signal request_offered(uid: int)
 ## Emitted when an artefact arrives (in holding or waiting at the gate), with its uid
 ## (outbox).
-@warning_ignore("unused_signal")
 signal artefact_arrived(uid: int)
 ## Emitted when a hidden research project is revealed, with its id (outbox).
-@warning_ignore("unused_signal")
 signal research_revealed(project_id: StringName)
 ## Emitted when a story effect sets a flag, with its name (outbox).
-@warning_ignore("unused_signal")
 signal flag_changed(flag: StringName)
 ## Emitted when an artefact is handed over, with its id (outbox).
-@warning_ignore("unused_signal")
 signal artefact_taken(artefact_id: StringName)
 ## Emitted when every held instance of an artefact becomes Studied, with its id (outbox).
-@warning_ignore("unused_signal")
 signal artefact_studied(artefact_id: StringName)
-## Emitted when a faction queues a contact, with its id (outbox).
-@warning_ignore("unused_signal")
-signal contact_pending(faction: StringName)
-## Emitted when an unanswered phone call expires, with the faction id (outbox; logged).
-@warning_ignore("unused_signal")
-signal call_missed(faction: StringName)
-## Emitted when a hail gets no answer, with the world id (outbox; logged "No answer.").
-@warning_ignore("unused_signal")
-signal hail_unanswered(world_id: StringName)
-## Emitted when a conversation starts, with its id and channel (outbox).
-@warning_ignore("unused_signal")
-signal conversation_started(conversation_id: StringName, channel: StringName)
-## Emitted when the running conversation shows a line, with the node id (outbox).
-@warning_ignore("unused_signal")
-signal conversation_line(node_id: StringName)
-## Emitted when the running conversation waits at a choice (outbox).
-@warning_ignore("unused_signal")
-signal conversation_choices
-## Emitted when a conversation ends, with its transcript uid and whether it was cut off
-## (outbox).
-@warning_ignore("unused_signal")
-signal conversation_ended(transcript_uid: int, cut_off: bool)
 ## Emitted when a faction's standing changes, with its id, the new standing and the change
 ## applied (posted through the outbox; the Committee posts confidence_changed too).
-@warning_ignore("unused_signal")
 signal standing_changed(faction: StringName, standing: int, delta: int)
 ## Emitted the first time the player meets a faction, with its id (posted through the outbox;
 ## logged).
-@warning_ignore("unused_signal")
 signal faction_met(faction: StringName)
+## Emitted when a conversation starts, with its id and channel (outbox).
+signal conversation_started(conversation_id: StringName, channel: StringName)
+## Emitted when the running conversation shows a line, with the node id (outbox).
+signal conversation_line(node_id: StringName)
+## Emitted when the running conversation waits at a choice (outbox).
+signal conversation_choices
+## Emitted when a conversation ends, with its transcript uid and whether it was cut off
+## (outbox).
+signal conversation_ended(transcript_uid: int, cut_off: bool)
+## Emitted when a hail gets no answer, with the world id (outbox; logged "No answer.").
+signal hail_unanswered(world_id: StringName)
+## Emitted when a faction queues a contact, with its id (outbox).
+signal contact_pending(faction: StringName)
+## Emitted when an unanswered phone call expires, with the faction id (outbox; logged).
+signal call_missed(faction: StringName)
+## Emitted when an incoming wormhole activates the Ring, with the faction id (outbox).
+signal incoming_wormhole(faction: StringName)
+## Emitted when an incoming wormhole is answered, with the faction id (outbox).
+signal incoming_answered(faction: StringName)
+## Emitted when an incoming wormhole is ignored or gives up, with the faction id (outbox;
+## logged).
+signal incoming_ignored(faction: StringName)
+@warning_ignore_restore("unused_signal")
 ## Emitted whenever Committee Confidence changes (an event or the daily settlement's drift),
 ## with the new value in tenths (posted through the outbox).
 @warning_ignore("unused_signal")

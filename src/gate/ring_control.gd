@@ -62,6 +62,21 @@ static func finish_dial(gate: GateState, entry: DialLogEntry) -> void:
 	gate.is_hostile = entry.outcome == DialOutcome.Kind.HOSTILE_LOCK
 
 
+## Opens the waiting incoming wormhole from the far side at [param tick]: IDLE becomes LOCKED
+## to [param world_id] without a dial (the far side dialed; nothing goes in the Dial Log).
+## Only while an incoming wormhole waits: anything else fails an assert.
+static func answer_incoming(gate: GateState, world_id: StringName, tick: int) -> void:
+	var waiting: bool = gate.has_incoming()
+	assert(waiting, "RingControl.answer_incoming(): no incoming wormhole waits")
+	if not waiting:
+		return
+	gate.mode = GateState.RingMode.LOCKED
+	assert(_log_transition(GateState.RingMode.IDLE, GateState.RingMode.LOCKED))
+	gate.connected_world_id = world_id
+	gate.lock_started_tick = tick
+	gate.is_hostile = false
+
+
 ## Closes the open wormhole: LOCKED becomes IDLE and the Ring forgets the connection. Only
 ## from LOCKED: anything else fails an assert (a dial in progress is never cut short).
 static func close(gate: GateState) -> void:
@@ -103,6 +118,7 @@ static func _clear(gate: GateState) -> void:
 	gate.connected_world_id = &""
 	gate.lock_started_tick = -1
 	gate.is_hostile = false
+	gate.clear_incoming()
 
 
 ## Prints one mode change and returns true; called only inside an assert, so only in debug

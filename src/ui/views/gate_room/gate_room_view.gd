@@ -33,6 +33,7 @@ const _TITLE_KEY: StringName = &"GATE_ROOM_TITLE"
 var _photo := HorizonPhoto.new()
 var _camera_cue := CameraCue.new()
 var _moth := MothScreen.new()
+var _incoming := IncomingBanner.new()
 
 @onready var _console: DialConsole = %DialConsole
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
@@ -59,6 +60,8 @@ func _ready() -> void:
 	wormhole.camera_extended.connect(_on_camera_extended)
 	wormhole.photo_requested.connect(_photo.toggle_enlarged)
 	add_child(_moth)
+	_incoming.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	add_child(_incoming)
 	_moth.changed.connect(_on_moth_changed)
 
 
@@ -83,6 +86,12 @@ func setup(simulation: Simulation) -> void:
 	_overlays.setup(simulation)
 	_photo.setup(simulation)
 	_moth.setup(simulation)
+	_incoming.setup(simulation)
+
+
+## Returns the incoming wormhole banner.
+func get_incoming_banner() -> IncomingBanner:
+	return _incoming
 
 
 ## Returns the dial console.

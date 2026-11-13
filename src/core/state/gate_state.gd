@@ -54,8 +54,10 @@ var lock_started_tick: int = -1
 var is_hostile: bool = false
 ## Every dial attempt, oldest first.
 var dial_log: Array[DialLogEntry] = []
-## An incoming wormhole waiting for Answer or Ignore: faction, conversation and the tick it
-## gives up; &"" / −1 when none.
+## An incoming wormhole from a faction: the faction, the conversation and the tick the far
+## side gives up; &"" / −1 when none. While the Ring is IDLE it waits for Answer or Ignore;
+## once answered the Ring is LOCKED and the fields stay until it closes (that wormhole costs
+## CAIRN no energy).
 var incoming_faction: StringName = &""
 var incoming_conversation: StringName = &""
 var incoming_until_tick: int = -1
@@ -63,7 +65,19 @@ var incoming_until_tick: int = -1
 
 ## True while an incoming wormhole waits for an answer.
 func has_incoming() -> bool:
-	return not incoming_faction.is_empty()
+	return not incoming_faction.is_empty() and mode == RingMode.IDLE
+
+
+## True while the open wormhole is an answered incoming one.
+func is_incoming_lock() -> bool:
+	return not incoming_faction.is_empty() and mode == RingMode.LOCKED
+
+
+## Forgets the incoming wormhole.
+func clear_incoming() -> void:
+	incoming_faction = &""
+	incoming_conversation = &""
+	incoming_until_tick = -1
 
 
 ## Returns JSON-safe data for saving. The mode is a lowercase name; a missing address is null.
@@ -86,7 +100,7 @@ func to_dict() -> Dictionary:
 
 
 func _incoming_to_dict() -> Dictionary:
-	if not has_incoming():
+	if incoming_faction.is_empty():
 		return {}
 	return {
 		"faction": String(incoming_faction),

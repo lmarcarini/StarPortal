@@ -56,7 +56,7 @@ func get_type() -> StringName:
 func validate(state: GameState) -> CommandResult:
 	if address == null or not address.is_well_formed():
 		return CommandResult.fail(&"bad_address")
-	if state.gate.mode != GateState.RingMode.IDLE:
+	if state.gate.mode != GateState.RingMode.IDLE or state.gate.has_incoming():
 		return CommandResult.fail(&"ring_busy")
 	var needed_mwh: float = GateQueries.lock_energy_mwh(state, address)
 	if state.power.stored_mwh < needed_mwh:

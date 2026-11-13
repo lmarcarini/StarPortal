@@ -57,6 +57,8 @@ static func register_defaults() -> void:
 	_types[CloseWormholeCommand.TYPE] = CloseWormholeCommand
 	_types[ChooseOptionCommand.TYPE] = ChooseOptionCommand
 	_types[HailCommand.TYPE] = HailCommand
+	_types[AnswerIncomingCommand.TYPE] = AnswerIncomingCommand
+	_types[IgnoreIncomingCommand.TYPE] = IgnoreIncomingCommand
 	_types[EndConversationCommand.TYPE] = EndConversationCommand
 	_types[DeliverDocumentCommand.TYPE] = DeliverDocumentCommand
 	_types[MarkDocumentReadCommand.TYPE] = MarkDocumentReadCommand
