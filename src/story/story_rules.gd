@@ -154,7 +154,7 @@ static func _add_address(state: GameState, world: StringName) -> bool:
 	var key: String = galaxy.address_of(world, galaxy.home().origin_glyph).key()
 	if state.address_book.find(key) != null:
 		return false
-	var entry := AddressEntry.create(key, AddressEntry.Source.DOCUMENT, &"")
+	var entry := AddressEntry.create(key, AddressEntry.Source.DOCUMENT, world)
 	entry.world_id = world
 	state.address_book.entries.push_front(entry)
 	state.events.post(&"address_book_changed", [])

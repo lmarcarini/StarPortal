@@ -123,6 +123,7 @@ func act(simulation: Simulation) -> void:
 	if simulation.commands.pending_count() == 0 and SoakStaff.work(simulation):
 		staff_moves += 1
 	staff_assigns += int(simulation.commands.pending_count() == 0 and SoakStaff.assign(simulation))
+	SoakStory.work(simulation)
 	if not clock.is_paused and clock.tick < _next_action_tick:
 		return
 	if clock.mode == ClockState.Mode.HELD:

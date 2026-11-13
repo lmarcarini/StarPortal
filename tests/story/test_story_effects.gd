@@ -70,6 +70,8 @@ func test_add_address_once() -> void:
 	assert_bool(_apply(effect)).is_true()
 	assert_int(_state.address_book.entries.size()).is_equal(count + 1)
 	assert_str(String(_state.address_book.entries[0].world_id)).is_equal("world_lintel")
+	var data: Dictionary = JSON.parse_string(JSON.stringify(_state.to_dict()))
+	assert_array(GameState.validate_dict(data)).is_empty()
 	assert_bool(_apply(effect)).is_false()
 	effect.world = &"world_nowhere"
 	assert_bool(_apply(effect)).is_false()
