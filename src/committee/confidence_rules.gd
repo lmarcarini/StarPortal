@@ -23,8 +23,11 @@ const REPORTS: StringName = &"reports"
 ## A team lost (-10) and a member deceased in a rescue (-3 each; m3 section 4).
 const TEAM_LOST: StringName = &"team_lost"
 const DECEASED: StringName = &"deceased"
+## A story effect on the Committee (M4: m4-core-systems.md section 2); the subject is the
+## translation key of the reason.
+const STORY: StringName = &"story"
 const CAUSES: Array[StringName] = [
-	LOCKED, HORIZON_RECORD, SURVEYED, RESEARCH, REPORTS, TEAM_LOST, DECEASED
+	LOCKED, HORIZON_RECORD, SURVEYED, RESEARCH, REPORTS, TEAM_LOST, DECEASED, STORY
 ]
 ## Change per lock, horizon record, team survey, project and analyst, in tenths.
 const LOCK_CHANGE: int = 50

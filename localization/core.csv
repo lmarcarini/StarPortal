@@ -90,3 +90,11 @@ COMMAND_MONTH_9,Sep,set
 COMMAND_MONTH_10,Oct,out
 COMMAND_MONTH_11,Nov,nov
 COMMAND_MONTH_12,Dec,dez
+CONFIDENCE_CAUSE_STORY,{name}  {amount},{name}  {amount}
+LOG_KIND_FACTION,Factions,Facções
+LOG_LINE_FACTION_MET,First contact: {name}.,Primeiro contato: {name}.
+ATTITUDE_HOSTILE,Hostile,Hostil
+ATTITUDE_UNFRIENDLY,Unfriendly,Pouco amistoso
+ATTITUDE_NEUTRAL,Neutral,Neutro
+ATTITUDE_FRIENDLY,Friendly,Amistoso
+ATTITUDE_ALLIED,Allied,Aliado

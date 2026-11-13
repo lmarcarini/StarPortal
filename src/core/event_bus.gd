@@ -216,6 +216,14 @@ signal research_done(project_id: StringName)
 ## (posted through the outbox).
 @warning_ignore("unused_signal")
 signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
+## Emitted when a faction's standing changes, with its id, the new standing and the change
+## applied (posted through the outbox; the Committee posts confidence_changed too).
+@warning_ignore("unused_signal")
+signal standing_changed(faction: StringName, standing: int, delta: int)
+## Emitted the first time the player meets a faction, with its id (posted through the outbox;
+## logged).
+@warning_ignore("unused_signal")
+signal faction_met(faction: StringName)
 ## Emitted whenever Committee Confidence changes (an event or the daily settlement's drift),
 ## with the new value in tenths (posted through the outbox).
 @warning_ignore("unused_signal")
