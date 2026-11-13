@@ -22,3 +22,8 @@ COND_HAS_ARTEFACT,Requires the artefact {name},[EN] Requires the artefact {name}
 COND_WORLD_STATUS_AT_LEAST,Requires {name} {status},[EN] Requires {name} {status}
 COND_REQUEST_IS,Requires the request {name},[EN] Requires the request {name}
 COND_NO_DIAL_SINCE,Keep the Ring closed,[EN] Keep the Ring closed
+LOG_LINE_REQUEST_ACTIVE,Request accepted: {name}.,[EN] Request accepted: {name}.
+LOG_LINE_REQUEST_FULFILLED,Request fulfilled: {name}.,[EN] Request fulfilled: {name}.
+LOG_LINE_REQUEST_FAILED,Request failed: {name}.,[EN] Request failed: {name}.
+LOG_LINE_REQUEST_DECLINED,Request declined: {name}.,[EN] Request declined: {name}.
+LOG_LINE_REQUEST_LAPSED,Request offer lapsed: {name}.,[EN] Request offer lapsed: {name}.

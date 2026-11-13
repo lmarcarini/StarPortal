@@ -26,10 +26,11 @@ static func apply(state: GameState, effect: EffectDef) -> bool:
 
 ## Appends an OFFERED instance of [param request] and posts request_offered. While offered,
 ## deadline_tick holds the tick the offer lapses (offered + offer_days); acceptance (M4-15)
-## replaces it with the real deadline. Returns the uid, or −1 for an unknown request.
+## replaces it with the real deadline. Returns the uid, or −1 for an unknown request or one
+## with an instance still open (OFFERED or ACTIVE).
 static func offer_request(state: GameState, request: StringName) -> int:
 	var def: RequestDef = state.request_defs.get(request)
-	if def == null:
+	if def == null or RequestRules.open_instance(state, request) != null:
 		return -1
 	var record := RequestRecord.new()
 	record.uid = state.requests.next_uid

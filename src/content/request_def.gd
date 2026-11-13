@@ -20,6 +20,8 @@ extends DefBase
 @export var deadline_succeeds: bool = false
 ## In-game days the offer stands before it lapses; at least 1.
 @export var offer_days: int = 1
+## Effects applied when accepted (e.g. StampFlag for a keep-the-Ring-closed request).
+@export var on_accept: Array[EffectDef] = []
 ## Effects applied when fulfilled.
 @export var reward: Array[EffectDef] = []
 ## Effects applied when failed.
