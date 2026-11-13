@@ -90,7 +90,14 @@ static func scientist_skill(state: GameState, standing: bool = false) -> int:
 ## Research speed of [param state] in twelfths of the standard crew's: 2 per skill point,
 ## between MIN_SPEED (25%) and MAX_SPEED (200%).
 static func speed(state: GameState) -> int:
-	return clampi(SPEED_PER_SKILL * scientist_skill(state), MIN_SPEED, MAX_SPEED)
+	var base: int = clampi(SPEED_PER_SKILL * scientist_skill(state), MIN_SPEED, MAX_SPEED)
+	return with_modifier(state, base)
+
+
+## [param base_speed] with the research_speed_pct modifier applied (M4), at least 1.
+static func with_modifier(state: GameState, base_speed: int) -> int:
+	var percent: int = ModifierRules.total(state, &"research_speed_pct")
+	return maxi(1, base_speed * (100 + percent) / 100)
 
 
 ## Research speed of [param state] as a whole percentage, rounded down (25 to 200).
@@ -118,7 +125,9 @@ static func work_left(state: GameState) -> int:
 static func ticks_left(state: GameState) -> int:
 	var rate: int = speed(state)
 	if not has_lab_on(state):
-		rate = clampi(SPEED_PER_SKILL * scientist_skill(state, true), MIN_SPEED, MAX_SPEED)
+		rate = with_modifier(
+			state, clampi(SPEED_PER_SKILL * scientist_skill(state, true), MIN_SPEED, MAX_SPEED)
+		)
 	return RateSteps.ticks_to(work_left(state), state.clock.tick, rate, SPEED_DENOMINATOR)
 
 

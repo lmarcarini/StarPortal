@@ -7,7 +7,7 @@ extends RefCounted
 ## Bible: docs/content/m27-daily-rhythm.md section 4
 
 ## What the line stands for.
-enum Kind { ALLOCATION, ROOM_TYPE, OTHER_ROOMS, SALARIES, NET }
+enum Kind { ALLOCATION, ROOM_TYPE, OTHER_ROOMS, SALARIES, NET, MODIFIERS }
 
 var kind: Kind = Kind.NET
 ## The room def of a ROOM_TYPE line; empty otherwise.

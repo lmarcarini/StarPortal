@@ -33,6 +33,8 @@ static func line_name(state: GameState, line: CommandLine) -> String:
 				&"COMMAND_LINE_SALARIES_ONE" if line.count == 1 else &"COMMAND_LINE_SALARIES"
 			)
 			return _tr(key).format({"count": line.count})
+		CommandLine.Kind.MODIFIERS:
+			return _tr(&"COMMAND_LINE_MODIFIERS")
 	return _tr(&"COMMAND_LINE_NET")
 
 
