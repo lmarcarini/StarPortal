@@ -89,6 +89,8 @@ func test_palette_offers_only_unlocked_rooms() -> void:
 		if def_id == ExpeditionUnlock.INFIRMARY_DEF:
 			assert_object(palette.get_room_button(def_id)).is_null()
 			continue
+		if def_id in [&"room_artefact_vault", &"room_containment"]:
+			continue  # M4 storage rooms: tests/base/test_storage_rooms.gd
 		var wanted: bool = (
 			def_id
 			in [&"room_capacitor_bank", &"room_research_lab", &"room_quarters", &"room_corridor"]

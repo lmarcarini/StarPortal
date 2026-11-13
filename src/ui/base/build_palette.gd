@@ -29,6 +29,8 @@ const ROOMS: Array[StringName] = [
 	&"room_quarters",
 	&"room_workshop",
 	&"room_infirmary",
+	&"room_artefact_vault",
+	&"room_containment",
 	&"room_lift",
 	&"room_stairs",
 	&"room_corridor",

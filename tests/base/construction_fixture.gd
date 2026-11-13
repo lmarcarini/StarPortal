@@ -29,10 +29,13 @@ static func state() -> GameState:
 
 
 ## [param game] after every M2.5 project (UnlockFixture.projects()): every room but the
-## staff-locked ones, digging down to Level 4, three banks and the fuel contract.
+## staff-locked ones (and the M4 storage rooms), digging down to Level 4, three banks and the
+## fuel contract.
 static func unlock_all(game: GameState) -> GameState:
 	for project_id: StringName in UnlockFixture.projects():
 		UnlockFixture.apply_project(game.unlocks, project_id)
+	for storage: StringName in [&"room_artefact_vault", &"room_containment"]:
+		UnlockRules.apply(game.unlocks, UnlockRules.EFFECT_UNLOCK_ROOM, storage)
 	return game
 
 

@@ -104,6 +104,8 @@ func test_catalogue_numbers() -> void:
 		&"room_lift": [2, 2, false, 400, 240, 0.0, 0.0, 0.0, 10],
 		&"room_stairs": [2, 1, true, 100, 120, 0.0, 0.0, 0.0, 0],
 		&"room_corridor": [1, 1, false, 5, 10, 0.0, 0.0, 0.0, 0],
+		&"room_artefact_vault": [4, 3, true, 600, 360, 5.0, 0.0, 0.0, 40],
+		&"room_containment": [3, 3, true, 900, 480, 10.0, 0.0, 0.0, 60],
 	}
 	assert_int(Registry.get_all_of(RoomDef).size()).is_equal(table.size())
 	for id: StringName in table:
