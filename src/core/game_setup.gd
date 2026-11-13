@@ -37,6 +37,9 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	state.faction_defs.clear()
 	for faction: FactionDef in defs.factions:
 		state.faction_defs[faction.id] = faction
+	state.conversation_defs.clear()
+	for conversation: ConversationDef in defs.conversations:
+		state.conversation_defs[conversation.id] = conversation
 	state.request_defs.clear()
 	for request: RequestDef in defs.requests:
 		state.request_defs[request.id] = request
@@ -47,6 +50,7 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	var systems: Array[SimSystem] = [
 		PowerSystem.new(defs.balance),
 		GateSystem.new(),
+		ConversationSystem.new(),
 		DocumentSystem.new(defs.documents),
 		ProbeSystem.new(),
 		ExpeditionSystem.new(),
