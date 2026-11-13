@@ -99,6 +99,13 @@ const BALANCE_ID: StringName = &"balance"
 	&"role_medic": 5,
 }
 
+## Factions (m4-core-systems.md sections 2 and 3): a met faction starts a contact at most once
+## every this many days; an unanswered phone call expires after this many days; an incoming
+## wormhole waits this many in-game minutes for Answer or Ignore.
+@export var faction_contact_days: int = 4
+@export var phone_expiry_days: int = 2
+@export var incoming_answer_minutes: int = 5
+
 
 func _init() -> void:
 	id = BALANCE_ID

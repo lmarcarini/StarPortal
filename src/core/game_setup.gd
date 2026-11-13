@@ -59,6 +59,7 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 		ResearchSystem.new(),
 		RecruitmentSystem.new(defs.balance, defs.roles, defs.staff_names),
 		StaffCareSystem.new(),
+		FactionSystem.new(),
 	]
 	return Result.ok(Simulation.new(state, systems))
 
