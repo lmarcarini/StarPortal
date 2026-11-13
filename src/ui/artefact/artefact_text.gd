@@ -43,7 +43,22 @@ static func describe(state: GameState, record: ArtefactRecord) -> String:
 			parts.append(_tr(&"ARTEFACT_WHILE_ON").format({"effects": ", ".join(effects)}))
 		if def.hazard_chance_pct > 0:
 			parts.append(_tr(&"ARTEFACT_HAZARD").format({"chance": def.hazard_chance_pct}))
+	var study: ResearchDef = study_project(state, record.artefact)
+	if study != null and record.state == ArtefactRecord.ArtefactState.STUDIED:
+		parts.append(_tr(&"ARTEFACT_STUDIED_BY").format({"project": _tr(study.name_key)}))
 	return ". ".join(parts)
+
+
+## The research project that studies [param artefact] (a StudyArtefactEffect), or null.
+static func study_project(state: GameState, artefact: StringName) -> ResearchDef:
+	for def: ResearchDef in state.research_defs.values():
+		for effect: EffectDef in def.effects:
+			if (
+				effect is StudyArtefactEffect
+				and (effect as StudyArtefactEffect).artefact == artefact
+			):
+				return def
+	return null
 
 
 ## Where [param record] is: holding, at the gate or a room.
