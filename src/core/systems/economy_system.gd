@@ -49,13 +49,24 @@ func tick(state: GameState) -> void:
 ## Runs the daily settlement, then files reports on every 15th day.
 func on_day(state: GameState) -> void:
 	DailySettlement.settle(state, _balance.daily_allocation_k, costs_k(state))
+	var bonus_k: int = ModifierRules.total(state, &"allocation_k")
+	if bonus_k != 0:
+		state.budget.funds_k += bonus_k
+		state.events.post(&"budget_changed", [state.budget.funds_k])
 	if ConfidenceRules.is_report_day(TimeMath.day_index(state.clock.tick)):
 		ConfidenceEvents.file_reports(state)
 
 
-## Today's costs per 30 days in $k: room upkeep plus salaries (arrivals included).
+## Today's costs per 30 days in $k: room upkeep (with the upkeep modifier) plus salaries
+## (arrivals included). The allocation_k modifier is added to the funds after the settlement.
 func costs_k(state: GameState) -> int:
-	return upkeep_k(state.base, _room_defs, state.unlocks) + StaffRules.salaries_k(state)
+	var upkeep: int = modified_upkeep_k(state, upkeep_k(state.base, _room_defs, state.unlocks))
+	return upkeep + StaffRules.salaries_k(state)
+
+
+## [param upkeep] with the upkeep_pct modifier applied (M4), rounded down, never below 0.
+static func modified_upkeep_k(state: GameState, upkeep: int) -> int:
+	return maxi(0, upkeep * (100 + ModifierRules.total(state, &"upkeep_pct")) / 100)
 
 
 ## Total upkeep per 30 days of [param base]'s built rooms, in $k, with [param room_defs] by

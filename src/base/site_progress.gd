@@ -79,7 +79,10 @@ static func _of(
 		total = build * site.size()
 	elif state.balance != null and LiftShafts.is_segment(state.base, room):
 		total = maxi(1, state.balance.lift_segment_ticks)
-	var ticks: int = BuildSpeed.ticks_to_finish(work, state.clock.tick, workshop)
+	var bonus: int = BuildSpeed.with_modifier(
+		workshop, ModifierRules.total(state, &"build_speed_pct")
+	)
+	var ticks: int = BuildSpeed.ticks_to_finish(work, state.clock.tick, bonus)
 	return _make(Kind.BUILDING, work, total, ticks)
 
 

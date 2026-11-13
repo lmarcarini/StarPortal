@@ -27,11 +27,13 @@ static func lines(state: GameState) -> Array[CommandLine]:
 	salaries.count = salaries.item_ids.size()
 	if salaries.count > 0:
 		out.append(salaries)
+	var modifier: int = modifiers_k(state)
+	if modifier != 0:
+		out.append(CommandLine.create(CommandLine.Kind.MODIFIERS, modifier))
 	var costs: int = costs_k(state)
-	var net := CommandLine.create(
-		CommandLine.Kind.NET, allocation * ConfidenceRules.PERIOD_DAYS - costs
-	)
-	net.per_day_tenths = allocation * 10 - roundi(costs * 10.0 / ConfidenceRules.PERIOD_DAYS)
+	var income: int = allocation * ConfidenceRules.PERIOD_DAYS + modifier
+	var net := CommandLine.create(CommandLine.Kind.NET, income - costs)
+	net.per_day_tenths = roundi((income - costs) * 10.0 / ConfidenceRules.PERIOD_DAYS)
 	out.append(net)
 	return out
 
@@ -45,12 +47,21 @@ static func allocation_k(state: GameState) -> int:
 	)
 
 
-## Room upkeep plus salaries per 30 days, in $k (what the settlement charges ÷ 30).
+## Room upkeep plus salaries per 30 days, in $k (what the settlement charges ÷ 30), with no
+## modifier.
 static func costs_k(state: GameState) -> int:
 	return (
 		EconomySystem.upkeep_k(state.base, state.room_defs, state.unlocks)
 		+ StaffRules.salaries_k(state)
 	)
+
+
+## What the modifiers add per 30 days, in $k: the allocation_k modifier for 30 days, less
+## the upkeep_pct modifier's change to the room upkeep (M4).
+static func modifiers_k(state: GameState) -> int:
+	var upkeep: int = EconomySystem.upkeep_k(state.base, state.room_defs, state.unlocks)
+	var upkeep_change: int = EconomySystem.modified_upkeep_k(state, upkeep) - upkeep
+	return ModifierRules.total(state, &"allocation_k") * ConfidenceRules.PERIOD_DAYS - upkeep_change
 
 
 ## One line per room type, the most expensive first (by name on a tie), with the types past

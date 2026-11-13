@@ -24,7 +24,19 @@ const MAX_BONUS: int = 14
 
 ## Ticks of progress a site or dig of [param state] makes this tick, with the bonus as it is.
 static func progress(state: GameState) -> int:
-	return step_at(state.clock.tick, bonus(state))
+	return step_at(state.clock.tick, effective_bonus(state))
+
+
+## The Workshop bonus with the build_speed_pct modifier applied (M4), in fortieths over normal
+## speed: (40 + bonus) × (100 + modifier) / 100 − 40, never below −39 (always some progress).
+static func effective_bonus(state: GameState) -> int:
+	return with_modifier(bonus(state), ModifierRules.total(state, &"build_speed_pct"))
+
+
+## [param bonus_40ths] with a [param percent] modifier applied (see effective_bonus()).
+static func with_modifier(bonus_40ths: int, percent: int) -> int:
+	var rate: int = (DENOMINATOR + bonus_40ths) * (100 + percent) / 100
+	return maxi(rate, 1) - DENOMINATOR
 
 
 ## Ticks of progress on clock tick [param tick] with [param bonus_40ths] of bonus.
@@ -71,4 +83,4 @@ static func ticks_to_finish(work: int, first_tick: int, bonus_40ths: int) -> int
 ## Clock ticks [param state]'s site or dig with [param work] ticks of progress left needs to
 ## finish, with the bonus as it is now.
 static func ticks_left(state: GameState, work: int) -> int:
-	return ticks_to_finish(work, state.clock.tick, bonus(state))
+	return ticks_to_finish(work, state.clock.tick, effective_bonus(state))
