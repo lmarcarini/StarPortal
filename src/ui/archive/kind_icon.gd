@@ -25,7 +25,7 @@ func _draw() -> void:
 			_draw_image(box, color)
 		DocumentDef.Kind.DOSSIER:
 			_draw_dossier(box, color)
-		DocumentDef.Kind.LOG:
+		DocumentDef.Kind.LOG, DocumentText.TRANSCRIPT_KIND:
 			_draw_log(box, color)
 		DocumentDef.Kind.GIFT:
 			_draw_gift(box, color)

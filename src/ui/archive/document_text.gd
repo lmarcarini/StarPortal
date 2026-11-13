@@ -7,7 +7,7 @@ extends RefCounted
 ## shows only what the document's own text says.
 ## Bible: game-design.md#core-loop, gate-and-address-spec.md#the-opening-puzzle
 
-## Translation key of each DocumentDef.Kind, indexed by kind.
+## Translation key of each DocumentDef.Kind, indexed by kind, then the transcript kind.
 const KIND_KEYS: Array[StringName] = [
 	&"ARCHIVE_KIND_NOTE",
 	&"ARCHIVE_KIND_IMAGE",
@@ -15,7 +15,10 @@ const KIND_KEYS: Array[StringName] = [
 	&"ARCHIVE_KIND_LOG",
 	&"ARCHIVE_KIND_GIFT",
 	&"ARCHIVE_KIND_ARTEFACT",
+	&"ARCHIVE_KIND_TRANSCRIPT",
 ]
+## Kind index of a conversation transcript (after the DocumentDef kinds).
+const TRANSCRIPT_KIND: int = 6
 
 static var _bold: RegEx = RegEx.create_from_string("\\*\\*(.+?)\\*\\*")
 static var _italic: RegEx = RegEx.create_from_string("\\*(.+?)\\*")

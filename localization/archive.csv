@@ -102,3 +102,9 @@ WORLD_THREAT_MED,MED,MÉDIA
 WORLD_THREAT_HIGH,HIGH,ALTA
 WORLD_THREAT_RANGE,{low}–{high},{low}–{high}
 WORLD_HELD_BY,Held by:,Controlado por:
+ARCHIVE_KIND_TRANSCRIPT,Transcript,Transcrição
+TRANSCRIPT_TITLE,"{name}, {channel}","{name}, {channel}"
+TRANSCRIPT_CHANNEL_WORMHOLE,by our wormhole,pelo nosso buraco de minhoca
+TRANSCRIPT_CHANNEL_INCOMING,by incoming wormhole,por buraco de minhoca recebido
+TRANSCRIPT_CHANNEL_PHONE,by phone,por telefone
+TRANSCRIPT_YOU,You: {text},Você: {text}

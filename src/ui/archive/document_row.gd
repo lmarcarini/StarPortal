@@ -15,6 +15,7 @@ const UNREAD_COLOR: Color = Color(0.45, 0.85, 0.5)
 var _document_id: StringName = &""
 var _def: DocumentDef = null
 var _unread: bool = false
+var _transcript_title: String = ""
 
 @onready var _icon: KindIcon = %KindIcon
 @onready var _title: Label = %Title
@@ -65,11 +66,21 @@ func get_title_text() -> String:
 	return _title.text
 
 
+## Shows the transcript [param document_id] titled [param title_text].
+func setup_transcript(document_id: StringName, title_text: String, unread: bool) -> void:
+	_transcript_title = title_text
+	setup(document_id, null, unread)
+
+
 func _show() -> void:
 	var kind: int = _def.kind if _def != null else DocumentDef.Kind.NOTE
+	if not _transcript_title.is_empty():
+		kind = DocumentText.TRANSCRIPT_KIND
 	_icon.kind = kind
 	tooltip_text = tr(DocumentText.kind_key(kind))
 	_title.text = DocumentText.title(_def)
+	if not _transcript_title.is_empty():
+		_title.text = _transcript_title
 	_source.text = DocumentText.source_line(_def)
 	_source.visible = not _source.text.is_empty()
 	_unread_mark.text = tr(&"ARCHIVE_UNREAD")

@@ -34,10 +34,12 @@ func _ready() -> void:
 
 func _enter_tree() -> void:
 	EventBus.document_received.connect(_on_document_received)
+	EventBus.conversation_ended.connect(_on_conversation_ended)
 
 
 func _exit_tree() -> void:
 	EventBus.document_received.disconnect(_on_document_received)
+	EventBus.conversation_ended.disconnect(_on_conversation_ended)
 
 
 func _notification(what: int) -> void:
@@ -153,12 +155,24 @@ func _build_rows() -> void:
 		return
 	var archive: ArchiveState = _simulation.state.archive
 	for document_id: StringName in DocumentText.newest_first(archive.received):
-		var def: DocumentDef = Registry.get_def(document_id) as DocumentDef
+		var is_transcript: bool = TranscriptText.is_transcript(document_id)
+		var def: DocumentDef = (
+			null if is_transcript else Registry.get_def(document_id) as DocumentDef
+		)
 		var kind: int = def.kind if def != null else DocumentDef.Kind.NOTE
+		if is_transcript:
+			kind = DocumentText.TRANSCRIPT_KIND
 		if _kind != ANY_KIND and kind != _kind:
 			continue
 		var row: DocumentRow = _ROW_SCENE.instantiate() as DocumentRow
-		row.setup(document_id, def, not archive.is_read(document_id))
+		var unread: bool = not archive.is_read(document_id)
+		if is_transcript:
+			var record: TranscriptRecord = TranscriptText.record_of(_simulation.state, document_id)
+			row.setup_transcript(
+				document_id, TranscriptText.title(_simulation.state, record), unread
+			)
+		else:
+			row.setup(document_id, def, unread)
 		row.chosen.connect(func(id: StringName) -> void: document_chosen.emit(id))
 		_rows_box.add_child(row)
 		_rows.append(row)
@@ -179,5 +193,10 @@ func _render_empty() -> void:
 
 
 func _on_document_received(_document_id: StringName) -> void:
+	if is_node_ready():
+		refresh()
+
+
+func _on_conversation_ended(_uid: int, _cut_off: bool) -> void:
 	if is_node_ready():
 		refresh()

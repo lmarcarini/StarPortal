@@ -117,7 +117,8 @@ static func arrive(state: GameState, node_id: StringName) -> void:
 			finish(state, false)
 
 
-## Ends the running conversation: records the transcript, counts the run, marks a once-only
+## Ends the running conversation: records the transcript (listed unread in the Archive), counts
+## the run, marks a once-only
 ## conversation used and posts conversation_ended. A cut-off one applies no End effects.
 ## Returns the transcript uid, or −1 when none was running.
 static func finish(state: GameState, cut_off: bool) -> int:
@@ -134,6 +135,7 @@ static func finish(state: GameState, cut_off: bool) -> int:
 	record.path = active.path
 	record.cut_off = cut_off
 	state.conversations.transcripts.append(record)
+	state.archive.add(TranscriptText.archive_id(record.uid), state.clock.tick)
 	var conversation_id: StringName = active.conversation
 	state.conversations.count[conversation_id] = (
 		state.conversations.count.get(conversation_id, 0) + 1
