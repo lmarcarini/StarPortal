@@ -48,21 +48,25 @@ static func has_switch(def: RoomDef) -> bool:
 ## build or demolition state (RoomState.revision) or the charge rates change.
 static func totals(state: GameState) -> PackedFloat64Array:
 	var power: PowerState = state.power
+	var plant_bonus: float = float(ModifierRules.total(state, &"plant_output_mw"))
 	if (
 		power.totals_revision == RoomState.revision
 		and _gathered_for(state)
 		and power.totals_rates == power.charge_rates
+		and power.totals_plant_bonus == plant_bonus
 	):
 		return power.totals_cache
 	var sums: PackedFloat64Array = _sum(state)
 	power.totals_cache = sums
 	power.totals_revision = RoomState.revision
 	power.totals_rates = power.charge_rates.duplicate()
+	power.totals_plant_bonus = plant_bonus
 	return sums
 
 
 ## One pass over powered_rooms() for totals(), uncached.
 static func _sum(state: GameState) -> PackedFloat64Array:
+	var plant_bonus: float = float(ModifierRules.total(state, &"plant_output_mw"))
 	var supply: float = 0.0
 	var draw: float = 0.0
 	var banks: float = 0.0
@@ -81,6 +85,8 @@ static func _sum(state: GameState) -> PackedFloat64Array:
 				rated += 1.0
 		elif def.always_on or room.powered_on:
 			supply += def.power_output_mw
+			if def.power_output_mw > 0.0:
+				supply += plant_bonus
 			draw += def.power_draw_mw
 	var charge: float = _sum_charge(state, int(rated) == rates.size())
 	return PackedFloat64Array([supply, draw, banks, rated, charge])
@@ -190,4 +196,18 @@ static func charge_per_tick_mwh(rate_mw: float) -> float:
 
 ## Net MW flowing into the capacitors: charging less an open wormhole's drain.
 static func net_flow_mw(state: GameState) -> float:
-	return charge_mw(state) - PowerMath.drain_mw(state.gate, state.balance)
+	return charge_mw(state) - drain_mw(state)
+
+
+## The highest charge rate of a bank of [param def], in whole MW, with the charge_rate_pct
+## modifier (M4).
+static func max_charge_mw(state: GameState, def: RoomDef) -> int:
+	return floori(ModifierRules.percent(state, &"charge_rate_pct", def.max_charge_rate_mw))
+
+
+## The open wormhole's drain in MW with the dial_cost_pct modifier (M4); 0 while not drawing.
+static func drain_mw(state: GameState) -> float:
+	var drain: float = PowerMath.drain_mw(state.gate, state.balance)
+	if drain <= 0.0:
+		return drain
+	return ModifierRules.percent(state, &"dial_cost_pct", drain)

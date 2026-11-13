@@ -50,7 +50,7 @@ func validate(state: GameState) -> CommandResult:
 		return CommandResult.fail(&"not_a_bank")
 	if not PowerRules.is_standing(room):
 		return CommandResult.fail(&"not_built")
-	if rate_mw < 0 or rate_mw > def.max_charge_rate_mw:
+	if rate_mw < 0 or rate_mw > PowerRules.max_charge_mw(state, def):
 		return CommandResult.fail(&"rate_out_of_range")
 	var raise: int = rate_mw - state.power.charge_rates.get(room_id, 0)
 	var spare: float = PowerRules.supply_mw(state) - PowerRules.allocated_mw(state)

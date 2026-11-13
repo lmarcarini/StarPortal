@@ -198,6 +198,7 @@ func _show_live(state: GameState) -> void:
 	var run: MothRun = state.probes.moth
 	_scans.visible = true
 	_scans.render(state)
+	_battery_bar.max_value = maxi(MothRules.BATTERY_MINUTES, run.battery_left)
 	_battery_bar.value = run.battery_left
 	_battery_label.text = MothText.battery_left(run.battery_left)
 	_recall_note.text = GateRoomFormat.translate(&"MOTH_RECALL_NEEDS").format(

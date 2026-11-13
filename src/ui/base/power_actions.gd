@@ -32,7 +32,7 @@ static func set_rate(simulation: Simulation, room_id: StringName, rate_mw: int) 
 	var def: RoomDef = null if room == null else state.room_defs.get(room.def_id)
 	if not PowerRules.is_bank(def):
 		return ""
-	var target: int = clampi(rate_mw, 0, floori(def.max_charge_rate_mw))
+	var target: int = clampi(rate_mw, 0, PowerRules.max_charge_mw(state, def))
 	var current: int = state.power.charge_rates.get(room_id, 0)
 	if target == current:
 		return ""

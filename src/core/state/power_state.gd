@@ -26,6 +26,8 @@ var powered_rooms_defs: int = -1
 var totals_cache: PackedFloat64Array = PackedFloat64Array()
 ## Transient: the RoomState.revision the totals were summed at; -1 before the first sum.
 var totals_revision: int = -1
+## Transient: the plant_output_mw modifier the totals were summed with (M4).
+var totals_plant_bonus: float = 0.0
 ## Transient: a copy of [member charge_rates] as the totals were summed.
 var totals_rates: Dictionary[StringName, int] = {}
 

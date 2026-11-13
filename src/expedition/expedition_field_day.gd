@@ -28,9 +28,8 @@ static func resolve(state: GameState, _day: int, rng: RandomNumberGenerator) -> 
 		return ExpeditionState.DAY_OK
 	var members: Array[PersonState] = _members(state)
 	var roller: PersonState = FieldCheck.roller(members, def.role)
-	var percent: int = FieldCheck.chance(
-		FieldCheck.skill_of(roller), FieldCheck.difficulty(def, facts)
-	)
+	var skill: int = FieldCheck.skill_of(roller) + ModifierRules.total(state, &"field_check_bonus")
+	var percent: int = FieldCheck.chance(skill, FieldCheck.difficulty(def, facts))
 	var outcome: String = FINDING
 	if not FieldCheck.succeeds(rng.randi_range(0, 99), percent):
 		outcome = _apply_setback(def.setback, roller, members)

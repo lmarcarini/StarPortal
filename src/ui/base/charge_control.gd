@@ -53,11 +53,10 @@ func show_room(state: GameState, room: RoomState, def: RoomDef) -> void:
 		return
 	_room_id = room.id
 	var rate: int = state.power.charge_rates.get(room.id, 0)
-	_slider.max_value = def.max_charge_rate_mw
+	var cap: int = PowerRules.max_charge_mw(state, def)
+	_slider.max_value = cap
 	_slider.set_value_no_signal(rate)
-	_rate.text = tr(&"BASE_POWER_CHARGE_RATE").format(
-		{"mw": rate, "max": PowerText.mw(def.max_charge_rate_mw)}
-	)
+	_rate.text = tr(&"BASE_POWER_CHARGE_RATE").format({"mw": rate, "max": PowerText.mw(cap)})
 	_stored.text = PowerText.capacitors(state)
 	_minus.text = tr(&"BASE_POWER_RATE_DOWN")
 	_plus.text = tr(&"BASE_POWER_RATE_UP")

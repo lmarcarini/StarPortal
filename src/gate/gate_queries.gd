@@ -8,13 +8,16 @@ extends RefCounted
 
 
 ## Returns the energy in MWh the capacitors must hold to dial the well-formed
-## [param address] from the home Ring.
+## [param address] from the home Ring, with the dial_cost_pct modifier (M4).
 static func lock_energy_mwh(state: GameState, address: GateAddress) -> float:
 	assert(state.galaxy != null and state.balance != null, "GateQueries: no galaxy or balance")
 	if state.galaxy == null or state.balance == null:
 		return 0.0
 	var home_ly: Vector3i = state.galaxy.home().position_ly
-	return EnergyMath.lock_energy_mwh(address, home_ly, state.galaxy.anchors_ly(), state.balance)
+	var energy: float = EnergyMath.lock_energy_mwh(
+		address, home_ly, state.galaxy.anchors_ly(), state.balance
+	)
+	return ModifierRules.percent(state, &"dial_cost_pct", energy)
 
 
 ## Returns the ticks until the capacitors hold the lock energy of [param address] at the
@@ -28,7 +31,7 @@ static func ticks_until_ready(state: GameState, address: GateAddress) -> int:
 	var sums: PackedFloat64Array = PowerRules.totals(state)
 	if needed > PowerRules.capacity_of(state, sums):
 		return -1
-	var drain: float = PowerMath.drain_mw(state.gate, state.balance)
+	var drain: float = PowerRules.drain_mw(state)
 	var net: float = PowerRules.charge_mw_of(state, sums) - drain
 	return PowerMath.ticks_until_mwh(stored, needed, net)
 
@@ -50,7 +53,7 @@ static func open_ticks_left(state: GameState) -> int:
 	if gate.mode != GateState.RingMode.LOCKED or state.balance == null:
 		return 0
 	var open_for: int = state.clock.tick - gate.lock_started_tick
-	return maxi(state.balance.max_open_ticks - open_for, 0)
+	return maxi(max_open_ticks(state) - open_for, 0)
 
 
 ## The faction holding the world the Ring is locked to (WorldRecord.controller), or &"".
@@ -70,3 +73,9 @@ static func can_hail(state: GameState) -> bool:
 		return true
 	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, state.gate.connected_world_id)
 	return facts != null and facts.life == WorldDef.Life.PEOPLE
+
+
+## The longest a wormhole stays open, in ticks (minutes): the balance plus the
+## wormhole_minutes modifier (M4), at least 1.
+static func max_open_ticks(state: GameState) -> int:
+	return maxi(1, state.balance.max_open_ticks + ModifierRules.total(state, &"wormhole_minutes"))
