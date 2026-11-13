@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="RequestDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/request_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/conditions/flag_is_condition.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="3"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+flag = &"relic_handed_over"
+value = true
+
+[sub_resource type="Resource" id="r2"]
+script = ExtResource("3")
+faction = &"faction_kindred"
+delta = 20
+
+[resource]
+script = ExtResource("1")
+faction = &"faction_kindred"
+title_key = &"REQ_KINDRED_HANDOVER"
+text_key = &"REQ_KINDRED_HANDOVER_TEXT"
+objective = Array[Resource]([SubResource("r1")])
+deadline_days = 0
+offer_days = 5
+reward = Array[Resource]([SubResource("r2")])
+id = &"request_kindred_handover"

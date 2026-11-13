@@ -2,3 +2,26 @@ keys,en,pt_BR
 CONV_SIGNAL_LOST,(signal lost),[EN] (signal lost)
 CONV_LINE,{speaker}: {text},{speaker}: {text}
 CONV_CLOSE,Close,Fechar
+CONV_SPEAKER_LIAISON,Liaison,[EN] Liaison
+CONV_SPEAKER_KINDRED_ELDER,Kindred Elder,[EN] Kindred Elder
+CONV_SPEAKER_OSSAR,Ossar Warden,[EN] Ossar Warden
+CONV_BRIEFING_1,"Director, the Committee has two addresses for you.","[EN] Director, the Committee has two addresses for you."
+CONV_BRIEFING_2,Both worlds show signs of people. Filing them in your Address Book now.,[EN] Both worlds show signs of people. Filing them in your Address Book now.
+CONV_BRIEFING_3,We want a survey of HEARTH within ten days.,[EN] We want a survey of HEARTH within ten days.
+CONV_CHECKIN_1,"Good work on HEARTH, Director. The Committee noticed.","[EN] Good work on HEARTH, Director. The Committee noticed."
+CONV_KINDRED_FIRST_1,"Travellers through the ring. We are the Kindred. Why do you come?","[EN] Travellers through the ring. We are the Kindred. Why do you come?"
+CONV_KINDRED_FIRST_PEACE,We come in peace and want to learn.,[EN] We come in peace and want to learn.
+CONV_KINDRED_FIRST_DEMAND,We want your technology.,[EN] We want your technology.
+CONV_KINDRED_FIRST_WARM,Then you are welcome here.,[EN] Then you are welcome here.
+CONV_KINDRED_FIRST_COLD,We will watch you closely.,[EN] We will watch you closely.
+CONV_KINDRED_RETURN_1,You return. We have tasks for friends.,[EN] You return. We have tasks for friends.
+CONV_KINDRED_RETURN_HANDOVER,Hand over the relic.,[EN] Hand over the relic.
+CONV_KINDRED_RETURN_BYE,Until next time.,[EN] Until next time.
+CONV_KINDRED_RETURN_THANKS,You honour us.,[EN] You honour us.
+CONV_KINDRED_GIFT_1,"Friends, we open the ring to you with a gift. Choose.","[EN] Friends, we open the ring to you with a gift. Choose."
+CONV_KINDRED_GIFT_FUNDS,Resources for our base.,[EN] Resources for our base.
+CONV_KINDRED_GIFT_FRIENDSHIP,Your friendship is enough.,[EN] Your friendship is enough.
+CONV_OSSAR_HAIL_1,This ring is watched by the Ossar.,[EN] This ring is watched by the Ossar.
+CONV_OSSAR_HAIL_2,Close it and do not return.,[EN] Close it and do not return.
+CONV_OSSAR_DEMAND_1,Earth. Your ring is loud.,[EN] Earth. Your ring is loud.
+CONV_OSSAR_DEMAND_2,Keep it shut for five days or we will answer.,[EN] Keep it shut for five days or we will answer.

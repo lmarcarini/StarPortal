@@ -42,6 +42,9 @@ var _simulation: Simulation = null
 
 func before() -> void:
 	_defs = GameDefs.from_registry(Registry)
+	# This flow predates factions (M4): without them no phone call waits unanswered and
+	# costs Confidence while the player plays on.
+	_defs.factions.clear()
 
 
 func before_test() -> void:
