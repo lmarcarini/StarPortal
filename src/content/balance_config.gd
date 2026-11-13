@@ -105,6 +105,8 @@ const BALANCE_ID: StringName = &"balance"
 @export var faction_contact_days: int = 4
 @export var phone_expiry_days: int = 2
 @export var incoming_answer_minutes: int = 5
+## Artefacts Gate Room holding can keep (m4-core-systems.md section 5).
+@export var holding_capacity: int = 2
 
 
 func _init() -> void:

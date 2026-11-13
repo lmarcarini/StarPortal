@@ -39,6 +39,9 @@ func _samples() -> Array[Command]:
 		ChooseOptionCommand.new(2),
 		EndConversationCommand.new(),
 		HailCommand.new(),
+		HouseArtefactCommand.new(1, 2),
+		UnhouseArtefactCommand.new(1),
+		RetrieveArtefactCommand.new(1),
 		DebugStoryCommand.create(&"flag", &"x", "1"),
 		AcceptRequestCommand.new(3),
 		DeclineRequestCommand.new(4),
@@ -196,6 +199,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"extend_pole_camera",
 				&"hail",
 				&"hire",
+				&"house_artefact",
 				&"ignore_incoming",
 				&"launch_canister",
 				&"launch_moth",
@@ -209,6 +213,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"raise_world_status",
 				&"read_console",
 				&"recall_team",
+				&"retrieve_artefact",
 				&"send_team",
 				&"set_charge_rate",
 				&"set_flag",
@@ -216,6 +221,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"start_research",
 				&"switch_room",
 				&"unassign_staff",
+				&"unhouse_artefact",
 			]
 		)
 	)
@@ -252,6 +258,7 @@ func test_register_type_adds_a_type() -> void:
 				&"extend_pole_camera",
 				&"hail",
 				&"hire",
+				&"house_artefact",
 				&"ignore_incoming",
 				&"launch_canister",
 				&"launch_moth",
@@ -266,6 +273,7 @@ func test_register_type_adds_a_type() -> void:
 				&"raise_world_status",
 				&"read_console",
 				&"recall_team",
+				&"retrieve_artefact",
 				&"send_team",
 				&"set_charge_rate",
 				&"set_flag",
@@ -273,6 +281,7 @@ func test_register_type_adds_a_type() -> void:
 				&"start_research",
 				&"switch_room",
 				&"unassign_staff",
+				&"unhouse_artefact",
 			]
 		)
 	)
@@ -311,6 +320,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"extend_pole_camera",
 				&"hail",
 				&"hire",
+				&"house_artefact",
 				&"ignore_incoming",
 				&"launch_canister",
 				&"launch_moth",
@@ -324,6 +334,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"raise_world_status",
 				&"read_console",
 				&"recall_team",
+				&"retrieve_artefact",
 				&"send_team",
 				&"set_charge_rate",
 				&"set_flag",
@@ -331,6 +342,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"start_research",
 				&"switch_room",
 				&"unassign_staff",
+				&"unhouse_artefact",
 			]
 		)
 	)
