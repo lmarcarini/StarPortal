@@ -84,11 +84,12 @@ func test_unknown_room_def_is_rejected() -> void:
 	assert_str("; ".join(errors)).contains("unknown def 'room_bakery'")
 
 
-func test_unknown_research_is_rejected() -> void:
+## M4-29: a research id the content no longer has is not an error; the load drops it.
+func test_unknown_research_is_dropped_not_rejected() -> void:
 	var errors: Array[String] = _errors_after(
 		func(data: Dictionary) -> void: data["research"]["done"] = ["later_6_fission_plant"]
 	)
-	assert_str("; ".join(errors)).contains("unknown project")
+	assert_str("; ".join(errors)).not_contains("unknown project")
 
 
 ## An assignment to a missing room is rejected without the content too.

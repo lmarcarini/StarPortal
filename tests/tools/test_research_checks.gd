@@ -69,13 +69,14 @@ func test_order_and_keys() -> void:
 
 ## ResearchDef reports a need on itself or on a locked slot, and a locked slot with a cost.
 func test_def_content_errors() -> void:
-	var locked: ResearchDef = _copy(&"later_fission_plant")
+	var category := ResearchCategoryDef.new()
 	var def: ResearchDef = _copy(&"lift_shaft")
-	def.needs.assign([&"lift_shaft", &"later_fission_plant"])
-	var defs: Dictionary[StringName, DefBase] = {def.id: def, locked.id: locked}
+	def.needs.assign([&"lift_shaft", &"research_construction"])
+	var defs: Dictionary[StringName, DefBase] = {def.id: def, &"research_construction": category}
 	assert_array(def.get_content_errors(defs)).has_size(2)
-	locked.cost_k = 10
-	assert_array(locked.get_content_errors(defs)).has_size(1)
+	def.needs.clear()
+	def.reveal = &"sometimes"
+	assert_array(def.get_content_errors(defs)).has_size(1)
 
 
 ## Every real def names a known category; an unknown or missing category, a category that is
@@ -83,7 +84,7 @@ func test_def_content_errors() -> void:
 func test_categories() -> void:
 	var categories: Array[ResearchCategoryDef] = []
 	categories.assign(ResearchView.categories())
-	assert_int(categories.size()).is_equal(5)
+	assert_int(categories.size()).is_equal(7)
 	var empty: Dictionary[String, bool] = {}
 	assert_array(ContentCheckResearch.check_categories(_real(), categories, empty)).is_empty()
 	var def: ResearchDef = _copy(&"bank_array")

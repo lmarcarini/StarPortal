@@ -52,7 +52,7 @@ func _node(id: StringName) -> ResearchNode:
 func test_sub_tabs_follow_the_data() -> void:
 	var board: ResearchBoard = _view.get_board()
 	assert_array(board.tab_titles()).is_equal(
-		["Construction •", "Energy •", "Gate", "Alien", "Staff"]
+		["Construction •", "Energy •", "Gate", "Alien", "Staff", "Defence", "Life and language"]
 	)
 	assert_str(String(board.get_category())).is_equal("research_construction")
 	assert_int(_tree().nodes().size()).is_equal(4)
@@ -71,17 +71,20 @@ func test_sub_tabs_follow_the_data() -> void:
 	assert_str(_tree().empty_text()).is_equal("Nothing to research yet")
 	assert_array(_view.get_panel().lines()).is_equal(["SELECTED", "", "", "", ""])
 	board.show_category(&"research_staff")
-	for node: ResearchNode in _tree().nodes():
-		assert_array(node.texts()).is_equal(["Unknown", "Requires staff", "locked"])
+	assert_array(_tree().nodes()).is_empty()
 	board.show_category(&"research_alien")
-	assert_int(_tree().nodes().size()).is_equal(5)
-	assert_str(_tree().nodes()[0].texts()[1]).is_equal("Requires an alien find")
+	assert_array(_tree().nodes()).is_empty()
+	FactionRules.meet(_simulation.state, &"faction_kindred")
+	board.show_category(&"research_staff")
+	board.show_category(&"research_alien")
+	assert_int(_tree().nodes().size()).is_equal(1)
 
 
 func test_dot_leaves_a_tab_with_nothing_to_start() -> void:
 	ResearchFixture.finish(_simulation.state, &"second_plant")
 	ResearchFixture.finish(_simulation.state, &"fuel_contracts")
 	ResearchFixture.finish(_simulation.state, &"bank_array")
+	ResearchFixture.finish(_simulation.state, &"later_capacitor_lattice")
 	_view.refresh()
 	assert_str(_view.get_board().tab_titles()[1]).is_equal("Energy")
 
@@ -170,12 +173,10 @@ func test_shoulders_switch_sub_tabs_then_main_tabs() -> void:
 	assert_str(String(_view.get_panel().get_project())).is_equal("second_plant")
 	assert_bool(_shoulder(JOY_BUTTON_LEFT_SHOULDER)).is_true()
 	assert_bool(_shoulder(JOY_BUTTON_LEFT_SHOULDER)).is_false()
-	board.show_category(&"research_staff")
+	board.show_category(&"research_life")
 	assert_bool(_shoulder(JOY_BUTTON_RIGHT_SHOULDER)).is_false()
 	assert_bool(_shoulder(JOY_BUTTON_LEFT_SHOULDER)).is_true()
-	assert_str(String(board.get_category())).is_equal("research_alien")
-	assert_object(_focus()).is_same(_tree().nodes()[0])
-	assert_bool(_shoulder(JOY_BUTTON_LEFT_SHOULDER)).is_true()
+	assert_str(String(board.get_category())).is_equal("research_defence")
 	assert_object(_focus()).is_same(board.get_tabs())
 
 

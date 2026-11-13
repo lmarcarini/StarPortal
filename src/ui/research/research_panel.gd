@@ -30,8 +30,9 @@ func show_project(state: GameState, def: ResearchDef) -> void:
 		return
 	_name.text = tr(def.name_key)
 	_line.text = tr(def.line_key)
-	if def.is_locked():
-		return
+	var reason: String = ResearchText.lock_reason(state, def)
+	if not reason.is_empty():
+		_line.text += "\n" + reason
 	_cost.text = (
 		tr(&"RESEARCH_PANEL_COST")
 		. format(

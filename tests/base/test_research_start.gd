@@ -73,9 +73,10 @@ func test_insufficient_funds() -> void:
 ## Locked slots, done projects and unknown ids are refused.
 func test_locked_done_unknown() -> void:
 	var game: GameState = ResearchFixture.state()
-	var locked: CommandResult = _start(game, &"later_fission_plant")
-	assert_that(locked.error_code).is_equal(&"project_locked")
-	assert_str(locked.detail).is_equal("staff")
+	var hidden: CommandResult = _start(game, &"later_containment")
+	assert_that(hidden.error_code).is_equal(&"unknown_project")
+	game.research.revealed.append(&"later_containment")
+	assert_that(_start(game, &"later_containment").error_code).is_equal(&"requirement_unmet")
 	assert_that(_start(game, &"warp_drive").error_code).is_equal(&"unknown_project")
 	ResearchFixture.finish(game, &"bank_array")
 	assert_that(_start(game, &"bank_array").error_code).is_equal(&"project_done")
@@ -100,17 +101,17 @@ func test_cancel_refunds_half() -> void:
 	assert_bool(_start(game, &"second_plant").is_ok).is_true()
 
 
-## The project list is the seven projects in order, then the seven locked slots.
+## The project list is the seven M2.5 projects in order, then the two M4 projects.
 func test_project_list() -> void:
 	var ids: Array[StringName] = []
 	for def: ResearchDef in ResearchRules.projects(ResearchFixture.state()):
 		ids.append(def.id)
 	assert_array(ids.slice(0, 7)).is_equal(UnlockFixture.projects().keys())
-	assert_int(ids.size()).is_equal(14)
+	assert_int(ids.size()).is_equal(9)
 	var cost: int = 0
 	var days: int = 0
 	for def: ResearchDef in ResearchRules.projects(ResearchFixture.state()):
-		if not def.is_locked():
+		if def.order <= 7:
 			cost += def.cost_k
 			days += def.days
 	assert_int(cost).is_equal(3400)

@@ -12,15 +12,21 @@ enum Kind { START, NEEDS, ACTIVE, DONE, LOCKED }
 
 ## The kind of row [param def] is in [param state].
 static func kind(state: GameState, def: ResearchDef) -> Kind:
-	if def.is_locked():
-		return Kind.LOCKED
 	if state.research.is_done(def.id):
 		return Kind.DONE
 	if state.research.active == def.id:
 		return Kind.ACTIVE
 	if not first_unmet(state, def).is_empty():
 		return Kind.NEEDS
+	if ResearchRules.first_failing(state, def) != null:
+		return Kind.LOCKED
 	return Kind.START
+
+
+## The reason a project is locked ("Requires the artefact ..."), or "" when it is not.
+static func lock_reason(state: GameState, def: ResearchDef) -> String:
+	var failing: ConditionDef = ResearchRules.first_failing(state, def)
+	return "" if failing == null else StoryText.reason(failing)
 
 
 ## The first project [param def] needs that is not done in [param state], or &"".
@@ -110,8 +116,9 @@ static func refusal(result: CommandResult, state: GameState) -> String:
 			return _tr(&"RESEARCH_ERR_NEEDS_PROJECT").format({"name": name})
 		&"insufficient_funds":
 			return _tr(&"RESEARCH_ERR_FUNDS").format({"cost": result.detail})
-		&"project_locked":
-			return _tr(&"RESEARCH_LOCK_%s" % result.detail.to_upper())
+		&"requirement_unmet":
+			var project: ResearchDef = state.research_defs.get(StringName(result.detail))
+			return "" if project == null else lock_reason(state, project)
 	return _tr(&"RESEARCH_ERR_OTHER")
 
 

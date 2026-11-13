@@ -1,13 +1,14 @@
 class_name ResearchDef
 extends DefBase
 ## Definition of a research project (docs/content/m25-lean-start.md section 3): its place in
-## the list, cost, days, the projects it needs and the unlock effects it applies when done. A
-## locked slot (a later unlock shown at the bottom of the list) has a [member lock] reason and
-## no cost, days, needs or effects. Read only at runtime.
-## Bible: docs/content/m25-lean-start.md section 3, technical-architecture.md#data-model
+## the list, cost, days, the projects it needs, the conditions it requires (M4), whether it is
+## hidden or shown locked until then, and the effects it applies when done. Read only at
+## runtime.
+## Bible: docs/content/m25-lean-start.md section 3, docs/content/m4-core-systems.md section 7
 
-## Lock reasons of a slot that research cannot start yet.
-const LOCKS: Array[StringName] = [&"alien_find", &"staff"]
+## How a project whose needs or requirements are unmet shows: &"locked" (drawn, with its
+## reasons) or &"hidden" (not drawn until available, revealed or done).
+const REVEALS: Array[StringName] = [&"locked", &"hidden"]
 
 ## Position in the Research list, lowest first; unique among projects.
 @export var order: int = 0
@@ -17,22 +18,23 @@ const LOCKS: Array[StringName] = [&"alien_find", &"staff"]
 @export var days: int = 1
 ## Ids of the projects that must be done before this one starts.
 @export var needs: Array[StringName] = []
-## The unlocks, each an [effect id, value] pair for UnlockRules.apply_to_game().
+## Conditions beyond needs that must all hold to start it (artefact held, standing, flag...).
+@export var requires: Array[ConditionDef] = []
+## One of [constant REVEALS].
+@export var reveal: StringName = &"locked"
+## What finishing it does: unlock effects, story effects and modifiers.
 @export var effects: Array[EffectDef] = []
-## Empty for a project; one of [constant LOCKS] for a later slot.
-@export var lock: StringName = &""
 ## Id of the ResearchCategoryDef whose sub-tab shows this project or slot.
 @export var category: StringName = &""
-## Translation key of the name ("Unknown" for a locked slot).
+## Translation key of the name.
 @export var name_key: StringName = &""
-## Translation key of the one-line effect ("Up to 3 Capacitor Banks.") or, for a locked
-## slot, of the reason ("Requires an alien find").
+## Translation key of the one-line effect ("Up to 3 Capacitor Banks.").
 @export var line_key: StringName = &""
 
 
-## True for a later slot that cannot be started.
-func is_locked() -> bool:
-	return not lock.is_empty()
+## True when it shows only once available, revealed or done.
+func is_hidden() -> bool:
+	return reveal == &"hidden"
 
 
 ## The projects this one needs, and its category.
@@ -45,7 +47,7 @@ func get_references() -> Array[StringName]:
 
 ## Problems against the other loaded [param defs]: needs that are not projects (or are this
 ## one), no category or one that is not a ResearchCategoryDef, a bad cost or time, an unknown
-## lock, a project without effects, or a locked slot that has a cost, needs or effects. The
+## reveal, or a project without effects. The
 ## effect pairs themselves are checked by the content validator (ContentCheckResearch), since
 ## content may not depend on the simulation.
 func get_content_errors(defs: Dictionary[StringName, DefBase]) -> Array[String]:
@@ -53,19 +55,15 @@ func get_content_errors(defs: Dictionary[StringName, DefBase]) -> Array[String]:
 	for need: StringName in needs:
 		var other: DefBase = defs.get(need)
 		var project: ResearchDef = other as ResearchDef
-		if need == id or (other != null and (project == null or project.is_locked())):
-			errors.append("needs '%s', which is not another open project" % need)
+		if need == id or (other != null and project == null):
+			errors.append("needs '%s', which is not another project" % need)
 	var group: DefBase = defs.get(category)
 	if category.is_empty() or (group != null and not group is ResearchCategoryDef):
 		errors.append("has category '%s', which is not a research category" % category)
 	if cost_k < 0 or days < 1:
 		errors.append("needs cost_k >= 0 and days >= 1")
-	if is_locked():
-		if not lock in LOCKS:
-			errors.append("has unknown lock '%s'" % lock)
-		if cost_k != 0 or not needs.is_empty() or not effects.is_empty():
-			errors.append("is locked but has a cost, needs or effects")
-		return errors
+	if not reveal in REVEALS:
+		errors.append("has unknown reveal '%s'" % reveal)
 	if effects.is_empty():
 		errors.append("has no effects")
 	return errors

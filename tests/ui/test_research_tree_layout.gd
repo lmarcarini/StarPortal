@@ -62,17 +62,15 @@ func test_real_tree_matches_the_card() -> void:
 		{
 			&"second_plant": Vector2i(0, 0),
 			&"bank_array": Vector2i(0, 1),
-			&"fuel_contracts": Vector2i(1, 0)
+			&"fuel_contracts": Vector2i(1, 0),
+			&"later_capacitor_lattice": Vector2i(1, 1)
 		}
 	)
 	assert_dict(ResearchTreeLayout.cells(defs, &"research_gate")).is_empty()
 	var alien: Array[ResearchDef] = ResearchTreeLayout.in_category(defs, &"research_alien")
 	var staff: Array[ResearchDef] = ResearchTreeLayout.in_category(defs, &"research_staff")
-	assert_int(alien.size()).is_equal(5)
-	assert_int(staff.size()).is_equal(2)
-	for def: ResearchDef in alien:
-		assert_str(String(def.lock)).is_equal("alien_find")
-	for def: ResearchDef in staff:
-		assert_str(String(def.lock)).is_equal("staff")
+	assert_int(alien.size()).is_equal(1)
+	assert_bool(alien[0].is_hidden()).is_true()
+	assert_int(staff.size()).is_equal(0)
 	for def: ResearchDef in defs:
 		assert_array(ResearchTreeLayout.stubs(defs, def)).is_empty()
