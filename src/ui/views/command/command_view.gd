@@ -5,12 +5,20 @@ extends GameView
 ## [CommandPanel] (Committee summary, or a money line's breakdown) on the right. (A), Enter or
 ## a click on a money line opens its breakdown; (B) or Esc closes it. Reads state only, and
 ## rereads it on every money, Confidence, staff and room event, on each settlement, on
-## showing and on a locale change, so it stays right while paused.
+## showing and on a locale change, so it stays right while paused. Sub-tabs at the top switch
+## between this Overview and Requests (m4-core-systems.md section 4); the tab title gains
+## "(!)" while an offer has not been seen in Requests.
 ## Bible: docs/content/m27-daily-rhythm.md section 4
 
 var _simulation: Simulation = null
 ## Index of the money line whose breakdown is shown, or -1.
 var _breakdown: int = -1
+## Highest request uid seen in the Requests sub-tab.
+var _seen_uid: int = -1
+var _subtabs := HBoxContainer.new()
+var _overview_button := Button.new()
+var _requests_button := Button.new()
+var _requests := RequestsPanel.new()
 
 @onready var _board: CommandBoard = %Board
 @onready var _panel: CommandPanel = %Panel
@@ -19,6 +27,22 @@ var _breakdown: int = -1
 func _ready() -> void:
 	_board.line_activated.connect(open_breakdown)
 	visibility_changed.connect(_on_visibility_changed)
+	_subtabs.position = Vector2(16, 8)
+	for button: Button in [_overview_button, _requests_button]:
+		button.toggle_mode = true
+		_subtabs.add_child(button)
+	_overview_button.text = &"COMMAND_SUBTAB_OVERVIEW"
+	_requests_button.text = &"COMMAND_SUBTAB_REQUESTS"
+	_overview_button.pressed.connect(show_requests.bind(false))
+	_requests_button.pressed.connect(show_requests.bind(true))
+	add_child(_subtabs)
+	_requests.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_requests.offset_left = 16.0
+	_requests.offset_top = 52.0
+	_requests.offset_right = -16.0
+	_requests.offset_bottom = -8.0
+	add_child(_requests)
+	show_requests(false)
 
 
 func _enter_tree() -> void:
@@ -38,6 +62,8 @@ func _notification(what: int) -> void:
 func setup(simulation: Simulation) -> void:
 	_simulation = simulation
 	_breakdown = -1
+	_seen_uid = -1
+	_requests.setup(simulation)
 	refresh()
 
 
@@ -48,6 +74,53 @@ func get_default_focus() -> Control:
 
 func get_title_key() -> StringName:
 	return &"COMMAND_TITLE"
+
+
+## The title, with "(!)" while an offer is new.
+func get_tab_title() -> String:
+	var title: String = tr(get_title_key())
+	if has_new_offer():
+		return tr(&"COMMAND_TITLE_NEW").format({"title": title})
+	return title
+
+
+## True while an offered request has not been seen in Requests.
+func has_new_offer() -> bool:
+	if _simulation == null:
+		return false
+	for record: RequestRecord in _simulation.state.requests.items:
+		if record.state == RequestRecord.RequestState.OFFERED and record.uid > _seen_uid:
+			return true
+	return false
+
+
+## Shows the Requests sub-tab ([param on]) or the Overview.
+func show_requests(on: bool) -> void:
+	(get_node(^"Columns") as Control).visible = not on
+	_requests.visible = on
+	_overview_button.button_pressed = not on
+	_requests_button.button_pressed = on
+	if on:
+		_mark_seen()
+		_requests.refresh()
+
+
+## Returns the Requests panel.
+func get_requests() -> RequestsPanel:
+	return _requests
+
+
+## Returns the Requests sub-tab button.
+func get_requests_button() -> Button:
+	return _requests_button
+
+
+func _mark_seen() -> void:
+	if _simulation == null:
+		return
+	for record: RequestRecord in _simulation.state.requests.items:
+		_seen_uid = maxi(_seen_uid, record.uid)
+	title_changed.emit()
 
 
 ## Returns the board, for tests.
@@ -118,6 +191,8 @@ func _connect_events(on: bool) -> void:
 		EventBus.room_demolished,
 		EventBus.power_allocation_changed,
 		EventBus.research_done,
+		EventBus.request_offered,
+		EventBus.request_changed,
 	]
 	for event: Signal in signals:
 		if on:
@@ -127,8 +202,11 @@ func _connect_events(on: bool) -> void:
 
 
 func _on_event(_a: Variant = null, _b: Variant = null, _c: Variant = null) -> void:
+	title_changed.emit()
 	if is_visible_in_tree():
 		refresh()
+		if _requests.visible:
+			_requests.refresh()
 
 
 ## Events are skipped while the tab is hidden, so showing it rereads everything.
