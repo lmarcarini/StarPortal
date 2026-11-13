@@ -60,3 +60,5 @@ REQ_KINDRED_HANDOVER,Return the relic,[EN] Return the relic
 REQ_KINDRED_HANDOVER_TEXT,The Kindred ask for a relic taken from their world.,[EN] The Kindred ask for a relic taken from their world.
 REQ_OSSAR_CLOSED,Keep the Ring closed,[EN] Keep the Ring closed
 REQ_OSSAR_CLOSED_TEXT,The Ossar demand that no wormhole open from Earth for five days.,[EN] The Ossar demand that no wormhole open from Earth for five days.
+LOG_LINE_DEBUG,(debug) {line},(debug) {line}
+DEBUG_CAUSE,(debug),(debug)

@@ -3,7 +3,8 @@ extends PanelContainer
 ## Debug-only panel: the speed index, the ticks run over the last second, the mean tick time
 ## and a collapsible tree of simulation.state.to_dict(). Hidden at start; the
 ## debug_toggle_overlay action shows and hides it. The shell creates it only in debug builds.
-## It reads SimClock.simulation and never changes it.
+## It reads SimClock.simulation; its story row (action, id, value, Run) changes state only
+## through DebugStoryCommand.
 ## A tick's time runs from the previous tick in the same frame, or from the start of the
 ## frame for the first one, to its EventBus.tick_advanced; it includes the tick's listeners.
 ## Bible: technical-architecture.md#architecture-overview
@@ -26,6 +27,11 @@ var _window_usec: Array[int] = []
 var _mark_usec: int = 0
 var _items: Dictionary[String, TreeItem] = {}
 
+var _story_action := OptionButton.new()
+var _story_id := LineEdit.new()
+var _story_value := LineEdit.new()
+var _story_run := Button.new()
+
 @onready var _speed_label: Label = %SpeedIndexLabel
 @onready var _rate_label: Label = %TicksPerSecondLabel
 @onready var _tick_time_label: Label = %TickTimeLabel
@@ -38,6 +44,7 @@ func _ready() -> void:
 	_window_ticks.resize(WINDOWS_PER_SECOND)
 	_window_usec.resize(WINDOWS_PER_SECOND)
 	_tree.create_item()
+	_add_story_row()
 	_refresh_timer.timeout.connect(_on_refresh_timeout)
 	_refresh_timer.start(REFRESH_SECONDS)
 
@@ -178,3 +185,34 @@ static func _array_as_dict(values: Array) -> Dictionary:
 	for index: int in values.size():
 		data[index] = values[index]
 	return data
+
+
+func _add_story_row() -> void:
+	var row := HBoxContainer.new()
+	for action: StringName in DebugStoryCommand.ACTIONS:
+		_story_action.add_item(String(action))
+	_story_id.placeholder_text = "id"
+	_story_id.custom_minimum_size = Vector2(180, 0)
+	_story_value.placeholder_text = "value"
+	_story_run.text = "Run"
+	_story_run.pressed.connect(run_story)
+	for control: Control in [_story_action, _story_id, _story_value, _story_run]:
+		row.add_child(control)
+	_tree.get_parent().add_child(row)
+	_tree.get_parent().move_child(row, _tree.get_index())
+
+
+## Submits the story row as a DebugStoryCommand; returns its result.
+func run_story() -> CommandResult:
+	if SimClock.simulation == null:
+		return CommandResult.fail(&"no_simulation")
+	var action: StringName = DebugStoryCommand.ACTIONS[maxi(_story_action.selected, 0)]
+	var command := DebugStoryCommand.create(action, StringName(_story_id.text), _story_value.text)
+	return SimClock.simulation.submit(command)
+
+
+## Sets the story row (for tests).
+func set_story(action_index: int, id: String, value: String) -> void:
+	_story_action.select(action_index)
+	_story_id.text = id
+	_story_value.text = value
