@@ -60,6 +60,17 @@ static func _project_errors(
 	for effect: EffectDef in def.effects:
 		if not effect_ok(effect):
 			errors.append("research %s: bad effect %s" % [def.id, _describe(effect)])
+	for effect: EffectDef in def.effects:
+		if (
+			effect is StudyArtefactEffect
+			and not _requires_artefact(def, effect.get_references()[0])
+		):
+			errors.append(
+				(
+					"research %s: studies '%s' but does not require HasArtefact of it"
+					% [def.id, effect.get_references()[0]]
+				)
+			)
 	for need: StringName in def.needs:
 		if by_id.has(need) and by_id[need].order >= def.order:
 			errors.append("research %s: needs %s, which comes later in the list" % [def.id, need])
@@ -82,3 +93,13 @@ static func _describe(effect: EffectDef) -> String:
 	if effect == null:
 		return "<empty>"
 	return str(UnlockRules.unlock_pair(effect))
+
+
+static func _requires_artefact(def: ResearchDef, artefact: StringName) -> bool:
+	for condition: ConditionDef in def.requires:
+		if (
+			condition is HasArtefactCondition
+			and (condition as HasArtefactCondition).artefact == artefact
+		):
+			return true
+	return false

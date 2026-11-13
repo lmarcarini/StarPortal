@@ -26,6 +26,10 @@ func tick(state: GameState) -> void:
 	var def: ResearchDef = state.research_defs.get(research.active)
 	if def == null or not ResearchRules.has_lab_on(state):
 		return
+	# A requirement that stops holding (an artefact handed over mid-study) pauses the project
+	# until it holds again; the Research tab shows the reason (M4-30).
+	if ResearchRules.first_failing(state, def) != null:
+		return
 	research.ticks_done += ResearchRules.step(state)
 	if research.ticks_done >= ResearchRules.total_ticks(def):
 		finish(state, def)

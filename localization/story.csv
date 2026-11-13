@@ -83,3 +83,4 @@ ARTEFACT_REFUSED_NOT_BUILT,The room is not built yet.,[EN] The room is not built
 ARCHIVE_SECTION_ARTEFACTS,Artefacts,[EN] Artefacts
 GATE_ARTEFACTS_BUTTON,Artefacts: {header},[EN] Artefacts: {header}
 ROOM_ARTEFACTS_HOUSED,Housed: {names},[EN] Housed: {names}
+ARTEFACT_STUDIED_BY,Studied by {project},[EN] Studied by {project}
