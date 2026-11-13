@@ -37,6 +37,11 @@ extends DefBase
 @export var staff_slots: int = 0
 ## Beds the room adds while built and not coming down (Control Room 6, Quarters 4).
 @export var beds: int = 0
+## Artefacts the room can house (Artefact Vault 2, Containment 1; M4).
+@export var artefact_slots: int = 0
+## The storage class it houses: &"vault" or &"containment" (which also houses vault
+## artefacts); &"" for rooms without artefact slots.
+@export var artefact_class: StringName = &""
 
 
 ## The staff role, when the room has one.
@@ -46,9 +51,16 @@ func get_references() -> Array[StringName]:
 	return [staff_role]
 
 
-## Errors: slots without a role or a role without slots, and negative counts.
+## Errors: slots without a role or a role without slots, negative counts, and artefact slots
+## without a known class (or the reverse).
 func get_content_errors(_defs: Dictionary[StringName, DefBase]) -> Array[String]:
 	var errors: Array[String] = []
+	if (artefact_slots > 0) != (not artefact_class.is_empty()):
+		errors.append("needs both artefact slots and an artefact class, or neither")
+	if not artefact_class.is_empty() and not ArtefactDef.STORAGE_CLASSES.has(artefact_class):
+		errors.append("has artefact class '%s', not vault or containment" % artefact_class)
+	if artefact_slots < 0:
+		errors.append("has negative artefact slots")
 	if staff_slots < 0 or beds < 0:
 		errors.append("has negative staff slots or beds")
 	if (staff_slots > 0) != (not staff_role.is_empty()):

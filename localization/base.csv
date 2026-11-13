@@ -164,3 +164,9 @@ LOG_LINE_STAFF_RELEASED,Staff unassigned from {room}: {count}.,Pessoal liberado 
 BASE_SUBTAB_BUILD,Build,Construir
 BASE_SUBTAB_ENERGY,Energy,Energia
 BASE_LEVEL_NEXT,L{n} +,N{n} +
+ROOM_ARTEFACT_VAULT_NAME,Artefact Vault,Cofre de Artefatos
+ROOM_ARTEFACT_VAULT_NOW,"Houses 2 artefacts. While on, their effects apply.","Guarda 2 artefatos. Ligado, seus efeitos valem."
+ROOM_ARTEFACT_VAULT_LATER,Stores alien artefacts safely.,Guarda artefatos alienígenas com segurança.
+ROOM_CONTAINMENT_NAME,Containment,Contenção
+ROOM_CONTAINMENT_NOW,"Houses 1 artefact of any kind and keeps its hazard away.","Guarda 1 artefato de qualquer tipo e afasta seu perigo."
+ROOM_CONTAINMENT_LATER,Holds dangerous artefacts.,Guarda artefatos perigosos.

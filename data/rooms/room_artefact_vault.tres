@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RoomDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/room_def.gd" id="1_room"]
+
+; docs/content/m4-core-systems.md section 5 (Housing).
+[resource]
+script = ExtResource("1_room")
+size_cells = Vector2i(4, 3)
+rotatable = true
+build_cost_k = 600
+build_ticks = 360
+power_draw_mw = 5.0
+fixed = false
+always_on = false
+power_output_mw = 0.0
+max_charge_rate_mw = 0.0
+upkeep_k = 40
+artefact_slots = 2
+artefact_class = &"vault"
+name_key = &"ROOM_ARTEFACT_VAULT_NAME"
+description_key = &"ROOM_ARTEFACT_VAULT_NOW"
+id = &"room_artefact_vault"
