@@ -34,6 +34,10 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	state.room_defs.clear()
 	for def: RoomDef in defs.rooms:
 		state.room_defs[def.id] = def
+	state.artefact_defs.clear()
+	for artefact: ArtefactDef in defs.artefacts:
+		state.artefact_defs[artefact.id] = artefact
+	state.modifiers = ModifierCache.new()
 	state.faction_defs.clear()
 	for faction: FactionDef in defs.factions:
 		state.faction_defs[faction.id] = faction
