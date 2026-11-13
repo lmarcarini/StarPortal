@@ -35,6 +35,7 @@ func validate(state: GameState) -> CommandResult:
 func apply(state: GameState) -> void:
 	state.probes.rack -= 1
 	state.probes.moth = MothRun.create(state.gate.connected_world_id)
+	state.probes.moth.battery_left = MothRules.battery_minutes(state)
 	state.events.post(&"moth_launched", [state.gate.connected_world_id])
 
 

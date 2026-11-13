@@ -106,7 +106,7 @@ static func open_ticks_left(state: GameState) -> int:
 	var by_time: int = GateQueries.open_ticks_left(state)
 	if by_time <= 0:
 		return 0
-	var net_mw: float = PowerRules.charge_mw(state) - PowerMath.drain_mw(state.gate, state.balance)
+	var net_mw: float = PowerRules.charge_mw(state) - PowerRules.drain_mw(state)
 	if net_mw >= 0.0:
 		return by_time
 	var by_charge: int = floori(state.power.stored_mwh / (-net_mw / PowerMath.TICKS_PER_HOUR))

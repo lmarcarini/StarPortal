@@ -77,7 +77,7 @@ static func max_rates(state: GameState) -> Dictionary[StringName, int]:
 		if not PowerRules.is_bank(def) or not PowerRules.is_standing(room):
 			continue
 		var rate: int = state.power.charge_rates.get(room.id, 0)
-		var raise: int = raise_mw(floori(def.max_charge_rate_mw) - rate, spare)
+		var raise: int = raise_mw(PowerRules.max_charge_mw(state, def) - rate, spare)
 		spare -= raise
 		rates[room.id] = rate + raise
 	return rates

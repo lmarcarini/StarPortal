@@ -70,3 +70,13 @@ static func confidence_after_loss(current: WorldReport.Confidence) -> WorldRepor
 	if current >= WorldReport.Confidence.FAIR:
 		return current
 	return (current + 1) as WorldReport.Confidence
+
+
+## The MOTH's battery in minutes with the moth_battery_pct modifier (M4), at least 1.
+static func battery_minutes(state: GameState) -> int:
+	return maxi(1, floori(ModifierRules.percent(state, &"moth_battery_pct", BATTERY_MINUTES)))
+
+
+## The most battery a saved MOTH run may hold: the battery at the highest modifier (+300 %).
+static func max_battery_minutes() -> int:
+	return BATTERY_MINUTES * (100 + ModifierRules.PERCENT_MAX) / 100

@@ -86,7 +86,7 @@ func _resolve(state: GameState, end_tick: int) -> void:
 func _close_reason(state: GameState, end_tick: int) -> StringName:
 	if state.power.stored_mwh <= 0.0 and not state.gate.is_incoming_lock():
 		return REASON_POWER
-	if end_tick - state.gate.lock_started_tick >= state.balance.max_open_ticks:
+	if end_tick - state.gate.lock_started_tick >= GateQueries.max_open_ticks(state):
 		return REASON_TIMEOUT
 	return &""
 

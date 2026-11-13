@@ -80,7 +80,7 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	if not data.get("world_id") is String or str(data.get("world_id")).is_empty():
 		errors.append("moth 'world_id' is not a non-empty string")
-	if not _is_between(data.get("battery_left"), 0, MothRules.BATTERY_MINUTES):
+	if not _is_between(data.get("battery_left"), 0, MothRules.max_battery_minutes()):
 		errors.append("moth 'battery_left' is not a whole number of battery minutes")
 	var scan_data: Variant = data.get("scan")
 	var scan_index: int = MothRules.SCAN_NAMES.find(str(scan_data))

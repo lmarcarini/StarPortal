@@ -41,7 +41,7 @@ func tick(state: GameState) -> void:
 		sums = PowerRules.totals(state)
 	var capacity: float = PowerRules.capacity_of(state, sums)
 	var charge: float = PowerRules.charge_mw_of(state, sums)
-	var net: float = charge - PowerMath.drain_mw(state.gate, state.balance)
+	var net: float = charge - PowerRules.drain_mw(state)
 	state.power.stored_mwh = PowerMath.step_stored_mwh(state.power.stored_mwh, capacity, net)
 
 
@@ -89,7 +89,9 @@ static func _adopt_new_banks(state: GameState) -> void:
 		if state.power.charge_rates.has(room.id):
 			continue
 		var spare: float = PowerRules.spare_mw(state)
-		state.power.charge_rates[room.id] = floori(minf(spare, def.max_charge_rate_mw))
+		state.power.charge_rates[room.id] = mini(
+			floori(spare), PowerRules.max_charge_mw(state, def)
+		)
 		state.events.post(&"capacitors_installed", [PowerRules.capacity_mwh(state)])
 		state.events.post(Simulation.PAUSE_EVENT, [PAUSE_REASON])
 		state.events.post(&"power_allocation_changed", [])

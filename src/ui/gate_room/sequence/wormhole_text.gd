@@ -30,14 +30,14 @@ static func time_left(state: GameState) -> String:
 		&"GATE_WORMHOLE_TIME_LEFT",
 		{
 			"left": GateRoomFormat.duration(GateQueries.open_ticks_left(state)),
-			"total": GateRoomFormat.duration(state.balance.max_open_ticks),
+			"total": GateRoomFormat.duration(GateQueries.max_open_ticks(state)),
 		}
 	)
 
 
 ## Returns the open wormhole's power drain, e.g. "Power drain: 20.0 MW".
 static func drain(state: GameState) -> String:
-	var drain_mw: float = PowerMath.drain_mw(state.gate, state.balance)
+	var drain_mw: float = PowerRules.drain_mw(state)
 	return _format(&"GATE_WORMHOLE_DRAIN", {"power": String.num(drain_mw, 1)})
 
 
