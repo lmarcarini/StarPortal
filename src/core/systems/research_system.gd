@@ -34,8 +34,7 @@ func tick(state: GameState) -> void:
 ## Applies [param def]'s effects to [param state], marks it done, clears the active project
 ## and posts research_done and the pause request.
 static func finish(state: GameState, def: ResearchDef) -> void:
-	for pair: Array in def.effects:
-		UnlockRules.apply_to_game(state, StringName(str(pair[0])), pair[1])
+	StoryRules.apply_all(state, def.effects, def.id)
 	if not state.research.is_done(def.id):
 		state.research.done.append(def.id)
 	state.research.active = &""

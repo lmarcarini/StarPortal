@@ -39,7 +39,7 @@ func test_locked_before_the_unlock_and_not_research() -> void:
 	var result: CommandResult = UnlockRules.can_build_room(_game, ExpeditionUnlock.INFIRMARY_DEF)
 	assert_str(String(result.error_code)).is_equal("needs_staff")
 	var project: StringName = UnlockRules.project_for(
-		UnlockRules.EFFECT_UNLOCK_ROOM, ExpeditionUnlock.INFIRMARY_DEF
+		UnlockFixture.research(), UnlockRules.EFFECT_UNLOCK_ROOM, ExpeditionUnlock.INFIRMARY_DEF
 	)
 	assert_str(String(project)).is_empty()
 	for def: ResearchDef in _defs.research:

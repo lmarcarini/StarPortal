@@ -5,7 +5,7 @@
 ## its documents. The player paints a corridor and builds a Research Lab against it on Level 1 (it
 ## completes on, taking its 5 MW from charging: "Research Lab on: charging lowered to 20 MW",
 ## m25-lean-start.md section 3), is granted Excavation survey through
-## UnlockRules.apply_project() (no research system yet), digs Level 2, and the next daily
+## UnlockFixture.apply_project() (no research system yet), digs Level 2, and the next daily
 ## settlement pays the allocation less the day's share of the upkeep. Last, with the total
 ## charge rate lowered below the open wormhole's 20 MWh/h drain, a lock closes when the
 ## capacitors run empty.
@@ -176,7 +176,7 @@ func _corridor_built_at(state: GameState, cell: Vector2i) -> bool:
 func _dig_level_2(player: M15Player) -> void:
 	var refused: CommandResult = DigLevelCommand.new().validate(player.state())
 	assert_str(String(refused.error_code)).is_equal("needs_research")
-	assert_bool(UnlockRules.apply_project(player.state().unlocks, &"excavation_survey")).is_true()
+	assert_bool(UnlockFixture.apply_project(player.state().unlocks, &"excavation_survey")).is_true()
 	var funds: int = player.state().budget.funds_k
 	assert_bool(player.simulation.submit(DigLevelCommand.new()).is_ok).is_true()
 	assert_int(player.state().budget.funds_k).is_equal(funds - 1500)

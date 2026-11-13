@@ -43,11 +43,11 @@ func test_new_game_palette_offers_every_starting_unlock() -> void:
 
 func test_each_research_room_unlock_appears_after_its_project() -> void:
 	var palette: BuildPalette = _view.get_palette()
-	for project_id: StringName in UnlockRules.PROJECTS:
-		UnlockRules.apply_project(_simulation.state.unlocks, project_id)
+	for project_id: StringName in UnlockFixture.projects():
+		UnlockFixture.apply_project(_simulation.state.unlocks, project_id)
 		_view.get_build().refresh()
 		await get_tree().process_frame
-		for pair: Array in UnlockRules.PROJECTS[project_id]:
+		for pair: Array in UnlockFixture.projects()[project_id]:
 			if pair[0] != UnlockRules.EFFECT_UNLOCK_ROOM:
 				continue
 			var def_id := StringName(str(pair[1]))

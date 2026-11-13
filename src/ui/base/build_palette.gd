@@ -122,7 +122,9 @@ func role_line(def_id: StringName) -> String:
 	if button == null:
 		return ""
 	if button.disabled:
-		return BasePanelText.unlock(UnlockRules.project_for(UnlockRules.EFFECT_UNLOCK_ROOM, def_id))
+		return BasePanelText.unlock(
+			UnlockRules.project_for(_research(), UnlockRules.EFFECT_UNLOCK_ROOM, def_id)
+		)
 	return BasePanelText.now(_defs[def_id])
 
 
@@ -211,7 +213,17 @@ func _show_dig_summary() -> void:
 static func _offered(def_id: StringName, unlocked: Array[StringName]) -> bool:
 	if def_id in unlocked:
 		return true
-	return not UnlockRules.project_for(UnlockRules.EFFECT_UNLOCK_ROOM, def_id).is_empty()
+	return not (
+		UnlockRules.project_for(_research(), UnlockRules.EFFECT_UNLOCK_ROOM, def_id).is_empty()
+	)
+
+
+## Every loaded ResearchDef by id.
+static func _research() -> Dictionary[StringName, ResearchDef]:
+	var found: Dictionary[StringName, ResearchDef] = {}
+	for def: DefBase in Registry.get_all_of(ResearchDef):
+		found[def.id] = def as ResearchDef
+	return found
 
 
 func _refresh_hint() -> void:

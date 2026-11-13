@@ -1,5 +1,5 @@
 ## Tests for ContentCheckResearch and ResearchDef's own content errors: bad effects, projects
-## out of step with UnlockRules.PROJECTS, needs later in the list, missing keys, locked slots
+## needs later in the list, missing keys, locked slots
 ## with a cost, and the real content passing.
 ## Bible: docs/content/m25-lean-start.md section 3
 extends GdUnitTestSuite
@@ -38,16 +38,20 @@ func test_real_content_passes() -> void:
 		assert_array(def.get_content_errors(defs)).is_empty()
 
 
-## An unknown effect id, a bad value and effects that differ from UnlockRules are reported.
+## An empty effect or an unlock value UnlockRules refuses is reported; a ModifierEffect is
+## allowed.
 func test_bad_effects() -> void:
 	var empty: Dictionary[String, bool] = {}
 	var def: ResearchDef = _copy(&"bank_array")
-	def.effects = [[&"teleport", 3]]
+	var cap := BankCapEffect.new()
+	cap.count = -2
+	def.effects = [cap]
 	var errors: Array[String] = ContentCheckResearch.check(_without(&"bank_array", def), empty)
-	assert_str("\n".join(errors)).contains("bad effect").contains("differ")
-	def.effects = [[&"bank_cap", -2]]
-	errors = ContentCheckResearch.check(_without(&"bank_array", def), empty)
 	assert_str("\n".join(errors)).contains("bad effect")
+	var room := UnlockRoomEffect.new()
+	def.effects = [room, ModifierEffect.new()]
+	errors = ContentCheckResearch.check(_without(&"bank_array", def), empty)
+	assert_int(errors.size()).is_equal(1)
 
 
 ## A need later in the list, a duplicate order and a missing key are reported.

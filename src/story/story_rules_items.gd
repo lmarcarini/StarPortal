@@ -93,8 +93,7 @@ static func _complete(state: GameState, project: StringName) -> bool:
 	if state.research.active == project:
 		ResearchSystem.finish(state, def)
 		return true
-	for pair: Array in def.effects:
-		UnlockRules.apply_to_game(state, StringName(str(pair[0])), pair[1])
+	StoryRules.apply_all(state, def.effects, def.id)
 	state.research.done.append(project)
 	state.events.post(&"research_done", [project])
 	return true

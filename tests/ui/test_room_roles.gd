@@ -109,7 +109,7 @@ func test_panel_upkeep_uses_the_fuel_contracts_override() -> void:
 	_view.get_plan().select(plant.id)
 	var before: String = _view.get_room_panel().lines()[4]
 	assert_str(before).contains(str(_def(&"room_power_plant").upkeep_k))
-	UnlockRules.apply_project(_simulation.state.unlocks, &"fuel_contracts")
+	UnlockFixture.apply_project(_simulation.state.unlocks, &"fuel_contracts")
 	_view.get_plan().select(&"")
 	_view.get_plan().select(plant.id)
 	assert_str(_view.get_room_panel().lines()[4]).is_equal("Upkeep $100k per 30 days")

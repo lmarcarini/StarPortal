@@ -77,6 +77,10 @@ static func apply(state: GameState, effect: EffectDef, _source: StringName) -> b
 		return _add_document(state, (effect as AddDocumentEffect).document)
 	if effect is AddAddressEffect:
 		return _add_address(state, (effect as AddAddressEffect).world)
+	var unlock: Array = UnlockRules.unlock_pair(effect)
+	if not unlock.is_empty():
+		var unlock_id: StringName = unlock[0]
+		return UnlockRules.apply_to_game(state, unlock_id, unlock[1])
 	return StoryRulesItems.apply(state, effect)
 
 
