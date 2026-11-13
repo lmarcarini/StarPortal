@@ -87,6 +87,8 @@ var room_defs: Dictionary[StringName, RoomDef] = {}
 ## Every ResearchDef by id, projects and locked slots, read only. Transient: not in
 ## to_dict(); GameSetup.build() sets it.
 var research_defs: Dictionary[StringName, ResearchDef] = {}
+## Every RequestDef by id, read only. Transient: GameSetup.build() sets it.
+var request_defs: Dictionary[StringName, RequestDef] = {}
 
 
 ## Returns a fresh campaign state seeded with [param base_seed]. The galaxy seed is

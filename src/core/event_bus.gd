@@ -216,6 +216,25 @@ signal research_done(project_id: StringName)
 ## (posted through the outbox).
 @warning_ignore("unused_signal")
 signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
+## Emitted when a story effect offers a request, with the new request's uid (outbox).
+@warning_ignore("unused_signal")
+signal request_offered(uid: int)
+## Emitted when an artefact arrives (in holding or waiting at the gate), with its uid
+## (outbox).
+@warning_ignore("unused_signal")
+signal artefact_arrived(uid: int)
+## Emitted when a hidden research project is revealed, with its id (outbox).
+@warning_ignore("unused_signal")
+signal research_revealed(project_id: StringName)
+## Emitted when a story effect sets a flag, with its name (outbox).
+@warning_ignore("unused_signal")
+signal flag_changed(flag: StringName)
+## Emitted when an artefact is handed over, with its id (outbox).
+@warning_ignore("unused_signal")
+signal artefact_taken(artefact_id: StringName)
+## Emitted when every held instance of an artefact becomes Studied, with its id (outbox).
+@warning_ignore("unused_signal")
+signal artefact_studied(artefact_id: StringName)
 ## Emitted when a faction's standing changes, with its id, the new standing and the change
 ## applied (posted through the outbox; the Committee posts confidence_changed too).
 @warning_ignore("unused_signal")

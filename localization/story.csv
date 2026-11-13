@@ -1,0 +1,24 @@
+keys,en,pt_BR
+STORY_CAUSE,Story event,[EN] Story event
+STORY_HIDDEN,?,?
+STORY_FX_STANDING,{name} standing {amount},[EN] {name} standing {amount}
+STORY_FX_CONFIDENCE,Confidence {amount},[EN] Confidence {amount}
+STORY_FX_MONEY,{amount},[EN] {amount}
+STORY_FX_DOCUMENT,A document: {name},[EN] A document: {name}
+STORY_FX_ADDRESS,An address: {name},[EN] An address: {name}
+STORY_FX_REQUEST,A request: {name},[EN] A request: {name}
+STORY_FX_GIVE_ARTEFACT,An artefact: {name},[EN] An artefact: {name}
+STORY_FX_TAKE_ARTEFACT,Hand over: {name},[EN] Hand over: {name}
+STORY_FX_STUDY_ARTEFACT,{name} studied,[EN] {name} studied
+STORY_FX_UNLOCK_RESEARCH,New research: {name},[EN] New research: {name}
+STORY_FX_COMPLETE_RESEARCH,Research done: {name},[EN] Research done: {name}
+STORY_FX_MODIFIER,{key} {amount},[EN] {key} {amount}
+COND_FLAG_IS,Requires an earlier event,[EN] Requires an earlier event
+COND_STANDING_AT_LEAST,Requires {name} standing {amount},[EN] Requires {name} standing {amount}
+COND_STANDING_BELOW,Requires {name} standing below {amount},[EN] Requires {name} standing below {amount}
+COND_FACTION_MET,Requires contact with {name},[EN] Requires contact with {name}
+COND_RESEARCH_DONE,Requires {name},[EN] Requires {name}
+COND_HAS_ARTEFACT,Requires the artefact {name},[EN] Requires the artefact {name}
+COND_WORLD_STATUS_AT_LEAST,Requires {name} {status},[EN] Requires {name} {status}
+COND_REQUEST_IS,Requires the request {name},[EN] Requires the request {name}
+COND_NO_DIAL_SINCE,Keep the Ring closed,[EN] Keep the Ring closed
