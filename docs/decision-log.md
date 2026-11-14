@@ -322,3 +322,10 @@ Each entry has four fields:
 - **Decision:** The seven tabs follow the loop: Gate Room F1, Base F2, Research F3, Personnel F4, Expeditions F5, Archive F6, Command F7. Q/E and the shoulders still cycle and wrap. A player's saved rebinding is kept; only the defaults move. Each tab has a code-drawn icon, lit orange on the current tab, and a dot while something inside needs the player (`GameView.needs_attention()`).
 - **Reason:** Owner approval of the interface pass (PR #325, card #324).
 - **Bible section:** [content/interface-pass.md](content/interface-pass.md) section 4
+
+## 2026-11-14 — CI runs less often
+
+- **Date:** 2026-11-14
+- **Decision:** CI runs only on non-draft pull requests and skips those that change only docs or Markdown; pushes to `main` no longer run it again. The soak moves from every push to `main` to a nightly run (skipped when `main` has no new commits in the last 24 hours) plus a manual trigger.
+- **Reason:** Owner request: GitHub Actions minutes were running out before the monthly reset.
+- **Bible section:** [technical-architecture.md](technical-architecture.md#testing-and-tooling)
