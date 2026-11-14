@@ -47,6 +47,12 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	state.request_defs.clear()
 	for request: RequestDef in defs.requests:
 		state.request_defs[request.id] = request
+	state.incursion_defs.clear()
+	for incursion: IncursionDef in defs.incursions:
+		state.incursion_defs[incursion.id] = incursion
+	state.unit_defs.clear()
+	for unit: UnitDef in defs.units:
+		state.unit_defs[unit.id] = unit
 	state.research_defs.clear()
 	for def: ResearchDef in defs.research:
 		state.research_defs[def.id] = def

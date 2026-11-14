@@ -117,6 +117,9 @@ func test_transient_references_are_never_saved() -> void:
 				"conversations",
 				"requests",
 				"artefacts",
+				"incursion",
+				"security",
+				"outcome",
 			]
 		)
 	)

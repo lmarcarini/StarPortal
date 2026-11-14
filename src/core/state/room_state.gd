@@ -51,6 +51,8 @@ var site: StringName = &""
 ## Cancel and demolish refund a share of the sum paid for the rooms they remove
 ## (m25-lean-start.md section 2: refunds use the money actually paid).
 var paid_k: int = 0
+## True when intruders damaged it (M4c): it is off and does nothing until repaired.
+var damaged: bool = false
 
 
 ## Returns a room of [param def_id] with instance [param room_id] at [param origin] on
@@ -94,6 +96,7 @@ func to_dict() -> Dictionary:
 		"demolish_ticks_left": demolish_ticks_left,
 		"site": String(site),
 		"paid_k": paid_k,
+		"damaged": damaged,
 	}
 
 
@@ -111,6 +114,7 @@ static func from_dict(data: Dictionary) -> RoomState:
 	room.demolish_ticks_left = read_count(data.get("demolish_ticks_left"))
 	room.site = StringName(str(data.get("site", "")))
 	room.paid_k = read_count(data.get("paid_k"))
+	room.damaged = data.get("damaged") is bool and data["damaged"]
 	return room
 
 
@@ -118,7 +122,8 @@ static func from_dict(data: Dictionary) -> RoomState:
 ## "def_id" non-empty Strings, "level" a whole number of at least 1, "build_ticks_left" one of
 ## at least 0,
 ## "origin" a cell of two whole numbers of at least 0, "rotated" and "powered_on" bools; when
-## present, "demolish_ticks_left" a whole number of at least 0 and "site" a String.
+## present, "demolish_ticks_left" a whole number of at least 0, "site" a String and
+## "damaged" a bool.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in ["id", "def_id"]:
@@ -140,6 +145,8 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'site' is not a String")
 	if data.has("paid_k") and not is_count(data["paid_k"]):
 		errors.append("'paid_k' is not a whole number of at least 0")
+	if data.has("damaged") and not data["damaged"] is bool:
+		errors.append("'damaged' is not a bool")
 	return errors
 
 

@@ -28,6 +28,9 @@ const _SECTIONS: Array[String] = [
 	"conversations",
 	"requests",
 	"artefacts",
+	"incursion",
+	"security",
+	"outcome",
 ]
 
 ## The simulation clock.
@@ -74,6 +77,12 @@ var conversations: ConversationsState = ConversationsState.new()
 var requests: RequestsState = RequestsState.new()
 ## Every artefact held.
 var artefacts: ArtefactsState = ArtefactsState.new()
+## The incursion under way and each faction's last one (M4c).
+var incursion: IncursionState = IncursionState.new()
+## Squads and soldiers' fighting health (M4c).
+var security: SecurityState = SecurityState.new()
+## Whether the game still runs (M4c).
+var outcome: OutcomeState = OutcomeState.new()
 ## Domain events waiting for the end of the tick. Transient: not in to_dict(), and
 ## new_game() and from_dict() start with an empty outbox.
 var events: EventOutbox = EventOutbox.new()
@@ -97,6 +106,9 @@ var artefact_defs: Dictionary[StringName, ArtefactDef] = {}
 var modifiers: ModifierCache = ModifierCache.new()
 ## Every ConversationDef by id, read only. Transient: GameSetup.build() sets it.
 var conversation_defs: Dictionary[StringName, ConversationDef] = {}
+## Every IncursionDef and UnitDef by id, read only (M4c). Transient: GameSetup.build() sets them.
+var incursion_defs: Dictionary[StringName, IncursionDef] = {}
+var unit_defs: Dictionary[StringName, UnitDef] = {}
 
 
 ## Returns a fresh campaign state seeded with [param base_seed]. The galaxy seed is
@@ -152,6 +164,9 @@ func to_dict() -> Dictionary:
 		"conversations": conversations.to_dict(),
 		"requests": requests.to_dict(),
 		"artefacts": artefacts.to_dict(),
+		"incursion": incursion.to_dict(),
+		"security": security.to_dict(),
+		"outcome": outcome.to_dict(),
 	}
 
 
@@ -181,6 +196,9 @@ static func from_dict(data: Dictionary) -> GameState:
 	state.conversations = ConversationsState.from_dict(_dict_or_empty(data.get("conversations")))
 	state.requests = RequestsState.from_dict(_dict_or_empty(data.get("requests")))
 	state.artefacts = ArtefactsState.from_dict(_dict_or_empty(data.get("artefacts")))
+	state.incursion = IncursionState.from_dict(_dict_or_empty(data.get("incursion")))
+	state.security = SecurityState.from_dict(_dict_or_empty(data.get("security")))
+	state.outcome = OutcomeState.from_dict(_dict_or_empty(data.get("outcome")))
 	var flag_data: Dictionary = _dict_or_empty(data.get("flags"))
 	for key: Variant in flag_data:
 		var flag_value: Variant = flag_data[key]
@@ -195,7 +213,8 @@ static func from_dict(data: Dictionary) -> GameState:
 ## Returns human-readable errors for saved [param data], empty when it is valid: "clock", "random",
 ## "flags", "gate", "power", "budget", "base", "worlds", "archive", "address_book",
 ## "operations_log", "unlocks", "research", "staff", "committee", "recruitment", "probes",
-## "expedition", "factions", "conversations", "requests" and "artefacts" must be
+## "expedition", "factions", "conversations", "requests", "artefacts", "incursion",
+## "security" and "outcome" must be
 ## objects, the sub-states must pass their own validate_dict(), and
 ## every flag must be a bool, a String or a
 ## whole number with absolute value at most [constant JsonLimits.MAX_EXACT_INT] (larger numbers do
@@ -279,7 +298,7 @@ static func _section_errors(key: String, section: Dictionary) -> Array[String]:
 	return _m4_section_errors(key, section)
 
 
-## Errors of the M4 sections (factions, conversations, requests, artefacts).
+## Errors of the M4 and M4c sections.
 static func _m4_section_errors(key: String, section: Dictionary) -> Array[String]:
 	match key:
 		"factions":
@@ -290,6 +309,12 @@ static func _m4_section_errors(key: String, section: Dictionary) -> Array[String
 			return RequestsState.validate_dict(section)
 		"artefacts":
 			return ArtefactsState.validate_dict(section)
+		"incursion":
+			return IncursionState.validate_dict(section)
+		"security":
+			return SecurityState.validate_dict(section)
+		"outcome":
+			return OutcomeState.validate_dict(section)
 	return []
 
 

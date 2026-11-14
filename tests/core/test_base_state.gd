@@ -40,7 +40,7 @@ func test_game_state_round_trip() -> void:
 
 ## validate_dict() rejects missing keys, bad shapes and impossible placements.
 func test_validate_rejects_bad_data() -> void:
-	assert_array(BaseState.validate_dict({})).has_size(4)
+	assert_array(BaseState.validate_dict({})).has_size(5)
 	var cases: Array[Dictionary] = [
 		{"grid_size": [0, 20]},
 		{"grid_size": [36]},
