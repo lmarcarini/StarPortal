@@ -19,7 +19,7 @@ var _fading: Dictionary[StringName, float] = {}
 var _leaving: Dictionary[StringName, StaffToken] = {}
 
 
-## Starts [param token] along [param path] (cell centres with levels, from PlanPaths). An
+## Starts [param token] along [param path] (cell centres with levels, from BasePaths). An
 ## empty path fades the token to its home instead.
 func walk(token: StaffToken, path: PackedVector3Array) -> void:
 	_fading.erase(token.person_id)

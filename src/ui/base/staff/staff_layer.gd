@@ -220,7 +220,7 @@ func _walk(state: GameState, token: StaffToken, to_level: int) -> void:
 		floori(token.home.y / BasePlanPainter.CELL),
 		to_level
 	)
-	var path: PackedVector3Array = PlanPaths.find(state.base, from, to, state.room_defs)
+	var path: PackedVector3Array = BasePaths.find(state.base, from, to, state.room_defs)
 	if path.is_empty():
 		token.level = to_level
 	walker.walk(token, path)
@@ -233,7 +233,7 @@ func _send_out(state: GameState, token: StaffToken) -> void:
 		floori(token.position.y / BasePlanPainter.CELL),
 		token.level
 	)
-	walker.leave(token, PlanPaths.find(state.base, from, entrance(state), state.room_defs))
+	walker.leave(token, BasePaths.find(state.base, from, entrance(state), state.room_defs))
 
 
 ## The cell people arrive at and leave from: the top level's lift, else its first corridor.
