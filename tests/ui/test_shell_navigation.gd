@@ -60,7 +60,8 @@ func test_view_actions_switch_views_in_the_shell() -> void:
 	assert_object(_focus_owner()).is_same(switcher.get_view(&"base").get_default_focus())
 	await _press_action(&"time_toggle_pause")
 	assert_bool(SimClock.simulation.state.clock.is_paused).is_false()
-	# On the Base the first shoulder steps its sub-tabs; the next one the tabs.
+	# On the Base the shoulders step its sub-tabs (Build, Energy, Staff) before the tabs.
+	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
 	assert_str(String(switcher.current_view_id())).is_equal("personnel")

@@ -174,3 +174,8 @@ STAFF_SHOW_ON_PLAN,Show on plan,Mostrar na planta
 STAFF_TRAY_TITLE,UNASSIGNED,SEM POSTO
 CAMERA_EXPAND,Expand,Ampliar
 CAMERA_SHRINK,Shrink,Reduzir
+BASE_SUBTAB_STAFF,Staff,Equipe
+STAFF_SUBTAB_TITLE,ON BASE,NA BASE
+STAFF_PLACE,Assign,Designar
+STAFF_PLACE_HINT,Move to a lit room and confirm; Esc or (B) cancels.,Vá até uma sala acesa e confirme; Esc ou (B) cancela.
+STAFF_PLACE_NOWHERE,Drop on a lit room or on the tray.,Solte numa sala acesa ou na bandeja.
