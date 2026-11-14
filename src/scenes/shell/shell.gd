@@ -83,6 +83,7 @@ func _ready() -> void:
 	if DebugCheatCommand.cheats_on():
 		add_child(CheatPanel.new())
 	ShellBoot.add_pause_menu(self, pause_menu)
+	ShellBoot.add_game_over(self)
 	add_child(gate_focus)
 	gate_focus.attach(view_switcher)
 	var is_new: bool = GameStart.is_new()

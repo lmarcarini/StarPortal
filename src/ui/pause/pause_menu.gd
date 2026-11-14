@@ -23,6 +23,8 @@ var save_button := Button.new()
 var load_button := Button.new()
 var menu_button := Button.new()
 var quit_button := Button.new()
+## The Failure states setting (M4c-15), until a settings screen exists.
+var failure_toggle := CheckButton.new()
 ## The confirm question and its Yes key.
 var question := Label.new()
 var yes_button := Button.new()
@@ -73,6 +75,10 @@ func _build_keys(column: VBoxContainer) -> void:
 		button.theme_type_variation = &"KeyButton"
 		button.custom_minimum_size = Vector2(320, 40)
 		_keys.add_child(button)
+	failure_toggle.text = &"PAUSE_FAILURE_STATES"
+	failure_toggle.set_pressed_no_signal(Settings.get_bool(&"gameplay", &"failure_states"))
+	failure_toggle.toggled.connect(_on_failure_toggled)
+	_keys.add_child(failure_toggle)
 	column.add_child(_keys)
 	question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(question)
@@ -189,6 +195,12 @@ func _on_yes() -> void:
 	_pending = Callable()
 	if then.is_valid():
 		then.call()
+
+
+func _on_failure_toggled(on: bool) -> void:
+	Settings.set_value(&"gameplay", &"failure_states", on)
+	if SimClock.simulation != null:
+		ShellBoot.apply_settings(SimClock.simulation)
 
 
 func _quit() -> void:
