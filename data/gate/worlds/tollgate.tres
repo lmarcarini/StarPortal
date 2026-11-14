@@ -14,6 +14,14 @@ script = ExtResource("2_target")
 id = &"effigy"
 name_key = &"TARGET_TOLLGATE_EFFIGY"
 is_object = true
+artefact_id = &"ossar_effigy"
+
+[sub_resource type="Resource" id="Target_2"]
+script = ExtResource("2_target")
+id = &"lattice"
+name_key = &"TARGET_TOLLGATE_LATTICE"
+is_object = true
+artefact_id = &"resonant_lattice"
 
 [resource]
 script = ExtResource("1_world")
@@ -29,6 +37,6 @@ biohazard = 1
 life = 1
 structures = 3
 threat = 2
-targets = Array[ExtResource("2_target")]([SubResource("Target_0"), SubResource("Target_1")])
+targets = Array[ExtResource("2_target")]([SubResource("Target_0"), SubResource("Target_1"), SubResource("Target_2")])
 controller = &"faction_ossar"
 id = &"world_tollgate"

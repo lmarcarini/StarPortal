@@ -73,6 +73,10 @@ static func apply(state: GameState, effect: EffectDef, _source: StringName) -> b
 		state.budget.funds_k += (effect as ChangeMoneyEffect).amount_k
 		state.events.post(&"budget_changed", [state.budget.funds_k])
 		return true
+	if effect is DrainPowerEffect:
+		var drain: int = (effect as DrainPowerEffect).mwh
+		state.power.stored_mwh = maxf(0.0, state.power.stored_mwh - float(drain))
+		return true
 	if effect is AddDocumentEffect:
 		return _add_document(state, (effect as AddDocumentEffect).document)
 	if effect is AddAddressEffect:
