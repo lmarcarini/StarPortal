@@ -5,11 +5,15 @@ extends Control
 ## demolition (SiteBar), and the selection. No cell is
 ## reserved. The mouse wheel or the right stick zooms; a right
 ## or middle drag or the left stick pans; a click or (A) on the cursor cell selects what is
-## there; the arrow keys or the D-pad move the cell cursor.
+## there; the arrow keys or the D-pad move the cell cursor. Staff tokens stand on the plan
+## (StaffLayer) and the unassigned are listed in a tray along its bottom
+## (docs/content/interface-pass.md section 5).
 ## Bible: docs/content/m2-base.md section 6, game-design.md#base-building-and-power
 
 ## Emitted when the selection changes: a room id or [code]&""[/code].
 signal selection_changed(selected: StringName)
+## Emitted when a staff token is chosen on the plan or in the tray: a person id.
+signal person_chosen(person_id: StringName)
 
 ## Level shown, 1 the top one.
 var level: int = 1
@@ -17,6 +21,10 @@ var level: int = 1
 var cursor: Vector2i = Vector2i.ZERO
 ## Zoom and pan of the plan inside this control.
 var view: ZoomPan = ZoomPan.new()
+## The staff tokens over the plan.
+var staff_layer := StaffLayer.new()
+## The unassigned people, along the bottom of the plan.
+var tray := UnassignedTray.new()
 
 var _base: BaseState = null
 var _defs: Dictionary = {}
@@ -24,6 +32,14 @@ var _selected: StringName = &""
 var _dragging: bool = false
 ## SiteProgress by room id, for the sites' and demolitions' bars (SiteBar).
 var _progress: Dictionary = {}
+
+
+func _init() -> void:
+	add_child(staff_layer)
+	add_child(tray)
+	tray.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	tray.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	tray.person_chosen.connect(_choose_person)
 
 
 func _ready() -> void:
@@ -41,6 +57,9 @@ func show_base(base: BaseState, defs: Dictionary) -> void:
 	view.reset(Vector2(base.grid_size) * BasePlanPainter.CELL, size)
 	if base.find_room(_selected) == null:
 		select(&"")
+	var simulation: Simulation = SimClock.simulation
+	if simulation != null and simulation.state.base == base:
+		staff_layer.rebuild(simulation.state)
 	queue_redraw()
 
 
@@ -113,6 +132,7 @@ func _draw() -> void:
 	if has_focus():
 		BasePlanPainter.draw_cursor(self, cursor)
 	draw_set_transform(Vector2.ZERO)
+	staff_layer.queue_redraw()
 
 
 func _draw_room(room: RoomState, font: Font) -> void:
@@ -145,8 +165,24 @@ func _selected_cells() -> Rect2i:
 
 
 func _gui_input(event: InputEvent) -> void:
+	var motion := event as InputEventMouseMotion
+	if motion != null:
+		staff_layer.set_hovered(staff_layer.token_at(motion.position))
+	var click := event as InputEventMouseButton
+	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
+		var person: StringName = staff_layer.token_at(click.position)
+		if person != &"":
+			_choose_person(person)
+			accept_event()
+			return
 	if BasePlanInput.handle(self, event):
 		accept_event()
+
+
+## Selects [param person_id]'s token and their room.
+func _choose_person(person_id: StringName) -> void:
+	staff_layer.focus_person(person_id)
+	person_chosen.emit(person_id)
 
 
 func _process(delta: float) -> void:

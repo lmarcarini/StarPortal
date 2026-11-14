@@ -165,6 +165,8 @@ func _connect_view(view: GameView) -> void:
 	if view is ArchiveView:
 		(view as ArchiveView).unread_changed.connect(_refresh_titles)
 		(view as ArchiveView).plan_requested.connect(_on_plan_requested)
+	elif view is PersonnelView:
+		(view as PersonnelView).show_on_plan.connect(_on_show_on_plan)
 	elif view is GateRoomView:
 		(view as GateRoomView).archive_requested.connect(_on_archive_requested)
 		(view as GateRoomView).capacitor_bank_requested.connect(_on_capacitor_bank_requested)
@@ -314,3 +316,14 @@ func _on_plan_requested(world_id: StringName) -> void:
 		return
 	expeditions.plan_world(world_id)
 	show_view(EXPEDITIONS)
+
+
+## Opens the Base on [param person_id]'s level with their token selected.
+func _on_show_on_plan(person_id: StringName) -> void:
+	if not _views.has(BASE):
+		return
+	var base: BaseView = _views[BASE] as BaseView
+	if base == null:
+		return
+	show_view(BASE)
+	base.get_plan().staff_layer.focus_person(person_id)

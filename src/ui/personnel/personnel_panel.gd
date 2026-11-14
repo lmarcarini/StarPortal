@@ -16,6 +16,8 @@ signal unassign_pressed(person_id: StringName)
 signal dismiss_held(person_id: StringName)
 ## Emitted when Hire is pressed.
 signal hire_pressed(candidate_id: StringName)
+## Show on plan was pressed for [param person_id].
+signal show_on_plan_pressed(person_id: StringName)
 
 var _heading: Label = _add_label(16)
 var _name: Label = _add_label(22)
@@ -26,6 +28,7 @@ var _assign: Button = _add_button(Button.new(), _open_rooms)
 var _unassign: Button = _add_button(Button.new(), _on_unassign)
 var _dismiss: HoldButton = _add_button(HoldButton.new(), Callable()) as HoldButton
 var _hire: Button = _add_button(Button.new(), _on_hire)
+var _show_on_plan: Button = _add_button(Button.new(), _on_show_on_plan)
 var _rooms: VBoxContainer = VBoxContainer.new()
 var _notice: Label = _add_label(14)
 var _id: StringName = &""
@@ -49,6 +52,7 @@ func show_id(state: GameState, id: StringName) -> void:
 		label.text = ""
 	for button: Button in buttons():
 		button.visible = false
+	_show_on_plan.visible = false
 	var person: PersonState = state.staff.find_person(id)
 	var candidate: CandidateState = state.recruitment.find_candidate(id)
 	if person != null:
@@ -119,6 +123,8 @@ func _show_person(person: PersonState) -> void:
 	_assign.disabled = not on_base or StaffPicks.rooms_for(_state, person).is_empty()
 	_unassign.visible = person.is_assigned()
 	_dismiss.visible = true
+	_show_on_plan.text = tr(&"STAFF_SHOW_ON_PLAN")
+	_show_on_plan.visible = on_base and not StaffRules.is_on_team(_state, person.id)
 	if not on_base:
 		_notice.text = tr(&"STAFF_ERR_NOT_ON_BASE")
 	elif _assign.disabled:
@@ -214,3 +220,7 @@ func _add_label(font_size: int) -> Label:
 	label.add_theme_font_size_override(&"font_size", font_size)
 	add_child(label)
 	return label
+
+
+func _on_show_on_plan() -> void:
+	show_on_plan_pressed.emit(_id)
