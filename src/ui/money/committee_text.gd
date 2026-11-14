@@ -16,6 +16,9 @@ const CAUSE_KEYS: Dictionary[StringName, StringName] = {
 	&"team_lost": &"CONFIDENCE_CAUSE_TEAM_LOST",
 	&"deceased": &"CONFIDENCE_CAUSE_DECEASED",
 	&"story": &"CONFIDENCE_CAUSE_STORY",
+	&"incursion_damage": &"CONFIDENCE_CAUSE_INCURSION_DAMAGE",
+	&"incursion_down": &"CONFIDENCE_CAUSE_INCURSION_DOWN",
+	&"incursion_stopped": &"CONFIDENCE_CAUSE_INCURSION_STOPPED",
 }
 ## Line key of each committee_warning reason.
 const WARNING_KEYS: Dictionary[StringName, StringName] = {

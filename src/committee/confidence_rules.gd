@@ -26,9 +26,28 @@ const DECEASED: StringName = &"deceased"
 ## A story effect on the Committee (M4: m4-core-systems.md section 2); the subject is the
 ## translation key of the reason.
 const STORY: StringName = &"story"
+## After an incursion (M4c): something damaged or stolen; a soldier down and nothing stopped;
+## every intruder stopped with no loss.
+const INCURSION_DAMAGE: StringName = &"incursion_damage"
+const INCURSION_DOWN: StringName = &"incursion_down"
+const INCURSION_STOPPED: StringName = &"incursion_stopped"
 const CAUSES: Array[StringName] = [
-	LOCKED, HORIZON_RECORD, SURVEYED, RESEARCH, REPORTS, TEAM_LOST, DECEASED, STORY
+	LOCKED,
+	HORIZON_RECORD,
+	SURVEYED,
+	RESEARCH,
+	REPORTS,
+	TEAM_LOST,
+	DECEASED,
+	STORY,
+	INCURSION_DAMAGE,
+	INCURSION_DOWN,
+	INCURSION_STOPPED,
 ]
+## Incursion changes, in tenths.
+const INCURSION_DAMAGE_CHANGE: int = -30
+const INCURSION_DOWN_CHANGE: int = -80
+const INCURSION_STOPPED_CHANGE: int = 30
 ## Change per lock, horizon record, team survey, project and analyst, in tenths.
 const LOCK_CHANGE: int = 50
 const HORIZON_CHANGE: int = 20
@@ -102,7 +121,7 @@ static func is_report_day(day_index: int) -> bool:
 static func reporting_analysts(state: GameState) -> int:
 	var count: int = 0
 	for room: RoomState in state.base.rooms:
-		if room.def_id != REPORT_ROOM or not room.is_built() or not room.powered_on:
+		if room.def_id != REPORT_ROOM or not room.is_built() or not room.powered_on or room.damaged:
 			continue
 		for person: PersonState in StaffRules.working(state, room):
 			if person.role == ANALYST and person.is_on_base(state.clock.tick):

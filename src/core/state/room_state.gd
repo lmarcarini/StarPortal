@@ -52,7 +52,13 @@ var site: StringName = &""
 ## (m25-lean-start.md section 2: refunds use the money actually paid).
 var paid_k: int = 0
 ## True when intruders damaged it (M4c): it is off and does nothing until repaired.
-var damaged: bool = false
+var damaged: bool = false:
+	set(value):
+		if value != damaged:
+			revision += 1
+		damaged = value
+## Ticks of repair left (M4c); 0 when not being repaired.
+var repair_ticks_left: int = 0
 
 
 ## Returns a room of [param def_id] with instance [param room_id] at [param origin] on
@@ -97,6 +103,7 @@ func to_dict() -> Dictionary:
 		"site": String(site),
 		"paid_k": paid_k,
 		"damaged": damaged,
+		"repair_ticks_left": repair_ticks_left,
 	}
 
 
@@ -115,6 +122,7 @@ static func from_dict(data: Dictionary) -> RoomState:
 	room.site = StringName(str(data.get("site", "")))
 	room.paid_k = read_count(data.get("paid_k"))
 	room.damaged = data.get("damaged") is bool and data["damaged"]
+	room.repair_ticks_left = read_count(data.get("repair_ticks_left"))
 	return room
 
 
@@ -147,6 +155,8 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'paid_k' is not a whole number of at least 0")
 	if data.has("damaged") and not data["damaged"] is bool:
 		errors.append("'damaged' is not a bool")
+	if data.has("repair_ticks_left") and not is_count(data["repair_ticks_left"]):
+		errors.append("'repair_ticks_left' is not a whole number of at least 0")
 	return errors
 
 

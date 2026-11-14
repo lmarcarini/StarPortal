@@ -21,7 +21,7 @@ func get_id() -> StringName:
 ## its time is reached. An active id with no def (content changed) is left alone.
 func tick(state: GameState) -> void:
 	var research: ResearchState = state.research
-	if not research.is_running():
+	if not research.is_running() or state.incursion.is_active():
 		return
 	var def: ResearchDef = state.research_defs.get(research.active)
 	if def == null or not ResearchRules.has_lab_on(state):

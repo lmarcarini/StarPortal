@@ -49,6 +49,7 @@ static func finish(state: GameState) -> void:
 	elif report.get("done", false):
 		outcome = "done"
 	report["outcome"] = outcome
+	_judge(state, report)
 	incursion.phase = IncursionState.Phase.NONE
 	incursion.groups.clear()
 	incursion.report = {}
@@ -191,6 +192,34 @@ static func _to_door(state: GameState, from: Vector3i, goal: Vector3i) -> Packed
 			break
 		trimmed.append(point)
 	return trimmed
+
+
+# The Committee's reaction to [param report] (m4c-incursions.md section 5).
+static func _judge(state: GameState, report: Dictionary) -> void:
+	var subject: StringName = StringName(str(report.get("def", "")))
+	var losses: bool = report.has("damaged") or report.has("lost")
+	if losses:
+		ConfidenceEvents.raise(
+			state,
+			ConfidenceRules.INCURSION_DAMAGE,
+			subject,
+			Vector2i(1, ConfidenceRules.INCURSION_DAMAGE_CHANGE)
+		)
+	var stopped: bool = report["outcome"] == "stopped"
+	if report.has("injured") and not stopped:
+		ConfidenceEvents.raise(
+			state,
+			ConfidenceRules.INCURSION_DOWN,
+			subject,
+			Vector2i(1, ConfidenceRules.INCURSION_DOWN_CHANGE)
+		)
+	if stopped and not losses and not report.has("injured"):
+		ConfidenceEvents.raise(
+			state,
+			ConfidenceRules.INCURSION_STOPPED,
+			subject,
+			Vector2i(1, ConfidenceRules.INCURSION_STOPPED_CHANGE)
+		)
 
 
 static func _objective(state: GameState) -> StringName:

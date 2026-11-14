@@ -2,13 +2,14 @@ class_name IntruderGroup
 extends RefCounted
 ## One group of intruders (M4c): its units, the room it is heading for (&"" until chosen),
 ## and where it was last seen (Vector3i, or −1s when never seen).
-## Saved shape: {"units": [UnitState], "target_room", "last_seen", "work_ticks"}.
+## Saved shape: {"units": [UnitState], "target_room", "last_seen", "work_ticks",
+## "visited"}.
 ## Bible: docs/content/m4c-incursions.md sections 3, 7 and 9
 
 ## Saved keys, in to_dict() order.
 const KEYS: Array[String] = ["units", "target_room", "last_seen"]
 ## Optional saved keys (absent in the first v19 saves).
-const OPTIONAL: Array[String] = ["work_ticks"]
+const OPTIONAL: Array[String] = ["work_ticks", "visited"]
 ## last_seen when the group has not been seen.
 const UNSEEN: Vector3i = Vector3i(-1, -1, -1)
 
@@ -20,6 +21,8 @@ var target_room: StringName = &""
 var last_seen: Vector3i = UNSEEN
 ## Ticks spent on the objective so far (reset while a squad contests the room).
 var work_ticks: int = 0
+## Rooms the group has entered (each civilian there is at risk once per group).
+var visited: Array[StringName] = []
 
 
 ## The units still standing.
@@ -56,6 +59,7 @@ func to_dict() -> Dictionary:
 		"target_room": String(target_room),
 		"last_seen": seen,
 		"work_ticks": work_ticks,
+		"visited": SaveFields.write_ids(visited),
 	}
 
 
@@ -68,6 +72,7 @@ static func from_dict(data: Dictionary) -> IntruderGroup:
 	var seen: Variant = data.get("last_seen")
 	group.last_seen = UnitState.read_pos(seen) if UnitState.is_pos(seen) else UNSEEN
 	group.work_ticks = SaveFields.read_int(data.get("work_ticks"))
+	group.visited = SaveFields.read_ids(data.get("visited"))
 	return group
 
 
@@ -88,4 +93,6 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		and not (SaveFields.is_int(data["work_ticks"]) and data["work_ticks"] >= 0)
 	):
 		errors.append("'work_ticks' is not a whole number of at least 0")
+	if data.has("visited"):
+		errors.append_array(SaveFields.id_list_errors(data["visited"], "visited"))
 	return errors

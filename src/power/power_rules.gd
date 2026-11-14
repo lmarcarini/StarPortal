@@ -22,9 +22,10 @@ static func is_standing(room: RoomState) -> bool:
 	return room.is_built() and not room.is_demolishing()
 
 
-## True when [param room] of [param def] is standing and running: always on, or switched on.
+## True when [param room] of [param def] is standing and running: always on, or switched on,
+## and not damaged by intruders (M4c).
 static func is_running(room: RoomState, def: RoomDef) -> bool:
-	if def == null or not is_standing(room):
+	if def == null or not is_standing(room) or room.damaged:
 		return false
 	return def.always_on or room.powered_on
 
@@ -83,7 +84,7 @@ static func _sum(state: GameState) -> PackedFloat64Array:
 			banks += 1.0
 			if rates.has(room.id):
 				rated += 1.0
-		elif def.always_on or room.powered_on:
+		elif (def.always_on or room.powered_on) and not room.damaged:
 			supply += def.power_output_mw
 			if def.power_output_mw > 0.0:
 				supply += plant_bonus
