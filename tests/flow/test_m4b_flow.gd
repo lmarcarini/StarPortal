@@ -15,6 +15,8 @@ func before_test() -> void:
 	_simulation = GameSetup.build_new(_state, defs).value
 	_state.clock.mode = ClockState.Mode.RUNNING
 	_state.budget.funds_k += 20000
+	# The Vault needs Secure storage (owner change 2026-11-14); its research is not this test.
+	UnlockFixture.apply_project(_state.unlocks, &"secure_storage")
 
 
 func _ticks(count: int) -> void:

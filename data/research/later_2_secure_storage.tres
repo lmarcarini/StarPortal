@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1_research"]
+[ext_resource type="Script" path="res://src/content/story/effects/unlock_room_effect.gd" id="2_room"]
+
+; Owner change 2026-11-14: advanced rooms are researched before they can be built. The
+; Artefact Vault is no longer unlocked from the start.
+[sub_resource type="Resource" id="fx_0"]
+script = ExtResource("2_room")
+room = &"room_artefact_vault"
+
+[resource]
+script = ExtResource("1_research")
+order = 47
+cost_k = 400
+days = 2
+needs = Array[StringName]([])
+effects = Array[Resource]([SubResource("fx_0")])
+category = &"research_construction"
+name_key = &"RESEARCH_SECURE_STORAGE_NAME"
+line_key = &"RESEARCH_SECURE_STORAGE_LINE"
+id = &"secure_storage"

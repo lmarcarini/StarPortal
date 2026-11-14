@@ -77,7 +77,6 @@ func test_research_locked_rooms_are_greyed_with_their_project() -> void:
 	var palette: BuildPalette = _view.get_palette()
 	var expected: Dictionary[StringName, String] = {
 		&"room_power_plant": "Unlock: Second plant",
-		&"room_workshop": "Unlock: Field engineering",
 		&"room_lift": "Unlock: Lift shaft",
 		&"room_stairs": "Unlock: Excavation survey",
 	}
@@ -87,6 +86,13 @@ func test_research_locked_rooms_are_greyed_with_their_project() -> void:
 		button.focus_entered.emit()
 		assert_str(palette.get_role()).is_equal(expected[def_id])
 	assert_object(palette.get_room_button(&"room_infirmary")).is_null()
+	# Advanced rooms are not offered at all until researched (owner change 2026-11-14).
+	for def_id: StringName in BuildPalette.ADVANCED:
+		(
+			assert_object(palette.get_room_button(def_id))
+			. override_failure_message(String(def_id))
+			. is_null()
+		)
 	assert_object(palette.first_button()).is_equal(palette.get_room_button(&"room_capacitor_bank"))
 
 
@@ -119,7 +125,7 @@ func test_longest_lines_fit_1280_by_720_in_both_languages() -> void:
 	var palette: BuildPalette = _view.get_palette()
 	for locale: String in LOCALES:
 		TranslationServer.set_locale(locale)
-		palette.get_room_button(&"room_workshop").focus_entered.emit()
+		palette.get_room_button(&"room_power_plant").focus_entered.emit()
 		_view.get_plan().select(_find(&"room_power_plant").id)
 		for _frame: int in 3:
 			await get_tree().process_frame

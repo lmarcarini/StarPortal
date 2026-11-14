@@ -329,3 +329,11 @@ Each entry has four fields:
 - **Decision:** CI runs only on non-draft pull requests and skips those that change only docs or Markdown; pushes to `main` no longer run it again. The soak moves from every push to `main` to a nightly run (skipped when `main` has no new commits in the last 24 hours) plus a manual trigger.
 - **Reason:** Owner request: GitHub Actions minutes were running out before the monthly reset.
 - **Bible section:** [technical-architecture.md](technical-architecture.md#testing-and-tooling)
+
+
+## 2026-11-14 — Advanced rooms are researched before they are offered
+
+- **Date:** 2026-11-14
+- **Decision:** The build palette no longer offers advanced rooms (Workshop, Infirmary, Artefact Vault, Containment) until they are unlocked; core rooms still show disabled with "Unlock: <project>". The Artefact Vault is no longer unlocked from the start: a new Construction project, Secure storage ($400k, 2 days), unlocks it. Containment keeps its own project.
+- **Reason:** Owner request: keep the early palette to what the player can plan for.
+- **Bible section:** [content/m4-core-systems.md](content/m4-core-systems.md) sections 5 and 7
