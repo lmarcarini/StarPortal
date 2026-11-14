@@ -28,11 +28,12 @@ var _controls := ResearchTreeControls.new()
 var _zoom: float = 1.0
 var _categories: Array[ResearchCategoryDef] = []
 var _state: GameState = null
+var _header := HBoxContainer.new()
 
 
 func _init() -> void:
 	add_theme_constant_override(&"separation", 8)
-	var header := HBoxContainer.new()
+	var header := _header
 	header.add_theme_constant_override(&"separation", 16)
 	header.custom_minimum_size.y = 48
 	_current.size_flags_horizontal = SIZE_EXPAND_FILL
@@ -250,3 +251,14 @@ static func _label(font_size: int) -> Label:
 	label.size_flags_vertical = SIZE_SHRINK_CENTER
 	label.add_theme_font_size_override(&"font_size", font_size)
 	return label
+
+
+## The parts the screen puts in its left column: the title and the current project with its
+## progress, stacked (docs/content/interface-pass.md section 4).
+func left_parts() -> Array[Control]:
+	var stack := VBoxContainer.new()
+	for part: Control in [_title, _current, _left, _bar]:
+		_header.remove_child(part)
+		stack.add_child(part)
+	_header.queue_free()
+	return [stack]

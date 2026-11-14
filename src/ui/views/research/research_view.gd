@@ -19,6 +19,7 @@ var _queue := ResearchQueueBox.new()
 
 @onready var _board: ResearchBoard = %Board
 @onready var _panel: ResearchPanel = %Panel
+@onready var _columns: ThreeColumn = %Columns
 
 
 func _ready() -> void:
@@ -26,7 +27,8 @@ func _ready() -> void:
 	_board.project_activated.connect(act)
 	_board.category_changed.connect(_on_category_changed)
 	_panel.action_pressed.connect(act)
-	_panel.get_parent().add_child(_queue)
+	_columns.put_left(_board.left_parts())
+	_columns.put_left([_queue] as Array[Control])
 	visibility_changed.connect(_on_visibility_changed)
 
 

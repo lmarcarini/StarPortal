@@ -25,6 +25,7 @@ var _pending_key: StringName = &""
 
 @onready var _board: PersonnelBoard = %Board
 @onready var _panel: PersonnelPanel = %Panel
+@onready var _columns: ThreeColumn = %Columns
 
 
 func _ready() -> void:
@@ -36,6 +37,7 @@ func _ready() -> void:
 	_panel.dismiss_held.connect(dismiss)
 	_panel.hire_pressed.connect(hire)
 	_panel.show_on_plan_pressed.connect(show_on_plan.emit)
+	_columns.put_left(_board.left_parts())
 	visibility_changed.connect(_on_visibility_changed)
 
 
