@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://src/ui/views/command/command_view.gd" id="1_command_view"]
 [ext_resource type="Script" path="res://src/ui/command/command_board.gd" id="2_board"]
 [ext_resource type="Script" path="res://src/ui/command/command_panel.gd" id="3_panel"]
+[ext_resource type="Script" path="res://src/ui/layout/three_column.gd" id="9_columns"]
 
 [node name="CommandView" type="Control"]
 layout_mode = 3
@@ -15,6 +16,7 @@ mouse_filter = 2
 script = ExtResource("1_command_view")
 
 [node name="Columns" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,6 +29,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_constants/separation = 24
+script = ExtResource("9_columns")
 
 [node name="Board" type="VBoxContainer" parent="Columns"]
 unique_name_in_owner = true
@@ -36,6 +39,5 @@ script = ExtResource("2_board")
 
 [node name="Panel" type="VBoxContainer" parent="Columns"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(352, 0)
 layout_mode = 2
 script = ExtResource("3_panel")

@@ -11,8 +11,8 @@ const SLOTS: int = ConfidenceRules.FUNDS_HISTORY_KEPT
 ## Width of one slot and the gap inside it, in pixels.
 const SLOT_WIDTH: float = 12.0
 const GAP: float = 3.0
-const BAR_COLOR: Color = Color(0.55, 0.75, 0.95)
-const NEGATIVE_COLOR: Color = Color(0.9, 0.25, 0.2)
+const BAR_COLOR: Color = UiPalette.GOOD
+const NEGATIVE_COLOR: Color = UiPalette.ALARM
 
 var _balances: Array[int] = []
 

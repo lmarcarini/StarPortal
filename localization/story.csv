@@ -28,6 +28,7 @@ LOG_LINE_REQUEST_FAILED,Request failed: {name}.,[EN] Request failed: {name}.
 LOG_LINE_REQUEST_DECLINED,Request declined: {name}.,[EN] Request declined: {name}.
 LOG_LINE_REQUEST_LAPSED,Request offer lapsed: {name}.,[EN] Request offer lapsed: {name}.
 COMMAND_SUBTAB_OVERVIEW,Overview,[EN] Overview
+COMMAND_SUBTAB_FINANCES,Finances,Finanças
 COMMAND_SUBTAB_REQUESTS,Requests,[EN] Requests
 REQUESTS_OFFERED,Offered,[EN] Offered
 REQUESTS_ACTIVE,Active,[EN] Active

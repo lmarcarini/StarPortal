@@ -11,6 +11,10 @@ extends GameView
 ## Bible: docs/content/m27-daily-rhythm.md section 4
 
 ## Sub-tabs.
+## Sub-tab ids for [method show_sub_tab].
+const FINANCES_ID: StringName = &"finances"
+const FACTIONS_ID: StringName = &"factions"
+const REQUESTS_ID: StringName = &"requests"
 const OVERVIEW: int = 0
 const REQUESTS: int = 1
 const FACTIONS: int = 2
@@ -20,7 +24,6 @@ var _simulation: Simulation = null
 var _breakdown: int = -1
 ## Highest request uid seen in the Requests sub-tab.
 var _seen_uid: int = -1
-var _subtabs := HBoxContainer.new()
 var _overview_button := Button.new()
 var _requests_button := Button.new()
 var _requests := RequestsPanel.new()
@@ -29,29 +32,29 @@ var _factions := FactionsPanel.new()
 
 @onready var _board: CommandBoard = %Board
 @onready var _panel: CommandPanel = %Panel
+@onready var _columns: ThreeColumn = %Columns
 
 
 func _ready() -> void:
 	_board.line_activated.connect(open_breakdown)
 	visibility_changed.connect(_on_visibility_changed)
-	_subtabs.position = Vector2(16, 8)
-	for button: Button in [_overview_button, _requests_button, _factions_button]:
+	var stack := VBoxContainer.new()
+	stack.name = &"SubTabs"
+	for button: Button in [_overview_button, _factions_button, _requests_button]:
 		button.toggle_mode = true
-		_subtabs.add_child(button)
-	_overview_button.text = &"COMMAND_SUBTAB_OVERVIEW"
+		button.theme_type_variation = &"KeyButton"
+		stack.add_child(button)
+	_overview_button.text = &"COMMAND_SUBTAB_FINANCES"
 	_requests_button.text = &"COMMAND_SUBTAB_REQUESTS"
 	_factions_button.text = &"COMMAND_SUBTAB_FACTIONS"
 	_overview_button.pressed.connect(show_subtab.bind(OVERVIEW))
 	_requests_button.pressed.connect(show_subtab.bind(REQUESTS))
 	_factions_button.pressed.connect(show_subtab.bind(FACTIONS))
-	add_child(_subtabs)
+	_columns.put_left([stack] as Array[Control])
 	for panel: Control in [_requests, _factions]:
-		panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		panel.offset_left = 16.0
-		panel.offset_top = 52.0
-		panel.offset_right = -16.0
-		panel.offset_bottom = -8.0
-		add_child(panel)
+		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_columns.add_child(panel)
+		_columns.move_child(panel, _board.get_index() + 1)
 	show_subtab(OVERVIEW)
 
 
@@ -110,9 +113,22 @@ func show_requests(on: bool) -> void:
 	show_subtab(REQUESTS if on else OVERVIEW)
 
 
-## Shows sub-tab [param index]: OVERVIEW, REQUESTS or FACTIONS.
+## Shows the sub-tab [param id]: finances, factions or requests (the top bar's funds and
+## Confidence open Finances; a request alert opens Requests).
+func show_sub_tab(id: StringName) -> void:
+	match id:
+		FACTIONS_ID:
+			show_subtab(FACTIONS)
+		REQUESTS_ID:
+			show_subtab(REQUESTS)
+		_:
+			show_subtab(OVERVIEW)
+
+
+## Shows sub-tab [param index]: OVERVIEW (Finances), REQUESTS or FACTIONS.
 func show_subtab(index: int) -> void:
-	(get_node(^"Columns") as Control).visible = index == OVERVIEW
+	_board.visible = index == OVERVIEW
+	_panel.visible = index == OVERVIEW
 	_requests.visible = index == REQUESTS
 	_factions.visible = index == FACTIONS
 	_overview_button.button_pressed = index == OVERVIEW
