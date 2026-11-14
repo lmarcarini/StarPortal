@@ -30,6 +30,8 @@ var new_game_seed: int = -1
 ## The debug overlay; null in release builds.
 var debug_overlay: DebugOverlay = null
 
+## The pause menu (Esc / Start when nothing else takes it).
+var pause_menu := PauseMenu.new()
 ## The latest Log entries along the bottom of every screen.
 var log_strip := LogStrip.new()
 ## Grain and vignette over the whole screen (display/screen_grain setting).
@@ -71,19 +73,20 @@ func _ready() -> void:
 	log_strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	log_strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	log_strip.keep_above(view_switcher)
-	log_strip.open_log.connect(_open_log)
+	log_strip.open_log.connect(ShellBoot.open_log.bind(view_switcher))
 	_toast_timer.timeout.connect(_toast.hide)
 	_add_alerts()
 	add_child(_conversation)
 	_setup_debug_tools()
 	if DebugCheatCommand.cheats_on():
 		add_child(CheatPanel.new())
+	ShellBoot.add_pause_menu(self, pause_menu)
 	var is_new: bool = GameStart.is_new()
 	_start(GameStart.take_state(ShellBoot.choose_seed(new_game_seed), Registry.balance()), is_new)
 	SimClock.pause()
 	_bind_views(_simulation)
 	var buttons: Array[Button] = get_focus_order()
-	_link_focus(buttons, view_switcher.get_tab_bar())
+	ShellBoot.link_focus(buttons, view_switcher.get_tab_bar())
 	view_switcher.set_focus_above(buttons[0])
 	buttons[0].grab_focus()
 
@@ -113,7 +116,9 @@ func _exit_tree() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(_ACTION_QUICK_SAVE):
+	if event.is_action_pressed(&"pause_menu") and not pause_menu.is_open():
+		pause_menu.open()
+	elif event.is_action_pressed(_ACTION_QUICK_SAVE):
 		quick_save()
 	elif event.is_action_pressed(_ACTION_QUICK_LOAD):
 		quick_load()
@@ -124,7 +129,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Saves the running game to slot [constant QUICK_SLOT] and shows a toast.
 func quick_save() -> void:
-	var result: Result = SaveService.save_game(_simulation.state, QUICK_SLOT)
+	save_slot(QUICK_SLOT)
+
+
+## Saves the running game to [param slot] and shows a toast.
+func save_slot(slot: StringName) -> void:
+	var result: Result = SaveService.save_game(_simulation.state, slot)
+	pause_menu.saved_tick = _simulation.state.clock.tick if result.is_ok else pause_menu.saved_tick
 	if not result.is_ok:
 		push_warning("Shell: quick save failed: %s %s" % [result.error_code, result.detail])
 		_show_toast(&"UI_SAVE_FAILED")
@@ -135,7 +146,12 @@ func quick_save() -> void:
 ## Loads slot [constant QUICK_SLOT], restarts SimClock with it and shows a toast. On failure
 ## the running game carries on.
 func quick_load() -> void:
-	var result: Result = SaveService.load_game(QUICK_SLOT, GameDefs.from_registry(Registry))
+	load_slot(QUICK_SLOT)
+
+
+## Loads [param slot] and restarts with it, with a toast; on failure the game carries on.
+func load_slot(slot: StringName) -> void:
+	var result: Result = SaveService.load_game(slot, GameDefs.from_registry(Registry))
 	if not result.is_ok:
 		if result.error_code == &"missing_file":
 			_show_toast(&"UI_QUICK_SAVE_MISSING")
@@ -151,15 +167,8 @@ func quick_load() -> void:
 		_show_toast(&"UI_LOAD_FAILED")
 		return
 	_bind_views(_simulation)
+	pause_menu.saved_tick = state.clock.tick
 	_show_toast(&"UI_LOADED")
-
-
-## Shows the Archive's Log (the log strip's Open).
-func _open_log() -> void:
-	view_switcher.show_view(ViewSwitcher.ARCHIVE)
-	var archive: ArchiveView = view_switcher.get_view(ViewSwitcher.ARCHIVE) as ArchiveView
-	if archive != null:
-		archive.show_section(true)
 
 
 ## Opens the Command tab (the funds and Conf. readouts in the top bar;
@@ -264,20 +273,6 @@ func _setup_debug_tools() -> void:
 	add_child(debug_overlay)
 
 
-static func _link_focus(buttons: Array[Button], below: Control) -> void:
-	var count: int = buttons.size()
-	for index: int in count:
-		var button: Button = buttons[index]
-		var previous: NodePath = button.get_path_to(buttons[(index - 1 + count) % count])
-		var next: NodePath = button.get_path_to(buttons[(index + 1) % count])
-		button.focus_neighbor_left = previous
-		button.focus_previous = previous
-		button.focus_neighbor_right = next
-		button.focus_next = next
-		button.focus_neighbor_top = NodePath(".")
-		button.focus_neighbor_bottom = button.get_path_to(below)
-
-
 ## Passes [param simulation] to the game views. Called after each [method _start]: at start
 ## and after a quick load.
 func _bind_views(simulation: Simulation) -> void:
@@ -311,7 +306,7 @@ func _add_alerts() -> void:
 func _relink_top_bar() -> void:
 	if not is_node_ready():
 		return
-	_link_focus(get_focus_order(), view_switcher.get_tab_bar())
+	ShellBoot.link_focus(get_focus_order(), view_switcher.get_tab_bar())
 
 
 func _on_team_checked_in(world_id: StringName, light: int, serious: int, _day: String) -> void:

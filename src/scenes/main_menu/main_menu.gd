@@ -21,6 +21,9 @@ var quit_button := Button.new()
 ## The reason a load failed, under the buttons.
 var message := Label.new()
 
+## The save list behind Load.
+var slots := SlotList.new()
+
 var _column := VBoxContainer.new()
 
 
@@ -57,6 +60,11 @@ func _init() -> void:
 	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	message.visible = false
 	_column.add_child(message)
+	slots.visible = false
+	slots.slot_chosen.connect(func(slot: StringName) -> void: open_slot(slot))
+	slots.cancelled.connect(show_keys)
+	_column.add_child(slots)
+	load_button.pressed.connect(show_slots)
 	continue_button.pressed.connect(continue_game)
 	new_button.pressed.connect(new_game)
 	quit_button.pressed.connect(func() -> void: get_tree().quit())
@@ -74,8 +82,26 @@ func _ready() -> void:
 ## for the load list.
 func refresh() -> void:
 	continue_button.visible = not SaveService.list_slots().is_empty()
-	load_button.visible = false
+	load_button.visible = not SaveService.list_all_slots().is_empty()
 	scenarios_button.visible = false
+
+
+## Shows the save list to load from.
+func show_slots() -> void:
+	for button: Button in [continue_button, new_button, load_button, scenarios_button, quit_button]:
+		button.visible = false
+	slots.visible = true
+	slots.show_mode(SlotList.Mode.LOAD)
+	slots.first_focus().grab_focus.call_deferred()
+
+
+## Back from the save list to the menu's keys.
+func show_keys() -> void:
+	slots.visible = false
+	new_button.visible = true
+	quit_button.visible = true
+	refresh()
+	first_button().grab_focus.call_deferred()
 
 
 ## The first visible button (Continue, or New game without saves).

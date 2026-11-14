@@ -80,7 +80,7 @@ func test_keyboard_and_gamepad_bindings_drive_the_clock() -> void:
 	assert_int(clock.speed_index).is_equal(1)
 	await _pull_trigger(JOY_AXIS_TRIGGER_RIGHT, [1.0, 0.0])
 	assert_int(clock.speed_index).is_equal(2)
-	await _press_joypad(JOY_BUTTON_START)
+	await _press_joypad(JOY_BUTTON_LEFT_STICK)
 	assert_bool(clock.is_paused).is_true()
 
 

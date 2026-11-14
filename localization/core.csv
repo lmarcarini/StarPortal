@@ -139,3 +139,21 @@ MENU_SCENARIOS,Scenarios,Cenários
 MENU_QUIT,Quit,Sair
 MENU_NO_SAVE,There is no save to continue.,Não há jogo salvo para continuar.
 MENU_RETURN,Main menu,Menu principal
+PAUSE_RESUME,Resume,Continuar
+PAUSE_SAVE,Save,Salvar
+PAUSE_LOAD,Load,Carregar
+PAUSE_QUIT,Quit to desktop,Sair para o sistema
+PAUSE_YES,Yes,Sim
+PAUSE_NO,No,Não
+PAUSE_CONFIRM_MENU,Leave this game for the main menu? Unsaved time is lost.,Sair deste jogo para o menu principal? O tempo não salvo será perdido.
+PAUSE_CONFIRM_QUIT,Quit to the desktop? Unsaved time is lost.,Sair para o sistema? O tempo não salvo será perdido.
+PAUSE_CONFIRM_LOAD,Load this save? Time since your last save is lost.,Carregar este jogo? O tempo desde o último salvamento será perdido.
+SAVES_NEW_NAME,new save name,nome do novo jogo salvo
+SAVES_SAVE_NEW,Save as new,Salvar como novo
+SAVES_BACK,Back,Voltar
+SAVES_BAD_NAME,"Use letters, digits, - or _ (up to 32).","Use letras, dígitos, - ou _ (até 32)."
+SAVES_CONFIRM_OVERWRITE,Overwrite {slot}? Choose it again to confirm.,Substituir {slot}? Escolha de novo para confirmar.
+SAVES_CANT_LOAD,can't load: {why},não carrega: {why}
+SAVES_SAVED_AT,saved {when},salvo {when}
+SAVES_NEWER,made by a newer version,feito por uma versão mais nova
+SAVES_BROKEN,the file is damaged,o arquivo está danificado

@@ -45,6 +45,7 @@ const VALUES: Dictionary = {
 		&"quick_load": {},
 		&"debug_toggle_overlay": {},
 		&"debug_toggle_cheats": {},
+		&"pause_menu": {},
 		&"view_next": {},
 		&"view_previous": {},
 		&"view_gate_room": {},
