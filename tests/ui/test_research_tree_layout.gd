@@ -57,6 +57,7 @@ func test_real_tree_matches_the_card() -> void:
 				&"deep_excavation": Vector2i(2, 0),
 				&"modular_frames": Vector2i(3, 0),
 				&"reinforced_shafts": Vector2i(4, 0),
+				&"secure_storage": Vector2i(0, 2),
 			}
 		)
 	)

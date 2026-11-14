@@ -15,10 +15,15 @@ func test_defs() -> void:
 	assert_float(containment.power_draw_mw).is_equal(10.0)
 
 
-func test_vault_unlocked_containment_not() -> void:
+## Owner change 2026-11-14: the Vault needs Secure storage; Containment needs its project.
+func test_vault_and_containment_need_research() -> void:
 	var game: GameState = ConstructionFixture.state()
-	assert_bool(UnlockRules.can_build_room(game, &"room_artefact_vault").is_ok).is_true()
+	var vault: CommandResult = UnlockRules.can_build_room(game, &"room_artefact_vault")
+	assert_bool(vault.is_ok).is_false()
+	assert_str(vault.detail).is_equal("secure_storage")
 	assert_bool(UnlockRules.can_build_room(game, &"room_containment").is_ok).is_false()
+	UnlockFixture.apply_project(game.unlocks, &"secure_storage")
+	assert_bool(UnlockRules.can_build_room(game, &"room_artefact_vault").is_ok).is_true()
 
 
 func test_vault_places_builds_and_switches() -> void:

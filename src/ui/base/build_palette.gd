@@ -36,6 +36,15 @@ const ROOMS: Array[StringName] = [
 	&"room_corridor",
 ]
 
+## Advanced rooms: not offered at all until research (or the story) unlocks them, so the
+## palette shows only what the player can plan for (owner change 2026-11-14).
+const ADVANCED: Array[StringName] = [
+	&"room_workshop",
+	&"room_infirmary",
+	&"room_artefact_vault",
+	&"room_containment",
+]
+
 ## Extra lines shown under a room's "now" line on hover or focus, as {def id: text}; set by
 ## the Base view (the second Research Lab note, m25-lean-start.md section 3).
 var notes: Dictionary[StringName, String] = {}
@@ -90,8 +99,9 @@ func _init() -> void:
 
 
 ## Fills the palette with the rooms of [param defs] (RoomDef by id) in [constant ROOMS]: those
-## in [param unlocked] (UnlockState.rooms) can be picked; those a research project unlocks show
-## disabled, saying which project; any other locked room (staff) is not offered.
+## in [param unlocked] (UnlockState.rooms) can be picked; core rooms a research project unlocks
+## show disabled, saying which project; advanced rooms ([constant ADVANCED]) and staff-locked
+## rooms are not offered until unlocked.
 func show_rooms(defs: Dictionary, unlocked: Array[StringName]) -> void:
 	_defs.assign(defs)
 	_shown_unlocks = unlocked.duplicate()
@@ -215,6 +225,8 @@ func _show_dig_summary() -> void:
 static func _offered(def_id: StringName, unlocked: Array[StringName]) -> bool:
 	if def_id in unlocked:
 		return true
+	if def_id in ADVANCED:
+		return false
 	return not (
 		UnlockRules.project_for(_research(), UnlockRules.EFFECT_UNLOCK_ROOM, def_id).is_empty()
 	)

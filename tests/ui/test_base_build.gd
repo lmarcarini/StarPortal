@@ -86,7 +86,7 @@ func test_invalid_spots_say_why() -> void:
 func test_palette_offers_only_unlocked_rooms() -> void:
 	var palette: BuildPalette = _view.get_palette()
 	for def_id: StringName in BuildPalette.ROOMS:
-		if def_id == ExpeditionUnlock.INFIRMARY_DEF:
+		if def_id == ExpeditionUnlock.INFIRMARY_DEF or def_id in BuildPalette.ADVANCED:
 			assert_object(palette.get_room_button(def_id)).is_null()
 			continue
 		if def_id in [&"room_artefact_vault", &"room_containment"]:

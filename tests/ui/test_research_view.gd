@@ -63,7 +63,7 @@ func test_sub_tabs_follow_the_data() -> void:
 		]
 	)
 	assert_str(String(board.get_category())).is_equal("research_construction")
-	assert_int(_tree().nodes().size()).is_equal(6)
+	assert_int(_tree().nodes().size()).is_equal(7)
 	assert_array(_node(&"excavation_survey").texts()).is_equal(
 		["Excavation survey", "$400k · 2 d", "Start"]
 	)
