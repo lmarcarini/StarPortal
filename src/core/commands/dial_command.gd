@@ -60,6 +60,8 @@ func validate(state: GameState) -> CommandResult:
 		return CommandResult.fail(&"ring_busy")
 	if state.incursion.is_active():
 		return CommandResult.fail(&"incursion")
+	if ShutterRules.is_closed(state):
+		return CommandResult.fail(&"shutter_closed")
 	var needed_mwh: float = GateQueries.lock_energy_mwh(state, address)
 	if state.power.stored_mwh < needed_mwh:
 		return CommandResult.fail(

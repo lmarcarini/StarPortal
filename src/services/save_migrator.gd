@@ -13,7 +13,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 19
+const TARGET_VERSION: int = 20
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
 const OLDEST_VERSION: int = 15
 
@@ -22,7 +22,7 @@ const OLDEST_VERSION: int = 15
 ## constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
 	var built_in: Dictionary[int, Callable] = {
-		15: _v15_to_v16, 16: _v16_to_v17, 17: _v17_to_v18, 18: _v18_to_v19
+		15: _v15_to_v16, 16: _v16_to_v17, 17: _v17_to_v18, 18: _v18_to_v19, 19: _v19_to_v20
 	}
 	return built_in
 
@@ -92,6 +92,18 @@ static func _v18_to_v19(data: Dictionary) -> Dictionary:
 	if state.get("base") is Dictionary:
 		var base: Dictionary = state["base"]
 		base["doors"] = []
+	return out
+
+
+## v20 (M4c-10): the Shutter, open.
+static func _v19_to_v20(data: Dictionary) -> Dictionary:
+	var out: Dictionary = data.duplicate(true)
+	if not out.get("state") is Dictionary:
+		return out
+	var state: Dictionary = out["state"]
+	if state.get("gate") is Dictionary:
+		var gate: Dictionary = state["gate"]
+		gate["shutter"] = "open"
 	return out
 
 

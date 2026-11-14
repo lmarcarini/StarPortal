@@ -13,7 +13,11 @@ extends RefCounted
 
 ## Ring modes. IDLE: no dial. DIALING: seals engaging. LOCKED: wormhole open.
 enum RingMode { IDLE, DIALING, LOCKED }
+## The Shutter over the Ring (M4c-10). Only an installed Shutter closes.
+enum Shutter { OPEN, CLOSED }
 
+## Saved names of the Shutter states.
+const SHUTTER_NAMES: Array[String] = ["open", "closed"]
 ## Saved names of the modes, indexed by RingMode value.
 const _MODE_NAMES: Array[String] = ["idle", "dialing", "locked"]
 ## Value of a tick field that is not set.
@@ -37,6 +41,7 @@ static var _field_rules: Dictionary[String, Array] = {
 	"lock_started_tick": [_is_tick_or_unset, "-1 or a whole number from 0 to 2^53"],
 	"is_hostile": [_is_bool, "a bool"],
 	"operating": [_is_bool, "a bool"],
+	"shutter": [_is_shutter_name, "open or closed"],
 }
 
 ## Current mode of the Ring.
@@ -56,6 +61,8 @@ var is_hostile: bool = false
 ## While LOCKED: the gate operations panel is up and slows the clock (gate_ops). Saved
 ## (format v18).
 var operating: bool = false
+## The Shutter over the Ring (M4c-10): OPEN or CLOSED.
+var shutter: Shutter = Shutter.OPEN
 ## Every dial attempt, oldest first.
 var dial_log: Array[DialLogEntry] = []
 ## An incoming wormhole from a faction: the faction, the conversation and the tick the far
@@ -99,6 +106,7 @@ func to_dict() -> Dictionary:
 		"lock_started_tick": lock_started_tick,
 		"is_hostile": is_hostile,
 		"operating": operating,
+		"shutter": SHUTTER_NAMES[shutter],
 		"dial_log": log_data,
 		"incoming": _incoming_to_dict(),
 	}
@@ -135,6 +143,7 @@ static func from_dict(data: Dictionary) -> GateState:
 	var hostile: Variant = data.get("is_hostile")
 	if hostile is bool:
 		gate.is_hostile = hostile
+	gate.shutter = maxi(0, SHUTTER_NAMES.find(str(data.get("shutter", "open")))) as Shutter
 	var operating_data: Variant = data.get("operating")
 	if operating_data is bool:
 		gate.operating = operating_data
@@ -277,6 +286,10 @@ static func _is_tick_or_unset(value: Variant) -> bool:
 
 static func _is_string(value: Variant) -> bool:
 	return value is String
+
+
+static func _is_shutter_name(value: Variant) -> bool:
+	return value is String and SHUTTER_NAMES.has(str(value))
 
 
 static func _is_bool(value: Variant) -> bool:

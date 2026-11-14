@@ -10,6 +10,8 @@ const GATE_IDLE: StringName = &"idle"
 const GATE_DIALLING: StringName = &"dialling"
 const GATE_OPEN: StringName = &"open"
 const GATE_INCOMING: StringName = &"incoming"
+## The Shutter is closed (M4c-10).
+const GATE_SHUTTER: StringName = &"shutter"
 
 
 ## Today's net change of the funds in $k per day: the Command ledger's net line, rounded.
@@ -53,10 +55,12 @@ static func gate_status(state: GameState) -> StringName:
 		return GATE_DIALLING
 	if gate.incoming_faction != &"":
 		return GATE_INCOMING
+	if gate.shutter == GateState.Shutter.CLOSED:
+		return GATE_SHUTTER
 	return GATE_IDLE
 
 
-## The gate chip text: "GATE: IDLE", "GATE: DIALLING", "GATE: INCOMING" or
+## The gate chip text: "GATE: IDLE", "GATE: DIALLING", "GATE: INCOMING", "GATE: SHUTTER" or
 ## "GATE: OPEN Abydos 38 min".
 static func gate_text(state: GameState) -> String:
 	var status: StringName = gate_status(state)

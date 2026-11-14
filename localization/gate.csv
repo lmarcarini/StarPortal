@@ -346,3 +346,10 @@ TARGET_TOLLGATE_WATCHPOST,the watchpost,o posto de vigia
 TARGET_TOLLGATE_EFFIGY,the effigy,a efígie
 TARGET_TOLLGATE_LATTICE,the lattice frame,a armação de treliça
 GATE_STAND_BY,Stand by (keep open),Em espera (manter aberto)
+INSTALLATION_SHUTTER_NAME,The Shutter,O Obturador
+INSTALLATION_SHUTTER_EFFECT,"Close it and nothing comes through the Ring; each wave stopped takes 100 MWh.","Feche e nada atravessa o Anel; cada onda detida consome 100 MWh."
+GATE_SHUTTER_CLOSE,Close Shutter,Fechar Obturador
+GATE_SHUTTER_OPEN,Open Shutter,Abrir Obturador
+GATE_ERR_SHUTTER_CLOSED,The Shutter is closed,O Obturador está fechado
+GATE_ERR_NOT_INSTALLED,The Shutter is not installed,O Obturador não está instalado
+GATE_ERR_WORMHOLE_OPEN,Close the wormhole first,Feche o buraco de minhoca primeiro

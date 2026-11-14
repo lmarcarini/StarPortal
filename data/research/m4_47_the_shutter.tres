@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="2"]
+
+; docs/content/m4c-incursions.md section 6: $600k, 4 days; then installed in the Gate Room.
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+flag = &"shutter_researched"
+value = true
+
+[resource]
+script = ExtResource("1")
+order = 48
+cost_k = 600
+days = 4
+needs = Array[StringName]([&"iris_studies"])
+effects = Array[Resource]([SubResource("r1")])
+category = &"research_defence"
+name_key = &"RESEARCH_THE_SHUTTER_NAME"
+line_key = &"RESEARCH_THE_SHUTTER_LINE"
+id = &"the_shutter"

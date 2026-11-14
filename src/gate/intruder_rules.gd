@@ -44,7 +44,9 @@ static func finish(state: GameState) -> void:
 	report["def"] = String(incursion.def_id)
 	report["objective"] = String(_objective(state))
 	var outcome: String = "left"
-	if not report.has("escaped"):
+	if report.has("shutter"):
+		outcome = "shutter"
+	elif not report.has("escaped"):
 		outcome = "stopped"
 	elif report.get("done", false):
 		outcome = "done"
@@ -205,7 +207,7 @@ static func _judge(state: GameState, report: Dictionary) -> void:
 			subject,
 			Vector2i(1, ConfidenceRules.INCURSION_DAMAGE_CHANGE)
 		)
-	var stopped: bool = report["outcome"] == "stopped"
+	var stopped: bool = report["outcome"] == "stopped" or report["outcome"] == "shutter"
 	if report.has("injured") and not stopped:
 		ConfidenceEvents.raise(
 			state,

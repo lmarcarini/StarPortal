@@ -19,7 +19,11 @@ func get_type() -> StringName:
 
 ## Rejects with &"no_incoming" when no incoming wormhole waits.
 func validate(state: GameState) -> CommandResult:
-	return CommandResult.ok() if state.gate.has_incoming() else CommandResult.fail(&"no_incoming")
+	if not state.gate.has_incoming():
+		return CommandResult.fail(&"no_incoming")
+	if ShutterRules.is_closed(state):
+		return CommandResult.fail(&"shutter_closed")
+	return CommandResult.ok()
 
 
 ## Answers the incoming wormhole (IncomingRules.answer).

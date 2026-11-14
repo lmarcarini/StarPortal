@@ -175,3 +175,4 @@ UNIT_BREACHER_NAME,Breacher,Arrombador
 CONFIDENCE_CAUSE_INCURSION_DAMAGE,Intruders damaged or stole something  {amount},Intrusos danificaram ou roubaram algo  {amount}
 CONFIDENCE_CAUSE_INCURSION_DOWN,Soldiers down and the intruders not stopped  {amount},Soldados abatidos e os intrusos não foram detidos  {amount}
 CONFIDENCE_CAUSE_INCURSION_STOPPED,Every intruder stopped with no loss  {amount},Todos os intrusos detidos sem perdas  {amount}
+TOPBAR_GATE_SHUTTER,GATE: SHUTTER,ANEL: OBTURADOR
