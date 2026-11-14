@@ -30,6 +30,8 @@ var new_game_seed: int = -1
 ## The debug overlay; null in release builds.
 var debug_overlay: DebugOverlay = null
 
+## The latest Log entries along the bottom of every screen.
+var log_strip := LogStrip.new()
 ## Grain and vignette over the whole screen (display/screen_grain setting).
 var screen_grain := ScreenGrain.new()
 
@@ -65,6 +67,11 @@ func _ready() -> void:
 	top_bar.open_view.connect(open_view)
 	top_bar.alert_chosen.connect(_on_alert_chosen)
 	top_bar.resized.connect(_fit_below_top_bar)
+	add_child(log_strip)
+	log_strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	log_strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	log_strip.keep_above(view_switcher)
+	log_strip.open_log.connect(_open_log)
 	_toast_timer.timeout.connect(_toast.hide)
 	_add_alerts()
 	add_child(_conversation)
@@ -142,6 +149,14 @@ func quick_load() -> void:
 		return
 	_bind_views(_simulation)
 	_show_toast(&"UI_LOADED")
+
+
+## Shows the Archive's Log (the log strip's Open).
+func _open_log() -> void:
+	view_switcher.show_view(ViewSwitcher.ARCHIVE)
+	var archive: ArchiveView = view_switcher.get_view(ViewSwitcher.ARCHIVE) as ArchiveView
+	if archive != null:
+		archive.show_section(true)
 
 
 ## Opens the Command tab (the funds and Conf. readouts in the top bar;
@@ -272,6 +287,7 @@ func _bind_views(simulation: Simulation) -> void:
 	if gate_room != null:
 		top_bar.gate_chip.ring = gate_room.get_ring_view()
 	top_bar.bind(simulation)
+	log_strip.refresh(true)
 
 
 ## Puts the alert stack in the top bar after the time bar, and the rescue alert over the top

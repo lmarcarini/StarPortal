@@ -126,3 +126,8 @@ ALERT_TEAM_CHECK_IN,Team checked in from {name},A equipe deu notícias de {name}
 ALERT_FUNDS_RED,Funds in the red: {funds},Verba no vermelho: {funds}
 ALERT_RESCUE,{line},{line}
 CAMERA_NO_SIGNAL,NO SIGNAL,SEM SINAL
+LOG_STRIP_TITLE,LOG,REGISTRO
+LOG_STRIP_MORE,More,Mais
+LOG_STRIP_LESS,Less,Menos
+LOG_STRIP_OPEN,Open log,Abrir registro
+LOG_STRIP_EMPTY,Nothing logged yet.,Nada registrado ainda.
