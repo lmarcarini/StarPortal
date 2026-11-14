@@ -71,6 +71,7 @@ static func register_defaults() -> void:
 	_types[RemoveDoorCommand.TYPE] = RemoveDoorCommand
 	_types[SetDoorCommand.TYPE] = SetDoorCommand
 	_types[OrderSquadCommand.TYPE] = OrderSquadCommand
+	_types[RepairRoomCommand.TYPE] = RepairRoomCommand
 	_types[AcceptRequestCommand.TYPE] = AcceptRequestCommand
 	_types[DeclineRequestCommand.TYPE] = DeclineRequestCommand
 	_types[AnswerCallCommand.TYPE] = AnswerCallCommand

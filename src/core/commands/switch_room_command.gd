@@ -55,6 +55,8 @@ func validate(state: GameState) -> CommandResult:
 		return CommandResult.fail(&"not_built")
 	if not PowerRules.has_switch(def):
 		return CommandResult.fail(&"no_switch")
+	if on and room.damaged:
+		return CommandResult.fail(&"damaged")
 	if room.powered_on == on:
 		return CommandResult.ok()
 	return _power_check(state, def)

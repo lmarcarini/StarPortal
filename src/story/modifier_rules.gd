@@ -67,7 +67,12 @@ static func is_room_working(state: GameState, room_uid: int) -> bool:
 	var room: RoomState = state.base.find_room(room_id_of(room_uid))
 	if room == null:
 		return false
-	return room.build_ticks_left == 0 and room.demolish_ticks_left == 0 and room.powered_on
+	return (
+		room.build_ticks_left == 0
+		and room.demolish_ticks_left == 0
+		and room.powered_on
+		and not room.damaged
+	)
 
 
 static func _add(sums: Dictionary[StringName, int], modifier: ModifierEffect) -> void:

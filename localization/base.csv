@@ -190,3 +190,8 @@ BASE_BUILD_ERR_NOT_BUILT,The door is still being built,A porta ainda está em co
 BASE_BUILD_ERR_NO_DOOR,There is no door here,Não há porta aqui
 ROOM_SECURITY_POST_NAME,Security,Guarda
 ROOM_SECURITY_POST_NOW,Its soldiers form one squad you can order around the base.,Seus soldados formam um esquadrão que você pode mover pela base.
+BASE_REPAIR,"Hold to repair: {cost}, {time}","Segure para reparar: {cost}, {time}"
+BASE_REPAIR_STARTED,Repairing the {name}.,Reparando: {name}.
+BASE_BUILD_ERR_NOT_DAMAGED,The room is not damaged,A sala não está danificada
+BASE_BUILD_ERR_REPAIRING,Being repaired,Em reparo
+BASE_BUILD_ERR_DAMAGED,Damaged: repair it first,Danificada: repare primeiro

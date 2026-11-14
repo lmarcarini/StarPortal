@@ -8,7 +8,8 @@ extends SimSystem
 ## (FinishingPower) and, when it is the first of its type, takes the waiting crew
 ## (StaffChanges.auto_assign()). A running Workshop speeds sites and the dig up by 10% to 35%,
 ## by its engineers (BuildSpeed).
-## Builds blast doors (DoorRules) and drops doors whose corridor was demolished. Draws no
+## Nothing moves during an incursion (M4c). Repairs damaged rooms (RepairRules). Builds blast
+## doors (DoorRules) and drops doors whose corridor was demolished. Draws no
 ## power.
 ## Posts room_built(site id), room_demolished(id) and level_dug(level), each once:
 ## room_demolished carries the cell's room id for a corridor (each cell is its own demolition
@@ -33,11 +34,16 @@ func get_id() -> StringName:
 ## Advances the active sites, every demolition and then the dig by one tick (a lift segment
 ## started by the dig begins building on the next tick).
 func tick(state: GameState) -> void:
+	if state.incursion.is_active():
+		return
 	var idle: bool = _is_idle(state.base)
 	var doors_building: bool = _doors_building(state.base)
-	if idle and state.base.digging_level() == 0 and not doors_building:
+	var repairing: bool = RepairRules.any(state.base)
+	if idle and state.base.digging_level() == 0 and not doors_building and not repairing:
 		return
 	var step: int = BuildSpeed.progress(state)
+	if repairing:
+		RepairRules.tick(state, step)
 	if doors_building:
 		DoorRules.tick_builds(state, step)
 	if not idle:

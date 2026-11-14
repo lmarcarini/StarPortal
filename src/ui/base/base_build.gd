@@ -4,7 +4,8 @@ extends RefCounted
 ## palette, the placement ghost over the plan and the selected-room panel's action to the
 ## simulation. Picking a room starts its ghost at the cursor; a click or press submits
 ## PlaceRoomCommand or PaintCorridorCommand and the ghost stays out for another; the panel
-## offers Cancel (a site, 75% back) or Demolish (a room, 50% back) with the refund shown;
+## offers Cancel (a site, 75% back), Repair (a damaged room, M4c) or Demolish (a room, 50%
+## back) with the refund or cost shown;
 ## the Dig button digs or cancels the dig. The result, or why the command was refused, shows
 ## on the palette's hint line. Changes no state itself.
 ## Bible: docs/content/m2-base.md sections 4 and 6
@@ -125,6 +126,15 @@ func show_action(selected: StringName) -> void:
 		refund_k = CancelBuildCommand.refund_k(state, room.id)
 		text = tr_format(&"BASE_BUILD_CANCEL", refund_k, "")
 		_action_message = tr_format(&"BASE_BUILD_CANCELLED", refund_k, _t(def.name_key))
+	elif room.damaged:
+		command = RepairRoomCommand.create(room.id)
+		var time: String = BuildText.duration(RepairRules.ticks(def))
+		if room.repair_ticks_left > 0:
+			time = BuildText.duration(room.repair_ticks_left)
+		text = _t(&"BASE_REPAIR").format(
+			{"cost": MoneyLabel.format_k(RepairRules.cost_k(def)), "time": time}
+		)
+		_action_message = _t(&"BASE_REPAIR_STARTED").format({"name": _t(def.name_key)})
 	else:
 		command = DemolishRoomCommand.create(room.id)
 		refund_k = DemolishRoomCommand.refund_k(state, room)
