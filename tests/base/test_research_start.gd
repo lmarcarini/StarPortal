@@ -107,7 +107,7 @@ func test_project_list() -> void:
 	for def: ResearchDef in ResearchRules.projects(ResearchFixture.state()):
 		ids.append(def.id)
 	assert_array(ids.slice(0, 7)).is_equal(UnlockFixture.projects().keys())
-	assert_int(ids.size()).is_equal(38)
+	assert_int(ids.size()).is_equal(39)
 	var cost: int = 0
 	var days: int = 0
 	for def: ResearchDef in ResearchRules.projects(ResearchFixture.state()):

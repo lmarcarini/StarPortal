@@ -121,3 +121,5 @@ RESEARCH_SECURE_STORAGE_NAME,Secure storage,Armazenamento seguro
 RESEARCH_SECURE_STORAGE_LINE,Unlocks the Artefact Vault for safe artefacts.,Libera o Cofre de Artefatos para artefatos seguros.
 RESEARCH_THE_SHUTTER_NAME,The Shutter,O Obturador
 RESEARCH_THE_SHUTTER_LINE,"A barrier over the Ring, installed in the Gate Room: nothing comes through while it is closed.","Uma barreira sobre o Anel, instalada na Sala do Portal: nada passa enquanto estiver fechada."
+RESEARCH_AUTOMATED_DEFENCE_NAME,Automated defence,Defesa automatizada
+RESEARCH_AUTOMATED_DEFENCE_LINE,Sentry guns for rooms and plating for blast doors.,Torretas para salas e blindagem para portas.

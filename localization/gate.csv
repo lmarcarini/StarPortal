@@ -353,3 +353,7 @@ GATE_SHUTTER_OPEN,Open Shutter,Abrir Obturador
 GATE_ERR_SHUTTER_CLOSED,The Shutter is closed,O Obturador está fechado
 GATE_ERR_NOT_INSTALLED,The Shutter is not installed,O Obturador não está instalado
 GATE_ERR_WORMHOLE_OPEN,Close the wormhole first,Feche o buraco de minhoca primeiro
+INSTALLATION_SENTRY_NAME,Sentry gun,Torreta
+INSTALLATION_SENTRY_EFFECT,"Fires on intruders in its room while the room is on: 3 a tick, health 15.","Atira em intrusos na sala enquanto ela está ligada: 3 por turno, vida 15."
+INSTALLATION_PLATING_NAME,Door plating,Blindagem de porta
+INSTALLATION_PLATING_EFFECT,The door takes twice as long to breach.,A porta leva o dobro do tempo para ser arrombada.

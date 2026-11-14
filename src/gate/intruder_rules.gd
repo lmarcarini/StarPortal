@@ -176,6 +176,8 @@ static func _breach(state: GameState, group: IntruderGroup, goal: Vector3i) -> v
 		var def: UnitDef = state.unit_defs.get(unit.unit)
 		var ticks: int = def.door_breach_ticks if def != null else 15
 		needed = ticks if needed == 0 else mini(needed, ticks)
+	if SentryRules.plated(door):
+		needed *= 2
 	door.breach_ticks += 1
 	if door.breach_ticks < needed:
 		return

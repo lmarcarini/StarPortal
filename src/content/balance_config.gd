@@ -69,6 +69,8 @@ const BALANCE_ID: StringName = &"balance"
 @export var combat_roll_max: float = 1.25
 @export var defender_reduction: float = 0.25
 @export var combat_reach_cells: int = 3
+## A sentry gun's attack per tick (M4c-21).
+@export var sentry_attack: float = 3.0
 ## Failure states (M4c): ticks intruders must hold the Control Room for an Overrun; days in a
 ## row at Confidence 0 and in the red for Shutdown and Bankruptcy; and whether those two end
 ## the game (owner decision 2026-11-14: they only warn for now).
