@@ -125,3 +125,4 @@ ALERT_SITE_FINISHED,Finished building: {name},Obra concluída: {name}
 ALERT_TEAM_CHECK_IN,Team checked in from {name},A equipe deu notícias de {name}
 ALERT_FUNDS_RED,Funds in the red: {funds},Verba no vermelho: {funds}
 ALERT_RESCUE,{line},{line}
+CAMERA_NO_SIGNAL,NO SIGNAL,SEM SINAL
