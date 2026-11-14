@@ -56,12 +56,15 @@ scripts/lint.sh                # check formatting and lint; exits non-zero on an
 gdformat src tests tools       # fix formatting in place
 ```
 
-CI (`.github/workflows/ci.yml`, status check `ci`) runs on every pull request and every push to
-`main`: lint, then Godot project import, then `scripts/test.sh`. When tests fail, the reports in
-`.godot/test-reports/` are uploaded as the `test-reports` artifact of the run. The Godot zip is
-checked against the `SHA512-SUMS.txt` of the same `godotengine/godot-builds` release, on every
-run (cached or not), before Godot is started. A newer push to a pull request cancels its older
-run; runs for pushes to `main` (`ci` and `soak`) are never cancelled.
+CI (`.github/workflows/ci.yml`, status check `ci`) runs on pull requests that are not drafts:
+lint, then Godot project import, then `scripts/test.sh`. Pull requests that change only docs or
+Markdown skip it, and pushes to `main` do not run it again (the pull request already did). When
+tests fail, the reports in `.godot/test-reports/` are uploaded as the `test-reports` artifact of
+the run. The Godot zip is checked against the `SHA512-SUMS.txt` of the same
+`godotengine/godot-builds` release, on every run (cached or not), before Godot is started. A
+newer push to a pull request cancels its older run. The `soak` job runs nightly on `main`, only
+when it got new commits in the last 24 hours, and can be started by hand (Actions → ci → Run
+workflow).
 
 ## Tools
 

@@ -1,18 +1,27 @@
-# Continuous integration: lint, import and tests on every pull request and every push to main.
+# Continuous integration: lint, import and tests on pull requests; the soak runs nightly.
 # Bible: technical-architecture.md#testing-and-tooling
+#
+# Kept lean to save Actions minutes:
+# - Pull requests only (the merged code was already tested on its PR), never draft PRs.
+# - Changes that touch only docs or Markdown do not run CI.
+# - The soak runs once a night, and only if main got new commits in the last 24 hours.
 name: ci
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - ".github/ISSUE_TEMPLATE/**"
+  schedule:
+    - cron: "17 6 * * *" # 03:17 in Sao Paulo
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 # Pull requests: one group per branch, and a newer push cancels the older run.
-# Everything else (pushes to main): one group per run, so a run is never cancelled, neither
-# while in progress nor while pending behind a newer one. Covers both the ci and soak jobs.
 concurrency:
   group: >-
     ${{ github.event_name == 'pull_request'
@@ -23,6 +32,7 @@ concurrency:
 jobs:
   ci:
     name: ci
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -156,20 +166,35 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-  # One in-game year with a save and load every month (tests/soak). Runs only on pushes to
-  # main, never on pull requests. Bible: technical-architecture.md#testing-and-tooling
+  # One in-game year with a save and load every month (tests/soak). Runs nightly on main (and
+  # by hand), never on pull requests. Bible: technical-architecture.md#testing-and-tooling
   soak:
     name: soak
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # Nightly runs skip quietly when nothing landed on main in the last 24 hours.
+      - name: Skip if main has no new commits
+        id: fresh
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = schedule ] \
+              && [ "$(git log -1 --format=%ct)" -lt "$(( $(date +%s) - 86400 ))" ]; then
+            echo "::notice::No commits on main in the last 24 hours; soak skipped."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
       # The expected hash comes from SHA512-SUMS.txt of the same godot-builds release as the
       # zip; nothing is hard-coded. It is also part of the cache key.
       - name: Read Godot version and checksum
+        if: steps.fresh.outputs.run == 'true'
         id: godot
         run: |
           full="$(tr -d '[:space:]' < .godot-version)"   # e.g. 4.7.2.stable
@@ -196,6 +221,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Cache Godot zip
+        if: steps.fresh.outputs.run == 'true'
         id: godot-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -205,6 +231,7 @@ jobs:
       # Downloads on a cache miss, then always verifies the zip (fresh or cached) before
       # unpacking it. A mismatch fails here, before Godot ever runs.
       - name: Download and verify Godot
+        if: steps.fresh.outputs.run == 'true'
         env:
           GODOT_NAME: ${{ steps.godot.outputs.name }}
           GODOT_URL: ${{ steps.godot.outputs.url }}
@@ -229,6 +256,7 @@ jobs:
           chmod +x "$GODOT_DIR/godot"
 
       - name: Locate Godot
+        if: steps.fresh.outputs.run == 'true'
         env:
           GODOT_DIR: ${{ steps.godot.outputs.dir }}
         run: |
@@ -236,14 +264,16 @@ jobs:
           "$GODOT_DIR/godot" --headless --version
 
       - name: Import project
+        if: steps.fresh.outputs.run == 'true'
         run: '"$GODOT_BIN" --headless --path . --import'
 
       - name: Soak
+        if: steps.fresh.outputs.run == 'true'
         id: soak
         run: scripts/soak.sh
 
       - name: Upload soak reports
-        if: failure() && steps.soak.outcome == 'failure'
+        if: steps.fresh.outputs.run == 'true' && (failure() && steps.soak.outcome == 'failure')
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: soak-reports
