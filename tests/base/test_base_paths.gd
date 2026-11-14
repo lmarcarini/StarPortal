@@ -35,10 +35,10 @@ func test_two_rooms_side_by_side_connect_only_through_the_corridor() -> void:
 		[&"room_quarters", 1, Vector2i(to.x, to.y)],
 	]
 	var base: BaseState = _base(rooms)
-	assert_int(PlanPaths.find(base, from, to, _defs).size()).is_equal(0)
+	assert_int(BasePaths.find(base, from, to, _defs).size()).is_equal(0)
 	for x: int in range(0, lab.x + quarters.x):
 		base.add_room(&"room_corridor", 1, Vector2i(x, row)).build_ticks_left = 0
-	var path: PackedVector3Array = PlanPaths.find(base, from, to, _defs)
+	var path: PackedVector3Array = BasePaths.find(base, from, to, _defs)
 	assert_int(path.size()).is_greater(0)
 	var used_corridor: bool = false
 	for point: Vector3 in path:
@@ -55,7 +55,7 @@ func test_levels_join_through_the_lift_shaft() -> void:
 		[&"room_corridor", 2, Vector2i(2, 0)],
 	]
 	var base: BaseState = _base(rooms)
-	var path: PackedVector3Array = PlanPaths.find(base, Vector3i(0, 0, 1), Vector3i(2, 0, 2), _defs)
+	var path: PackedVector3Array = BasePaths.find(base, Vector3i(0, 0, 1), Vector3i(2, 0, 2), _defs)
 	assert_int(path.size()).is_greater(0)
 	assert_float(path[0].z).is_equal(1.0)
 	assert_float(path[path.size() - 1].z).is_equal(2.0)
@@ -66,8 +66,8 @@ func test_unbuilt_rooms_and_missing_cells_give_no_path() -> void:
 	var site: RoomState = base.add_room(&"room_corridor", 1, Vector2i(1, 0))
 	site.build_ticks_left = 50
 	base.add_room(&"room_corridor", 1, Vector2i(2, 0)).build_ticks_left = 0
-	assert_int(PlanPaths.find(base, Vector3i(0, 0, 1), Vector3i(2, 0, 1), _defs).size()).is_equal(0)
-	assert_int(PlanPaths.find(base, Vector3i(9, 9, 1), Vector3i(0, 0, 1), _defs).size()).is_equal(0)
+	assert_int(BasePaths.find(base, Vector3i(0, 0, 1), Vector3i(2, 0, 1), _defs).size()).is_equal(0)
+	assert_int(BasePaths.find(base, Vector3i(9, 9, 1), Vector3i(0, 0, 1), _defs).size()).is_equal(0)
 
 
 func test_walker_moves_stops_while_paused_and_snaps() -> void:
@@ -104,3 +104,79 @@ func test_no_path_fades_out_and_in_at_home() -> void:
 	assert_object(token.position).is_equal(token.home)
 	walker.step(tokens, TokenWalker.FADE_SECONDS, 1, false)
 	assert_bool(walker.is_moving(&"p")).is_false()
+
+
+func _row(length: int) -> BaseState:
+	var rooms: Array = []
+	for x: int in length:
+		rooms.append([&"room_corridor", 1, Vector2i(x, 0)])
+	return _base(rooms)
+
+
+func _door(base: BaseState, x: int, mode: DoorState.Mode) -> void:
+	var door := DoorState.new()
+	door.cell = Vector2i(x, 0)
+	door.mode = mode
+	base.doors.append(door)
+
+
+func test_sealed_doors_block_and_open_doors_do_not() -> void:
+	var base: BaseState = _row(6)
+	var from := Vector3i(0, 0, 1)
+	var to := Vector3i(5, 0, 1)
+	_door(base, 2, DoorState.Mode.OPEN)
+	assert_int(BasePaths.walking_distance(base, from, to, _defs)).is_equal(5)
+	_door(base, 4, DoorState.Mode.SEALED)
+	assert_int(BasePaths.find(base, from, to, _defs).size()).is_equal(0)
+	assert_int(BasePaths.walking_distance(base, from, to, _defs)).is_equal(-1)
+	assert_int(BasePaths.find(base, from, to, _defs, true).size()).is_equal(6)
+	assert_str(str(BasePaths.first_sealed_door(base, from, to, _defs))).is_equal(
+		str(Vector3i(4, 0, 1))
+	)
+	base.doors[1].mode = DoorState.Mode.OPEN
+	assert_str(str(BasePaths.first_sealed_door(base, from, to, _defs))).is_equal(
+		str(BasePaths.NO_DOOR)
+	)
+
+
+func test_damaged_rooms_can_be_walked_through() -> void:
+	var base: BaseState = _row(4)
+	base.rooms[2].damaged = true
+	(
+		assert_int(BasePaths.walking_distance(base, Vector3i(0, 0, 1), Vector3i(3, 0, 1), _defs))
+		. is_equal(3)
+	)
+
+
+func test_results_are_deterministic_and_fast() -> void:
+	var rooms: Array = []
+	for level: int in [1, 2]:
+		for x: int in 30:
+			for y: int in [0, 5, 10]:
+				rooms.append([&"room_corridor", level, Vector2i(x, y)])
+		for y: int in 11:
+			if not [0, 5, 10].has(y):
+				rooms.append([&"room_corridor", level, Vector2i(0, y)])
+	rooms.append([&"room_lift", 1, Vector2i(29, 1)])
+	var base: BaseState = _base(rooms)
+	var first: PackedVector3Array = BasePaths.find(
+		base, Vector3i(29, 10, 1), Vector3i(29, 0, 2), _defs
+	)
+	var started: int = Time.get_ticks_usec()
+	for index: int in 100:
+		(
+			assert_bool(
+				(
+					BasePaths.find(base, Vector3i(29, 10, 1), Vector3i(29, 10, 2), _defs)
+					== PackedVector3Array()
+				)
+			)
+			. is_true()
+		)
+		(
+			assert_bool(
+				BasePaths.find(base, Vector3i(29, 10, 1), Vector3i(29, 0, 2), _defs) == first
+			)
+			. is_true()
+		)
+	assert_int(Time.get_ticks_usec() - started).is_less(2_000_000)
