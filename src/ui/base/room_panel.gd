@@ -10,6 +10,9 @@ extends VBoxContainer
 ## Emitted when the action button's hold confirms; [param command] is the one to submit.
 signal action_held(command: Command)
 
+## The INSTALLATIONS section (M4c-19).
+var install_list := InstallList.new()
+
 var _heading: Label = _add_label(16)
 var _name: Label = _add_label(22)
 var _size: Label = _add_label(16)
@@ -23,8 +26,13 @@ var _reason: Label = _add_label(14)
 var _command: Command = null
 
 
+func _ready() -> void:
+	add_child(install_list)
+
+
 ## Shows nothing selected.
 func show_nothing() -> void:
+	install_list.show_room(null)
 	_set_lines([tr(&"BASE_PANEL_SELECTED"), "", "", "", "", "", tr(&"BASE_PANEL_NONE"), ""])
 
 
@@ -45,6 +53,7 @@ func show_room(
 			BasePanelText.later(def),
 		]
 	)
+	install_list.show_room(room)
 
 
 ## Returns the panel's lines, top to bottom, as shown.

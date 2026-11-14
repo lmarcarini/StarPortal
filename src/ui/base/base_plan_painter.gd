@@ -83,6 +83,17 @@ static func draw_door(canvas: CanvasItem, door: DoorState) -> void:
 	canvas.draw_rect(Rect2(right, Vector2(jamb, area.size.y)), ink, door.is_built(), 2.0)
 
 
+## Draws a small mark per installation at [param cells]' bottom-left (M4c-19): a filled
+## square once built, a hollow one while it is being fitted.
+static func draw_installations(
+	canvas: CanvasItem, cells: Rect2i, items: Array[InstallationState]
+) -> void:
+	var area: Rect2 = _pixels(cells)
+	for index: int in items.size():
+		var mark := Rect2(area.position + Vector2(4 + index * 9, area.size.y - 11), Vector2(7, 7))
+		canvas.draw_rect(mark, UiPalette.SELECT, items[index].is_built(), 1.5)
+
+
 ## Draws a corridor cell: a flat lighter strip.
 static func draw_corridor(canvas: CanvasItem, cells: Rect2i) -> void:
 	canvas.draw_rect(_pixels(cells), CORRIDOR)
