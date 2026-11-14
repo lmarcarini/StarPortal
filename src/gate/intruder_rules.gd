@@ -15,12 +15,15 @@ static func assign_targets(state: GameState) -> void:
 		group.target_room = ObjectiveRules.target_room(state, objective)
 
 
-## One tick of every group, then the end check.
-static func tick(state: GameState) -> void:
+## One tick of every group (those in [param engaged] fought and stand still), then the end
+## check.
+static func tick(state: GameState, engaged: Array[IntruderGroup] = []) -> void:
 	var incursion: IncursionState = state.incursion
 	for group: IntruderGroup in incursion.groups.duplicate():
 		if group.standing().is_empty():
 			_wipe(state, group)
+			continue
+		if engaged.has(group):
 			continue
 		if incursion.phase == IncursionState.Phase.RETREAT:
 			_retreat(state, group)
@@ -63,6 +66,9 @@ static func walk_toward(state: GameState, group: IntruderGroup, goal: Vector3i) 
 	var path: PackedVector3Array = BasePaths.find(state.base, from, goal, state.room_defs)
 	if path.is_empty():
 		path = _to_door(state, from, goal)
+		if path.size() <= 1:
+			_breach(state, group, goal)
+			return false
 	var budget: int = state.balance.squad_cells_per_tick
 	var at: Vector3i = from
 	for index: int in range(1, path.size()):
@@ -153,6 +159,25 @@ static func _half_down(state: GameState) -> bool:
 	for group: IntruderGroup in state.incursion.groups:
 		up += group.standing().size()
 	return total > 0 and up * 2 <= total
+
+
+# Works on the sealed door between [param group] and [param goal]: at the group's fastest
+# breach time (its standing units' UnitDefs) the door is destroyed (door_changed).
+static func _breach(state: GameState, group: IntruderGroup, goal: Vector3i) -> void:
+	var at: Vector3i = BasePaths.first_sealed_door(state.base, group.pos(), goal, state.room_defs)
+	var door: DoorState = DoorRules.find(state.base, at.z, Vector2i(at.x, at.y))
+	if door == null:
+		return
+	var needed: int = 0
+	for unit: UnitState in group.standing():
+		var def: UnitDef = state.unit_defs.get(unit.unit)
+		var ticks: int = def.door_breach_ticks if def != null else 15
+		needed = ticks if needed == 0 else mini(needed, ticks)
+	door.breach_ticks += 1
+	if door.breach_ticks < needed:
+		return
+	state.base.doors.erase(door)
+	state.events.post(&"door_changed", [door.level, door.cell])
 
 
 static func _to_door(state: GameState, from: Vector3i, goal: Vector3i) -> PackedVector3Array:

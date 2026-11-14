@@ -24,7 +24,8 @@ func tick(state: GameState) -> void:
 		return
 	IncursionRules.close_outgoing(state)
 	if incursion.phase != IncursionState.Phase.WARNING:
-		IntruderRules.tick(state)
+		var engaged: Array[IntruderGroup] = BattleRules.fight(state, state.random.stream(STREAM))
+		IntruderRules.tick(state, engaged)
 		return
 	incursion.countdown -= 1
 	if incursion.countdown <= 0:

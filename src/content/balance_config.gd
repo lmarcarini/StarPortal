@@ -61,6 +61,14 @@ const BALANCE_ID: StringName = &"balance"
 ## Squads (M4c): cells walked per tick, and ticks to change level in a lift or stairs.
 @export var squad_cells_per_tick: int = 2
 @export var squad_level_ticks: int = 1
+## Combat (M4c): a soldier's health; the seeded roll on each side's damage; the share the
+## side defending a room (there first) does not take; walking cells within which squads and
+## intruders in corridors fight.
+@export var soldier_health: int = 10
+@export var combat_roll_min: float = 0.75
+@export var combat_roll_max: float = 1.25
+@export var defender_reduction: float = 0.25
+@export var combat_reach_cells: int = 3
 ## Room def ids a new game may build before any research (m25-lean-start.md section 1).
 @export var starting_room_unlocks: Array[StringName] = [
 	&"room_capacitor_bank",

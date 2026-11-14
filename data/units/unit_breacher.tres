@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/unit_def.gd" id="1_unit"]
+
+; docs/content/m4c-incursions.md section 2 (test intruder).
+[resource]
+script = ExtResource("1_unit")
+name_key = &"UNIT_BREACHER_NAME"
+health = 12
+attack = 2.0
+door_breach_ticks = 8
+id = &"unit_breacher"
