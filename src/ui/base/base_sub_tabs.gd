@@ -12,9 +12,13 @@ signal sub_tab_changed(tab: StringName)
 
 const BUILD: StringName = &"build"
 const ENERGY: StringName = &"energy"
+## Who works where: the list, placing and room tints (security is reserved, not shown).
+const STAFF: StringName = &"staff"
 ## The sub-tabs in order; [constant TITLES] holds their title keys in the same order.
-const TABS: Array[StringName] = [BUILD, ENERGY]
-const TITLES: Array[StringName] = [&"BASE_SUBTAB_BUILD", &"BASE_SUBTAB_ENERGY"]
+const TABS: Array[StringName] = [BUILD, ENERGY, STAFF]
+const TITLES: Array[StringName] = [
+	&"BASE_SUBTAB_BUILD", &"BASE_SUBTAB_ENERGY", &"BASE_SUBTAB_STAFF"
+]
 
 
 func _init() -> void:

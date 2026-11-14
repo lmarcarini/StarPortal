@@ -10,6 +10,9 @@ extends Node
 ## palette's Dig entry.
 ## Bible: docs/content/m2-base.md section 6; docs/content/m25-lean-start.md section 3
 
+## The Staff sub-tab strip, shown in place of the palette.
+var staff_tab := StaffSubTab.new()
+
 var _sub_tabs: BaseSubTabs = null
 var _levels: LevelTabs = null
 var _plan: BasePlan = null
@@ -34,17 +37,68 @@ func attach(
 	_palette.room_picked.connect(_close_energy_layer.unbind(1))
 	_power.layer.visibility_changed.connect(_on_energy_layer_toggled)
 	_move_message_line()
+	_attach_staff()
 	show_sub_tab()
+
+
+## Puts the Staff strip where the palette sits and joins it to the plan's staff layer.
+func _attach_staff() -> void:
+	_palette.get_parent().add_child(staff_tab)
+	staff_tab.person_chosen.connect(_on_staff_person)
+	staff_tab.assign_pressed.connect(_on_assign_pressed)
+	_plan.placement_message.connect(_on_placement_message)
+	_plan.drag_moved.connect(_on_drag_moved)
+	_plan.staff_layer.token_selected.connect(_refresh_staff.unbind(1))
+	staff_tab.staff_changed.connect(_refresh_staff)
+
+
+func _refresh_staff() -> void:
+	var simulation: Simulation = SimClock.simulation
+	if simulation != null and staff_tab.visible:
+		staff_tab.show_state(simulation.state, _plan.staff_layer.selected())
+
+
+func _on_staff_person(person_id: StringName) -> void:
+	_plan.staff_layer.focus_person(person_id)
+
+
+func _on_assign_pressed() -> void:
+	_plan.start_placing(_plan.staff_layer.selected())
+
+
+func _on_placement_message(text: String) -> void:
+	staff_tab.show_hint(text)
+	if not text.is_empty():
+		_palette.show_message(text)
+
+
+## Holding a token over a level tab shows that level, so a drop can go to another level.
+func _on_drag_moved(global_point: Vector2) -> void:
+	var number: int = 0
+	for child: Node in _levels.get_children():
+		var button := child as Button
+		if button == null or button == _levels.next_tab:
+			continue
+		number += 1
+		if button.is_visible_in_tree() and button.get_global_rect().has_point(global_point):
+			if number != _plan.level:
+				_plan.show_level(number)
+			return
 
 
 ## Shows the sub-tab the energy layer stands for, and moves focus off anything it hid.
 func show_sub_tab() -> void:
 	var energy: bool = _power.is_layer_on()
+	var staff: bool = not energy and _sub_tabs.shown() == BaseSubTabs.STAFF
 	_sub_tabs.set_block_signals(true)
-	_sub_tabs.show_tab(BaseSubTabs.ENERGY if energy else BaseSubTabs.BUILD)
+	var tab: StringName = BaseSubTabs.ENERGY if energy else BaseSubTabs.BUILD
+	_sub_tabs.show_tab(BaseSubTabs.STAFF if staff else tab)
 	_sub_tabs.set_block_signals(false)
-	_palette.visible = not energy
-	_levels.next_tab.visible = not energy and _levels.has_next()
+	_palette.visible = not energy and not staff
+	staff_tab.visible = staff
+	_plan.staff_layer.tint = staff
+	_refresh_staff()
+	_levels.next_tab.visible = not energy and not staff and _levels.has_next()
 	_keep_focus()
 
 
@@ -82,6 +136,8 @@ func _on_energy_layer_toggled() -> void:
 func _on_sub_tab_changed(tab: StringName) -> void:
 	if (tab == BaseSubTabs.ENERGY) != _power.is_layer_on():
 		_power.toggle_layer()
+	else:
+		show_sub_tab()
 
 
 ## The ghost level tab: back to Build and onto the palette's Dig entry, which holds to dig.

@@ -91,7 +91,9 @@ func test_default_keys_and_gamepad_shoulders_switch_views() -> void:
 	assert_str(String(_switcher.current_view_id())).is_equal("personnel")
 	await _runner.simulate_key_pressed(KEY_F2)
 	assert_str(String(_switcher.current_view_id())).is_equal("base")
-	# The first shoulder steps the Base tab's sub-tabs (Build -> Energy), the next one the tabs.
+	# The shoulders step the Base tab's sub-tabs (Build -> Energy -> Staff), then the tabs.
+	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
+	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
 	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)

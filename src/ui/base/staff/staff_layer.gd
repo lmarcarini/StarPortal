@@ -18,6 +18,15 @@ const QUEUE_GAP: float = 14.0
 var walker := TokenWalker.new()
 ## People shifting about, visiting and going to Quarters at night (display/ambient_movement).
 var ambient := AmbientLife.new()
+## Placing a person: rooms that can take them light up, the others dim.
+var assign := AssignMode.new()
+## A mouse drag of a token.
+var drag := TokenDrag.new()
+## Tints rooms by filled slots (the Staff sub-tab).
+var tint: bool = false:
+	set(value):
+		tint = value
+		queue_redraw()
 
 var _plan: BasePlan = null
 var _tokens: Dictionary[StringName, StaffToken] = {}
@@ -324,6 +333,7 @@ func _draw() -> void:
 	if _plan == null:
 		return
 	draw_set_transform(_plan.view.offset, 0.0, Vector2.ONE * _plan.view.scale())
+	StaffOverlay.draw_rooms(self, _plan.level, assign, tint)
 	var font: Font = UiThemeBuilder.data_font()
 	for token: StaffToken in _tokens.values() + walker.leaving():
 		if token.level == _plan.level:
@@ -334,6 +344,13 @@ func _draw() -> void:
 		if token != null and token.level == _plan.level:
 			_draw_name(token, font)
 	draw_set_transform(Vector2.ZERO)
+	if drag.is_dragging():
+		var ghost: StaffToken = token_for(drag.person_id)
+		if ghost != null:
+			var copy := StaffToken.new()
+			copy.role = ghost.role
+			copy.position = drag.at
+			StaffToken.draw(self, copy, UiThemeBuilder.data_font(), true, 0.8)
 
 
 func _draw_name(token: StaffToken, font: Font) -> void:

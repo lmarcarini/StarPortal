@@ -14,6 +14,10 @@ extends Control
 signal selection_changed(selected: StringName)
 ## Emitted when a staff token is chosen on the plan or in the tray: a person id.
 signal person_chosen(person_id: StringName)
+## Emitted while a token is dragged, with the pointer's global position (level tabs).
+signal drag_moved(global_point: Vector2)
+## A placing hint or a refused drop's reason ("" clears it).
+signal placement_message(text: String)
 
 ## Level shown, 1 the top one.
 var level: int = 1
@@ -166,18 +170,103 @@ func _selected_cells() -> Rect2i:
 
 
 func _gui_input(event: InputEvent) -> void:
-	var motion := event as InputEventMouseMotion
-	if motion != null:
-		staff_layer.set_hovered(staff_layer.token_at(motion.position))
-	var click := event as InputEventMouseButton
-	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
-		var person: StringName = staff_layer.token_at(click.position)
-		if person != &"":
-			_choose_person(person)
-			accept_event()
-			return
+	if _placing_input(event) or _drag_input(event):
+		accept_event()
+		return
 	if BasePlanInput.handle(self, event):
 		accept_event()
+
+
+## Starts placing [param person_id] (select-then-place): rooms that can take them light up;
+## move the cursor and confirm, or click a room; Esc or (B) cancels.
+func start_placing(person_id: StringName) -> void:
+	var simulation: Simulation = SimClock.simulation
+	if simulation == null or person_id == &"":
+		return
+	staff_layer.assign.start(simulation.state, person_id)
+	var allowed: Array[StringName] = staff_layer.assign.allowed_rooms()
+	if not allowed.is_empty():
+		var room: RoomState = _base.find_room(allowed[0])
+		if room != null:
+			show_level(room.level)
+			cursor = room.origin
+	staff_layer.queue_redraw()
+	grab_focus()
+	placement_message.emit(tr(&"STAFF_PLACE_HINT"))
+
+
+## Places the person being placed in the room at [param point] (or on the tray), and says
+## why when the command refuses. Returns true when it handled the drop.
+func drop_at(point: Vector2) -> bool:
+	var simulation: Simulation = SimClock.simulation
+	if simulation == null or not staff_layer.assign.is_active():
+		return false
+	var done: bool = false
+	if tray.visible and tray.get_global_rect().has_point(get_global_transform() * point):
+		done = staff_layer.assign.unassign(simulation)
+	else:
+		var room_id: StringName = item_at(cell_at(point))
+		done = room_id != &"" and staff_layer.assign.place(simulation, room_id)
+	if not done:
+		var reason: String = staff_layer.assign.last_reason
+		placement_message.emit(reason if not reason.is_empty() else tr(&"STAFF_PLACE_NOWHERE"))
+	staff_layer.assign.cancel()
+	staff_layer.queue_redraw()
+	return true
+
+
+func _drag_motion(motion: InputEventMouseMotion) -> bool:
+	var drag: TokenDrag = staff_layer.drag
+	staff_layer.set_hovered(staff_layer.token_at(motion.position))
+	if drag.person_id == &"":
+		return false
+	if drag.move(motion.position):
+		staff_layer.assign.start(SimClock.simulation.state, drag.person_id)
+	if drag.is_dragging():
+		drag_moved.emit(get_global_transform() * motion.position)
+		staff_layer.queue_redraw()
+	return drag.is_dragging()
+
+
+func _placing_input(event: InputEvent) -> bool:
+	if not staff_layer.assign.is_active() or staff_layer.drag.is_dragging():
+		return false
+	if event.is_action_pressed(&"ui_cancel"):
+		staff_layer.assign.cancel()
+		staff_layer.queue_redraw()
+		placement_message.emit("")
+		return true
+	if event.is_action_pressed(&"ui_accept"):
+		var point: Vector2 = (Vector2(cursor) + Vector2(0.5, 0.5)) * BasePlanPainter.CELL
+		return drop_at(point * view.scale() + view.offset)
+	var click := event as InputEventMouseButton
+	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
+		return drop_at(click.position)
+	return false
+
+
+func _drag_input(event: InputEvent) -> bool:
+	var motion := event as InputEventMouseMotion
+	if motion != null:
+		return _drag_motion(motion)
+	var drag: TokenDrag = staff_layer.drag
+	var click := event as InputEventMouseButton
+	if click == null or click.button_index != MOUSE_BUTTON_LEFT:
+		return false
+	if click.pressed:
+		var person: StringName = staff_layer.token_at(click.position)
+		if person == &"":
+			return false
+		drag.press(person, click.position)
+		_choose_person(person)
+		return true
+	if drag.person_id == &"":
+		return false
+	var dragged: bool = drag.is_dragging()
+	drag.release()
+	if dragged:
+		drop_at(click.position)
+	return true
 
 
 ## Selects [param person_id]'s token and their room.
