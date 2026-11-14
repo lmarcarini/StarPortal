@@ -182,3 +182,12 @@ COMMITTEE_WARN_WOULD_CLOSE,The Committee would close the site.,O Comitê fechari
 COMMITTEE_WARN_WOULD_BANKRUPT,The site would be bankrupt.,O local estaria falido.
 ALERT_SHUTDOWN_COUNTDOWN,Confidence 0: the Committee would close the site in {days} days,Confiança 0: o Comitê fecharia o local em {days} dias
 ALERT_BANKRUPTCY_COUNTDOWN,In the red: the site would be bankrupt in {days} days,No vermelho: o local estaria falido em {days} dias
+GAME_OVER_OVERRUN,OVERRUN,INVADIDO
+GAME_OVER_OVERRUN_LINE,Intruders held the Control Room. The site is lost.,Intrusos tomaram a Sala de Controle. O local está perdido.
+GAME_OVER_SHUTDOWN,SHUT DOWN,FECHADO
+GAME_OVER_SHUTDOWN_LINE,The Committee has closed the site.,O Comitê fechou o local.
+GAME_OVER_BANKRUPTCY,BANKRUPT,FALIDO
+GAME_OVER_BANKRUPTCY_LINE,The site has run out of money.,O local ficou sem dinheiro.
+GAME_OVER_FIGURES,Days survived: {days} · Worlds locked: {worlds} · Research done: {research},Dias sobrevividos: {days} · Mundos travados: {worlds} · Pesquisas concluídas: {research}
+GAME_OVER_LOAD_LAST,Load last save,Carregar último save
+PAUSE_FAILURE_STATES,Failure states (the game can be lost),Estados de derrota (o jogo pode ser perdido)
