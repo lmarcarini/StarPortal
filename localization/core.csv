@@ -101,3 +101,13 @@ ATTITUDE_ALLIED,Allied,Aliado
 LOG_LINE_CALL_MISSED,Missed a call from {name}. Committee Confidence -1.,Ligação perdida de {name}. Confiança do Comitê -1.
 CAUSE_CALL_MISSED,Missed call,Ligação perdida
 UI_CALL_WAITING,Call waiting: {name},Ligação em espera: {name}
+TOPBAR_NET_PER_DAY,{net}/d,{net}/dia
+TOPBAR_POWER,PWR {used}/{supply} MW,ENER {used}/{supply} MW
+TOPBAR_STORED,CAP {stored} MWh,CAP {stored} MWh
+TOPBAR_GATE_IDLE,GATE: IDLE,ANEL: INATIVO
+TOPBAR_GATE_DIALLING,GATE: DIALLING,ANEL: DISCANDO
+TOPBAR_GATE_INCOMING,GATE: INCOMING,ANEL: CHEGANDO
+TOPBAR_GATE_OPEN,GATE: OPEN {world} {left},ANEL: ABERTO {world} {left}
+TOPBAR_MINUTES,{m} min,{m} min
+TOPBAR_HOURS_MINUTES,{h} h {m} min,{h} h {m} min
+TOPBAR_ALERTS,Alerts,Alertas

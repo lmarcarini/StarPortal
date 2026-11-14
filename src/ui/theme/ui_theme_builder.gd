@@ -3,7 +3,7 @@ extends RefCounted
 ## Builds the one interface Theme in code: palette, fonts, bezelled panels, raised key
 ## buttons and the type variations later screens use. Screens style nothing by hand.
 ## Variations: PanelBezel (PanelContainer), HeaderStrip, DataLabel, StencilLabel (Label),
-## KeyButton, KeyButtonSelected (Button).
+## KeyButton, KeyButtonSelected, ReadoutButton (Button).
 ## Bible: docs/content/interface-pass.md section 2, art-and-audio.md#ui-and-typography
 
 ## Labels and headings.
@@ -108,6 +108,25 @@ static func _add_buttons(theme: Theme, s: float) -> void:
 	theme.set_color(&"font_color", &"KeyButtonSelected", UiPalette.SELECT)
 	theme.set_color(&"font_hover_color", &"KeyButtonSelected", UiPalette.SELECT)
 	theme.set_color(&"font_focus_color", &"KeyButtonSelected", UiPalette.SELECT)
+	_add_readout_button(theme, s, focus)
+
+
+## ReadoutButton: a flat button in the data font for the top bar's figures.
+static func _add_readout_button(theme: Theme, s: float, focus: StyleBox) -> void:
+	theme.set_type_variation(&"ReadoutButton", &"Button")
+	theme.set_font(&"font", &"ReadoutButton", data_font())
+	theme.set_font_size(&"font_size", &"ReadoutButton", roundi(DATA_SIZE * s))
+	var flat := StyleBoxFlat.new()
+	flat.draw_center = false
+	flat.set_content_margin_all(6 * s)
+	var hover := flat.duplicate() as StyleBoxFlat
+	hover.draw_center = true
+	hover.bg_color = UiPalette.KEYCAP
+	for state: StringName in [&"normal", &"disabled"]:
+		theme.set_stylebox(state, &"ReadoutButton", flat)
+	for state: StringName in [&"hover", &"pressed", &"hover_pressed"]:
+		theme.set_stylebox(state, &"ReadoutButton", hover)
+	theme.set_stylebox(&"focus", &"ReadoutButton", focus)
 
 
 static func _add_labels(theme: Theme, s: float) -> void:

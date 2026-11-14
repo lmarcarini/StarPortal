@@ -39,17 +39,19 @@ var _rescue_alert := RescueAlert.new()
 var _alert_stack := AlertStack.new()
 var _conversation := ConversationPanel.new()
 
+## The bar on every screen (docs/content/interface-pass.md section 3).
+@onready var top_bar: TopBar = %TopBar
 ## The time bar at the top of the screen.
-@onready var time_bar: TimeBar = %TimeBar
+@onready var time_bar: TimeBar = top_bar.time_bar
 ## The game views and their tabs, under the top bar.
 @onready var view_switcher: ViewSwitcher = %ViewSwitcher
 ## The money display in the top bar.
-@onready var money_label: MoneyLabel = %MoneyLabel
+@onready var money_label: MoneyLabel = top_bar.money_label
 ## The Committee Confidence readout beside the funds.
-@onready var confidence_readout: ConfidenceReadout = %ConfidenceReadout
-@onready var _quick_save_button: Button = %QuickSaveButton
-@onready var _quick_load_button: Button = %QuickLoadButton
-@onready var _debug_flag_button: Button = %DebugFlagButton
+@onready var confidence_readout: ConfidenceReadout = top_bar.confidence_readout
+@onready var _quick_save_button: Button = top_bar.quick_save_button
+@onready var _quick_load_button: Button = top_bar.quick_load_button
+@onready var _debug_flag_button: Button = top_bar.debug_flag_button
 @onready var _toast: Label = %Toast
 @onready var _toast_timer: Timer = %ToastTimer
 
@@ -60,8 +62,8 @@ func _ready() -> void:
 	add_child(screen_grain)
 	_quick_save_button.pressed.connect(quick_save)
 	_quick_load_button.pressed.connect(quick_load)
-	money_label.pressed.connect(open_command)
-	confidence_readout.pressed.connect(open_command)
+	top_bar.open_view.connect(open_view)
+	top_bar.resized.connect(_fit_below_top_bar)
 	_toast_timer.timeout.connect(_toast.hide)
 	_add_alerts()
 	add_child(_conversation)
@@ -147,6 +149,14 @@ func open_command() -> void:
 	view_switcher.show_view(ViewSwitcher.COMMAND)
 
 
+## Shows [param view_id], on the Base's [param sub_tab] when one is given (the top bar).
+func open_view(view_id: StringName, sub_tab: StringName = &"") -> void:
+	view_switcher.show_view(view_id)
+	var base: BaseView = view_switcher.get_view(view_id) as BaseView
+	if base != null and sub_tab != &"" and view_switcher.current_view_id() == view_id:
+		base.get_sub_tabs().show_tab(sub_tab)
+
+
 ## Returns the rescue alert.
 func get_rescue_alert() -> RescueAlert:
 	return _rescue_alert
@@ -163,17 +173,14 @@ func get_alert_stack() -> AlertStack:
 
 
 ## Returns every button in focus order: the time bar's, the alert stack's (while shown), the
-## funds and Confidence readouts,
-## then save, load and (debug only) the flag button. Neighbours wrap around, so a gamepad
-## reaches them all; down from any of them is the view tabs.
+## funds, Confidence, power, gate and alerts, then save, load and (debug only) the flag
+## button. Neighbours wrap around, so a gamepad reaches them all; down from any of them is
+## the view tabs.
 func get_focus_order() -> Array[Button]:
-	var buttons: Array[Button] = time_bar.get_buttons()
+	var extra: Array[Button] = []
 	if _alert_stack.get_rescue_button().visible:
-		buttons.append(_alert_stack.get_rescue_button())
-	buttons.append_array([money_label, confidence_readout, _quick_save_button, _quick_load_button])
-	if _debug_flag_button != null:
-		buttons.append(_debug_flag_button)
-	return buttons
+		extra.append(_alert_stack.get_rescue_button())
+	return top_bar.get_focus_buttons(extra)
 
 
 ## Returns the text of the toast on screen, or "" when none is shown.
@@ -245,21 +252,19 @@ func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
 	_rescue_alert.setup(simulation)
 	_conversation.setup(simulation)
-	money_label.show_budget(simulation.state.budget.funds_k)
-	confidence_readout.setup(simulation.state)
+	top_bar.bind(simulation)
 
 
 ## Puts the alert stack in the top bar after the time bar, and the rescue alert over the top
 ## of the current tab, below the tab bar.
 func _add_alerts() -> void:
-	var row: Node = time_bar.get_parent()
-	row.add_child(_alert_stack)
-	row.move_child(_alert_stack, time_bar.get_index() + 1)
+	top_bar.add_after_clock(_alert_stack)
 	add_child(_rescue_alert)
 	_rescue_alert.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	_rescue_alert.offset_left = 16.0
 	_rescue_alert.offset_right = -16.0
 	_rescue_alert.offset_top = view_switcher.offset_top + 48.0
+	_fit_below_top_bar()
 	_rescue_alert.gate_room_requested.connect(view_switcher.show_view.bind(ViewSwitcher.GATE_ROOM))
 	_alert_stack.setup(_rescue_alert)
 	_rescue_alert.changed.connect(_relink_top_bar)
@@ -347,3 +352,10 @@ func _apply_theme() -> void:
 func _on_setting_changed(section: StringName, key: StringName, _value: Variant) -> void:
 	if section == &"display" and key == &"ui_scale":
 		_apply_theme()
+
+
+## Keeps the views and the rescue alert just under the top bar, which grows to two rows in a
+## narrow window.
+func _fit_below_top_bar() -> void:
+	view_switcher.offset_top = top_bar.size.y
+	_rescue_alert.offset_top = top_bar.size.y + 48.0
