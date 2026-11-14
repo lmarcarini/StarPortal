@@ -84,8 +84,8 @@ func _gui_input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	if has_focus():
-		draw_rect(Rect2(Vector2.ZERO, size), Color(1, 1, 1, 0.12))
-		draw_rect(Rect2(Vector2.ZERO, size), Color(1, 1, 1, 0.6), false, 2.0)
+		draw_rect(Rect2(Vector2.ZERO, size), Color(UiPalette.SELECT, 0.12))
+		draw_rect(Rect2(Vector2.ZERO, size), UiPalette.SELECT, false, 2.0)
 
 
 func _on_focus() -> void:

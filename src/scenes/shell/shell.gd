@@ -156,6 +156,9 @@ func open_view(view_id: StringName, sub_tab: StringName = &"") -> void:
 	var base: BaseView = view_switcher.get_view(view_id) as BaseView
 	if base != null and sub_tab != &"" and view_switcher.current_view_id() == view_id:
 		base.get_sub_tabs().show_tab(sub_tab)
+	var command: CommandView = view_switcher.get_view(view_id) as CommandView
+	if command != null:
+		command.show_sub_tab(sub_tab)
 
 
 ## Selects the target of the alert [param entry] once its screen is open: a research project;
