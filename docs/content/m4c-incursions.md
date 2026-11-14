@@ -161,9 +161,11 @@ and a lost MOTH is reordered automatically. Now the player researches Survey dro
 row of the tree, cheap), installs the rack and orders each MOTH; a lost one is not replaced
 until the player orders another. The existing MOTH research (batteries, shielding) requires
 Survey drones. Until then, a new world is looked at with the pole camera and the canister.
-**A world still needs a MOTH run to become Probed**, so expeditions wait for the rack: this
-moves the first expedition a few days later **(proposal; say if the pole camera should be
-enough to send a team)**. Old saves keep their MOTHs: migration grants the research and the
+**Sending a team without probing is allowed but ill-advised (owner decision 2026-11-14).**
+A Survey can go to a world that is only Locked: a **blind** expedition. The plan screen
+warns and asks to confirm; every risk roll treats the threat as one step higher, and the
+first check-in comes one interval late. Missions that need a known target still need a
+probe or a survey. The Expeditions tab and the Infirmary unlock on the first lock. Old saves keep their MOTHs: migration grants the research and the
 rack.
 
 **Sentry guns** fight like a unit that never moves. They need the room on, so power is
@@ -242,8 +244,7 @@ Settled on 2026-11-14: injuries only; Shutdown and Bankruptcy only warn; the Shu
 as a built upgrade, with the MOTH rack, sentry guns and door plating; all work stops during
 an incursion; 1× with no auto-pause; sight follows power.
 
-Open: whether a world needs a MOTH run before a team can go, now that the MOTH comes later
-(section 6).
+Also settled: a team may be sent without probing, at more risk (section 6).
 
 ## 11. Cards
 
@@ -271,3 +272,4 @@ Milestone "M4c Incursions and failure states". This document is M4c-01.
 | M4c-19 | Installations in the room panel | 18 |
 | M4c-20 | The MOTH rack: researched, installed, MOTHs built to order | 18 |
 | M4c-21 | Sentry guns and door plating | 08, 18 |
+| M4c-22 | Send a team without probing (blind expeditions) | 20 |
