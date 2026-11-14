@@ -196,3 +196,22 @@ ALARM_BREACHES_SHUTTER,They have a way through the Shutter,Eles têm como passar
 ALARM_INTRUDERS,INTRUDERS ON LEVEL {levels},INTRUSOS NO NÍVEL {levels}
 ALARM_OVERRUN,CONTROL ROOM FALLS IN {ticks},SALA DE CONTROLE CAI EM {ticks}
 ALERT_INCURSION,Intruders: open Security,Intrusos: abra Segurança
+LOG_KIND_INCURSION,Incursions,Incursões
+AAR_TITLE,AFTER-ACTION REPORT,RELATÓRIO PÓS-AÇÃO
+AAR_ATTACKER,Attacker: {name},Atacante: {name}
+AAR_OBJECTIVE,Objective: {name},Objetivo: {name}
+AAR_RESULT_STOPPED,Result: every intruder stopped,Resultado: todos os intrusos detidos
+AAR_RESULT_DONE,Result: they did what they came for and left,Resultado: cumpriram o objetivo e partiram
+AAR_RESULT_LEFT,Result: they withdrew,Resultado: eles recuaram
+AAR_RESULT_SHUTTER,Result: stopped at the Shutter,Resultado: detidos no Obturador
+AAR_DAMAGED,Damaged: {list},Danificado: {list}
+AAR_LOST,Artefacts lost: {count},Artefatos perdidos: {count}
+AAR_RECOVERED,Artefacts recovered: {count},Artefatos recuperados: {count}
+AAR_INJURED,Injured: {count},Feridos: {count}
+AAR_CONFIDENCE,Confidence: {change},Confiança: {change}
+AAR_OBJ_SABOTAGE,sabotage,sabotagem
+AAR_OBJ_THEFT,theft,roubo
+AAR_OBJ_ASSAULT,assault,assalto
+AAR_CLOSE,Close,Fechar
+CAMERA_FIGHT,FIGHT,COMBATE
+FACTION_UNKNOWN,Unknown,Desconhecido

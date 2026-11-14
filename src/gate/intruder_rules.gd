@@ -199,6 +199,7 @@ static func _to_door(state: GameState, from: Vector3i, goal: Vector3i) -> Packed
 # The Committee's reaction to [param report] (m4c-incursions.md section 5).
 static func _judge(state: GameState, report: Dictionary) -> void:
 	var subject: StringName = StringName(str(report.get("def", "")))
+	var before: int = state.committee.confidence
 	var losses: bool = report.has("damaged") or report.has("lost")
 	if losses:
 		ConfidenceEvents.raise(
@@ -222,6 +223,7 @@ static func _judge(state: GameState, report: Dictionary) -> void:
 			subject,
 			Vector2i(1, ConfidenceRules.INCURSION_STOPPED_CHANGE)
 		)
+	report["confidence"] = (state.committee.confidence - before) / ConfidenceRules.TENTHS
 
 
 static func _objective(state: GameState) -> StringName:

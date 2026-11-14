@@ -64,6 +64,8 @@ func show_room(room_uid: StringName) -> void:
 	var name_text: String = String(room.def_id) if def == null else tr(def.name_key)
 	feed.show_set(RoomSetCatalogue.for_room(room.def_id), label_text(state, room, name_text))
 	feed.set_room_state(_set_state(room, def))
+	if not PowerRules.is_running(room, def) and PowerRules.is_standing(room):
+		feed.show_no_signal()
 	_people_key = ""
 	visible = true
 	_refresh_people()
@@ -130,6 +132,7 @@ func people() -> Array[FeedPerson]:
 		if token.level == room.level and area.has_point(token.position):
 			var at: Vector2 = (token.position - area.position) / area.size
 			found.append(FeedPerson.create(StringName(String(token.role).trim_prefix("role_")), at))
+	found.append_array(FeedIntruders.in_room(simulation.state, room))
 	return found
 
 
@@ -137,6 +140,7 @@ func _refresh_people() -> void:
 	var room_set: RoomSet = feed.get_set()
 	if room_set == null:
 		return
+	_flash_fight()
 	var found: Array[FeedPerson] = people()
 	var key: String = ""
 	for person: FeedPerson in found:
@@ -145,6 +149,15 @@ func _refresh_people() -> void:
 		return
 	_people_key = key
 	room_set.set_people(found)
+
+
+# A room where squads and intruders fight flashes red (M4c-13).
+func _flash_fight() -> void:
+	var simulation: Simulation = SimClock.simulation
+	var room: RoomState = null if simulation == null else simulation.state.base.find_room(_room_id)
+	var fight: bool = room != null and FeedIntruders.fighting(simulation.state, room)
+	var on: bool = fight and int(Time.get_ticks_msec() / 400) % 2 == 0
+	feed.modulate = Color(1.0, 0.55, 0.5) if on else Color.WHITE
 
 
 func _update_live() -> void:

@@ -57,11 +57,13 @@ static func apply_settings(simulation: Simulation) -> void:
 	simulation.state.outcome.enabled = on
 
 
-## Adds the game over screen (M4c-15) over [param shell] and joins it to the shell's load and
+## Adds the after-action report (M4c-13) and the game over screen (M4c-15) over
+## [param shell] and joins it to the shell's load and
 ## menu; returns it.
 static func add_game_over(shell: Node) -> GameOverScreen:
 	var screen := GameOverScreen.new()
 	shell.add_child(screen)
 	screen.load_requested.connect(Callable(shell, &"load_slot"))
 	screen.menu_requested.connect(Callable(shell, &"return_to_menu"))
+	shell.add_child(AfterActionReport.new())
 	return screen
