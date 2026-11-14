@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScenarioDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/scenario_def.gd" id="1_scenario"]
+
+[resource]
+script = ExtResource("1_scenario")
+title_key = &"SCENARIO_FRESH_BASE_TITLE"
+description_key = &"SCENARIO_FRESH_BASE_LINE"
+save_path = "res://data/scenarios/scenario_fresh_base.json"
+order = 1
+id = &"scenario_fresh_base"

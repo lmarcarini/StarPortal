@@ -23,6 +23,8 @@ var message := Label.new()
 
 ## The save list behind Load.
 var slots := SlotList.new()
+## The scenario list behind Scenarios.
+var scenarios := ScenarioList.new()
 
 var _column := VBoxContainer.new()
 
@@ -65,6 +67,11 @@ func _init() -> void:
 	slots.cancelled.connect(show_keys)
 	_column.add_child(slots)
 	load_button.pressed.connect(show_slots)
+	scenarios.visible = false
+	scenarios.scenario_chosen.connect(func(def: ScenarioDef) -> void: open_scenario(def))
+	scenarios.cancelled.connect(show_keys)
+	_column.add_child(scenarios)
+	scenarios_button.pressed.connect(show_scenarios)
 	continue_button.pressed.connect(continue_game)
 	new_button.pressed.connect(new_game)
 	quit_button.pressed.connect(func() -> void: get_tree().quit())
@@ -83,7 +90,7 @@ func _ready() -> void:
 func refresh() -> void:
 	continue_button.visible = not SaveService.list_slots().is_empty()
 	load_button.visible = not SaveService.list_all_slots().is_empty()
-	scenarios_button.visible = false
+	scenarios_button.visible = not Registry.scenarios().is_empty()
 
 
 ## Shows the save list to load from.
@@ -95,9 +102,32 @@ func show_slots() -> void:
 	slots.first_focus().grab_focus.call_deferred()
 
 
-## Back from the save list to the menu's keys.
+## Shows the scenario list.
+func show_scenarios() -> void:
+	for button: Button in [continue_button, new_button, load_button, scenarios_button, quit_button]:
+		button.visible = false
+	scenarios.visible = true
+	scenarios.show_scenarios(Registry.scenarios())
+	scenarios.first_focus().grab_focus.call_deferred()
+
+
+## Loads [param scenario]'s save and opens it, paused; on failure shows why and stays.
+## Returns true when the game opened.
+func open_scenario(scenario: ScenarioDef) -> bool:
+	var result: Result = SaveService.load_file(scenario.save_path, GameDefs.from_registry(Registry))
+	if not result.is_ok:
+		show_message(load_error_key(result.error_code))
+		return false
+	var state: GameState = result.value
+	GameStart.start_scenario(scenario.id, state)
+	_open_shell()
+	return true
+
+
+## Back from a list to the menu's keys.
 func show_keys() -> void:
 	slots.visible = false
+	scenarios.visible = false
 	new_button.visible = true
 	quit_button.visible = true
 	refresh()
