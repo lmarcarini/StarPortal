@@ -2,7 +2,8 @@ class_name IncursionSystem
 extends SimSystem
 ## Runs incursions (M4c-06): at 00:00 each hostile faction with an IncursionDef rolls its
 ## daily chance (seeded, faction id order, never within the cooldown); each tick of the
-## warning counts down, and at zero the intruders breach into the Gate Room. While one is
+## warning counts down, and at zero the intruders breach into the Gate Room; then they go
+## about their objective and leave (IntruderRules). While one is
 ## under way no outgoing wormhole stays open. The clock's incursion slow reason follows the
 ## phase (SlowRules).
 ## Bible: docs/content/m4c-incursions.md section 1
@@ -23,6 +24,7 @@ func tick(state: GameState) -> void:
 		return
 	IncursionRules.close_outgoing(state)
 	if incursion.phase != IncursionState.Phase.WARNING:
+		IntruderRules.tick(state)
 		return
 	incursion.countdown -= 1
 	if incursion.countdown <= 0:
