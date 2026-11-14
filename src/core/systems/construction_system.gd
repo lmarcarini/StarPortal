@@ -8,7 +8,8 @@ extends SimSystem
 ## (FinishingPower) and, when it is the first of its type, takes the waiting crew
 ## (StaffChanges.auto_assign()). A running Workshop speeds sites and the dig up by 10% to 35%,
 ## by its engineers (BuildSpeed).
-## Draws no power.
+## Builds blast doors (DoorRules) and drops doors whose corridor was demolished. Draws no
+## power.
 ## Posts room_built(site id), room_demolished(id) and level_dug(level), each once:
 ## room_demolished carries the cell's room id for a corridor (each cell is its own demolition
 ## order) and the site id for any other room.
@@ -33,9 +34,12 @@ func get_id() -> StringName:
 ## started by the dig begins building on the next tick).
 func tick(state: GameState) -> void:
 	var idle: bool = _is_idle(state.base)
-	if idle and state.base.digging_level() == 0:
+	var doors_building: bool = _doors_building(state.base)
+	if idle and state.base.digging_level() == 0 and not doors_building:
 		return
 	var step: int = BuildSpeed.progress(state)
+	if doors_building:
+		DoorRules.tick_builds(state, step)
 	if not idle:
 		_tick_sites(state, step)
 		_tick_demolitions(state)
@@ -112,6 +116,11 @@ func _tick_demolitions(state: GameState) -> void:
 			room.demolish_ticks_left -= 1
 			if not room.is_demolishing():
 				finished.append(room)
+	if not finished.is_empty():
+		_remove_finished(state, finished)
+
+
+func _remove_finished(state: GameState, finished: Array[RoomState]) -> void:
 	var posted: Array[StringName] = []
 	for room: RoomState in finished:
 		state.base.remove_room(room.id)
@@ -121,6 +130,15 @@ func _tick_demolitions(state: GameState) -> void:
 		if not key in posted:
 			posted.append(key)
 			state.events.post(&"room_demolished", [key])
+	if not state.base.doors.is_empty():
+		DoorRules.drop_orphans(state)
+
+
+static func _doors_building(base: BaseState) -> bool:
+	for door: DoorState in base.doors:
+		if not door.is_built():
+			return true
+	return false
 
 
 func _tick_dig(state: GameState, step: int) -> void:

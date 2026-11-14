@@ -179,3 +179,12 @@ STAFF_SUBTAB_TITLE,ON BASE,NA BASE
 STAFF_PLACE,Assign,Designar
 STAFF_PLACE_HINT,Move to a lit room and confirm; Esc or (B) cancels.,Vá até uma sala acesa e confirme; Esc ou (B) cancela.
 STAFF_PLACE_NOWHERE,Drop on a lit room or on the tray.,Solte numa sala acesa ou na bandeja.
+BASE_DOOR_NAME,Blast door,Porta blindada
+BASE_DOOR_SUMMARY,"Blast door: on a corridor cell, $50k, 2 hours. Click it to seal or open it, even while paused.","Porta blindada: numa célula de corredor, $50k, 2 horas. Clique para fechar ou abrir, mesmo pausado."
+BASE_DOOR_SEALED,Door sealed,Porta fechada
+BASE_DOOR_OPENED,Door opened,Porta aberta
+BASE_BUILD_ERR_NOT_CORRIDOR,A blast door goes on a corridor cell,A porta blindada vai numa célula de corredor
+BASE_BUILD_ERR_GATE_DOORWAY,The Gate Room doorway cannot be sealed,A entrada da Sala do Portal não pode ser fechada
+BASE_BUILD_ERR_DOOR_EXISTS,There is a door here already,Já há uma porta aqui
+BASE_BUILD_ERR_NOT_BUILT,The door is still being built,A porta ainda está em construção
+BASE_BUILD_ERR_NO_DOOR,There is no door here,Não há porta aqui

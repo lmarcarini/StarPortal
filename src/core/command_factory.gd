@@ -67,6 +67,9 @@ static func register_defaults() -> void:
 	_types[OverrideSlowCommand.TYPE] = OverrideSlowCommand
 	_types[OperateGateCommand.TYPE] = OperateGateCommand
 	_types[StandByCommand.TYPE] = StandByCommand
+	_types[BuildDoorCommand.TYPE] = BuildDoorCommand
+	_types[RemoveDoorCommand.TYPE] = RemoveDoorCommand
+	_types[SetDoorCommand.TYPE] = SetDoorCommand
 	_types[AcceptRequestCommand.TYPE] = AcceptRequestCommand
 	_types[DeclineRequestCommand.TYPE] = DeclineRequestCommand
 	_types[AnswerCallCommand.TYPE] = AnswerCallCommand
