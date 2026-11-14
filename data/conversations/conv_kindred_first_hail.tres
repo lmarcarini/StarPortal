@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://src/content/conversation_node_def.gd" id="2"]
 [ext_resource type="Script" path="res://src/content/conversation_choice_def.gd" id="3"]
 [ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="4"]
+[ext_resource type="Script" path="res://src/content/story/effects/unlock_research_effect.gd" id="5"]
 
 [sub_resource type="Resource" id="r1"]
 script = ExtResource("2")
@@ -58,9 +59,14 @@ minutes = 2
 next = &"end"
 
 [sub_resource type="Resource" id="r9"]
+script = ExtResource("5")
+project = &"later_containment"
+
+[sub_resource type="Resource" id="r10"]
 script = ExtResource("2")
 id = &"end"
 kind = 2
+effects = Array[Resource]([SubResource("r9")])
 
 [resource]
 script = ExtResource("1")
@@ -68,6 +74,6 @@ faction = &"faction_kindred"
 channels = Array[StringName]([&"wormhole"])
 priority = 10
 start = &"l1"
-nodes = Array[Resource]([SubResource("r1"), SubResource("r6"), SubResource("r7"), SubResource("r8"), SubResource("r9")])
+nodes = Array[Resource]([SubResource("r1"), SubResource("r6"), SubResource("r7"), SubResource("r8"), SubResource("r10")])
 id = &"conv_kindred_first_hail"
 once = true

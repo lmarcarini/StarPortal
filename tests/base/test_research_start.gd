@@ -101,13 +101,13 @@ func test_cancel_refunds_half() -> void:
 	assert_bool(_start(game, &"second_plant").is_ok).is_true()
 
 
-## The project list is the seven M2.5 projects in order, then the two M4 projects.
+## The project list starts with the seven M2.5 projects in order; M4 adds the rest of the tree.
 func test_project_list() -> void:
 	var ids: Array[StringName] = []
 	for def: ResearchDef in ResearchRules.projects(ResearchFixture.state()):
 		ids.append(def.id)
 	assert_array(ids.slice(0, 7)).is_equal(UnlockFixture.projects().keys())
-	assert_int(ids.size()).is_equal(9)
+	assert_int(ids.size()).is_equal(36)
 	var cost: int = 0
 	var days: int = 0
 	for def: ResearchDef in ResearchRules.projects(ResearchFixture.state()):

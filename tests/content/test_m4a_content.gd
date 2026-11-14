@@ -124,3 +124,24 @@ func test_effigy_hazard_drains_power() -> void:
 	assert_float(state.power.stored_mwh).is_equal(10.0)
 	StoryRules.apply_all(state, effigy.hazard, effigy.id)
 	assert_float(state.power.stored_mwh).is_equal(0.0)
+
+
+## M4-35: the placeholder tech tree covers every branch and every modifier key.
+func test_tech_tree_coverage() -> void:
+	var per_branch: Dictionary[StringName, int] = {}
+	var keys: Dictionary[StringName, bool] = {}
+	var studies: int = 0
+	for def: ResearchDef in _defs.research:
+		per_branch[def.category] = per_branch.get(def.category, 0) + 1
+		for effect: EffectDef in def.effects:
+			if effect is ModifierEffect:
+				keys[(effect as ModifierEffect).key] = true
+			if effect is StudyArtefactEffect:
+				studies += 1
+	assert_int(per_branch.size()).is_equal(7)
+	for branch: StringName in per_branch:
+		assert_int(per_branch[branch]).override_failure_message(String(branch)).is_between(4, 7)
+	for key: StringName in ModifierEffect.KEYS:
+		assert_bool(keys.has(key)).override_failure_message(String(key)).is_true()
+	assert_int(studies).is_equal(3)
+	assert_int(_defs.research.size()).is_between(34, 38)

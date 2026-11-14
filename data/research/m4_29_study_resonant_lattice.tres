@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/conditions/has_artefact_condition.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/effects/study_artefact_effect.gd" id="3"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+artefact = &"resonant_lattice"
+
+[sub_resource type="Resource" id="r2"]
+script = ExtResource("3")
+artefact = &"resonant_lattice"
+
+[resource]
+script = ExtResource("1")
+order = 29
+cost_k = 500
+days = 3
+needs = Array[StringName]([])
+requires = Array[Resource]([SubResource("r1")])
+effects = Array[Resource]([SubResource("r2")])
+category = &"research_alien"
+name_key = &"RESEARCH_STUDY_RESONANT_LATTICE_NAME"
+line_key = &"RESEARCH_STUDY_RESONANT_LATTICE_LINE"
+id = &"study_resonant_lattice"

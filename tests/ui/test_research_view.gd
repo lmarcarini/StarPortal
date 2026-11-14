@@ -52,10 +52,18 @@ func _node(id: StringName) -> ResearchNode:
 func test_sub_tabs_follow_the_data() -> void:
 	var board: ResearchBoard = _view.get_board()
 	assert_array(board.tab_titles()).is_equal(
-		["Construction •", "Energy •", "Gate", "Alien", "Staff", "Defence", "Life and language"]
+		[
+			"Construction •",
+			"Energy •",
+			"Gate •",
+			"Alien",
+			"Staff •",
+			"Defence •",
+			"Life and language"
+		]
 	)
 	assert_str(String(board.get_category())).is_equal("research_construction")
-	assert_int(_tree().nodes().size()).is_equal(4)
+	assert_int(_tree().nodes().size()).is_equal(6)
 	assert_array(_node(&"excavation_survey").texts()).is_equal(
 		["Excavation survey", "$400k · 2 d", "Start"]
 	)
@@ -67,17 +75,10 @@ func test_sub_tabs_follow_the_data() -> void:
 		ResearchTree.cell_position(Vector2i(2, 0))
 	)
 	board.show_category(&"research_gate")
-	assert_array(_tree().nodes()).is_empty()
-	assert_str(_tree().empty_text()).is_equal("Nothing to research yet")
-	assert_array(_view.get_panel().lines()).is_equal(["SELECTED", "", "", "", ""])
-	board.show_category(&"research_staff")
-	assert_array(_tree().nodes()).is_empty()
+	assert_int(_tree().nodes().size()).is_equal(5)
 	board.show_category(&"research_alien")
-	assert_array(_tree().nodes()).is_empty()
-	FactionRules.meet(_simulation.state, &"faction_kindred")
-	board.show_category(&"research_staff")
-	board.show_category(&"research_alien")
-	assert_int(_tree().nodes().size()).is_equal(1)
+	assert_object(_node(&"later_containment")).is_null()
+	assert_object(_node(&"lattice_harmonics")).is_null()
 
 
 func test_dot_leaves_a_tab_with_nothing_to_start() -> void:
@@ -85,6 +86,8 @@ func test_dot_leaves_a_tab_with_nothing_to_start() -> void:
 	ResearchFixture.finish(_simulation.state, &"fuel_contracts")
 	ResearchFixture.finish(_simulation.state, &"bank_array")
 	ResearchFixture.finish(_simulation.state, &"later_capacitor_lattice")
+	ResearchFixture.finish(_simulation.state, &"plant_tuning")
+	ResearchFixture.finish(_simulation.state, &"fuel_cells")
 	_view.refresh()
 	assert_str(_view.get_board().tab_titles()[1]).is_equal("Energy")
 
@@ -155,7 +158,8 @@ func test_dpad_moves_along_the_tree() -> void:
 	await _press(&"ui_right")
 	assert_object(_focus()).is_same(_node(&"deep_excavation"))
 	await _press(&"ui_right")
-	assert_object(_focus()).is_same(_node(&"deep_excavation"))
+	assert_object(_focus()).is_same(_node(&"modular_frames"))
+	await _press(&"ui_left")
 	await _press(&"ui_left")
 	await _press(&"ui_left")
 	await _press(&"ui_down")
@@ -177,7 +181,7 @@ func test_shoulders_switch_sub_tabs_then_main_tabs() -> void:
 	assert_bool(_shoulder(JOY_BUTTON_RIGHT_SHOULDER)).is_false()
 	assert_bool(_shoulder(JOY_BUTTON_LEFT_SHOULDER)).is_true()
 	assert_str(String(board.get_category())).is_equal("research_defence")
-	assert_object(_focus()).is_same(board.get_tabs())
+	assert_object(_focus()).is_same(_tree().nodes()[0])
 
 
 func test_mouse_click_selects_a_node() -> void:
@@ -261,11 +265,9 @@ func test_layout_fits_in_both_languages() -> void:
 		var columns: Control = _view.get_node("Columns") as Control
 		var needed: Vector2 = columns.get_combined_minimum_size()
 		assert_bool(needed.x <= VIEW_SIZE.x - 32 and needed.y <= VIEW_SIZE.y).is_true()
-		# The board's share of 1280: the margins, the gap and the 352 px panel taken off.
-		var board_width: float = 1280 - 32 - 24 - 352
+		# Wide trees pan and zoom, so only the height is held to the screen.
 		for category: StringName in [&"research_construction", &"research_energy"]:
 			_view.get_board().show_category(category)
-			assert_float(_tree().custom_minimum_size.x).is_less_equal(board_width)
 			assert_float(_tree().custom_minimum_size.y).is_less_equal(VIEW_SIZE.y - 160)
 		assert_vector(_tree().nodes()[0].size).is_equal(ResearchNode.SIZE)
 
