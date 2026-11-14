@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://src/content/request_def.gd" id="1"]
 [ext_resource type="Script" path="res://src/content/story/conditions/research_done_condition.gd" id="2"]
 [ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="3"]
+[ext_resource type="Script" path="res://src/content/story/effects/give_artefact_effect.gd" id="4"]
 
 [sub_resource type="Resource" id="r1"]
 script = ExtResource("2")
@@ -13,6 +14,10 @@ script = ExtResource("3")
 faction = &"faction_kindred"
 delta = 10
 
+[sub_resource type="Resource" id="r3"]
+script = ExtResource("4")
+artefact = &"kindred_loom"
+
 [resource]
 script = ExtResource("1")
 faction = &"faction_kindred"
@@ -21,5 +26,5 @@ text_key = &"REQ_KINDRED_RESEARCH_TEXT"
 objective = Array[Resource]([SubResource("r1")])
 deadline_days = 0
 offer_days = 5
-reward = Array[Resource]([SubResource("r2")])
+reward = Array[Resource]([SubResource("r2"), SubResource("r3")])
 id = &"request_kindred_research"

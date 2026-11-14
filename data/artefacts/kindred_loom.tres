@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtefactDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/artefact_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/modifier_effect.gd" id="2"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+key = &"research_speed_pct"
+amount = 15
+
+[resource]
+script = ExtResource("1")
+name_key = &"ARTEFACT_KINDRED_LOOM"
+description_key = &"ARTEFACT_KINDRED_LOOM_TEXT"
+storage = &"vault"
+modifiers = Array[Resource]([SubResource("r1")])
+hazard_chance_pct = 0
+id = &"kindred_loom"

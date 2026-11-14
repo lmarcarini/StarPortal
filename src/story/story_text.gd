@@ -79,6 +79,7 @@ static func signed(amount: int) -> String:
 static func _item_preview(effect: EffectDef) -> String:
 	var keys: Dictionary[String, StringName] = {
 		"AddDocumentEffect": &"STORY_FX_DOCUMENT",
+		"DrainPowerEffect": &"STORY_FX_DRAIN",
 		"AddAddressEffect": &"STORY_FX_ADDRESS",
 		"OfferRequestEffect": &"STORY_FX_REQUEST",
 		"GiveArtefactEffect": &"STORY_FX_GIVE_ARTEFACT",
@@ -92,7 +93,8 @@ static func _item_preview(effect: EffectDef) -> String:
 	if key.is_empty():
 		return ""
 	var refs: Array[StringName] = effect.get_references()
-	return _line(key, refs[0] if not refs.is_empty() else &"", "")
+	var amount: String = str((effect as DrainPowerEffect).mwh) if effect is DrainPowerEffect else ""
+	return _line(key, refs[0] if not refs.is_empty() else &"", amount)
 
 
 static func _line(key: StringName, id: StringName, amount: String) -> String:

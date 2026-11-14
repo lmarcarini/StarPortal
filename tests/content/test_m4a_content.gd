@@ -87,3 +87,40 @@ func _paths(def: ConversationDef, node_id: StringName, prefix: Array[int]) -> Ar
 				longer.append(index)
 				found.append_array(_paths(def, node.choices[index].next, longer))
 	return found
+
+
+## M4-34: three artefacts with the design's values, each reachable in play.
+func test_artefacts_and_where_they_come_from() -> void:
+	assert_int(_defs.artefacts.size()).is_equal(3)
+	var state: GameState = _new_game()
+	var effigy: ArtefactDef = state.artefact_defs[&"ossar_effigy"]
+	assert_str(String(effigy.storage)).is_equal("containment")
+	assert_int(effigy.hazard_chance_pct).is_equal(20)
+	assert_int(effigy.modifiers[0].amount).is_equal(-20)
+	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, &"world_tollgate")
+	var found: Array[StringName] = []
+	for target: WorldTarget in facts.targets:
+		found.append(target.artefact_id)
+	assert_array(found).contains([&"ossar_effigy", &"resonant_lattice"])
+	var research: RequestDef = state.request_defs[&"request_kindred_research"]
+	var gives_loom: bool = false
+	for effect: EffectDef in research.reward:
+		gives_loom = (
+			gives_loom
+			or (
+				effect is GiveArtefactEffect
+				and (effect as GiveArtefactEffect).artefact == &"kindred_loom"
+			)
+		)
+	assert_bool(gives_loom).is_true()
+
+
+## The hazard drains stored power, never below zero.
+func test_effigy_hazard_drains_power() -> void:
+	var state: GameState = _new_game()
+	state.power.stored_mwh = 30.0
+	var effigy: ArtefactDef = state.artefact_defs[&"ossar_effigy"]
+	StoryRules.apply_all(state, effigy.hazard, effigy.id)
+	assert_float(state.power.stored_mwh).is_equal(10.0)
+	StoryRules.apply_all(state, effigy.hazard, effigy.id)
+	assert_float(state.power.stored_mwh).is_equal(0.0)

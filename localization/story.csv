@@ -84,3 +84,10 @@ ARCHIVE_SECTION_ARTEFACTS,Artefacts,[EN] Artefacts
 GATE_ARTEFACTS_BUTTON,Artefacts: {header},[EN] Artefacts: {header}
 ROOM_ARTEFACTS_HOUSED,Housed: {names},[EN] Housed: {names}
 ARTEFACT_STUDIED_BY,Studied by {project},[EN] Studied by {project}
+STORY_FX_DRAIN,-{amount} MWh stored,[EN] -{amount} MWh stored
+ARTEFACT_RESONANT_LATTICE,Resonant Lattice,[EN] Resonant Lattice
+ARTEFACT_RESONANT_LATTICE_TEXT,"A crystalline frame that hums near capacitors; they charge faster around it.","[EN] A crystalline frame that hums near capacitors; they charge faster around it."
+ARTEFACT_KINDRED_LOOM,Kindred Loom,[EN] Kindred Loom
+ARTEFACT_KINDRED_LOOM_TEXT,"A Kindred teaching tool. Scientists near it think faster.","[EN] A Kindred teaching tool. Scientists near it think faster."
+ARTEFACT_OSSAR_EFFIGY,Ossar Effigy,[EN] Ossar Effigy
+ARTEFACT_OSSAR_EFFIGY_TEXT,"An Ossar ward-figure. It eases the Ring's lock but bleeds power when uncontained.","[EN] An Ossar ward-figure. It eases the Ring's lock but bleeds power when uncontained."
