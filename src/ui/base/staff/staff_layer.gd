@@ -16,6 +16,8 @@ const QUEUE_GAP: float = 14.0
 
 ## Moves tokens along corridors when people are reassigned, arrive or leave.
 var walker := TokenWalker.new()
+## People shifting about, visiting and going to Quarters at night (display/ambient_movement).
+var ambient := AmbientLife.new()
 
 var _plan: BasePlan = null
 var _tokens: Dictionary[StringName, StaffToken] = {}
@@ -39,17 +41,19 @@ func _notification(what: int) -> void:
 
 
 func _enter_tree() -> void:
-	for signal_name: StringName in [
-		&"staff_changed", &"staff_arrived", &"game_loaded", &"day_started"
-	]:
+	for signal_name: StringName in [&"staff_changed", &"day_started"]:
 		EventBus.connect(signal_name, _on_event)
+	EventBus.staff_arrived.connect(_on_arrived)
+	EventBus.game_loaded.connect(_on_loaded)
+	Settings.setting_changed.connect(_on_setting_changed)
 
 
 func _exit_tree() -> void:
-	for signal_name: StringName in [
-		&"staff_changed", &"staff_arrived", &"game_loaded", &"day_started"
-	]:
+	for signal_name: StringName in [&"staff_changed", &"day_started"]:
 		EventBus.disconnect(signal_name, _on_event)
+	EventBus.staff_arrived.disconnect(_on_arrived)
+	EventBus.game_loaded.disconnect(_on_loaded)
+	Settings.setting_changed.disconnect(_on_setting_changed)
 
 
 ## Rebuilds every token from [param state]; called by the plan with the running state.
@@ -70,6 +74,7 @@ func rebuild(state: GameState) -> void:
 		if not kept.has(id):
 			_send_out(state, _tokens[id])
 	_tokens = kept
+	ambient.reset()
 	_place_all(state)
 	_start_walks(state, before)
 	if _plan != null:
@@ -248,8 +253,30 @@ func _process(delta: float) -> void:
 	if simulation == null:
 		return
 	var clock: ClockState = simulation.state.clock
+	if not clock.is_paused and Settings.get_bool(&"display", &"ambient_movement"):
+		var factor: float = TokenWalker.SPEED_FACTORS[clampi(clock.speed_index, 0, 3)]
+		ambient.step(self, simulation.state, delta, factor)
 	if walker.step(_tokens, delta, clock.speed_index, clock.is_paused):
 		queue_redraw()
+
+
+## Walks [param token] to [param target] (plan pixels) on [param level] for ambient life,
+## without changing the person's assignment.
+func move_token(state: GameState, token: StaffToken, target: Vector2, level: int) -> void:
+	token.home = target
+	token.home_level = level
+	_walk(state, token, level)
+
+
+## The plan pixels of spot [param index] of [param count] in [param room].
+func spot_pixels(state: GameState, room: RoomState, index: int, count: int) -> Vector2:
+	var def: RoomDef = state.room_defs.get(room.def_id)
+	if def == null:
+		return Vector2(room.origin) * BasePlanPainter.CELL
+	var cells: Rect2i = BaseRules.footprint(room, def)
+	var spots: Array[Vector2] = RoomSpots.for_room(def, cells.size, count)
+	var area := Rect2(Vector2(cells.position), Vector2(cells.size))
+	return (area.position + area.size * spots[index % spots.size()]) * BasePlanPainter.CELL
 
 
 func _room_spot(state: GameState, room: RoomState, index: int) -> Vector2:
@@ -323,6 +350,12 @@ func _draw_name(token: StaffToken, font: Font) -> void:
 		Rect2(at - Vector2(2, size), Vector2(width + 4, size + 4)), Color(UiPalette.GROUND, 0.85)
 	)
 	draw_string(font, at, text, 0, -1, size, UiPalette.TEXT)
+
+
+## Switching ambient movement off sends everyone back to their spots.
+func _on_setting_changed(section: StringName, key: StringName, _value: Variant) -> void:
+	if section == &"display" and key == &"ambient_movement":
+		_on_event()
 
 
 func _on_arrived(person_id: StringName) -> void:
