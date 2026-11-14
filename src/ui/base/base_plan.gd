@@ -84,6 +84,7 @@ func show_level(number: int) -> void:
 		return
 	level = clamped
 	select(&"")
+	staff_layer.snap()
 	queue_redraw()
 
 
