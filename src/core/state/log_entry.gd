@@ -21,6 +21,7 @@ const KINDS: Array[StringName] = [
 	&"committee",
 	&"expedition",
 	&"faction",
+	&"incursion",
 ]
 
 ## Tick the event happened.

@@ -83,6 +83,11 @@ static func entries_for(
 			return [_committee_entry(event_name, args, state, tick)]
 		&"staff_arrived", ExpeditionUnlock.LENT_EVENT:
 			return _arrival_entries(args, state, tick, event_name != &"staff_arrived")
+		&"incursion_ended":
+			var report: Dictionary = (
+				args[0] if not args.is_empty() and args[0] is Dictionary else {}
+			)
+			return [LogEntry.create(tick, &"incursion", &"", report)]
 		&"team_sent", &"team_returned":
 			return [_trip_entry(event_name, args, tick)]
 		ExpeditionSystem.PROLOGUE_EVENT:

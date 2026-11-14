@@ -17,6 +17,7 @@ const ROLE_COLOURS: Dictionary[StringName, Color] = {
 	&"analyst": Color("#7d8fa3"),
 	&"soldier": Color("#55654a"),
 	&"medic": Color("#c9c9c9"),
+	&"intruder": Color("#e5533d"),
 }
 
 
@@ -116,7 +117,9 @@ static func figure(role: StringName) -> Node3D:
 	body.height = 1.1
 	body.top_radius = 0.18
 	body.bottom_radius = 0.22
-	body.radial_segments = 4 if role == &"engineer" else (3 if role == &"analyst" else 8)
+	body.radial_segments = (
+		4 if role == &"engineer" else (3 if role in [&"analyst", &"intruder"] else 8)
+	)
 	body.material = material(colour)
 	var body_node := MeshInstance3D.new()
 	body_node.mesh = body

@@ -22,6 +22,7 @@ const KIND_KEYS: Array[StringName] = [
 	&"LOG_KIND_COMMITTEE",
 	&"LOG_KIND_EXPEDITION",
 	&"LOG_KIND_FACTION",
+	&"LOG_KIND_INCURSION",
 ]
 ## Height of a row of one line, and what each extra line adds.
 const _ROW_HEIGHT: float = 52.0
@@ -127,6 +128,8 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 			return staff_line(entry.args)
 		&"committee":
 			return CommitteeText.log_line(entry.args)
+		&"incursion":
+			return AfterActionText.summary(entry.args, state)
 		&"expedition":
 			return ExpeditionLogText.line(entry.args, world)
 		&"faction":
