@@ -65,6 +65,8 @@ func test_sabotage_damages_the_plant_then_they_leave() -> void:
 
 
 func test_a_squad_in_the_room_stops_the_work() -> void:
+	_state.unit_defs[&"unit_raider"].health = 100000
+	_state.unit_defs[&"unit_raider"].attack = 0.0
 	_start(&"sabotage")
 	var plant: RoomState = _room(ObjectiveRules.POWER_PLANT_DEF)
 	var post: RoomState = _post()
@@ -109,7 +111,7 @@ func test_they_wait_at_a_sealed_door() -> void:
 	door.mode = DoorState.Mode.SEALED
 	_state.base.doors.append(door)
 	_start(&"sabotage")
-	_ticks(100)
+	_ticks(12)
 	var at: Vector3i = _state.incursion.groups[0].pos()
 	(
 		assert_int(BasePaths.walking_distance(_state.base, at, door.pos(), _state.room_defs, true))

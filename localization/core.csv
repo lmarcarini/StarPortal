@@ -170,3 +170,5 @@ UI_SLOW_INCURSION,intruders,intrusos
 UI_FASTER_HINT,Faster,Mais rápido
 UI_FASTER_OVERRIDE,Faster: ignore the slow and go back to {speed}×,Mais rápido: ignorar a lentidão e voltar a {speed}×
 UI_FASTER_NO_OVERRIDE,Faster sets your speed; the {reason} keeps the game slow until it ends,Mais rápido define sua velocidade; {reason} mantém o jogo lento até terminar
+UNIT_RAIDER_NAME,Raider,Invasor
+UNIT_BREACHER_NAME,Breacher,Arrombador
