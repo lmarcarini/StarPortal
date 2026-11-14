@@ -25,6 +25,8 @@ var breach_ticks: int = 0
 var build_ticks_left: int = 0
 ## What was paid for it, $k.
 var paid_k: int = 0
+## Installations fitted to it (M4c-18); optional when loading.
+var installations: Array[InstallationState] = []
 
 
 ## True once built.
@@ -46,6 +48,7 @@ func to_dict() -> Dictionary:
 		"breach_ticks": breach_ticks,
 		"build_ticks_left": build_ticks_left,
 		"paid_k": paid_k,
+		"installations": InstallationState.write_all(installations),
 	}
 
 
@@ -58,6 +61,7 @@ static func from_dict(data: Dictionary) -> DoorState:
 	door.breach_ticks = SaveFields.read_int(data.get("breach_ticks"))
 	door.build_ticks_left = SaveFields.read_int(data.get("build_ticks_left"))
 	door.paid_k = SaveFields.read_int(data.get("paid_k"))
+	door.installations = InstallationState.read_all(data.get("installations"))
 	return door
 
 
@@ -75,4 +79,10 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	for key: String in ["breach_ticks", "build_ticks_left", "paid_k"]:
 		if not (SaveFields.is_int(data[key]) and data[key] >= 0):
 			errors.append("'%s' is not a whole number of at least 0" % key)
+	if data.has("installations"):
+		errors.append_array(
+			SaveFields.record_list_errors(
+				data["installations"], "installations", InstallationState.validate_dict
+			)
+		)
 	return errors
