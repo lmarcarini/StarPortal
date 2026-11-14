@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/modifier_effect.gd" id="2"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+key = &"build_speed_pct"
+amount = 15
+
+[resource]
+script = ExtResource("1")
+order = 20
+cost_k = 900
+days = 3
+needs = Array[StringName]([&"deep_excavation"])
+effects = Array[Resource]([SubResource("r1")])
+category = &"research_construction"
+name_key = &"RESEARCH_MODULAR_FRAMES_NAME"
+line_key = &"RESEARCH_MODULAR_FRAMES_LINE"
+id = &"modular_frames"

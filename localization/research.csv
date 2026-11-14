@@ -63,3 +63,57 @@ RESEARCH_FILTER_AVAILABLE,Available,Disponíveis
 RESEARCH_FILTER_DONE,Done,Concluídos
 RESEARCH_FILTER_LOCKED,Locked,Bloqueados
 RESEARCH_SEARCH,Search,Buscar
+RESEARCH_MODULAR_FRAMES_NAME,Modular frames,[EN] Modular frames
+RESEARCH_MODULAR_FRAMES_LINE,Sites and digs finish 15% faster.,[EN] Sites and digs finish 15% faster.
+RESEARCH_REINFORCED_SHAFTS_NAME,Reinforced shafts,[EN] Reinforced shafts
+RESEARCH_REINFORCED_SHAFTS_LINE,Sites and digs finish another 10% faster.,[EN] Sites and digs finish another 10% faster.
+RESEARCH_PLANT_TUNING_NAME,Plant tuning,[EN] Plant tuning
+RESEARCH_PLANT_TUNING_LINE,Each plant gives 2 MW more.,[EN] Each plant gives 2 MW more.
+RESEARCH_FUEL_CELLS_NAME,Fuel cells,[EN] Fuel cells
+RESEARCH_FUEL_CELLS_LINE,Room upkeep is 10% lower.,[EN] Room upkeep is 10% lower.
+RESEARCH_GATE_CALIBRATION_NAME,Gate calibration,[EN] Gate calibration
+RESEARCH_GATE_CALIBRATION_LINE,Dialing and holding cost 10% less energy.,[EN] Dialing and holding cost 10% less energy.
+RESEARCH_WORMHOLE_STABILISER_NAME,Wormhole stabiliser,[EN] Wormhole stabiliser
+RESEARCH_WORMHOLE_STABILISER_LINE,Wormholes stay open 15 minutes longer.,[EN] Wormholes stay open 15 minutes longer.
+RESEARCH_LONG_RANGE_DIALING_NAME,Long-range dialing,[EN] Long-range dialing
+RESEARCH_LONG_RANGE_DIALING_LINE,Dialing costs another 10% less energy.,[EN] Dialing costs another 10% less energy.
+RESEARCH_MOTH_BATTERIES_NAME,MOTH batteries,[EN] MOTH batteries
+RESEARCH_MOTH_BATTERIES_LINE,The MOTH flies 50% longer.,[EN] The MOTH flies 50% longer.
+RESEARCH_MOTH_SHIELDING_NAME,MOTH shielding,[EN] MOTH shielding
+RESEARCH_MOTH_SHIELDING_LINE,The MOTH flies another 25% longer.,[EN] The MOTH flies another 25% longer.
+RESEARCH_STUDY_RESONANT_LATTICE_NAME,Study the Lattice,[EN] Study the Lattice
+RESEARCH_STUDY_RESONANT_LATTICE_LINE,Learn what the Lattice does.,[EN] Learn what the Lattice does.
+RESEARCH_LATTICE_HARMONICS_NAME,Lattice harmonics,[EN] Lattice harmonics
+RESEARCH_LATTICE_HARMONICS_LINE,Banks charge 15% faster.,[EN] Banks charge 15% faster.
+RESEARCH_STUDY_KINDRED_LOOM_NAME,Study the Loom,[EN] Study the Loom
+RESEARCH_STUDY_KINDRED_LOOM_LINE,Learn how the Loom teaches.,[EN] Learn how the Loom teaches.
+RESEARCH_LOOM_PEDAGOGY_NAME,Loom pedagogy,[EN] Loom pedagogy
+RESEARCH_LOOM_PEDAGOGY_LINE,Research is 10% faster.,[EN] Research is 10% faster.
+RESEARCH_STUDY_OSSAR_EFFIGY_NAME,Study the Effigy,[EN] Study the Effigy
+RESEARCH_STUDY_OSSAR_EFFIGY_LINE,Learn what the Effigy wards against.,[EN] Learn what the Effigy wards against.
+RESEARCH_EFFIGY_WARDS_NAME,Effigy wards,[EN] Effigy wards
+RESEARCH_EFFIGY_WARDS_LINE,Dialing costs 10% less energy.,[EN] Dialing costs 10% less energy.
+RESEARCH_FIELD_MEDICINE_NAME,Field medicine,[EN] Field medicine
+RESEARCH_FIELD_MEDICINE_LINE,Field checks are a little easier.,[EN] Field checks are a little easier.
+RESEARCH_SURVIVAL_TRAINING_NAME,Survival training,[EN] Survival training
+RESEARCH_SURVIVAL_TRAINING_LINE,Field checks are a little easier again.,[EN] Field checks are a little easier again.
+RESEARCH_COMMAND_STAFF_NAME,Command staff,[EN] Command staff
+RESEARCH_COMMAND_STAFF_LINE,The Committee adds $20k a day.,[EN] The Committee adds $20k a day.
+RESEARCH_STAFF_WELFARE_NAME,Staff welfare,[EN] Staff welfare
+RESEARCH_STAFF_WELFARE_LINE,Room upkeep is 5% lower.,[EN] Room upkeep is 5% lower.
+RESEARCH_PERIMETER_ALARMS_NAME,Perimeter alarms,[EN] Perimeter alarms
+RESEARCH_PERIMETER_ALARMS_LINE,Room upkeep is 5% lower.,[EN] Room upkeep is 5% lower.
+RESEARCH_IRIS_STUDIES_NAME,Iris studies,[EN] Iris studies
+RESEARCH_IRIS_STUDIES_LINE,Dialing costs 5% less energy.,[EN] Dialing costs 5% less energy.
+RESEARCH_HARDENED_CORRIDORS_NAME,Hardened corridors,[EN] Hardened corridors
+RESEARCH_HARDENED_CORRIDORS_LINE,Sites and digs finish 10% faster.,[EN] Sites and digs finish 10% faster.
+RESEARCH_SENTRY_DRILLS_NAME,Sentry drills,[EN] Sentry drills
+RESEARCH_SENTRY_DRILLS_LINE,Field checks are a little easier.,[EN] Field checks are a little easier.
+RESEARCH_XENOLINGUISTICS_NAME,Xenolinguistics,[EN] Xenolinguistics
+RESEARCH_XENOLINGUISTICS_LINE,Research is 5% faster.,[EN] Research is 5% faster.
+RESEARCH_KINDRED_DIALECTS_NAME,Kindred dialects,[EN] Kindred dialects
+RESEARCH_KINDRED_DIALECTS_LINE,The Committee adds $15k a day.,[EN] The Committee adds $15k a day.
+RESEARCH_CULTURAL_EXCHANGE_NAME,Cultural exchange,[EN] Cultural exchange
+RESEARCH_CULTURAL_EXCHANGE_LINE,Research is 5% faster.,[EN] Research is 5% faster.
+RESEARCH_KINDRED_ARCHIVE_NAME,Kindred archive,[EN] Kindred archive
+RESEARCH_KINDRED_ARCHIVE_LINE,The Committee adds $25k a day.,[EN] The Committee adds $25k a day.

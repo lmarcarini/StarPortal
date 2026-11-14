@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://src/content/conversation_choice_def.gd" id="4"]
 [ext_resource type="Script" path="res://src/content/story/effects/change_money_effect.gd" id="5"]
 [ext_resource type="Script" path="res://src/content/story/effects/change_standing_effect.gd" id="6"]
+[ext_resource type="Script" path="res://src/content/story/effects/unlock_research_effect.gd" id="7"]
 
 [sub_resource type="Resource" id="r1"]
 script = ExtResource("2")
@@ -48,9 +49,14 @@ kind = 1
 choices = Array[Resource]([SubResource("r4"), SubResource("r6")])
 
 [sub_resource type="Resource" id="r8"]
+script = ExtResource("7")
+project = &"kindred_dialects"
+
+[sub_resource type="Resource" id="r9"]
 script = ExtResource("3")
 id = &"end"
 kind = 2
+effects = Array[Resource]([SubResource("r8")])
 
 [resource]
 script = ExtResource("1")
@@ -59,5 +65,5 @@ channels = Array[StringName]([&"incoming"])
 conditions = Array[Resource]([SubResource("r1")])
 priority = 5
 start = &"l1"
-nodes = Array[Resource]([SubResource("r2"), SubResource("r7"), SubResource("r8")])
+nodes = Array[Resource]([SubResource("r2"), SubResource("r7"), SubResource("r9")])
 id = &"conv_kindred_gift"

@@ -55,22 +55,25 @@ func test_real_tree_matches_the_card() -> void:
 				&"field_engineering": Vector2i(0, 1),
 				&"lift_shaft": Vector2i(1, 0),
 				&"deep_excavation": Vector2i(2, 0),
+				&"modular_frames": Vector2i(3, 0),
+				&"reinforced_shafts": Vector2i(4, 0),
 			}
 		)
 	)
-	assert_dict(ResearchTreeLayout.cells(defs, &"research_energy")).is_equal(
-		{
-			&"second_plant": Vector2i(0, 0),
-			&"bank_array": Vector2i(0, 1),
-			&"fuel_contracts": Vector2i(1, 0),
-			&"later_capacitor_lattice": Vector2i(1, 1)
-		}
+	(
+		assert_dict(ResearchTreeLayout.cells(defs, &"research_gate"))
+		. is_equal(
+			{
+				&"gate_calibration": Vector2i(0, 0),
+				&"wormhole_stabiliser": Vector2i(1, 0),
+				&"long_range_dialing": Vector2i(2, 0),
+				&"moth_batteries": Vector2i(0, 1),
+				&"moth_shielding": Vector2i(1, 1),
+			}
+		)
 	)
-	assert_dict(ResearchTreeLayout.cells(defs, &"research_gate")).is_empty()
 	var alien: Array[ResearchDef] = ResearchTreeLayout.in_category(defs, &"research_alien")
-	var staff: Array[ResearchDef] = ResearchTreeLayout.in_category(defs, &"research_staff")
-	assert_int(alien.size()).is_equal(1)
-	assert_bool(alien[0].is_hidden()).is_true()
-	assert_int(staff.size()).is_equal(0)
+	assert_int(alien.size()).is_equal(7)
+	assert_int(ResearchTreeLayout.in_category(defs, &"research_staff").size()).is_equal(4)
 	for def: ResearchDef in defs:
 		assert_array(ResearchTreeLayout.stubs(defs, def)).is_empty()

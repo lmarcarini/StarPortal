@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/modifier_effect.gd" id="2"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+key = &"dial_cost_pct"
+amount = -10
+
+[resource]
+script = ExtResource("1")
+order = 34
+cost_k = 1000
+days = 4
+needs = Array[StringName]([&"study_ossar_effigy"])
+effects = Array[Resource]([SubResource("r1")])
+category = &"research_alien"
+name_key = &"RESEARCH_EFFIGY_WARDS_NAME"
+line_key = &"RESEARCH_EFFIGY_WARDS_LINE"
+id = &"effigy_wards"
+reveal = &"hidden"

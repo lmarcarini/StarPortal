@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/modifier_effect.gd" id="2"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+key = &"plant_output_mw"
+amount = 2
+
+[resource]
+script = ExtResource("1")
+order = 22
+cost_k = 700
+days = 3
+needs = Array[StringName]([&"fuel_contracts"])
+effects = Array[Resource]([SubResource("r1")])
+category = &"research_energy"
+name_key = &"RESEARCH_PLANT_TUNING_NAME"
+line_key = &"RESEARCH_PLANT_TUNING_LINE"
+id = &"plant_tuning"
