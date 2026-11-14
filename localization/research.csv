@@ -58,3 +58,8 @@ RESEARCH_QUEUE_DOWN,Down,Descer
 RESEARCH_QUEUE_WAITING_FOR_FUNDS,Waiting for funds,Aguardando fundos
 RESEARCH_QUEUE_REQUIREMENTS_NOT_MET,Requirements not met,Requisitos não atendidos
 RESEARCH_QUEUE_NEEDS_LAB,Waiting for a Research Lab that is on,Aguardando um Laboratório ligado
+RESEARCH_FILTER_ALL,All,Todos
+RESEARCH_FILTER_AVAILABLE,Available,Disponíveis
+RESEARCH_FILTER_DONE,Done,Concluídos
+RESEARCH_FILTER_LOCKED,Locked,Bloqueados
+RESEARCH_SEARCH,Search,Buscar
