@@ -1,7 +1,7 @@
-## Every en and pt_BR value in localization/*.csv can be drawn by the default theme font:
-## no character the font lacks (such as "→" or "▲"), until a project font comes with the art
-## pass.
-## Bible: technical-architecture.md#input-accessibility-and-localisation
+## Every en and pt_BR value in localization/*.csv can be drawn by each interface font
+## (Barlow Condensed for labels, IBM Plex Mono for data): no character a font lacks.
+## Bible: technical-architecture.md#input-accessibility-and-localisation,
+## docs/content/interface-pass.md section 2
 extends GdUnitTestSuite
 
 const LOCALIZATION_DIR: String = "res://localization"
@@ -9,8 +9,20 @@ const LOCALIZATION_DIR: String = "res://localization"
 const LOCALES: Array[String] = ["en", "pt_BR"]
 
 
-func test_every_string_uses_only_characters_the_default_font_draws() -> void:
-	var font: Font = ThemeDB.fallback_font
+func test_every_string_uses_only_characters_the_label_font_draws() -> void:
+	_check_font(UiThemeBuilder.label_font())
+
+
+func test_every_string_uses_only_characters_the_stencil_font_draws() -> void:
+	_check_font(UiThemeBuilder.stencil_font())
+
+
+func test_every_string_uses_only_characters_the_data_font_draws() -> void:
+	_check_font(UiThemeBuilder.data_font())
+
+
+func _check_font(font: Font) -> void:
+	assert_object(font).is_not_null()
 	var missing: Array[String] = []
 	var files: PackedStringArray = DirAccess.get_files_at(LOCALIZATION_DIR)
 	var checked: int = 0
