@@ -1,15 +1,15 @@
 class_name ConfidenceReadout
 extends Button
-## Top bar Committee Confidence readout, beside the funds: "Conf. 61 -0.1", the whole part of
-## Confidence and today's drift, with a tooltip giving the value with one decimal, why it
-## drifts and the last three causes. Red, with the warning in the tooltip, while the Committee
-## warns (Confidence 0, days in the red). Refreshes when Confidence or the funds change, on
-## showing and on a locale change, so it is right while paused and after a load. Reads state
+## Top bar Committee Confidence readout, beside the funds: "Conf. 61 -0.1 ↓", the whole part of
+## Confidence, today's drift and its trend arrow, with a tooltip giving the value with one decimal,
+## why it drifts and the last three causes. Red, with the warning in the tooltip, while the
+## Committee warns (Confidence 0, days in the red). Refreshes when Confidence or the funds change,
+## on showing and on a locale change, so it is right while paused and after a load. Reads state
 ## only.
 ## Bible: docs/content/m27-daily-rhythm.md sections 2 and 5
 
 ## Font colour while the Committee warns.
-const WARNING_COLOR: Color = Color(0.9, 0.25, 0.2)
+const WARNING_COLOR: Color = UiPalette.ALARM
 ## Causes listed in the tooltip, newest first.
 const TOOLTIP_CAUSES: int = 3
 
@@ -65,9 +65,23 @@ func refresh() -> void:
 static func readout_text(confidence: int, drift: int) -> String:
 	if drift == 0:
 		return _tr(&"CONFIDENCE_READOUT").format({"value": confidence})
-	return _tr(&"CONFIDENCE_READOUT_DRIFT").format(
-		{"value": confidence, "drift": CommitteeText.signed_tenths(drift)}
+	return (
+		"%s %s"
+		% [
+			_tr(&"CONFIDENCE_READOUT_DRIFT").format(
+				{"value": confidence, "drift": CommitteeText.signed_tenths(drift)}
+			),
+			trend_arrow(drift),
+		]
 	)
+
+
+## The trend arrow of a drift of [param drift] tenths: up, down or "" with no drift. Drawn
+## with the data font (IBM Plex Mono has the arrows; the label font does not).
+static func trend_arrow(drift: int) -> String:
+	if drift == 0:
+		return ""
+	return char(0x2191) if drift > 0 else char(0x2193)
 
 
 ## The tooltip: Confidence with one decimal, today's drift and why, the last three causes,
