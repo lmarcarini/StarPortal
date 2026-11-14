@@ -58,6 +58,8 @@ func validate(state: GameState) -> CommandResult:
 		return CommandResult.fail(&"bad_address")
 	if state.gate.mode != GateState.RingMode.IDLE or state.gate.has_incoming():
 		return CommandResult.fail(&"ring_busy")
+	if state.incursion.is_active():
+		return CommandResult.fail(&"incursion")
 	var needed_mwh: float = GateQueries.lock_energy_mwh(state, address)
 	if state.power.stored_mwh < needed_mwh:
 		return CommandResult.fail(

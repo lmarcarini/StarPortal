@@ -7,13 +7,17 @@ extends RefCounted
 ## event.
 ## Bible: docs/content/event-time.md section 2
 
-## Reasons sync() owns; incursion is added by its own system.
-const OWNED: Array[StringName] = [&"conversation", &"awaiting_answer", &"dialling", &"gate_ops"]
+## Reasons sync() owns: all of them.
+const OWNED: Array[StringName] = [
+	&"conversation", &"awaiting_answer", &"dialling", &"gate_ops", &"incursion"
+]
 
 
 ## The slow keys [param state] wants now from conversations and waiting items.
 static func wanted(state: GameState) -> Array[StringName]:
 	var keys: Array[StringName] = []
+	if state.incursion.is_active():
+		keys.append(TimeControl.slow_key(&"incursion"))
 	if state.gate.mode == GateState.RingMode.DIALING:
 		keys.append(TimeControl.slow_key(&"dialling"))
 	if state.gate.operating:

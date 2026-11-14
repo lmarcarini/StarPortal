@@ -295,7 +295,8 @@ version itself and says so in its PR.
 
 1. **Incursions and failure states** — *Owner decision 2026-11-12:* a short M4c after M4b.
 2. **Ignore an incoming wormhole** costs standing −2. *Owner decision 2026-11-12:* a hostile
-   wormhole cannot send anything through in M4.
+   wormhole cannot send anything through in M4. *Since M4c, a hostile faction can send an
+   incursion through the Ring: see m4c-incursions.md section 1.*
 3. **Over-capacity holding** — *Owner decision 2026-11-12:* holding cannot go over capacity;
    an artefact that arrives while holding is full waits at the gate and can be retrieved once
    there is room. No Confidence cost.

@@ -9,6 +9,8 @@ extends RefCounted
 
 ## Applies an item effect; false for an effect this class does not handle or that cannot apply.
 static func apply(state: GameState, effect: EffectDef) -> bool:
+	if effect is StartIncursionEffect:
+		return IncursionRules.start(state, (effect as StartIncursionEffect).incursion).is_ok
 	if effect is OfferRequestEffect:
 		return offer_request(state, (effect as OfferRequestEffect).request) >= 0
 	if effect is GiveArtefactEffect:

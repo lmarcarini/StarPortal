@@ -8,7 +8,9 @@ extends Command
 ## The command's stable type id.
 const TYPE: StringName = &"debug_story"
 ## The actions.
-const ACTIONS: Array[StringName] = [&"standing", &"meet", &"flag", &"offer", &"contact"]
+const ACTIONS: Array[StringName] = [
+	&"standing", &"meet", &"flag", &"offer", &"contact", &"incursion"
+]
 
 ## One of ACTIONS.
 var action: StringName = &""
@@ -61,6 +63,8 @@ func validate(state: GameState) -> CommandResult:
 			known = state.request_defs.has(id)
 		&"contact":
 			known = state.conversation_defs.has(id)
+		&"incursion":
+			known = state.incursion_defs.has(id)
 	return CommandResult.ok() if known else CommandResult.fail(&"unknown_id")
 
 
@@ -83,6 +87,8 @@ func apply(state: GameState) -> void:
 			var faction: FactionDef = state.faction_defs.get(conversation.faction)
 			if faction != null:
 				ContactRules.queue(state, faction, id)
+		&"incursion":
+			IncursionRules.start(state, id)
 	state.events.post(&"debug_story", [action, id])
 
 
