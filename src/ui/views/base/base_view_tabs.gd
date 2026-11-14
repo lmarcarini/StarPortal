@@ -41,9 +41,10 @@ func attach(
 	show_sub_tab()
 
 
-## Puts the Staff strip where the palette sits and joins it to the plan's staff layer.
+## Puts the Staff strip under the plan, in the plan's column (so it never overlaps the plan,
+## the sub-tabs or the message line), and joins it to the plan's staff layer.
 func _attach_staff() -> void:
-	_palette.get_parent().add_child(staff_tab)
+	_plan.get_parent().add_child(staff_tab)
 	staff_tab.person_chosen.connect(_on_staff_person)
 	staff_tab.assign_pressed.connect(_on_assign_pressed)
 	_plan.placement_message.connect(_on_placement_message)

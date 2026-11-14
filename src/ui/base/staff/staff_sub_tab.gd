@@ -13,6 +13,9 @@ signal assign_pressed
 ## Staff changed: the list should be redrawn.
 signal staff_changed
 
+## Height of the scrolling list, so the strip never grows over the plan or the sub-tabs.
+const LIST_HEIGHT: float = 92.0
+
 ## Starts placing the selected person.
 var assign_button := Button.new()
 
@@ -33,9 +36,17 @@ func _init() -> void:
 	assign_button.pressed.connect(assign_pressed.emit)
 	row.add_child(assign_button)
 	_hint.theme_type_variation = &"StencilLabel"
+	_hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_hint.clip_text = true
+	_hint.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	row.add_child(_hint)
 	add_child(row)
-	add_child(_list)
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size.y = LIST_HEIGHT
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(_list)
+	add_child(scroll)
 
 
 func _enter_tree() -> void:

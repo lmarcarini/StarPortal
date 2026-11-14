@@ -30,7 +30,7 @@ func _columns(view_id: StringName) -> ThreeColumn:
 
 
 func test_left_board_detail_in_order() -> void:
-	for view_id: StringName in [ViewSwitcher.RESEARCH, ViewSwitcher.PERSONNEL]:
+	for view_id: StringName in [ViewSwitcher.RESEARCH]:
 		var columns: ThreeColumn = _columns(view_id)
 		assert_object(columns.get_child(0)).is_same(columns.left)
 		assert_int(columns.left.get_child_count()).is_greater(0)
@@ -38,18 +38,21 @@ func test_left_board_detail_in_order() -> void:
 		assert_float(columns.detail().custom_minimum_size.x).is_equal(ThreeColumn.DETAIL_WIDTH)
 
 
-func test_personnel_sub_tabs_sit_on_the_left() -> void:
+## Owner change 2026-11-14: Personnel keeps its title, summary and sub-tabs above the list,
+## with no left column.
+func test_personnel_header_sits_above_the_list() -> void:
 	var personnel: PersonnelView = _shell.view_switcher.get_view(ViewSwitcher.PERSONNEL)
 	var board: PersonnelBoard = personnel.find_child("Board", true, false) as PersonnelBoard
-	assert_object(board.get_tabs().get_parent()).is_same(_columns(ViewSwitcher.PERSONNEL).left)
+	assert_object(board.get_tabs().get_parent()).is_same(board)
+	assert_object(_columns(ViewSwitcher.PERSONNEL)).is_null()
 
 
 func test_both_fit_at_1280_in_pt_br() -> void:
 	TranslationServer.set_locale("pt_BR")
 	_shell.size = Vector2(1280, 720)
-	_shell.view_switcher.show_view(ViewSwitcher.PERSONNEL)
+	_shell.view_switcher.show_view(ViewSwitcher.RESEARCH)
 	await _runner.simulate_frames(3)
-	for view_id: StringName in [ViewSwitcher.PERSONNEL]:
+	for view_id: StringName in [ViewSwitcher.RESEARCH]:
 		var columns: ThreeColumn = _columns(view_id)
 		assert_float(columns.get_combined_minimum_size().x).is_less_equal(1280.0)
 		assert_float(columns.detail().get_global_rect().end.x).is_less_equal(1280.5)

@@ -3,7 +3,6 @@
 [ext_resource type="Script" path="res://src/ui/views/personnel/personnel_view.gd" id="1_personnel_view"]
 [ext_resource type="Script" path="res://src/ui/personnel/personnel_board.gd" id="2_board"]
 [ext_resource type="Script" path="res://src/ui/personnel/personnel_panel.gd" id="3_panel"]
-[ext_resource type="Script" path="res://src/ui/layout/three_column.gd" id="9_columns"]
 
 [node name="PersonnelView" type="Control"]
 layout_mode = 3
@@ -29,7 +28,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_constants/separation = 24
-script = ExtResource("9_columns")
 
 [node name="Board" type="VBoxContainer" parent="Columns"]
 unique_name_in_owner = true
@@ -38,6 +36,7 @@ size_flags_horizontal = 3
 script = ExtResource("2_board")
 
 [node name="Panel" type="VBoxContainer" parent="Columns"]
+custom_minimum_size = Vector2(360, 0)
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("3_panel")

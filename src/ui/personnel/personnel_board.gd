@@ -28,12 +28,11 @@ var _tabs: TabBar = TabBar.new()
 var _scroll: ScrollContainer = ScrollContainer.new()
 var _list: VBoxContainer = VBoxContainer.new()
 var _rows: Array[PersonnelRow] = []
-var _header := HBoxContainer.new()
 
 
 func _init() -> void:
 	add_theme_constant_override(&"separation", 8)
-	var header := _header
+	var header := HBoxContainer.new()
 	header.add_theme_constant_override(&"separation", 16)
 	header.custom_minimum_size.y = 48
 	_summary.size_flags_horizontal = SIZE_EXPAND_FILL
@@ -138,16 +137,3 @@ func _label(font_size: int) -> Label:
 	label.size_flags_vertical = SIZE_SHRINK_CENTER
 	label.add_theme_font_size_override(&"font_size", font_size)
 	return label
-
-
-## The parts the screen puts in its left column: the title, the summary and the Roster /
-## Recruit sub-tabs (docs/content/interface-pass.md section 4).
-func left_parts() -> Array[Control]:
-	var stack := VBoxContainer.new()
-	for part: Control in [_title, _summary]:
-		_header.remove_child(part)
-		stack.add_child(part)
-	_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_header.queue_free()
-	remove_child(_tabs)
-	return [stack, _tabs]
