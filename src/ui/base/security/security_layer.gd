@@ -16,6 +16,8 @@ var shown: Dictionary[String, Vector2] = {}
 var last_seen: Dictionary[int, Array] = {}
 ## Rooms marked as the objective.
 var targets: Array[StringName] = []
+## The squad whose path to the plan's cursor is previewed (M4c-12), or &"".
+var preview_squad: StringName = &""
 
 var _plan: BasePlan = null
 
@@ -37,6 +39,8 @@ func _process(delta: float) -> void:
 	if simulation == null or _plan == null:
 		return
 	var state: GameState = simulation.state
+	if not preview_squad.is_empty():
+		queue_redraw()
 	if not state.incursion.is_active() and state.security.squads.is_empty():
 		if not shown.is_empty():
 			shown.clear()
@@ -89,6 +93,7 @@ func _draw() -> void:
 	draw_set_transform(_plan.view.offset, 0.0, Vector2.ONE * _plan.view.scale())
 	var font: Font = get_theme_default_font()
 	_draw_targets(state)
+	_draw_preview(state)
 	_draw_last_seen(state)
 	for index: int in state.incursion.groups.size():
 		var group: IntruderGroup = state.incursion.groups[index]
@@ -101,6 +106,20 @@ func _draw() -> void:
 			var number: int = SquadRules.number_of(state, squad.post_room)
 			SecurityMarks.square(self, shown[key], number, font, _SQUAD)
 	draw_set_transform(Vector2.ZERO)
+
+
+func _draw_preview(state: GameState) -> void:
+	var squad: SquadState = state.security.squad_of(preview_squad)
+	if squad == null:
+		return
+	var goal := Vector3i(_plan.cursor.x, _plan.cursor.y, _plan.level)
+	var path: PackedVector3Array = BasePaths.find(state.base, squad.pos, goal, state.room_defs)
+	var points := PackedVector2Array()
+	for point: Vector3 in path:
+		if int(point.z) == _plan.level:
+			points.append(Vector2(point.x, point.y) * BasePlanPainter.CELL)
+	if points.size() >= 2:
+		draw_polyline(points, Color(0.5, 0.7, 0.85, 0.8), 3.0)
 
 
 func _draw_last_seen(state: GameState) -> void:

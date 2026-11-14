@@ -195,3 +195,17 @@ BASE_REPAIR_STARTED,Repairing the {name}.,Reparando: {name}.
 BASE_BUILD_ERR_NOT_DAMAGED,The room is not damaged,A sala não está danificada
 BASE_BUILD_ERR_REPAIRING,Being repaired,Em reparo
 BASE_BUILD_ERR_DAMAGED,Damaged: repair it first,Danificada: repare primeiro
+BASE_SUBTAB_SECURITY,Security,Segurança
+SECURITY_HOLD,Hold,Manter posição
+SECURITY_FALL_BACK,Fall back,Recuar
+SECURITY_SQUAD_ROW,Squad {number} · {standing}/{total} · {order} · L{level},Esquadrão {number} · {standing}/{total} · {order} · N{level}
+SECURITY_ORDER_HOLD,Holding,Em posição
+SECURITY_ORDER_MOVE,Moving,Movendo
+SECURITY_ORDER_FALL_BACK,Falling back,Recuando
+SECURITY_DOOR_OPEN,"Door L{level} ({x}, {y}): open","Porta N{level} ({x}, {y}): aberta"
+SECURITY_DOOR_SEALED,"Door L{level} ({x}, {y}): SEALED","Porta N{level} ({x}, {y}): FECHADA"
+SECURITY_DOOR_BUILDING,"Door L{level} ({x}, {y}): building","Porta N{level} ({x}, {y}): em obras"
+SECURITY_ERR_NO_PATH,No open path there,Sem caminho aberto até lá
+SECURITY_ERR_SQUAD_DOWN,Nobody in the squad can fight,Ninguém no esquadrão pode lutar
+SECURITY_ERR_NO_SQUAD,Pick a squad first,Escolha um esquadrão primeiro
+SECURITY_PICK_TARGET,Pick a room or corridor for Squad {number},Escolha uma sala ou corredor para o Esquadrão {number}
