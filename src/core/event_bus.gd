@@ -1,4 +1,5 @@
 extends Node
+@warning_ignore_start("unused_signal")
 ## Autoload. Domain events for the presentation layer: views subscribe here and redraw.
 ## The simulation never references this node; bind_simulation() forwards its signals,
 ## and re-emits each outbox event (Simulation.event_posted) as the signal of the same name
@@ -6,7 +7,6 @@ extends Node
 ## Bible: technical-architecture.md#architecture-overview
 
 ## Emitted after each simulation tick, by the clock.
-@warning_ignore("unused_signal")
 signal tick_advanced(tick: int)
 ## Emitted at the first tick of each day, with the new day's index.
 signal day_started(day_index: int)
@@ -15,213 +15,162 @@ signal command_rejected(type: StringName, code: StringName)
 ## Emitted when the simulation asks the clock to pause.
 signal pause_requested(reason: StringName)
 ## Emitted when the clock speed changes.
-@warning_ignore("unused_signal")
 signal speed_changed(speed_index: int)
 ## Emitted when the clock pauses or resumes.
-@warning_ignore("unused_signal")
 signal paused_changed(is_paused: bool)
 ## Emitted when the clock's time-control mode changes, with the new ClockState.Mode.
-@warning_ignore("unused_signal")
 signal time_mode_changed(mode: int)
 ## Emitted after a save completes.
-@warning_ignore("unused_signal")
 signal game_saved(slot: StringName)
 ## Emitted after a load completes.
-@warning_ignore("unused_signal")
 signal game_loaded(slot: StringName)
 ## Emitted when the Ring starts dialing, with the dialed address's key (GateAddress.key())
 ## (posted through the outbox).
-@warning_ignore("unused_signal")
 signal dial_started(address_key: String)
 ## Emitted when a dial resolves, with its DialOutcome.Kind and the address key; nothing else,
 ## so a failure never tells which seal was wrong (posted through the outbox).
-@warning_ignore("unused_signal")
 signal dial_resolved(outcome: int, address_key: String)
 ## Emitted when the open wormhole closes: &"player", &"timeout" or &"power" (posted through
 ## the outbox).
-@warning_ignore("unused_signal")
 signal wormhole_closed(reason: StringName)
 ## Emitted when a document arrives in the Archive, with its DocumentDef id (posted through
 ## the outbox).
-@warning_ignore("unused_signal")
 signal document_received(document_id: StringName)
 ## Emitted when the Address Book changes: a dial recorded or a note set (posted through the
 ## outbox).
-@warning_ignore("unused_signal")
 signal address_book_changed
 ## Emitted when a Capacitor Bank room is completed and starts charging, with the new capacity
 ## in MWh (posted through the outbox).
-@warning_ignore("unused_signal")
 signal capacitors_installed(capacity_mwh: float)
 ## Emitted when the power allocation changes: a room switched, a charge rate set, a new bank
 ## or rooms switched off to fit the supply (posted through the outbox).
-@warning_ignore("unused_signal")
 signal power_allocation_changed
 ## Emitted when the pole camera takes a world's horizon record, with the world id (posted
 ## through the outbox).
-@warning_ignore("unused_signal")
 signal horizon_record_taken(world_id: StringName)
 ## Emitted when the budget changes, with the new balance in $k (posted through the outbox).
-@warning_ignore("unused_signal")
 signal budget_changed(budget_k: int)
 ## Emitted when the player reads a far Ring's console, with that world's id (posted through
 ## the outbox).
-@warning_ignore("unused_signal")
 signal console_read(world_id: StringName)
 ## Emitted when a world's state rises (WorldProgress), with the world id and the new
 ## WorldsState.WorldStatus (posted through the outbox).
-@warning_ignore("unused_signal")
 signal world_status_changed(world_id: StringName, status: int)
 ## Emitted when a World Report fact's confidence rises (WorldProgress), with the world id, the
 ## WorldReport.Fact and the new WorldReport.Confidence (posted through the outbox).
-@warning_ignore("unused_signal")
 signal world_fact_raised(world_id: StringName, fact: int, confidence: int)
 ## Emitted when a target's saved state rises (WorldProgress.raise_target), with the world id,
 ## target id and TargetStates.State (posted through the outbox).
-@warning_ignore("unused_signal")
 signal world_target_changed(world_id: StringName, target_id: StringName, state: int)
 ## Emitted when a sample canister is thrown through, with the world id (posted through the
 ## outbox).
-@warning_ignore("unused_signal")
 signal canister_launched(world_id: StringName)
 ## Emitted when the canister is reeled back, with the world id and its WorldDef.Biohazard
 ## (posted through the outbox).
-@warning_ignore("unused_signal")
 signal canister_returned(world_id: StringName, biohazard: int)
 ## Emitted when the wormhole closes with the canister out, with the world id (posted through
 ## the outbox).
-@warning_ignore("unused_signal")
 signal canister_lost(world_id: StringName)
 ## Emitted when a MOTH is sent through, with the world id (posted through the outbox).
-@warning_ignore("unused_signal")
 signal moth_launched(world_id: StringName)
 ## Emitted when the MOTH starts a scan, with the MothRules.Scan and the target id (posted
 ## through the outbox).
-@warning_ignore("unused_signal")
 signal moth_scan_started(scan: int, target_id: StringName)
 ## Emitted when the MOTH finishes a scan, with the MothRules.Scan and the target id (posted
 ## through the outbox).
-@warning_ignore("unused_signal")
 signal moth_scan_finished(scan: int, target_id: StringName)
 ## Emitted when a recalled MOTH is back in the rack, with the world id (posted through the
 ## outbox).
-@warning_ignore("unused_signal")
 signal moth_recalled(world_id: StringName)
 ## Emitted when the MOTH is lost ("SIGNAL LOST"), with the world id and the reason:
 ## &"shot_down", &"battery" or &"wormhole_closed" (posted through the outbox).
-@warning_ignore("unused_signal")
 signal moth_lost(world_id: StringName, reason: StringName)
 ## Emitted when a replacement MOTH arrives, with the drones now in the rack (posted through
 ## the outbox).
-@warning_ignore("unused_signal")
 signal moth_delivered(rack: int)
 ## Emitted when an expedition is planned, with the world id (posted through the outbox).
-@warning_ignore("unused_signal")
 signal expedition_planned(world_id: StringName)
 ## Emitted when a team goes through the Ring, with the world id, the objective
 ## (ExpeditionState.Objective) and the team's names in slot order (posted through the outbox).
-@warning_ignore("unused_signal")
 signal team_sent(world_id: StringName, objective: int, team: Array)
 ## Emitted when a team comes home, with the world id, its ExpeditionState.Objective and whether
 ## the objective succeeded, and the team's names in slot order (posted through the outbox).
-@warning_ignore("unused_signal")
 signal team_returned(world_id: StringName, objective: int, success: bool, team: Array)
 ## Emitted at a check-in that is not the return, with the world id and the team's light and
 ## serious injuries and what the day brought ("finding", "injury" or "wasted") (posted through
 ## the outbox).
-@warning_ignore("unused_signal")
 signal team_checked_in(world_id: StringName, light: int, serious: int, day: String)
 ## Emitted when a field event resolves at a check-in, with the world id, the event id and the
 ## outcome ("finding" or a FieldEventDef setback name) and the name of who rolled ("" if no one)
 ## (posted through the outbox).
-@warning_ignore("unused_signal")
 signal field_event_resolved(
 	world_id: StringName, event_id: StringName, outcome: String, person_name: String
 )
 ## Emitted when the player recalls the team, with the world id (posted through the outbox).
-@warning_ignore("unused_signal")
 signal team_recalled(world_id: StringName)
 ## Emitted when a team misses a check-in and the rescue window opens, with the world id
 ## (posted through the outbox).
-@warning_ignore("unused_signal")
 signal check_in_missed(world_id: StringName)
 ## Emitted when Signal T-1 is sent, with the world id (posted through the outbox).
-@warning_ignore("unused_signal")
 signal rescue_signal_sent(world_id: StringName)
 ## Emitted when the wormhole closes before the signalled team reached the Ring, with the world
 ## id (posted through the outbox).
-@warning_ignore("unused_signal")
 signal rescue_signal_failed(world_id: StringName)
 ## Emitted for each team member who did not survive a rescue, with the name and the world id
 ## (posted through the outbox).
-@warning_ignore("unused_signal")
 signal member_deceased(person_name: String, world_id: StringName)
 ## Emitted when a rescued team comes through, with the world id and the survivors (posted
 ## through the outbox).
-@warning_ignore("unused_signal")
 signal team_rescued(world_id: StringName, survivors: int)
 ## Emitted once, when the first team comes home through its own check-ins (not a rescue), with
 ## the world id: the Prologue ends (posted through the outbox).
-@warning_ignore("unused_signal")
 signal prologue_completed(world_id: StringName)
 ## Emitted when a team is lost, with the world id and the reason, &"window" or &"no_answer"
 ## (posted through the outbox).
-@warning_ignore("unused_signal")
 signal team_lost(world_id: StringName, reason: StringName)
 
 ## Emitted when a construction site starts, with its site id (posted through the outbox).
-@warning_ignore("unused_signal")
 signal room_build_started(site_id: StringName)
 ## Emitted when a construction site finishes, with its site id (posted through the outbox).
-@warning_ignore("unused_signal")
 signal room_built(site_id: StringName)
 ## Emitted when a demolished room (all its levels) is gone, with its site id (posted through
 ## the outbox).
-@warning_ignore("unused_signal")
 signal room_demolished(site_id: StringName)
 ## Emitted when a new level is dug, with its number (posted through the outbox).
-@warning_ignore("unused_signal")
 signal level_dug(level: int)
 ## Emitted when a finished room switched on by lowering charging, with its id and the total
 ## charge rate left in MW (posted through the outbox).
-@warning_ignore("unused_signal")
 signal charging_lowered(room_id: StringName, charge_mw: int)
 ## Emitted when a finished room stays off because even zero charging is not enough, with its
 ## id, its draw and the spare supply in MW (posted through the outbox).
-@warning_ignore("unused_signal")
 signal room_finished_off(room_id: StringName, need_mw: int, spare_mw: int)
 ## Emitted when a plant went away (switched off or demolished) and the shed took its supply
 ## from charging first, then rooms: the plant's id, the total charge rate left in MW and the
 ## rooms switched off (posted through the outbox).
-@warning_ignore("unused_signal")
 signal supply_dropped(room_id: StringName, charge_mw: int, rooms_off: int)
 ## Emitted when a dug level's lift segment is refused for lack of funds, with the level and
 ## the segment's cost in $k (posted through the outbox).
-@warning_ignore("unused_signal")
 signal lift_segment_refused(level: int, cost_k: int)
 ## Emitted when a research project starts, with its id (posted through the outbox).
-@warning_ignore("unused_signal")
 signal research_started(project_id: StringName)
 ## Emitted when the running research project is cancelled, with its id (posted through the
 ## outbox).
-@warning_ignore("unused_signal")
 signal research_cancelled(project_id: StringName)
 ## Emitted when a research project finishes and its unlocks apply, with its id (posted
 ## through the outbox).
-@warning_ignore("unused_signal")
 signal research_done(project_id: StringName)
 ## Emitted when people change rooms or join or leave the roster, with the reason
 ## (StaffChanges: &"assigned", &"unassigned", &"auto_assigned", &"released"; RecruitmentRules:
 ## &"hired", &"dismissed"), the def id of the room concerned and how many people moved
 ## (posted through the outbox).
-@warning_ignore("unused_signal")
 signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
 # M4 factions, conversations, requests and artefacts (posted through the outbox).
-@warning_ignore_start("unused_signal")
 ## A story effect offered a request (uid).
 signal request_offered(uid: int)
 ## A debug story command ran (action, id; logged "(debug)").
 signal debug_story(action: StringName, id: StringName)
+## The active slow reasons changed (keys "reason" or "reason/source"; empty when none).
+signal slow_changed(reasons: Array[StringName])
 ## A cheat ran (action, id, value; logged "(cheat)").
 signal debug_cheat(action: StringName, id: StringName, value: int)
 ## A request changed state (RequestRecord.RequestState as int).
@@ -268,36 +217,27 @@ signal incoming_wormhole(faction: StringName)
 signal incoming_answered(faction: StringName)
 ## Emitted when an incoming wormhole is ignored or gives up, with the faction id (outbox; logged).
 signal incoming_ignored(faction: StringName)
-@warning_ignore_restore("unused_signal")
 ## Emitted whenever Committee Confidence changes (an event or the daily settlement's drift),
 ## with the new value in tenths (posted through the outbox).
-@warning_ignore("unused_signal")
 signal confidence_changed(confidence_tenths: int)
 ## Emitted when analysts file their reports (every 15th day), with how many filed (posted
 ## through the outbox; logged).
-@warning_ignore("unused_signal")
 signal reports_filed(analysts: int)
 ## Emitted when the Committee pays its commendation, with the amount in $k (posted through
 ## the outbox; logged).
-@warning_ignore("unused_signal")
 signal committee_commendation(amount_k: int)
 ## Emitted when the Committee warns (DailySettlement: &"red_days" every 7 settlements in a
 ## row in the red, &"confidence_zero" when Confidence first reaches 0). A warning only: the
 ## game goes on (posted through the outbox; logged).
-@warning_ignore("unused_signal")
 signal committee_warning(reason: StringName)
 ## Emitted on the tick a hired person arrives on base (RecruitmentSystem; logged).
-@warning_ignore("unused_signal")
 signal staff_arrived(person_id: StringName)
 ## Emitted when the Directorate lends a soldier, at the Expeditions unlock or as a replacement
 ## (ExpeditionUnlock; logged).
-@warning_ignore("unused_signal")
 signal soldier_lent(person_id: StringName)
 ## Emitted when an injured person heals and goes back to work (StaffCareSystem).
-@warning_ignore("unused_signal")
 signal staff_healed(person_id: StringName)
 ## Emitted when the candidate list changes: an arrival, a leaver or a hire.
-@warning_ignore("unused_signal")
 signal candidates_changed
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A

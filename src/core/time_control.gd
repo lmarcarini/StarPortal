@@ -21,6 +21,14 @@ const ALLOWED: Dictionary = {
 	ClockState.Mode.HELD: [ClockState.Mode.RUNNING, ClockState.Mode.PAUSED],
 }
 
+## Slow reasons the player may override with Faster (event-time.md section 2); the others
+## (conversation, incursion) need the player's eyes.
+const OVERRIDABLE: Array[StringName] = [&"dialling", &"gate_ops", &"awaiting_answer"]
+## Every slow reason.
+const SLOW_REASONS: Array[StringName] = [
+	&"dialling", &"gate_ops", &"conversation", &"awaiting_answer", &"incursion"
+]
+
 
 ## True when the table allows changing from [param from] to [param to]. Staying in the
 ## same mode is not a transition.
@@ -119,3 +127,70 @@ static func _log_transition(from: ClockState.Mode, to: ClockState.Mode, reason: 
 		var action: String = "added" if to == ClockState.Mode.HELD else "released"
 		line += " (hold %s %s)" % [reason, action]
 	print(line)
+
+
+## The slow key of [param reason] from [param source]: "reason" or "reason/source".
+static func slow_key(reason: StringName, source: StringName = &"") -> StringName:
+	return reason if source.is_empty() else StringName("%s/%s" % [reason, source])
+
+
+## The reason part of a slow [param key].
+static func reason_of(key: StringName) -> StringName:
+	return StringName(String(key).get_slice("/", 0))
+
+
+## Adds the slow [param reason] from [param source]. A key already active, or overridden
+## while its event goes on, adds nothing. Returns true when it changed the clock.
+static func add_slow(clock: ClockState, reason: StringName, source: StringName = &"") -> bool:
+	var key: StringName = slow_key(reason, source)
+	if clock.slows.has(key) or clock.overridden.has(key):
+		return false
+	clock.slows.append(key)
+	return true
+
+
+## Releases the slow [param reason] from [param source] (its event ended), and forgets an
+## override of it. Releasing one not held is a no-op. Returns true when slows changed.
+static func release_slow(clock: ClockState, reason: StringName, source: StringName = &"") -> bool:
+	var key: StringName = slow_key(reason, source)
+	clock.overridden.erase(key)
+	if not clock.slows.has(key):
+		return false
+	clock.slows.erase(key)
+	return true
+
+
+## True while any slow reason is active.
+static func is_slowed(clock: ClockState) -> bool:
+	return not clock.slows.is_empty()
+
+
+## The speed the clock runs at: the cruise speed, or [param slow_index] while slowed when
+## that is slower.
+static func effective_speed_index(
+	clock: ClockState, slow_index: int = ClockState.NORMAL_SPEED_INDEX
+) -> int:
+	if clock.slows.is_empty():
+		return clock.speed_index
+	return mini(clock.speed_index, slow_index)
+
+
+## True when an active slow can be overridden ([param overridable] reasons).
+static func can_override(clock: ClockState, overridable: Array[StringName] = OVERRIDABLE) -> bool:
+	for key: StringName in clock.slows:
+		if overridable.has(reason_of(key)):
+			return true
+	return false
+
+
+## Releases every active [param overridable] slow and remembers it as overridden until its
+## event ends. Returns true when anything changed.
+static func override(clock: ClockState, overridable: Array[StringName] = OVERRIDABLE) -> bool:
+	var changed: bool = false
+	for key: StringName in clock.slows.duplicate():
+		if overridable.has(reason_of(key)):
+			clock.slows.erase(key)
+			if not clock.overridden.has(key):
+				clock.overridden.append(key)
+			changed = true
+	return changed

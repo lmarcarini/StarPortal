@@ -168,7 +168,10 @@ func _run_due_ticks(due: int) -> int:
 ## the speed (a lock drops it to 1×), so views redraw through the usual signal.
 func _run_tick() -> void:
 	var speed_before: int = simulation.state.clock.speed_index
+	var slows_before: Array[StringName] = simulation.state.clock.slows.duplicate()
 	simulation.advance_tick()
+	if simulation.state.clock.slows != slows_before:
+		EventBus.slow_changed.emit(simulation.state.clock.slows.duplicate())
 	EventBus.tick_advanced.emit(simulation.state.clock.tick)
 	var speed_after: int = simulation.state.clock.speed_index
 	if speed_after != speed_before:
@@ -178,7 +181,13 @@ func _run_tick() -> void:
 func _ticks_per_second() -> float:
 	if _slow_mode:
 		return 1.0 / SLOW_MODE_SECONDS_PER_TICK
-	return SPEEDS[clampi(simulation.state.clock.speed_index, 0, SPEEDS.size() - 1)]
+	var clock: ClockState = simulation.state.clock
+	var balance: BalanceConfig = simulation.state.balance
+	var slow_index: int = (
+		ClockState.NORMAL_SPEED_INDEX if balance == null else balance.slow_speed_index
+	)
+	var index: int = TimeControl.effective_speed_index(clock, slow_index)
+	return SPEEDS[clampi(index, 0, SPEEDS.size() - 1)]
 
 
 ## Runs [param rule], a TimeControl function taking the ClockState, then emits

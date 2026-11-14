@@ -13,7 +13,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 16
+const TARGET_VERSION: int = 17
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
 const OLDEST_VERSION: int = 15
 
@@ -21,7 +21,7 @@ const OLDEST_VERSION: int = 15
 ## Returns the built-in steps, keyed by the version they migrate from. (A function, not a
 ## constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
-	var built_in: Dictionary[int, Callable] = {15: _v15_to_v16}
+	var built_in: Dictionary[int, Callable] = {15: _v15_to_v16, 16: _v16_to_v17}
 	return built_in
 
 
@@ -53,6 +53,19 @@ static func _v15_to_v16(data: Dictionary) -> Dictionary:
 ## Fails with &"bad_format_version", &"old_format_version" (below
 ## [constant OLDEST_VERSION]), &"newer_format_version", &"missing_migration_step" or
 ## &"migration_failed". The input dictionary is never modified.
+## v17 (M4.7-02): the clock gains its slow reasons and overrides, both empty.
+static func _v16_to_v17(data: Dictionary) -> Dictionary:
+	var out: Dictionary = data.duplicate(true)
+	if not out.get("state") is Dictionary:
+		return out
+	var state: Dictionary = out["state"]
+	if state.get("clock") is Dictionary:
+		var clock: Dictionary = state["clock"]
+		clock["slows"] = []
+		clock["overridden"] = []
+	return out
+
+
 static func migrate(data: Dictionary) -> Result:
 	var version_result := read_version(data)
 	if not version_result.is_ok:
