@@ -7,7 +7,7 @@ extends RefCounted
 ## Bible: game-design.md#base-building-and-power, technical-architecture.md#data-model
 
 ## Saved keys, in to_dict() order.
-const _KEYS: Array[String] = ["grid_size", "levels", "rooms", "next_room_number"]
+const _KEYS: Array[String] = ["grid_size", "levels", "rooms", "next_room_number", "doors"]
 
 ## Number of levels, dug or being dug: the size of [member levels].
 var level_count: int:
@@ -22,6 +22,8 @@ var levels: Array[LevelState] = []
 var rooms: Array[RoomState] = []
 ## Number used for the next room's id ("room_<n>"); never reused.
 var next_room_number: int = 1
+## Blast doors on corridor cells (M4c).
+var doors: Array[DoorState] = []
 
 
 ## Places a new built, unturned room of [param def_id] at [param origin] on level
@@ -84,11 +86,15 @@ func to_dict() -> Dictionary:
 	var room_data: Array = []
 	for room: RoomState in rooms:
 		room_data.append(room.to_dict())
+	var door_data: Array = []
+	for door: DoorState in doors:
+		door_data.append(door.to_dict())
 	return {
 		"grid_size": [grid_size.x, grid_size.y],
 		"levels": level_data,
 		"rooms": room_data,
 		"next_room_number": next_room_number,
+		"doors": door_data,
 	}
 
 
@@ -107,6 +113,8 @@ static func from_dict(data: Dictionary) -> BaseState:
 			var room_data: Dictionary = entry
 			base.rooms.append(RoomState.from_dict(room_data))
 	base.next_room_number = maxi(1, RoomState.read_count(data.get("next_room_number")))
+	for item: Dictionary in SaveFields.dicts_in(data.get("doors")):
+		base.doors.append(DoorState.from_dict(item))
 	return base
 
 
@@ -115,8 +123,9 @@ static func from_dict(data: Dictionary) -> BaseState:
 ## levels; "rooms" an array of valid rooms with unique ids, each on an existing level with its
 ## origin inside the grid, on a dug level, and not both building and being demolished; at most
 ## one level being dug, and only the deepest; "next_room_number" a whole number of at least 1
-## and above every "room_<n>" id's number (so add_room() can never repeat an id). Footprints are not
-## checked here: that needs the RoomDefs (BaseRules.fits()).
+## and above every "room_<n>" id's number (so add_room() can never repeat an id); "doors" an
+## array of valid blast doors. Footprints are not checked here: that needs the RoomDefs
+## (BaseRules.fits()).
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _KEYS:
@@ -131,6 +140,7 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'next_room_number' is not a whole number of at least 1")
 	errors.append_array(_entry_errors("levels", data["levels"], LevelState.validate_dict))
 	errors.append_array(_entry_errors("rooms", data["rooms"], RoomState.validate_dict))
+	errors.append_array(_entry_errors("doors", data["doors"], DoorState.validate_dict))
 	if not errors.is_empty():
 		return errors
 	var levels: Array = data["levels"]

@@ -13,7 +13,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 18
+const TARGET_VERSION: int = 19
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
 const OLDEST_VERSION: int = 15
 
@@ -21,7 +21,9 @@ const OLDEST_VERSION: int = 15
 ## Returns the built-in steps, keyed by the version they migrate from. (A function, not a
 ## constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
-	var built_in: Dictionary[int, Callable] = {15: _v15_to_v16, 16: _v16_to_v17, 17: _v17_to_v18}
+	var built_in: Dictionary[int, Callable] = {
+		15: _v15_to_v16, 16: _v16_to_v17, 17: _v17_to_v18, 18: _v18_to_v19
+	}
 	return built_in
 
 
@@ -75,6 +77,21 @@ static func _v17_to_v18(data: Dictionary) -> Dictionary:
 	if state.get("gate") is Dictionary:
 		var gate: Dictionary = state["gate"]
 		gate["operating"] = false
+	return out
+
+
+## v19 (M4c-02): empty incursion, security and outcome sections, and no blast doors.
+static func _v18_to_v19(data: Dictionary) -> Dictionary:
+	var out: Dictionary = data.duplicate(true)
+	if not out.get("state") is Dictionary:
+		return out
+	var state: Dictionary = out["state"]
+	state["incursion"] = IncursionState.new().to_dict()
+	state["security"] = SecurityState.new().to_dict()
+	state["outcome"] = OutcomeState.new().to_dict()
+	if state.get("base") is Dictionary:
+		var base: Dictionary = state["base"]
+		base["doors"] = []
 	return out
 
 

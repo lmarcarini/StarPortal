@@ -16,6 +16,9 @@ var _simulation: Simulation
 
 func before_test() -> void:
 	_state = StoryFixture.state()
+	for record: WorldRecord in _state.galaxy.all_worlds():
+		if record.controller == KINDRED:
+			record.controller = &""
 	_state.galaxy.get_world(WORLD).controller = KINDRED
 	var def: ConversationDef = ConversationTests.make_def()
 	def.channels = [&"incoming"]

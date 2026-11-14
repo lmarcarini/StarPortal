@@ -240,6 +240,25 @@ signal staff_healed(person_id: StringName)
 ## Emitted when the candidate list changes: an arrival, a leaver or a hire.
 signal candidates_changed
 
+# M4c incursions and failure states (docs/content/m4c-incursions.md).
+## The Ring opened from outside with the incursion [param def_id] on the way.
+signal incursion_warning(def_id: StringName)
+## The warning ran out: intruders are in the Gate Room.
+signal incursion_breached
+## The incursion ended; [param report] is the after-action report.
+signal incursion_ended(report: Dictionary)
+## A squad changed (order, place or strength).
+signal squad_changed(squad_id: StringName)
+## The blast door at [param cell] on [param level] changed.
+signal door_changed(level: int, cell: Vector2i)
+## A room was damaged or repaired.
+signal room_damaged(room_uid: StringName)
+signal room_repaired(room_uid: StringName)
+## Intruders moved this tick.
+signal intruders_moved
+## The game ended with [param cause].
+signal game_failed(cause: StringName)
+
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared
 ## name, so a system can never fake a tick, a day, a pause or a save. pause_requested is
