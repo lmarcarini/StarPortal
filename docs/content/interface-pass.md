@@ -35,10 +35,14 @@ Base plan and the Ring are today, so it costs no art time and scales cleanly fro
 150%.
 
 **Camera (3D).** Two places only: the Gate Room's view of the Ring, and the security camera
-feed. Both use the pipeline the MOTH feed already has: a low-poly scene in a small
-SubViewport (320 × 240), upscaled with scanlines and grain, a fixed camera, no free look.
-The low resolution is the style and also the budget: untextured or flat-colour meshes, one
-or two lights, no shadows beyond a baked blob.
+feed. Both use one new pipeline: a low-poly scene in a small SubViewport (320 × 240),
+upscaled with a scanline and grain shader, a fixed camera, no free look. The low resolution
+is the style and also the budget: sets are built in code from boxes and cylinders in flat
+colours, with one or two lights and no real-time shadows, so no modelled art is needed.
+
+This is the project's first 3D. The MOTH is a 2D scan screen today (M3 owner decision), so
+nothing exists to reuse; the SubViewport and shader built here are the ones the bible's 3D
+drone feed would use later.
 
 The contrast is deliberate. The player manages through instruments and *looks* through
 cameras, so anything shown in 3D feels like the real place.
@@ -179,7 +183,7 @@ outside Quarters and are also listed in a tray at the bottom of the plan.
 **Staff walk (owner decision).** Tokens move along corridors and through doors, never
 through walls, and the camera feeds show the same people in the same places.
 
-- *Reassignment:* the person walks from the old room to the new one. **(proposal)** The
+- *Reassignment:* the person walks from the old room to the new one. The
   assignment itself still takes effect at once in the simulation, as now; the walk is
   presentation. A real walk across the base is about one in-game minute, which is one
   second at 1× and nothing at 10×, so a simulated walk could not be seen anyway. The token
@@ -188,7 +192,7 @@ through walls, and the camera feeds show the same people in the same places.
 - *Life:* at work, people shift between a few spots in their room (desk, console, bench).
   Now and then one walks to another room and back. At night most tokens go to Quarters and
   a few stay on shift. All of it is presentation only, has no effect on output and uses its
-  own random stream, so saves and tests are untouched. **(proposal)**
+  own random stream, so saves and tests are untouched.
 - *Arrivals and leavers* walk in from, and out to, the lift.
 - *Paused:* everyone stops.
 
@@ -257,24 +261,28 @@ Settled on 2026-11-13: bible palette with more material and light; tab order and
 cork board and lit plan shading retired; gate thumbnail while a wormhole is open; staff
 walk.
 
-Still open, both PO proposals in section 5: the walk is presentation only (assignments
-take effect at once), and the day and night movement of staff is presentation only.
+Also confirmed by the owner (2026-11-14): the walk is presentation only (assignments take
+effect at once), and the day and night movement of staff is presentation only.
 
-## 11. Suggested cards
+## 11. Cards
 
-| # | Card | Type |
+Milestone "M4.5 Interface pass". This document is M4.5-01.
+
+| Card | Title | Depends on |
 | --- | --- | --- |
-| 1 | Theme: palette, fonts, bezelled panels, key buttons, lamps, grain as one Godot Theme | feature |
-| 2 | Top bar: funds change, power, gate chip with live thumbnail, alert list | feature |
-| 3 | Alert kinds and links for idle lab, unassigned staff, due requests and the rest | feature |
-| 4 | Tab bar: seven tabs, icons, attention dots, new order and keys | feature |
-| 5 | Three-column layout applied to Research, Personnel, Command | feature |
-| 6 | Base plan: schematic painter | feature |
-| 7 | Staff tokens and the unassigned tray | feature |
-| 7a | Corridor paths and walking tokens (reassignment, arrivals, leavers) | feature |
-| 7b | Ambient life: spots in rooms, visits, night in Quarters | feature |
-| 8 | Allocation by placing (mouse, keys, gamepad) and the Staff sub-tab | feature |
-| 9 | Camera kit: low-res 3D feed widget, three room sets | feature |
-| 10 | Camera inset and expand on the Base tab | feature |
-| 11 | Gate Room: 3D Ring view | feature |
-| 12 | Flow test, pseudo-localisation pass, playtest guide | test |
+| M4.5-02 | Theme: palette, fonts, bezelled panels, key buttons, lamps, grain | none |
+| M4.5-03 | Top bar: funds change, power, gate chip, alert button | 02 |
+| M4.5-04 | Alert list and alert kinds | 03 |
+| M4.5-05 | Tab bar: seven icon tabs, attention dots, new order and keys | 02 |
+| M4.5-06 | Three-column layout: Research and Personnel | 05 |
+| M4.5-07 | Command as an instrument tab with sub-tabs | 05 |
+| M4.5-08 | Base plan: schematic painter | 02 |
+| M4.5-09 | Staff tokens and the unassigned tray | 08 |
+| M4.5-10 | Corridor paths and walking tokens | 09 |
+| M4.5-11 | Ambient life on the plan | 10 |
+| M4.5-12 | Allocation by placing and the Staff sub-tab | 09 |
+| M4.5-13 | Camera feed kit: 3D feed widget, shader, three room sets | 02 |
+| M4.5-14 | Camera inset and expand on the Base tab | 10, 13 |
+| M4.5-15 | Gate Room: 3D Ring view | 13 |
+| M4.5-16 | Gate thumbnail in the top bar | 03, 15 |
+| M4.5-17 | Flow test, pseudo-localisation pass, playtest guide | all |
