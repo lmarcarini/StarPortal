@@ -13,6 +13,7 @@ const VALUES: Dictionary = {
 	{
 		&"ui_scale": 1.0,
 		&"text_size": 1.0,
+		&"screen_grain": true,
 	},
 	&"audio":
 	{

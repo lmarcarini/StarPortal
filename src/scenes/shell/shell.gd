@@ -30,6 +30,9 @@ var new_game_seed: int = -1
 ## The debug overlay; null in release builds.
 var debug_overlay: DebugOverlay = null
 
+## Grain and vignette over the whole screen (display/screen_grain setting).
+var screen_grain := ScreenGrain.new()
+
 var _simulation: Simulation = null
 var _debug_flag_count: int = 0
 var _rescue_alert := RescueAlert.new()
@@ -53,6 +56,8 @@ var _conversation := ConversationPanel.new()
 
 func _ready() -> void:
 	_apply_min_window_size()
+	_apply_theme()
+	add_child(screen_grain)
 	_quick_save_button.pressed.connect(quick_save)
 	_quick_load_button.pressed.connect(quick_load)
 	money_label.pressed.connect(open_command)
@@ -78,6 +83,7 @@ func _enter_tree() -> void:
 	EventBus.prologue_completed.connect(_on_prologue_completed)
 	EventBus.request_changed.connect(_on_request_changed)
 	EventBus.artefact_hazard.connect(_on_artefact_hazard)
+	Settings.setting_changed.connect(_on_setting_changed)
 
 
 func _exit_tree() -> void:
@@ -88,6 +94,7 @@ func _exit_tree() -> void:
 	EventBus.prologue_completed.disconnect(_on_prologue_completed)
 	EventBus.request_changed.disconnect(_on_request_changed)
 	EventBus.artefact_hazard.disconnect(_on_artefact_hazard)
+	Settings.setting_changed.disconnect(_on_setting_changed)
 	if _simulation != null and SimClock.simulation == _simulation:
 		SimClock.stop()
 
@@ -329,3 +336,14 @@ func _on_request_changed(uid: int, to: int) -> void:
 ## A non-pausing message when an artefact's hazard strikes.
 func _on_artefact_hazard(artefact_id: StringName) -> void:
 	show_message(ArtefactText.hazard_line(artefact_id), 4.0)
+
+
+## Applies the interface theme at the current UI scale and paints the ground colour.
+func _apply_theme() -> void:
+	theme = UiThemeBuilder.build(Settings.get_float(&"display", &"ui_scale"))
+	RenderingServer.set_default_clear_color(UiPalette.GROUND)
+
+
+func _on_setting_changed(section: StringName, key: StringName, _value: Variant) -> void:
+	if section == &"display" and key == &"ui_scale":
+		_apply_theme()
