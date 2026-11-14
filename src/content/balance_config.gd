@@ -110,6 +110,9 @@ const BALANCE_ID: StringName = &"balance"
 ## Research projects the player may queue (m4-core-systems.md section 7).
 @export var research_queue_max: int = 5
 
+## Speed index the clock drops to while a slow reason is active (event-time.md section 2).
+@export var slow_speed_index: int = 1
+
 
 func _init() -> void:
 	id = BALANCE_ID

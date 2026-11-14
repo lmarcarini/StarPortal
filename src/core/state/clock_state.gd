@@ -29,6 +29,13 @@ var holds: Array[StringName] = []
 ## Mode to return to when the last hold is released: RUNNING or PAUSED. Meaningful while
 ## HELD; player pause/resume requests during a hold change this instead of the mode.
 var mode_after_hold: Mode = Mode.PAUSED
+## Active slow reasons (docs/content/event-time.md section 2): each is a reason ("dialling")
+## or a reason and its source ("awaiting_answer/kindred"), so two events sharing a reason are
+## counted apart. While any is active the clock runs at the slow speed (or cruise, if slower).
+## Change only through TimeControl.
+var slows: Array[StringName] = []
+## Slow keys the player overrode: they do not slow again until their event releases them.
+var overridden: Array[StringName] = []
 ## True while time does not advance (mode is not RUNNING). Setting it is a player pause
 ## (true) or resume (false) request through TimeControl; it never clears a hold.
 var is_paused: bool:
@@ -52,7 +59,27 @@ func to_dict() -> Dictionary:
 		"mode": _MODE_NAMES[mode],
 		"holds": hold_names,
 		"mode_after_hold": _MODE_NAMES[mode_after_hold],
+		"slows": _names(slows),
+		"overridden": _names(overridden),
 	}
+
+
+static func _names(keys: Array[StringName]) -> Array[String]:
+	var names: Array[String] = []
+	for key: StringName in keys:
+		names.append(String(key))
+	return names
+
+
+static func _read_keys(value: Variant) -> Array[StringName]:
+	var keys: Array[StringName] = []
+	if value is Array:
+		var list: Array = value
+		for entry: Variant in list:
+			var key := StringName(str(entry))
+			if not key.is_empty() and not keys.has(key):
+				keys.append(key)
+	return keys
 
 
 ## Builds a ClockState from saved [param data]. Missing or unreadable keys keep their
@@ -69,6 +96,8 @@ static func from_dict(data: Dictionary) -> ClockState:
 		var hold_list: Array = hold_data
 		for reason: Variant in hold_list:
 			clock.holds.append(StringName(str(reason)))
+	clock.slows = _read_keys(data.get("slows", []))
+	clock.overridden = _read_keys(data.get("overridden", []))
 	return clock
 
 
@@ -90,6 +119,9 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 			errors.append("'speed_index' is not below %d" % SPEED_COUNT)
 	errors.append_array(_validate_modes(data))
 	errors.append_array(_validate_holds(data))
+	for key: String in ["slows", "overridden"]:
+		if data.has(key) and not data[key] is Array:
+			errors.append("'%s' is not an array" % key)
 	return errors
 
 

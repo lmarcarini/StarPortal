@@ -64,6 +64,7 @@ static func register_defaults() -> void:
 	_types[RetrieveArtefactCommand.TYPE] = RetrieveArtefactCommand
 	_types[DebugStoryCommand.TYPE] = DebugStoryCommand
 	_types[DebugCheatCommand.TYPE] = DebugCheatCommand
+	_types[OverrideSlowCommand.TYPE] = OverrideSlowCommand
 	_types[AcceptRequestCommand.TYPE] = AcceptRequestCommand
 	_types[DeclineRequestCommand.TYPE] = DeclineRequestCommand
 	_types[AnswerCallCommand.TYPE] = AnswerCallCommand

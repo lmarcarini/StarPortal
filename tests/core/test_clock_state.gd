@@ -26,6 +26,8 @@ func _held_data() -> Dictionary:
 		"mode": "held",
 		"holds": ["cutscene", "decision"],
 		"mode_after_hold": "paused",
+		"slows": [],
+		"overridden": [],
 	}
 
 
