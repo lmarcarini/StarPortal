@@ -188,3 +188,5 @@ BASE_BUILD_ERR_GATE_DOORWAY,The Gate Room doorway cannot be sealed,A entrada da 
 BASE_BUILD_ERR_DOOR_EXISTS,There is a door here already,Já há uma porta aqui
 BASE_BUILD_ERR_NOT_BUILT,The door is still being built,A porta ainda está em construção
 BASE_BUILD_ERR_NO_DOOR,There is no door here,Não há porta aqui
+ROOM_SECURITY_POST_NAME,Security,Guarda
+ROOM_SECURITY_POST_NOW,Its soldiers form one squad you can order around the base.,Seus soldados formam um esquadrão que você pode mover pela base.

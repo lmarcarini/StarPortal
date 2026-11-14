@@ -58,9 +58,16 @@ const BALANCE_ID: StringName = &"balance"
 ## A blast door (M4c): cost in $k and build time in ticks.
 @export var door_cost_k: int = 50
 @export var door_build_ticks: int = 120
+## Squads (M4c): cells walked per tick, and ticks to change level in a lift or stairs.
+@export var squad_cells_per_tick: int = 2
+@export var squad_level_ticks: int = 1
 ## Room def ids a new game may build before any research (m25-lean-start.md section 1).
 @export var starting_room_unlocks: Array[StringName] = [
-	&"room_capacitor_bank", &"room_research_lab", &"room_corridor", &"room_quarters"
+	&"room_capacitor_bank",
+	&"room_research_lab",
+	&"room_corridor",
+	&"room_quarters",
+	&"room_security_post",
 ]
 
 @export_group("Dial outcomes")
