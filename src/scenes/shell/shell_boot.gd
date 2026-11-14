@@ -18,3 +18,34 @@ static func choose_seed(new_game_seed: int) -> int:
 static func apply_min_window_size(window: Window, size: Vector2i) -> void:
 	if window != null:
 		window.min_size = size
+
+
+## Links [param buttons] into a ring (left/right wrap) with [param below] under each.
+static func link_focus(buttons: Array[Button], below: Control) -> void:
+	var count: int = buttons.size()
+	for index: int in count:
+		var button: Button = buttons[index]
+		var previous: NodePath = button.get_path_to(buttons[(index - 1 + count) % count])
+		var next: NodePath = button.get_path_to(buttons[(index + 1) % count])
+		button.focus_neighbor_left = previous
+		button.focus_previous = previous
+		button.focus_neighbor_right = next
+		button.focus_next = next
+		button.focus_neighbor_top = NodePath(".")
+		button.focus_neighbor_bottom = button.get_path_to(below)
+
+
+## Adds [param menu] over [param shell] and joins it to the shell's save, load and menu.
+static func add_pause_menu(shell: Node, menu: PauseMenu) -> void:
+	shell.add_child(menu)
+	menu.save_requested.connect(Callable(shell, &"save_slot"))
+	menu.load_requested.connect(Callable(shell, &"load_slot"))
+	menu.menu_requested.connect(Callable(shell, &"return_to_menu"))
+
+
+## Shows the Archive's Log in [param view_switcher] (the log strip's Open).
+static func open_log(view_switcher: ViewSwitcher) -> void:
+	view_switcher.show_view(ViewSwitcher.ARCHIVE)
+	var archive: ArchiveView = view_switcher.get_view(ViewSwitcher.ARCHIVE) as ArchiveView
+	if archive != null:
+		archive.show_section(true)

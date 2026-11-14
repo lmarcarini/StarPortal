@@ -120,6 +120,32 @@ func list_slots() -> Array[Dictionary]:
 	return slots
 
 
+## Like [method list_slots] but keeps the files that can't be loaded, each with "error" set to
+## why (a newer or older format, a broken file...), newest file first. Usable entries have
+## "error" = &"" (the save list, M4.6-02).
+func list_all_slots() -> Array[Dictionary]:
+	var slots: Array[Dictionary] = []
+	var dir := DirAccess.open(saves_dir)
+	if dir == null:
+		return slots
+	for file_name: String in dir.get_files():
+		var slot := StringName(file_name.trim_suffix(FILE_EXTENSION))
+		if not file_name.ends_with(FILE_EXTENSION) or not is_valid_slot_name(slot):
+			continue
+		var entry: Dictionary = _slot_entry(slot)
+		if entry.is_empty():
+			var failed: Result = load_game(slot)
+			var error: StringName = &"broken_file" if failed.is_ok else failed.error_code
+			var modified: int = FileAccess.get_modified_time(slot_path(slot))
+			entry = {"slot": slot, "tick": -1, "saved_at_unix": modified, "format_version": -1}
+			entry["error"] = error
+		else:
+			entry["error"] = &""
+		slots.append(entry)
+	slots.sort_custom(_newer_first)
+	return slots
+
+
 ## Deletes [param slot] and any leftover temporary file for it. A leftover temporary file
 ## is removed even when the slot itself is missing, which still fails with &"missing_file".
 func delete_slot(slot: StringName) -> Result:

@@ -54,7 +54,10 @@ func test_actions_registered_at_start_up_not_in_project_settings() -> void:
 		assert_bool(InputMap.has_action(action)).is_true()
 		assert_bool(ProjectSettings.has_setting("input/%s" % action)).is_false()
 	assert_bool(InputMap.event_is_action(_key(KEY_SPACE), &"time_toggle_pause")).is_true()
-	assert_bool(InputMap.event_is_action(_button(JOY_BUTTON_START), &"time_toggle_pause")).is_true()
+	(
+		assert_bool(InputMap.event_is_action(_button(JOY_BUTTON_LEFT_STICK), &"time_toggle_pause"))
+		. is_true()
+	)
 	assert_bool(InputMap.event_is_action(_key(KEY_F8), &"quick_save")).is_true()
 
 
@@ -182,7 +185,7 @@ func test_reset_to_defaults() -> void:
 	_changed_actions.clear()
 	service.reset_to_defaults()
 	_assert_keys(service, &"quick_load", [KEY_F9])
-	_assert_pad(service, &"time_toggle_pause", [JOY_BUTTON_START])
+	_assert_pad(service, &"time_toggle_pause", [JOY_BUTTON_LEFT_STICK])
 	assert_bool(InputMap.event_is_action(_key(KEY_L), &"quick_load")).is_false()
 	assert_array(_changed_actions).contains_exactly_in_any_order(
 		[&"quick_load", &"time_toggle_pause"]

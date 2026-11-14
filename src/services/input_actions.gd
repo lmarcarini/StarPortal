@@ -20,6 +20,7 @@ const ACTIONS: Array[StringName] = [
 	&"quick_load",
 	&"debug_toggle_overlay",
 	&"debug_toggle_cheats",
+	&"pause_menu",
 	&"view_next",
 	&"view_previous",
 	&"view_gate_room",
@@ -61,7 +62,8 @@ const DEFAULTS: Dictionary = {
 	&"time_toggle_pause":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_SPACE}],
-		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_START}],
+		GAMEPAD:
+		[{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_LEFT_STICK}],
 	},
 	&"time_faster":
 	{
@@ -114,6 +116,11 @@ const DEFAULTS: Dictionary = {
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F10}],
 		GAMEPAD: [],
+	},
+	&"pause_menu":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_ESCAPE}],
+		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_START}],
 	},
 	&"view_next":
 	{
