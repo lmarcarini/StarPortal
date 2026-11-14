@@ -14,6 +14,9 @@ extends GameView
 ## demolition's or dig's work left crosses a step.
 const PROGRESS_STEP_TICKS: int = 5
 
+## The selected room's camera inset in the detail column.
+var room_camera := RoomCamera.new()
+
 var _simulation: Simulation = null
 var _defs: Dictionary = {}
 ## What the plan last drew from; a tick redraws only when it changes.
@@ -46,6 +49,9 @@ func _ready() -> void:
 	_ready_build()
 	_setup_power()
 	add_child(_messages)
+	_panel.add_child(room_camera)
+	_panel.move_child(room_camera, 0)
+	room_camera.setup(_plan)
 	_panel.add_child(_slots)
 	_room_artefacts.visible = false
 	_panel.add_child(_room_artefacts)
@@ -130,6 +136,10 @@ func get_sub_tabs() -> BaseSubTabs:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if room_camera.is_expanded() and event.is_action_pressed(&"ui_cancel"):
+		room_camera.set_expanded(false)
+		get_viewport().set_input_as_handled()
+		return
 	if is_visible_in_tree() and _tabs.handle_input(event):
 		get_viewport().set_input_as_handled()
 		return
@@ -215,6 +225,7 @@ func _on_selection_changed(selected: StringName) -> void:
 	_power.select(selected)
 	if _simulation == null:
 		return
+	room_camera.show_room(selected)
 	_slots.show_room(selected)
 	var room: RoomState = _simulation.state.base.find_room(selected)
 	_show_room_artefacts(room)
