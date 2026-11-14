@@ -1,14 +1,18 @@
 class_name RingView
 extends Control
-## The Ring as seen through the control room glass (placeholder art drawn in code): a gunmetal
-## band carrying the 36 glyph marks, eight seal lamps around it (SealRing) and the event
-## horizon inside it (EventHorizon). The horizon mirrors the Ring: DARK (idle), DIALING (seals
+## The Ring as seen through the control room glass: a 3D camera on the Gate Room (RingSet,
+## rendered at a third of the view's resolution through the feed shader) with the 36 glyph
+## marks, eight seal lamps (SealRing) and the event horizon (EventHorizon) drawn over it in
+## 2D, lined up with the Ring by an orthographic camera. The feed renders only while the view
+## is visible, or while [member keep_live] is set (the top bar's thumbnail). The horizon
+## mirrors the Ring: The horizon mirrors the Ring: DARK (idle), DIALING (seals
 ## lighting, set by the dialing sequence), OPEN (a wormhole: a shimmer, after a short opening
 ## burst on a fresh lock) and CLOSING (a short fade back to DARK once the wormhole closes, for
 ## any reason). While OPEN the portal is clickable and focusable: a left click, or accept (Enter,
 ## gamepad A) with it focused, emits [signal portal_pressed]. Draws only; never changes state.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
-## overview.md#locked-decisions (Presentation: hybrid), technical-architecture.md#state-machines
+## overview.md#locked-decisions (Presentation: hybrid), technical-architecture.md#state-machines,
+## docs/content/interface-pass.md section 6
 
 ## The horizon state changed to [param state] (a [enum Horizon]).
 signal horizon_changed(state: int)
@@ -36,9 +40,22 @@ const _MARGIN: float = 14.0
 const _ARC_POINTS: int = 72
 const _EDGE_WIDTH: float = 2.0
 const _MARK_SHARE: float = 0.6
-const _FOCUS_COLOR: Color = Color(0.55, 0.8, 1.0)
+const _FOCUS_COLOR: Color = UiPalette.SELECT
+## The 3D feed renders at the view's size divided by this.
+const FEED_DOWNSCALE: float = 3.0
+const _FEED_SHADER: String = "res://src/ui/camera/feed_shader.gdshader"
+
+## Keeps the feed rendering while the view is hidden (the top bar's thumbnail).
+var keep_live: bool = false:
+	set(value):
+		keep_live = value
+		_update_live()
+## The 3D Gate Room behind the overlay.
+var ring_set := RingSet.new()
 
 var _state: Horizon = Horizon.DARK
+var _viewport := SubViewport.new()
+var _picture := TextureRect.new()
 var _burst_seconds: float = BURST_SECONDS
 var _marks: Array[GlyphDef] = []
 
@@ -50,7 +67,66 @@ func _ready() -> void:
 	for index: int in GateAddress.GLYPH_COUNT:
 		var id: StringName = StringName(GlyphIcon.GLYPH_ID_FORMAT % index)
 		_marks.append(Registry.get_def(id) as GlyphDef)
+	_build_feed()
 	set_process(false)
+
+
+func _init() -> void:
+	_viewport.add_child(ring_set)
+	add_child(_viewport)
+
+
+func _build_feed() -> void:
+	_viewport.own_world_3d = true
+	_viewport.msaa_3d = Viewport.MSAA_DISABLED
+	var environment := Environment.new()
+	environment.background_mode = Environment.BG_COLOR
+	environment.background_color = UiPalette.GROUND
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	environment.ambient_light_color = Color("#9aa39c")
+	environment.ambient_light_energy = 0.25
+	var world := WorldEnvironment.new()
+	world.environment = environment
+	_viewport.add_child(world)
+	_picture.texture = _viewport.get_texture()
+	_picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_picture.stretch_mode = TextureRect.STRETCH_SCALE
+	_picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_picture.show_behind_parent = true
+	_picture.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var material := ShaderMaterial.new()
+	material.shader = load(_FEED_SHADER) as Shader
+	_picture.material = material
+	add_child(_picture)
+	move_child(_picture, 0)
+	ring_set.camera.make_current()
+	ring_set.set_lit(_seals.lit)
+	_fit_feed()
+	_update_live()
+
+
+## The live picture of the Ring, for the top bar's thumbnail.
+func feed_texture() -> Texture2D:
+	return _viewport.get_texture()
+
+
+## True while the 3D feed renders.
+func is_feed_live() -> bool:
+	return _viewport.render_target_update_mode != SubViewport.UPDATE_DISABLED
+
+
+func _fit_feed() -> void:
+	var pixels := Vector2i((size / FEED_DOWNSCALE).max(Vector2.ONE * 8.0))
+	_viewport.size = pixels
+	ring_set.frame(outer_radius(size) / FEED_DOWNSCALE, float(pixels.y))
+
+
+func _update_live() -> void:
+	var live: bool = keep_live or is_visible_in_tree()
+	_viewport.render_target_update_mode = (
+		SubViewport.UPDATE_ALWAYS if live else SubViewport.UPDATE_DISABLED
+	)
 
 
 func _enter_tree() -> void:
@@ -67,11 +143,17 @@ func _get_minimum_size() -> Vector2:
 
 func _notification(what: int) -> void:
 	match what:
-		NOTIFICATION_RESIZED, NOTIFICATION_FOCUS_ENTER, NOTIFICATION_FOCUS_EXIT:
+		NOTIFICATION_RESIZED:
+			queue_redraw()
+			if is_node_ready():
+				_fit_feed()
+		NOTIFICATION_FOCUS_ENTER, NOTIFICATION_FOCUS_EXIT:
 			queue_redraw()
 		NOTIFICATION_VISIBILITY_CHANGED:
-			if is_node_ready() and not is_visible_in_tree():
-				_settle()
+			if is_node_ready():
+				_update_live()
+				if not is_visible_in_tree():
+					_settle()
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -91,7 +173,7 @@ func _process(delta: float) -> void:
 ## Shows what a Ring in [param mode] (a GateState.RingMode) looks like, at once and without
 ## the opening burst: after a load, or when the view is set up.
 func setup(mode: int) -> void:
-	_seals.lit = GateAddress.SEAL_COUNT if mode == GateState.RingMode.LOCKED else 0
+	_light(GateAddress.SEAL_COUNT if mode == GateState.RingMode.LOCKED else 0)
 	match mode:
 		GateState.RingMode.DIALING:
 			_set_state(Horizon.DIALING)
@@ -103,7 +185,7 @@ func setup(mode: int) -> void:
 
 ## A dial began: all seals unlit, the centre dark.
 func begin_dialing() -> void:
-	_seals.lit = 0
+	_light(0)
 	_set_state(Horizon.DIALING)
 
 
@@ -112,13 +194,19 @@ func end_dialing(is_locked: bool) -> void:
 	if is_locked:
 		_open(true)
 		return
-	_seals.lit = 0
+	_light(0)
 	_set_state(Horizon.DARK)
 
 
 ## Lights [param count] seals, 0 to 8.
 func set_lit(count: int) -> void:
+	_light(count)
+
+
+## Lights [param count] seal lamps and the 3D chevrons with them.
+func _light(count: int) -> void:
 	_seals.lit = count
+	ring_set.set_lit(count)
 
 
 ## Returns the seals lit.
@@ -146,6 +234,7 @@ func advance(delta: float) -> void:
 		Horizon.CLOSING:
 			_horizon.burst = 0.0
 			_horizon.level = maxf(0.0, _horizon.level - delta / CLOSE_SECONDS)
+			ring_set.set_horizon(_horizon.level)
 			if _horizon.level <= 0.0:
 				_set_state(Horizon.DARK)
 
@@ -161,11 +250,12 @@ static func horizon_radius(area: Vector2) -> float:
 
 
 func _open(is_new: bool) -> void:
-	_seals.lit = GateAddress.SEAL_COUNT
+	_light(GateAddress.SEAL_COUNT)
 	var is_soft: bool = Settings.get_bool(&"accessibility", &"reduced_flashing")
 	_burst_seconds = SOFT_BURST_SECONDS if is_soft else BURST_SECONDS
 	_horizon.level = 1.0
 	_horizon.burst = _burst_peak() if is_new else 0.0
+	ring_set.set_horizon(1.0)
 	_set_state(Horizon.OPEN)
 
 
@@ -183,8 +273,9 @@ func _set_state(state: Horizon) -> void:
 	if state == Horizon.DARK or state == Horizon.DIALING:
 		_horizon.level = 0.0
 		_horizon.burst = 0.0
+		ring_set.set_horizon(0.0)
 	if state == Horizon.DARK:
-		_seals.lit = 0
+		_light(0)
 	set_process(state == Horizon.OPEN or state == Horizon.CLOSING)
 	_set_clickable(state == Horizon.OPEN)
 	if state == _state:
@@ -219,9 +310,6 @@ func _draw() -> void:
 		return
 	var center: Vector2 = size / 2.0
 	var band: float = outer * BAND_RATIO
-	draw_arc(center, outer - band / 2.0, 0.0, TAU, _ARC_POINTS, GUNMETAL, band)
-	draw_arc(center, outer, 0.0, TAU, _ARC_POINTS, GUNMETAL_EDGE, _EDGE_WIDTH)
-	draw_arc(center, outer - band, 0.0, TAU, _ARC_POINTS, GUNMETAL_EDGE, _EDGE_WIDTH)
 	var side: float = minf(band, TAU * (outer - band / 2.0) / GateAddress.GLYPH_COUNT)
 	for index: int in _marks.size():
 		var angle: float = -PI / 2.0 + TAU * float(index) / float(_marks.size())
