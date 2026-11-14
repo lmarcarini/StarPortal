@@ -145,6 +145,8 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 				return _tr(&"LOG_LINE_RESEARCH_QUEUED").format({"name": project_name})
 			if entry.args.get("reason", "") == "hazard":
 				return ArtefactText.hazard_line(StringName(str(entry.args.get("artefact_id", ""))))
+			if entry.args.get("reason", "") == "cheat":
+				return "(cheat) " + str(entry.args.get("line", ""))
 			if entry.args.get("reason", "") == "debug":
 				return _tr(&"LOG_LINE_DEBUG").format({"line": str(entry.args.get("line", ""))})
 			if entry.args.has("request_id"):

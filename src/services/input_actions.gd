@@ -19,6 +19,7 @@ const ACTIONS: Array[StringName] = [
 	&"quick_save",
 	&"quick_load",
 	&"debug_toggle_overlay",
+	&"debug_toggle_cheats",
 	&"view_next",
 	&"view_previous",
 	&"view_gate_room",
@@ -107,6 +108,11 @@ const DEFAULTS: Dictionary = {
 	&"debug_toggle_overlay":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F12}],
+		GAMEPAD: [],
+	},
+	&"debug_toggle_cheats":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F10}],
 		GAMEPAD: [],
 	},
 	&"view_next":
