@@ -222,6 +222,8 @@ signal staff_changed(reason: StringName, room_def_id: StringName, count: int)
 signal request_offered(uid: int)
 ## A debug story command ran (action, id; logged "(debug)").
 signal debug_story(action: StringName, id: StringName)
+## A cheat ran (action, id, value; logged "(cheat)").
+signal debug_cheat(action: StringName, id: StringName, value: int)
 ## A request changed state (RequestRecord.RequestState as int).
 signal request_changed(uid: int, state: int)
 ## An artefact arrived, in holding or waiting at the gate (uid).

@@ -34,6 +34,13 @@ static func entries_for(
 			return [
 				LogEntry.create(tick, &"faction", StringName(_text(args)), {"reason": "no_answer"})
 			]
+		&"debug_cheat":
+			var line: String = "%s %s %s" % [args[0], args[1], args[2]]
+			return [
+				LogEntry.create(
+					tick, &"faction", &"", {"reason": "cheat", "line": line.strip_edges()}
+				)
+			]
 		&"debug_story":
 			return [
 				LogEntry.create(

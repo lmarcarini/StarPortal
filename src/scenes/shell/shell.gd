@@ -76,6 +76,8 @@ func _ready() -> void:
 	_add_alerts()
 	add_child(_conversation)
 	_setup_debug_tools()
+	if DebugCheatCommand.cheats_on():
+		add_child(CheatPanel.new())
 	var is_new: bool = GameStart.is_new()
 	_start(GameStart.take_state(ShellBoot.choose_seed(new_game_seed), Registry.balance()), is_new)
 	SimClock.pause()
