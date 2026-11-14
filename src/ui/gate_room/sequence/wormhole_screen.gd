@@ -3,11 +3,13 @@ extends Control
 ## The open wormhole, beside the Ring and never over it, and never a modal. A status strip shows,
 ## the whole time a wormhole is open, the destination (or "Unknown world"), a hostile warning when
 ## the far side is guarded, the time left (live with sim time), the drain, the bank's state and the
-## documents this wormhole brought ("New in the Archive: …"). Clicking the portal on the Ring (or A
-## with it focused) shows or hides the action panel under the strip (WormholeActions); B / Escape
-## hides it, and dismisses the closed message. Open the Address Book and Read in the Archive hide it
-## and pass the request on. When the wormhole closes, for any reason, the strip says why until the
-## player dismisses it or dials again. Below the strip the screen lets clicks through.
+## documents this wormhole brought ("New in the Archive: …"). The action panel is the gate
+## operations panel: showing it operates the gate (slow) and hiding it stands by. Clicking the
+## portal on the Ring (or A with it focused) shows or hides the action panel under the strip
+## (WormholeActions); Stand by, B or Escape hides it, and dismisses the closed message. Open the
+## Address Book and Read in the Archive hide it and pass the request on. When the wormhole closes,
+## for any reason, the strip says why until the player dismisses it or dials again. Below the strip
+## the screen lets clicks through.
 ## Bible: gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole,
 ## technical-architecture.md#state-machines
 
@@ -56,6 +58,7 @@ func _ready() -> void:
 	_actions.focus_changed.connect(_on_actions_focus_changed)
 	_actions.camera_extended.connect(camera_extended.emit)
 	_actions.photo_requested.connect(photo_requested.emit)
+	_actions.stand_by_requested.connect(hide_actions)
 	_render()
 
 
@@ -96,7 +99,7 @@ func setup(simulation: Simulation) -> void:
 ## LOCKED.
 func open() -> void:
 	if _is_locked():
-		_set_phase(Phase.STATUS)
+		_set_phase(Phase.ACTIONS if _simulation.state.gate.operating else Phase.STATUS)
 
 
 ## Shows the action panel if hidden, hides it if shown. Only while a wormhole is open.
@@ -205,6 +208,7 @@ func _is_locked() -> bool:
 
 
 func _set_phase(phase: Phase) -> void:
+	_operate(phase)
 	_phase = phase
 	if phase != Phase.CLOSED:
 		_closed_reason = &""
@@ -279,8 +283,25 @@ func _on_actions_focus_changed() -> void:
 
 
 func _on_tick_advanced(_tick: int) -> void:
-	if is_showing_open():
-		_render()
+	if not is_showing_open():
+		return
+	var operating: bool = _simulation.state.gate.operating
+	if operating != (_phase == Phase.ACTIONS) and _is_locked():
+		_set_phase(Phase.ACTIONS if operating else Phase.STATUS)
+		return
+	_render()
+
+
+# The action panel is the gate operations panel (docs/content/event-time.md section 3):
+# showing it operates the gate and hiding it, the wormhole still open, stands by.
+func _operate(phase: Phase) -> void:
+	if _simulation == null or not _is_locked():
+		return
+	var operating: bool = _simulation.state.gate.operating
+	if phase == Phase.ACTIONS and not operating:
+		_simulation.submit(OperateGateCommand.new())
+	elif phase == Phase.STATUS and operating:
+		_simulation.submit(StandByCommand.new())
 
 
 func _on_wormhole_closed(reason: StringName) -> void:

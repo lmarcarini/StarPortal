@@ -71,6 +71,7 @@ func advance_tick() -> void:
 	commands.flush(state)
 	for system: SimSystem in _systems:
 		system.tick(state)
+	SlowRules.sync(state)
 	state.clock.tick += 1
 	var new_tick: int = state.clock.tick
 	if TimeMath.is_day_start(new_tick):

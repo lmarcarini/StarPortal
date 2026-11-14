@@ -345,3 +345,4 @@ TARGET_HEARTH_LONGHOUSE,the longhouse,a casa comprida
 TARGET_TOLLGATE_WATCHPOST,the watchpost,o posto de vigia
 TARGET_TOLLGATE_EFFIGY,the effigy,a efígie
 TARGET_TOLLGATE_LATTICE,the lattice frame,a armação de treliça
+GATE_STAND_BY,Stand by (keep open),Em espera (manter aberto)

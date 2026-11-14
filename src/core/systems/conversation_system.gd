@@ -1,8 +1,8 @@
 class_name ConversationSystem
 extends SimSystem
-## Each tick syncs the slow reasons (SlowRules) and runs the active conversation: cuts a wormhole or
-## incoming conversation off when the Ring is no longer locked, and moves on from a Line once
-## its minutes have passed. Choices come by ChooseOptionCommand.
+## Runs the active conversation each tick (the Simulation syncs its slow reason): cuts a
+## wormhole or incoming conversation off when the Ring is no longer locked, and moves on from
+## a Line once its minutes have passed. Choices come by ChooseOptionCommand.
 ## Bible: docs/content/m4-core-systems.md section 3
 
 
@@ -13,7 +13,6 @@ func get_id() -> StringName:
 
 ## One tick of the running conversation, if any.
 func tick(state: GameState) -> void:
-	SlowRules.sync(state)
 	var active: ActiveConversation = state.conversations.active
 	if active == null:
 		return

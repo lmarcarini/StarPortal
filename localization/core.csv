@@ -159,3 +159,4 @@ SAVES_NEWER,made by a newer version,feito por uma versão mais nova
 SAVES_BROKEN,the file is damaged,o arquivo está danificado
 SCENARIO_FRESH_BASE_TITLE,Fresh base,Base nova
 SCENARIO_FRESH_BASE_LINE,"Day 1, the first Capacitor Bank just built.","Dia 1, o primeiro banco de capacitores acabou de ficar pronto."
+ALERT_WORMHOLE_OPEN,Wormhole open: the gate is on stand-by,Buraco de minhoca aberto: o portal está em espera

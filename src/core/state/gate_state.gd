@@ -36,6 +36,7 @@ static var _field_rules: Dictionary[String, Array] = {
 	"connected_world_id": [_is_string, "a string"],
 	"lock_started_tick": [_is_tick_or_unset, "-1 or a whole number from 0 to 2^53"],
 	"is_hostile": [_is_bool, "a bool"],
+	"operating": [_is_bool, "a bool"],
 }
 
 ## Current mode of the Ring.
@@ -52,6 +53,9 @@ var connected_world_id: StringName = &""
 var lock_started_tick: int = -1
 ## While LOCKED: true when the lock was a hostile lock.
 var is_hostile: bool = false
+## While LOCKED: the gate operations panel is up and slows the clock (gate_ops). Saved
+## (format v18).
+var operating: bool = false
 ## Every dial attempt, oldest first.
 var dial_log: Array[DialLogEntry] = []
 ## An incoming wormhole from a faction: the faction, the conversation and the tick the far
@@ -94,6 +98,7 @@ func to_dict() -> Dictionary:
 		"connected_world_id": String(connected_world_id),
 		"lock_started_tick": lock_started_tick,
 		"is_hostile": is_hostile,
+		"operating": operating,
 		"dial_log": log_data,
 		"incoming": _incoming_to_dict(),
 	}
@@ -130,6 +135,9 @@ static func from_dict(data: Dictionary) -> GateState:
 	var hostile: Variant = data.get("is_hostile")
 	if hostile is bool:
 		gate.is_hostile = hostile
+	var operating_data: Variant = data.get("operating")
+	if operating_data is bool:
+		gate.operating = operating_data
 	for item: Dictionary in _dicts_in(data.get("dial_log")):
 		gate.dial_log.append(DialLogEntry.from_dict(item))
 	var incoming_data: Dictionary = SaveFields.dict_or_empty(data.get("incoming"))

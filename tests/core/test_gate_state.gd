@@ -74,6 +74,7 @@ func test_defaults_and_dict_shape() -> void:
 				"connected_world_id": "",
 				"lock_started_tick": -1,
 				"is_hostile": false,
+				"operating": false,
 				"dial_log": [],
 				"incoming": {},
 			}

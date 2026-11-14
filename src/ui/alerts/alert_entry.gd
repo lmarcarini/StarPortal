@@ -11,7 +11,8 @@ const ALARM: StringName = &"alarm"
 const SEVERITIES: Array[StringName] = [INFO, WARN, ALARM]
 
 ## Kind: lab_idle, research_done, staff_unassigned, beds_full, candidate_waiting, request_due,
-## artefact_hazard, artefact_at_gate, site_finished, team_check_in, funds_red or rescue.
+## artefact_hazard, artefact_at_gate, wormhole_open, site_finished, team_check_in, funds_red or
+## rescue.
 var kind: StringName = &""
 ## One of SEVERITIES.
 var severity: StringName = INFO
