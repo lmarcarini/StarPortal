@@ -54,6 +54,32 @@ static func shape_of(status: StringName) -> StringName:
 	return &"ring"
 
 
+## A small texture of [param status]'s lamp, [param side] pixels square, for button icons.
+static func icon(status: StringName, side: int) -> ImageTexture:
+	var image := Image.create_empty(side, side, false, Image.FORMAT_RGBA8)
+	var color: Color = color_of(status)
+	var shape: StringName = shape_of(status)
+	var r: float = side * 0.42
+	for y: int in side:
+		for x: int in side:
+			var p := Vector2(x + 0.5 - side / 2.0, y + 0.5 - side / 2.0)
+			if _covers(shape, p, r):
+				image.set_pixel(x, y, color)
+	return ImageTexture.create_from_image(image)
+
+
+static func _covers(shape: StringName, p: Vector2, r: float) -> bool:
+	match shape:
+		&"disc":
+			return p.length() <= r
+		&"square":
+			return absf(p.x) <= r * 0.85 and absf(p.y) <= r * 0.85
+		&"triangle":
+			var depth: float = (p.y + r) / (2.0 * r)
+			return depth >= 0.0 and depth <= 1.0 and absf(p.x) <= depth * r
+	return p.length() <= r and p.length() >= r - 2.0
+
+
 func _draw() -> void:
 	var color: Color = color_of(_status)
 	var center: Vector2 = size / 2.0

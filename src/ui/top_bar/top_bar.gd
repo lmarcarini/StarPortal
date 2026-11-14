@@ -12,6 +12,8 @@ extends PanelContainer
 signal open_view(view_id: StringName, sub_tab: StringName)
 ## The alerts button was pressed.
 signal alerts_pressed
+## The player chose [param entry] in the alert list (the shell selects its target).
+signal alert_chosen(entry: AlertEntry)
 
 const _TIME_BAR_SCENE: String = "res://src/ui/time_bar/time_bar.tscn"
 const _ITEM_HEIGHT: float = 40.0
@@ -35,6 +37,8 @@ var quick_load_button := Button.new()
 var debug_flag_button := Button.new()
 ## The flowing row that holds every item.
 var row := HFlowContainer.new()
+## The drop-down list of alerts under the alerts button.
+var alert_list := AlertList.new()
 
 var _state: GameState = null
 
@@ -58,11 +62,15 @@ func _init() -> void:
 	quick_save_button.text = &"UI_SAVE"
 	quick_load_button.text = &"UI_LOAD"
 	debug_flag_button.text = &"UI_DEBUG_SET_FLAG"
-	alerts_button.text = &"TOPBAR_ALERTS"
 	for item: Control in _items():
 		item.custom_minimum_size.y = _ITEM_HEIGHT
 		row.add_child(item)
 	_connect_items()
+	alert_list.top_level = true
+	add_child(alert_list)
+	alert_list.changed.connect(_show_alert_count)
+	alert_list.alert_chosen.connect(_on_alert_chosen)
+	_show_alert_count()
 
 
 func _enter_tree() -> void:
@@ -80,12 +88,14 @@ func _exit_tree() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		refresh()
+		_show_alert_count()
 
 
 ## Reads [param simulation]'s state (after a start or a load) and redraws every item.
 func bind(simulation: Simulation) -> void:
 	_state = simulation.state
 	confidence_readout.setup(_state)
+	alert_list.bind(_state)
 	refresh()
 
 
@@ -149,6 +159,32 @@ func _connect_items() -> void:
 	power_readout.pressed.connect(open_view.emit.bind(ViewSwitcher.BASE, BaseSubTabs.ENERGY))
 	gate_chip.pressed.connect(open_view.emit.bind(ViewSwitcher.GATE_ROOM, &""))
 	alerts_button.pressed.connect(alerts_pressed.emit)
+	alerts_button.pressed.connect(toggle_alerts)
+	alerts_button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+
+
+## Opens or closes the alert list under the alerts button. It never pauses the game.
+func toggle_alerts() -> void:
+	var rect: Rect2 = alerts_button.get_global_rect()
+	var width: float = alert_list.get_combined_minimum_size().x
+	var view_width: float = get_viewport_rect().size.x
+	var left: float = clampf(rect.position.x, 0.0, maxf(view_width - width, 0.0))
+	alert_list.global_position = Vector2(left, rect.end.y + 4.0)
+	alert_list.toggle()
+
+
+## "Alerts 3" with the worst severity's lamp; "Alerts" and an unlit lamp with none.
+func _show_alert_count() -> void:
+	var entries: Array[AlertEntry] = alert_list.entries()
+	var title: String = tr(&"TOPBAR_ALERTS")
+	alerts_button.text = title if entries.is_empty() else "%s %d" % [title, entries.size()]
+	var worst: StringName = AlertRules.worst(entries)
+	alerts_button.icon = StatusLamp.icon(AlertText.lamp_status(worst), 14)
+
+
+func _on_alert_chosen(entry: AlertEntry) -> void:
+	open_view.emit(entry.view_id, entry.sub_tab)
+	alert_chosen.emit(entry)
 
 
 ## Power and the gate change every tick (stored energy, time left).

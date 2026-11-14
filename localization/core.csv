@@ -111,3 +111,17 @@ TOPBAR_GATE_OPEN,GATE: OPEN {world} {left},ANEL: ABERTO {world} {left}
 TOPBAR_MINUTES,{m} min,{m} min
 TOPBAR_HOURS_MINUTES,{h} h {m} min,{h} h {m} min
 TOPBAR_ALERTS,Alerts,Alertas
+ALERT_NONE,Nothing needs you.,Nada precisa de você.
+ALERT_DISMISS,Dismiss,Dispensar
+ALERT_LAB_IDLE,A lab is idle: choose research,Um laboratório está parado: escolha uma pesquisa
+ALERT_RESEARCH_DONE,Research finished: {name},Pesquisa concluída: {name}
+ALERT_STAFF_UNASSIGNED,{count} staff unassigned,{count} pessoas sem posto
+ALERT_BEDS_FULL,Every bed is taken,Todos os leitos estão ocupados
+ALERT_CANDIDATE_WAITING,{count} candidates waiting,{count} candidatos esperando
+ALERT_REQUEST_DUE,Request due in {time}: {name},Pedido vence em {time}: {name}
+ALERT_ARTEFACT_HAZARD,Artefact hazard: {name},Perigo de artefato: {name}
+ALERT_ARTEFACT_AT_GATE,Artefact waiting at the gate: {name},Artefato esperando no anel: {name}
+ALERT_SITE_FINISHED,Finished building: {name},Obra concluída: {name}
+ALERT_TEAM_CHECK_IN,Team checked in from {name},A equipe deu notícias de {name}
+ALERT_FUNDS_RED,Funds in the red: {funds},Verba no vermelho: {funds}
+ALERT_RESCUE,{line},{line}

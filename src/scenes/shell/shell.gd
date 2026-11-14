@@ -63,6 +63,7 @@ func _ready() -> void:
 	_quick_save_button.pressed.connect(quick_save)
 	_quick_load_button.pressed.connect(quick_load)
 	top_bar.open_view.connect(open_view)
+	top_bar.alert_chosen.connect(_on_alert_chosen)
 	top_bar.resized.connect(_fit_below_top_bar)
 	_toast_timer.timeout.connect(_toast.hide)
 	_add_alerts()
@@ -155,6 +156,18 @@ func open_view(view_id: StringName, sub_tab: StringName = &"") -> void:
 	var base: BaseView = view_switcher.get_view(view_id) as BaseView
 	if base != null and sub_tab != &"" and view_switcher.current_view_id() == view_id:
 		base.get_sub_tabs().show_tab(sub_tab)
+
+
+## Selects the target of the alert [param entry] once its screen is open: a research project;
+## the rescue alert opens the rescue window.
+func _on_alert_chosen(entry: AlertEntry) -> void:
+	if entry.kind == &"rescue":
+		_rescue_alert.open()
+		return
+	var research: ResearchView = view_switcher.get_view(entry.view_id) as ResearchView
+	if research != null and entry.target != &"" and research.is_available():
+		research.get_board().jump_to(entry.target)
+		research.get_board().project_chosen.emit(entry.target)
 
 
 ## Returns the rescue alert.
@@ -267,6 +280,7 @@ func _add_alerts() -> void:
 	_fit_below_top_bar()
 	_rescue_alert.gate_room_requested.connect(view_switcher.show_view.bind(ViewSwitcher.GATE_ROOM))
 	_alert_stack.setup(_rescue_alert)
+	top_bar.alert_list.set_rescue(_rescue_alert)
 	_rescue_alert.changed.connect(_relink_top_bar)
 
 
