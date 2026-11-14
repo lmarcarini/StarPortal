@@ -19,6 +19,12 @@ proposals and are marked **(proposal)**; the open ones are collected in section 
 - Defence is commanded through squads, and incursions come only through the gate (M4c).
 - Placing people directly on the plan is wanted as another way to allocate personnel.
 
+**Owner decisions on this document (2026-11-13):** keep the bible palette, though the first
+mock-up read as bland next to the owner's (section 2 answers that); the tab order is
+approved; the Command cork board and the plan's lit shading may go as long as function is
+kept; show a gate thumbnail in the top bar while a wormhole is open; **staff walk**, so the
+base feels alive and nobody teleports on a camera feed.
+
 ---
 
 ## 1. Two registers
@@ -41,8 +47,20 @@ cameras, so anything shown in 3D feels like the real place.
 
 The art bible's direction holds: government equipment, restricted palettes, and **the Ring's
 blue is the only saturated blue in the game**. The owner's mock-up uses blue for the whole
-interface; this design keeps its structure (top bar, left status, right gate panel, large
-tab buttons) but not its colour. **(proposal: the owner may prefer the blue.)**
+interface; this design keeps its structure (top bar, left status, large tab buttons) but
+not its colour. The owner accepted the palette but found the first flat mock-up bland, so
+the richness comes from material and light instead of hue:
+
+- **Hardware, not flat boxes.** Panels have a bezel and a stencilled header strip; buttons
+  are raised keys that sit down when pressed; switches and lamps look like parts.
+- **Light.** Lit things glow: status lamps, the selected tab, CRT text and the camera
+  feed bloom slightly on the dark ground. Unlit things stay matte.
+- **Texture.** A light grain and a faint vignette over the whole screen; scanlines on CRT
+  panels and feeds only.
+- **Large icon tabs,** as in the owner's mock-up: an icon over a label, the current one lit
+  in orange.
+- **Motion.** People walking on the plan, a slow sweep on the gate chip while dialling,
+  lamps that blink on alerts. Small, constant signs that the base is running.
 
 | Role | Colour | Used for |
 | --- | --- | --- |
@@ -78,7 +96,7 @@ One bar, 56 px at 1080p, on every screen. Left to right:
 | Funds | Balance and today's net change | Command |
 | Confidence | Value and trend arrow | Command |
 | Power | Switched on over supply; stored energy | Base, Energy |
-| Gate chip | IDLE, DIALLING, OPEN with world and time left, INCOMING | Gate Room |
+| Gate chip | IDLE, DIALLING, OPEN with world and time left, INCOMING; while a wormhole is open, a small live thumbnail of the Ring (96 × 54) | Gate Room |
 | Call lamp | Lit while a phone call waits (as now) | Answers the call |
 | Alerts | Count; opens a list, newest first | The alert's screen |
 
@@ -97,7 +115,7 @@ finished, team check-in. Each has a kind icon and links to its screen. **(propos
 ## 4. Tabs
 
 Seven tabs in a row under the top bar, in the order of the loop: act at the gate, run the
-base, then the records. **(proposal: order and keys.)**
+base, then the records. Order and keys are owner-approved.
 
 | Key | Tab | Register | Holds | Sub-tabs |
 | --- | --- | --- | --- | --- |
@@ -150,13 +168,32 @@ Left chooses, centre shows, right acts on the selection.
 ```
 
 **The plan** stays top-down and becomes more schematic: flat room fills by state (on, off,
-site, damaged), a stencilled name, a room-type icon, and thin furniture marks only at high
-zoom. The lit-diorama shading goes; the camera inset now does that job.
+site, damaged), a stencilled name, a room-type icon, and thin furniture marks. The
+lit-diorama shading goes; a room that is on has a soft inner glow instead, and the camera
+inset shows what the room looks like.
 
-**Staff tokens.** Each person on base is a small token inside their room (role by shape and
-letter: S scientist, E engineer, A analyst, later G guard). Tokens sit in fixed spots and
-do not walk; a reassignment moves the token at once. Unassigned people sit in a tray at the
-bottom of the plan.
+**Staff tokens.** Each person on base is a small token (role by shape and letter: S
+scientist, E engineer, A analyst, later G guard). Unassigned people stand in the corridor
+outside Quarters and are also listed in a tray at the bottom of the plan.
+
+**Staff walk (owner decision).** Tokens move along corridors and through doors, never
+through walls, and the camera feeds show the same people in the same places.
+
+- *Reassignment:* the person walks from the old room to the new one. **(proposal)** The
+  assignment itself still takes effect at once in the simulation, as now; the walk is
+  presentation. A real walk across the base is about one in-game minute, which is one
+  second at 1× and nothing at 10×, so a simulated walk could not be seen anyway. The token
+  walks at a readable screen speed that rises with the clock speed, and snaps to its place
+  if the player changes tab or level.
+- *Life:* at work, people shift between a few spots in their room (desk, console, bench).
+  Now and then one walks to another room and back. At night most tokens go to Quarters and
+  a few stay on shift. All of it is presentation only, has no effect on output and uses its
+  own random stream, so saves and tests are untouched. **(proposal)**
+- *Arrivals and leavers* walk in from, and out to, the lift.
+- *Paused:* everyone stops.
+
+M4c will need real positions for intruders and squads (which room, and how long a move
+takes). That is simulated, room by room; the walking between rooms uses the same paths.
 
 **Allocation by placing.** Drag a token to a room with a free slot of its role to assign;
 drag to the tray to unassign; rooms that can take the token highlight while dragging. With
@@ -197,8 +234,9 @@ everywhere, the chip can show a 96 px live thumbnail while a wormhole is open.)*
   "Show on plan" jumps to the person's token on the Base tab.
 - **Expeditions:** already left / centre / right; restyled only.
 - **Archive:** restyled only. Documents keep their paper look inside the reader.
-- **Command:** the cork board is retired for the instrument look; Finances, Factions and
-  Requests become sub-tabs on the left.
+- **Command:** the cork board is retired for the instrument look (owner: fine if function
+  is kept); Finances, Factions and Requests become sub-tabs on the left, with every figure
+  and action the tab has now.
 
 ## 8. Controls
 
@@ -213,27 +251,28 @@ Incursion rules, squads, doors and room damage (M4c). New game systems of any ki
 art for the 3D sets beyond the kit. Main menu, settings and save screens. Mobile or
 touch layouts.
 
-## 10. Owner decisions needed
+## 10. Owner decisions
 
-1. **Colour:** bible palette (grey-green, orange selection, blue only for the Ring), or the
-   mock-up's blue interface?
-2. **Tab order and keys** as in section 4 (Archive moves to F6)?
-3. **Command:** retire the cork board look?
-4. **Plan:** drop the lit-diorama shading for the schematic look?
-5. **Gate thumbnail** in the top bar while a wormhole is open: yes or no?
-6. **Staff tokens** jump between rooms (proposed) or walk along corridors?
+Settled on 2026-11-13: bible palette with more material and light; tab order and keys;
+cork board and lit plan shading retired; gate thumbnail while a wormhole is open; staff
+walk.
+
+Still open, both PO proposals in section 5: the walk is presentation only (assignments
+take effect at once), and the day and night movement of staff is presentation only.
 
 ## 11. Suggested cards
 
 | # | Card | Type |
 | --- | --- | --- |
-| 1 | Theme: palette, fonts, panel and button styles as one Godot Theme | feature |
-| 2 | Top bar: funds change, power, gate chip, alert list | feature |
+| 1 | Theme: palette, fonts, bezelled panels, key buttons, lamps, grain as one Godot Theme | feature |
+| 2 | Top bar: funds change, power, gate chip with live thumbnail, alert list | feature |
 | 3 | Alert kinds and links for idle lab, unassigned staff, due requests and the rest | feature |
 | 4 | Tab bar: seven tabs, icons, attention dots, new order and keys | feature |
 | 5 | Three-column layout applied to Research, Personnel, Command | feature |
 | 6 | Base plan: schematic painter | feature |
 | 7 | Staff tokens and the unassigned tray | feature |
+| 7a | Corridor paths and walking tokens (reassignment, arrivals, leavers) | feature |
+| 7b | Ambient life: spots in rooms, visits, night in Quarters | feature |
 | 8 | Allocation by placing (mouse, keys, gamepad) and the Staff sub-tab | feature |
 | 9 | Camera kit: low-res 3D feed widget, three room sets | feature |
 | 10 | Camera inset and expand on the Base tab | feature |
