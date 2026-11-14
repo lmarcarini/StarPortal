@@ -171,6 +171,12 @@ static func _add_labels(theme: Theme, s: float) -> void:
 	strip.content_margin_top = 4 * s
 	strip.content_margin_bottom = 4 * s
 	theme.set_stylebox(&"normal", &"HeaderStrip", strip)
+	theme.set_type_variation(&"StatusStrip", &"PanelContainer")
+	var status := _box(UiPalette.HEADER, UiPalette.RULE, 0, s)
+	status.border_width_top = 1
+	status.content_margin_top = 2 * s
+	status.content_margin_bottom = 2 * s
+	theme.set_stylebox(&"panel", &"StatusStrip", status)
 
 
 ## A flat box with a [param width]-pixel border and content margins.
