@@ -35,6 +35,8 @@ const VALUES: Dictionary = {
 		&"language": "en",
 		# On a lock, switch to the Gate Room and operate the gate (docs/content/event-time.md 3).
 		&"switch_to_gate_on_lock": true,
+		# Failure states (M4c-14): off for free play and testing; nothing can end the game.
+		&"failure_states": true,
 	},
 	# One key per InputActions.ACTIONS entry, holding that action's bindings encoded by
 	# InputService. An empty Dictionary means "use the built-in defaults".

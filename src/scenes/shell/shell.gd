@@ -259,6 +259,7 @@ func _start(state: GameState, is_new_game: bool = false) -> bool:
 		push_warning("Shell: cannot set up the game: %s %s" % [built.error_code, built.detail])
 		return false
 	_simulation = built.value
+	ShellBoot.apply_settings(_simulation)
 	SimClock.start(_simulation)
 	time_bar.refresh()
 	return true

@@ -69,6 +69,14 @@ const BALANCE_ID: StringName = &"balance"
 @export var combat_roll_max: float = 1.25
 @export var defender_reduction: float = 0.25
 @export var combat_reach_cells: int = 3
+## Failure states (M4c): ticks intruders must hold the Control Room for an Overrun; days in a
+## row at Confidence 0 and in the red for Shutdown and Bankruptcy; and whether those two end
+## the game (owner decision 2026-11-14: they only warn for now).
+@export var overrun_ticks: int = 30
+@export var shutdown_days: int = 7
+@export var bankruptcy_days: int = 30
+@export var shutdown_ends_game: bool = false
+@export var bankruptcy_ends_game: bool = false
 ## Room def ids a new game may build before any research (m25-lean-start.md section 1).
 @export var starting_room_unlocks: Array[StringName] = [
 	&"room_capacitor_bank",

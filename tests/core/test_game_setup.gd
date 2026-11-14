@@ -58,7 +58,8 @@ func test_build_from_real_content_runs_both_systems() -> void:
 			&"factions",
 			&"artefacts",
 			&"security",
-			&"incursion"
+			&"incursion",
+			&"outcome"
 		]
 	)
 	for index: int in 60:
