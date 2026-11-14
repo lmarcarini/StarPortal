@@ -12,12 +12,14 @@ signal sub_tab_changed(tab: StringName)
 
 const BUILD: StringName = &"build"
 const ENERGY: StringName = &"energy"
-## Who works where: the list, placing and room tints (security is reserved, not shown).
+## Who works where: the list, placing and room tints.
 const STAFF: StringName = &"staff"
+## Squads and doors (M4c-12); shown once a Security Post or a door exists.
+const SECURITY: StringName = &"security"
 ## The sub-tabs in order; [constant TITLES] holds their title keys in the same order.
-const TABS: Array[StringName] = [BUILD, ENERGY, STAFF]
+const TABS: Array[StringName] = [BUILD, ENERGY, STAFF, SECURITY]
 const TITLES: Array[StringName] = [
-	&"BASE_SUBTAB_BUILD", &"BASE_SUBTAB_ENERGY", &"BASE_SUBTAB_STAFF"
+	&"BASE_SUBTAB_BUILD", &"BASE_SUBTAB_ENERGY", &"BASE_SUBTAB_STAFF", &"BASE_SUBTAB_SECURITY"
 ]
 
 
@@ -32,6 +34,13 @@ func _init() -> void:
 func _ready() -> void:
 	for title: StringName in TITLES:
 		add_tab(tr(title))
+	set_tab_hidden(TABS.find(SECURITY), true)
+
+
+## Shows the Security sub-tab when [param state] has a Security Post or a blast door.
+func show_security_for(state: GameState) -> void:
+	var has: bool = not SquadRules.posts(state).is_empty() or not state.base.doors.is_empty()
+	set_tab_hidden(TABS.find(SECURITY), not has)
 
 
 func _notification(what: int) -> void:
@@ -49,12 +58,15 @@ func shown() -> StringName:
 func show_tab(tab: StringName) -> void:
 	var index: int = TABS.find(tab)
 	if index >= 0:
+		set_tab_hidden(index, false)
 		current_tab = index
 
 
 ## Moves [param offset] sub-tabs along; false, changing nothing, past the first or last.
 func step(offset: int) -> bool:
 	var index: int = current_tab + offset
+	if index >= 0 and index < TABS.size() and is_tab_hidden(index):
+		index += offset
 	if index < 0 or index >= TABS.size():
 		return false
 	current_tab = index

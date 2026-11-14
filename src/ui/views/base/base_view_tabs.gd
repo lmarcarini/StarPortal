@@ -12,6 +12,8 @@ extends Node
 
 ## The Staff sub-tab strip, shown in place of the palette.
 var staff_tab := StaffSubTab.new()
+## The Security strip (M4c-12), shown in place of the palette.
+var security_tab := SecuritySubTab.new()
 
 var _sub_tabs: BaseSubTabs = null
 var _levels: LevelTabs = null
@@ -38,6 +40,8 @@ func attach(
 	_power.layer.visibility_changed.connect(_on_energy_layer_toggled)
 	_move_message_line()
 	_attach_staff()
+	_plan.get_parent().add_child(security_tab)
+	security_tab.squad_picked.connect(_on_squad_picked)
 	show_sub_tab()
 
 
@@ -91,16 +95,53 @@ func _on_drag_moved(global_point: Vector2) -> void:
 func show_sub_tab() -> void:
 	var energy: bool = _power.is_layer_on()
 	var staff: bool = not energy and _sub_tabs.shown() == BaseSubTabs.STAFF
+	var security: bool = not energy and _sub_tabs.shown() == BaseSubTabs.SECURITY
 	_sub_tabs.set_block_signals(true)
 	var tab: StringName = BaseSubTabs.ENERGY if energy else BaseSubTabs.BUILD
-	_sub_tabs.show_tab(BaseSubTabs.STAFF if staff else tab)
+	if staff or security:
+		tab = _sub_tabs.shown()
+	_sub_tabs.show_tab(tab)
 	_sub_tabs.set_block_signals(false)
-	_palette.visible = not energy and not staff
+	_palette.visible = not energy and not staff and not security
 	staff_tab.visible = staff
+	_show_security(security)
 	_plan.staff_layer.tint = staff
 	_refresh_staff()
-	_levels.next_tab.visible = not energy and not staff and _levels.has_next()
+	_levels.next_tab.visible = _palette.visible and _levels.has_next()
 	_keep_focus()
+
+
+func _show_security(on: bool) -> void:
+	security_tab.visible = on
+	var simulation: Simulation = SimClock.simulation
+	if simulation != null:
+		_sub_tabs.show_security_for(simulation.state)
+		if on:
+			security_tab.show_state(simulation.state)
+	_on_squad_picked(security_tab.selected if on else &"")
+
+
+# A picked squad: its room shows in the detail column (its camera), the plan previews its
+# path to the cursor, and Enter or a click on the plan orders it there.
+func _on_squad_picked(squad_id: StringName) -> void:
+	_plan.security_layer.preview_squad = squad_id
+	if squad_id.is_empty():
+		_plan.order_target = Callable()
+		return
+	_plan.order_target = _order_move
+	var simulation: Simulation = SimClock.simulation
+	var squad: SquadState = simulation.state.security.squad_of(squad_id)
+	var cells: Dictionary[Vector3i, RoomState] = BasePaths.occupancy(
+		simulation.state.base, simulation.state.room_defs
+	)
+	var room: RoomState = cells.get(squad.pos)
+	if room != null:
+		_plan.select(room.id)
+	_plan.grab_focus()
+
+
+func _order_move(cell: Vector3i) -> void:
+	security_tab.order(SquadState.Order.MOVE, cell)
 
 
 ## Moves the palette's message line under the plan, where both sub-tabs show it: the power

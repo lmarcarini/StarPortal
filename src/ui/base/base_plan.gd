@@ -31,6 +31,9 @@ var view: ZoomPan = ZoomPan.new()
 var staff_layer := StaffLayer.new()
 ## Squads, intruders and the objective (M4c-11).
 var security_layer := SecurityLayer.new()
+## While valid, Enter / (A) or a click on a cell gives it the cell (x, y, level) instead of
+## selecting (a squad's Move to, M4c-12).
+var order_target: Callable = Callable()
 ## The unassigned people, along the bottom of the plan.
 var tray := UnassignedTray.new()
 
@@ -297,6 +300,9 @@ func move_cursor(step: Vector2i) -> void:
 
 ## Selects what stands at the cursor cell; on a built blast door, toggles it instead.
 func select_at_cursor() -> void:
+	if order_target.is_valid():
+		order_target.call(Vector3i(cursor.x, cursor.y, level))
+		return
 	var door: DoorState = null if _base == null else DoorRules.find(_base, level, cursor)
 	if door != null and door.is_built():
 		door_toggled.emit(level, cursor)
