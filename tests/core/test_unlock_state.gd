@@ -7,8 +7,17 @@ extends GdUnitTestSuite
 ## A new game may build the bank, the lab and corridors; no dig; one bank; no override.
 func test_new_game_unlocks() -> void:
 	var state := GameState.new_game(3, BalanceConfig.new())
-	assert_array(state.unlocks.rooms).is_equal(
-		[&"room_capacitor_bank", &"room_research_lab", &"room_corridor", &"room_quarters"]
+	(
+		assert_array(state.unlocks.rooms)
+		. is_equal(
+			[
+				&"room_capacitor_bank",
+				&"room_research_lab",
+				&"room_corridor",
+				&"room_quarters",
+				&"room_security_post",
+			]
+		)
 	)
 	assert_int(state.unlocks.dig_depth).is_equal(1)
 	assert_int(state.unlocks.bank_cap).is_equal(1)

@@ -31,6 +31,10 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 			)
 		)
 	state.balance = defs.balance
+	# Rooms a new game starts with stay unlocked in older saves (the Security Post, M4c).
+	for def_id: StringName in defs.balance.starting_room_unlocks:
+		if not def_id in state.unlocks.rooms:
+			state.unlocks.rooms.append(def_id)
 	state.room_defs.clear()
 	for def: RoomDef in defs.rooms:
 		state.room_defs[def.id] = def
@@ -73,6 +77,7 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 		StaffCareSystem.new(),
 		FactionSystem.new(),
 		ArtefactSystem.new(),
+		SecuritySystem.new(),
 	]
 	return Result.ok(Simulation.new(state, systems))
 

@@ -330,6 +330,7 @@ func test_documents_system_runs_after_gate() -> void:
 			&"recruitment",
 			&"staff_care",
 			&"factions",
-			&"artefacts"
+			&"artefacts",
+			&"security"
 		]
 	)

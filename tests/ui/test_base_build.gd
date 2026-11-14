@@ -79,7 +79,8 @@ func test_invalid_spots_say_why() -> void:
 	assert_int(_count(&"room_research_lab")).is_equal(0)
 
 
-## A new game's palette can pick only the Capacitor Bank, Research Lab, Quarters and Corridor
+## A new game's palette can pick only the Capacitor Bank, Research Lab, Quarters, Corridor and
+## Security Post (M4c)
 ## (m25-lean-start.md section 1, m26-staff-and-money.md section 3); research-locked rooms
 ## show disabled until research adds them. The Infirmary is not shown at all until the
 ## Expeditions unlock, and no research unlocks it (m3-beyond-the-ring.md section 9).
@@ -88,7 +89,13 @@ func test_palette_offers_only_unlocked_rooms() -> void:
 	for def_id: StringName in BuildPalette.ROOMS:
 		var wanted: bool = (
 			def_id
-			in [&"room_capacitor_bank", &"room_research_lab", &"room_quarters", &"room_corridor"]
+			in [
+				&"room_capacitor_bank",
+				&"room_research_lab",
+				&"room_quarters",
+				&"room_corridor",
+				&"room_security_post",
+			]
 		)
 		var button: Button = palette.get_room_button(def_id)
 		assert_bool(button != null).override_failure_message(String(def_id)).is_equal(wanted)

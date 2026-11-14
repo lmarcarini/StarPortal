@@ -16,6 +16,7 @@ const TYPES: Array[StringName] = [
 	&"room_infirmary",
 	&"room_artefact_vault",
 	&"room_containment",
+	&"room_security_post",
 	&"room_lift",
 	&"room_stairs",
 ]
@@ -70,6 +71,8 @@ static func draw(
 					centre + Vector2(side * r, -r), centre + Vector2(side * r, r), ink, _W
 				)
 			canvas.draw_rect(Rect2(centre - Vector2(r, r), Vector2(r * 2, r * 2)), ink, false, _W)
+		&"room_security_post":
+			_shield(canvas, centre, r, ink)
 		&"room_lift":
 			_triangle(canvas, centre - Vector2(0, r * 0.45), r * 0.55, ink)
 			_triangle(canvas, centre + Vector2(0, r * 0.45), -r * 0.55, ink)
@@ -89,6 +92,21 @@ static func draw(
 ## True when [param def_id] has its own icon (not the plain square).
 static func has_icon(def_id: StringName) -> bool:
 	return TYPES.has(def_id)
+
+
+## A shield outline: flat top, sides, a point at the bottom.
+static func _shield(canvas: CanvasItem, centre: Vector2, r: float, ink: Color) -> void:
+	var points := PackedVector2Array(
+		[
+			centre + Vector2(-r, -r),
+			centre + Vector2(r, -r),
+			centre + Vector2(r, r * 0.1),
+			centre + Vector2(0, r),
+			centre + Vector2(-r, r * 0.1),
+			centre + Vector2(-r, -r),
+		]
+	)
+	canvas.draw_polyline(points, ink, _W)
 
 
 ## A triangle pointing up (down when [param r] is negative).
