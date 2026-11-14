@@ -1,7 +1,8 @@
 class_name ArtefactRecord
 extends RefCounted
 ## One artefact the player holds: which ArtefactDef, its state, where it is and when it came.
-## room_uid is a room's uid when housed, −1 in Gate Room holding, −2 waiting at the gate.
+## room_uid is a room's uid when housed, −1 in Gate Room holding, −2 waiting at the gate,
+## −3 carried by intruders.
 ## Saved shape: {"uid", "artefact", "state", "room_uid", "arrived_tick"}.
 ## Bible: docs/content/m4-core-systems.md sections 5 and 9
 
@@ -12,6 +13,8 @@ enum ArtefactState { RECOVERED = 0, HOUSED = 1, STUDIED = 2 }
 const IN_HOLDING: int = -1
 ## room_uid of an artefact waiting at the gate because holding was full.
 const AT_GATE: int = -2
+## room_uid of an artefact intruders are carrying out (M4c); a unit holds its uid.
+const CARRIED: int = -3
 ## Saved keys, in to_dict() order.
 const KEYS: Array[String] = ["uid", "artefact", "state", "room_uid", "arrived_tick"]
 
@@ -61,8 +64,8 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'artefact' is not a non-empty string")
 	if not SaveFields.is_enum(data["state"], ArtefactState.size()):
 		errors.append("'state' is not an artefact state")
-	if not SaveFields.is_int(data["room_uid"]) or SaveFields.read_int(data["room_uid"]) < AT_GATE:
-		errors.append("'room_uid' is not a room uid, -1 or -2")
+	if not SaveFields.is_int(data["room_uid"]) or SaveFields.read_int(data["room_uid"]) < CARRIED:
+		errors.append("'room_uid' is not a room uid, -1, -2 or -3")
 	if not SaveFields.is_tick(data["arrived_tick"]):
 		errors.append("'arrived_tick' is not a tick")
 	return errors

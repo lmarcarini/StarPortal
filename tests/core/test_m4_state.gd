@@ -131,7 +131,7 @@ func test_malformed_sections_are_rejected() -> void:
 		[["requests", "items", 0, "accepted_tick"], -2],
 		[["requests", "next_uid"], 2],
 		[["artefacts", "items", 0, "state"], 3],
-		[["artefacts", "items", 0, "room_uid"], -3],
+		[["artefacts", "items", 0, "room_uid"], -4],
 		[["artefacts", "items", 0, "uid"], 9007199254740994.0],
 		[["research", "queue"], ["a", ""]],
 		[["research", "revealed"], 5],

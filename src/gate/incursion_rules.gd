@@ -78,6 +78,7 @@ static func breach(state: GameState) -> void:
 			incursion.groups.append(
 				_group(state, def.group_units[index], def.group_counts[index], at)
 			)
+	IntruderRules.assign_targets(state)
 	state.events.post(&"incursion_breached", [])
 
 

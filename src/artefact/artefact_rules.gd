@@ -104,6 +104,36 @@ static func move(state: GameState, uid: int, room_uid: int) -> void:
 	state.events.post(&"artefact_moved", [uid])
 
 
+## Intruders take artefact [param uid] (M4c-07): it is carried until they leave or fall.
+static func carry(state: GameState, uid: int) -> bool:
+	var record: ArtefactRecord = find(state, uid)
+	if record == null:
+		return false
+	record.room_uid = ArtefactRecord.CARRIED
+	state.events.post(&"artefact_moved", [uid])
+	return true
+
+
+## A carried artefact [param uid] left through the Ring: it is gone.
+static func lose(state: GameState, uid: int) -> bool:
+	var record: ArtefactRecord = find(state, uid)
+	if record == null:
+		return false
+	state.artefacts.items.erase(record)
+	state.events.post(&"artefact_moved", [uid])
+	return true
+
+
+## The intruders carrying artefact [param uid] fell: it goes back to Gate Room holding.
+static func recover(state: GameState, uid: int) -> bool:
+	var record: ArtefactRecord = find(state, uid)
+	if record == null:
+		return false
+	record.room_uid = ArtefactRecord.IN_HOLDING
+	state.events.post(&"artefact_moved", [uid])
+	return true
+
+
 static func _uids_at(state: GameState, room_uid: int) -> Array[int]:
 	var found: Array[int] = []
 	for record: ArtefactRecord in state.artefacts.items:

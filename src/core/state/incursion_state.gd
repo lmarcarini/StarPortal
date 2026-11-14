@@ -1,7 +1,8 @@
 class_name IncursionState
 extends RefCounted
 ## The incursion under way, if any (M4c), and when each faction last sent one.
-## Saved shape: {"phase", "def_id", "countdown", "groups": [IntruderGroup], "last_day": {}}.
+## Saved shape: {"phase", "def_id", "countdown", "groups": [IntruderGroup], "last_day": {},
+## "report": {}}.
 ## Bible: docs/content/m4c-incursions.md sections 1 and 9
 
 ## NONE: nothing under way; WARNING: the countdown; BREACH: intruders on base; RETREAT:
@@ -23,6 +24,10 @@ var countdown: int = 0
 var groups: Array[IntruderGroup] = []
 ## Day index of each faction's last incursion.
 var last_day: Dictionary[StringName, int] = {}
+## What happened so far, for the after-action report (JSON-safe): "damaged" room ids,
+## "stolen" and "recovered" artefact uids, "injured" person ids, "done" when the
+## objective was carried out. Optional when loading.
+var report: Dictionary = {}
 
 
 ## True while an incursion is under way.
@@ -41,6 +46,7 @@ func to_dict() -> Dictionary:
 		"countdown": countdown,
 		"groups": group_data,
 		"last_day": SaveFields.write_int_map(last_day),
+		"report": report.duplicate(true),
 	}
 
 
@@ -53,6 +59,7 @@ static func from_dict(data: Dictionary) -> IncursionState:
 	for item: Dictionary in SaveFields.dicts_in(data.get("groups")):
 		state.groups.append(IntruderGroup.from_dict(item))
 	state.last_day = SaveFields.read_int_map(data.get("last_day"))
+	state.report = SaveFields.dict_or_empty(data.get("report")).duplicate(true)
 	return state
 
 
@@ -73,4 +80,6 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		SaveFields.record_list_errors(data["groups"], "groups", IntruderGroup.validate_dict)
 	)
 	errors.append_array(SaveFields.int_map_errors(data["last_day"], "last_day", false))
+	if data.has("report") and not data["report"] is Dictionary:
+		errors.append("'report' is not an object")
 	return errors
