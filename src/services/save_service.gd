@@ -56,7 +56,16 @@ func save_game(state: GameState, slot: StringName) -> Result:
 func load_game(slot: StringName, defs: GameDefs = null) -> Result:
 	if not is_valid_slot_name(slot):
 		return Result.fail(&"bad_slot_name", "invalid slot name '%s'" % slot)
-	var read := _read_data(slot_path(slot))
+	var loaded: Result = load_file(slot_path(slot), defs)
+	if loaded.is_ok:
+		EventBus.game_loaded.emit(slot)
+	return loaded
+
+
+## Loads the save file at [param path] (a user slot or a shipped res:// scenario) through the
+## same checks and migrations as [method load_game]; never writes it.
+func load_file(path: String, defs: GameDefs = null) -> Result:
+	var read := _read_data(path)
 	if not read.is_ok:
 		return read
 	var raw_data: Dictionary = read.value
@@ -67,10 +76,7 @@ func load_game(slot: StringName, defs: GameDefs = null) -> Result:
 	var checked := _check_header(data)
 	if not checked.is_ok:
 		return checked
-	var built := _build_state(data, defs)
-	if built.is_ok:
-		EventBus.game_loaded.emit(slot)
-	return built
+	return _build_state(data, defs)
 
 
 ## Writes [param state] to autosave_1, after shifting older autosaves down one slot.

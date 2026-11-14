@@ -68,6 +68,15 @@ func get_all_of(script: Script) -> Array[DefBase]:
 	return found
 
 
+## Every shipped scenario, in menu order.
+func scenarios() -> Array[ScenarioDef]:
+	var found: Array[ScenarioDef] = []
+	for def: DefBase in get_all_of(ScenarioDef):
+		found.append(def as ScenarioDef)
+	found.sort_custom(func(a: ScenarioDef, b: ScenarioDef) -> bool: return a.order < b.order)
+	return found
+
+
 ## Returns true when a definition with [param id] is loaded.
 func has_def(id: StringName) -> bool:
 	return _defs.has(id)
