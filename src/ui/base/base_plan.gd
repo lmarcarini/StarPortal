@@ -18,6 +18,8 @@ signal person_chosen(person_id: StringName)
 signal drag_moved(global_point: Vector2)
 ## A placing hint or a refused drop's reason ("" clears it).
 signal placement_message(text: String)
+## A click or press on a built blast door: toggle it.
+signal door_toggled(level: int, cell: Vector2i)
 
 ## Level shown, 1 the top one.
 var level: int = 1
@@ -131,6 +133,9 @@ func _draw() -> void:
 	var font: Font = UiThemeBuilder.stencil_font()
 	for room: RoomState in BaseRules.rooms_on_level(_base, level):
 		_draw_room(room, font)
+	for door: DoorState in _base.doors:
+		if door.level == level:
+			BasePlanPainter.draw_door(self, door)
 	var chosen: Rect2i = _selected_cells()
 	if chosen.size != Vector2i.ZERO:
 		BasePlanPainter.draw_selection(self, chosen)
@@ -287,8 +292,12 @@ func move_cursor(step: Vector2i) -> void:
 	queue_redraw()
 
 
-## Selects what stands at the cursor cell.
+## Selects what stands at the cursor cell; on a built blast door, toggles it instead.
 func select_at_cursor() -> void:
+	var door: DoorState = null if _base == null else DoorRules.find(_base, level, cursor)
+	if door != null and door.is_built():
+		door_toggled.emit(level, cursor)
+		return
 	select(item_at(cursor))
 
 

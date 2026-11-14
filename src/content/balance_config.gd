@@ -55,6 +55,9 @@ const BALANCE_ID: StringName = &"balance"
 @export var lift_segment_cost_k: int = 100
 ## Ticks one lift segment takes to build: one in-game hour.
 @export var lift_segment_ticks: int = 60
+## A blast door (M4c): cost in $k and build time in ticks.
+@export var door_cost_k: int = 50
+@export var door_build_ticks: int = 120
 ## Room def ids a new game may build before any research (m25-lean-start.md section 1).
 @export var starting_room_unlocks: Array[StringName] = [
 	&"room_capacitor_bank", &"room_research_lab", &"room_corridor", &"room_quarters"

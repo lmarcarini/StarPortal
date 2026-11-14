@@ -35,6 +35,7 @@ func _init(plan: BasePlan, palette: BuildPalette, panel: RoomPanel) -> void:
 	_ghost.build_held.connect(_submit_build)
 	_ghost.checked.connect(_on_checked)
 	_ghost.cancelled.connect(_on_cancelled)
+	_plan.door_toggled.connect(_toggle_door)
 
 
 ## Builds with [param simulation]; [param defs] holds the RoomDefs by id.
@@ -148,6 +149,7 @@ static func _t(key: StringName) -> String:
 
 func _submit_build(command: Command) -> void:
 	var def: RoomDef = _simulation.state.room_defs.get(_ghost.def_id)
+	var name_key: StringName = &"BASE_DOOR_NAME" if def == null else def.name_key
 	var cost_k: int = _ghost.cost_k()
 	var result: CommandResult = _simulation.submit(command)
 	if not result.is_ok:
@@ -156,9 +158,24 @@ func _submit_build(command: Command) -> void:
 	_ghost.after_build()
 	_palette.show_message(
 		_t(&"BASE_BUILD_STARTED").format(
-			{"name": _t(def.name_key), "cost": MoneyLabel.format_k(cost_k)}
+			{"name": _t(name_key), "cost": MoneyLabel.format_k(cost_k)}
 		)
 	)
+
+
+## Seals an open door, opens a sealed one (M4c-04); works while paused.
+func _toggle_door(level: int, cell: Vector2i) -> void:
+	var door: DoorState = DoorRules.find(_simulation.state.base, level, cell)
+	if door == null:
+		return
+	var sealed: bool = door.mode == DoorState.Mode.SEALED
+	var to_mode: DoorState.Mode = DoorState.Mode.OPEN if sealed else DoorState.Mode.SEALED
+	var result: CommandResult = _simulation.submit(SetDoorCommand.create(level, cell, to_mode))
+	var key: StringName = &"BASE_DOOR_OPENED" if sealed else &"BASE_DOOR_SEALED"
+	_palette.show_message(
+		_t(key) if result.is_ok else BuildText.reason(result, _simulation.state, 0)
+	)
+	_plan.queue_redraw()
 
 
 func _submit_action(command: Command) -> void:
@@ -193,6 +210,7 @@ func _on_checked(reason: String) -> void:
 		_palette.show_message(reason)
 		return
 	var def: RoomDef = _simulation.state.room_defs.get(_ghost.def_id)
+	var name_key: StringName = &"BASE_DOOR_NAME" if def == null else def.name_key
 	var key: StringName = &"BASE_BUILD_PLACING"
 	if _ghost.is_corridor():
 		key = &"BASE_BUILD_CORRIDOR_END" if _ghost.has_start() else &"BASE_BUILD_CORRIDOR_START"
@@ -200,7 +218,7 @@ func _on_checked(reason: String) -> void:
 		_t(key)
 		. format(
 			{
-				"name": _t(def.name_key),
+				"name": _t(name_key),
 				"cost": MoneyLabel.format_k(_ghost.cost_k()),
 				"time": BuildText.duration(_ghost.build_ticks()),
 			}

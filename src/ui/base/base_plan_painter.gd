@@ -62,6 +62,27 @@ static func draw_ground(canvas: CanvasItem, grid_size: Vector2i) -> void:
 		canvas.draw_line(Vector2(0, row * CELL), Vector2(size.x, row * CELL), GRID)
 
 
+## Draws a blast door on its cell (M4c-04). Open: two jambs at the cell's sides with a gap.
+## Sealed: a solid bar across the cell with a cross. Being built: the jambs dashed.
+static func draw_door(canvas: CanvasItem, door: DoorState) -> void:
+	var area: Rect2 = _pixels(Rect2i(door.cell, Vector2i.ONE))
+	var ink: Color = UiPalette.TEXT if door.is_built() else UiPalette.TEXT_DIM
+	var jamb: float = area.size.x * 0.18
+	if door.mode == DoorState.Mode.SEALED:
+		var bar := Rect2(
+			area.position + Vector2(0, area.size.y * 0.3), Vector2(area.size.x, area.size.y * 0.4)
+		)
+		canvas.draw_rect(bar, UiPalette.ALARM)
+		canvas.draw_line(bar.position, bar.end, ink, 2.0)
+		canvas.draw_line(
+			Vector2(bar.position.x, bar.end.y), Vector2(bar.end.x, bar.position.y), ink, 2.0
+		)
+		return
+	canvas.draw_rect(Rect2(area.position, Vector2(jamb, area.size.y)), ink, door.is_built(), 2.0)
+	var right := Vector2(area.end.x - jamb, area.position.y)
+	canvas.draw_rect(Rect2(right, Vector2(jamb, area.size.y)), ink, door.is_built(), 2.0)
+
+
 ## Draws a corridor cell: a flat lighter strip.
 static func draw_corridor(canvas: CanvasItem, cells: Rect2i) -> void:
 	canvas.draw_rect(_pixels(cells), CORRIDOR)

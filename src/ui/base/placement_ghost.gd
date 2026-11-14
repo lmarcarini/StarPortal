@@ -131,6 +131,8 @@ func command() -> Command:
 		return null
 	if is_corridor():
 		return PaintCorridorCommand.create(_plan.level, run)
+	if _is_door():
+		return BuildDoorCommand.create(_plan.level, origin)
 	return PlaceRoomCommand.create(def_id, _plan.level, origin, rotated)
 
 
@@ -141,6 +143,8 @@ func reason() -> String:
 
 ## The cells the ghost covers, as one rect (a corridor run's bounding box).
 func area() -> Rect2i:
+	if _is_door():
+		return Rect2i(origin, Vector2i.ONE)
 	var def: RoomDef = _def()
 	if def == null:
 		return Rect2i()
@@ -159,6 +163,8 @@ func area() -> Rect2i:
 ## Total cost of the ghost in $k: for a room, what PlaceRoomCommand.cost_of() charges (the
 ## segment price when a lift extends a shaft).
 func cost_k() -> int:
+	if _is_door() and _state != null:
+		return _state.balance.door_cost_k
 	var def: RoomDef = _def()
 	if def == null:
 		return 0
@@ -172,6 +178,8 @@ func cost_k() -> int:
 ## Build time of the ghost in ticks: a corridor run's cells one after another, else what
 ## PlaceRoomCommand.ticks_of() gives (the segment time when a lift extends a shaft).
 func build_ticks() -> int:
+	if _is_door() and _state != null:
+		return _state.balance.door_build_ticks
 	var def: RoomDef = _def()
 	if def == null:
 		return 0
@@ -322,3 +330,8 @@ func _set_placing(on: bool) -> void:
 
 func _def() -> RoomDef:
 	return _state.room_defs.get(def_id) if _state != null else null
+
+
+# True when a blast door is being placed (one corridor cell).
+func _is_door() -> bool:
+	return def_id == BuildPalette.DOOR_ID

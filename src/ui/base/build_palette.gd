@@ -22,6 +22,9 @@ signal back_requested
 
 ## Buildable rooms, in palette order. The Infirmary shows only from the Expeditions unlock
 ## (m3-beyond-the-ring.md section 9): no research unlocks it.
+## The palette entry for a blast door (M4c-04): not a RoomDef; the ghost places one cell.
+const DOOR_ID: StringName = &"blast_door"
+
 const ROOMS: Array[StringName] = [
 	&"room_power_plant",
 	&"room_capacitor_bank",
@@ -119,8 +122,22 @@ func show_rooms(
 		button.gui_input.connect(_on_button_input)
 		_rooms.add_child(button)
 		_buttons[def_id] = button
+	_add_door_button()
 	_rooms.move_child(_dig, -1)
 	_refresh_hint()
+
+
+func _add_door_button() -> void:
+	var button := Button.new()
+	button.text = &"BASE_DOOR_NAME"
+	button.toggle_mode = true
+	button.set_pressed_no_signal(_picked == DOOR_ID)
+	button.pressed.connect(room_picked.emit.bind(DOOR_ID))
+	button.mouse_entered.connect(show_message.bind(tr(&"BASE_DOOR_SUMMARY")))
+	button.focus_entered.connect(show_message.bind(tr(&"BASE_DOOR_SUMMARY")))
+	button.gui_input.connect(_on_button_input)
+	_rooms.add_child(button)
+	_buttons[DOOR_ID] = button
 
 
 ## The line under the hint for [param def_id]: its "now" line, or "Unlock: <project>" while
