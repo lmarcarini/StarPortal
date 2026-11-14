@@ -165,6 +165,7 @@ func _draw_room(room: RoomState, font: Font) -> void:
 		BasePlanPainter.draw_room(self, cells, room.def_id, plan_state, view.scale())
 	if room.def_id != StartingBase.CORRIDOR_DEF or not room.is_built():
 		BasePlanPainter.draw_label(self, cells, tr(def.name_key).to_upper(), font)
+	BasePlanPainter.draw_installations(self, cells, room.installations)
 	var progress: SiteProgress = progress_of(room.id)
 	if progress != null:
 		var cell: float = BasePlanPainter.CELL
