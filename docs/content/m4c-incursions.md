@@ -10,8 +10,14 @@ individuals; incursions come only through the gate; no morale system. The owner 
 objection to: civilians act on their own, the clock drops to 1× on a breach with pausing
 allowed, and losing the Control Room ends the game.
 
-Everything else is a PO proposal; numbers are starting values in `balance_config`. Open
-choices are in section 10. One tick is one in-game minute, which is one second at 1×, so an
+**Owner decisions on this document (2026-11-14):** people are only injured, never killed;
+Confidence 0 and bankruptcy keep only warning, so Overrun is the one way to lose for now;
+the Shutter is in, as an **upgrade that is researched and then built**, and the MOTH and
+other defensive measures become upgrades of the same kind (section 6); all work stops
+during an incursion, like a state of alert; the clock is held at 1× with no auto-pause;
+sight follows power.
+
+Everything else is a PO proposal; numbers are starting values in `balance_config`. One tick is one in-game minute, which is one second at 1×, so an
 incursion of 60 to 120 ticks lasts one to two minutes of play, plus pauses.
 
 **Out of M4c:** surface attacks, sabotage and plants, outpost raids, accidents, the Murmur,
@@ -41,7 +47,7 @@ wormhole, countdown     Gate Room    do the objective, then leave         off or
 4. **End.** The incursion ends when no intruder is left on base. An after-action report
    lists what happened.
 
-**The Shutter** (section 6) can stop a wave before it arrives.
+**The Shutter** (section 6) can stop a wave before it arrives, once it is built.
 
 ## 2. Who fights
 
@@ -66,7 +72,7 @@ defender of a room (whoever was there first) takes 25% less. It is automatic: th
 part is where squads stand, when they fall back and which doors are sealed.
 
 A soldier at 0 health is **down**: out of the fight with a serious injury, treated by the
-existing injury rules. **Nobody dies in M4c** (section 10). A squad with everyone down is
+existing injury rules. **Nobody dies** (owner decision). A squad with everyone down is
 out until someone recovers.
 
 ## 3. Moving
@@ -123,10 +129,25 @@ in place; they do not need orders.
 stolen, −8 if a soldier went down and nothing was stopped, +3 if every intruder was stopped
 with no loss.
 
-## 6. The Shutter
+## 6. Installations: the Shutter, the MOTH rack and defences
 
-A research project, **The Shutter** ($600k, 4 days, requires the Research Lab), adds a
-control on the Gate Room: **Close Shutter** and **Open Shutter**.
+**Installations** are upgrades fitted to a room or a door. Each is unlocked by research,
+then **built** from the room's panel (**Install…**) for money and time, like a small
+construction site inside the room; the Workshop speeds it up as it does building. An
+installation works while its room is on, can be removed (50% refund) and is lost if the
+room is demolished. A damaged room's installations stop until it is repaired.
+
+| Installation | Fitted to | Research | Install | What it does |
+| --- | --- | --- | --- | --- |
+| The Shutter | Gate Room | The Shutter, $600k, 4 days | $400k, 1 day | Closes the Ring (below) |
+| MOTH rack | Gate Room | Survey drones, $200k, 2 days | $150k, 12 hours | Holds 2 MOTHs; each MOTH is built at the rack for $150k and 1 day |
+| Sentry gun | Any room except corridors, one per room | Automated defence, $500k, 4 days | $250k, 1 day | Attacks intruders in its room: 3 a tick, health 15; destroyed at 0 and must be reinstalled |
+| Door plating | A blast door | Automated defence | $100k, 6 hours | The door takes twice as long to breach |
+
+More can be added as data later (for example gas vents, a second Shutter layer, a camera
+battery that keeps sight when a room is off); none are in M4c.
+
+**The Shutter.** Once installed, the Gate Room has **Close Shutter** and **Open Shutter**.
 
 - Closed, nothing arrives and the player cannot dial or send anything through.
 - Each wave it stops takes 100 MWh from the capacitors. If they hold less, the Shutter
@@ -134,6 +155,19 @@ control on the Gate Room: **Close Shutter** and **Open Shutter**.
 - An `IncursionDef` may be marked `breaches_shutter`; the test Assault is. The warning says
   so ("They have a way through the Shutter").
 - Closing it during the warning counts: the wave is stopped at zero.
+
+**The MOTH becomes something the player builds.** Today the base starts with a rack of two
+and a lost MOTH is reordered automatically. Now the player researches Survey drones (first
+row of the tree, cheap), installs the rack and orders each MOTH; a lost one is not replaced
+until the player orders another. The existing MOTH research (batteries, shielding) requires
+Survey drones. Until then, a new world is looked at with the pole camera and the canister.
+**A world still needs a MOTH run to become Probed**, so expeditions wait for the rack: this
+moves the first expedition a few days later **(proposal; say if the pole camera should be
+enough to send a team)**. Old saves keep their MOTHs: migration grants the research and the
+rack.
+
+**Sentry guns** fight like a unit that never moves. They need the room on, so power is
+also defence.
 
 ## 7. What the player sees
 
@@ -162,16 +196,20 @@ saved, who is injured, the Confidence change. It is also written to the Log.
 
 ## 8. Failure states
 
-The game now ends in three ways. Each has a warning well before (bible).
+Three failures are tracked, each with a warning well before (bible); for now only the first ends the game.
 
-| Failure | Trigger | Warnings |
-| --- | --- | --- |
-| Overrun | Intruders hold the Control Room for 30 ticks in a row | A countdown in the alarm strip from the moment they enter; it resets if a squad contests the room |
-| Shutdown | Confidence is 0 at seven daily settlements in a row | Committee message at 20 and at 10; a daily countdown alert from the first day at 0 |
-| Bankruptcy | Funds are below zero at thirty daily settlements in a row | The existing 7-day red warning; a daily countdown alert from day 15 |
+| Failure | Trigger | Warnings | Ends the game |
+| --- | --- | --- | --- |
+| Overrun | Intruders hold the Control Room for 30 ticks in a row | A countdown in the alarm strip from the moment they enter; it resets if a squad contests the room | Yes |
+| Shutdown | Confidence is 0 at seven daily settlements in a row | Committee message at 20 and at 10; a daily countdown alert from the first day at 0 | No (warns) |
+| Bankruptcy | Funds are below zero at thirty daily settlements in a row | The existing 7-day red warning; a daily countdown alert from day 15 | No (warns) |
 
-This replaces the M2.6 rule that bankruptcy and Confidence 0 only warn. The bible's other
-failures (Destruction, Exposure, Takeover, Contagion) wait for their systems.
+**Owner decision (2026-11-14):** only Overrun ends the game in M4c. Shutdown and Bankruptcy
+stay as warnings: the counters, Committee messages and countdown alerts are built, and at
+the end of the count the alert reads "The Committee would close the site" (or "The site
+would be bankrupt") and nothing else happens. Turning them into real endings later is one
+flag each in `balance_config`. The bible's other failures (Destruction, Exposure, Takeover,
+Contagion) wait for their systems.
 
 **When the game ends** the simulation stops for good: `GameState.outcome` goes from RUNNING
 to FAILED with a cause, no command is accepted, and autosave stops (so the last autosave is
@@ -179,7 +217,7 @@ from before the end). The **game over screen** names the cause, shows the date a
 figures (days survived, worlds locked, research done), and offers **Load last save**,
 **Load…** and **Main menu**.
 
-A setting, **Failure states** (on by default), turns all three off for free play and
+A setting, **Failure states** (on by default), turns Overrun off for free play and
 testing.
 
 ## 9. Data and saves
@@ -190,22 +228,22 @@ testing.
   groups (units with health, cell, level, carried artefact), last-seen markers, per-faction
   last incursion day.
 - `SecurityState` (saved): squads (post room, order, target, cell, level), unit health.
-- `BaseState`: doors (cell, level, state); rooms gain `damaged`.
+- `InstallationDef` (resource): host (room type or door), research, cost, time, effect.
+- `BaseState`: doors (cell, level, state, plating); rooms gain `damaged` and a list of
+  installations (def id, state SITE or BUILT, progress, health).
 - `OutcomeState` (saved): RUNNING or FAILED, cause, tick; the two day counters.
 - The save version goes up by one, with a migration that adds the empty sections.
 
 All randomness uses a new seeded stream for incursions.
 
-## 10. Owner decisions needed
+## 10. Owner decisions
 
-1. **Death.** Proposed: nobody dies in M4c; soldiers and civilians are injured. Or may
-   people be killed?
-2. **Shutdown and Bankruptcy end the game** after 7 and 30 days, replacing "only warn"?
-3. **The Shutter in M4c,** or left for later so that every early incursion must be fought?
-4. **Work stops** base-wide during an incursion (proposed), or only in rooms intruders
-   enter?
-5. **No auto-pause** on the warning, only the drop to 1× (proposed)?
-6. **Sight follows power** (section 7): keep, or always show intruders?
+Settled on 2026-11-14: injuries only; Shutdown and Bankruptcy only warn; the Shutter is in,
+as a built upgrade, with the MOTH rack, sentry guns and door plating; all work stops during
+an incursion; 1× with no auto-pause; sight follows power.
+
+Open: whether a world needs a MOTH run before a team can go, now that the MOTH comes later
+(section 6).
 
 ## 11. Cards
 
@@ -221,7 +259,7 @@ Milestone "M4c Incursions and failure states". This document is M4c-01.
 | M4c-07 | Intruder movement, objectives and retreat | 03, 06 |
 | M4c-08 | Combat and door breaching | 05, 07 |
 | M4c-09 | Alarm effects: work stops, civilians, damage and repair, Confidence | 07 |
-| M4c-10 | The Shutter | 06 |
+| M4c-10 | The Shutter (an installation) | 06, 18 |
 | M4c-11 | Alarm state and the plan: squads, intruders, doors, sight | 04, 08 |
 | M4c-12 | Security sub-tab and squad orders | 11 |
 | M4c-13 | Cameras show the fight; after-action report | 11 |
@@ -229,3 +267,7 @@ Milestone "M4c Incursions and failure states". This document is M4c-01.
 | M4c-15 | Game over screen and the Failure states setting | 14 |
 | M4c-16 | Test incursions and debug triggers | 08, 10 |
 | M4c-17 | Flow tests, soak bot and playtest guide | all |
+| M4c-18 | Installations: defs, state, install and remove | 02 |
+| M4c-19 | Installations in the room panel | 18 |
+| M4c-20 | The MOTH rack: researched, installed, MOTHs built to order | 18 |
+| M4c-21 | Sentry guns and door plating | 08, 18 |
