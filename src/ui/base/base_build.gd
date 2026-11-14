@@ -43,7 +43,7 @@ func setup(simulation: Simulation, defs: Dictionary) -> void:
 	_ghost.stop()
 	_ghost.attach(_plan, simulation.state)
 	_defs.assign(defs)
-	_palette.show_rooms(defs, simulation.state.unlocks.rooms)
+	_palette.show_rooms(defs, simulation.state.unlocks.rooms, blocked(simulation.state))
 	_palette.set_placing(false, false)
 	refresh()
 
@@ -87,8 +87,10 @@ func place_at(def_id: StringName, cell: Vector2i) -> void:
 func refresh() -> void:
 	if _simulation == null:
 		return
-	if _palette.unlocks_changed(_simulation.state.unlocks.rooms):
-		_palette.show_rooms(_defs, _simulation.state.unlocks.rooms)
+	var state: GameState = _simulation.state
+	var now_blocked: Dictionary[StringName, String] = blocked(state)
+	if _palette.unlocks_changed(state.unlocks.rooms, now_blocked):
+		_palette.show_rooms(_defs, state.unlocks.rooms, now_blocked)
 	_palette.get_dig_button().refresh(_simulation.state)
 	_ghost.recheck()
 	show_action(_plan.selected())
@@ -226,3 +228,13 @@ func _on_cancelled() -> void:
 	_palette.mark_picked(&"")
 	_palette.set_placing(false, false)
 	_palette.show_message("")
+
+
+## Unlocked rooms that can't be built right now, with the reason (the bank cap, say).
+static func blocked(state: GameState) -> Dictionary[StringName, String]:
+	var found: Dictionary[StringName, String] = {}
+	for def_id: StringName in state.unlocks.rooms:
+		var result: CommandResult = UnlockRules.can_build_room(state, def_id)
+		if not result.is_ok:
+			found[def_id] = BuildText.unlock_reason(result, state)
+	return found

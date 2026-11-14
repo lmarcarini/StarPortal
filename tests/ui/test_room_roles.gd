@@ -73,27 +73,27 @@ func test_hovering_a_room_shows_its_summary_and_now_line() -> void:
 	assert_str(palette.get_role()).is_empty()
 
 
-func test_research_locked_rooms_are_greyed_with_their_project() -> void:
+## Owner change 2026-11-14: a room research has not unlocked is not offered at all; an
+## unlocked room that can't be built right now (the bank cap) shows greyed with the reason.
+func test_locked_rooms_hidden_and_capped_rooms_greyed() -> void:
 	var palette: BuildPalette = _view.get_palette()
-	var expected: Dictionary[StringName, String] = {
-		&"room_power_plant": "Unlock: Second plant",
-		&"room_lift": "Unlock: Lift shaft",
-		&"room_stairs": "Unlock: Excavation survey",
-	}
-	for def_id: StringName in expected:
-		var button: Button = palette.get_room_button(def_id)
-		assert_bool(button.disabled).override_failure_message(String(def_id)).is_true()
-		button.focus_entered.emit()
-		assert_str(palette.get_role()).is_equal(expected[def_id])
-	assert_object(palette.get_room_button(&"room_infirmary")).is_null()
-	# Advanced rooms are not offered at all until researched (owner change 2026-11-14).
-	for def_id: StringName in BuildPalette.ADVANCED:
+	for def_id: StringName in [
+		&"room_power_plant", &"room_lift", &"room_stairs", &"room_infirmary"
+	]:
 		(
 			assert_object(palette.get_room_button(def_id))
 			. override_failure_message(String(def_id))
 			. is_null()
 		)
 	assert_object(palette.first_button()).is_equal(palette.get_room_button(&"room_capacitor_bank"))
+	var state: GameState = _simulation.state
+	for _bank: int in state.unlocks.bank_cap:
+		state.base.add_room(&"room_capacitor_bank", 1, Vector2i(2 + _bank * 4, 2))
+	_view.get_build().refresh()
+	var bank: Button = palette.get_room_button(&"room_capacitor_bank")
+	assert_bool(bank.disabled).is_true()
+	bank.focus_entered.emit()
+	assert_str(palette.get_role()).starts_with("Up to")
 
 
 func test_selected_panel_shows_now_and_later_lines() -> void:
@@ -125,7 +125,7 @@ func test_longest_lines_fit_1280_by_720_in_both_languages() -> void:
 	var palette: BuildPalette = _view.get_palette()
 	for locale: String in LOCALES:
 		TranslationServer.set_locale(locale)
-		palette.get_room_button(&"room_power_plant").focus_entered.emit()
+		palette.get_room_button(&"room_research_lab").focus_entered.emit()
 		_view.get_plan().select(_find(&"room_power_plant").id)
 		for _frame: int in 3:
 			await get_tree().process_frame
