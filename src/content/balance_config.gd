@@ -107,6 +107,8 @@ const BALANCE_ID: StringName = &"balance"
 @export var incoming_answer_minutes: int = 5
 ## Artefacts Gate Room holding can keep (m4-core-systems.md section 5).
 @export var holding_capacity: int = 2
+## Research projects the player may queue (m4-core-systems.md section 7).
+@export var research_queue_max: int = 5
 
 
 func _init() -> void:

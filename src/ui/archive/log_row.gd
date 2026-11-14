@@ -136,6 +136,13 @@ static func line_for(entry: LogEntry, state: GameState) -> String:
 				Registry.get_def(StringName(str(entry.args.get("faction_id", "")))) as FactionDef
 			)
 			var name: String = "" if faction == null else _tr(faction.name_key)
+			if entry.args.get("reason", "") == "queue":
+				var project: ResearchDef = (
+					Registry.get_def(StringName(str(entry.args.get("project_id", ""))))
+					as ResearchDef
+				)
+				var project_name: String = "" if project == null else _tr(project.name_key)
+				return _tr(&"LOG_LINE_RESEARCH_QUEUED").format({"name": project_name})
 			if entry.args.get("reason", "") == "hazard":
 				return ArtefactText.hazard_line(StringName(str(entry.args.get("artefact_id", ""))))
 			if entry.args.get("reason", "") == "debug":

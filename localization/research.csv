@@ -49,3 +49,12 @@ RESEARCH_CONTAINMENT_LINE,Unlocks the Containment room for dangerous artefacts.,
 RESEARCH_CAT_DEFENCE,Defence,Defesa
 RESEARCH_CAT_LIFE,Life and language,Vida e linguagem
 RESEARCH_ERR_REQUIREMENT,{reason},{reason}
+LOG_LINE_RESEARCH_QUEUED,Research started from the queue: {name}.,Pesquisa iniciada da fila: {name}.
+RESEARCH_QUEUE_TITLE,Queue ({count}/{max}),Fila ({count}/{max})
+RESEARCH_QUEUE_ADD,Add to queue,Adicionar à fila
+RESEARCH_QUEUE_REMOVE,Remove,Remover
+RESEARCH_QUEUE_UP,Up,Subir
+RESEARCH_QUEUE_DOWN,Down,Descer
+RESEARCH_QUEUE_WAITING_FOR_FUNDS,Waiting for funds,Aguardando fundos
+RESEARCH_QUEUE_REQUIREMENTS_NOT_MET,Requirements not met,Requisitos não atendidos
+RESEARCH_QUEUE_NEEDS_LAB,Waiting for a Research Lab that is on,Aguardando um Laboratório ligado

@@ -46,6 +46,12 @@ static func entries_for(
 					tick, &"faction", &"", {"reason": "hazard", "artefact_id": _text(args)}
 				)
 			]
+		&"research_queue_started":
+			return [
+				LogEntry.create(
+					tick, &"faction", &"", {"reason": "queue", "project_id": _text(args)}
+				)
+			]
 		&"request_changed":
 			return RequestLog.entries(args, state, tick)
 		&"incoming_ignored":

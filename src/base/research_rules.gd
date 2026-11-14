@@ -182,3 +182,37 @@ static func _before(a: ResearchDef, b: ResearchDef) -> bool:
 	if a.order != b.order:
 		return a.order < b.order
 	return String(a.id) < String(b.id)
+
+
+## Why the first queued project of [param state] has not started: &"" when nothing waits or it
+## runs; &"waiting_for_funds", &"requirements_not_met" or the can_start() code otherwise.
+static func queue_wait(state: GameState) -> StringName:
+	if state.research.is_running() or state.research.queue.is_empty():
+		return &""
+	var result: CommandResult = can_start(state, state.research.queue[0])
+	if result.is_ok:
+		return &""
+	match result.error_code:
+		&"insufficient_funds":
+			return &"waiting_for_funds"
+		&"requirement_unmet", &"needs_project":
+			return &"requirements_not_met"
+	return result.error_code
+
+
+## Why [param project_id] cannot be queued: &"" when it can; &"unknown_project" (also hidden),
+## &"project_done", &"already_queued", &"project_running" or &"queue_full".
+static func queue_error(state: GameState, project_id: StringName) -> StringName:
+	var def: ResearchDef = state.research_defs.get(project_id)
+	if def == null or not is_visible(state, def):
+		return &"unknown_project"
+	if state.research.is_done(project_id):
+		return &"project_done"
+	if state.research.queue.has(project_id):
+		return &"already_queued"
+	if state.research.active == project_id:
+		return &"project_running"
+	var most: int = 5 if state.balance == null else state.balance.research_queue_max
+	if state.research.queue.size() >= most:
+		return &"queue_full"
+	return &""

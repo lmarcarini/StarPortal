@@ -33,6 +33,27 @@ func tick(state: GameState) -> void:
 	research.ticks_done += ResearchRules.step(state)
 	if research.ticks_done >= ResearchRules.total_ticks(def):
 		finish(state, def)
+		start_next(state)
+
+
+## Once a day: a queue waiting for money or requirements tries again.
+func on_day(state: GameState) -> void:
+	if not state.research.is_running():
+		start_next(state)
+
+
+## Starts the first queued project when nothing runs and it can start now (paid at start),
+## posting research_queue_started for the Log. Otherwise the queue waits (queue_wait()).
+static func start_next(state: GameState) -> bool:
+	var research: ResearchState = state.research
+	if research.is_running() or research.queue.is_empty():
+		return false
+	var next: StringName = research.queue[0]
+	if not ResearchRules.can_start(state, next).is_ok:
+		return false
+	StartResearchCommand.begin(state, next)
+	state.events.post(&"research_queue_started", [next])
+	return true
 
 
 ## Applies [param def]'s effects to [param state], marks it done, clears the active project
