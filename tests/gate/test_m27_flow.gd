@@ -150,7 +150,7 @@ func _lock_sill_and_settle_a_day(player: M15Player) -> void:
 
 ## F4, the Excavation survey node and Start begin the survey while the bank charges.
 func _start_survey_from_the_tree(player: M15Player) -> void:
-	await _key(KEY_F4)
+	await _key(KEY_F3)
 	var view := _shell.view_switcher.get_view(&"research") as ResearchView
 	await UiInput.click(view.get_board().get_tree_view().node_of(SURVEY))
 	var start: Button = view.get_panel().get_button()
@@ -206,7 +206,7 @@ func _wait_for_a_candidate(player: M15Player) -> StringName:
 
 ## F5, Candidates, the new candidate's row and Hire: the fee is paid and the hire is on the way.
 func _hire(player: M15Player, candidate_id: StringName) -> void:
-	await _key(KEY_F5)
+	await _key(KEY_F4)
 	var view := _shell.view_switcher.get_view(&"personnel") as PersonnelView
 	view.get_board().show_page(PersonnelBoard.Page.CANDIDATES)
 	view.get_board().row_of(candidate_id).grab_focus()
@@ -242,7 +242,7 @@ func _open_command_from_conf(player: M15Player) -> void:
 
 
 func _open_base() -> BaseView:
-	await _key(KEY_F3)
+	await _key(KEY_F2)
 	return _shell.view_switcher.get_view(&"base") as BaseView
 
 

@@ -121,7 +121,7 @@ func _build_bank_from_gate_room(player: M15Player) -> void:
 func _build_lab_on_a_painted_corridor(player: M15Player) -> void:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
-	await UiInput.key(switcher, KEY_F3)
+	await UiInput.key(switcher, KEY_F2)
 	var base := switcher.get_view(&"base") as BaseView
 	var before: int = _corridor_count(player.state())
 	base.get_build().start_placing(StartingBase.CORRIDOR_DEF)
@@ -150,7 +150,7 @@ func _lock_sill(player: M15Player) -> void:
 func _hire_first_candidate(player: M15Player) -> StringName:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
-	await UiInput.key(switcher, KEY_F5)
+	await UiInput.key(switcher, KEY_F4)
 	assert_str(String(switcher.current_view_id())).is_equal("personnel")
 	var view := switcher.get_view(&"personnel") as PersonnelView
 	view.get_board().show_page(PersonnelBoard.Page.CANDIDATES)
@@ -174,7 +174,7 @@ func _hire_first_candidate(player: M15Player) -> StringName:
 func _assign_to_the_lab(player: M15Player, person_id: StringName) -> void:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
-	await UiInput.key(switcher, KEY_F5)
+	await UiInput.key(switcher, KEY_F4)
 	var view := switcher.get_view(&"personnel") as PersonnelView
 	view.get_board().row_of(person_id).grab_focus()
 	await UiInput.settle(switcher)
@@ -195,7 +195,7 @@ func _assign_to_the_lab(player: M15Player, person_id: StringName) -> void:
 func _start_survey_from_the_tree(player: M15Player) -> void:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
-	await UiInput.key(switcher, KEY_F4)
+	await UiInput.key(switcher, KEY_F3)
 	var view := switcher.get_view(&"research") as ResearchView
 	await UiInput.click(view.get_board().get_tree_view().node_of(&"excavation_survey"))
 	var start: Button = view.get_panel().get_button()

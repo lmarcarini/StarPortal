@@ -138,32 +138,32 @@ const DEFAULTS: Dictionary = {
 	},
 	&"view_archive":
 	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F2}],
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F6}],
 		GAMEPAD: [],
 	},
 	&"view_base":
 	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F3}],
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F2}],
 		GAMEPAD: [],
 	},
 	&"view_research":
 	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F4}],
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F3}],
 		GAMEPAD: [],
 	},
 	&"view_personnel":
 	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F5}],
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F4}],
 		GAMEPAD: [],
 	},
 	&"view_command":
 	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F6}],
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F7}],
 		GAMEPAD: [],
 	},
 	&"view_expeditions":
 	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F7}],
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F5}],
 		GAMEPAD: [],
 	},
 	&"base_level_up":

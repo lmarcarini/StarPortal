@@ -31,7 +31,7 @@ mouse_filter = 2
 [node name="Tabs" type="TabBar" parent="Layout"]
 unique_name_in_owner = true
 auto_translate_mode = 2
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 focus_mode = 2
 
@@ -44,9 +44,6 @@ mouse_filter = 2
 [node name="GateRoom" parent="Layout/Views" instance=ExtResource("2_gate_room")]
 layout_mode = 1
 
-[node name="Archive" parent="Layout/Views" instance=ExtResource("3_archive")]
-layout_mode = 1
-
 [node name="Base" parent="Layout/Views" instance=ExtResource("4_base")]
 layout_mode = 1
 
@@ -56,8 +53,11 @@ layout_mode = 1
 [node name="Personnel" parent="Layout/Views" instance=ExtResource("6_personnel")]
 layout_mode = 1
 
-[node name="Command" parent="Layout/Views" instance=ExtResource("7_command")]
+[node name="Expeditions" parent="Layout/Views" instance=ExtResource("8_expeditions")]
 layout_mode = 1
 
-[node name="Expeditions" parent="Layout/Views" instance=ExtResource("8_expeditions")]
+[node name="Archive" parent="Layout/Views" instance=ExtResource("3_archive")]
+layout_mode = 1
+
+[node name="Command" parent="Layout/Views" instance=ExtResource("7_command")]
 layout_mode = 1

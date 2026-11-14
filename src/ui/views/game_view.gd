@@ -29,6 +29,13 @@ func get_tab_title() -> String:
 	return tr(get_title_key())
 
 
+## True while something inside the view needs the player; the switcher shows a dot on its
+## tab (docs/content/interface-pass.md section 4). Emit [signal title_changed] when it may
+## have changed.
+func needs_attention() -> bool:
+	return false
+
+
 ## False while the view's tab is hidden (the Research tab before a lab finishes). The
 ## switcher hides the tab, skips it with view_next and view_previous, and ignores its action.
 func is_available() -> bool:

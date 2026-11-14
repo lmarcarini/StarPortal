@@ -109,6 +109,7 @@ static func _add_buttons(theme: Theme, s: float) -> void:
 	theme.set_color(&"font_hover_color", &"KeyButtonSelected", UiPalette.SELECT)
 	theme.set_color(&"font_focus_color", &"KeyButtonSelected", UiPalette.SELECT)
 	_add_readout_button(theme, s, focus)
+	_add_tabs(theme, s, focus)
 
 
 ## ReadoutButton: a flat button in the data font for the top bar's figures.
@@ -127,6 +128,31 @@ static func _add_readout_button(theme: Theme, s: float, focus: StyleBox) -> void
 	for state: StringName in [&"hover", &"pressed", &"hover_pressed"]:
 		theme.set_stylebox(state, &"ReadoutButton", hover)
 	theme.set_stylebox(&"focus", &"ReadoutButton", focus)
+
+
+## TabBar: tabs are keys; the current one is lit orange with a glow.
+static func _add_tabs(theme: Theme, s: float, focus: StyleBox) -> void:
+	var tab := _key(UiPalette.KEYCAP, UiPalette.RULE, s)
+	tab.content_margin_left = 14 * s
+	tab.content_margin_right = 14 * s
+	tab.content_margin_top = 8 * s
+	tab.content_margin_bottom = 8 * s
+	var hover := tab.duplicate() as StyleBoxFlat
+	hover.bg_color = UiPalette.KEYCAP_HOVER
+	var lit := tab.duplicate() as StyleBoxFlat
+	lit.bg_color = UiPalette.KEYCAP_HOVER
+	lit.border_color = UiPalette.SELECT
+	lit.shadow_color = Color(UiPalette.SELECT, 0.35)
+	lit.shadow_size = roundi(6 * s)
+	theme.set_stylebox(&"tab_unselected", &"TabBar", tab)
+	theme.set_stylebox(&"tab_hovered", &"TabBar", hover)
+	theme.set_stylebox(&"tab_selected", &"TabBar", lit)
+	theme.set_stylebox(&"tab_disabled", &"TabBar", tab)
+	theme.set_stylebox(&"tab_focus", &"TabBar", focus)
+	theme.set_color(&"font_selected_color", &"TabBar", UiPalette.SELECT)
+	theme.set_color(&"font_unselected_color", &"TabBar", UiPalette.TEXT_DIM)
+	theme.set_color(&"font_hovered_color", &"TabBar", UiPalette.TEXT)
+	theme.set_constant(&"h_separation", &"TabBar", roundi(8 * s))
 
 
 static func _add_labels(theme: Theme, s: float) -> void:

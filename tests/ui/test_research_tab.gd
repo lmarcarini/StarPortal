@@ -37,7 +37,7 @@ func test_tab_appears_once_a_lab_has_finished() -> void:
 	var switcher: ViewSwitcher = _shell.view_switcher
 	var tabs: TabBar = switcher.get_tab_bar()
 	var index: int = switcher.get_view_ids().find(ViewSwitcher.RESEARCH)
-	assert_int(index).is_equal(3)
+	assert_int(index).is_equal(2)
 	assert_bool(tabs.is_tab_hidden(index)).is_true()
 	await _press(&"view_research")
 	assert_str(String(switcher.current_view_id())).is_equal("gate_room")

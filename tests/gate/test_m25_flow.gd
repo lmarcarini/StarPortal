@@ -134,7 +134,7 @@ func _lock_sill(player: M15Player) -> void:
 func _start_survey_from_research_tab(player: M15Player) -> void:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
-	await UiInput.key(switcher, KEY_F4)
+	await UiInput.key(switcher, KEY_F3)
 	assert_str(String(switcher.current_view_id())).is_equal("research")
 	var view := switcher.get_view(&"research") as ResearchView
 	await UiInput.click(view.get_board().get_tree_view().node_of(&"excavation_survey"))
