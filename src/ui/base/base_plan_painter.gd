@@ -1,32 +1,55 @@
 class_name BasePlanPainter
 extends RefCounted
-## Draws one level of the base plan, straight from above, in the lit-diorama placeholder look:
-## dark rock, concrete floors, a wall outline, a few furniture blocks, a warm light pool where a
-## built room is on, darker corridors, hatched sites and a label. A room without power is
-## dimmed, its light out, and carries the "no power" mark. Only rectangles, circles and
-## text, so it stays cheap on the Compatibility renderer. Coordinates are plan pixels
-## ([constant CELL] per cell); the caller sets the canvas transform for zoom and pan.
-## Bible: docs/content/m2-base.md section 6
+## Draws one level of the base plan, straight from above, as a clean schematic
+## (docs/content/interface-pass.md section 5): flat room fills by state, a stencilled name, a
+## room-type icon, thin furniture marks from a set zoom, and a soft inner glow on rooms that
+## are on. Each state differs by a mark as well as by colour: on (glow), off (dim fill,
+## dashed wall and the "no power" mark), site (hatching), coming down (hatching and a cross).
+## Colours come from UiPalette. Only lines, rectangles, circles and text, so it stays cheap on
+## the Compatibility renderer. Coordinates are plan pixels ([constant CELL] per cell); the
+## caller sets the canvas transform for zoom and pan.
+## Bible: docs/content/interface-pass.md section 5, docs/content/m2-base.md section 6
 
 ## Plan pixels per cell at 1× zoom.
 const CELL: float = 24.0
-## Palette of the chosen mock-up (concept B).
-const ROCK := Color("#1c1915")
-const GRID := Color("#23261d")
-const FLOOR := Color("#a9a793")
-const FLOOR_OFF := Color("#6e6c5e")
-const CORRIDOR := Color("#5b5e51")
-const WALL := Color("#3b4031")
-const FURNITURE := Color("#3b4031")
-const LIGHT := Color("#f59e3b")
-const SITE := Color("#4d5560")
-const SITE_LINE := Color("#b9b29c")
-const LABEL := Color("#efe6d2")
-const SELECTED := Color("#f5c27a")
-const CURSOR := Color("#ffe1b0")
-const _WALL_WIDTH: float = 2.0
-## Size of the "no power" mark on an unlit room, in plan pixels.
+## Room states the plan draws.
+const ON: StringName = &"on"
+const OFF: StringName = &"off"
+const SITE: StringName = &"site"
+const COMING_DOWN: StringName = &"coming_down"
+## Schematic colours, all from UiPalette.
+const ROCK: Color = UiPalette.GROUND
+const GRID: Color = Color(UiPalette.RULE, 0.35)
+const FLOOR: Color = Color("#232c2b")
+const FLOOR_OFF: Color = Color("#191e20")
+const CORRIDOR: Color = UiPalette.HEADER
+const WALL: Color = UiPalette.RULE
+const FURNITURE: Color = Color(UiPalette.TEXT_DIM, 0.45)
+const GLOW: Color = UiPalette.GOOD
+const SITE_LINE: Color = UiPalette.TEXT_DIM
+const DEMOLISH: Color = UiPalette.ALARM
+const LABEL: Color = UiPalette.TEXT
+const SELECTED: Color = UiPalette.SELECT
+const CURSOR: Color = UiPalette.TEXT
+## Zoom (canvas scale) from which furniture marks are drawn.
+const FURNITURE_ZOOM: float = 1.0
+## Size of the "no power" mark on an off room, in plan pixels.
 const NO_POWER_MARK: float = 14.0
+## Size of the room-type icon, in plan pixels.
+const ICON_SIZE: float = 10.0
+const _WALL_WIDTH: float = 1.5
+const _GLOW_STEPS: int = 4
+
+
+## The plan state of [param room] of [param def]: site, coming down, on or off.
+static func state_of(room: RoomState, def: RoomDef) -> StringName:
+	if not room.is_built():
+		return SITE
+	if room.is_demolishing():
+		return COMING_DOWN
+	if def == null or PowerRules.is_running(room, def) or not PowerRules.has_switch(def):
+		return ON
+	return OFF
 
 
 ## Fills the rock and the faint cell grid of a [param grid_size] level.
@@ -39,36 +62,52 @@ static func draw_ground(canvas: CanvasItem, grid_size: Vector2i) -> void:
 		canvas.draw_line(Vector2(0, row * CELL), Vector2(size.x, row * CELL), GRID)
 
 
-## Draws a corridor cell: darker concrete, no light.
+## Draws a corridor cell: a flat lighter strip.
 static func draw_corridor(canvas: CanvasItem, cells: Rect2i) -> void:
 	canvas.draw_rect(_pixels(cells), CORRIDOR)
 
 
-## Draws a built room of [param def_id] over [param cells]: floor, light pool when
-## [param lit], furniture and walls. An unlit room is shaded and gets the "no power" mark.
-static func draw_room(canvas: CanvasItem, cells: Rect2i, def_id: StringName, lit: bool) -> void:
+## Draws a built room of [param def_id] over [param cells] in [param state] (on or off) at
+## canvas scale [param zoom]: fill, glow when on, furniture marks from
+## [constant FURNITURE_ZOOM], the type icon and walls. An off room is dim with a dashed wall
+## and the "no power" mark.
+static func draw_room(
+	canvas: CanvasItem, cells: Rect2i, def_id: StringName, state: StringName, zoom: float = 1.0
+) -> void:
 	var area: Rect2 = _pixels(cells)
-	canvas.draw_rect(area, FLOOR if lit else FLOOR_OFF)
-	if lit:
-		_draw_light(canvas, area)
-	BasePlanFurniture.draw(canvas, area, def_id)
-	if not lit:
-		canvas.draw_rect(area, PowerMarks.OFF_SHADE)
-		PowerMarks.draw_no_power(canvas, no_power_mark_centre(cells), NO_POWER_MARK)
-	canvas.draw_rect(area, WALL, false, _WALL_WIDTH)
+	var on: bool = state == ON
+	canvas.draw_rect(area, FLOOR if on else FLOOR_OFF)
+	if on:
+		_draw_glow(canvas, area)
+	if zoom >= FURNITURE_ZOOM:
+		BasePlanFurniture.draw(canvas, area, def_id)
+	var ink: Color = UiPalette.TEXT_DIM if on else Color(UiPalette.TEXT_DIM, 0.5)
+	RoomIcon.draw(canvas, icon_centre(cells), ICON_SIZE, def_id, ink)
+	if on:
+		canvas.draw_rect(area, WALL, false, _WALL_WIDTH)
+		return
+	_draw_dashed_rect(canvas, area, SITE_LINE)
+	PowerMarks.draw_no_power(canvas, no_power_mark_centre(cells), NO_POWER_MARK)
 
 
-## Where the "no power" mark of an unlit room over [param cells] sits: its bottom-right
+## Where the type icon of a room over [param cells] sits: its top-right corner, clear of the
+## label at the top-left.
+static func icon_centre(cells: Rect2i) -> Vector2:
+	var area: Rect2 = _pixels(cells)
+	return Vector2(area.end.x - ICON_SIZE * 0.5 - 4.0, area.position.y + ICON_SIZE * 0.5 + 4.0)
+
+
+## Where the "no power" mark of an off room over [param cells] sits: its bottom-right
 ## corner, clear of the label at the top-left.
 static func no_power_mark_centre(cells: Rect2i) -> Vector2:
 	return _pixels(cells).end - Vector2.ONE * (NO_POWER_MARK * 0.5 + 3.0)
 
 
-## Draws a site over [param cells]: blueprint hatching and a dashed-looking outline. Used for
-## rooms under construction.
-static func draw_site(canvas: CanvasItem, cells: Rect2i) -> void:
+## Draws a site over [param cells]: hatching and a thin outline. A room coming down also gets
+## a cross in the alarm colour.
+static func draw_site(canvas: CanvasItem, cells: Rect2i, coming_down: bool = false) -> void:
 	var area: Rect2 = _pixels(cells)
-	canvas.draw_rect(area, SITE)
+	canvas.draw_rect(area, FLOOR_OFF)
 	var step: float = CELL * 0.5
 	var span: float = area.size.x + area.size.y
 	var t: float = step
@@ -77,28 +116,35 @@ static func draw_site(canvas: CanvasItem, cells: Rect2i) -> void:
 		var left_y: float = minf(t, area.size.y)
 		var from: Vector2 = area.position + Vector2(top_x, t - top_x)
 		var to: Vector2 = area.position + Vector2(t - left_y, left_y)
-		canvas.draw_line(from, to, Color(SITE_LINE, 0.35))
+		canvas.draw_line(from, to, Color(SITE_LINE, 0.3))
 		t += step
-	canvas.draw_rect(area, SITE_LINE, false, 1.0)
+	if coming_down:
+		var ink := Color(DEMOLISH, 0.7)
+		canvas.draw_line(area.position, area.end, ink, 2.0)
+		canvas.draw_line(
+			Vector2(area.end.x, area.position.y), Vector2(area.position.x, area.end.y), ink, 2.0
+		)
+	_draw_dashed_rect(canvas, area, DEMOLISH if coming_down else SITE_LINE)
 
 
 ## Writes [param text] at the top-left of [param cells], fitted by [PlanLabel] (wrapped or
-## smaller when it is wider than the room).
+## smaller when it is wider than the room), in the stencil font.
 static func draw_label(canvas: CanvasItem, cells: Rect2i, text: String, font: Font) -> void:
 	var area: Rect2 = _pixels(cells).grow(-PlanLabel.INSET)
-	var fitted: Dictionary = PlanLabel.fit(text, _pixels(cells).size, font)
+	var fitted: Dictionary = PlanLabel.fit(text, _pixels(cells).size - Vector2(ICON_SIZE, 0), font)
 	var size: int = fitted["size"]
 	var lines: Array = fitted["lines"]
 	var at := area.position + Vector2(0, size)
 	for line: String in lines:
-		canvas.draw_string(font, at + Vector2.ONE, line, 0, -1, size, Color(ROCK, 0.8))
 		canvas.draw_string(font, at, line, 0, -1, size, LABEL)
 		at.y += PlanLabel.line_height(size)
 
 
-## Outlines [param cells] as the selection.
+## Outlines [param cells] as the selection, in orange.
 static func draw_selection(canvas: CanvasItem, cells: Rect2i) -> void:
-	canvas.draw_rect(_pixels(cells).grow(2.0), SELECTED, false, 3.0)
+	var area: Rect2 = _pixels(cells).grow(2.0)
+	canvas.draw_rect(area.grow(2.0), Color(SELECTED, 0.25), false, 3.0)
+	canvas.draw_rect(area, SELECTED, false, 2.0)
 
 
 ## Outlines the one cell under the keyboard or gamepad cursor.
@@ -111,10 +157,21 @@ static func _pixels(cells: Rect2i) -> Rect2:
 	return Rect2(Vector2(cells.position) * CELL, Vector2(cells.size) * CELL)
 
 
-## A warm sodium pool from the ceiling fitting: a few stacked translucent circles.
-static func _draw_light(canvas: CanvasItem, area: Rect2) -> void:
-	var radius: float = minf(area.size.x, area.size.y) * 0.48
-	for step: int in 4:
-		var scale: float = 1.0 - step * 0.22
-		canvas.draw_circle(area.get_center(), radius * scale, Color(LIGHT, 0.10))
-	canvas.draw_circle(area.get_center(), 2.5, Color(CURSOR, 0.9))
+## A soft inner glow along the walls of a room that is on.
+static func _draw_glow(canvas: CanvasItem, area: Rect2) -> void:
+	for step: int in _GLOW_STEPS:
+		var inset: float = 1.5 + step * 2.0
+		var alpha: float = 0.22 * (1.0 - float(step) / _GLOW_STEPS)
+		canvas.draw_rect(area.grow(-inset), Color(GLOW, alpha), false, 2.0)
+
+
+## A dashed outline of [param area].
+static func _draw_dashed_rect(canvas: CanvasItem, area: Rect2, ink: Color) -> void:
+	var corners: Array[Vector2] = [
+		area.position,
+		Vector2(area.end.x, area.position.y),
+		area.end,
+		Vector2(area.position.x, area.end.y),
+	]
+	for index: int in 4:
+		canvas.draw_dashed_line(corners[index], corners[(index + 1) % 4], ink, 1.0, 4.0)
