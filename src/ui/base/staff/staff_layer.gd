@@ -14,8 +14,12 @@ const HIT_RADIUS: float = 8.0
 ## Gap between unassigned tokens outside Quarters, in plan pixels.
 const QUEUE_GAP: float = 14.0
 
+## Moves tokens along corridors when people are reassigned, arrive or leave.
+var walker := TokenWalker.new()
+
 var _plan: BasePlan = null
 var _tokens: Dictionary[StringName, StaffToken] = {}
+var _arriving: Dictionary[StringName, bool] = {}
 var _selected: StringName = &""
 var _hovered: StringName = &""
 
@@ -30,6 +34,8 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_PARENTED:
 		_plan = get_parent() as BasePlan
 		set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	elif what == NOTIFICATION_VISIBILITY_CHANGED and is_inside_tree():
+		snap()
 
 
 func _enter_tree() -> void:
@@ -49,15 +55,23 @@ func _exit_tree() -> void:
 ## Rebuilds every token from [param state]; called by the plan with the running state.
 func rebuild(state: GameState) -> void:
 	var kept: Dictionary[StringName, StaffToken] = {}
+	var before: Dictionary[StringName, Vector3] = {}
 	for person: PersonState in on_base(state):
+		var known: bool = _tokens.has(person.id)
 		var token: StaffToken = _tokens.get(person.id, StaffToken.new())
+		if known:
+			before[person.id] = Vector3(token.home.x, token.home.y, token.home_level)
 		token.person_id = person.id
 		token.name = person.name
 		token.role = person.role
 		token.room_id = person.room_id
 		kept[person.id] = token
+	for id: StringName in _tokens:
+		if not kept.has(id):
+			_send_out(state, _tokens[id])
 	_tokens = kept
 	_place_all(state)
+	_start_walks(state, before)
 	if _plan != null:
 		_plan.tray.show_tokens(unassigned(state))
 	if not _tokens.has(_selected):
@@ -150,15 +164,92 @@ func _place_all(state: GameState) -> void:
 		var token: StaffToken = _tokens[person.id]
 		var room: RoomState = state.base.find_room(person.room_id)
 		if room == null:
-			token.level = 1 if quarters == null else quarters.level
+			token.home_level = 1 if quarters == null else quarters.level
 			token.home = _queue_spot(state, quarters, queue)
 			queue += 1
 		else:
 			var index: int = by_room.get(room.id, 0)
 			by_room[room.id] = index + 1
-			token.level = room.level
+			token.home_level = room.level
 			token.home = _room_spot(state, room, index)
-		token.position = token.home
+
+
+## Walks every token whose place changed; new tokens appear at home, or walk in from the
+## lift when the person just arrived.
+func _start_walks(state: GameState, before: Dictionary[StringName, Vector3]) -> void:
+	for id: StringName in _tokens:
+		var token: StaffToken = _tokens[id]
+		if before.has(id):
+			var was: Vector3 = before[id]
+			if Vector2(was.x, was.y) == token.home and int(was.z) == token.home_level:
+				continue
+			_walk(state, token, token.home_level)
+		elif _arriving.has(id):
+			_arriving.erase(id)
+			var lift: Vector3i = entrance(state)
+			token.position = (Vector2(lift.x, lift.y) + Vector2(0.5, 0.5)) * BasePlanPainter.CELL
+			token.level = lift.z
+			_walk(state, token, token.home_level)
+		else:
+			token.position = token.home
+			token.level = token.home_level
+
+
+func _walk(state: GameState, token: StaffToken, to_level: int) -> void:
+	var from := Vector3i(
+		floori(token.position.x / BasePlanPainter.CELL),
+		floori(token.position.y / BasePlanPainter.CELL),
+		token.level
+	)
+	var to := Vector3i(
+		floori(token.home.x / BasePlanPainter.CELL),
+		floori(token.home.y / BasePlanPainter.CELL),
+		to_level
+	)
+	var path: PackedVector3Array = PlanPaths.find(state.base, from, to, state.room_defs)
+	if path.is_empty():
+		token.level = to_level
+	walker.walk(token, path)
+
+
+## A dismissed or departing person walks to the lift and vanishes.
+func _send_out(state: GameState, token: StaffToken) -> void:
+	var from := Vector3i(
+		floori(token.position.x / BasePlanPainter.CELL),
+		floori(token.position.y / BasePlanPainter.CELL),
+		token.level
+	)
+	walker.leave(token, PlanPaths.find(state.base, from, entrance(state), state.room_defs))
+
+
+## The cell people arrive at and leave from: the top level's lift, else its first corridor.
+static func entrance(state: GameState) -> Vector3i:
+	var fallback := Vector3i(0, 0, 1)
+	for room: RoomState in state.base.rooms:
+		if room.level != 1 or not room.is_built():
+			continue
+		if room.def_id == StartingBase.LIFT_DEF:
+			return Vector3i(room.origin.x, room.origin.y, 1)
+		if room.def_id == StartingBase.CORRIDOR_DEF and fallback == Vector3i(0, 0, 1):
+			fallback = Vector3i(room.origin.x, room.origin.y, 1)
+	return fallback
+
+
+## Puts every token at its place at once (tab or level change).
+func snap() -> void:
+	walker.snap_all(tokens())
+	for token: StaffToken in _tokens.values():
+		token.level = token.home_level
+	queue_redraw()
+
+
+func _process(delta: float) -> void:
+	var simulation: Simulation = SimClock.simulation
+	if simulation == null:
+		return
+	var clock: ClockState = simulation.state.clock
+	if walker.step(_tokens, delta, clock.speed_index, clock.is_paused):
+		queue_redraw()
 
 
 func _room_spot(state: GameState, room: RoomState, index: int) -> Vector2:
@@ -207,9 +298,10 @@ func _draw() -> void:
 		return
 	draw_set_transform(_plan.view.offset, 0.0, Vector2.ONE * _plan.view.scale())
 	var font: Font = UiThemeBuilder.data_font()
-	for token: StaffToken in _tokens.values():
+	for token: StaffToken in _tokens.values() + walker.leaving():
 		if token.level == _plan.level:
-			StaffToken.draw(self, token, font, token.person_id == _selected)
+			var alpha: float = walker.alpha_of(token.person_id)
+			StaffToken.draw(self, token, font, token.person_id == _selected, alpha)
 	for id: StringName in [_hovered, _selected]:
 		var token: StaffToken = _tokens.get(id)
 		if token != null and token.level == _plan.level:
@@ -231,6 +323,17 @@ func _draw_name(token: StaffToken, font: Font) -> void:
 		Rect2(at - Vector2(2, size), Vector2(width + 4, size + 4)), Color(UiPalette.GROUND, 0.85)
 	)
 	draw_string(font, at, text, 0, -1, size, UiPalette.TEXT)
+
+
+func _on_arrived(person_id: StringName) -> void:
+	_arriving[person_id] = true
+	_on_event()
+
+
+func _on_loaded(_slot: StringName) -> void:
+	_tokens.clear()
+	walker.snap_all([])
+	_on_event()
 
 
 func _on_event(_a: Variant = null, _b: Variant = null, _c: Variant = null) -> void:

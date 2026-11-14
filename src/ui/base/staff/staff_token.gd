@@ -19,8 +19,9 @@ var room_id: StringName = &""
 var level: int = 1
 ## Position in plan pixels (the plan's own canvas, before zoom and pan).
 var position: Vector2 = Vector2.ZERO
-## Where the token belongs (walkers move [member position] toward it).
+## Where the token belongs (walkers move [member position] toward it), and on which level.
 var home: Vector2 = Vector2.ZERO
+var home_level: int = 1
 
 
 ## The shape of [param role]: circle, square, triangle, diamond or cross.
@@ -55,12 +56,15 @@ static func letter_of(role: StringName) -> String:
 	return "?"
 
 
-## Draws [param token] on [param canvas] (plan pixels); [param lit] draws it selected.
-static func draw(canvas: CanvasItem, token: StaffToken, font: Font, lit: bool) -> void:
+## Draws [param token] on [param canvas] (plan pixels); [param lit] draws it selected,
+## [param alpha] fades it.
+static func draw(
+	canvas: CanvasItem, token: StaffToken, font: Font, lit: bool, alpha: float = 1.0
+) -> void:
 	var at: Vector2 = token.position
 	var r: float = RADIUS
-	var fill: Color = UiPalette.SELECT if lit else UiPalette.TEXT
-	var ink: Color = UiPalette.GROUND
+	var fill := Color(UiPalette.SELECT if lit else UiPalette.TEXT, alpha)
+	var ink := Color(UiPalette.GROUND, alpha)
 	match shape_of(token.role):
 		&"square":
 			canvas.draw_rect(Rect2(at - Vector2(r, r) * 0.9, Vector2(r, r) * 1.8), fill)
