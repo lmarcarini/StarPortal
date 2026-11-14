@@ -38,6 +38,7 @@ var _incoming := IncomingBanner.new()
 var _artefacts_button := Button.new()
 var _artefacts_box := PanelContainer.new()
 var _artefacts := ArtefactPanel.new()
+var _shutter := ShutterControl.new()
 
 @onready var _console: DialConsole = %DialConsole
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
@@ -67,6 +68,10 @@ func _ready() -> void:
 	_incoming.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	add_child(_incoming)
 	_add_artefacts()
+	_shutter.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	_shutter.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_shutter.position.x -= AddressBookDrawer.TAB_WIDTH + 16
+	add_child(_shutter)
 	_moth.changed.connect(_on_moth_changed)
 
 
@@ -98,6 +103,7 @@ func setup(simulation: Simulation) -> void:
 	_moth.setup(simulation)
 	_incoming.setup(simulation)
 	_artefacts.setup(simulation)
+	_shutter.setup(simulation)
 	_show_artefacts_button()
 
 

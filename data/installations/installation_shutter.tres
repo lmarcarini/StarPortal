@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="InstallationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/installation_def.gd" id="1"]
+
+; docs/content/m4c-incursions.md section 6: Gate Room, $400k, 1 day.
+[resource]
+script = ExtResource("1")
+name_key = &"INSTALLATION_SHUTTER_NAME"
+effect_key = &"INSTALLATION_SHUTTER_EFFECT"
+hosts = Array[StringName]([&"room_gate"])
+requires_research = &"the_shutter"
+cost_k = 400
+build_ticks = 1440
+max_per_host = 1
+health = 0
+effects = Array[Resource]([])
+id = &"installation_shutter"

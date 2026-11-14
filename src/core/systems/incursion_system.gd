@@ -30,7 +30,13 @@ func tick(state: GameState) -> void:
 		CivilianRules.hit(state, rng)
 		return
 	incursion.countdown -= 1
-	if incursion.countdown <= 0:
+	if incursion.countdown > 0:
+		return
+	var def: IncursionDef = state.incursion_defs.get(incursion.def_id)
+	if ShutterRules.stops_wave(state, def):
+		incursion.report["shutter"] = true
+		IntruderRules.finish(state)
+	else:
 		IncursionRules.breach(state)
 
 

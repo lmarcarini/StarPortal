@@ -260,6 +260,8 @@ signal intruders_moved
 signal game_failed(cause: StringName)
 ## An installation of room (or door key) [param room_uid] was started, finished or removed.
 signal installation_changed(room_uid: StringName)
+## The Shutter closed ([param closed] true) or opened.
+signal shutter_changed(closed: bool)
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared
