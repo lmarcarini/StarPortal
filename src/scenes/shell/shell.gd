@@ -265,6 +265,9 @@ func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
 	_rescue_alert.setup(simulation)
 	_conversation.setup(simulation)
+	var gate_room: GateRoomView = view_switcher.get_view(ViewSwitcher.GATE_ROOM) as GateRoomView
+	if gate_room != null:
+		top_bar.gate_chip.ring = gate_room.get_ring_view()
 	top_bar.bind(simulation)
 
 
