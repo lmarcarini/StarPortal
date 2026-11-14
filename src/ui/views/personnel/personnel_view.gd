@@ -11,6 +11,9 @@ extends GameView
 ## while paused.
 ## Bible: docs/content/m26-staff-and-money.md section 6
 
+## "Show on plan" was pressed for [param person_id]: the switcher opens the Base on them.
+signal show_on_plan(person_id: StringName)
+
 var _simulation: Simulation = null
 var _signature: int = 0
 ## Highest candidate number the player has seen on the Candidates sub-tab; a higher one puts
@@ -32,6 +35,7 @@ func _ready() -> void:
 	_panel.unassign_pressed.connect(unassign)
 	_panel.dismiss_held.connect(dismiss)
 	_panel.hire_pressed.connect(hire)
+	_panel.show_on_plan_pressed.connect(show_on_plan.emit)
 	visibility_changed.connect(_on_visibility_changed)
 
 
