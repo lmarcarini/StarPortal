@@ -104,7 +104,7 @@ func _draw() -> void:
 		return
 	draw_set_transform(view.offset, 0.0, Vector2.ONE * view.scale())
 	BasePlanPainter.draw_ground(self, _base.grid_size)
-	var font: Font = get_theme_default_font()
+	var font: Font = UiThemeBuilder.stencil_font()
 	for room: RoomState in BaseRules.rooms_on_level(_base, level):
 		_draw_room(room, font)
 	var chosen: Rect2i = _selected_cells()
@@ -120,12 +120,13 @@ func _draw_room(room: RoomState, font: Font) -> void:
 	if def == null:
 		return
 	var cells: Rect2i = BaseRules.footprint(room, def)
-	if not room.is_built():
-		BasePlanPainter.draw_site(self, cells)
+	var plan_state: StringName = BasePlanPainter.state_of(room, def)
+	if plan_state == BasePlanPainter.SITE or plan_state == BasePlanPainter.COMING_DOWN:
+		BasePlanPainter.draw_site(self, cells, plan_state == BasePlanPainter.COMING_DOWN)
 	elif room.def_id == StartingBase.CORRIDOR_DEF:
 		BasePlanPainter.draw_corridor(self, cells)
 	else:
-		BasePlanPainter.draw_room(self, cells, room.def_id, room.powered_on or def.always_on)
+		BasePlanPainter.draw_room(self, cells, room.def_id, plan_state, view.scale())
 	if room.def_id != StartingBase.CORRIDOR_DEF or not room.is_built():
 		BasePlanPainter.draw_label(self, cells, tr(def.name_key).to_upper(), font)
 	var progress: SiteProgress = progress_of(room.id)

@@ -9,13 +9,13 @@ extends Control
 ## commands.
 ## Bible: docs/content/m2-base.md sections 3 and 6
 
-const DIM := Color(0.04, 0.05, 0.06, 0.55)
-const PLATE := Color("#15171a")
-const ON := Color("#e0a040")
-const OFF := Color("#7a7d72")
-const LOCKED := Color("#c97c2c")
-const CHARGE := Color("#5cb8d6")
-const REFUSED := Color("#e5534b")
+const DIM := Color(UiPalette.GROUND, 0.55)
+const PLATE := UiPalette.GROUND
+const ON := UiPalette.GOOD
+const OFF := UiPalette.TEXT_DIM
+const LOCKED := UiPalette.SELECT
+const CHARGE := UiPalette.WARN
+const REFUSED := UiPalette.ALARM
 const _FONT_SIZE: int = 12
 
 var _plan: BasePlan = null
