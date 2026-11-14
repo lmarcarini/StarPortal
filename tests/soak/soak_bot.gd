@@ -64,9 +64,8 @@ var commands_while_paused: int = 0
 ## Times the bot paused and resumed the clock.
 var pauses: int = 0
 var resumes: int = 0
-## Holds the bot added (duplicates, which are no-ops, not counted).
+## Holds the bot added (duplicates, which are no-ops, not counted) and released.
 var holds_added: int = 0
-## Holds the bot released.
 var holds_released: int = 0
 ## Addresses the bot picked; of them Address Book entries and real worlds' addresses; and
 ## those it dropped unreachable.
@@ -158,7 +157,7 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 		return
 	var gate: GateState = state.gate
 	if gate.mode == GateState.RingMode.LOCKED:
-		_work_wormhole(simulation)
+		_work_wormhole(simulation, rng)
 		return
 	if gate.mode != GateState.RingMode.IDLE:
 		return
@@ -178,10 +177,11 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 		dials += 1
 
 
-## On an open wormhole: reads an unread console, else extends the pole camera for a record not
-## taken yet, else, with the camera in, closes the wormhole once it has been open
-## CLOSE_AFTER_TICKS.
-func _work_wormhole(simulation: Simulation) -> void:
+## On an open wormhole: operates or stands by at random (SoakGateOps); reads an unread console, else
+## extends the camera for a record not taken yet, else, with the camera in, closes the wormhole once
+## it has been open CLOSE_AFTER_TICKS.
+func _work_wormhole(simulation: Simulation, rng: RandomNumberGenerator) -> void:
+	SoakGateOps.work(simulation, rng)
 	var state: GameState = simulation.state
 	var gate: GateState = state.gate
 	var worlds: WorldsState = state.worlds
