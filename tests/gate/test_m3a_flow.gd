@@ -142,7 +142,7 @@ func _scan(player: M15Player, scan: MothRules.Scan, target: StringName = &"") ->
 ## Archive (F2), Worlds, SILL: the report shows a threat; Plan expedition opens F7 on SILL.
 ## The four slots are picked from their rosters and Ready team plans a Survey.
 func _plan_from_the_world_report(player: M15Player) -> void:
-	await _key(KEY_F2)
+	await _key(KEY_F6)
 	var archive := _shell.view_switcher.get_view(&"archive") as ArchiveView
 	archive.show_worlds()
 	archive.get_worlds().open_world(SILL)
@@ -208,7 +208,7 @@ func _check_in_and_come_home(player: M15Player) -> void:
 		func(e: LogEntry) -> bool: return e.args.get("reason", "") == "prologue"
 	)
 	assert_int(lines.size()).is_equal(1)
-	await _key(KEY_F7)
+	await _key(KEY_F5)
 	assert_str(_expeditions().get_trip().texts()[5]).contains("Survey report")
 
 

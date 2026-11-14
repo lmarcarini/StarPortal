@@ -3,9 +3,11 @@ extends Control
 ## Hosts the game views under a tab bar and shows one at a time. Each child of %Views is a
 ## [GameView]; its id is its node name in snake_case ([code]GateRoom[/code] is
 ## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
-## (view_next and view_previous wrap at the ends; view_gate_room, view_archive, view_base,
-## view_research, view_personnel, view_command, view_expeditions)
-## and the gamepad shoulders switch views. A view that is not available
+## (view_next and view_previous wrap at the ends; view_gate_room F1, view_base F2,
+## view_research F3, view_personnel F4, view_expeditions F5, view_archive F6, view_command F7)
+## and the gamepad shoulders switch views. Each tab has a code-drawn icon (TabIcon), lit
+## orange on the current tab, and a dot while its view needs attention
+## ([method GameView.needs_attention]). A view that is not available
 ## ([method GameView.is_available]: the Research tab before a lab finishes) has its tab
 ## hidden, is skipped by view_next and view_previous, and its action does nothing.
 ## Hidden views stay in the tree and keep their own state, but are invisible, do not process
@@ -19,7 +21,8 @@ extends Control
 ## When the World Report asks to plan an expedition, it opens Expeditions with that world chosen.
 ## The switcher holds no game state: it passes the simulation down and forgets it.
 ## Bible: game-design.md#core-loop, technical-architecture.md#signals-and-scenes,
-## technical-architecture.md#input-accessibility-and-localisation
+## technical-architecture.md#input-accessibility-and-localisation,
+## docs/content/interface-pass.md section 4
 
 ## Emitted with the id of the view just shown: once for the first view when the switcher is
 ## ready, then each time another view replaces it.
@@ -39,6 +42,9 @@ const PERSONNEL: StringName = &"personnel"
 const COMMAND: StringName = &"command"
 ## Id of the Expeditions view.
 const EXPEDITIONS: StringName = &"expeditions"
+
+## Added to a tab's title while its view needs attention.
+const ATTENTION_DOT: String = " •"
 
 const _ACTION_NEXT: StringName = &"view_next"
 const _ACTION_PREVIOUS: StringName = &"view_previous"
@@ -174,6 +180,7 @@ func _activate(view_id: StringName) -> void:
 	var view: GameView = _views[view_id]
 	_tabs.focus_neighbor_bottom = _tabs.get_path_to(view.get_default_focus())
 	_tabs.current_tab = _ids.find(view_id)
+	_refresh_titles()
 	view_changed.emit(view_id)
 
 
@@ -211,10 +218,17 @@ func _refresh_availability() -> void:
 		_activate(_ids[0])
 
 
+## Sets each tab's title, with the dot while its view needs attention, and its icon.
 func _refresh_titles() -> void:
+	var scale: float = Settings.get_float(&"display", &"ui_scale")
 	for index: int in _ids.size():
 		var view: GameView = _views[_ids[index]]
-		_tabs.set_tab_title(index, view.get_tab_title())
+		var title: String = view.get_tab_title()
+		if view.needs_attention():
+			title += ATTENTION_DOT
+		_tabs.set_tab_title(index, title)
+		var color: Color = UiPalette.SELECT if _ids[index] == _current else UiPalette.TEXT_DIM
+		_tabs.set_tab_icon(index, TabIcon.texture(_ids[index], scale, color))
 
 
 ## Shows or hides the view [param view_id].

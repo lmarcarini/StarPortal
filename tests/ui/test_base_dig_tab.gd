@@ -46,9 +46,9 @@ func test_research_then_dig_shows_a_selectable_level_tab() -> void:
 	assert_bool(dig.disabled).is_true()
 	assert_str(dig.get_reason()).is_equal("Unlock: Excavation survey")
 	assert_bool(tabs.next_tab.disabled).is_true()
-	await _key(KEY_F4)
-	await _finish_survey()
 	await _key(KEY_F3)
+	await _finish_survey()
+	await _key(KEY_F2)
 	assert_bool(dig.disabled).is_false()
 	assert_bool(tabs.next_tab.visible).is_true()
 	assert_bool(tabs.next_tab.disabled).is_false()
@@ -143,7 +143,7 @@ func test_message_line_shows_on_energy() -> void:
 func test_cancelling_a_dig_rebuilds_the_level_column() -> void:
 	var base: BaseView = await _open_base()
 	await _finish_survey()
-	await _key(KEY_F3)
+	await _key(KEY_F2)
 	var tabs: LevelTabs = _level_tabs(base)
 	var dig: DigButton = base.get_palette().get_dig_button()
 	dig.confirmed.emit()
@@ -172,7 +172,7 @@ func _focus_owner() -> Control:
 
 
 func _open_base() -> BaseView:
-	await _key(KEY_F3)
+	await _key(KEY_F2)
 	return _shell.view_switcher.get_view(&"base") as BaseView
 
 

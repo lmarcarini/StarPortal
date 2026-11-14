@@ -314,3 +314,11 @@ Each entry has four fields:
 - **Decision:** The M4 core-systems design (factions, conversations, requests, artefacts, modifiers, scalable tech tree, phase order) is approved. Incursions and failure states become a short M4c after M4b. A hostile incoming wormhole sends nothing through in M4. Gate Room holding never goes over capacity: an artefact arriving while holding is full waits at the gate and the player retrieves it when there is room; no Confidence cost.
 - **Reason:** Owner review of PR #251 (card #250), section 10 answers.
 - **Bible section:** [content/m4-core-systems.md](content/m4-core-systems.md)
+
+
+## 2026-11-14 — Interface pass: tab order and keys
+
+- **Date:** 2026-11-14
+- **Decision:** The seven tabs follow the loop: Gate Room F1, Base F2, Research F3, Personnel F4, Expeditions F5, Archive F6, Command F7. Q/E and the shoulders still cycle and wrap. A player's saved rebinding is kept; only the defaults move. Each tab has a code-drawn icon, lit orange on the current tab, and a dot while something inside needs the player (`GameView.needs_attention()`).
+- **Reason:** Owner approval of the interface pass (PR #325, card #324).
+- **Bible section:** [content/interface-pass.md](content/interface-pass.md) section 4

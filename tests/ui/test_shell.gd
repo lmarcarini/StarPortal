@@ -205,7 +205,9 @@ func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void
 		if _focus_owner() != tabs:
 			await _press_action(&"ui_up")
 	assert_object(_focus_owner()).is_same(tabs)
-	await _press_action(&"ui_right")
+	# Base, Personnel, then Archive: the hidden Research and Expeditions tabs are skipped.
+	for _step: int in 3:
+		await _press_action(&"ui_right")
 	assert_str(String(switcher.current_view_id())).is_equal("archive")
 	await _press_action(&"ui_down")
 	assert_object(_focus_owner()).is_same(archive.get_default_focus())

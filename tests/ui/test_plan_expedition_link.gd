@@ -62,7 +62,7 @@ func test_gamepad_a_opens_expeditions() -> void:
 
 
 func test_f7_reaches_the_tab() -> void:
-	await UiInput.key(_switcher.get_tab_bar(), KEY_F7)
+	await UiInput.key(_switcher.get_tab_bar(), KEY_F5)
 	assert_str(String(_switcher.current_view_id())).is_equal("expeditions")
 
 

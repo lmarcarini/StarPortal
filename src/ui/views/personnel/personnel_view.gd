@@ -65,9 +65,10 @@ func get_title_key() -> StringName:
 	return &"STAFF_TITLE"
 
 
-## "Personnel •" while a new candidate is unseen, else "Personnel".
-func get_tab_title() -> String:
-	return tr(get_title_key()) + (PersonnelBoard.DOT if _board.new_candidates else "")
+## True while a new candidate is unseen: the switcher then shows the tab's dot
+## ("Personnel •").
+func needs_attention() -> bool:
+	return _board.new_candidates
 
 
 ## Returns the board, for tests.

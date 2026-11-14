@@ -156,7 +156,7 @@ func test_the_horizon_record_names_the_documents_it_delivered() -> void:
 	var button: Button = _screen().get_actions().get_archive_button()
 	assert_bool(button.is_visible_in_tree()).is_true()
 	assert_str(button.tr(button.text)).is_equal("Read in the Archive")
-	assert_str(_switcher.get_tab_bar().get_tab_title(1)).is_equal("Archive (2)")
+	assert_str(_switcher.get_tab_bar().get_tab_title(5)).is_equal("Archive (2)")
 
 
 ## Read in the Archive opens the Archive with the first new document selected and read; back
@@ -170,7 +170,7 @@ func test_read_in_the_archive_and_back_to_the_wormhole() -> void:
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	assert_str(String(_archive().get_reader().get_document_id())).is_equal("doc_dossier")
 	assert_object(_focus_owner()).is_same(_archive().get_default_focus())
-	assert_str(_switcher.get_tab_bar().get_tab_title(1)).is_equal("Archive (1)")
+	assert_str(_switcher.get_tab_bar().get_tab_title(5)).is_equal("Archive (1)")
 	assert_bool(_screen().are_actions_shown()).is_false()
 	_switcher.show_view(ViewSwitcher.GATE_ROOM)
 	await get_tree().process_frame
