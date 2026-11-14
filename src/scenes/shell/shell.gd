@@ -76,7 +76,8 @@ func _ready() -> void:
 	_add_alerts()
 	add_child(_conversation)
 	_setup_debug_tools()
-	_start(GameState.new_game(_choose_seed(), Registry.balance()), true)
+	var is_new: bool = GameStart.is_new()
+	_start(GameStart.take_state(ShellBoot.choose_seed(new_game_seed), Registry.balance()), is_new)
 	SimClock.pause()
 	_bind_views(_simulation)
 	var buttons: Array[Button] = get_focus_order()
@@ -220,16 +221,14 @@ func get_toast_text() -> String:
 
 
 func _apply_min_window_size() -> void:
-	var window: Window = get_window()
-	if window == null:
-		return
-	window.min_size = MIN_WINDOW_SIZE
+	ShellBoot.apply_min_window_size(get_window(), MIN_WINDOW_SIZE)
 
 
-func _choose_seed() -> int:
-	if new_game_seed >= 0:
-		return new_game_seed
-	return int(Time.get_unix_time_from_system() * 1000.0)
+## Stops the clock, frees the simulation and goes back to the main menu.
+func return_to_menu() -> void:
+	SimClock.stop()
+	_simulation = null
+	get_tree().change_scene_to_file.call_deferred(ShellBoot.MENU_SCENE)
 
 
 ## Builds the Simulation for [param state] through GameSetup, from the Registry's content,

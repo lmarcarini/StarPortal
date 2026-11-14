@@ -131,3 +131,11 @@ LOG_STRIP_MORE,More,Mais
 LOG_STRIP_LESS,Less,Menos
 LOG_STRIP_OPEN,Open log,Abrir registro
 LOG_STRIP_EMPTY,Nothing logged yet.,Nada registrado ainda.
+MENU_TITLE,FAR SIDE PROTOCOL,FAR SIDE PROTOCOL
+MENU_CONTINUE,Continue,Continuar
+MENU_NEW_GAME,New game,Novo jogo
+MENU_LOAD,Load,Carregar
+MENU_SCENARIOS,Scenarios,Cenários
+MENU_QUIT,Quit,Sair
+MENU_NO_SAVE,There is no save to continue.,Não há jogo salvo para continuar.
+MENU_RETURN,Main menu,Menu principal

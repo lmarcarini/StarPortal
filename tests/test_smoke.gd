@@ -3,7 +3,7 @@
 extends GdUnitTestSuite
 
 const MAIN_SCENE_SETTING: String = "application/run/main_scene"
-const EXPECTED_MAIN_SCENE: String = "res://src/scenes/shell/shell.tscn"
+const EXPECTED_MAIN_SCENE: String = "res://src/scenes/main_menu/main_menu.tscn"
 
 
 ## The harness evaluates a trivial assertion.
@@ -12,7 +12,7 @@ func test_one_plus_one_equals_two() -> void:
 	assert_int(sum).is_equal(2)
 
 
-## The project boots into the shell scene.
-func test_main_scene_is_shell() -> void:
+## The project boots into the main menu (M4.6-01).
+func test_main_scene_is_the_menu() -> void:
 	var main_scene: String = ProjectSettings.get_setting(MAIN_SCENE_SETTING)
 	assert_str(main_scene).is_equal(EXPECTED_MAIN_SCENE)
