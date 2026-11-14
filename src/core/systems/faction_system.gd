@@ -20,7 +20,7 @@ func tick(state: GameState) -> void:  # gdlint: ignore=unused-argument
 func on_day(state: GameState) -> void:
 	ContactRules.expire_calls(state)
 	var ids: Array = state.faction_defs.keys()
-	ids.sort()
+	IdOrder.sort(ids)
 	for id: StringName in ids:
 		var faction: FactionDef = state.faction_defs[id]
 		if not ContactRules.may_contact(state, faction):

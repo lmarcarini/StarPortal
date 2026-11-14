@@ -156,7 +156,7 @@ static func pick(
 ) -> StringName:
 	var best: ConversationDef = null
 	var ids: Array = state.conversation_defs.keys()
-	ids.sort()
+	IdOrder.sort(ids)
 	for id: StringName in ids:
 		var def: ConversationDef = state.conversation_defs[id]
 		if not _is_available(def, faction, channel, world_id, state):

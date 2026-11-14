@@ -18,7 +18,7 @@ static func world_of(state: GameState, faction: StringName, conversation: String
 		for record: WorldRecord in state.galaxy.all_worlds():
 			if record.controller == faction:
 				ids.append(record.id)
-		ids.sort()
+		IdOrder.sort(ids)
 		if not ids.is_empty():
 			return ids[0]
 	var def: ConversationDef = state.conversation_defs.get(conversation)
