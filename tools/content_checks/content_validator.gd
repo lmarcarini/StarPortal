@@ -52,6 +52,7 @@ static func _check_content(registry: RegistryScript) -> Array[String]:
 	errors.append_array(ContentCheckStory.check_registry(registry))
 	errors.append_array(_check_factions(registry))
 	errors.append_array(_check_conversations(registry))
+	errors.append_array(_check_research_tree(registry))
 	var field: AnchorFieldDef = ContentSource.home_field(registry)
 	for def: DefBase in registry.get_all_of(AnchorFieldDef):
 		var each: AnchorFieldDef = def as AnchorFieldDef
@@ -79,6 +80,17 @@ static func _check_research(registry: RegistryScript) -> Array[String]:
 	var errors: Array[String] = ContentCheckResearch.check(research, research_keys)
 	errors.append_array(ContentCheckResearch.check_categories(research, categories, research_keys))
 	return errors
+
+
+## The research tree checks (cycles, never-visible needs, orders per branch).
+static func _check_research_tree(registry: RegistryScript) -> Array[String]:
+	var research: Array[ResearchDef] = []
+	for def: DefBase in registry.get_all_of(ResearchDef):
+		research.append(def as ResearchDef)
+	var revealed: Dictionary[StringName, bool] = ContentCheckResearchTree.revealed_ids(
+		registry.get_all_of(DefBase)
+	)
+	return ContentCheckResearchTree.check(research, revealed)
 
 
 ## The checks of conversations: nested conditions and effects, and text keys.

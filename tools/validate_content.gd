@@ -13,6 +13,11 @@ func _init() -> void:
 	var errors: Array[String] = ContentValidator.run(
 		registry, load_errors, ContentValidator.DEFAULT_SEEDS, true
 	)
+	var research: Array[ResearchDef] = []
+	for def: DefBase in registry.get_all_of(ResearchDef):
+		research.append(def as ResearchDef)
+	for line: String in ContentCheckResearchTree.report(research):
+		print(line)
 	registry.free()
 	for line: String in errors:
 		print("PROBLEM: " + line)
