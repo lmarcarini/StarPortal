@@ -334,6 +334,6 @@ Each entry has four fields:
 ## 2026-11-14 — Advanced rooms are researched before they are offered
 
 - **Date:** 2026-11-14
-- **Decision:** The build palette no longer offers advanced rooms (Workshop, Infirmary, Artefact Vault, Containment) until they are unlocked; core rooms still show disabled with "Unlock: <project>". The Artefact Vault is no longer unlocked from the start: a new Construction project, Secure storage ($400k, 2 days), unlocks it. Containment keeps its own project.
+- **Decision:** The build palette offers only rooms research has unlocked (amended the same day: this covers every room, not only the advanced ones). A greyed room is one that is unlocked but can't be built right now, such as the Capacitor Bank at its cap, and its line says why. The Artefact Vault is no longer unlocked from the start: a new Construction project, Secure storage ($400k, 2 days), unlocks it. Containment keeps its own project.
 - **Reason:** Owner request: keep the early palette to what the player can plan for.
 - **Bible section:** [content/m4-core-systems.md](content/m4-core-systems.md) sections 5 and 7

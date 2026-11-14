@@ -4,8 +4,8 @@ extends VBoxContainer
 ## room in catalogue order and the "Dig Level N" entry (greyed with "Unlock: <project>" while
 ## research locks it; held to dig), then a line that shows the hovered or focused
 ## room's cost, build time and draw, or while placing the ghost's state and a Build button
-## (one click), and under it the room's "now" line. A room research still locks shows greyed
-## (disabled) and its line reads "Unlock: <project>"; staff-locked rooms are not offered.
+## (one click), and under it the room's "now" line. Only rooms research has unlocked are
+## offered; one that can't be built right now (a cap reached) shows greyed with the reason.
 ## While placing, the picked room's entry shows pressed (pressing it again puts the ghost away)
 ## and a Cancel button sits next to Build. (B) or Esc on a palette button returns to the plan.
 ## Bible: docs/content/m2-base.md sections 4 and 6; docs/content/m25-lean-start.md section 4;
@@ -36,15 +36,6 @@ const ROOMS: Array[StringName] = [
 	&"room_corridor",
 ]
 
-## Advanced rooms: not offered at all until research (or the story) unlocks them, so the
-## palette shows only what the player can plan for (owner change 2026-11-14).
-const ADVANCED: Array[StringName] = [
-	&"room_workshop",
-	&"room_infirmary",
-	&"room_artefact_vault",
-	&"room_containment",
-]
-
 ## Extra lines shown under a room's "now" line on hover or focus, as {def id: text}; set by
 ## the Base view (the second Research Lab note, m25-lean-start.md section 3).
 var notes: Dictionary[StringName, String] = {}
@@ -62,6 +53,7 @@ var _buttons: Dictionary[StringName, Button] = {}
 var _defs: Dictionary[StringName, RoomDef] = {}
 var _message: String = ""
 var _shown_unlocks: Array[StringName] = []
+var _blocked: Dictionary[StringName, String] = {}
 var _picked: StringName = &""
 
 
@@ -98,23 +90,27 @@ func _init() -> void:
 	add_child(_role)
 
 
-## Fills the palette with the rooms of [param defs] (RoomDef by id) in [constant ROOMS]: those
-## in [param unlocked] (UnlockState.rooms) can be picked; core rooms a research project unlocks
-## show disabled, saying which project; advanced rooms ([constant ADVANCED]) and staff-locked
-## rooms are not offered until unlocked.
-func show_rooms(defs: Dictionary, unlocked: Array[StringName]) -> void:
+## Fills the palette with the rooms of [param defs] (RoomDef by id) in [constant ROOMS] that
+## are in [param unlocked] (UnlockState.rooms): a room research has not unlocked is not offered
+## at all. A room in [param blocked] (def id: reason) is unlocked but can't be built right now
+## (the Capacitor Bank cap, say): it shows greyed, its line giving the reason (owner change
+## 2026-11-14).
+func show_rooms(
+	defs: Dictionary, unlocked: Array[StringName], blocked: Dictionary[StringName, String] = {}
+) -> void:
 	_defs.assign(defs)
 	_shown_unlocks = unlocked.duplicate()
+	_blocked = blocked.duplicate()
 	for button: Button in _buttons.values():
 		button.queue_free()
 	_buttons.clear()
 	for def_id: StringName in ROOMS:
 		var def: RoomDef = _defs.get(def_id)
-		if def == null or not _offered(def_id, unlocked):
+		if def == null or not def_id in unlocked:
 			continue
 		var button := Button.new()
 		button.text = def.name_key
-		button.disabled = not def_id in unlocked
+		button.disabled = _blocked.has(def_id)
 		button.toggle_mode = true
 		button.set_pressed_no_signal(def_id == _picked)
 		button.pressed.connect(room_picked.emit.bind(def_id))
@@ -134,9 +130,7 @@ func role_line(def_id: StringName) -> String:
 	if button == null:
 		return ""
 	if button.disabled:
-		return BasePanelText.unlock(
-			UnlockRules.project_for(_research(), UnlockRules.EFFECT_UNLOCK_ROOM, def_id)
-		)
+		return _blocked.get(def_id, "")
 	return BasePanelText.now(_defs[def_id])
 
 
@@ -145,9 +139,12 @@ func get_role() -> String:
 	return _role.text if _role.visible else ""
 
 
-## True when [param unlocked] differs from the unlocks the palette was last filled for.
-func unlocks_changed(unlocked: Array[StringName]) -> bool:
-	return unlocked != _shown_unlocks
+## True when [param unlocked] or [param blocked] differs from what the palette was last
+## filled for.
+func unlocks_changed(
+	unlocked: Array[StringName], blocked: Dictionary[StringName, String] = {}
+) -> bool:
+	return unlocked != _shown_unlocks or blocked != _blocked
 
 
 ## Returns the Dig button.
@@ -220,24 +217,6 @@ func _show_summary(def_id: StringName) -> void:
 func _show_dig_summary() -> void:
 	_role.text = _dig.get_reason()
 	_role.visible = not _role.text.is_empty()
-
-
-static func _offered(def_id: StringName, unlocked: Array[StringName]) -> bool:
-	if def_id in unlocked:
-		return true
-	if def_id in ADVANCED:
-		return false
-	return not (
-		UnlockRules.project_for(_research(), UnlockRules.EFFECT_UNLOCK_ROOM, def_id).is_empty()
-	)
-
-
-## Every loaded ResearchDef by id.
-static func _research() -> Dictionary[StringName, ResearchDef]:
-	var found: Dictionary[StringName, ResearchDef] = {}
-	for def: DefBase in Registry.get_all_of(ResearchDef):
-		found[def.id] = def as ResearchDef
-	return found
 
 
 func _refresh_hint() -> void:

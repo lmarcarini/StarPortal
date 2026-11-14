@@ -86,18 +86,14 @@ func test_invalid_spots_say_why() -> void:
 func test_palette_offers_only_unlocked_rooms() -> void:
 	var palette: BuildPalette = _view.get_palette()
 	for def_id: StringName in BuildPalette.ROOMS:
-		if def_id == ExpeditionUnlock.INFIRMARY_DEF or def_id in BuildPalette.ADVANCED:
-			assert_object(palette.get_room_button(def_id)).is_null()
-			continue
-		if def_id in [&"room_artefact_vault", &"room_containment"]:
-			continue  # M4 storage rooms: tests/base/test_storage_rooms.gd
 		var wanted: bool = (
 			def_id
 			in [&"room_capacitor_bank", &"room_research_lab", &"room_quarters", &"room_corridor"]
 		)
 		var button: Button = palette.get_room_button(def_id)
-		assert_object(button).override_failure_message(String(def_id)).is_not_null()
-		assert_bool(not button.disabled).override_failure_message(String(def_id)).is_equal(wanted)
+		assert_bool(button != null).override_failure_message(String(def_id)).is_equal(wanted)
+		if button != null:
+			assert_bool(button.disabled).override_failure_message(String(def_id)).is_false()
 	ConstructionFixture.unlock_all(_simulation.state)
 	_view.get_build().refresh()
 	assert_object(palette.get_room_button(ExpeditionUnlock.INFIRMARY_DEF)).is_null()
