@@ -11,6 +11,11 @@ extends Control
 signal project_chosen(project_id: StringName)
 ## Emitted on (A) or Enter on a node.
 signal project_activated(project_id: StringName)
+## Emitted when a stub (a need in another branch) is pressed, with that need's id.
+signal stub_pressed(project_id: StringName)
+
+## What filter() keeps bright: every node, those that can start, done ones or locked ones.
+enum Filter { ALL, AVAILABLE, DONE, LOCKED }
 
 ## Room left of the first column for stubs, in pixels.
 const PAD: Vector2 = Vector2(40, 20)
@@ -21,7 +26,7 @@ var _category: StringName = &""
 var _cells: Dictionary[StringName, Vector2i] = {}
 var _edges: Array[Array] = []
 var _nodes: Dictionary[StringName, ResearchNode] = {}
-var _stubs: Array[Label] = []
+var _stubs: Array[Button] = []
 var _empty: Label = Label.new()
 
 
@@ -68,7 +73,7 @@ func node_of(project_id: StringName) -> ResearchNode:
 ## Returns the stub labels, e.g. "from Second plant".
 func stub_texts() -> Array[String]:
 	var found: Array[String] = []
-	for stub: Label in _stubs:
+	for stub: Button in _stubs:
 		found.append(stub.text)
 	return found
 
@@ -96,10 +101,45 @@ func _rebuild(state: GameState, defs: Array[ResearchDef], category: StringName) 
 		add_child(node)
 		_nodes[id] = node
 		extent = extent.max(node.position + ResearchNode.SIZE)
-		for need: StringName in ResearchTreeLayout.stubs(defs, state.research_defs[id]):
-			_add_stub(node, ResearchText.name_of(state, need))
+		for need: StringName in ResearchTreeLayout.stubs_in(_cells, state.research_defs[id]):
+			_add_stub(node, need, ResearchText.name_of(state, need))
 	custom_minimum_size = extent + Vector2(8, 8)
 	_link_focus()
+
+
+## Dims every node [param filter] leaves out and tints those whose name contains
+## [param search] (case-insensitive; empty matches none). Returns the matching ids in list order.
+func apply_view(state: GameState, filter: Filter, search: String) -> Array[StringName]:
+	var matches: Array[StringName] = []
+	var needle: String = search.strip_edges().to_lower()
+	for id: StringName in _nodes:
+		var node: ResearchNode = _nodes[id]
+		var def: ResearchDef = state.research_defs[id]
+		node.show_project(state, def)
+		if not keeps(state, def, filter):
+			node.modulate = Color(1, 1, 1, 0.25)
+		if not needle.is_empty() and tr(def.name_key).to_lower().contains(needle):
+			node.modulate = Color(1.0, 0.9, 0.4)
+			matches.append(id)
+	return matches
+
+
+## True when [param filter] keeps [param def] bright.
+static func keeps(state: GameState, def: ResearchDef, filter: Filter) -> bool:
+	var kind: ResearchText.Kind = ResearchText.kind(state, def)
+	match filter:
+		Filter.AVAILABLE:
+			return kind == ResearchText.Kind.START
+		Filter.DONE:
+			return kind == ResearchText.Kind.DONE
+		Filter.LOCKED:
+			return kind == ResearchText.Kind.LOCKED or kind == ResearchText.Kind.NEEDS
+	return true
+
+
+## Returns the stub buttons.
+func get_stubs() -> Array[Button]:
+	return _stubs.duplicate()
 
 
 ## Top-left corner of [param cell] (column, row), in pixels.
@@ -107,16 +147,18 @@ static func cell_position(cell: Vector2i) -> Vector2:
 	return PAD + Vector2(cell.x * STEP.x, cell.y * STEP.y)
 
 
-func _add_stub(node: ResearchNode, need_name: String) -> void:
-	var stub := Label.new()
+func _add_stub(node: ResearchNode, need: StringName, need_name: String) -> void:
+	var stub := Button.new()
+	stub.flat = true
+	stub.focus_mode = FOCUS_NONE
 	stub.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	stub.add_theme_font_size_override(&"font_size", 11)
 	stub.text = tr(&"RESEARCH_STUB").format({"name": need_name})
 	var earlier: int = 0
-	for other: Label in _stubs:
+	for other: Button in _stubs:
 		earlier += 1 if other.position.x == node.position.x + 8 else 0
-	stub.position = node.position + Vector2(8, -16 - 12 * earlier)
-	stub.mouse_filter = MOUSE_FILTER_IGNORE
+	stub.position = node.position + Vector2(8, -20 - 14 * earlier)
+	stub.pressed.connect(stub_pressed.emit.bind(need))
 	add_child(stub)
 	_stubs.append(stub)
 
@@ -164,6 +206,6 @@ func _draw() -> void:
 			colour,
 			2.0
 		)
-	for stub: Label in _stubs:
-		var y: float = stub.position.y + 8
+	for stub: Button in _stubs:
+		var y: float = stub.position.y + 12
 		draw_line(Vector2(stub.position.x - 32, y), Vector2(stub.position.x - 4, y), colour, 2.0)

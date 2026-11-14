@@ -35,6 +35,10 @@ const ACTIONS: Array[StringName] = [
 	&"dialog_choice_2",
 	&"dialog_choice_3",
 	&"dialog_choice_4",
+	&"research_pan_left",
+	&"research_pan_right",
+	&"research_pan_up",
+	&"research_pan_down",
 ]
 
 ## Gamepad bindings added to Godot's built-in UI actions at start-up, as {action: [encoded]},
@@ -197,6 +201,31 @@ const DEFAULTS: Dictionary = {
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_4}],
 		GAMEPAD: [],
+	},
+	# The research tree pans with the right stick (M4-32).
+	&"research_pan_left":
+	{
+		KEYBOARD: [],
+		GAMEPAD:
+		[{"kind": InputEventCodec.KIND_JOYPAD_MOTION, "axis": JOY_AXIS_RIGHT_X, "direction": -1}],
+	},
+	&"research_pan_right":
+	{
+		KEYBOARD: [],
+		GAMEPAD:
+		[{"kind": InputEventCodec.KIND_JOYPAD_MOTION, "axis": JOY_AXIS_RIGHT_X, "direction": 1}],
+	},
+	&"research_pan_up":
+	{
+		KEYBOARD: [],
+		GAMEPAD:
+		[{"kind": InputEventCodec.KIND_JOYPAD_MOTION, "axis": JOY_AXIS_RIGHT_Y, "direction": -1}],
+	},
+	&"research_pan_down":
+	{
+		KEYBOARD: [],
+		GAMEPAD:
+		[{"kind": InputEventCodec.KIND_JOYPAD_MOTION, "axis": JOY_AXIS_RIGHT_Y, "direction": 1}],
 	},
 }
 

@@ -56,3 +56,15 @@ static func stubs(defs: Array[ResearchDef], def: ResearchDef) -> Array[StringNam
 		if not placed.has(need):
 			found.append(need)
 	return found
+
+
+## The needs of [param def] outside the cells [param placed] (from cells()), without computing
+## the layout again: the fast form of stubs() for a whole tree.
+static func stubs_in(
+	placed: Dictionary[StringName, Vector2i], def: ResearchDef
+) -> Array[StringName]:
+	var found: Array[StringName] = []
+	for need: StringName in def.needs:
+		if not placed.has(need):
+			found.append(need)
+	return found

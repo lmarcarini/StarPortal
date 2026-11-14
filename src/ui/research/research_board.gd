@@ -22,7 +22,10 @@ var _left: Label = _label(16)
 var _bar: ProgressBar = ProgressBar.new()
 var _tabs: TabBar = TabBar.new()
 var _scroll: ScrollContainer = ScrollContainer.new()
+var _canvas: Control = Control.new()
 var _tree: ResearchTree = ResearchTree.new()
+var _controls := ResearchTreeControls.new()
+var _zoom: float = 1.0
 var _categories: Array[ResearchCategoryDef] = []
 var _state: GameState = null
 
@@ -48,10 +51,17 @@ func _init() -> void:
 	_tabs.focus_mode = FOCUS_ALL
 	_tabs.tab_changed.connect(_on_tab_changed)
 	add_child(_tabs)
+	add_child(_controls)
+	_controls.changed.connect(_apply_view)
+	_controls.zoom_requested.connect(zoom_by)
 	_scroll.size_flags_vertical = SIZE_EXPAND_FILL
 	_scroll.follow_focus = true
-	_scroll.add_child(_tree)
+	_canvas.mouse_filter = MOUSE_FILTER_IGNORE
+	_canvas.add_child(_tree)
+	_scroll.add_child(_canvas)
+	_scroll.gui_input.connect(_on_scroll_input)
 	add_child(_scroll)
+	_tree.stub_pressed.connect(jump_to)
 	_tree.project_chosen.connect(project_chosen.emit)
 	_tree.project_activated.connect(project_activated.emit)
 
@@ -86,6 +96,7 @@ func show_state(state: GameState) -> void:
 		var dot: String = DOT if has_available(state, category.id) else ""
 		_tabs.set_tab_title(index, tr(category.name_key) + dot)
 	_tree.show_category(state, get_category())
+	_apply_view()
 
 
 ## True when a project of [param category] can be started in [param state] (its needs done).
@@ -135,6 +146,79 @@ func get_tree_view() -> ResearchTree:
 ## Returns the sub-tab bar.
 func get_tabs() -> TabBar:
 	return _tabs
+
+
+## Returns the filter and search bar.
+func get_controls() -> ResearchTreeControls:
+	return _controls
+
+
+## The tree's zoom (0.4 to 2).
+func get_zoom() -> float:
+	return _zoom
+
+
+## Zooms the tree by [param factor], between 0.4 and 2.
+func zoom_by(factor: float) -> void:
+	_zoom = clampf(_zoom * factor, 0.4, 2.0)
+	_tree.scale = Vector2(_zoom, _zoom)
+	_canvas.custom_minimum_size = _tree.custom_minimum_size * _zoom
+
+
+## Shows [param project_id]'s branch and scrolls its node to the middle of the view.
+func jump_to(project_id: StringName) -> void:
+	var def: ResearchDef = null if _state == null else _state.research_defs.get(project_id)
+	if def == null:
+		return
+	show_category(def.category)
+	centre_on(project_id)
+
+
+## Scrolls so [param project_id]'s node sits in the middle of the view; false when not shown.
+func centre_on(project_id: StringName) -> bool:
+	var node: ResearchNode = _tree.node_of(project_id)
+	if node == null:
+		return false
+	var centre: Vector2 = (node.position + ResearchNode.SIZE * 0.5) * _zoom
+	_scroll.scroll_horizontal = int(centre.x - _scroll.size.x * 0.5)
+	_scroll.scroll_vertical = int(centre.y - _scroll.size.y * 0.5)
+	return true
+
+
+## Pans with the right stick (research_pan_* actions) while shown.
+func _process(delta: float) -> void:
+	if not is_visible_in_tree():
+		return
+	var pan: Vector2 = Input.get_vector(
+		&"research_pan_left", &"research_pan_right", &"research_pan_up", &"research_pan_down"
+	)
+	if not pan.is_zero_approx():
+		_scroll.scroll_horizontal += int(pan.x * 900.0 * delta)
+		_scroll.scroll_vertical += int(pan.y * 900.0 * delta)
+
+
+func _apply_view() -> void:
+	if _state == null:
+		return
+	_canvas.custom_minimum_size = _tree.custom_minimum_size * _zoom
+	var matches: Array[StringName] = _tree.apply_view(
+		_state, _controls.get_filter(), _controls.get_search()
+	)
+	if not matches.is_empty() and not _controls.get_search().strip_edges().is_empty():
+		centre_on(matches[0])
+
+
+## Ctrl + mouse wheel zooms the tree.
+func _on_scroll_input(event: InputEvent) -> void:
+	var wheel: InputEventMouseButton = event as InputEventMouseButton
+	if wheel == null or not wheel.pressed or not wheel.ctrl_pressed:
+		return
+	if wheel.button_index == MOUSE_BUTTON_WHEEL_UP:
+		zoom_by(ResearchTreeControls.ZOOM_STEP)
+		_scroll.accept_event()
+	elif wheel.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+		zoom_by(1.0 / ResearchTreeControls.ZOOM_STEP)
+		_scroll.accept_event()
 
 
 ## Returns the header's texts: title, current project, time left.

@@ -58,5 +58,9 @@ const VALUES: Dictionary = {
 		&"dialog_choice_2": {},
 		&"dialog_choice_3": {},
 		&"dialog_choice_4": {},
+		&"research_pan_left": {},
+		&"research_pan_right": {},
+		&"research_pan_up": {},
+		&"research_pan_down": {},
 	},
 }

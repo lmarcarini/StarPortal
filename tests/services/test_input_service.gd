@@ -200,7 +200,7 @@ func test_bindings_survive_restart() -> void:
 	var shifted: InputEventKey = _key(KEY_S)
 	shifted.shift_pressed = true
 	var stick := InputEventJoypadMotion.new()
-	stick.axis = JOY_AXIS_RIGHT_Y
+	stick.axis = JOY_AXIS_LEFT_Y
 	stick.axis_value = -0.8
 	assert_bool(service.rebind(&"quick_save", KEYBOARD, 0, shifted).is_ok).is_true()
 	assert_bool(service.rebind(&"quick_save", KEYBOARD, 1, mouse).is_ok).is_true()
