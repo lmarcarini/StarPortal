@@ -151,7 +151,7 @@ func _play_puzzle(player: M15Player, index: int, target: GateAddress) -> void:
 	assert_int(entry.outcome).override_failure_message(world_id).is_equal(DialOutcome.Kind.LOCK)
 	assert_str(String(entry.world_id)).is_equal(String(world_id))
 	assert_int(player.state().gate.mode).is_equal(GateState.RingMode.LOCKED)
-	assert_int(player.state().clock.speed_index).is_equal(ClockState.NORMAL_SPEED_INDEX)
+	assert_int(player.state().clock.speed_index).is_equal(FASTEST_SPEED)
 	assert_array(player.state().archive.received).is_equal(held_before)
 	var arrived: Array[StringName] = player.extend_pole_camera()
 	assert_bool(player.state().worlds.is_horizon_record_taken(world_id)).is_true()

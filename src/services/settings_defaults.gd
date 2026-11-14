@@ -33,6 +33,8 @@ const VALUES: Dictionary = {
 	&"gameplay":
 	{
 		&"language": "en",
+		# On a lock, switch to the Gate Room and operate the gate (docs/content/event-time.md 3).
+		&"switch_to_gate_on_lock": true,
 	},
 	# One key per InputActions.ACTIONS entry, holding that action's bindings encoded by
 	# InputService. An empty Dictionary means "use the built-in defaults".

@@ -105,6 +105,14 @@ static func _request_alerts(state: GameState) -> Array[AlertEntry]:
 
 static func _artefact_alerts(state: GameState) -> Array[AlertEntry]:
 	var found: Array[AlertEntry] = []
+	var gate: GateState = state.gate
+	var standing_by: bool = gate.mode == GateState.RingMode.LOCKED and not gate.operating
+	if standing_by and not gate.is_incoming_lock():
+		found.append(
+			AlertEntry.create(
+				&"wormhole_open", AlertEntry.INFO, ViewSwitcher.GATE_ROOM, gate.lock_started_tick
+			)
+		)
 	for record: ArtefactRecord in state.artefacts.items:
 		if record.room_uid != ArtefactRecord.AT_GATE:
 			continue

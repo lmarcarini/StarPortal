@@ -1,5 +1,5 @@
-## Tests that the top bar's speed label follows the lock speed rule: a lock at 10× shows 1×
-## through EventBus.speed_changed, and speeding up again while the wormhole is open shows.
+## The dial and the gate operations panel slow the clock through slow reasons and never change
+## the cruise speed the top bar shows (M4.7-04).
 ## Bible: game-design.md#time-real-time-with-pause,
 ## gate-and-address-spec.md#the-dialing-sequence-and-an-open-wormhole
 extends GdUnitTestSuite
@@ -41,19 +41,32 @@ func _speed_text() -> String:
 	return (_bar.find_child("SpeedLabel", true, false) as Label).text
 
 
-func test_lock_at_ten_times_shows_one_times() -> void:
+func _effective() -> int:
+	return TimeControl.effective_speed_index(_state.clock)
+
+
+## The dial is slow (dialling), the lock gives cruise back until the gate is operated, and
+## Stand by gives it back again; the player's cruise speed never changes.
+func test_dial_slows_and_lock_returns_to_cruise() -> void:
 	SimClock.set_speed_index(3)
 	assert_str(_speed_text()).is_equal("10×")
 	var address: GateAddress = DialFixture.address_of(_state.galaxy, DialFixture.OPEN_ID)
 	assert_bool(SimClock.simulation.submit(DialCommand.create(address)).is_ok).is_true()
-	SimClock.step_ticks(_state.balance.dial_duration_ticks + 1)
+	SimClock.step_ticks(1)
+	assert_int(_state.gate.mode).is_equal(GateState.RingMode.DIALING)
+	assert_int(_effective()).is_equal(1)
+	SimClock.step_ticks(_state.balance.dial_duration_ticks)
 	assert_int(_state.gate.mode).is_equal(GateState.RingMode.LOCKED)
-	assert_array(_speeds).is_equal([3, 1])
-	assert_str(_speed_text()).is_equal("1×")
-	SimClock.faster()
-	SimClock.step_ticks(5)
-	assert_array(_speeds).is_equal([3, 1, 2])
-	assert_str(_speed_text()).is_equal("3×")
+	assert_int(_effective()).is_equal(3)
+	assert_bool(SimClock.simulation.submit(OperateGateCommand.new()).is_ok).is_true()
+	SimClock.step_ticks(1)
+	assert_int(_effective()).is_equal(1)
+	assert_bool(SimClock.simulation.submit(StandByCommand.new()).is_ok).is_true()
+	SimClock.step_ticks(1)
+	assert_int(_effective()).is_equal(3)
+	assert_int(_state.gate.mode).is_equal(GateState.RingMode.LOCKED)
+	assert_int(_state.clock.speed_index).is_equal(3)
+	assert_str(_speed_text()).is_equal("10×")
 
 
 func test_a_tick_that_keeps_the_speed_emits_nothing() -> void:

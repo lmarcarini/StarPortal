@@ -36,6 +36,8 @@ var pause_menu := PauseMenu.new()
 var log_strip := LogStrip.new()
 ## Grain and vignette over the whole screen (display/screen_grain setting).
 var screen_grain := ScreenGrain.new()
+## Switches to the Gate Room on a lock and stands by on leaving it.
+var gate_focus := GateFocus.new()
 
 var _simulation: Simulation = null
 var _debug_flag_count: int = 0
@@ -81,6 +83,8 @@ func _ready() -> void:
 	if DebugCheatCommand.cheats_on():
 		add_child(CheatPanel.new())
 	ShellBoot.add_pause_menu(self, pause_menu)
+	add_child(gate_focus)
+	gate_focus.attach(view_switcher)
 	var is_new: bool = GameStart.is_new()
 	_start(GameStart.take_state(ShellBoot.choose_seed(new_game_seed), Registry.balance()), is_new)
 	SimClock.pause()

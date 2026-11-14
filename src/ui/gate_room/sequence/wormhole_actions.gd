@@ -24,12 +24,15 @@ signal focus_changed
 signal camera_extended
 ## The player asked to see the horizon photo enlarged.
 signal photo_requested
+## The player pressed Stand by: hide the panel and keep the wormhole open.
+signal stand_by_requested
 
 var _simulation: Simulation = null
 var _team_actions := RingTeamActions.new()
 var _close_warning := Label.new()
 var _is_close_warned: bool = false
 var _hail_button: Button = Button.new()
+var _stand_by_button: Button = Button.new()
 
 @onready var _camera_button: Button = %PoleCameraButton
 @onready var _camera_progress: ProgressBar = %CameraProgress
@@ -64,6 +67,10 @@ func _ready() -> void:
 	_close_warning.add_theme_font_size_override(&"font_size", 13)
 	add_child(_close_warning)
 	move_child(_close_warning, _close_button.get_index())
+	_stand_by_button.name = &"StandByButton"
+	_stand_by_button.text = &"GATE_STAND_BY"
+	_stand_by_button.pressed.connect(stand_by_requested.emit)
+	add_child(_stand_by_button)
 
 
 ## Connects the panel to [param simulation].
@@ -103,7 +110,13 @@ func get_focusables() -> Array[Control]:
 		found.append(_moth_button)
 	found.append_array(_team_actions.get_focusables())
 	found.append(_close_button)
+	found.append(_stand_by_button)
 	return found
+
+
+## Returns the Stand by button.
+func get_stand_by_button() -> Button:
+	return _stand_by_button
 
 
 ## Returns the far Ring's console panel.

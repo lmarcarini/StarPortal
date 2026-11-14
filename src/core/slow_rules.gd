@@ -1,18 +1,23 @@
 class_name SlowRules
 extends RefCounted
-## Which events slow the clock now (docs/content/event-time.md section 2). Instead of
-## overwriting the speed, each tick sync() adds a slow reason for every event that wants the
-## player's attention and releases the ones whose event has ended, so the clock returns to
-## cruise speed on its own. An overridden reason is not added again for the same event.
+## Which events slow the clock now (docs/content/event-time.md section 2). Instead of overwriting
+## the speed, the Simulation calls sync() after every tick's systems: it adds a slow reason for
+## every event that wants the player's attention and releases the ones whose event has ended, so the
+## clock returns to cruise speed on its own. An overridden reason is not added again for the same
+## event.
 ## Bible: docs/content/event-time.md section 2
 
-## Reasons sync() owns; dialling, gate_ops and incursion are added by their own systems.
-const OWNED: Array[StringName] = [&"conversation", &"awaiting_answer"]
+## Reasons sync() owns; incursion is added by its own system.
+const OWNED: Array[StringName] = [&"conversation", &"awaiting_answer", &"dialling", &"gate_ops"]
 
 
 ## The slow keys [param state] wants now from conversations and waiting items.
 static func wanted(state: GameState) -> Array[StringName]:
 	var keys: Array[StringName] = []
+	if state.gate.mode == GateState.RingMode.DIALING:
+		keys.append(TimeControl.slow_key(&"dialling"))
+	if state.gate.operating:
+		keys.append(TimeControl.slow_key(&"gate_ops"))
 	if state.conversations.active != null:
 		keys.append(TimeControl.slow_key(&"conversation"))
 	if state.gate.has_incoming():
@@ -26,8 +31,11 @@ static func wanted(state: GameState) -> Array[StringName]:
 	return keys
 
 
-## Adds the wanted slows of [param state] and releases its owned slows no longer wanted.
+## Adds the wanted slows of [param state] and releases its owned slows no longer wanted. A
+## gate that is no longer locked by the player stops operating first.
 static func sync(state: GameState) -> void:
+	if state.gate.mode != GateState.RingMode.LOCKED or state.gate.is_incoming_lock():
+		state.gate.operating = false
 	var clock: ClockState = state.clock
 	var keys: Array[StringName] = wanted(state)
 	for key: StringName in clock.slows.duplicate():

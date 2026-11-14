@@ -52,13 +52,10 @@ func test_the_rescue_waits_for_a_signal() -> void:
 	assert_int(_effective()).is_equal(4)
 
 
-## Only the player's speed commands (SimClock and ClockState loading) write speed_index. The
-## gate's lock drop is removed by M4.7-04 (#399), which takes gate_system.gd off this list.
+## Only the player's speed commands (SimClock and ClockState loading) write speed_index.
 func test_nothing_else_writes_the_speed() -> void:
 	var allowed: Array[String] = [
-		"res://src/core/systems/gate_system.gd",
-		"res://src/core/sim_clock.gd",
-		"res://src/core/state/clock_state.gd"
+		"res://src/core/sim_clock.gd", "res://src/core/state/clock_state.gd"
 	]
 	var offenders: Array[String] = []
 	_scan("res://src", allowed, offenders)
