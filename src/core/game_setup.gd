@@ -82,6 +82,7 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 		ArtefactSystem.new(),
 		SecuritySystem.new(),
 		IncursionSystem.new(),
+		OutcomeSystem.new(),
 	]
 	return Result.ok(Simulation.new(state, systems))
 

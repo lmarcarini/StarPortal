@@ -49,3 +49,9 @@ static func open_log(view_switcher: ViewSwitcher) -> void:
 	var archive: ArchiveView = view_switcher.get_view(ViewSwitcher.ARCHIVE) as ArchiveView
 	if archive != null:
 		archive.show_section(true)
+
+
+## Applies the settings the simulation reads to [param simulation]: Failure states (M4c-14).
+static func apply_settings(simulation: Simulation) -> void:
+	var on: bool = Settings.get_bool(&"gameplay", &"failure_states")
+	simulation.state.outcome.enabled = on

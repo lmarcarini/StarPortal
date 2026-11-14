@@ -176,3 +176,9 @@ CONFIDENCE_CAUSE_INCURSION_DAMAGE,Intruders damaged or stole something  {amount}
 CONFIDENCE_CAUSE_INCURSION_DOWN,Soldiers down and the intruders not stopped  {amount},Soldados abatidos e os intrusos não foram detidos  {amount}
 CONFIDENCE_CAUSE_INCURSION_STOPPED,Every intruder stopped with no loss  {amount},Todos os intrusos detidos sem perdas  {amount}
 TOPBAR_GATE_SHUTTER,GATE: SHUTTER,ANEL: OBTURADOR
+COMMITTEE_WARN_CONFIDENCE_20,The Committee's Confidence has fallen to 20. Questions are being asked.,A Confiança do Comitê caiu para 20. Perguntas estão sendo feitas.
+COMMITTEE_WARN_CONFIDENCE_10,The Committee's Confidence has fallen to 10. The site's future is in doubt.,A Confiança do Comitê caiu para 10. O futuro do local está em dúvida.
+COMMITTEE_WARN_WOULD_CLOSE,The Committee would close the site.,O Comitê fecharia o local.
+COMMITTEE_WARN_WOULD_BANKRUPT,The site would be bankrupt.,O local estaria falido.
+ALERT_SHUTDOWN_COUNTDOWN,Confidence 0: the Committee would close the site in {days} days,Confiança 0: o Comitê fecharia o local em {days} dias
+ALERT_BANKRUPTCY_COUNTDOWN,In the red: the site would be bankrupt in {days} days,No vermelho: o local estaria falido em {days} dias

@@ -58,6 +58,8 @@ func _init(initial_state: GameState, systems: Array[SimSystem] = []) -> void:
 ## from an event handler, by the emission already running); a queued command's events come
 ## out with its tick.
 func submit(command: Command) -> CommandResult:
+	if state.outcome.has_failed():
+		return CommandResult.fail(&"game_over")
 	var applies_now: bool = state.clock.is_paused
 	var result: CommandResult = commands.submit(command, state)
 	if applies_now:
@@ -65,9 +67,12 @@ func submit(command: Command) -> CommandResult:
 	return result
 
 
-## Runs one tick: flush commands, tick each system, advance the clock, run the day hooks
-## and emit day_started when the new tick starts a day, then emit the tick's events last.
+## Runs one tick (none once the game is lost, M4c-14): flush commands, tick each system,
+## advance the clock, run the day hooks and emit day_started when the new tick starts a day,
+## then emit the tick's events last.
 func advance_tick() -> void:
+	if state.outcome.has_failed():
+		return
 	commands.flush(state)
 	for system: SimSystem in _systems:
 		system.tick(state)

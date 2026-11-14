@@ -105,6 +105,7 @@ static func _request_alerts(state: GameState) -> Array[AlertEntry]:
 
 static func _artefact_alerts(state: GameState) -> Array[AlertEntry]:
 	var found: Array[AlertEntry] = []
+	_failure_alerts(state, found)
 	var gate: GateState = state.gate
 	var standing_by: bool = gate.mode == GateState.RingMode.LOCKED and not gate.operating
 	if standing_by and not gate.is_incoming_lock():
@@ -123,6 +124,25 @@ static func _artefact_alerts(state: GameState) -> Array[AlertEntry]:
 		entry.args = {"artefact_id": String(record.artefact)}
 		found.append(entry)
 	return found
+
+
+## The Shutdown and Bankruptcy countdowns (M4c-14).
+static func _failure_alerts(state: GameState, found: Array[AlertEntry]) -> void:
+	var now: int = state.clock.tick
+	var shutdown: int = FailureRules.shutdown_left(state)
+	if shutdown >= 0:
+		var entry := AlertEntry.create(
+			&"shutdown_countdown", AlertEntry.ALARM, ViewSwitcher.COMMAND, now
+		)
+		entry.args = {"days": shutdown}
+		found.append(entry)
+	var bankrupt: int = FailureRules.bankruptcy_left(state)
+	if bankrupt >= 0:
+		var entry := AlertEntry.create(
+			&"bankruptcy_countdown", AlertEntry.ALARM, ViewSwitcher.COMMAND, now
+		)
+		entry.args = {"days": bankrupt}
+		found.append(entry)
 
 
 ## research_done, team_check_in and artefact_hazard from the last day of the Log.

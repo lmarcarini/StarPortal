@@ -85,6 +85,8 @@ func load_file(path: String, defs: GameDefs = null) -> Result:
 ## before the final rename leaves the newest data only in autosave_1.json.tmp, which is
 ## not read back.
 func autosave(state: GameState) -> Result:
+	if state.outcome.has_failed():
+		return Result.fail(&"game_over")
 	var slot := StringName(AUTOSAVE_PREFIX + "1")
 	var path := slot_path(slot)
 	var written := _write_temp(path, _serialize(state))

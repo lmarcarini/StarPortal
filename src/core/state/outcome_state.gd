@@ -10,6 +10,8 @@ enum Status { RUNNING, FAILED }
 
 ## Saved names of the statuses, indexed by Status value.
 const STATUS_NAMES: Array[String] = ["running", "failed"]
+## Optional saved keys (added after the first v19/v20 saves).
+const OPTIONAL: Array[String] = ["overrun_ticks", "warned"]
 ## Saved keys, in to_dict() order.
 const KEYS: Array[String] = [
 	"status", "cause", "tick", "zero_confidence_days", "negative_funds_days"
@@ -25,6 +27,13 @@ var tick: int = -1
 var zero_confidence_days: int = 0
 ## Daily settlements in a row with funds below zero.
 var negative_funds_days: int = 0
+## Ticks in a row intruders have held the Control Room uncontested.
+var overrun_ticks: int = 0
+## Warnings already given and not yet re-armed (confidence_20, confidence_10,
+## would_close, would_bankrupt).
+var warned: Array[StringName] = []
+## False when the Failure states setting is off. Transient: the shell sets it.
+var enabled: bool = true
 
 
 ## True once the game has ended.
@@ -40,6 +49,8 @@ func to_dict() -> Dictionary:
 		"tick": tick,
 		"zero_confidence_days": zero_confidence_days,
 		"negative_funds_days": negative_funds_days,
+		"overrun_ticks": overrun_ticks,
+		"warned": SaveFields.write_ids(warned),
 	}
 
 
@@ -51,6 +62,8 @@ static func from_dict(data: Dictionary) -> OutcomeState:
 	outcome.tick = SaveFields.read_int(data.get("tick"), -1)
 	outcome.zero_confidence_days = SaveFields.read_int(data.get("zero_confidence_days"))
 	outcome.negative_funds_days = SaveFields.read_int(data.get("negative_funds_days"))
+	outcome.overrun_ticks = SaveFields.read_int(data.get("overrun_ticks"))
+	outcome.warned = SaveFields.read_ids(data.get("warned"))
 	return outcome
 
 
@@ -67,7 +80,9 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'tick' is not a tick or -1")
 	if data["status"] == "failed" and (str(data["cause"]).is_empty() or data["tick"] == -1):
 		errors.append("a failed outcome needs a cause and a tick")
-	for key: String in ["zero_confidence_days", "negative_funds_days"]:
-		if not (SaveFields.is_int(data[key]) and data[key] >= 0):
+	for key: String in ["zero_confidence_days", "negative_funds_days", "overrun_ticks"]:
+		if data.has(key) and not (SaveFields.is_int(data[key]) and data[key] >= 0):
 			errors.append("'%s' is not a whole number of at least 0" % key)
+	if data.has("warned"):
+		errors.append_array(SaveFields.id_list_errors(data["warned"], "warned"))
 	return errors

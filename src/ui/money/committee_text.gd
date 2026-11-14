@@ -24,6 +24,10 @@ const CAUSE_KEYS: Dictionary[StringName, StringName] = {
 const WARNING_KEYS: Dictionary[StringName, StringName] = {
 	&"red_days": &"COMMITTEE_WARN_RED_DAYS",
 	&"confidence_zero": &"COMMITTEE_WARN_CONFIDENCE_ZERO",
+	&"confidence_20": &"COMMITTEE_WARN_CONFIDENCE_20",
+	&"confidence_10": &"COMMITTEE_WARN_CONFIDENCE_10",
+	&"would_close": &"COMMITTEE_WARN_WOULD_CLOSE",
+	&"would_bankrupt": &"COMMITTEE_WARN_WOULD_BANKRUPT",
 }
 
 
