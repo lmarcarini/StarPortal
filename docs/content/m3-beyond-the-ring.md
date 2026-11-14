@@ -38,7 +38,7 @@ story path runs through M3: STILLWATER's anchor leads to MOORING, where the Kind
 the first Threshold team is home."
 
 **Loop timing.** One 400 MWh bank charging at 20 MW (the M2.6 opening), a 366.6 MWh world
-such as STILLWATER. At 1× an in-game minute is a real second; a lock drops the clock to 1×.
+such as STILLWATER. At 1× an in-game minute is a real second; a lock drops the clock to 1× (since M4.7: slow reasons, event-time.md).
 
 | Stretch | In game | At 1× | At 10× |
 | --- | --- | --- | --- |
@@ -257,7 +257,8 @@ field in M3 except through a missed check-in: in a rescue, or in a lost team.
 **Missed check-in and rescue.** A missed check-in is a due check-in, or the return, that does
 not come; a team that comes home before any check-in fell due never opens a rescue. When one is
 missed, the game **pauses**, the speed
-is set to 1× for when it resumes, and a rescue alert opens with a **3-day** countdown (it stays
+is set to 1× for when it resumes (since M4.7 an `awaiting_answer` slow reason until the
+Signal: see event-time.md section 2), and a rescue alert opens with a **3-day** countdown (it stays
 on the top bar's alert stack). The rescue is a normal dial of the world at its normal lock
 energy, then the Ring action **Signal T-1**: the team reaches the Ring in 15 minutes and comes
 through; closing early fails, and the player can try again within the window.

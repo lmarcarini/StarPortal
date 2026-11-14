@@ -3,8 +3,8 @@ extends RefCounted
 ## Rules of the one running conversation: start one, list the choices at a Choice node, move
 ## to a node (applying its effects), pick a choice, end it (finished or cut off) and choose the
 ## best conversation to start for a faction, channel and world. Called only from commands and
-## ConversationSystem. A conversation drops the clock to 1× while it runs (the player may
-## still pause).
+## ConversationSystem. A conversation slows the clock (the conversation reason) while it
+## runs; the player may still pause.
 ## Bible: docs/content/m4-core-systems.md section 3
 
 ## Channels that run over the open wormhole (cut off when it closes).
@@ -12,8 +12,8 @@ const WORMHOLE_CHANNELS: Array[StringName] = [&"wormhole", &"incoming"]
 
 
 ## Starts [param conversation_id] on [param channel] at [param world_id]: refuses (false) when
-## one is running or the id is unknown. Drops the clock to 1×, posts conversation_started and
-## arrives at the start node.
+## one is running or the id is unknown. Slows the clock (conversation), posts
+## conversation_started and arrives at the start node.
 static func start(
 	state: GameState, conversation_id: StringName, channel: StringName, world_id: StringName
 ) -> bool:
@@ -26,7 +26,7 @@ static func start(
 	active.world = world_id
 	active.started_tick = state.clock.tick
 	state.conversations.active = active
-	drop_to_normal_speed(state.clock)
+	SlowRules.sync(state)
 	state.events.post(&"conversation_started", [conversation_id, channel])
 	arrive(state, def.start)
 	return true
@@ -164,12 +164,6 @@ static func pick(
 		if best == null or def.priority > best.priority:
 			best = def
 	return &"" if best == null else best.id
-
-
-## Sets [param clock] to 1× when it runs faster.
-static func drop_to_normal_speed(clock: ClockState) -> void:
-	if clock.speed_index > ClockState.NORMAL_SPEED_INDEX:
-		clock.speed_index = ClockState.NORMAL_SPEED_INDEX
 
 
 static func _is_available(

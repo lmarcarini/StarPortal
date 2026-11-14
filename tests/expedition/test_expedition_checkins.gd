@@ -95,7 +95,9 @@ func test_missed_check_in_pauses_at_normal_speed_and_opens_the_window() -> void:
 	assert_int(plan.mode).is_equal(ExpeditionState.Mode.MISSING)
 	assert_int(plan.missed_tick).is_equal(due)
 	assert_array(_pauses).is_equal([ExpeditionRescue.PAUSE_REASON])
-	assert_int(_state.clock.speed_index).is_equal(ClockState.NORMAL_SPEED_INDEX)
+	assert_int(TimeControl.effective_speed_index(_state.clock)).is_equal(
+		ClockState.NORMAL_SPEED_INDEX
+	)
 	assert_bool(_events.has(ExpeditionSystem.CHECKED_IN_EVENT)).is_false()
 	assert_array(_expedition_lines()).is_equal(["departed", "missed"])
 	assert_array(plan.away_ids()).has_size(4)

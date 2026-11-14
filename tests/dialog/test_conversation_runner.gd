@@ -76,10 +76,13 @@ func _node() -> String:
 	return String(_state.conversations.active.node)
 
 
-func test_lines_advance_by_minutes_and_speed_drops() -> void:
+func test_lines_advance_by_minutes_and_the_clock_slows() -> void:
 	_state.clock.speed_index = ClockState.NORMAL_SPEED_INDEX + 2
 	assert_bool(ConversationRules.start(_state, CONV, &"wormhole", &"world_lintel")).is_true()
-	assert_int(_state.clock.speed_index).is_equal(ClockState.NORMAL_SPEED_INDEX)
+	assert_int(_state.clock.speed_index).is_equal(ClockState.NORMAL_SPEED_INDEX + 2)
+	assert_int(TimeControl.effective_speed_index(_state.clock)).is_equal(
+		ClockState.NORMAL_SPEED_INDEX
+	)
 	assert_int(_state.budget.funds_k).is_equal(1)
 	assert_bool(ConversationRules.start(_state, CONV, &"wormhole", &"")).is_false()
 	_ticks(2)
@@ -87,7 +90,9 @@ func test_lines_advance_by_minutes_and_speed_drops() -> void:
 	_state.clock.speed_index = ClockState.NORMAL_SPEED_INDEX + 2
 	_ticks(1)
 	assert_str(_node()).is_equal("l2")
-	assert_int(_state.clock.speed_index).is_equal(ClockState.NORMAL_SPEED_INDEX)
+	assert_int(TimeControl.effective_speed_index(_state.clock)).is_equal(
+		ClockState.NORMAL_SPEED_INDEX
+	)
 	_ticks(2)
 	assert_str(_node()).is_equal("l2")
 	_ticks(1)
