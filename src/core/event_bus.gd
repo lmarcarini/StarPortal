@@ -258,6 +258,8 @@ signal room_repaired(room_uid: StringName)
 signal intruders_moved
 ## The game ended with [param cause].
 signal game_failed(cause: StringName)
+## An installation of room (or door key) [param room_uid] was started, finished or removed.
+signal installation_changed(room_uid: StringName)
 
 ## Bus signals owned by the clock, the save service and the Simulation's own forwards. A
 ## posted domain event may not use one of these names: it is rejected like an undeclared

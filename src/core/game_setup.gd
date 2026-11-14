@@ -57,6 +57,9 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	state.unit_defs.clear()
 	for unit: UnitDef in defs.units:
 		state.unit_defs[unit.id] = unit
+	state.installation_defs.clear()
+	for installation: InstallationDef in defs.installations:
+		state.installation_defs[installation.id] = installation
 	state.research_defs.clear()
 	for def: ResearchDef in defs.research:
 		state.research_defs[def.id] = def

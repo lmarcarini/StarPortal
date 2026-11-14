@@ -109,6 +109,8 @@ var conversation_defs: Dictionary[StringName, ConversationDef] = {}
 ## Every IncursionDef and UnitDef by id, read only (M4c). Transient: GameSetup.build() sets them.
 var incursion_defs: Dictionary[StringName, IncursionDef] = {}
 var unit_defs: Dictionary[StringName, UnitDef] = {}
+## Every InstallationDef by id, read only (M4c-18). Transient: GameSetup.build() sets it.
+var installation_defs: Dictionary[StringName, InstallationDef] = {}
 
 
 ## Returns a fresh campaign state seeded with [param base_seed]. The galaxy seed is

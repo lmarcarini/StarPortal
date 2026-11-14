@@ -59,6 +59,8 @@ var damaged: bool = false:
 		damaged = value
 ## Ticks of repair left (M4c); 0 when not being repaired.
 var repair_ticks_left: int = 0
+## Installations fitted to it (M4c-18); optional when loading.
+var installations: Array[InstallationState] = []
 
 
 ## Returns a room of [param def_id] with instance [param room_id] at [param origin] on
@@ -104,6 +106,7 @@ func to_dict() -> Dictionary:
 		"paid_k": paid_k,
 		"damaged": damaged,
 		"repair_ticks_left": repair_ticks_left,
+		"installations": InstallationState.write_all(installations),
 	}
 
 
@@ -123,6 +126,7 @@ static func from_dict(data: Dictionary) -> RoomState:
 	room.paid_k = read_count(data.get("paid_k"))
 	room.damaged = data.get("damaged") is bool and data["damaged"]
 	room.repair_ticks_left = read_count(data.get("repair_ticks_left"))
+	room.installations = InstallationState.read_all(data.get("installations"))
 	return room
 
 
@@ -157,6 +161,12 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'damaged' is not a bool")
 	if data.has("repair_ticks_left") and not is_count(data["repair_ticks_left"]):
 		errors.append("'repair_ticks_left' is not a whole number of at least 0")
+	if data.has("installations"):
+		errors.append_array(
+			SaveFields.record_list_errors(
+				data["installations"], "installations", InstallationState.validate_dict
+			)
+		)
 	return errors
 
 

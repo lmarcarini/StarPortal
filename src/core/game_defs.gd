@@ -32,6 +32,8 @@ var artefacts: Array[ArtefactDef] = []
 ## Every IncursionDef and UnitDef (M4c), in Registry load order.
 var incursions: Array[IncursionDef] = []
 var units: Array[UnitDef] = []
+## Every InstallationDef (M4c-18), in Registry load order.
+var installations: Array[InstallationDef] = []
 ## Every conversation, in Registry load order (sorted by path).
 var conversations: Array[ConversationDef] = []
 ## The staff name list (&"staff_names"), or null.
@@ -99,3 +101,6 @@ static func _append_story_defs(registry: Node, defs: GameDefs) -> void:
 	for def: Variant in registry.call(&"get_all_of", UnitDef):
 		if def is UnitDef:
 			defs.units.append(def)
+	for def: Variant in registry.call(&"get_all_of", InstallationDef):
+		if def is InstallationDef:
+			defs.installations.append(def)

@@ -1,7 +1,8 @@
 class_name ModifierRules
 extends RefCounted
-## Sums every lasting modifier by key: the ModifierEffects of finished research and of
-## artefacts housed in a built, switched-on room. Percent keys are clamped to −90..300. The sum
+## Sums every lasting modifier by key: the ModifierEffects of finished research, of
+## artefacts housed in a built, switched-on room and of active installations (M4c-18).
+## Percent keys are clamped to −90..300. The sum
 ## is cached on GameState.modifiers and recomputed only when its sources change.
 ## Bible: docs/content/m4-core-systems.md section 6
 
@@ -44,6 +45,7 @@ static func compute(state: GameState) -> Dictionary[StringName, int]:
 		if artefact != null and is_room_working(state, record.room_uid):
 			for modifier: ModifierEffect in artefact.modifiers:
 				_add(sums, modifier)
+	_add_installations(state, sums)
 	for key: StringName in sums:
 		if is_percent(key):
 			sums[key] = clampi(sums[key], PERCENT_MIN, PERCENT_MAX)
@@ -75,6 +77,16 @@ static func is_room_working(state: GameState, room_uid: int) -> bool:
 	)
 
 
+static func _add_installations(state: GameState, sums: Dictionary[StringName, int]) -> void:
+	for room: RoomState in state.base.rooms:
+		for item: InstallationState in room.installations:
+			var def: InstallationDef = state.installation_defs.get(item.def)
+			if def != null and InstallationRules.active(state, room.id, item.def):
+				for effect: EffectDef in def.effects:
+					if effect is ModifierEffect:
+						_add(sums, effect as ModifierEffect)
+
+
 static func _add(sums: Dictionary[StringName, int], modifier: ModifierEffect) -> void:
 	sums[modifier.key] = sums.get(modifier.key, 0) + modifier.amount
 
@@ -88,6 +100,8 @@ static func _signature(state: GameState) -> Array:
 		placed.append(record.room_uid)
 	return [
 		RoomState.revision,
+		InstallationState.revision,
+		state.installation_defs.size(),
 		state.base.get_instance_id(),
 		state.base.rooms.size(),
 		state.base.next_room_number,
