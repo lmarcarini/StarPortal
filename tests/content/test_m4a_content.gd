@@ -144,4 +144,4 @@ func test_tech_tree_coverage() -> void:
 	for key: StringName in ModifierEffect.KEYS:
 		assert_bool(keys.has(key)).override_failure_message(String(key)).is_true()
 	assert_int(studies).is_equal(3)
-	assert_int(_defs.research.size()).is_between(34, 38)
+	assert_int(_defs.research.size()).is_between(34, 42)

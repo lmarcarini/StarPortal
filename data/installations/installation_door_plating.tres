@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="InstallationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/installation_def.gd" id="1"]
+
+; docs/content/m4c-incursions.md section 6: door plating, $100k, 6 hours.
+[resource]
+script = ExtResource("1")
+name_key = &"INSTALLATION_PLATING_NAME"
+effect_key = &"INSTALLATION_PLATING_EFFECT"
+hosts = Array[StringName]([&"door"])
+requires_research = &"automated_defence"
+cost_k = 100
+build_ticks = 360
+max_per_host = 1
+health = 0
+effects = Array[Resource]([])
+id = &"installation_door_plating"

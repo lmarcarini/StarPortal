@@ -8,7 +8,8 @@ extends RefCounted
 ## Bible: docs/content/m4c-incursions.md section 2
 
 
-## Fights every squad of [param state] against every group in reach, with [param rng];
+## Fights every squad of [param state] against every group in reach, then the sentry guns
+## (SentryRules), with [param rng];
 ## returns the groups that fought.
 static func fight(state: GameState, rng: RandomNumberGenerator) -> Array[IntruderGroup]:
 	var engaged: Array[IntruderGroup] = []
@@ -23,6 +24,9 @@ static func fight(state: GameState, rng: RandomNumberGenerator) -> Array[Intrude
 			_exchange(state, squad, group, rng)
 			if not engaged.has(group):
 				engaged.append(group)
+	for group: IntruderGroup in SentryRules.fight(state, rng):
+		if not engaged.has(group):
+			engaged.append(group)
 	return engaged
 
 

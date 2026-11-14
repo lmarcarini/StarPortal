@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="InstallationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/installation_def.gd" id="1"]
+
+; docs/content/m4c-incursions.md section 6: sentry gun, any room but corridors, $250k, 1 day.
+[resource]
+script = ExtResource("1")
+name_key = &"INSTALLATION_SENTRY_NAME"
+effect_key = &"INSTALLATION_SENTRY_EFFECT"
+hosts = Array[StringName]([])
+requires_research = &"automated_defence"
+cost_k = 250
+build_ticks = 1440
+max_per_host = 1
+health = 15
+effects = Array[Resource]([])
+id = &"installation_sentry_gun"

@@ -31,6 +31,7 @@ combat_roll_min = 0.75
 combat_roll_max = 1.25
 defender_reduction = 0.25
 combat_reach_cells = 3
+sentry_attack = 3.0
 overrun_ticks = 30
 shutdown_days = 7
 bankruptcy_days = 30
