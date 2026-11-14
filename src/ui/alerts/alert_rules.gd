@@ -126,9 +126,13 @@ static func _artefact_alerts(state: GameState) -> Array[AlertEntry]:
 	return found
 
 
-## The Shutdown and Bankruptcy countdowns (M4c-14).
+## The incursion (M4c-11) and the Shutdown and Bankruptcy countdowns (M4c-14).
 static func _failure_alerts(state: GameState, found: Array[AlertEntry]) -> void:
 	var now: int = state.clock.tick
+	if state.incursion.is_active():
+		var alarm := AlertEntry.create(&"incursion", AlertEntry.ALARM, ViewSwitcher.BASE, now)
+		alarm.sub_tab = &"security"
+		found.append(alarm)
 	var shutdown: int = FailureRules.shutdown_left(state)
 	if shutdown >= 0:
 		var entry := AlertEntry.create(
