@@ -39,6 +39,8 @@ var debug_flag_button := Button.new()
 var row := HFlowContainer.new()
 ## The drop-down list of alerts under the alerts button.
 var alert_list := AlertList.new()
+## The incursion strip and alarm look (M4c-11).
+var alarm_strip := AlarmStrip.new()
 
 var _state: GameState = null
 
@@ -66,6 +68,7 @@ func _init() -> void:
 		item.custom_minimum_size.y = _ITEM_HEIGHT
 		row.add_child(item)
 	_connect_items()
+	row.add_child(alarm_strip)
 	alert_list.top_level = true
 	add_child(alert_list)
 	alert_list.changed.connect(_show_alert_count)
@@ -191,6 +194,7 @@ func _on_alert_chosen(entry: AlertEntry) -> void:
 func _refresh_live() -> void:
 	power_readout.show_state(_state)
 	gate_chip.show_state(_state)
+	alarm_strip.show_state(_state)
 
 
 static func _redraw_signals() -> Array[StringName]:
@@ -209,6 +213,9 @@ static func _redraw_signals() -> Array[StringName]:
 		&"incoming_answered",
 		&"incoming_ignored",
 		&"game_loaded",
+		&"incursion_warning",
+		&"incursion_breached",
+		&"incursion_ended",
 	]
 
 

@@ -262,7 +262,8 @@ func _process(delta: float) -> void:
 	if simulation == null:
 		return
 	var clock: ClockState = simulation.state.clock
-	if not clock.is_paused and Settings.get_bool(&"display", &"ambient_movement"):
+	var alarm: bool = simulation.state.incursion.is_active()
+	if not clock.is_paused and not alarm and Settings.get_bool(&"display", &"ambient_movement"):
 		var factor: float = TokenWalker.SPEED_FACTORS[clampi(clock.speed_index, 0, 3)]
 		ambient.step(self, simulation.state, delta, factor)
 	if walker.step(_tokens, delta, clock.speed_index, clock.is_paused):

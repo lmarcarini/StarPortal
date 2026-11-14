@@ -29,6 +29,8 @@ var cursor: Vector2i = Vector2i.ZERO
 var view: ZoomPan = ZoomPan.new()
 ## The staff tokens over the plan.
 var staff_layer := StaffLayer.new()
+## Squads, intruders and the objective (M4c-11).
+var security_layer := SecurityLayer.new()
 ## The unassigned people, along the bottom of the plan.
 var tray := UnassignedTray.new()
 
@@ -42,6 +44,7 @@ var _progress: Dictionary = {}
 
 func _init() -> void:
 	add_child(staff_layer)
+	add_child(security_layer)
 	add_child(tray)
 	tray.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	tray.grow_vertical = Control.GROW_DIRECTION_BEGIN
