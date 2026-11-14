@@ -40,7 +40,15 @@ func validate(state: GameState) -> CommandResult:
 
 ## Pays in full and makes the project active from zero progress.
 func apply(state: GameState) -> void:
-	var def: ResearchDef = state.research_defs[project_id]
+	begin(state, project_id)
+
+
+## Pays for [param project] in full, makes it active from zero progress, drops it from the
+## queue and posts budget_changed and research_started (also used by the queue).
+static func begin(state: GameState, project: StringName) -> void:
+	var def: ResearchDef = state.research_defs[project]
+	var project_id: StringName = project
+	state.research.queue.erase(project_id)
 	state.budget.spend(def.cost_k)
 	state.research.active = project_id
 	state.research.ticks_done = 0

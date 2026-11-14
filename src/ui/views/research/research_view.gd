@@ -15,6 +15,8 @@ var _simulation: Simulation = null
 var _available: bool = false
 var _signature: int = 0
 
+var _queue := ResearchQueueBox.new()
+
 @onready var _board: ResearchBoard = %Board
 @onready var _panel: ResearchPanel = %Panel
 
@@ -24,6 +26,7 @@ func _ready() -> void:
 	_board.project_activated.connect(act)
 	_board.category_changed.connect(_on_category_changed)
 	_panel.action_pressed.connect(act)
+	_panel.get_parent().add_child(_queue)
 	visibility_changed.connect(_on_visibility_changed)
 
 
@@ -47,6 +50,7 @@ func setup(simulation: Simulation) -> void:
 	_available = false
 	_board.set_categories(categories())
 	_panel.show_notice("")
+	_queue.setup(simulation)
 	refresh()
 	_check_available()
 
@@ -83,6 +87,11 @@ func get_panel() -> ResearchPanel:
 	return _panel
 
 
+## Returns the research queue box.
+func get_queue() -> ResearchQueueBox:
+	return _queue
+
+
 ## Starts [param project_id], or cancels it when it is the running project; shows a refusal.
 func act(project_id: StringName) -> void:
 	if _simulation == null or project_id.is_empty():
@@ -106,6 +115,7 @@ func refresh() -> void:
 		shown = _first_project()
 	var def: ResearchDef = state.research_defs.get(shown)
 	_panel.show_project(state, def)
+	_queue.select(&"" if def == null else def.id)
 	_signature = _research_signature(state)
 
 
@@ -155,11 +165,13 @@ func _on_chosen(project_id: StringName) -> void:
 	if _simulation != null:
 		var def: ResearchDef = _simulation.state.research_defs.get(project_id)
 		_panel.show_project(_simulation.state, def)
+		_queue.select(project_id)
 
 
 func _connect_events(on: bool) -> void:
 	var signals: Array[Signal] = [
 		EventBus.research_started,
+		EventBus.research_queue_changed,
 		EventBus.research_cancelled,
 		EventBus.research_done,
 		EventBus.budget_changed,

@@ -39,6 +39,8 @@ func _samples() -> Array[Command]:
 		ChooseOptionCommand.new(2),
 		EndConversationCommand.new(),
 		HailCommand.new(),
+		QueueResearchCommand.new(&"lift_shaft", 1),
+		UnqueueResearchCommand.new(&"lift_shaft"),
 		HouseArtefactCommand.new(1, 2),
 		UnhouseArtefactCommand.new(1),
 		RetrieveArtefactCommand.new(1),
@@ -209,6 +211,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"paint_corridor",
 				&"place_room",
 				&"plan_expedition",
+				&"queue_research",
 				&"raise_world_fact",
 				&"raise_world_status",
 				&"read_console",
@@ -222,6 +225,7 @@ func test_defaults_are_registered_lazily() -> void:
 				&"switch_room",
 				&"unassign_staff",
 				&"unhouse_artefact",
+				&"unqueue_research",
 			]
 		)
 	)
@@ -269,6 +273,7 @@ func test_register_type_adds_a_type() -> void:
 				&"ping",
 				&"place_room",
 				&"plan_expedition",
+				&"queue_research",
 				&"raise_world_fact",
 				&"raise_world_status",
 				&"read_console",
@@ -282,6 +287,7 @@ func test_register_type_adds_a_type() -> void:
 				&"switch_room",
 				&"unassign_staff",
 				&"unhouse_artefact",
+				&"unqueue_research",
 			]
 		)
 	)
@@ -330,6 +336,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"paint_corridor",
 				&"place_room",
 				&"plan_expedition",
+				&"queue_research",
 				&"raise_world_fact",
 				&"raise_world_status",
 				&"read_console",
@@ -343,6 +350,7 @@ func test_reset_removes_registrations_and_restores_defaults() -> void:
 				&"switch_room",
 				&"unassign_staff",
 				&"unhouse_artefact",
+				&"unqueue_research",
 			]
 		)
 	)
