@@ -37,16 +37,33 @@ static func work_lab(simulation: Simulation, lab_def: StringName) -> bool:
 	return true
 
 
-## Starts the first project of [param order] not done yet when nothing runs and it may start.
-## True when it sent a command.
+## Starts the first project of [param order] not done yet when nothing runs and it may start;
+## while one runs, queues the next one in order (M4-31). True when it sent a command.
 static func work_research(simulation: Simulation, order: Array[StringName]) -> bool:
 	var state: GameState = simulation.state
 	if state.research.is_running():
-		return false
+		return _queue_next(simulation, order)
 	for project_id: StringName in order:
 		if state.research.is_done(project_id):
 			continue
 		var next := StartResearchCommand.create(project_id)
+		if not next.validate(state).is_ok:
+			return false
+		simulation.submit(next)
+		return true
+	return false
+
+
+## Queues the first project of [param order] that is neither done, running nor queued, when the
+## queue is empty and the project may be queued. True when it sent a command.
+static func _queue_next(simulation: Simulation, order: Array[StringName]) -> bool:
+	var state: GameState = simulation.state
+	if not state.research.queue.is_empty():
+		return false
+	for project_id: StringName in order:
+		if state.research.is_done(project_id) or state.research.active == project_id:
+			continue
+		var next := QueueResearchCommand.new(project_id)
 		if not next.validate(state).is_ok:
 			return false
 		simulation.submit(next)
