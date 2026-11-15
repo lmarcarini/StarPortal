@@ -100,7 +100,10 @@ static func contested(state: GameState, room_id: StringName) -> bool:
 static func _advance(state: GameState, group: IntruderGroup) -> void:
 	var room_id: StringName = group.target_room
 	var goal: Vector3i = ObjectiveRules.target_cell(state, room_id)
+	var before: Vector3i = group.pos()
 	if not walk_toward(state, group, goal):
+		if not room_id.is_empty() and _cut_off(state, group, before, goal):
+			group.target_room = &""
 		return
 	var objective: StringName = _objective(state) if not room_id.is_empty() else &"hold"
 	var needed: int = ObjectiveRules.WORK_TICKS.get(objective, ObjectiveRules.HOLD_GATE_TICKS)
@@ -108,6 +111,10 @@ static func _advance(state: GameState, group: IntruderGroup) -> void:
 		group.work_ticks = 0
 		return
 	group.work_ticks += 1
+	if needed < 0 and not state.outcome.enabled:
+		# With Failure states off an assault cannot win, so it holds as long as an Overrun
+		# would take and then leaves.
+		needed = state.balance.overrun_ticks
 	if needed < 0 or group.work_ticks < needed:
 		return
 	_complete(state, group, objective)
@@ -133,13 +140,26 @@ static func _complete(state: GameState, group: IntruderGroup, objective: StringN
 
 
 static func _retreat(state: GameState, group: IntruderGroup) -> void:
-	if not walk_toward(state, group, IncursionRules.gate_cell(state)):
+	var before: Vector3i = group.pos()
+	var gate: Vector3i = IncursionRules.gate_cell(state)
+	if not walk_toward(state, group, gate) and not _cut_off(state, group, before, gate):
 		return
 	for unit: UnitState in group.units:
 		if unit.carrying >= 0 and ArtefactRules.lose(state, unit.carrying):
 			_append(state.incursion.report, "lost", unit.carrying)
 	state.incursion.report["escaped"] = true
 	state.incursion.groups.erase(group)
+
+
+# True when [param group] did not move from [param before] and there is no way to [param goal]
+# even through sealed doors (the room is on a level the Ring cannot reach): it gives that goal
+# up instead of standing there for ever.
+static func _cut_off(
+	state: GameState, group: IntruderGroup, before: Vector3i, goal: Vector3i
+) -> bool:
+	if group.pos() != before:
+		return false
+	return BasePaths.walking_distance(state.base, before, goal, state.room_defs, true) < 0
 
 
 static func _wipe(state: GameState, group: IntruderGroup) -> void:
