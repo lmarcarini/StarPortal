@@ -55,7 +55,19 @@ static func state(balance: BalanceConfig = null, paused: bool = true) -> GameSta
 	PowerFixture.add_bank(game, CHARGE_RATE_MW)
 	game.power.stored_mwh = config.capacitor_bank_capacity_mwh
 	game.clock.is_paused = paused
+	give_moth_rack(game)
 	return game
+
+
+## Gives [param game] a built MOTH rack in its Gate Room with two MOTHs (M4c-20), as games
+## had before MOTHs were built to order.
+static func give_moth_rack(game: GameState) -> void:
+	for room: RoomState in game.base.rooms:
+		if room.def_id == StartingBase.GATE_ROOM_DEF:
+			var rack := InstallationState.new()
+			rack.def = MothRules.RACK_DEF
+			room.installations.append(rack)
+	game.probes.rack = MothRules.RACK_SIZE
 
 
 ## Returns a Simulation over [param game] with the real systems in tick order.

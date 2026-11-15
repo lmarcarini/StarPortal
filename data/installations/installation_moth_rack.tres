@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="InstallationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/installation_def.gd" id="1"]
+
+; docs/content/m4c-incursions.md section 6: MOTH rack (M4c-20): Gate Room, $150k, 12 hours; holds 2 MOTHs built to order.
+[resource]
+script = ExtResource("1")
+name_key = &"INSTALLATION_MOTH_RACK_NAME"
+effect_key = &"INSTALLATION_MOTH_RACK_EFFECT"
+hosts = Array[StringName]([&"room_gate"])
+requires_research = &"survey_drones"
+cost_k = 150
+build_ticks = 720
+max_per_host = 1
+health = 0
+effects = Array[Resource]([])
+id = &"installation_moth_rack"

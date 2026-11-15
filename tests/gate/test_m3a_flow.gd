@@ -58,6 +58,7 @@ func after_test() -> void:
 
 func test_first_threshold_team_and_a_rescue() -> void:
 	var player: M15Player = M15Player.new(SimClock.simulation)
+	preload("res://tests/gate/dial_fixture.gd").give_moth_rack(player.state())
 	assert_bool(player.state().clock.is_paused).is_true()
 	await _build_bank_from_gate_room(player)
 	await _lock_sill(player)

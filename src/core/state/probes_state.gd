@@ -16,7 +16,7 @@ var canister_ticks_left: int = 0
 ## The MOTH out, or null.
 var moth: MothRun = null
 ## MOTHs in the rack, ready to launch.
-var rack: int = MothRules.RACK_SIZE
+var rack: int = 0
 ## Arrival ticks of the replacements on order, earliest first.
 var reorders: Array[int] = []
 ## Photo documents the probes took, oldest first: {"world_id", "kind", "target_id", "tick"}.

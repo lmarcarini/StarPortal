@@ -71,7 +71,7 @@ Three ways to look, cheapest first. All need the wormhole open and are Ring acti
 | --- | --- | --- | --- |
 | Pole camera (M1.6, unchanged) | Free | 5 min | Horizon record: one photo, air, temperature, radiation; story documents on a world's first push |
 | Sample canister | $10k each, never runs out | 10 min | Biohazard (none, low, high) and a sample note |
-| MOTH drone | One from the rack; replacement $150k, 1 day | Up to 20 min | Scans (below), threat estimate, scan targets |
+| MOTH drone | One from the rack; replacement $150k, 1 day (since M4c: researched, rack installed, each MOTH ordered — m4c-incursions.md section 6) | Up to 20 min | Scans (below), threat estimate, scan targets |
 
 **Sample canister.** A tethered canister is thrown through and reeled back after 10 minutes
 with soil and water. It fills the **Biohazard** field, the one thing the pole camera's sampling

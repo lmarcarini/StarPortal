@@ -248,7 +248,9 @@ func _show_moth(state: GameState) -> void:
 	_moth_button.disabled = not is_ok
 	_moth_button.focus_mode = Control.FOCUS_ALL if is_ok else Control.FOCUS_NONE
 	var note: String = tr(&"GATE_WORMHOLE_MOTH_RACK").format({"count": state.probes.rack})
-	if state.probes.is_moth_out():
+	if not MothRules.has_rack(state):
+		note = tr(&"GATE_WORMHOLE_MOTH_NO_RACK")
+	elif state.probes.is_moth_out():
 		note = tr(&"GATE_WORMHOLE_MOTH_OUT")
 	elif state.probes.rack <= 0:
 		note = tr(&"GATE_WORMHOLE_MOTH_EMPTY")

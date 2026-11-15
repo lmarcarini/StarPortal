@@ -123,3 +123,5 @@ RESEARCH_THE_SHUTTER_NAME,The Shutter,O Obturador
 RESEARCH_THE_SHUTTER_LINE,"A barrier over the Ring, installed in the Gate Room: nothing comes through while it is closed.","Uma barreira sobre o Anel, instalada na Sala do Portal: nada passa enquanto estiver fechada."
 RESEARCH_AUTOMATED_DEFENCE_NAME,Automated defence,Defesa automatizada
 RESEARCH_AUTOMATED_DEFENCE_LINE,Sentry guns for rooms and plating for blast doors.,Torretas para salas e blindagem para portas.
+RESEARCH_SURVEY_DRONES_NAME,Survey drones,Drones de reconhecimento
+RESEARCH_SURVEY_DRONES_LINE,"Unlocks the MOTH rack for the Gate Room; each MOTH is then built to order.","Libera o suporte de MOTH na Sala do Portal; cada MOTH é construído sob encomenda."

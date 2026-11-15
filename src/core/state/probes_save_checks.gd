@@ -67,8 +67,8 @@ static func _rack_errors(data: Dictionary, is_moth_out: bool) -> Array[String]:
 		return found
 	var rack_count: int = type_convert(rack, TYPE_INT)
 	var total: int = rack_count + reorder_list.size() + (1 if is_moth_out else 0)
-	if total != MothRules.RACK_SIZE:
-		found.append("not exactly %d MOTHs in the rack, out and on order" % MothRules.RACK_SIZE)
+	if total > MothRules.RACK_SIZE:
+		found.append("more than %d MOTHs in the rack, out and on order" % MothRules.RACK_SIZE)
 	return found
 
 

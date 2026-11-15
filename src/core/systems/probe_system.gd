@@ -1,18 +1,17 @@
 class_name ProbeSystem
 extends SimSystem
-## Moves the probes each tick, after GateSystem and DocumentSystem: replacement MOTHs arrive in
-## the rack; the sample canister is reeled back with the world's Biohazard after
-## CANISTER_TICKS ticks, or lost when the wormhole to its world closes first; the MOTH's
-## running scan drains its battery a minute a tick and, when done, rolls a seeded loss by the
+## Moves the probes each tick, after GateSystem and DocumentSystem: MOTHs built to order (M4c-20; a
+## lost one is not replaced) arrive in the rack; the sample canister is reeled back with the world's
+## Biohazard after CANISTER_TICKS ticks, or lost when the wormhole to its world closes first; the
+## MOTH's running scan drains its battery a minute a tick and, when done, rolls a seeded loss by the
 ## world's true threat (doubled for a Close look) before giving its result (MothScanEffects).
-## [br][br]
-## A run ends when the drone is recalled (back in the rack), shot down (finished scans kept,
-## threat confidence one step up, to FAIR at most), left without battery for a recall, or cut
-## off by the wormhole closing. Every end makes the world PROBED; every loss orders a
-## replacement automatically ($150k, charged even into debt like upkeep, arriving in a day).
-## Events: canister_returned(world id, biohazard), canister_lost(world id),
-## moth_scan_finished(scan, target id), moth_recalled(world id), moth_lost(world id, reason:
-## &"shot_down", &"battery" or &"wormhole_closed"), moth_delivered(rack count), budget_changed.
+## [br][br] A run ends when the drone is recalled (back in the rack), shot down (finished scans
+## kept, threat confidence one step up, to FAIR at most), left without battery for a recall, or cut
+## off by the wormhole closing. Every end makes the world PROBED; every loss orders a replacement
+## automatically ($150k, charged even into debt like upkeep, arriving in a day). Events:
+## canister_returned(world id, biohazard), canister_lost(world id), moth_scan_finished(scan, target
+## id), moth_recalled(world id), moth_lost(world id, reason: &"shot_down", &"battery" or
+## &"wormhole_closed"), moth_delivered(rack count), budget_changed.
 ## Bible: docs/content/m3-beyond-the-ring.md section 2 (Probes; losses)
 
 ## Id of the system and of its random stream.
@@ -120,9 +119,6 @@ func _end_run(state: GameState, loss: StringName) -> void:
 				MothScanEffects.SOURCE
 			)
 		)
-	state.budget.funds_k -= MothRules.REORDER_COST_K
-	state.probes.reorders.append(state.clock.tick + MothRules.REORDER_TICKS)
-	state.events.post(&"budget_changed", [state.budget.funds_k])
 	state.events.post(&"moth_lost", [world_id, loss])
 
 

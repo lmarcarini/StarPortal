@@ -22,6 +22,8 @@ func get_type() -> StringName:
 ## Rejects a Ring with no open wormhole (&"no_wormhole"), a MOTH already out (&"moth_busy")
 ## and an empty rack (&"rack_empty").
 func validate(state: GameState) -> CommandResult:
+	if not MothRules.has_rack(state):
+		return CommandResult.fail(&"no_rack")
 	if state.gate.mode != GateState.RingMode.LOCKED:
 		return CommandResult.fail(&"no_wormhole")
 	if state.probes.is_moth_out():

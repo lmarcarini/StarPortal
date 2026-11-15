@@ -39,6 +39,7 @@ var _artefacts_button := Button.new()
 var _artefacts_box := PanelContainer.new()
 var _artefacts := ArtefactPanel.new()
 var _shutter := ShutterControl.new()
+var _moth_order := MothOrderControl.new()
 
 @onready var _console: DialConsole = %DialConsole
 @onready var _gauge: CapacitorGauge = %CapacitorGauge
@@ -68,10 +69,15 @@ func _ready() -> void:
 	_incoming.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	add_child(_incoming)
 	_add_artefacts()
-	_shutter.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	_shutter.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_shutter.position.x -= AddressBookDrawer.TAB_WIDTH + 16
-	add_child(_shutter)
+	var controls := VBoxContainer.new()
+	controls.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	controls.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	controls.offset_right = -AddressBookDrawer.TAB_WIDTH - 16
+	controls.offset_top = 16
+	controls.alignment = BoxContainer.ALIGNMENT_END
+	controls.add_child(_shutter)
+	controls.add_child(_moth_order)
+	add_child(controls)
 	_moth.changed.connect(_on_moth_changed)
 
 
@@ -104,6 +110,7 @@ func setup(simulation: Simulation) -> void:
 	_incoming.setup(simulation)
 	_artefacts.setup(simulation)
 	_shutter.setup(simulation)
+	_moth_order.setup(simulation)
 	_show_artefacts_button()
 
 

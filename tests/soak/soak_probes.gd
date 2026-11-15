@@ -43,6 +43,8 @@ static func work(simulation: Simulation) -> bool:
 		if _try(simulation, LaunchCanisterCommand.new()):
 			return true
 	if not state.probes.is_moth_out():
+		if state.probes.rack == 0 and MothRules.owned(state) < MothRules.RACK_SIZE:
+			return _try(simulation, OrderMothCommand.new())
 		return _try(simulation, LaunchMothCommand.new())
 	for command: MothScanCommand in _scans(state, world_id):
 		if _try(simulation, command):
