@@ -62,6 +62,7 @@ const VALUES: Dictionary = {
 		&"base_level_up": {},
 		&"base_level_down": {},
 		&"base_energy_layer": {},
+		&"dialog_continue": {},
 		&"dialog_choice_1": {},
 		&"dialog_choice_2": {},
 		&"dialog_choice_3": {},

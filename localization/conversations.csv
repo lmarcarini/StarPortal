@@ -31,3 +31,10 @@ CONV_OSSAR_HAIL_1,This ring is watched by the Ossar.,[EN] This ring is watched b
 CONV_OSSAR_HAIL_2,Close it and do not return.,[EN] Close it and do not return.
 CONV_OSSAR_DEMAND_1,Earth. Your ring is loud.,[EN] Earth. Your ring is loud.
 CONV_OSSAR_DEMAND_2,Keep it shut for five days or we will answer.,[EN] Keep it shut for five days or we will answer.
+DIALOG_BASE_ON_HOLD,BASE ON HOLD,BASE EM ESPERA
+DIALOG_CHANNEL_RING,TRANSMISSION · RING · {world},TRANSMISSÃO · ANEL · {world}
+DIALOG_CHANNEL_INCOMING,INCOMING WORMHOLE · {world},BURACO DE MINHOCA RECEBIDO · {world}
+DIALOG_CHANNEL_PHONE,SECURE LINE · EARTH,LINHA SEGURA · TERRA
+DIALOG_YOU,YOU,VOCÊ
+DIALOG_STANDING,STANDING {value}  {attitude},POSIÇÃO {value}  {attitude}
+DIALOG_CONFIDENCE,CONFIDENCE {value},CONFIANÇA {value}
