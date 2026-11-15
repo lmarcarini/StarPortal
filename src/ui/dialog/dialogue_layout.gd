@@ -64,11 +64,8 @@ static func _left_column(screen: DialogueScreen, body: HBoxContainer) -> VBoxCon
 	var left := VBoxContainer.new()
 	left.add_theme_constant_override(&"separation", 12)
 	body.add_child(left)
-	var frame := StyleBoxFlat.new()
-	frame.bg_color = Color.BLACK
-	frame.border_color = UiPalette.RULE
-	frame.set_border_width_all(2)
-	screen.portrait_slot.add_theme_stylebox_override(&"panel", frame)
+	screen.portrait_slot.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	screen.portrait_slot.add_child(screen.portrait)
 	screen.portrait_slot.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	screen.portrait_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	left.add_child(screen.portrait_slot)

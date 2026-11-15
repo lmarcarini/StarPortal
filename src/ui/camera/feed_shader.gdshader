@@ -1,11 +1,14 @@
 // Security camera look: the low-resolution feed upscaled with scanlines, grain and a slight
-// bloom on bright parts. Bible: docs/content/interface-pass.md sections 1 and 2
+// bloom on bright parts. The dialogue screen's video link adds a slow rolling band (roll > 0).
+// Bible: docs/content/interface-pass.md sections 1 and 2, docs/content/dialogue-screen.md
+// section 3
 shader_type canvas_item;
 
 uniform float scanline_strength : hint_range(0.0, 1.0) = 0.25;
 uniform float grain_strength : hint_range(0.0, 0.3) = 0.06;
 uniform float bloom : hint_range(0.0, 1.0) = 0.25;
 uniform float lines = 240.0;
+uniform float roll : hint_range(0.0, 1.0) = 0.0;
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
@@ -21,6 +24,8 @@ void fragment() {
 	float line = 0.5 + 0.5 * sin(UV.y * lines * 3.14159 * 2.0);
 	colour *= 1.0 - scanline_strength * (1.0 - line);
 	colour += (hash(UV * 512.0 + floor(TIME * 18.0)) - 0.5) * grain_strength;
+	float band = fract(UV.y - TIME * 0.12);
+	colour *= 1.0 + roll * 0.12 * smoothstep(0.0, 0.04, band) * (1.0 - smoothstep(0.04, 0.1, band));
 	float grey = dot(colour, vec3(0.299, 0.587, 0.114));
 	COLOR = vec4(mix(colour, vec3(grey), 0.35), 1.0);
 }
