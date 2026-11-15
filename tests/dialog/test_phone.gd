@@ -68,6 +68,6 @@ func test_hang_up_is_cut_off() -> void:
 	_simulation.submit(AnswerCallCommand.new())
 	_simulation.advance_tick()
 	assert_bool(_simulation.submit(EndConversationCommand.new()).is_ok).is_true()
-	_simulation.advance_tick()
+	assert_bool(_simulation.submit(AdvanceConversationCommand.new()).is_ok).is_true()
 	assert_object(_state.conversations.active).is_null()
 	assert_bool(_state.conversations.transcripts[0].cut_off).is_true()

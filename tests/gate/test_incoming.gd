@@ -80,13 +80,16 @@ func test_answer_locks_without_drain_and_starts() -> void:
 	assert_str(String(_state.conversations.active.channel)).is_equal("incoming")
 	assert_array(_state.factions.met).contains([KINDRED])
 	assert_array(_state.gate.dial_log).is_empty()
+	assert_int(_state.clock.mode).is_equal(ClockState.Mode.HELD)
+	ConversationDriver.play(_state, [1])
+	assert_int(_state.clock.mode).is_equal(ClockState.Mode.RUNNING)
 	_state.power.stored_mwh = 0.0
 	_ticks(3)
 	assert_int(_state.gate.mode).is_equal(GateState.RingMode.LOCKED)
 	_ticks(_state.balance.max_open_ticks)
 	assert_int(_state.gate.mode).is_equal(GateState.RingMode.IDLE)
 	assert_str(String(_state.gate.incoming_faction)).is_empty()
-	assert_bool(_state.conversations.transcripts[0].cut_off).is_true()
+	assert_bool(_state.conversations.transcripts[0].cut_off).is_false()
 
 
 func test_ignore_command() -> void:

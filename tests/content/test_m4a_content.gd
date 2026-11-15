@@ -40,14 +40,7 @@ func test_every_path_reaches_the_end() -> void:
 			var state: GameState = _new_game()
 			state.gate.mode = GateState.RingMode.LOCKED
 			assert_bool(ConversationRules.start(state, def.id, def.channels[0], &"")).is_true()
-			var answers: Array = path.duplicate()
-			while state.conversations.active != null:
-				var node: ConversationNodeDef = ConversationRules.current_node(state)
-				if node.kind == ConversationNodeDef.Kind.LINE:
-					ConversationRules.arrive(state, node.next)
-				else:
-					var answer: int = answers.pop_front()
-					ConversationRules.choose(state, answer)
+			ConversationDriver.play(state, path)
 			var record: TranscriptRecord = state.conversations.transcripts[-1]
 			assert_bool(record.cut_off).override_failure_message(String(def.id)).is_false()
 
@@ -67,8 +60,7 @@ func test_briefing_effects() -> void:
 	var state: GameState = _new_game()
 	var books: int = state.address_book.entries.size()
 	ConversationRules.start(state, &"conv_committee_briefing", &"phone", &"")
-	while state.conversations.active != null:
-		ConversationRules.arrive(state, ConversationRules.current_node(state).next)
+	ConversationDriver.play(state)
 	assert_int(state.address_book.entries.size()).is_equal(books + 2)
 	assert_str(String(state.requests.items[0].request)).is_equal("request_survey_hearth")
 

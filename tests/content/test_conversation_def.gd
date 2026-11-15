@@ -47,7 +47,7 @@ func _conversation(nodes: Array[ConversationNodeDef]) -> ConversationDef:
 func test_fixture_loads_every_node_kind() -> void:
 	var conversation: ConversationDef = _load()
 	assert_int(conversation.nodes.size()).is_equal(4)
-	assert_int(conversation.node(&"hello").minutes).is_equal(2)
+	assert_int(conversation.node(&"hello").kind).is_equal(ConversationNodeDef.Kind.LINE)
 	assert_int(conversation.node(&"ask").kind).is_equal(ConversationNodeDef.Kind.CHOICE)
 	assert_bool(conversation.node(&"ask").choices[0].show_locked).is_true()
 	assert_int(conversation.node(&"end_good").effects.size()).is_equal(1)
@@ -78,12 +78,6 @@ func test_graph_errors() -> void:
 	var no_start: ConversationDef = _conversation(good)
 	no_start.start = &"x"
 	assert_array(ConversationGraph.errors(no_start)).contains(["start 'x' is not a node"])
-	var zero: ConversationNodeDef = _line(&"a", &"z")
-	zero.minutes = 0
-	var zero_nodes: Array[ConversationNodeDef] = [zero, _end(&"z")]
-	assert_array(ConversationGraph.errors(_conversation(zero_nodes))).contains(
-		["line 'a' needs at least 1 minute"]
-	)
 
 
 func test_choice_needs_a_free_answer() -> void:

@@ -1,19 +1,23 @@
 class_name ConversationRules
 extends RefCounted
-## Rules of the one running conversation: start one, list the choices at a Choice node, move
-## to a node (applying its effects), pick a choice, end it (finished or cut off) and choose the
-## best conversation to start for a faction, channel and world. Called only from commands and
-## ConversationSystem. A conversation slows the clock (the conversation reason) while it
-## runs; the player may still pause.
-## Bible: docs/content/m4-core-systems.md section 3
+## Rules of the one running conversation: start one, move it on (advance), list the choices at
+## a Choice node, move to a node (applying its effects), pick a choice, end the link (by the
+## story or cut off), close it and choose the best conversation to start for a faction, channel
+## and world. Called only from commands and ConversationSystem. The clock is held (hold
+## [constant HOLD]) from the start until the player closes the ended conversation: no tick
+## runs while the player talks (docs/content/dialogue-screen.md section 2).
+## Bible: docs/content/m4-core-systems.md section 3, docs/content/dialogue-screen.md
+## sections 2 and 7
 
 ## Channels that run over the open wormhole (cut off when it closes).
 const WORMHOLE_CHANNELS: Array[StringName] = [&"wormhole", &"incoming"]
+## The clock hold reason while a conversation is open.
+const HOLD: StringName = &"conversation"
 
 
 ## Starts [param conversation_id] on [param channel] at [param world_id]: refuses (false) when
-## one is running or the id is unknown. Slows the clock (conversation), posts
-## conversation_started and arrives at the start node.
+## one is running or the id is unknown. Holds the clock, posts conversation_started and waits
+## in OPENING for the player to advance to the start node.
 static func start(
 	state: GameState, conversation_id: StringName, channel: StringName, world_id: StringName
 ) -> bool:
@@ -25,11 +29,61 @@ static func start(
 	active.channel = channel
 	active.world = world_id
 	active.started_tick = state.clock.tick
+	active.phase = ActiveConversation.Phase.OPENING
 	state.conversations.active = active
-	SlowRules.sync(state)
+	TimeControl.add_hold(state.clock, HOLD)
 	state.events.post(&"conversation_started", [conversation_id, channel])
-	arrive(state, def.start)
 	return true
+
+
+## Why advancing is refused, or &"" when allowed: &"no_conversation", or &"needs_choice" at a
+## choice.
+static func advance_error(state: GameState) -> StringName:
+	var active: ActiveConversation = state.conversations.active
+	if active == null:
+		return &"no_conversation"
+	if active.phase == ActiveConversation.Phase.CHOICE:
+		return &"needs_choice"
+	return &""
+
+
+## Moves the conversation on (checked with advance_error first): OPENING to the start node, a
+## Line to its next node, ENDED closes it.
+static func advance(state: GameState) -> void:
+	var active: ActiveConversation = state.conversations.active
+	match active.phase:
+		ActiveConversation.Phase.OPENING:
+			arrive(state, active_def(state).start)
+		ActiveConversation.Phase.LINE:
+			var node: ConversationNodeDef = current_node(state)
+			if node == null:
+				end_link(state, true)
+				return
+			arrive(state, node.next)
+		ActiveConversation.Phase.ENDED:
+			finish(state, active.cut_off)
+
+
+## Ends the link without closing the screen: the phase becomes ENDED ([param cut_off] true for
+## signal lost) and conversation_over is posted. Nothing when none runs or it already ended.
+static func end_link(state: GameState, cut_off: bool) -> void:
+	var active: ActiveConversation = state.conversations.active
+	if active == null or active.phase == ActiveConversation.Phase.ENDED:
+		return
+	active.phase = ActiveConversation.Phase.ENDED
+	active.cut_off = cut_off
+	state.events.post(&"conversation_over", [cut_off])
+
+
+## Settles a conversation loaded from a save migrated from v21 (which saved every phase as
+## LINE): a running one standing at a Choice node is put at CHOICE.
+static func settle_loaded(state: GameState) -> void:
+	var active: ActiveConversation = state.conversations.active
+	if active == null or active.phase != ActiveConversation.Phase.LINE:
+		return
+	var node: ConversationNodeDef = current_node(state)
+	if node != null and node.kind == ConversationNodeDef.Kind.CHOICE:
+		active.phase = ActiveConversation.Phase.CHOICE
 
 
 ## The running conversation's definition, or null.
@@ -98,7 +152,8 @@ static func choose(state: GameState, index: int) -> void:
 
 
 ## Moves to [param node_id]: adds it to the path, applies a Line's effects and posts its line,
-## posts the choices of a Choice, and finishes at an End (applying its effects).
+## posts the choices of a Choice, and ends the link at an End (applying its effects; an End
+## marked signal_lost ends it as cut off).
 static func arrive(state: GameState, node_id: StringName) -> void:
 	var active: ActiveConversation = state.conversations.active
 	var def: ConversationDef = active_def(state)
@@ -108,19 +163,21 @@ static func arrive(state: GameState, node_id: StringName) -> void:
 	active.path.append([node_id, -1])
 	match node.kind:
 		ConversationNodeDef.Kind.LINE:
+			active.phase = ActiveConversation.Phase.LINE
 			StoryRules.apply_all(state, node.effects, def.id)
 			state.events.post(&"conversation_line", [node_id])
 		ConversationNodeDef.Kind.CHOICE:
+			active.phase = ActiveConversation.Phase.CHOICE
 			state.events.post(&"conversation_choices", [])
 		ConversationNodeDef.Kind.END:
 			StoryRules.apply_all(state, node.effects, def.id)
-			finish(state, false)
+			end_link(state, node.signal_lost)
 
 
-## Ends the running conversation: records the transcript (listed unread in the Archive), counts
-## the run, marks a once-only
-## conversation used and posts conversation_ended. A cut-off one applies no End effects.
-## Returns the transcript uid, or −1 when none was running.
+## Closes the running conversation: records the transcript (listed unread in the Archive),
+## counts the run, marks a once-only conversation used, releases the clock hold and posts
+## conversation_ended. A cut-off one applies no End effects. Returns the transcript uid, or −1
+## when none was running.
 static func finish(state: GameState, cut_off: bool) -> int:
 	var active: ActiveConversation = state.conversations.active
 	if active == null:
@@ -144,6 +201,7 @@ static func finish(state: GameState, cut_off: bool) -> int:
 	if def != null and def.once and not state.factions.used.has(conversation_id):
 		state.factions.used.append(conversation_id)
 	state.conversations.active = null
+	TimeControl.release_hold(state.clock, HOLD)
 	state.events.post(&"conversation_ended", [record.uid, cut_off])
 	return record.uid
 

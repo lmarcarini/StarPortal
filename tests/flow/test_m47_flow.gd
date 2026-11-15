@@ -1,6 +1,7 @@
 ## The M4.7 flow end to end at 10× cruise: dial (slow), lock and operate (slow), pole camera,
-## Stand by (10×), a waiting call (slow), answer it (slow), hang up (10×), an incoming wormhole
-## that expires (10×), and an override during a waiting call. The cruise speed never changes.
+## Stand by (10×), a waiting call (slow), answer it (the clock is held, M4.8-02), hang up and
+## close (10×), an incoming wormhole that expires (10×), and an override during a waiting
+## call. The cruise speed never changes.
 ## Bible: docs/content/event-time.md
 extends GdUnitTestSuite
 
@@ -66,12 +67,17 @@ func test_event_time_flow() -> void:
 	assert_int(_state.gate.mode).is_equal(GateState.RingMode.LOCKED)
 	RingControl.close(_state.gate)
 	_run(1)
-	# A waiting call slows; answering keeps it slow; hanging up gives 10× back.
+	# A waiting call slows; answering holds the clock (M4.8-02); hanging up and closing gives
+	# 10× back, running.
 	_call(99999)
 	assert_int(_speed()).is_equal(SLOW)
+	var tick: int = _state.clock.tick
 	_do(AnswerCallCommand.new())
-	assert_int(_speed()).is_equal(SLOW)
+	assert_int(_state.clock.mode).is_equal(ClockState.Mode.HELD)
+	assert_int(_state.clock.tick).is_equal(tick)
 	_do(EndConversationCommand.new())
+	_do(AdvanceConversationCommand.new())
+	assert_int(_state.clock.mode).is_equal(ClockState.Mode.RUNNING)
 	assert_int(_speed()).is_equal(CRUISE)
 	# An incoming wormhole waits (slow) and expires: 10×.
 	_state.gate.incoming_faction = &"faction_kindred"

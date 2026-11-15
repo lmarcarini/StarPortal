@@ -204,6 +204,9 @@ signal conversation_started(conversation_id: StringName, channel: StringName)
 signal conversation_line(node_id: StringName)
 ## Emitted when the running conversation waits at a choice (outbox).
 signal conversation_choices
+## Emitted when the running conversation's link ends (its End, or cut off when [param cut_off]);
+## the screen stays until the player closes it (outbox).
+signal conversation_over(cut_off: bool)
 ## Emitted when a conversation ends, with its transcript uid and whether it was cut off (outbox).
 signal conversation_ended(transcript_uid: int, cut_off: bool)
 ## Emitted when a hail gets no answer, with the world id (outbox; logged "No answer.").

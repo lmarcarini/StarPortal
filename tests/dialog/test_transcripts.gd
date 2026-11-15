@@ -18,11 +18,11 @@ func before_test() -> void:
 func _finish(choice: int, cut_off: bool) -> TranscriptRecord:
 	ConversationRules.start(_state, ConversationTests.CONV, &"wormhole", &"")
 	if cut_off:
-		ConversationRules.finish(_state, true)
+		ConversationRules.advance(_state)
+		ConversationRules.end_link(_state, true)
+		ConversationRules.advance(_state)
 	else:
-		for node: StringName in [&"l2", &"l3", &"ask"]:
-			ConversationRules.arrive(_state, node)
-		ConversationRules.choose(_state, choice)
+		ConversationDriver.play(_state, [choice])
 	return _state.conversations.transcripts[-1]
 
 

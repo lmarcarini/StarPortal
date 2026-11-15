@@ -1,6 +1,7 @@
 ## Tests for the conversation panel (M4-13): it opens on a start, adds lines as they arrive,
-## shows answers (locked ones greyed with a reason), picks by click and by keys 1-4, shows
-## "(signal lost)" on a cut-off, fits the right third, and never changes the state itself.
+## shows answers (locked ones greyed with a reason), picks by click and by keys 1-4, Continue
+## moves on and becomes Close at the end (M4.8-02), shows "(signal lost)" on a cut-off, fits
+## the right third, and never changes the state itself.
 ## Bible: docs/content/m4-core-systems.md section 3
 extends GdUnitTestSuite
 
@@ -35,12 +36,12 @@ func after_test() -> void:
 
 func _start() -> void:
 	ConversationRules.start(_state, ConversationTests.CONV, &"wormhole", &"")
-	_simulation.advance_tick()
+	_advance()
 
 
-func _ticks(count: int) -> void:
+func _advance(count: int = 1) -> void:
 	for index: int in count:
-		_simulation.advance_tick()
+		_simulation.submit(AdvanceConversationCommand.new())
 
 
 func test_opens_and_adds_lines() -> void:
@@ -48,8 +49,10 @@ func test_opens_and_adds_lines() -> void:
 	_start()
 	assert_bool(_panel.visible).is_true()
 	assert_int(_panel.get_line_texts().size()).is_equal(1)
-	_ticks(6)
+	assert_bool(_panel.get_continue_button().visible).is_true()
+	_advance(3)
 	assert_int(_panel.get_line_texts().size()).is_equal(3)
+	assert_bool(_panel.get_continue_button().visible).is_false()
 	var buttons: Array[Button] = _panel.get_choice_buttons()
 	assert_int(buttons.size()).is_equal(2)
 	assert_bool(buttons[0].disabled).is_true()
@@ -57,34 +60,42 @@ func test_opens_and_adds_lines() -> void:
 	assert_str(buttons[1].text).starts_with("2. ")
 
 
-func test_click_chooses_and_signal_lost() -> void:
+func test_continue_moves_on_and_closes() -> void:
 	_start()
-	_ticks(6)
-	_state.clock.mode = ClockState.Mode.PAUSED
+	_panel.get_continue_button().pressed.emit()
+	assert_str(String(_state.conversations.active.node)).is_equal("l2")
+	_advance(2)
 	_panel.get_choice_buttons()[1].pressed.emit()
-	assert_object(_state.conversations.active).is_null()
 	assert_array(_panel.get_choice_buttons()).is_empty()
-	ConversationRules.start(_state, ConversationTests.CONV, &"wormhole", &"")
+	assert_str(_panel.get_continue_button().text).is_equal("CONV_CLOSE")
+	assert_bool(_panel.visible).is_true()
+	_panel.get_continue_button().pressed.emit()
+	assert_object(_state.conversations.active).is_null()
+	assert_bool(_panel.visible).is_false()
+
+
+func test_signal_lost() -> void:
+	_start()
 	_state.gate.mode = GateState.RingMode.IDLE
-	_state.clock.mode = ClockState.Mode.RUNNING
-	_ticks(1)
+	ConversationSystem.new().tick(_state)
+	_simulation.submit(EndConversationCommand.new())  # Refused (already ended); drains events.
 	assert_str(_panel.get_line_texts()[-1]).is_equal("(signal lost)")
+	assert_str(_panel.get_continue_button().text).is_equal("CONV_CLOSE")
 
 
 func test_number_key_chooses() -> void:
 	_start()
-	_ticks(6)
-	_state.clock.mode = ClockState.Mode.PAUSED
+	_advance(3)
 	var first := InputEventAction.new()
 	first.action = &"dialog_choice_1"
 	first.pressed = true
 	_panel._unhandled_input(first)
-	assert_object(_state.conversations.active).is_not_null()
+	assert_int(_state.conversations.active.phase).is_equal(ActiveConversation.Phase.CHOICE)
 	var second := InputEventAction.new()
 	second.action = &"dialog_choice_2"
 	second.pressed = true
 	_panel._unhandled_input(second)
-	assert_object(_state.conversations.active).is_null()
+	assert_int(_state.conversations.active.phase).is_equal(ActiveConversation.Phase.ENDED)
 
 
 func test_fits_the_right_third_and_reads_only() -> void:

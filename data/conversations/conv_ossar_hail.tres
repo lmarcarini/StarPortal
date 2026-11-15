@@ -9,7 +9,6 @@ script = ExtResource("2")
 id = &"l1"
 speaker_key = &"CONV_SPEAKER_OSSAR"
 text_key = &"CONV_OSSAR_HAIL_1"
-minutes = 2
 next = &"l2"
 
 [sub_resource type="Resource" id="r2"]
@@ -17,7 +16,6 @@ script = ExtResource("2")
 id = &"l2"
 speaker_key = &"CONV_SPEAKER_OSSAR"
 text_key = &"CONV_OSSAR_HAIL_2"
-minutes = 2
 next = &"end"
 
 [sub_resource type="Resource" id="r3"]

@@ -29,12 +29,12 @@ func test_current_version_is_pass_through() -> void:
 	assert_dict(result.value).is_equal(data)
 
 
-## The target is 21 (M4c) and the oldest loadable version 15 (the M3 clean break), with one
+## The target is 22 (M4.8) and the oldest loadable version 15 (the M3 clean break), with one
 ## step from 15.
-func test_target_version_is_twenty_one() -> void:
-	assert_int(SaveMigrator.TARGET_VERSION).is_equal(21)
+func test_target_version_is_twenty_two() -> void:
+	assert_int(SaveMigrator.TARGET_VERSION).is_equal(22)
 	assert_int(SaveMigrator.OLDEST_VERSION).is_equal(15)
-	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([15, 16, 17, 18, 19, 20])
+	assert_array(SaveMigrator.built_in_steps().keys()).is_equal([15, 16, 17, 18, 19, 20, 21])
 
 
 ## A v15 save of a real game migrates to v16 with empty M4 sections and then validates.
@@ -52,7 +52,7 @@ func test_v15_save_migrates_to_v16() -> void:
 	var result: Result = SaveMigrator.migrate(v15)
 	assert_bool(result.is_ok).is_true()
 	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(21)
+	assert_int(migrated["format_version"]).is_equal(22)
 	var state: Dictionary = migrated["state"]
 	assert_array(GameState.validate_dict(state)).is_empty()
 	assert_dict(state["requests"]).is_equal({"items": [], "next_uid": 0})

@@ -35,6 +35,7 @@ func start(new_simulation: Simulation) -> void:
 		return
 	simulation = new_simulation
 	simulation.pause_requested.connect(_on_pause_requested)
+	simulation.clock_mode_changed.connect(_on_clock_mode_changed)
 	EventBus.bind_simulation(simulation)
 
 
@@ -45,6 +46,7 @@ func stop() -> void:
 	if simulation == null:
 		return
 	simulation.pause_requested.disconnect(_on_pause_requested)
+	simulation.clock_mode_changed.disconnect(_on_clock_mode_changed)
 	EventBus.bind_simulation(null)
 	simulation = null
 
@@ -221,3 +223,11 @@ func _warn_cap_once(due: int) -> void:
 ## becomes PAUSED.
 func _on_pause_requested(reason: StringName) -> void:  # gdlint: ignore=unused-argument
 	pause()
+
+
+## The simulation changed the mode itself (a conversation hold): tells the views.
+func _on_clock_mode_changed(before: ClockState.Mode, mode: ClockState.Mode) -> void:
+	EventBus.time_mode_changed.emit(mode)
+	var was_paused: bool = before != ClockState.Mode.RUNNING
+	if was_paused != (mode != ClockState.Mode.RUNNING):
+		EventBus.paused_changed.emit(not was_paused)

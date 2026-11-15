@@ -26,7 +26,6 @@ script = ExtResource("3")
 id = &"l1"
 speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
 text_key = &"CONV_KINDRED_RETURN_1"
-minutes = 2
 effects = Array[Resource]([SubResource("r2"), SubResource("r3")])
 next = &"ask"
 
@@ -67,7 +66,6 @@ script = ExtResource("3")
 id = &"end_thanks"
 speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
 text_key = &"CONV_KINDRED_RETURN_THANKS"
-minutes = 2
 next = &"end"
 
 [sub_resource type="Resource" id="r12"]

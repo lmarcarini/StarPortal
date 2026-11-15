@@ -11,6 +11,9 @@ signal command_rejected(type: StringName, code: StringName)
 ## Emitted when a system asks the clock to pause, e.g. &"incoming_wormhole". Systems and
 ## commands ask by posting [constant PAUSE_EVENT] with [code][reason][/code].
 signal pause_requested(reason: StringName)
+## Emitted when a command or a tick changed the clock's time-control mode (a conversation
+## holds it and releases it), with the mode before and the new mode.
+signal clock_mode_changed(before: ClockState.Mode, mode: ClockState.Mode)
 ## Emitted once per domain event drained from [code]state.events[/code], in posting order:
 ## at the end of each tick, and after a command that applied at once while paused.
 ## [constant PAUSE_EVENT] is emitted as [signal pause_requested] instead. Just before an
@@ -61,19 +64,29 @@ func submit(command: Command) -> CommandResult:
 	if state.outcome.has_failed():
 		return CommandResult.fail(&"game_over")
 	var applies_now: bool = state.clock.is_paused
+	var mode_before: ClockState.Mode = state.clock.mode
 	var result: CommandResult = commands.submit(command, state)
 	if applies_now:
+		_emit_mode_change(mode_before)
 		_emit_events()
 	return result
 
 
 ## Runs one tick (none once the game is lost, M4c-14): flush commands, tick each system,
 ## advance the clock, run the day hooks and emit day_started when the new tick starts a day,
-## then emit the tick's events last.
+## then emit the tick's events last. A flushed command that holds the clock (a conversation
+## starts) ends the tick there: no system runs and the tick does not advance. No tick runs at
+## all while a conversation holds the clock (docs/content/dialogue-screen.md section 2), even
+## one asked for by hand (tools, tests).
 func advance_tick() -> void:
-	if state.outcome.has_failed():
+	if state.outcome.has_failed() or state.clock.holds.has(ConversationRules.HOLD):
 		return
+	var mode_before: ClockState.Mode = state.clock.mode
 	commands.flush(state)
+	if state.clock.mode == ClockState.Mode.HELD and mode_before != ClockState.Mode.HELD:
+		_emit_mode_change(mode_before)
+		_emit_events()
+		return
 	for system: SimSystem in _systems:
 		system.tick(state)
 	SlowRules.sync(state)
@@ -81,7 +94,13 @@ func advance_tick() -> void:
 	var new_tick: int = state.clock.tick
 	if TimeMath.is_day_start(new_tick):
 		_start_day(new_tick)
+	_emit_mode_change(mode_before)
 	_emit_events()
+
+
+func _emit_mode_change(mode_before: ClockState.Mode) -> void:
+	if state.clock.mode != mode_before:
+		clock_mode_changed.emit(mode_before, state.clock.mode)
 
 
 func _start_day(new_tick: int) -> void:

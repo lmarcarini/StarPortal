@@ -8,12 +8,11 @@ extends RefCounted
 ## Bible: docs/content/event-time.md section 2
 
 ## Reasons sync() owns: all of them.
-const OWNED: Array[StringName] = [
-	&"conversation", &"awaiting_answer", &"dialling", &"gate_ops", &"incursion"
-]
+const OWNED: Array[StringName] = [&"awaiting_answer", &"dialling", &"gate_ops", &"incursion"]
 
 
-## The slow keys [param state] wants now from conversations and waiting items.
+## The slow keys [param state] wants now from waiting items (a conversation holds the clock
+## instead; docs/content/dialogue-screen.md section 2).
 static func wanted(state: GameState) -> Array[StringName]:
 	var keys: Array[StringName] = []
 	if state.incursion.is_active():
@@ -22,8 +21,6 @@ static func wanted(state: GameState) -> Array[StringName]:
 		keys.append(TimeControl.slow_key(&"dialling"))
 	if state.gate.operating:
 		keys.append(TimeControl.slow_key(&"gate_ops"))
-	if state.conversations.active != null:
-		keys.append(TimeControl.slow_key(&"conversation"))
 	if state.gate.has_incoming():
 		keys.append(TimeControl.slow_key(&"awaiting_answer", &"incoming"))
 	for contact: PendingContact in state.factions.pending:

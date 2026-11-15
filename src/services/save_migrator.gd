@@ -13,7 +13,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 21
+const TARGET_VERSION: int = 22
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
 const OLDEST_VERSION: int = 15
 
@@ -27,7 +27,8 @@ static func built_in_steps() -> Dictionary[int, Callable]:
 		17: _v17_to_v18,
 		18: _v18_to_v19,
 		19: _v19_to_v20,
-		20: _v20_to_v21
+		20: _v20_to_v21,
+		21: _v21_to_v22
 	}
 	return built_in
 
@@ -133,6 +134,35 @@ static func _v20_to_v21(data: Dictionary) -> Dictionary:
 				{"def": "installation_moth_rack", "build_ticks_left": 0, "paid_k": 0, "health": 0}
 			)
 			room["installations"] = items
+	return out
+
+
+## v22 (M4.8-02, docs/content/dialogue-screen.md section 7): a conversation holds the clock
+## instead of slowing it. A running conversation gets a phase (LINE; GameSetup puts one at a
+## choice at CHOICE), no cut-off and the conversation hold; the old conversation slow goes.
+static func _v21_to_v22(data: Dictionary) -> Dictionary:
+	var out: Dictionary = data.duplicate(true)
+	if not out.get("state") is Dictionary:
+		return out
+	var state: Dictionary = out["state"]
+	var clock: Dictionary = SaveFields.dict_or_empty(state.get("clock"))
+	for key: String in ["slows", "overridden"]:
+		if clock.get(key) is Array:
+			var keys: Array = clock[key]
+			clock[key] = keys.filter(func(entry: Variant) -> bool: return entry != "conversation")
+	var conversations: Dictionary = SaveFields.dict_or_empty(state.get("conversations"))
+	var active: Dictionary = SaveFields.dict_or_empty(conversations.get("active"))
+	if active.is_empty():
+		return out
+	active["phase"] = "line"
+	active["cut_off"] = false
+	if clock.get("holds") is Array and not clock.is_empty():
+		var holds: Array = clock["holds"]
+		if holds.is_empty():
+			clock["mode_after_hold"] = "running" if clock.get("mode") == "running" else "paused"
+			clock["mode"] = "held"
+		if not holds.has("conversation"):
+			holds.append("conversation")
 	return out
 
 
