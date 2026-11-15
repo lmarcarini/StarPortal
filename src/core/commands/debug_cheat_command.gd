@@ -20,6 +20,9 @@ const ACTIONS: Array[StringName] = [
 	&"grant_artefact",
 	&"unlock_all_research",
 	&"heal_all",
+	&"incursion",
+	&"skip_warning",
+	&"clear_intruders",
 ]
 
 ## Test hook: overrides whether cheats are on (-1 uses CheatRules.enabled()).
@@ -81,6 +84,8 @@ func validate(state: GameState) -> CommandResult:
 			known = state.artefact_defs.has(id)
 		&"add_staff":
 			known = String(id).begins_with("role_")
+		&"incursion":
+			known = state.incursion_defs.has(id)
 	return CommandResult.ok() if known else CommandResult.fail(&"unknown_id")
 
 
@@ -107,6 +112,15 @@ func apply(state: GameState) -> void:
 			CheatRules.unlock_all_research(state)
 		&"heal_all":
 			CheatRules.heal_all(state)
+		&"incursion":
+			IncursionRules.start(state, id)
+		&"skip_warning":
+			if state.incursion.phase == IncursionState.Phase.WARNING:
+				state.incursion.countdown = 1
+		&"clear_intruders":
+			for group: IntruderGroup in state.incursion.groups:
+				for unit: UnitState in group.units:
+					unit.health = 0
 	state.events.post(&"debug_cheat", [action, id, value])
 
 

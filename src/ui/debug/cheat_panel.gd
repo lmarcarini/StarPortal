@@ -19,6 +19,9 @@ const _BUTTONS: Array[Array] = [
 	["Grant artefact (id)", &"grant_artefact", 0],
 	["Unlock all research", &"unlock_all_research", 0],
 	["Heal all", &"heal_all", 0],
+	["Incursion (id, e.g. incursion_test_sabotage)", &"incursion", 0],
+	["Skip the warning", &"skip_warning", 0],
+	["Down all intruders", &"clear_intruders", 0],
 ]
 
 ## The id input (role, faction or artefact) and the value input.

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="IncursionDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/incursion_def.gd" id="1"]
+
+; docs/content/m4c-incursions.md sections 5 and 6: test incursion (sabotage).
+[resource]
+script = ExtResource("1")
+faction = &"faction_ossar"
+group_units = Array[StringName]([&"unit_raider"])
+group_counts = Array[int]([4])
+objective = &"sabotage"
+warning_ticks = 30
+breaches_shutter = false
+id = &"incursion_test_sabotage"
