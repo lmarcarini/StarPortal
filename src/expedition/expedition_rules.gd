@@ -51,7 +51,7 @@ static func plan_error(state: GameState, plan: ExpeditionState, team: Dictionary
 static func objective_error(state: GameState, plan: ExpeditionState) -> StringName:
 	match plan.objective:
 		ExpeditionState.Objective.SURVEY:
-			if not state.worlds.has_reached(plan.world_id, WorldsState.WorldStatus.PROBED):
+			if not state.worlds.has_reached(plan.world_id, WorldsState.WorldStatus.LOCKED):
 				return NOT_PROBED
 		ExpeditionState.Objective.RECOVER:
 			if not state.worlds.targets.is_recoverable(plan.world_id, plan.target_id):
@@ -111,3 +111,33 @@ static func open_ticks_left(state: GameState) -> int:
 		return by_time
 	var by_charge: int = floori(state.power.stored_mwh / (-net_mw / PowerMath.TICKS_PER_HOUR))
 	return mini(by_time, by_charge)
+
+
+## True when a Survey of [param plan] in [param state] would go in blind (M4c-22): the world
+## is Locked but was never Probed.
+static func is_blind(state: GameState, plan: ExpeditionState) -> bool:
+	if plan.objective != ExpeditionState.Objective.SURVEY:
+		return false
+	return not state.worlds.has_reached(plan.world_id, WorldsState.WorldStatus.PROBED)
+
+
+## The facts the run of [param state] rolls its risks against: the world's, with the threat
+## one step higher (capped at HIGH) on a blind run.
+static func risk_facts(state: GameState) -> WorldFacts:
+	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, state.expedition.world_id)
+	if facts == null or not state.expedition.blind:
+		return facts
+	var copy: WorldFacts = _copy(facts)
+	var steps: int = state.balance.blind_threat_steps
+	copy.threat = mini(facts.threat + steps, WorldDef.Threat.HIGH) as WorldDef.Threat
+	return copy
+
+
+static func _copy(facts: WorldFacts) -> WorldFacts:
+	var copy := WorldFacts.new()
+	for property: Dictionary in facts.get_property_list():
+		var usage: int = property["usage"]
+		var name: String = property["name"]
+		if usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
+			copy.set(name, facts.get(name))
+	return copy

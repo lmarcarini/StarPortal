@@ -46,13 +46,10 @@ func test_locked_before_the_unlock_and_not_research() -> void:
 		assert_str(String(def.id)).not_contains("infirmary")
 
 
-func test_first_probed_world_unlocks() -> void:
+func test_first_locked_world_unlocks() -> void:
 	_system.tick(_game)
 	assert_bool(ExpeditionUnlock.is_unlocked(_game)).is_false()
 	_game.worlds.statuses[&"world_x"] = WorldsState.WorldStatus.LOCKED
-	_system.tick(_game)
-	assert_bool(ExpeditionUnlock.is_unlocked(_game)).is_false()
-	_game.worlds.statuses[&"world_x"] = WorldsState.WorldStatus.PROBED
 	_system.tick(_game)
 	assert_bool(ExpeditionUnlock.is_unlocked(_game)).is_true()
 	assert_bool(_game.flags[ExpeditionUnlock.FLAG]).is_true()

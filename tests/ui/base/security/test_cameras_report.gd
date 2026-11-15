@@ -61,3 +61,13 @@ func test_report_lines_and_log() -> void:
 	var entries: Array[LogEntry] = LogRules.entries_for(&"incursion_ended", [report], _state, 5)
 	assert_str(String(entries[0].kind)).is_equal("incursion")
 	assert_str(ArchiveLogRow.line_for(entries[0], _state)).contains("did what they came for")
+
+
+func test_the_log_entry_survives_a_save() -> void:
+	var report: Dictionary = {
+		"def": "incursion_test", "outcome": "done", "damaged": ["room_3"], "lost": [1]
+	}
+	var entry: LogEntry = LogRules.entries_for(&"incursion_ended", [report], _state, 5)[0]
+	var saved: Dictionary = JSON.parse_string(JSON.stringify(entry.to_dict()))
+	assert_array(LogEntry.validate_dict(saved)).is_empty()
+	assert_str("\n".join(AfterActionText.lines(entry.args, _state))).contains("Artefacts lost: 1")

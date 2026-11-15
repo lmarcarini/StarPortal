@@ -64,8 +64,9 @@ func test_injured_member_refused() -> void:
 
 
 func test_objectives_need_their_world_state() -> void:
-	_state.worlds.statuses[Fixture.WORLD_ID] = WorldsState.WorldStatus.LOCKED
+	_state.worlds.statuses.erase(Fixture.WORLD_ID)
 	assert_str(_error(Fixture.survey(_state))).is_equal("world_not_probed")
+	_state.worlds.statuses[Fixture.WORLD_ID] = WorldsState.WorldStatus.LOCKED
 	assert_str(_error(Fixture.recover(_state))).is_equal("target_not_recoverable")
 	WorldProgress.raise_target(
 		_state, Fixture.WORLD_ID, Fixture.ANCHOR_ID, TargetStates.State.RECOVERABLE

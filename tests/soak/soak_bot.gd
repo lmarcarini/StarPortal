@@ -152,14 +152,15 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 			simulation.submit(PowerFixture.build_first_bank(state))
 			installs += 1
 		return
-	if charge_sets == 0:
+	var starved: bool = state.power.charge_rates.values().max() == 0
+	if charge_sets == 0 or (starved and PowerRules.spare_mw(state) >= 1.0):
 		_set_full_charge(simulation)
 		return
 	var gate: GateState = state.gate
 	if gate.mode == GateState.RingMode.LOCKED:
 		_work_wormhole(simulation, rng)
 		return
-	if gate.mode != GateState.RingMode.IDLE:
+	if gate.mode != GateState.RingMode.IDLE or gate.has_incoming() or state.incursion.is_active():
 		return
 	if _picked == null:
 		_pick_address(state, rng)
@@ -177,9 +178,8 @@ func _work_ring(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 		dials += 1
 
 
-## On an open wormhole: operates or stands by at random (SoakGateOps); reads an unread console, else
-## extends the camera for a record not taken yet, else, with the camera in, closes the wormhole once
-## it has been open CLOSE_AFTER_TICKS.
+## On an open wormhole: operates or stands by (SoakGateOps); reads the console, extends the
+## camera for a new record, else closes after CLOSE_AFTER_TICKS.
 func _work_wormhole(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	SoakGateOps.work(simulation, rng)
 	var state: GameState = simulation.state

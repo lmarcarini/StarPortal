@@ -198,7 +198,7 @@ func _assert_daily_settlement(player: M15Player) -> void:
 		player.step()
 	var funds: int = state.budget.funds_k
 	var allocation: int = 50 + state.committee.whole()
-	var owed: int = (190 + 10 + 60) + 145 + state.committee.cost_carry
+	var owed: int = (190 + 10 + 60) + StaffRules.salaries_k(state) + state.committee.cost_carry
 	player.step()
 	assert_int(state.budget.funds_k).is_equal(funds + allocation - owed / 30)
 	assert_int(state.committee.cost_carry).is_equal(owed % 30)

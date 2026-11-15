@@ -71,6 +71,10 @@ const BALANCE_ID: StringName = &"balance"
 @export var combat_reach_cells: int = 3
 ## A sentry gun's attack per tick (M4c-21).
 @export var sentry_attack: float = 3.0
+## Blind expeditions (M4c-22): threat steps added to risk rolls, and days the first check-in
+## comes later.
+@export var blind_threat_steps: int = 1
+@export var blind_check_in_delay_days: int = 1
 ## Failure states (M4c): ticks intruders must hold the Control Room for an Overrun; days in a
 ## row at Confidence 0 and in the red for Shutdown and Bankruptcy; and whether those two end
 ## the game (owner decision 2026-11-14: they only warn for now).

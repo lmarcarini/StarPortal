@@ -87,7 +87,7 @@ static func entries_for(
 			var report: Dictionary = (
 				args[0] if not args.is_empty() and args[0] is Dictionary else {}
 			)
-			return [LogEntry.create(tick, &"incursion", &"", report)]
+			return [LogEntry.create(tick, &"incursion", &"", _log_safe(report))]
 		&"team_sent", &"team_returned":
 			return [_trip_entry(event_name, args, tick)]
 		ExpeditionSystem.PROLOGUE_EVENT:
@@ -110,7 +110,7 @@ static func entries_for(
 static func _trip_entry(event_name: StringName, args: Array, tick: int) -> LogEntry:
 	var saved: int = type_convert(args[1], TYPE_INT)
 	var objective: int = clampi(saved, 0, ExpeditionState.OBJECTIVE_NAMES.size() - 1)
-	var team: Array = args[-1]
+	var team: Array = args[2] if event_name == &"team_sent" else args[-1]
 	var details: Dictionary = {
 		"reason": "departed" if event_name == &"team_sent" else "returned",
 		"objective": ExpeditionState.OBJECTIVE_NAMES[objective],
@@ -118,6 +118,8 @@ static func _trip_entry(event_name: StringName, args: Array, tick: int) -> LogEn
 	}
 	if event_name == &"team_returned":
 		details["success"] = args[2] == true
+	if event_name == &"team_sent" and args.size() > 3 and args[3] == true:
+		details["blind"] = true
 	return LogEntry.create(tick, &"expedition", StringName(str(args[0])), details)
 
 
@@ -269,3 +271,21 @@ static func _last_lock_world(state: GameState) -> StringName:
 ## The first argument as text, or empty when there is none.
 static func _text(args: Array) -> String:
 	return str(args[0]) if args.size() >= 1 else ""
+
+
+## [param report] with its lists of names joined into one string (Log args hold only strings,
+## bools, whole numbers and lists of whole numbers).
+static func _log_safe(report: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for key: Variant in report:
+		var value: Variant = report[key]
+		if value is Array:
+			var parts: PackedStringArray = []
+			for item: Variant in value:
+				parts.append(str(item))
+			out[key] = ", ".join(parts)
+		elif value is float:
+			out[key] = type_convert(value, TYPE_INT)
+		else:
+			out[key] = value
+	return out

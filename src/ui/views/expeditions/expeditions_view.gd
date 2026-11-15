@@ -13,6 +13,8 @@ extends GameView
 
 var _simulation: Simulation = null
 var _available: bool = false
+## The world a blind Survey was warned about; Ready team again on it sends it.
+var _blind_confirmed: StringName = &""
 
 @onready var _sheet: ExpeditionPlanSheet = %Sheet
 @onready var _trip: ExpeditionTripPanel = %Trip
@@ -94,6 +96,16 @@ func refresh() -> void:
 func ready_team() -> void:
 	if _simulation == null:
 		return
+	var draft: ExpeditionPlanDraft = _sheet.get_draft()
+	var probed: bool = _simulation.state.worlds.has_reached(
+		draft.world_id, WorldsState.WorldStatus.PROBED
+	)
+	var blind: bool = draft.objective == ExpeditionState.Objective.SURVEY and not probed
+	if blind and _blind_confirmed != draft.world_id:
+		_blind_confirmed = draft.world_id
+		_sheet.show_refusal(tr(&"EXPEDITION_BLIND_WARNING"))
+		return
+	_blind_confirmed = &""
 	var result: CommandResult = _simulation.submit(_sheet.get_draft().to_command())
 	refresh()
 	if not result.is_ok:

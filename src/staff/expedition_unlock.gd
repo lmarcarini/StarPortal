@@ -1,13 +1,13 @@
 class_name ExpeditionUnlock
 extends RefCounted
-## The Expeditions unlock and the Directorate's lent soldiers
-## (docs/content/m3-beyond-the-ring.md section 4; owner decision 3 in section 9). When the first
-## world is Probed (or an expedition card calls [method unlock]), the game sets the
-## [constant FLAG] flag, the Infirmary joins the Base build palette (not research) and the
-## Directorate lends Maj. Ruth Adair and Sgt Owen Hale: soldiers of skill 3, on base at once,
-## with no bed and a normal salary. A lent soldier lost ([method lose_person]) is replaced 7 days
-## later ([method lend_due]), with a Log line. Changes only the GameState it is given: call it
-## from Command.apply() or SimSystem.tick() (StaffCareSystem), or from a test.
+## The Expeditions unlock and the Directorate's lent soldiers (docs/content/m3-beyond-the-ring.md
+## section 4; owner decision 3 in section 9). When the first world is Locked (M4c-22; it was Probed
+## before) (or an expedition card calls [method unlock]), the game sets the [constant FLAG] flag,
+## the Infirmary joins the Base build palette (not research) and the Directorate lends Maj. Ruth
+## Adair and Sgt Owen Hale: soldiers of skill 3, on base at once, with no bed and a normal salary. A
+## lent soldier lost ([method lose_person]) is replaced 7 days later ([method lend_due]), with a Log
+## line. Changes only the GameState it is given: call it from Command.apply() or SimSystem.tick()
+## (StaffCareSystem), or from a test.
 ## Bible: docs/content/m3-beyond-the-ring.md sections 4 and 9
 
 ## Flag set (true) once Expeditions are unlocked; expedition cards read it through
@@ -34,12 +34,12 @@ static func is_unlocked(state: GameState) -> bool:
 	return state.flags.get(FLAG, false) == true
 
 
-## True when [param state] should unlock now: not yet unlocked and some world Probed.
+## True when [param state] should unlock now: not yet unlocked and some world Locked.
 static func is_due(state: GameState) -> bool:
 	if is_unlocked(state):
 		return false
 	for world_id: StringName in state.worlds.statuses:
-		if state.worlds.has_reached(world_id, WorldsState.WorldStatus.PROBED):
+		if state.worlds.has_reached(world_id, WorldsState.WorldStatus.LOCKED):
 			return true
 	return false
 

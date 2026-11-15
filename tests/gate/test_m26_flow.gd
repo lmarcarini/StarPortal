@@ -10,6 +10,9 @@
 ## docs/content/m26-staff-and-money.md sections 2 to 7, docs/content/m27-daily-rhythm.md
 extends GdUnitTestSuite
 
+## Salaries after the hire, with the two lent soldiers (M4c-22).
+const SALARIES_WITH_LENT: int = 235
+
 const M15Player := preload("res://tests/gate/m15_player.gd")
 const UiInput := preload("res://tests/ui/fixtures/ui_input.gd")
 const SWITCHER_SCENE: String = "res://src/ui/views/view_switcher.tscn"
@@ -230,8 +233,9 @@ func _settle_to_february(player: M15Player) -> void:
 		changes[cause.cause] = cause.change
 	assert_int(changes.get(ConfidenceRules.LOCKED, 0)).is_equal(ConfidenceRules.LOCK_CHANGE)
 	assert_int(changes.get(ConfidenceRules.RESEARCH, 0)).is_equal(ConfidenceRules.RESEARCH_CHANGE)
-	assert_int(StaffRules.headcount(state)).is_equal(6)
-	assert_int(StaffRules.salaries_k(state)).is_equal(175)
+	# Two soldiers are lent when the first world is locked (M4c-22).
+	assert_int(StaffRules.headcount(state)).is_equal(8)
+	assert_int(StaffRules.salaries_k(state)).is_equal(SALARIES_WITH_LENT)
 	assert_int(state.committee.whole()).is_greater(50)
 
 
