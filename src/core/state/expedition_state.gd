@@ -60,6 +60,10 @@ var missed_tick: int = -1
 var signal_tick: int = -1
 ## Documents teams brought back, oldest first.
 var documents: Array[Dictionary] = []
+## Blind run (M4c-22): a Survey sent to a world never probed. Its risk rolls read the threat
+## one step higher and its first check-in comes delay_ticks later. Optional when loading.
+var blind: bool = false
+var delay_ticks: int = 0
 
 
 ## Field days of the planned objective.
@@ -94,7 +98,7 @@ func check_in_ticks() -> Array[int]:
 	if mode != Mode.AWAY:
 		return ticks
 	for day: int in range(1, days() + 1):
-		ticks.append(departed_tick + day * TimeMath.TICKS_PER_DAY)
+		ticks.append(departed_tick + delay_ticks + day * TimeMath.TICKS_PER_DAY)
 	return ticks
 
 
@@ -102,7 +106,7 @@ func check_in_ticks() -> Array[int]:
 func next_day_end_tick() -> int:
 	if mode != Mode.AWAY:
 		return -1
-	return departed_tick + (day_results.size() + 1) * TimeMath.TICKS_PER_DAY
+	return departed_tick + delay_ticks + (day_results.size() + 1) * TimeMath.TICKS_PER_DAY
 
 
 ## Sets the plan, replacing any earlier one.
@@ -128,6 +132,8 @@ func clear() -> void:
 	departed_tick = -1
 	day_results.clear()
 	recalled = false
+	blind = false
+	delay_ticks = 0
 	missed_tick = -1
 	signal_tick = -1
 
@@ -156,6 +162,8 @@ func to_dict() -> Dictionary:
 		"missed_tick": missed_tick,
 		"signal_tick": signal_tick,
 		"documents": documents.duplicate(true),
+		"blind": blind,
+		"delay_ticks": delay_ticks,
 	}
 
 
@@ -179,6 +187,9 @@ static func from_dict(data: Dictionary) -> ExpeditionState:
 		for result: Variant in result_list:
 			expedition.day_results.append(str(result))
 	expedition.recalled = data.get("recalled", false) == true
+	expedition.blind = data.get("blind", false) == true
+	var delay: int = type_convert(data.get("delay_ticks", 0), TYPE_INT)
+	expedition.delay_ticks = maxi(0, delay)
 	expedition.missed_tick = type_convert(data.get("missed_tick", -1), TYPE_INT)
 	expedition.signal_tick = type_convert(data.get("signal_tick", -1), TYPE_INT)
 	var documents_data: Variant = data.get("documents", [])

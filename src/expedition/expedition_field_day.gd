@@ -20,7 +20,7 @@ const FINDING: String = "finding"
 ## [param state]'s expedition, drawn with [param rng], the expedition's seeded generator.
 static func resolve(state: GameState, _day: int, rng: RandomNumberGenerator) -> String:
 	var plan: ExpeditionState = state.expedition
-	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, plan.world_id)
+	var facts: WorldFacts = ExpeditionRules.risk_facts(state)
 	if facts == null:
 		return ExpeditionState.DAY_OK
 	var def: FieldEventDef = FieldEvents.draw(plan.objective, facts, rng)

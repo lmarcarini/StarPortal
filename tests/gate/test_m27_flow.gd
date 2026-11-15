@@ -217,7 +217,7 @@ func _hire(player: M15Player, candidate_id: StringName) -> void:
 	assert_str(hire.text).is_equal("Hire (fee %s)" % MoneyLabel.format_k(fee))
 	var funds: int = player.state().budget.funds_k
 	await UiInput.click(hire)
-	assert_int(player.state().staff.people.size()).is_equal(6)
+	assert_int(player.state().staff.people.size()).is_equal(8)
 	assert_str(player.state().staff.people.back().name).is_equal(candidate.name)
 	assert_int(player.state().budget.funds_k).is_equal(funds - fee)
 

@@ -110,7 +110,7 @@ static func entries_for(
 static func _trip_entry(event_name: StringName, args: Array, tick: int) -> LogEntry:
 	var saved: int = type_convert(args[1], TYPE_INT)
 	var objective: int = clampi(saved, 0, ExpeditionState.OBJECTIVE_NAMES.size() - 1)
-	var team: Array = args[-1]
+	var team: Array = args[2] if event_name == &"team_sent" else args[-1]
 	var details: Dictionary = {
 		"reason": "departed" if event_name == &"team_sent" else "returned",
 		"objective": ExpeditionState.OBJECTIVE_NAMES[objective],
@@ -118,6 +118,8 @@ static func _trip_entry(event_name: StringName, args: Array, tick: int) -> LogEn
 	}
 	if event_name == &"team_returned":
 		details["success"] = args[2] == true
+	if event_name == &"team_sent" and args.size() > 3 and args[3] == true:
+		details["blind"] = true
 	return LogEntry.create(tick, &"expedition", StringName(str(args[0])), details)
 
 

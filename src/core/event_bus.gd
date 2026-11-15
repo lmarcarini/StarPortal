@@ -91,8 +91,9 @@ signal moth_delivered(rack: int)
 ## Emitted when an expedition is planned, with the world id (posted through the outbox).
 signal expedition_planned(world_id: StringName)
 ## Emitted when a team goes through the Ring, with the world id, the objective
-## (ExpeditionState.Objective) and the team's names in slot order (posted through the outbox).
-signal team_sent(world_id: StringName, objective: int, team: Array)
+## (ExpeditionState.Objective), the team's names in slot order and whether it goes in blind
+## (M4c-22) (posted through the outbox).
+signal team_sent(world_id: StringName, objective: int, team: Array, blind: bool)
 ## Emitted when a team comes home, with the world id, its ExpeditionState.Objective and whether
 ## the objective succeeded, and the team's names in slot order (posted through the outbox).
 signal team_returned(world_id: StringName, objective: int, success: bool, team: Array)

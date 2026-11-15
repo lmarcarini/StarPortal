@@ -20,8 +20,13 @@ func before_test() -> void:
 	_player = M15Player.new(simulation)
 
 
+## The Log without the staff lines (the soldiers lent on the first lock, M4c-22).
 func _log() -> Array[LogEntry]:
-	return _player.state().operations_log.entries
+	var found: Array[LogEntry] = []
+	for entry: LogEntry in _player.state().operations_log.entries:
+		if entry.kind != &"staff":
+			found.append(entry)
+	return found
 
 
 func _kinds(from: int) -> Array[StringName]:

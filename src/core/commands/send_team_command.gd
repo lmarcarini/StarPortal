@@ -37,8 +37,13 @@ func apply(state: GameState) -> void:
 	state.expedition.mode = ExpeditionState.Mode.AWAY
 	state.expedition.departed_tick = state.clock.tick
 	var plan: ExpeditionState = state.expedition
+	plan.blind = ExpeditionRules.is_blind(state, plan)
+	plan.delay_ticks = (
+		state.balance.blind_check_in_delay_days * TimeMath.TICKS_PER_DAY if plan.blind else 0
+	)
 	state.events.post(
-		&"team_sent", [plan.world_id, plan.objective, ExpeditionSystem.team_names(state)]
+		&"team_sent",
+		[plan.world_id, plan.objective, ExpeditionSystem.team_names(state), plan.blind]
 	)
 
 

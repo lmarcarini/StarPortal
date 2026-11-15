@@ -137,6 +137,9 @@ procedural ones derive it. A later generator, 2D or 3D, reads the same scene.
 
 ## 3. Worlds
 
+*Since M4c (m4c-incursions.md section 6): a Survey may go to a world that is only Locked — a blind expedition, at more risk — and Expeditions unlock on the first lock.*
+
+
 | State | Reached by | Unlocks |
 | --- | --- | --- |
 | Unknown | (not stored) | Dial |

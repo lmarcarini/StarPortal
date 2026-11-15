@@ -17,11 +17,12 @@ var target_id: StringName = &""
 var team: Dictionary[String, StringName] = {}
 
 
-## The worlds a plan may go to in [param state]: those Probed or beyond, sorted by name.
+## The worlds a plan may go to in [param state]: those Locked or beyond (a Survey to one
+## never Probed goes in blind, M4c-22), sorted by name.
 static func worlds(state: GameState) -> Array[StringName]:
 	var ids: Array[StringName] = []
 	for world_id: StringName in WorldReportText.known_world_ids(state):
-		if state.worlds.has_reached(world_id, WorldsState.WorldStatus.PROBED):
+		if state.worlds.has_reached(world_id, WorldsState.WorldStatus.LOCKED):
 			ids.append(world_id)
 	return ids
 

@@ -92,7 +92,7 @@ static func _arrive(state: GameState, rng: RandomNumberGenerator) -> void:
 		if person != null:
 			members.append(person)
 	var days: int = (state.clock.tick - plan.missed_tick) / TimeMath.TICKS_PER_DAY
-	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, plan.world_id)
+	var facts: WorldFacts = ExpeditionRules.risk_facts(state)
 	if facts == null:
 		facts = WorldFacts.new()
 	var deceased: Array[StringName] = SurvivalRules.roll(members, facts, days, rng)

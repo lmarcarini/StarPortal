@@ -16,16 +16,20 @@ const _DOCUMENT_KEYS: Dictionary[String, StringName] = {
 }
 
 
-## "T-1  STILLWATER  Survey" for the planned or away team.
+## "T-1  STILLWATER  Survey" for the planned or away team; "BLIND  …" for a blind run.
 static func header(state: GameState) -> String:
 	var expedition: ExpeditionState = state.expedition
+	var tag: String = _tr(&"EXPEDITION_BLIND") + "  " if expedition.blind else ""
 	return (
-		_tr(&"EXPEDITION_TRIP_HEADER")
-		. format(
-			{
-				"world": AddressBookText.name_of_world(expedition.world_id, state),
-				"objective": ExpeditionText.objective_name(expedition.objective),
-			}
+		tag
+		+ (
+			_tr(&"EXPEDITION_TRIP_HEADER")
+			. format(
+				{
+					"world": AddressBookText.name_of_world(expedition.world_id, state),
+					"objective": ExpeditionText.objective_name(expedition.objective),
+				}
+			)
 		)
 	)
 

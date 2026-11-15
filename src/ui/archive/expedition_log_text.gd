@@ -28,19 +28,24 @@ static func line(args: Dictionary, world: String) -> String:
 	var key: StringName = LINE_KEYS.get(str(args.get("reason", "")), &"")
 	if key.is_empty():
 		return ""
+	var prefix: String = _tr(&"EXPEDITION_BLIND") + " " if args.get("blind", false) == true else ""
 	return (
-		_tr(key)
-		. format(
-			{
-				"world": world,
-				"name": str(args.get("name", "")),
-				"survivors": type_convert(args.get("survivors", 0), TYPE_INT),
-				"injuries": injuries(args),
-				"objective":
-				_tr(StringName("TEAM_OBJECTIVE_" + str(args.get("objective", "")).to_upper())),
-				"team": str(args.get("team", "")),
-				"day": _tr(StringName("TEAM_DAY_" + str(args.get("day", "finding")).to_upper())),
-			}
+		prefix
+		+ (
+			_tr(key)
+			. format(
+				{
+					"world": world,
+					"name": str(args.get("name", "")),
+					"survivors": type_convert(args.get("survivors", 0), TYPE_INT),
+					"injuries": injuries(args),
+					"objective":
+					_tr(StringName("TEAM_OBJECTIVE_" + str(args.get("objective", "")).to_upper())),
+					"team": str(args.get("team", "")),
+					"day":
+					_tr(StringName("TEAM_DAY_" + str(args.get("day", "finding")).to_upper())),
+				}
+			)
 		)
 	)
 
