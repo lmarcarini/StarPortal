@@ -33,6 +33,7 @@ const ACTIONS: Array[StringName] = [
 	&"base_level_up",
 	&"base_level_down",
 	&"base_energy_layer",
+	&"dialog_continue",
 	&"dialog_choice_1",
 	&"dialog_choice_2",
 	&"dialog_choice_3",
@@ -194,7 +195,18 @@ const DEFAULTS: Dictionary = {
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_P}],
 		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_BACK}],
 	},
-	# The conversation panel's answers 1 to 4 (a gamepad picks them by focus and (A)).
+	# The dialogue screen's Continue (M4.8-04). Space is time_toggle_pause's; the screen reads
+	# that action as Continue while it is up. Gamepad (A) presses the focused Continue key.
+	&"dialog_continue":
+	{
+		KEYBOARD:
+		[
+			{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_ENTER},
+			{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_KP_ENTER},
+		],
+		GAMEPAD: [],
+	},
+	# The dialogue screen's answers 1 to 4 (a gamepad picks them by focus and (A)).
 	&"dialog_choice_1":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_1}],

@@ -3,11 +3,11 @@ extends Control
 ## autosave on each new day, the Committee's messages, the game views under the top bar and,
 ## in debug builds only, the debug overlay and a button that submits a SetFlagCommand. It also
 ## hosts the rescue alert over the current tab (not modal) with its entry on the top bar's alert
-## stack, and shows each team check-in as a message that never pauses. Holds no game rules: it
-## reads state and sends commands.
+## stack, shows team check-ins and hosts the dialogue screen (M4.8) under the pause menu.
+## Holds no game rules: it reads state and sends commands.
 ## Bible: game-design.md#time-real-time-with-pause, game-design.md#core-loop,
 ## technical-architecture.md#architecture-overview,
-## docs/content/m3-beyond-the-ring.md sections 4 and 7
+## docs/content/m3-beyond-the-ring.md sections 4 and 7, docs/content/dialogue-screen.md
 
 ## Smallest window size the game supports, in pixels.
 const MIN_WINDOW_SIZE: Vector2i = Vector2i(1280, 720)
@@ -43,7 +43,7 @@ var _simulation: Simulation = null
 var _debug_flag_count: int = 0
 var _rescue_alert := RescueAlert.new()
 var _alert_stack := AlertStack.new()
-var _conversation := ConversationPanel.new()
+var _dialogue := DialogueScreen.new()
 
 ## The bar on every screen (docs/content/interface-pass.md section 3).
 @onready var top_bar: TopBar = %TopBar
@@ -78,11 +78,12 @@ func _ready() -> void:
 	log_strip.open_log.connect(ShellBoot.open_log.bind(view_switcher))
 	_toast_timer.timeout.connect(_toast.hide)
 	_add_alerts()
-	add_child(_conversation)
+	add_child(_dialogue)
 	_setup_debug_tools()
 	if DebugCheatCommand.cheats_on():
 		add_child(CheatPanel.new())
 	ShellBoot.add_pause_menu(self, pause_menu)
+	_dialogue.pause_menu = pause_menu
 	ShellBoot.add_game_over(self)
 	add_child(gate_focus)
 	gate_focus.attach(view_switcher)
@@ -210,9 +211,9 @@ func get_rescue_alert() -> RescueAlert:
 	return _rescue_alert
 
 
-## Returns the conversation panel.
-func get_conversation_panel() -> ConversationPanel:
-	return _conversation
+## Returns the dialogue screen.
+func get_dialogue_screen() -> DialogueScreen:
+	return _dialogue
 
 
 ## Returns the top bar's alert stack.
@@ -284,7 +285,7 @@ func _setup_debug_tools() -> void:
 func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
 	_rescue_alert.setup(simulation)
-	_conversation.setup(simulation)
+	_dialogue.bind(simulation)
 	var gate_room: GateRoomView = view_switcher.get_view(ViewSwitcher.GATE_ROOM) as GateRoomView
 	if gate_room != null:
 		top_bar.gate_chip.ring = gate_room.get_ring_view()
