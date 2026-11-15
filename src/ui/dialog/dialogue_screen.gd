@@ -34,8 +34,10 @@ const PASSED_ACTIONS: Array[StringName] = [
 
 ## The pause menu, when the shell has one: while it is open the screen takes no input.
 var pause_menu: PauseMenu = null
-## The square window the portrait goes in (a plain frame until M4.8-05).
+## The square slot the portrait window fills.
 var portrait_slot := PanelContainer.new()
+## The portrait of whoever is talking, through the video look (M4.8-05).
+var portrait := PortraitWindow.new()
 var name_plate := NamePlate.new()
 var transcript := TranscriptView.new()
 var answers := AnswerList.new()
@@ -165,11 +167,12 @@ func show_line(node: ConversationNodeDef, typed: bool = true) -> void:
 		var standing: String = ConversationText.standing(state, faction)
 		name_plate.show_speaker(speaker_name, accent, title, standing)
 	speaker_shown(speaker, node.mood)
+	portrait.set_talking(transcript.is_typing())
 
 
-## Hook for the portrait window (M4.8-05): [param speaker] now talks in [param mood].
-func speaker_shown(_speaker: SpeakerDef, _mood: StringName) -> void:
-	pass
+## The portrait window shows [param speaker] in [param mood].
+func speaker_shown(speaker: SpeakerDef, mood: StringName) -> void:
+	portrait.show_speaker(speaker, mood)
 
 
 ## Shows the player's answer [param text] as YOU.
@@ -216,7 +219,7 @@ func _on_ended(_uid: int, _cut_off: bool) -> void:
 
 
 func _on_typing_finished() -> void:
-	pass
+	portrait.set_talking(false)
 
 
 func _show_phase() -> void:
@@ -273,6 +276,7 @@ func _open_screen() -> void:
 	_focus_before = get_viewport().gui_get_focus_owner() if is_inside_tree() else null
 	transcript.clear()
 	answers.clear()
+	portrait.clear()
 	_refresh_strip()
 	visible = true
 	if is_inside_tree():
@@ -283,6 +287,7 @@ func _open_screen() -> void:
 func _close_screen() -> void:
 	transcript.clear()
 	answers.clear()
+	portrait.clear()
 	if not visible:
 		return
 	visible = false
@@ -302,6 +307,12 @@ func _refresh_strip() -> void:
 	_hold.text = tr(&"DIALOG_BASE_ON_HOLD")
 	var active: ActiveConversation = state.conversations.active
 	_channel.text = "" if active == null else ConversationText.channel(state, active)
+	portrait.portrait_defs = state.portrait_defs
+	if active != null:
+		var world: String = (
+			"" if active.world.is_empty() else AddressBookText.name_of_world(active.world, state)
+		)
+		portrait.set_channel(active.channel, world)
 	var scale: float = Settings.get_float(&"display", &"ui_scale")
 	transcript.set_ui_scale(scale)
 	answers.set_ui_scale(scale)
