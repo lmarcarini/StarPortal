@@ -103,3 +103,22 @@ func test_a_save_mid_conversation_loads_back_at_its_line() -> void:
 		"Kindred Elder: Then you are welcome here."
 	)
 	assert_int(_state().clock.mode).is_equal(ClockState.Mode.HELD)
+
+
+func test_closing_returns_to_the_tab_and_the_clock() -> void:
+	_shell.open_view(ViewSwitcher.BASE)
+	SimClock.set_speed_index(3)
+	SimClock.resume()
+	var screen: DialogueScreen = await _open()
+	assert_int(_state().clock.mode).is_equal(ClockState.Mode.HELD)
+	await _key(KEY_ENTER)
+	await _key(KEY_ENTER)
+	await _key(KEY_1)
+	await _key(KEY_ENTER)
+	await _key(KEY_ENTER)
+	assert_int(_state().conversations.active.phase).is_equal(ActiveConversation.Phase.ENDED)
+	await _key(KEY_ENTER)
+	assert_bool(screen.visible).is_false()
+	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("base")
+	assert_int(_state().clock.mode).is_equal(ClockState.Mode.RUNNING)
+	assert_int(_state().clock.speed_index).is_equal(3)
