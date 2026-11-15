@@ -42,10 +42,12 @@ be clicked.
 
 - **Top strip.** Date and time (stopped), "BASE ON HOLD", and the channel: Ring and world,
   incoming wormhole, or secure line.
-- **Left, about 40%: the portrait window** (section 3) and under it the **name plate**:
+- **Left, about a quarter of the width: the portrait window** (section 3), roughly square
+  and no taller than 40% of the screen (owner, 2026-11-15: the first mock-up's portrait was
+  too large), and under it the **name plate**:
   the speaker's name and title, the faction, and its standing with the player (Confidence
   for the Committee).
-- **Right: the transcript.** The current line is large and types out; earlier lines stay
+- **Right, the other three quarters: the transcript.** The current line is large and types out; earlier lines stay
   above it, dimmed, and can be scrolled. The player's own answers appear in it as "YOU".
 - **Bottom right: the answers,** up to four large buttons numbered 1 to 4. A locked answer
   is greyed with its reason, as now. While a line is still being said there are no
