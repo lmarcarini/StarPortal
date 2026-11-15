@@ -10,7 +10,6 @@ script = ExtResource("2")
 id = &"l1"
 speaker_key = &"CONV_SPEAKER_LIAISON"
 text_key = &"CONV_BRIEFING_1"
-minutes = 2
 next = &"l2"
 
 [sub_resource type="Resource" id="r2"]
@@ -26,7 +25,6 @@ script = ExtResource("2")
 id = &"l2"
 speaker_key = &"CONV_SPEAKER_LIAISON"
 text_key = &"CONV_BRIEFING_2"
-minutes = 2
 effects = Array[Resource]([SubResource("r2"), SubResource("r3")])
 next = &"l3"
 
@@ -39,7 +37,6 @@ script = ExtResource("2")
 id = &"l3"
 speaker_key = &"CONV_SPEAKER_LIAISON"
 text_key = &"CONV_BRIEFING_3"
-minutes = 2
 effects = Array[Resource]([SubResource("r5")])
 next = &"end"
 

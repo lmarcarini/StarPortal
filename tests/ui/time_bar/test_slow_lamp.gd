@@ -61,12 +61,12 @@ func test_a_call_shows_its_reason_and_faster_overrides() -> void:
 	assert_bool(lamp.visible).is_false()
 
 
-func test_a_conversation_cannot_be_overridden() -> void:
-	_slow(&"conversation")
+func test_intruders_cannot_be_overridden() -> void:
+	_slow(&"incursion")
 	var lamp: SlowLamp = _bar.get_slow_lamp()
-	assert_str(lamp.get_text()).is_equal("SLOW · conversation")
+	assert_str(lamp.get_text()).is_equal("SLOW · intruders")
 	assert_str(String(lamp.get_status())).is_equal("alarm")
-	assert_str(_faster_button().tooltip_text).contains("conversation")
+	assert_str(_faster_button().tooltip_text).contains("intruders")
 	SimClock.set_speed_index(2)
 	_bar.faster()
 	assert_int(_state.clock.speed_index).is_equal(3)

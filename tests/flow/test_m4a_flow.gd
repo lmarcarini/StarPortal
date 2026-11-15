@@ -1,7 +1,7 @@
 ## The M4a loop through commands on the real content (M4-20): the Committee's call on day 2
 ## files both addresses and offers the HEARTH survey; dial HEARTH, hail the Kindred and answer;
 ## accept and fulfil the survey and see the reward; an Ossar incoming wormhole answered and one
-## ignored; a conversation cut off by closing the wormhole; transcripts in the Archive.
+## ignored; the wormhole cannot be closed during a hail (M4.8-02); transcripts in the Archive.
 ## Bible: docs/content/m4-core-systems.md sections 2 to 4 and 8
 extends GdUnitTestSuite
 
@@ -34,17 +34,19 @@ func _submit(command: Command) -> void:
 	_ticks(1)
 
 
-## Lines advance by themselves; at each choice take the first enabled answer.
+## Continue through lines; at each choice take the first enabled answer; close at the end.
 func _talk_to_the_end() -> void:
 	for guard: int in 200:
 		if _state.conversations.active == null:
 			return
+		if _state.conversations.active.phase != ActiveConversation.Phase.CHOICE:
+			_submit(AdvanceConversationCommand.new())
+			continue
 		for choice: Dictionary in ConversationRules.choices(_state):
 			if choice["enabled"]:
 				var index: int = choice["index"]
 				_submit(ChooseOptionCommand.new(index))
 				break
-		_ticks(1)
 
 
 ## Builds the first Capacitor Bank and waits until it holds charge.
@@ -98,12 +100,12 @@ func test_m4a_loop() -> void:
 	_ticks(1)
 	_submit(IgnoreIncomingCommand.new())
 	assert_int(FactionRules.standing(_state, &"faction_ossar")).is_equal(standing - 2)
-	# A hail cut off by closing the wormhole.
+	# The wormhole cannot be closed while a hail runs over it (M4.8-02).
 	_dial(&"world_tollgate")
 	_submit(HailCommand.new())
-	_submit(CloseWormholeCommand.new())
-	_ticks(1)
-	assert_bool(_state.conversations.transcripts[-1].cut_off).is_true()
+	var refused: CommandResult = _simulation.submit(CloseWormholeCommand.new())
+	assert_str(String(refused.error_code)).is_equal("conversation_running")
+	_talk_to_the_end()
 	for record: TranscriptRecord in _state.conversations.transcripts:
 		assert_bool(_state.archive.has_document(TranscriptText.archive_id(record.uid))).is_true()
 	assert_int(_state.conversations.transcripts.size()).is_greater_equal(4)

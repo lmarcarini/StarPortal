@@ -20,10 +20,14 @@ func get_type() -> StringName:
 	return TYPE
 
 
-## Rejects a Ring with no open wormhole (&"not_locked").
+## Rejects a Ring with no open wormhole (&"not_locked"), and while a conversation runs over
+## it (&"conversation_running"; docs/content/dialogue-screen.md section 2).
 func validate(state: GameState) -> CommandResult:
 	if state.gate.mode != GateState.RingMode.LOCKED:
 		return CommandResult.fail(&"not_locked")
+	var active: ActiveConversation = state.conversations.active
+	if active != null and ConversationRules.WORMHOLE_CHANNELS.has(active.channel):
+		return CommandResult.fail(&"conversation_running")
 	return CommandResult.ok()
 
 

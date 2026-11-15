@@ -1,7 +1,8 @@
 class_name EndConversationCommand
 extends Command
-## The player hangs up a phone conversation (finished, not cut off; End effects not applied).
-## Wormhole conversations end only when the wormhole closes.
+## The player hangs up a phone conversation: the link ends as cut off (End effects not
+## applied) and the player closes the screen with AdvanceConversationCommand. Wormhole
+## conversations end only when the wormhole closes.
 ## Bible: docs/content/m4-core-systems.md section 3
 
 ## The command's stable type id.
@@ -24,12 +25,14 @@ func validate(state: GameState) -> CommandResult:
 		return CommandResult.fail(&"no_conversation")
 	if state.conversations.active.channel != &"phone":
 		return CommandResult.fail(&"not_phone")
+	if state.conversations.active.phase == ActiveConversation.Phase.ENDED:
+		return CommandResult.fail(&"already_ended")
 	return CommandResult.ok()
 
 
 ## Ends the call as cut off (its End was not reached).
 func apply(state: GameState) -> void:
-	ConversationRules.finish(state, true)
+	ConversationRules.end_link(state, true)
 
 
 ## Returns JSON-safe data: just the type.

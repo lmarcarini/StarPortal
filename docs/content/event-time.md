@@ -24,9 +24,12 @@ cruise speed at once, with nothing for the player to do. Pausing works as always
 | --- | --- | --- | --- |
 | `dialling` | The dial sequence starts | Lock or failure | Yes |
 | `gate_ops` | A lock (the gate operations panel opens, section 3) | Stand by, leaving the Gate Room tab, or the wormhole closing | Yes |
-| `conversation` | A hail, call or incoming wormhole is answered | The conversation ends | No |
+| `conversation` (retired in M4.8) | A hail, call or incoming wormhole is answered | The conversation ends | No |
 | `awaiting_answer` | An incoming wormhole or phone call starts waiting; a team asks for a field decision; a rescue alert opens | Answered, ignored, dismissed or expired | Yes |
 | `incursion` | The warning (M4c) | The incursion ends | No |
+
+*Since M4.8 a conversation no longer slows the clock: it holds it (hold reason
+`conversation`) until the player closes it; see dialogue-screen.md section 2.*
 
 **Override.** While slowed, pressing **Faster** releases every reason that can be
 overridden and returns to cruise speed; they do not come back for that event. The two

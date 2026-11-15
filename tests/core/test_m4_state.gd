@@ -24,6 +24,7 @@ func _filled() -> GameState:
 	active.world = &"world_hearth"
 	active.node = &"n2"
 	active.node_tick = 4990
+	active.phase = ActiveConversation.Phase.CHOICE
 	active.path = [[&"n1", -1], [&"n2", 1]]
 	state.conversations.active = active
 	var transcript := TranscriptRecord.new()

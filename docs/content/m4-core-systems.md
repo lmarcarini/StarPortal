@@ -115,7 +115,9 @@ may run at (empty = any of the faction's worlds), its own conditions, priority, 
 node and nodes. A choice may be `show_locked`: greyed with its reason instead of hidden.
 
 **Running.** One conversation at a time. Opening one forces the clock down to 1× (the player can
-still pause). *Since M4.7 this is the `conversation` slow reason: see event-time.md section 2.* A line appears, then the next one after its minutes have passed in game time. At a
+still pause). *Since M4.7 this is the `conversation` slow reason: see event-time.md section 2.* *Since M4.8
+the clock is held for the whole conversation and the player moves lines on; line minutes are
+gone: see dialogue-screen.md section 2.* A line appears, then the next one after its minutes have passed in game time. At a
 choice the clock keeps running; the wormhole keeps draining. The End node applies its effects.
 If the wormhole closes (timeout, energy, player) the conversation ends "(signal lost)": effects
 on nodes already reached stay applied, the End node's do not.

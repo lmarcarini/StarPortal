@@ -1,7 +1,8 @@
 class_name SoakStory
 extends RefCounted
 ## The soak bot's story habits (M4): answers phone calls, answers every other incoming
-## wormhole and ignores the rest, accepts offered requests, picks the first enabled answer and
+## wormhole and ignores the rest, accepts offered requests, moves conversations on (Continue,
+## then Close at the end, M4.8-02), picks the first enabled answer and
 ## hails a held world once per lock while its faction has something to say, then looks after
 ## artefacts (SoakArtefacts). One command per call at most.
 
@@ -18,6 +19,8 @@ static func work(simulation: Simulation) -> void:
 
 static func _next(state: GameState) -> Command:
 	if state.conversations.active != null:
+		if state.conversations.active.phase != ActiveConversation.Phase.CHOICE:
+			return AdvanceConversationCommand.new()
 		var shown: Array[Dictionary] = ConversationRules.choices(state)
 		for choice: Dictionary in shown:
 			if choice["enabled"]:

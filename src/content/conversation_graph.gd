@@ -45,8 +45,6 @@ static func _node_errors(node: ConversationNodeDef) -> Array[String]:
 	var found: Array[String] = []
 	match node.kind:
 		ConversationNodeDef.Kind.LINE:
-			if node.minutes < 1:
-				found.append("line '%s' needs at least 1 minute" % node.id)
 			if node.text_key.is_empty():
 				found.append("line '%s' needs a text key" % node.id)
 		ConversationNodeDef.Kind.CHOICE:

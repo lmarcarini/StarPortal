@@ -2,13 +2,12 @@ class_name ConversationPanel
 extends PanelContainer
 ## The non-modal conversation panel on the right third of the screen: the faction, the lines
 ## as they arrive, then the answers (locked ones greyed with their reason); "(signal lost)"
-## when cut off. Answers by mouse, keyboard (1 to 4) or gamepad focus; it closes a few
-## seconds after the end or with Close. It only reads the state and submits
-## ChooseOptionCommand. Placeholder look (the Interface phase redesigns it).
-## Bible: docs/content/m4-core-systems.md section 3
+## when cut off. Answers by mouse, keyboard (1 to 4) or gamepad focus; Continue moves a line
+## on and, once the link has ended, becomes Close. It only reads the state and submits
+## ChooseOptionCommand and AdvanceConversationCommand. Stand-in until the dialogue screen
+## (M4.8-04) replaces it.
+## Bible: docs/content/m4-core-systems.md section 3, docs/content/dialogue-screen.md section 2
 
-## Seconds the panel stays after the conversation ends.
-const CLOSE_AFTER_SECONDS: float = 4.0
 ## Actions that pick the first four answers (keys 1 to 4 by default).
 const _ACTIONS: Array[StringName] = [
 	&"dialog_choice_1", &"dialog_choice_2", &"dialog_choice_3", &"dialog_choice_4"
@@ -19,8 +18,7 @@ var _header := Label.new()
 var _scroll := ScrollContainer.new()
 var _lines := VBoxContainer.new()
 var _choices := VBoxContainer.new()
-var _close := Button.new()
-var _timer := Timer.new()
+var _continue := Button.new()
 
 
 func _init() -> void:
@@ -42,18 +40,16 @@ func _init() -> void:
 	_scroll.add_child(_lines)
 	layout.add_child(_scroll)
 	layout.add_child(_choices)
-	_close.text = &"CONV_CLOSE"
-	_close.pressed.connect(hide)
-	layout.add_child(_close)
-	_timer.one_shot = true
-	_timer.timeout.connect(hide)
-	add_child(_timer)
+	_continue.text = &"CONV_CONTINUE"
+	_continue.pressed.connect(_advance)
+	layout.add_child(_continue)
 
 
 func _enter_tree() -> void:
 	EventBus.conversation_started.connect(_on_started)
 	EventBus.conversation_line.connect(_on_line)
 	EventBus.conversation_choices.connect(_on_choices)
+	EventBus.conversation_over.connect(_on_over)
 	EventBus.conversation_ended.connect(_on_ended)
 
 
@@ -61,6 +57,7 @@ func _exit_tree() -> void:
 	EventBus.conversation_started.disconnect(_on_started)
 	EventBus.conversation_line.disconnect(_on_line)
 	EventBus.conversation_choices.disconnect(_on_choices)
+	EventBus.conversation_over.disconnect(_on_over)
 	EventBus.conversation_ended.disconnect(_on_ended)
 
 
@@ -92,7 +89,11 @@ func setup(simulation: Simulation) -> void:
 		var node: ConversationNodeDef = def.node(node_id)
 		if node != null and node.kind == ConversationNodeDef.Kind.LINE:
 			_add_line(ConversationText.line(node))
+	if active.phase == ActiveConversation.Phase.ENDED:
+		_on_over(active.cut_off)
+		return
 	_show_choices()
+	_update_continue()
 
 
 ## Returns the shown lines' texts, oldest first.
@@ -111,6 +112,11 @@ func get_choice_buttons() -> Array[Button]:
 	return found
 
 
+## Returns the Continue (Close once ended) button.
+func get_continue_button() -> Button:
+	return _continue
+
+
 ## Returns the header text.
 func get_header_text() -> String:
 	return _header.text
@@ -119,13 +125,13 @@ func get_header_text() -> String:
 func _on_started(conversation_id: StringName, _channel: StringName) -> void:
 	if _simulation == null:
 		return
-	_timer.stop()
 	for child: Node in _lines.get_children():
 		child.queue_free()
 		_lines.remove_child(child)
 	_clear_choices()
 	var def: ConversationDef = _simulation.state.conversation_defs.get(conversation_id)
 	_header.text = ConversationText.header(_simulation.state, def)
+	_update_continue()
 	show()
 
 
@@ -137,18 +143,40 @@ func _on_line(node_id: StringName) -> void:
 		return
 	_clear_choices()
 	_add_line(ConversationText.line(def.node(node_id)))
+	_update_continue()
 
 
 func _on_choices() -> void:
 	_show_choices()
+	_update_continue()
 
 
-func _on_ended(_uid: int, cut_off: bool) -> void:
+func _on_over(cut_off: bool) -> void:
 	_clear_choices()
 	if cut_off:
 		_add_line(tr(&"CONV_SIGNAL_LOST"))
-	if is_inside_tree():
-		_timer.start(CLOSE_AFTER_SECONDS)
+	_update_continue()
+
+
+func _on_ended(_uid: int, _cut_off: bool) -> void:
+	hide()
+
+
+## Continue shows except at a choice; it reads Close once the link has ended.
+func _update_continue() -> void:
+	var active: ActiveConversation = (
+		null if _simulation == null else _simulation.state.conversations.active
+	)
+	_continue.visible = active != null and active.phase != ActiveConversation.Phase.CHOICE
+	var ended: bool = active != null and active.phase == ActiveConversation.Phase.ENDED
+	_continue.text = &"CONV_CLOSE" if ended else &"CONV_CONTINUE"
+	if _continue.visible and is_inside_tree():
+		_continue.grab_focus.call_deferred()
+
+
+func _advance() -> void:
+	if _simulation != null:
+		_simulation.submit(AdvanceConversationCommand.new())
 
 
 func _show_choices() -> void:

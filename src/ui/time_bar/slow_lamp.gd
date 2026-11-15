@@ -7,9 +7,7 @@ extends HBoxContainer
 ## Bible: docs/content/event-time.md section 4
 
 ## Reasons the player cannot override come first, then the gate, then waiting items.
-const _ORDER: Array[StringName] = [
-	&"incursion", &"conversation", &"gate_ops", &"dialling", &"awaiting_answer"
-]
+const _ORDER: Array[StringName] = [&"incursion", &"gate_ops", &"dialling", &"awaiting_answer"]
 
 var _lamp := StatusLamp.new()
 var _label := Label.new()
@@ -55,7 +53,7 @@ static func shown_key(clock: ClockState) -> StringName:
 	return &""
 
 
-## The translation key naming slow [param key]: gate, dialling, conversation, call waiting,
+## The translation key naming slow [param key]: gate, dialling, call waiting,
 ## decision waiting or intruders.
 static func label_key(key: StringName) -> StringName:
 	var reason: StringName = TimeControl.reason_of(key)

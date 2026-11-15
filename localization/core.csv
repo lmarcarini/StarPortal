@@ -163,7 +163,6 @@ ALERT_WORMHOLE_OPEN,Wormhole open: the gate is on stand-by,Buraco de minhoca abe
 UI_SLOW,SLOW · {reason},LENTO · {reason}
 UI_SLOW_GATE_OPS,gate,portal
 UI_SLOW_DIALLING,dialling,discando
-UI_SLOW_CONVERSATION,conversation,conversa
 UI_SLOW_CALL,call waiting,chamada em espera
 UI_SLOW_DECISION,decision waiting,decisão pendente
 UI_SLOW_INCURSION,intruders,intrusos

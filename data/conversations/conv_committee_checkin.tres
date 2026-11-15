@@ -15,7 +15,6 @@ script = ExtResource("3")
 id = &"l1"
 speaker_key = &"CONV_SPEAKER_LIAISON"
 text_key = &"CONV_CHECKIN_1"
-minutes = 2
 next = &"end"
 
 [sub_resource type="Resource" id="r3"]

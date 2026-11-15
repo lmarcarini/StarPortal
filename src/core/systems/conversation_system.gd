@@ -1,9 +1,10 @@
 class_name ConversationSystem
 extends SimSystem
-## Runs the active conversation each tick (the Simulation syncs its slow reason): cuts a
-## wormhole or incoming conversation off when the Ring is no longer locked, and moves on from
-## a Line once its minutes have passed. Choices come by ChooseOptionCommand.
-## Bible: docs/content/m4-core-systems.md section 3
+## Watches the active conversation each tick: cuts a wormhole or incoming conversation off when
+## the Ring is no longer locked, or one whose node is gone. Ticks do not run while a
+## conversation holds the clock, so this matters only to ticks run by hand (tools, tests).
+## Lines move on by AdvanceConversationCommand and choices by ChooseOptionCommand.
+## Bible: docs/content/m4-core-systems.md section 3, docs/content/dialogue-screen.md section 2
 
 
 ## Returns &"conversations".
@@ -14,16 +15,12 @@ func get_id() -> StringName:
 ## One tick of the running conversation, if any.
 func tick(state: GameState) -> void:
 	var active: ActiveConversation = state.conversations.active
-	if active == null:
+	if active == null or active.phase == ActiveConversation.Phase.ENDED:
 		return
 	var on_wormhole: bool = ConversationRules.WORMHOLE_CHANNELS.has(active.channel)
 	if on_wormhole and state.gate.mode != GateState.RingMode.LOCKED:
-		ConversationRules.finish(state, true)
+		ConversationRules.end_link(state, true)
 		return
-	var node: ConversationNodeDef = ConversationRules.current_node(state)
-	if node == null:
-		ConversationRules.finish(state, true)
-		return
-	if node.kind == ConversationNodeDef.Kind.LINE:
-		if state.clock.tick - active.node_tick >= node.minutes:
-			ConversationRules.arrive(state, node.next)
+	var opening: bool = active.phase == ActiveConversation.Phase.OPENING
+	if not opening and ConversationRules.current_node(state) == null:
+		ConversationRules.end_link(state, true)

@@ -2,6 +2,7 @@ keys,en,pt_BR
 CONV_SIGNAL_LOST,(signal lost),[EN] (signal lost)
 CONV_LINE,{speaker}: {text},{speaker}: {text}
 CONV_CLOSE,Close,Fechar
+CONV_CONTINUE,Continue,Continuar
 CONV_SPEAKER_LIAISON,Liaison,[EN] Liaison
 CONV_SPEAKER_KINDRED_ELDER,Kindred Elder,[EN] Kindred Elder
 CONV_SPEAKER_OSSAR,Ossar Warden,[EN] Ossar Warden

@@ -56,6 +56,7 @@ static func register_defaults() -> void:
 	_types[DialCommand.TYPE] = DialCommand
 	_types[CloseWormholeCommand.TYPE] = CloseWormholeCommand
 	_types[ChooseOptionCommand.TYPE] = ChooseOptionCommand
+	_types[AdvanceConversationCommand.TYPE] = AdvanceConversationCommand
 	_types[HailCommand.TYPE] = HailCommand
 	_types[QueueResearchCommand.TYPE] = QueueResearchCommand
 	_types[UnqueueResearchCommand.TYPE] = UnqueueResearchCommand

@@ -21,13 +21,11 @@ const ALLOWED: Dictionary = {
 	ClockState.Mode.HELD: [ClockState.Mode.RUNNING, ClockState.Mode.PAUSED],
 }
 
-## Slow reasons the player may override with Faster (event-time.md section 2); the others
-## (conversation, incursion) need the player's eyes.
+## Slow reasons the player may override with Faster (event-time.md section 2); the other
+## (incursion) needs the player's eyes. A conversation holds the clock instead of slowing it.
 const OVERRIDABLE: Array[StringName] = [&"dialling", &"gate_ops", &"awaiting_answer"]
 ## Every slow reason.
-const SLOW_REASONS: Array[StringName] = [
-	&"dialling", &"gate_ops", &"conversation", &"awaiting_answer", &"incursion"
-]
+const SLOW_REASONS: Array[StringName] = [&"dialling", &"gate_ops", &"awaiting_answer", &"incursion"]
 
 
 ## True when the table allows changing from [param from] to [param to]. Staying in the
