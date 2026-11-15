@@ -8,7 +8,7 @@
 [sub_resource type="Resource" id="r1"]
 script = ExtResource("2")
 id = &"l1"
-speaker_key = &"CONV_SPEAKER_LIAISON"
+speaker = &"speaker_liaison"
 text_key = &"CONV_BRIEFING_1"
 next = &"l2"
 
@@ -23,7 +23,7 @@ world = &"world_tollgate"
 [sub_resource type="Resource" id="r4"]
 script = ExtResource("2")
 id = &"l2"
-speaker_key = &"CONV_SPEAKER_LIAISON"
+speaker = &"speaker_liaison"
 text_key = &"CONV_BRIEFING_2"
 effects = Array[Resource]([SubResource("r2"), SubResource("r3")])
 next = &"l3"
@@ -35,7 +35,7 @@ request = &"request_survey_hearth"
 [sub_resource type="Resource" id="r6"]
 script = ExtResource("2")
 id = &"l3"
-speaker_key = &"CONV_SPEAKER_LIAISON"
+speaker = &"speaker_liaison"
 text_key = &"CONV_BRIEFING_3"
 effects = Array[Resource]([SubResource("r5")])
 next = &"end"

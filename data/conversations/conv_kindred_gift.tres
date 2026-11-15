@@ -16,7 +16,7 @@ amount = 25
 [sub_resource type="Resource" id="r2"]
 script = ExtResource("3")
 id = &"l1"
-speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+speaker = &"speaker_kindred_elder"
 text_key = &"CONV_KINDRED_GIFT_1"
 next = &"ask"
 

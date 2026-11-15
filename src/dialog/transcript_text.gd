@@ -3,7 +3,8 @@ extends RefCounted
 ## Transcripts in the Archive: a transcript is listed among the documents under the id
 ## "transcript_<uid>" (its read mark lives in the Archive like a document's), and is rendered
 ## from its saved path with the current definitions and texts, so later text changes show in
-## old transcripts.
+## old transcripts. Saves keep only node ids and answer indices, so a transcript saved before
+## M4.8-03 (when lines named a speaker key) reads with today's SpeakerDef names.
 ## Bible: docs/content/m4-core-systems.md section 3 (Transcripts)
 
 ## Prefix of a transcript's Archive id.
@@ -66,7 +67,7 @@ static func lines(state: GameState, record: TranscriptRecord) -> Array[String]:
 			if node == null:
 				continue
 			if node.kind == ConversationNodeDef.Kind.LINE:
-				found.append(ConversationText.line(node))
+				found.append(ConversationText.line(state, node))
 			elif node.kind == ConversationNodeDef.Kind.CHOICE:
 				if choice_index >= 0 and choice_index < node.choices.size():
 					var answer: String = _tr(node.choices[choice_index].text_key)

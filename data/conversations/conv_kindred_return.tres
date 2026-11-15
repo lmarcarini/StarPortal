@@ -24,7 +24,7 @@ request = &"request_kindred_handover"
 [sub_resource type="Resource" id="r4"]
 script = ExtResource("3")
 id = &"l1"
-speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+speaker = &"speaker_kindred_elder"
 text_key = &"CONV_KINDRED_RETURN_1"
 effects = Array[Resource]([SubResource("r2"), SubResource("r3")])
 next = &"ask"
@@ -64,7 +64,7 @@ choices = Array[Resource]([SubResource("r8"), SubResource("r9")])
 [sub_resource type="Resource" id="r11"]
 script = ExtResource("3")
 id = &"end_thanks"
-speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+speaker = &"speaker_kindred_elder"
 text_key = &"CONV_KINDRED_RETURN_THANKS"
 next = &"end"
 

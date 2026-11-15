@@ -31,7 +31,6 @@ next = &"end"
 [sub_resource type="Resource" id="n1"]
 script = ExtResource("2")
 id = &"hello"
-speaker_key = &"CONV_TEST_ELDER"
 text_key = &"CONV_TEST_HELLO"
 next = &"ask"
 

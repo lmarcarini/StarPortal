@@ -6,6 +6,11 @@ CONV_CONTINUE,Continue,Continuar
 CONV_SPEAKER_LIAISON,Liaison,[EN] Liaison
 CONV_SPEAKER_KINDRED_ELDER,Kindred Elder,[EN] Kindred Elder
 CONV_SPEAKER_OSSAR,Ossar Warden,[EN] Ossar Warden
+CONV_SPEAKER_YOU,You,Você
+SPEAKER_TITLE_LIAISON,"Committee liaison, secure line","Elo de ligação do Comitê, linha segura"
+SPEAKER_TITLE_KINDRED_ELDER,Speaker for the Kindred,Porta-voz dos Kindred
+SPEAKER_TITLE_OSSAR,Warden of TOLLGATE,Guardião de TOLLGATE
+SPEAKER_TITLE_PLAYER,Site CAIRN command,Comando do Sítio CAIRN
 CONV_BRIEFING_1,"Director, the Committee has two addresses for you.","[EN] Director, the Committee has two addresses for you."
 CONV_BRIEFING_2,Both worlds show signs of people. Filing them in your Address Book now.,[EN] Both worlds show signs of people. Filing them in your Address Book now.
 CONV_BRIEFING_3,We want a survey of HEARTH within ten days.,[EN] We want a survey of HEARTH within ten days.

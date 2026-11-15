@@ -34,10 +34,21 @@ func node(node_id: StringName) -> ConversationNodeDef:
 	return null
 
 
-## The faction and the worlds.
+## The faction, the worlds and every line's speaker.
 func get_references() -> Array[StringName]:
 	var found: Array[StringName] = [faction]
 	found.append_array(worlds)
+	for speaker: StringName in speakers():
+		found.append(speaker)
+	return found
+
+
+## Every speaker named by a line, once each, in node order.
+func speakers() -> Array[StringName]:
+	var found: Array[StringName] = []
+	for each: ConversationNodeDef in nodes:
+		if each != null and not each.speaker.is_empty() and not found.has(each.speaker):
+			found.append(each.speaker)
 	return found
 
 
@@ -70,6 +81,10 @@ func all_effects() -> Array[EffectDef]:
 ## ConversationGraph.errors().
 func get_content_errors(defs: Dictionary[StringName, DefBase]) -> Array[String]:
 	var errors: Array[String] = ConversationGraph.errors(self)
+	for speaker: StringName in speakers():
+		var def: DefBase = defs.get(speaker)
+		if def != null and not def is SpeakerDef:
+			errors.append("speaker '%s' is not a speaker" % speaker)
 	var owner: DefBase = defs.get(faction)
 	if owner != null and not owner is FactionDef:
 		errors.append("faction '%s' is not a faction" % faction)

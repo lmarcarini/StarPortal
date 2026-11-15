@@ -77,6 +77,16 @@ func scenarios() -> Array[ScenarioDef]:
 	return found
 
 
+## Returns the SpeakerDef [param id], or null.
+func speaker(speaker_id: StringName) -> SpeakerDef:
+	return get_def(speaker_id) as SpeakerDef
+
+
+## Returns the PortraitDef [param id], or null.
+func portrait(portrait_id: StringName) -> PortraitDef:
+	return get_def(portrait_id) as PortraitDef
+
+
 ## Returns true when a definition with [param id] is loaded.
 func has_def(id: StringName) -> bool:
 	return _defs.has(id)

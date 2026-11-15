@@ -36,6 +36,9 @@ var units: Array[UnitDef] = []
 var installations: Array[InstallationDef] = []
 ## Every conversation, in Registry load order (sorted by path).
 var conversations: Array[ConversationDef] = []
+## Every SpeakerDef and PortraitDef (M4.8), in Registry load order.
+var speakers: Array[SpeakerDef] = []
+var portraits: Array[PortraitDef] = []
 ## The staff name list (&"staff_names"), or null.
 var staff_names: StaffNameListDef = null
 
@@ -80,8 +83,8 @@ static func from_registry(registry: Node) -> GameDefs:
 	return defs
 
 
-## Appends every FactionDef, RequestDef, ConversationDef, ArtefactDef, IncursionDef and
-## UnitDef of [param registry] to [param defs].
+## Appends every FactionDef, RequestDef, ConversationDef, SpeakerDef, PortraitDef,
+## ArtefactDef, IncursionDef and UnitDef of [param registry] to [param defs].
 static func _append_story_defs(registry: Node, defs: GameDefs) -> void:
 	for def: Variant in registry.call(&"get_all_of", FactionDef):
 		if def is FactionDef:
@@ -92,6 +95,12 @@ static func _append_story_defs(registry: Node, defs: GameDefs) -> void:
 	for def: Variant in registry.call(&"get_all_of", ConversationDef):
 		if def is ConversationDef:
 			defs.conversations.append(def)
+	for def: Variant in registry.call(&"get_all_of", SpeakerDef):
+		if def is SpeakerDef:
+			defs.speakers.append(def)
+	for def: Variant in registry.call(&"get_all_of", PortraitDef):
+		if def is PortraitDef:
+			defs.portraits.append(def)
 	for def: Variant in registry.call(&"get_all_of", ArtefactDef):
 		if def is ArtefactDef:
 			defs.artefacts.append(def)

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SpeakerDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/speaker_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name_key = &"CONV_SPEAKER_LIAISON"
+title_key = &"SPEAKER_TITLE_LIAISON"
+faction = &"faction_committee"
+portrait = &"portrait_liaison"
+id = &"speaker_liaison"

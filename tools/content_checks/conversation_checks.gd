@@ -33,19 +33,29 @@ static func check(
 	return errors
 
 
-## Every speaker, line and answer key of [param conversation].
+## Every line and answer key of [param conversation] (speaker names live on SpeakerDefs).
 static func text_keys(conversation: ConversationDef) -> Array[StringName]:
 	var keys: Array[StringName] = []
 	for node: ConversationNodeDef in conversation.nodes:
 		if node == null:
 			continue
-		for key: StringName in [node.speaker_key, node.text_key]:
-			if not key.is_empty() and not keys.has(key):
-				keys.append(key)
+		if not node.text_key.is_empty() and not keys.has(node.text_key):
+			keys.append(node.text_key)
 		for choice: ConversationChoiceDef in node.choices:
 			if choice != null and not choice.text_key.is_empty() and not keys.has(choice.text_key):
 				keys.append(choice.text_key)
 	return keys
+
+
+## The problems of [param speaker]'s name and title keys against [param table].
+static func check_speaker(
+	speaker: SpeakerDef, table: Dictionary[String, PackedStringArray]
+) -> Array[String]:
+	var errors: Array[String] = []
+	for key: StringName in [speaker.name_key, speaker.title_key]:
+		if not key.is_empty():
+			errors.append_array(_key_errors(speaker.id, key, table))
+	return errors
 
 
 static func _key_errors(

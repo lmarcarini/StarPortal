@@ -1,8 +1,8 @@
 class_name ConversationGraph
 extends RefCounted
 ## Pure checks of a conversation's node graph: channels, unique node ids, start and every next
-## exist, every node reachable, no cycle (so every path reaches an End), Line minutes at least
-## 1, and every Choice offering at least one answer without conditions.
+## exist, every node reachable, no cycle (so every path reaches an End), every Line mood
+## known, and every Choice offering at least one answer without conditions.
 ## Bible: docs/content/m4-core-systems.md section 3
 
 
@@ -47,6 +47,8 @@ static func _node_errors(node: ConversationNodeDef) -> Array[String]:
 		ConversationNodeDef.Kind.LINE:
 			if node.text_key.is_empty():
 				found.append("line '%s' needs a text key" % node.id)
+			if not node.mood.is_empty() and not ConversationNodeDef.MOODS.has(node.mood):
+				found.append("line '%s' has unknown mood '%s'" % [node.id, node.mood])
 		ConversationNodeDef.Kind.CHOICE:
 			var free: bool = false
 			for choice: ConversationChoiceDef in node.choices:
