@@ -49,6 +49,12 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	for conversation: ConversationDef in defs.conversations:
 		state.conversation_defs[conversation.id] = conversation
 	ConversationRules.settle_loaded(state)
+	state.speaker_defs.clear()
+	for speaker: SpeakerDef in defs.speakers:
+		state.speaker_defs[speaker.id] = speaker
+	state.portrait_defs.clear()
+	for portrait: PortraitDef in defs.portraits:
+		state.portrait_defs[portrait.id] = portrait
 	state.request_defs.clear()
 	for request: RequestDef in defs.requests:
 		state.request_defs[request.id] = request

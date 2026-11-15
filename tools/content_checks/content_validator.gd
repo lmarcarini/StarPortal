@@ -93,7 +93,8 @@ static func _check_research_tree(registry: RegistryScript) -> Array[String]:
 	return ContentCheckResearchTree.check(research, revealed)
 
 
-## The checks of conversations: nested conditions and effects, and text keys.
+## The checks of conversations: nested conditions and effects, and text keys (speakers'
+## names and titles included).
 static func _check_conversations(registry: RegistryScript) -> Array[String]:
 	var conversations: Array[ConversationDef] = []
 	var known: Dictionary[StringName, DefBase] = {}
@@ -104,7 +105,10 @@ static func _check_conversations(registry: RegistryScript) -> Array[String]:
 	var table: Dictionary[String, PackedStringArray] = ContentCheckDocuments.read_table(
 		ContentCheckConversations.TABLE
 	)
-	return ContentCheckConversations.check(conversations, known, table)
+	var errors: Array[String] = ContentCheckConversations.check(conversations, known, table)
+	for def: DefBase in registry.get_all_of(SpeakerDef):
+		errors.append_array(ContentCheckConversations.check_speaker(def as SpeakerDef, table))
+	return errors
 
 
 ## The checks across factions (the Committee, contacts).

@@ -9,12 +9,17 @@ extends Resource
 ## What the node is.
 enum Kind { LINE, CHOICE, END }
 
+## Moods a line may carry; empty means neutral.
+const MOODS: Array[StringName] = [&"neutral", &"pleased", &"wary", &"angry"]
+
 ## Id, unique within the conversation.
 @export var id: StringName = &""
 ## What the node is.
 @export var kind: Kind = Kind.LINE
-## Line: translation key of the speaker's name.
-@export var speaker_key: StringName = &""
+## Line: id of the SpeakerDef who says it (&"" for narration with no speaker).
+@export var speaker: StringName = &""
+## Line: the speaker's mood, one of [constant MOODS]; &"" means neutral.
+@export var mood: StringName = &""
 ## Line: translation key of what is said.
 @export var text_key: StringName = &""
 ## Line and End: effects applied when the node is reached.

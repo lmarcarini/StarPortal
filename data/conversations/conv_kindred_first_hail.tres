@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="r1"]
 script = ExtResource("2")
 id = &"l1"
-speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+speaker = &"speaker_kindred_elder"
 text_key = &"CONV_KINDRED_FIRST_1"
 next = &"ask"
 
@@ -44,15 +44,17 @@ choices = Array[Resource]([SubResource("r3"), SubResource("r5")])
 [sub_resource type="Resource" id="r7"]
 script = ExtResource("2")
 id = &"end_warm"
-speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+speaker = &"speaker_kindred_elder"
 text_key = &"CONV_KINDRED_FIRST_WARM"
+mood = &"pleased"
 next = &"end"
 
 [sub_resource type="Resource" id="r8"]
 script = ExtResource("2")
 id = &"end_cold"
-speaker_key = &"CONV_SPEAKER_KINDRED_ELDER"
+speaker = &"speaker_kindred_elder"
 text_key = &"CONV_KINDRED_FIRST_COLD"
+mood = &"wary"
 next = &"end"
 
 [sub_resource type="Resource" id="r9"]

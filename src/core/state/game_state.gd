@@ -106,6 +106,9 @@ var artefact_defs: Dictionary[StringName, ArtefactDef] = {}
 var modifiers: ModifierCache = ModifierCache.new()
 ## Every ConversationDef by id, read only. Transient: GameSetup.build() sets it.
 var conversation_defs: Dictionary[StringName, ConversationDef] = {}
+## Every SpeakerDef and PortraitDef by id, read only (M4.8). Transient: GameSetup.build().
+var speaker_defs: Dictionary[StringName, SpeakerDef] = {}
+var portrait_defs: Dictionary[StringName, PortraitDef] = {}
 ## Every IncursionDef and UnitDef by id, read only (M4c). Transient: GameSetup.build() sets them.
 var incursion_defs: Dictionary[StringName, IncursionDef] = {}
 var unit_defs: Dictionary[StringName, UnitDef] = {}

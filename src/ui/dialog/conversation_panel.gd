@@ -88,7 +88,7 @@ func setup(simulation: Simulation) -> void:
 		var node_id: StringName = step[0]
 		var node: ConversationNodeDef = def.node(node_id)
 		if node != null and node.kind == ConversationNodeDef.Kind.LINE:
-			_add_line(ConversationText.line(node))
+			_add_line(ConversationText.line(simulation.state, node))
 	if active.phase == ActiveConversation.Phase.ENDED:
 		_on_over(active.cut_off)
 		return
@@ -142,7 +142,7 @@ func _on_line(node_id: StringName) -> void:
 	if def == null or def.node(node_id) == null:
 		return
 	_clear_choices()
-	_add_line(ConversationText.line(def.node(node_id)))
+	_add_line(ConversationText.line(_simulation.state, def.node(node_id)))
 	_update_continue()
 
 

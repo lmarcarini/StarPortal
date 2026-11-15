@@ -13,7 +13,7 @@ state = 2
 [sub_resource type="Resource" id="r2"]
 script = ExtResource("3")
 id = &"l1"
-speaker_key = &"CONV_SPEAKER_LIAISON"
+speaker = &"speaker_liaison"
 text_key = &"CONV_CHECKIN_1"
 next = &"end"
 
