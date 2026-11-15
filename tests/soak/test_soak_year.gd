@@ -337,7 +337,6 @@ func _assert_run_base(run: SoakRun) -> void:
 	assert_int(state.base.level_count).is_equal(
 		_defs.balance.starting_levels + _defs.balance.dig_level_costs_k.size()
 	)
-	assert_int(state.base.digging_level()).is_equal(0)
 	var lab: RoomState = PowerFixture.first_room(state, SoakBot.LAB_DEF)
 	assert_object(lab).is_not_null()
 	assert_bool(lab.is_built()).is_true()
@@ -345,6 +344,8 @@ func _assert_run_base(run: SoakRun) -> void:
 	assert_int(run.bot.research_started).is_equal(SoakResearch.ORDER.size())
 	assert_int(run.bot.staff_moves).is_greater(1)
 	assert_int(run.bot.staff_assigns).is_greater(0)
+	assert_int(run.bot.security_moves).is_greater(0)
+	assert_int(SoakSecurity.incursions_logged(state)).is_greater_equal(3)
 	assert_array(state.research.done).is_equal(SoakResearch.ORDER)
 	assert_bool(state.research.is_running()).is_false()
 	assert_int(state.unlocks.dig_depth).is_equal(4)

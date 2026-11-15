@@ -94,9 +94,10 @@ var digs: int = 0
 ## projects it started.
 var lab_steps: int = 0
 var research_started: int = 0
-## Hires and dismissals, and assignments of arrived hires, the bot sent (SoakStaff).
+## Hires and dismissals, assignments (SoakStaff) and defence moves (SoakSecurity) sent.
 var staff_moves: int = 0
 var staff_assigns: int = 0
+var security_moves: int = 0
 ## Teams sent and rescues worked (SoakExpeditions; it also dials a missing team's world).
 var expeditions := SoakExpeditions.new()
 
@@ -108,10 +109,8 @@ var _picked: GateAddress = null
 var _check_at_tick: int = 0
 
 
-## Acts once on [param simulation] before its next tick. While running, the bot waits for
-## its next action tick, then submits a command, pauses or adds a hold. While paused or
-## held, every call is an action: resume, release or add a hold, or submit a command that
-## applies at once.
+## Acts once on [param simulation] before its next tick: while running, on its action tick
+## it commands, pauses or holds; while paused or held, every call is an action.
 func act(simulation: Simulation) -> void:
 	var clock: ClockState = simulation.state.clock
 	var rng: RandomNumberGenerator = simulation.state.random.stream(STREAM_ID)
@@ -123,6 +122,7 @@ func act(simulation: Simulation) -> void:
 		staff_moves += 1
 	staff_assigns += int(simulation.commands.pending_count() == 0 and SoakStaff.assign(simulation))
 	SoakStory.work(simulation)
+	security_moves += int(SoakSecurity.work(simulation, rng))
 	if not clock.is_paused and clock.tick < _next_action_tick:
 		return
 	if clock.mode == ClockState.Mode.HELD:
