@@ -21,6 +21,8 @@ const LEFT_SHARE: float = 0.25
 const PORTRAIT_MAX_SHARE: float = 0.4
 ## The answers' largest height, as a share of the screen's height (they scroll beyond it).
 const ANSWERS_MAX_SHARE: float = 0.42
+## Share of the opening the screen takes to fade in over the game.
+const FADE_SHARE: float = 0.3
 ## Pixels the transcript scrolls per key press or stick pull.
 const SCROLL_STEP: float = 60.0
 ## Actions that pick the first four answers.
@@ -38,6 +40,10 @@ var pause_menu: PauseMenu = null
 var portrait_slot := PanelContainer.new()
 ## The portrait of whoever is talking, through the video look (M4.8-05).
 var portrait := PortraitWindow.new()
+## The link opening and closing over the portrait (M4.8-06).
+var link := LinkTransition.new()
+## Seconds the opening plays; negative uses LinkTransition.opening_seconds() (tests set it).
+var opening_seconds: float = -1.0
 var name_plate := NamePlate.new()
 var transcript := TranscriptView.new()
 var answers := AnswerList.new()
@@ -65,6 +71,7 @@ func _init() -> void:
 	transcript.typing_finished.connect(_on_typing_finished)
 	answers.chosen.connect(_choose)
 	answers.continued.connect(continue_pressed)
+	link.finished.connect(_on_link_open)
 	resized.connect(_fit_portrait)
 
 
@@ -108,6 +115,9 @@ func bind(simulation: Simulation) -> void:
 ## Continue: shows the whole line while it types, else moves the conversation on (to the first
 ## line, the next line, or closing at the end). Nothing at a choice.
 func continue_pressed() -> void:
+	if link.is_opening():
+		link.skip()
+		return
 	if transcript.is_typing():
 		transcript.finish_typing()
 		return
@@ -117,9 +127,13 @@ func continue_pressed() -> void:
 	_simulation.submit(AdvanceConversationCommand.new())
 
 
-## Picks the answer shown at place [param number] (1 to 4); true when one was picked.
+## Picks the answer shown at place [param number] (1 to 4) at a choice; true when one was
+## picked.
 func pick_number(number: int) -> bool:
-	if transcript.is_typing():
+	var active: ActiveConversation = _active()
+	if transcript.is_typing() or active == null:
+		return false
+	if active.phase != ActiveConversation.Phase.CHOICE:
 		return false
 	return answers.press_number(number)
 
@@ -188,7 +202,27 @@ func _on_started(_conversation_id: StringName, _channel_id: StringName) -> void:
 	if _simulation == null:
 		return
 	_open_screen()
-	_simulation.submit(AdvanceConversationCommand.new())
+	_play_opening()
+
+
+## Plays the link opening; the first line comes when it ends (or is skipped).
+func _play_opening() -> void:
+	var active: ActiveConversation = _active()
+	var seconds: float = (
+		opening_seconds if opening_seconds >= 0.0 else LinkTransition.opening_seconds()
+	)
+	answers.show_continue(&"CONV_CONTINUE")
+	answers.focus_first()
+	if seconds > 0.0 and is_inside_tree():
+		modulate.a = 0.0
+		create_tween().tween_property(self, ^"modulate:a", 1.0, seconds * FADE_SHARE)
+	link.play_opening(active.channel, seconds)
+
+
+func _on_link_open() -> void:
+	var active: ActiveConversation = _active()
+	if active != null and active.phase == ActiveConversation.Phase.OPENING:
+		_simulation.submit(AdvanceConversationCommand.new())
 
 
 func _on_line(node_id: StringName) -> void:
@@ -208,6 +242,8 @@ func _on_choices() -> void:
 
 func _on_over(cut_off: bool) -> void:
 	transcript.finish_typing()
+	portrait.set_talking(false)
+	link.show_closed(cut_off)
 	if cut_off:
 		transcript.add_line("", UiPalette.ALARM, tr(&"CONV_SIGNAL_LOST"), false)
 	answers.show_continue(&"CONV_CLOSE")
@@ -226,7 +262,7 @@ func _show_phase() -> void:
 	var active: ActiveConversation = _active()
 	match active.phase:
 		ActiveConversation.Phase.OPENING:
-			_simulation.submit(AdvanceConversationCommand.new())
+			_play_opening()
 		ActiveConversation.Phase.LINE:
 			answers.show_continue(&"CONV_CONTINUE")
 		ActiveConversation.Phase.CHOICE:
@@ -277,6 +313,7 @@ func _open_screen() -> void:
 	transcript.clear()
 	answers.clear()
 	portrait.clear()
+	link.clear()
 	_refresh_strip()
 	visible = true
 	if is_inside_tree():
@@ -288,9 +325,11 @@ func _close_screen() -> void:
 	transcript.clear()
 	answers.clear()
 	portrait.clear()
+	link.clear()
 	if not visible:
 		return
 	visible = false
+	modulate.a = 1.0
 	if is_instance_valid(_focus_before) and _focus_before.is_visible_in_tree():
 		_focus_before.grab_focus()
 	_focus_before = null

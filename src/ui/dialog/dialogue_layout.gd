@@ -66,6 +66,7 @@ static func _left_column(screen: DialogueScreen, body: HBoxContainer) -> VBoxCon
 	body.add_child(left)
 	screen.portrait_slot.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	screen.portrait_slot.add_child(screen.portrait)
+	screen.portrait_slot.add_child(screen.link)
 	screen.portrait_slot.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	screen.portrait_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	left.add_child(screen.portrait_slot)
