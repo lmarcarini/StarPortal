@@ -9,8 +9,12 @@ themselves are a follow-up; this milestone builds the screen and the frame they 
 in.
 
 It replaces the conversation panel of `m4-core-systems.md` section 3 and the `conversation`
-slow reason of `event-time.md`. Choices beyond the brief are PO proposals **(proposal)**;
-the open ones are in section 8.
+slow reason of `event-time.md`.
+
+**Owner decisions on this document (2026-11-15):** no time passes during a conversation
+(time passing would be annoying); lines advance on a key press; every channel uses the
+video look, and some callers show a still portrait instead of a moving one; there is no
+summary: at the end the player closes the screen and it just closes.
 
 ## 1. The screen
 
@@ -37,7 +41,7 @@ be clicked.
 ```
 
 - **Top strip.** Date and time (stopped), "BASE ON HOLD", and the channel: Ring and world,
-  incoming wormhole, or telephone.
+  incoming wormhole, or secure line.
 - **Left, about 40%: the portrait window** (section 3) and under it the **name plate**:
   the speaker's name and title, the faction, and its standing with the player (Confidence
   for the Committee).
@@ -50,18 +54,18 @@ be clicked.
 ## 2. Time stops
 
 **Everything else pauses** (owner decision). From the moment a conversation opens until
-its summary is closed, the clock is held: no tick runs, no money, no drain on an open
+the player closes the screen, the clock is held: no tick runs, no money, no drain on an open
 wormhole, no incursion can begin.
 
 This changes how a conversation moves on. Today a line lasts some in-game minutes and the
 next one arrives by itself. With the clock held, the player moves it on:
 
 - A line types out (about 40 characters a second). **Space, click or (A)** shows the whole
-  line at once; pressed again, it goes to the next line. **(proposal)**
+  line at once; pressed again, it goes to the next line.
 - At a choice, the player picks an answer. Nothing times out.
 - A line's `minutes` in the data is no longer used and is removed.
 
-Consequences to accept **(proposal)**:
+Consequences, accepted by the owner:
 
 - A conversation costs no in-game time and no capacitor charge. Hailing over an open
   wormhole is free once the lock is made.
@@ -75,15 +79,21 @@ keeps the conversation at its current line.
 
 ## 3. The portrait window
 
-The window is a small screen inside the screen, and what it looks like depends on the
-channel:
+The window is a small screen inside the screen. **Every channel uses the same video look**
+(owner decision): scanlines, a slight roll, "VIDEO LINK · LIVE". Only the frame and label
+change with the channel:
 
-| Channel | Looks like | Accent |
+| Channel | Label | Frame accent |
 | --- | --- | --- |
-| Ring (hail, or an answered incoming wormhole) | A video link: scanlines, slight roll, "VIDEO LINK · LIVE" | Ring blue frame: the one place it appears outside the gate |
-| Telephone (Earth factions) | No picture is being sent: a personnel photograph of the caller on a card, a moving audio level beside it, "SECURE LINE" | CRT green |
+| Ring (hail, or an answered incoming wormhole) | VIDEO LINK · RING · world | Ring blue: the one place it appears outside the gate |
+| Earth (the former telephone channel) | VIDEO LINK · SECURE LINE | CRT green |
 
-**What this milestone builds:** the window, both channel looks, and a **placeholder
+**Moving or still, by caller.** A speaker's portrait is either animated or a **still**: a
+fixed picture shown through the same video look, for callers who would not be on camera or
+whose art is only a photograph. A still does not breathe, blink or move its mouth; the
+frame's "LIVE" becomes "STILL".
+
+**What this milestone builds:** the window, the video look, and a **placeholder
 portrait** drawn in code: a head-and-shoulders figure tinted with the faction's colour,
 with three behaviours:
 
@@ -97,7 +107,7 @@ content job and not a code job, this milestone adds the data they will hang on:
 
 - `SpeakerDef`: id, name, title, faction, and a portrait id.
 - `PortraitDef`: how to draw the speaker. For now one kind, `placeholder`, with a few
-  parameters (skin, hair, clothing colours, build). Later kinds (layered 2D art, or a 3D
+  parameters (skin, hair, clothing colours, build), and a `still` flag. Later kinds (layered 2D art, or a 3D
   head through the camera kit) slot in behind the same window without touching the screen.
 - Each line names its speaker by id and may name a mood.
 
@@ -111,25 +121,16 @@ second: the window shows static, "ESTABLISHING LINK" (Ring) or a ringing line be
 up (telephone), then the picture settles and the first line starts.
 
 **Closing.** When the conversation ends, the picture cuts to "LINK CLOSED" (or "SIGNAL
-LOST" when the story cuts it) and the right side shows a short **summary**: what changed
-because of this conversation.
-
-```
-LINK CLOSED · Elder Sahra, the Kindred
-  Standing  +10 -> +15
-  New request: Medicine for Mooring (due 21 Mar)
-  New document: Kindred greeting, transcribed
-  [Read transcript]                       [Return to base]
-```
-
-**Return to base** closes the screen and releases the clock, which goes back to the
-cruise speed. The transcript is saved to the Archive as now.
+LOST" when the story cuts it), the transcript stays readable, and a single **Close**
+button replaces the answers. Closing returns to the base and releases the clock, which
+goes back to the cruise speed. There is no summary (owner decision); what changed is in
+the Log and on the tabs, and the transcript is saved to the Archive as now.
 
 ## 5. Controls
 
 1 to 4 pick an answer; Space, Enter, click or (A) continue; Up, Down, the wheel or the
 right stick scroll earlier lines; D-pad or stick moves between answers. Esc or Start opens
-the pause menu. There is no close button: a conversation ends when it ends.
+the pause menu. There is no close button until the conversation has ended.
 
 ## 6. Look
 
@@ -146,22 +147,15 @@ A mock-up is in the interface canvas (artboard "Dialogue screen").
 - `ConversationNodeDef`: `speaker: StringName` (a SpeakerDef id) replaces `speaker_key`;
   `mood: StringName` added; `minutes` removed.
 - `ActiveConversation`: `node_tick` is no longer used for pacing; a `phase` is added
-  (OPENING, LINE, CHOICE, SUMMARY) so a save made mid-conversation reopens in the right
+  (OPENING, LINE, CHOICE, ENDED) so a save made mid-conversation reopens in the right
   place.
-- `TranscriptRecord` gains `outcomes`: the summary lines, recorded as effects are applied.
-- New command `AdvanceConversationCommand` (next line; close the summary).
+- New command `AdvanceConversationCommand` (next line; close after the end).
 - The clock uses a hold with the reason `conversation`.
 - The save version goes up by one. The seven test conversations are converted.
 
-## 8. Owner decisions needed
+## 8. Owner decisions
 
-1. **No time passes in a conversation** (section 2), so talking is free in time and
-   charge. Or should the clock jump forward by the conversation's length when it closes?
-2. **Lines advance on a key press,** with typing that can be skipped. Or advance
-   automatically after a pause, with a key only to hurry?
-3. **Telephone calls show a photograph and an audio level,** not a moving picture. Or the
-   same video look for every channel?
-4. **The summary at the end:** wanted, or just close?
+All settled on 2026-11-15; see the top of this document.
 
 ## 9. Cards
 
@@ -172,5 +166,5 @@ A mock-up is in the interface canvas (artboard "Dialogue screen").
 | M4.8-03 | Speakers, moods and portrait data | 01 |
 | M4.8-04 | The dialogue screen: modal, transcript, answers | 02 |
 | M4.8-05 | The portrait window and placeholder portraits | 03, 04 |
-| M4.8-06 | Opening, closing and the summary | 04 |
+| M4.8-06 | Opening and closing | 04 |
 | M4.8-07 | Flow test and playtest guide | all |
