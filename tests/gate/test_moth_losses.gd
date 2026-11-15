@@ -24,12 +24,13 @@ func _losses(threat: WorldDef.Threat, scan: MothRules.Scan) -> int:
 	var lost: int = 0
 	for trial: int in TRIALS:
 		state.probes.moth = MothRun.create(WORLD)
-		state.probes.reorders.clear()
+		state.events.drain()
 		MothScanCommand.create(scan, ProbeFixture.ANCHOR_ID).apply(state)
 		for minute: int in MothRules.minutes_of(scan):
 			system.tick(state)
-		if state.probes.reorders.size() == 1:
-			lost += 1
+		for event: SimEvent in state.events.drain():
+			if event.name == &"moth_lost":
+				lost += 1
 	return lost
 
 
@@ -54,7 +55,7 @@ func test_shot_down_keeps_scans_and_raises_threat() -> void:
 		var report: WorldReport = outcome.worlds.report_of(WORLD)
 		assert_int(report.confidence_of(WorldReport.Fact.THREAT)).is_equal(start + 1)
 		assert_int(outcome.worlds.status_of(WORLD)).is_equal(WorldsState.WorldStatus.PROBED)
-		assert_int(outcome.probes.reorders.size()).is_equal(1)
+		assert_array(outcome.probes.reorders).is_empty()
 	assert_int(MothRules.confidence_after_loss(WorldReport.Confidence.FAIR)).is_equal(
 		WorldReport.Confidence.FAIR
 	)

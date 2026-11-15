@@ -45,8 +45,8 @@ func test_validation() -> void:
 	data = _busy_probes().to_dict()
 	data["rack"] = 1
 	assert_array(ProbesState.validate_dict(data)).is_not_empty()
-	data["rack"] = 0
-	data["reorders"] = []
+	data["rack"] = 2
+	data["reorders"] = [5, 6]
 	assert_array(ProbesState.validate_dict(data)).is_not_empty()
 	data = _busy_probes().to_dict()
 	data["photos"] = [{"world_id": "a", "kind": "selfie", "target_id": "", "tick": 1}]

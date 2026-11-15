@@ -357,3 +357,10 @@ INSTALLATION_SENTRY_NAME,Sentry gun,Torreta
 INSTALLATION_SENTRY_EFFECT,"Fires on intruders in its room while the room is on: 3 a tick, health 15.","Atira em intrusos na sala enquanto ela está ligada: 3 por turno, vida 15."
 INSTALLATION_PLATING_NAME,Door plating,Blindagem de porta
 INSTALLATION_PLATING_EFFECT,The door takes twice as long to breach.,A porta leva o dobro do tempo para ser arrombada.
+INSTALLATION_MOTH_RACK_NAME,MOTH rack,Suporte de MOTH
+INSTALLATION_MOTH_RACK_EFFECT,Holds 2 MOTHs; each is built to order.,Guarda 2 MOTHs; cada um é construído sob encomenda.
+GATE_MOTH_ORDER,"Order MOTH · {count}/2","Encomendar MOTH · {count}/2"
+GATE_ERR_NO_RACK,Needs the MOTH rack,Requer o suporte de MOTH
+GATE_ERR_RACK_FULL,The rack is full,O suporte está cheio
+GATE_ERR_INSUFFICIENT_FUNDS,Not enough money,Dinheiro insuficiente
+GATE_WORMHOLE_MOTH_NO_RACK,No MOTH rack: research Survey drones and install it.,Sem suporte de MOTH: pesquise Drones de reconhecimento e instale.

@@ -65,11 +65,12 @@ func test_real_tree_matches_the_card() -> void:
 		assert_dict(ResearchTreeLayout.cells(defs, &"research_gate"))
 		. is_equal(
 			{
-				&"gate_calibration": Vector2i(0, 0),
+				&"survey_drones": Vector2i(0, 0),
 				&"wormhole_stabiliser": Vector2i(1, 0),
 				&"long_range_dialing": Vector2i(2, 0),
-				&"moth_batteries": Vector2i(0, 1),
-				&"moth_shielding": Vector2i(1, 1),
+				&"gate_calibration": Vector2i(0, 1),
+				&"moth_batteries": Vector2i(1, 1),
+				&"moth_shielding": Vector2i(2, 1),
 			}
 		)
 	)

@@ -55,7 +55,7 @@ func test_battery_plan_and_recall() -> void:
 
 
 ## A second Close look leaves 1 minute, too little to recall: the drone is lost when the
-## battery runs out, its scans are kept, and a replacement is ordered ($150k) for a day later.
+## battery runs out and its scans are kept; nothing replaces it until one is ordered (M4c-20).
 func test_battery_runs_out() -> void:
 	_scan(MothRules.Scan.LOOK_AROUND)
 	_scan(MothRules.Scan.CLOSE_LOOK, ProbeFixture.ANCHOR_ID)
@@ -65,14 +65,14 @@ func test_battery_runs_out() -> void:
 	_scan(MothRules.Scan.CLOSE_LOOK, ProbeFixture.FOOTPRINTS_ID)
 	assert_object(_state.probes.moth).is_null()
 	assert_int(_state.probes.rack).is_equal(1)
-	assert_int(funds - _state.budget.funds_k).is_equal(150)
+	assert_int(funds - _state.budget.funds_k).is_equal(0)
 	assert_int(_confidence(WorldReport.Fact.TARGETS)).is_equal(WorldReport.Confidence.FAIR)
 	assert_int(_state.probes.photos.size()).is_equal(3)
 	assert_int(_state.worlds.status_of(WORLD)).is_equal(WorldsState.WorldStatus.PROBED)
 	_assert_reorder_arrives_in_a_day()
 
 
-## Closing the wormhole with the MOTH out loses it; the replacement arrives a day later.
+## Closing the wormhole with the MOTH out loses it; an ordered one arrives a day later.
 func test_wormhole_close_loses_the_drone() -> void:
 	_simulation.submit(MothScanCommand.create(MothRules.Scan.LOOK_AROUND))
 	ProbeFixture.advance(_simulation, 2)
@@ -84,11 +84,12 @@ func test_wormhole_close_loses_the_drone() -> void:
 
 
 func _assert_reorder_arrives_in_a_day() -> void:
-	assert_int(_state.probes.reorders.size()).is_equal(1)
+	assert_array(_state.probes.reorders).is_empty()
 	var rack: int = _state.probes.rack
-	ProbeFixture.advance(_simulation, TimeMath.TICKS_PER_DAY - 2)
-	assert_int(_state.probes.rack).is_equal(rack)
-	ProbeFixture.advance(_simulation, 2)
+	assert_bool(_simulation.submit(OrderMothCommand.new()).is_ok).is_true()
+	ProbeFixture.advance(_simulation, 1)
+	assert_int(_state.probes.reorders.size()).is_equal(1)
+	ProbeFixture.advance(_simulation, TimeMath.TICKS_PER_DAY + 1)
 	assert_int(_state.probes.rack).is_equal(rack + 1)
 	assert_array(_state.probes.reorders).is_empty()
 

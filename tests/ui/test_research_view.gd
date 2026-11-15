@@ -75,7 +75,7 @@ func test_sub_tabs_follow_the_data() -> void:
 		ResearchTree.cell_position(Vector2i(2, 0))
 	)
 	board.show_category(&"research_gate")
-	assert_int(_tree().nodes().size()).is_equal(5)
+	assert_int(_tree().nodes().size()).is_equal(6)
 	board.show_category(&"research_alien")
 	assert_object(_node(&"later_containment")).is_null()
 	assert_object(_node(&"lattice_harmonics")).is_null()

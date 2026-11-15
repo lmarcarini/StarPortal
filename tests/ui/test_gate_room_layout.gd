@@ -88,6 +88,8 @@ func _check_label(label: Label, found: Array[String]) -> void:
 
 func _check_button(button: Button, found: Array[String]) -> void:
 	var text: String = button.tr(button.text)
+	if button.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED:
+		text = button.text
 	if text.is_empty():
 		return
 	var font: Font = button.get_theme_font(&"font")

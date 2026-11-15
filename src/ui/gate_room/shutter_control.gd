@@ -42,6 +42,10 @@ func refresh() -> void:
 	text = tr(&"GATE_SHUTTER_OPEN" if closed else &"GATE_SHUTTER_CLOSE")
 	var check: CommandResult = SetShutterCommand.create(not closed).validate(state)
 	disabled = not check.is_ok
+	update_minimum_size()
+	var box: Control = get_parent() as Control
+	if box != null:
+		box.reset_size()
 	tooltip_text = (
 		"" if check.is_ok else tr(StringName("GATE_ERR_" + String(check.error_code).to_upper()))
 	)

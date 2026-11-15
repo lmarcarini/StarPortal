@@ -72,6 +72,7 @@ class SoakRun:
 	func _init(base_seed: int, defs: GameDefs) -> void:
 		var built: Result = GameSetup.build_new(GameState.new_game(base_seed, defs.balance), defs)
 		var first: Simulation = built.value
+		preload("res://tests/gate/dial_fixture.gd").give_moth_rack(first.state)
 		attach(first)
 
 	## Counts the tick just run when stored power was NaN or left 0..capacity.

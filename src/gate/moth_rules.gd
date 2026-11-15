@@ -26,6 +26,8 @@ const RACK_SIZE: int = 2
 const REORDER_COST_K: int = 150
 ## Ticks from a loss to the replacement's arrival: 1 day.
 const REORDER_TICKS: int = TimeMath.TICKS_PER_DAY
+## The rack installation (M4c-20).
+const RACK_DEF: StringName = &"installation_moth_rack"
 ## A sample canister's cost, in $k; canisters never run out.
 const CANISTER_COST_K: int = 10
 ## Ticks from throwing the canister to reeling it back.
@@ -80,3 +82,18 @@ static func battery_minutes(state: GameState) -> int:
 ## The most battery a saved MOTH run may hold: the battery at the highest modifier (+300 %).
 static func max_battery_minutes() -> int:
 	return BATTERY_MINUTES * (100 + ModifierRules.PERCENT_MAX) / 100
+
+
+## True when the Gate Room of [param state] has a built MOTH rack (M4c-20).
+static func has_rack(state: GameState) -> bool:
+	for room: RoomState in state.base.rooms:
+		if room.def_id == StartingBase.GATE_ROOM_DEF:
+			var item: InstallationState = InstallationRules.find(room.installations, RACK_DEF)
+			return item != null and item.is_built()
+	return false
+
+
+## MOTHs in the rack, out and on order.
+static func owned(state: GameState) -> int:
+	var probes: ProbesState = state.probes
+	return probes.rack + probes.reorders.size() + (1 if probes.is_moth_out() else 0)

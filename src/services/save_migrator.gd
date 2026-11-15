@@ -13,7 +13,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 20
+const TARGET_VERSION: int = 21
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
 const OLDEST_VERSION: int = 15
 
@@ -22,7 +22,12 @@ const OLDEST_VERSION: int = 15
 ## constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
 	var built_in: Dictionary[int, Callable] = {
-		15: _v15_to_v16, 16: _v16_to_v17, 17: _v17_to_v18, 18: _v18_to_v19, 19: _v19_to_v20
+		15: _v15_to_v16,
+		16: _v16_to_v17,
+		17: _v17_to_v18,
+		18: _v18_to_v19,
+		19: _v19_to_v20,
+		20: _v20_to_v21
 	}
 	return built_in
 
@@ -104,6 +109,30 @@ static func _v19_to_v20(data: Dictionary) -> Dictionary:
 	if state.get("gate") is Dictionary:
 		var gate: Dictionary = state["gate"]
 		gate["shutter"] = "open"
+	return out
+
+
+## v21 (M4c-20): MOTHs are built to order from a researched rack; an old save keeps its
+## MOTHs, gets Survey drones done and a built rack in the Gate Room.
+static func _v20_to_v21(data: Dictionary) -> Dictionary:
+	var out: Dictionary = data.duplicate(true)
+	if not out.get("state") is Dictionary:
+		return out
+	var state: Dictionary = out["state"]
+	if state.get("research") is Dictionary:
+		var research: Dictionary = state["research"]
+		if research.get("done") is Array:
+			var done: Array = research["done"]
+			if not done.has("survey_drones"):
+				done.append("survey_drones")
+	var base: Dictionary = SaveFields.dict_or_empty(state.get("base"))
+	for room: Dictionary in SaveFields.dicts_in(base.get("rooms")):
+		if room.get("def_id") == "room_gate":
+			var items: Array = room.get("installations", [])
+			items.append(
+				{"def": "installation_moth_rack", "build_ticks_left": 0, "paid_k": 0, "health": 0}
+			)
+			room["installations"] = items
 	return out
 
 
