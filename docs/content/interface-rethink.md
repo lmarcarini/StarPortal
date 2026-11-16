@@ -268,8 +268,9 @@ monitors; body text only in documents, conversations and hover cards.
 
 Each phase is playable on its own. Cards are written per phase once the direction is set.
 
-1. **Gate:** the scene, the console, destinations, the Ring as keyboard, the send rail,
-   team staging and mission orders, teams seen coming home with a debrief.
+1. **Gate** (milestone M4.9): the plate and live layers, the console, destinations, the
+   alien panel, the send rail, team staging and mission orders, talking through an open
+   gate, teams seen coming home with a debrief.
 2. **Frame:** clock, gauges, the wire with actions, station keys, gate monitor; requests
    answered in conversations.
 3. **Base:** lit plan, build tray, breakers, people cards.
@@ -279,11 +280,9 @@ Each phase is playable on its own. Cards are written per phase once the directio
 
 ## 9. Owner decisions
 
-Settled on 2026-11-15: four stations; direct dialling first, the alien panel for composing;
-talk only through an open gate; industrial style; plate plus live layers.
-
-Open:
-
-1. **Plates:** will the owner generate the station plates (as with the mock-ups, but with
-   no interface and the gate idle and empty), starting with the Gate hall?
-2. **Phase order:** Gate first, then the frame and the wire (assumed unless told otherwise).
+Settled on 2026-11-15 and 16: four stations; direct dialling first, the alien panel for
+composing; talk only through an open gate (hail the team while a wormhole is open to their
+world; a team in trouble dials in and calls; neither return nor call means overdue);
+industrial style; plate plus live layers; the owner generates the plates from
+`plate-prompts.md`. The first plate, the Gate hall, is `art/plates/gate_hall.png`
+(1672 × 941, supplied 2026-11-16). Phase order: Gate first, then the frame and the wire.
