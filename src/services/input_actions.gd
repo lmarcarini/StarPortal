@@ -239,8 +239,7 @@ const DEFAULTS: Dictionary = {
 	&"station_pin":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_U}],
-		GAMEPAD:
-		[{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_MISC1}],
+		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_MISC1}],
 	},
 	# The research tree pans with the right stick (M4-32).
 	&"research_pan_left":
