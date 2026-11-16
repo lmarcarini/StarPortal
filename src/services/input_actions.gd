@@ -44,6 +44,7 @@ const ACTIONS: Array[StringName] = [
 	&"research_pan_down",
 	&"station_flip",
 	&"station_pin",
+	&"station_rail_5",
 ]
 
 ## Gamepad bindings added to Godot's built-in UI actions at start-up, as {action: [encoded]},
@@ -240,6 +241,12 @@ const DEFAULTS: Dictionary = {
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_U}],
 		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_MISC1}],
+	},
+	# The send rail's fifth key (keys 1 to 4 are the dialogue answers' actions).
+	&"station_rail_5":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_5}],
+		GAMEPAD: [],
 	},
 	# The research tree pans with the right stick (M4-32).
 	&"research_pan_left":

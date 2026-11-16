@@ -18,6 +18,8 @@ var _simulation: Simulation = null
 var _ring: RingLayer = null
 var _report: PaperCard = PaperCard.new()
 var _report_panel: WorldReportPanel = WorldReportPanel.new()
+var _rail: SendRail = SendRail.new()
+var _moth: MothScreen = MothScreen.new()
 
 @onready var _station: StationScene = %Station
 @onready var _console: GateConsole = %GateConsole
@@ -43,6 +45,10 @@ func _ready() -> void:
 	_report_panel.plan_requested.connect(plan_requested.emit)
 	_report.gui_input.connect(_on_report_input)
 	add_child(_report)
+	_rail.name = "SendRail"
+	add_child(_rail)
+	move_child(_rail, _station.get_index() + 1)
+	add_child(_moth)
 	resized.connect(_layout)
 	_console.resized.connect(_layout)
 	_layout.call_deferred()
@@ -58,6 +64,8 @@ func setup(simulation: Simulation) -> void:
 	_console.setup(simulation)
 	_rack.setup(simulation)
 	_panel.setup(simulation)
+	_rail.setup(simulation)
+	_moth.setup(simulation)
 	_report.visible = false
 
 
@@ -107,6 +115,16 @@ func get_alien_panel() -> AlienPanel:
 	return _panel
 
 
+## The send rail.
+func get_rail() -> SendRail:
+	return _rail
+
+
+## The MOTH scan screen.
+func get_moth_screen() -> MothScreen:
+	return _moth
+
+
 ## The World Report card.
 func get_report_card() -> PaperCard:
 	return _report
@@ -137,6 +155,11 @@ func _layout() -> void:
 	var width: float = DestinationCard.CARD_SIZE.x * s + 24.0
 	_rack.position = Vector2(size.x - width - 12.0, 12.0)
 	_rack.size = Vector2(width, maxf(0.0, size.y - _console.size.y - 24.0))
+	var rail_at: Vector2 = _station.anchor(&"rail")
+	_rail.reset_size()
+	_rail.position = Vector2(
+		rail_at.x, minf(rail_at.y, size.y - _console.size.y - _rail.size.y - 8.0)
+	)
 
 
 func _unhandled_input(event: InputEvent) -> void:
