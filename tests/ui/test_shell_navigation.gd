@@ -64,7 +64,7 @@ func test_view_actions_switch_views_in_the_shell() -> void:
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
 	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
-	assert_str(String(switcher.current_view_id())).is_equal("personnel")
+	assert_str(String(switcher.current_station())).is_equal("office")
 	assert_int(SimClock.simulation.state.clock.speed_index).is_equal(1)
 
 

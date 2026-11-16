@@ -206,7 +206,7 @@ func _wait_for_a_candidate(player: M15Player) -> StringName:
 
 ## F5, Candidates, the new candidate's row and Hire: the fee is paid and the hire is on the way.
 func _hire(player: M15Player, candidate_id: StringName) -> void:
-	await _key(KEY_F4)
+	_shell.view_switcher.show_view(ViewSwitcher.PERSONNEL)
 	var view := _shell.view_switcher.get_view(&"personnel") as PersonnelView
 	view.get_board().show_page(PersonnelBoard.Page.CANDIDATES)
 	view.get_board().row_of(candidate_id).grab_focus()

@@ -69,6 +69,7 @@ func _ready() -> void:
 	frame.open_view.connect(open_view)
 	frame.alert_chosen.connect(_on_alert_chosen)
 	frame.band_changed.connect(_fit_below_frame)
+	frame.station_keys.station_chosen.connect(view_switcher.show_station)
 	view_switcher.view_changed.connect(_fit_below_frame.unbind(1))
 	frame.log_requested.connect(ShellBoot.open_log.bind(view_switcher))
 	frame.wire_step.connect(ShellBoot.wire_step.bind(view_switcher, _rescue_alert).unbind(1))
@@ -277,6 +278,7 @@ func _setup_debug_tools() -> void:
 ## and after a quick load.
 func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
+	frame.station_keys.bind(view_switcher)
 	_rescue_alert.setup(simulation)
 	_dialogue.bind(simulation)
 	frame.bind(simulation)
@@ -386,6 +388,7 @@ func _on_setting_changed(section: StringName, key: StringName, _value: Variant) 
 ## Keeps the views and the rescue alert just under the frame's top plates.
 func _fit_below_frame() -> void:
 	view_switcher.offset_top = frame.band_height()
+	view_switcher.offset_bottom = -frame.bottom_height()
 	frame.wire_gap = view_switcher.get_tab_bar().size.y
 	var station: bool = view_switcher.current_view_id() == ViewSwitcher.GATE_ROOM
 	view_switcher.offset_left = 0.0 if station else frame.wire.size.x + Frame.EDGE * 2.0

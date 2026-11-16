@@ -153,7 +153,7 @@ func _lock_sill(player: M15Player) -> void:
 func _hire_first_candidate(player: M15Player) -> StringName:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
-	await UiInput.key(switcher, KEY_F4)
+	switcher.show_view(ViewSwitcher.PERSONNEL)
 	assert_str(String(switcher.current_view_id())).is_equal("personnel")
 	var view := switcher.get_view(&"personnel") as PersonnelView
 	view.get_board().show_page(PersonnelBoard.Page.CANDIDATES)
@@ -177,7 +177,7 @@ func _hire_first_candidate(player: M15Player) -> StringName:
 func _assign_to_the_lab(player: M15Player, person_id: StringName) -> void:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
-	await UiInput.key(switcher, KEY_F4)
+	switcher.show_view(ViewSwitcher.PERSONNEL)
 	var view := switcher.get_view(&"personnel") as PersonnelView
 	view.get_board().row_of(person_id).grab_focus()
 	await UiInput.settle(switcher)

@@ -5,7 +5,8 @@ extends Control
 ## play / fast, the slow lamp and the call lamp) and a status plate (the gate chip and the
 ## rescue entry); top centre the alarm strip during an incursion; top right the gauge plate
 ## (funds, power, charge, Confidence). Under the left plates runs the wire, the event cards
-## with their action keys (M4.10-02). Save, Load and the debug button left the screen: they
+## with their action keys (M4.10-02); bottom left the four station keys (M4.10-03). Save,
+## Load and the debug button left the screen: they
 ## are in the pause menu and on F12. Redraws on
 ## EventBus signals and on [method bind]. Reads state only.
 ## Bible: docs/content/interface-rethink.md section 3
@@ -40,6 +41,8 @@ var gate_chip := GateChip.new()
 var alert_list := AlertList.new()
 ## The wire: event cards with their action keys, under the left plates.
 var wire := Wire.new()
+## The four station keys, bottom left.
+var station_keys := StationKeys.new()
 ## The incursion strip and alarm look.
 var alarm_strip := AlarmStrip.new()
 
@@ -77,6 +80,8 @@ func _init() -> void:
 	add_child(alert_list)
 	wire.position = Vector2(EDGE, EDGE)
 	add_child(wire)
+	add_child(station_keys)
+	station_keys.resized.connect(_layout)
 	wire.open_view.connect(open_view.emit)
 	wire.entry_chosen.connect(_on_alert_chosen)
 	wire.step_requested.connect(wire_step.emit)
@@ -124,6 +129,11 @@ func refresh() -> void:
 	_refresh_live()
 
 
+## Height of the bottom band the station keys take, in pixels.
+func bottom_height() -> float:
+	return station_keys.size.y + EDGE * 2.0
+
+
 ## Height of the top plates' band, in pixels (the scene shows below and between).
 func band_height() -> float:
 	return maxf(_left.size.y, gauge_plate.size.y) + EDGE * 2.0
@@ -142,6 +152,7 @@ func get_focus_buttons(extra: Array[Button]) -> Array[Button]:
 	buttons.append(gate_chip)
 	buttons.append_array(gauge_plate.get_buttons())
 	buttons.append_array(wire.get_keys())
+	buttons.append_array(station_keys.get_buttons())
 	return buttons.filter(func(b: Button) -> bool: return b.visible)
 
 
@@ -168,8 +179,11 @@ func _layout() -> void:
 	var centre: float = (gap_left + gauge_plate.position.x) * 0.5
 	alarm_strip.position = Vector2(centre - alarm_strip.size.x * 0.5, EDGE)
 	wire.position = Vector2(EDGE, band_height() + wire_gap)
-	if not is_equal_approx(band_height(), _band):
-		_band = band_height()
+	station_keys.reset_size()
+	station_keys.position = Vector2(EDGE, size.y - station_keys.size.y - EDGE)
+	var bands: float = band_height() + bottom_height() * 1000.0
+	if not is_equal_approx(bands, _band):
+		_band = bands
 		band_changed.emit()
 
 

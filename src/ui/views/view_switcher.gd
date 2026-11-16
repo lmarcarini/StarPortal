@@ -1,11 +1,14 @@
 class_name ViewSwitcher
 extends Control
-## Hosts the game views under a tab bar and shows one at a time. Each child of %Views is a
+## Hosts the game views and shows one at a time, grouped into four stations (M4.10-03): Gate,
+## Base (with Personnel's roster), Lab (Research) and Office (Command, Archive and Personnel's
+## hiring); the station keys on the frame pick a station (F1-F4, Q/E cycle) and the tab bar
+## shows only the current station's folders. Each child of %Views is a
 ## [GameView]; its id is its node name in snake_case ([code]GateRoom[/code] is
-## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
-## (view_next and view_previous wrap at the ends; view_gate_room F1, view_base F2,
-## view_research F3, view_personnel F4, view_archive F6, view_command F7)
-## and the gamepad shoulders switch views. Each tab has a code-drawn icon (TabIcon), lit
+## [code]&"gate_room"[/code]) and its tab follows child order. The station actions
+## (view_next E and view_previous Q wrap over the stations; view_gate_room F1, view_base F2,
+## view_research F3 for the Lab, view_office F4) and the gamepad shoulders switch stations;
+## the tabs switch folders. Each tab has a code-drawn icon (TabIcon), lit
 ## orange on the current tab, and a dot while its view needs attention
 ## ([method GameView.needs_attention]). A view that is not available
 ## ([method GameView.is_available]: the Research tab before a lab finishes) has its tab
@@ -26,6 +29,8 @@ extends Control
 ## Emitted with the id of the view just shown: once for the first view when the switcher is
 ## ready, then each time another view replaces it.
 signal view_changed(view_id: StringName)
+## The station on screen changed (or its attention or availability did).
+signal stations_changed
 
 ## Id of the Gate Room view.
 const GATE_ROOM: StringName = &"gate_room"
@@ -40,19 +45,28 @@ const PERSONNEL: StringName = &"personnel"
 ## Id of the Command view.
 const COMMAND: StringName = &"command"
 
+## The four stations (M4.10-03) and the views each hosts as folders, first the default.
+## Personnel is the Base's roster and the Office's hiring folder.
+const STATIONS: Dictionary[StringName, Array] = {
+	&"gate": [GATE_ROOM],
+	&"base": [BASE, PERSONNEL],
+	&"lab": [RESEARCH],
+	&"office": [COMMAND, ARCHIVE, PERSONNEL],
+}
+## Station order for the keys and Q/E.
+const STATION_ORDER: Array[StringName] = [&"gate", &"base", &"lab", &"office"]
+
 ## Added to a tab's title while its view needs attention.
 const ATTENTION_DOT: String = " •"
 
 const _ACTION_NEXT: StringName = &"view_next"
 const _ACTION_PREVIOUS: StringName = &"view_previous"
-## Actions that open one view, as {action: view id}.
+## Actions that open one station, as {action: station id}: F1-F4.
 const _DIRECT_ACTIONS: Dictionary = {
-	&"view_gate_room": GATE_ROOM,
-	&"view_archive": ARCHIVE,
-	&"view_base": BASE,
-	&"view_research": RESEARCH,
-	&"view_personnel": PERSONNEL,
-	&"view_command": COMMAND,
+	&"view_gate_room": &"gate",
+	&"view_base": &"base",
+	&"view_research": &"lab",
+	&"view_office": &"office",
 }
 
 var _ids: Array[StringName] = []
@@ -61,6 +75,8 @@ var _current: StringName = &""
 ## The root modes each hidden view had before the switcher hid it, as
 ## {view id: [process_mode, focus_behavior_recursive, mouse_behavior_recursive]}.
 var _saved_modes: Dictionary[StringName, Array] = {}
+var _station: StringName = &"gate"
+var _last_folder: Dictionary[StringName, StringName] = {}
 
 @onready var _tabs: TabBar = %Tabs
 @onready var _views_root: Control = %Views
@@ -130,7 +146,58 @@ func get_view(view_id: StringName) -> GameView:
 	return _views.get(view_id)
 
 
-## Returns the tab bar, the switcher's entry point for focus navigation.
+## Shows station [param station]: the folder last open there, else its first available one.
+func show_station(station: StringName) -> void:
+	var folder: StringName = folder_of(station)
+	if folder.is_empty():
+		return
+	_station = station
+	show_view(folder)
+
+
+## The station on screen.
+func current_station() -> StringName:
+	return _station
+
+
+## The view station [param station] opens on: its last folder, else its first available; &""
+## when none is available (the Lab before a Research Lab exists).
+func folder_of(station: StringName) -> StringName:
+	var last: StringName = _last_folder.get(station, &"")
+	if not last.is_empty() and _views.has(last) and _views[last].is_available():
+		return last
+	for id: StringName in STATIONS.get(station, []):
+		if _views.has(id) and _views[id].is_available():
+			return id
+	return &""
+
+
+## True when station [param station] has an available view.
+func is_station_available(station: StringName) -> bool:
+	return not folder_of(station).is_empty()
+
+
+## True when a view of station [param station] needs attention (GameView.needs_attention).
+func station_needs_attention(station: StringName) -> bool:
+	for id: StringName in STATIONS.get(station, []):
+		if _views.has(id) and _views[id].is_available() and _views[id].needs_attention():
+			return true
+	return false
+
+
+## The station hosting [param view_id]: the current one when it does, else the first.
+func station_of(view_id: StringName) -> StringName:
+	var here: Array = STATIONS.get(_station, [])
+	if here.has(view_id):
+		return _station
+	for station: StringName in STATION_ORDER:
+		var folders: Array = STATIONS[station]
+		if folders.has(view_id):
+			return station
+	return _station
+
+
+## Returns the tab bar (the current station's folders), the entry point for focus navigation.
 func get_tab_bar() -> TabBar:
 	return _tabs
 
@@ -160,12 +227,14 @@ func _collect_views() -> void:
 func _connect_view(view: GameView) -> void:
 	if view is ArchiveView:
 		(view as ArchiveView).unread_changed.connect(_refresh_titles)
-		(view as ArchiveView).plan_requested.connect(_on_plan_requested)
-		(view as ArchiveView).team_report_requested.connect(_on_team_report_requested)
+		(view as ArchiveView).plan_requested.connect(ViewRequests.plan.bind(self))
+		(view as ArchiveView).team_report_requested.connect(ViewRequests.team_report.bind(self))
 	elif view is PersonnelView:
-		(view as PersonnelView).show_on_plan.connect(_on_show_on_plan)
+		(view as PersonnelView).show_on_plan.connect(ViewRequests.show_on_plan.bind(self))
 	elif view is GateStationView:
-		(view as GateStationView).capacitor_bank_requested.connect(_on_capacitor_bank_requested)
+		(view as GateStationView).capacitor_bank_requested.connect(
+			ViewRequests.capacitor_bank.bind(self)
+		)
 		(view as GateStationView).report_opened.connect(show_view.bind(GATE_ROOM))
 
 
@@ -174,13 +243,17 @@ func _activate(view_id: StringName) -> void:
 	if view_id == _current:
 		return
 	_current = view_id
+	_station = station_of(view_id)
+	_last_folder[_station] = view_id
 	for id: StringName in _ids:
 		_set_active(id, id == view_id)
 	var view: GameView = _views[view_id]
 	_tabs.focus_neighbor_bottom = _tabs.get_path_to(view.get_default_focus())
+	_refresh_availability()
 	_tabs.current_tab = _ids.find(view_id)
 	_refresh_titles()
 	view_changed.emit(view_id)
+	stations_changed.emit()
 
 
 ## Returns the view [param event] asks for, or [code]&""[/code] if it is no view action.
@@ -193,28 +266,40 @@ func _view_for_event(event: InputEvent) -> StringName:
 		return _neighbour(-1)
 	for action: StringName in _DIRECT_ACTIONS:
 		if InputActions.is_new_press(event, action):
-			var id: StringName = _DIRECT_ACTIONS[action]
-			return id if _views.has(id) and _views[id].is_available() else &""
+			var station: StringName = _DIRECT_ACTIONS[action]
+			return _enter(station)
 	return &""
 
 
-## Returns the id [param offset] tabs away from the current one, wrapping at the ends.
+## The folder of station [param station], made current; &"" when it has none available.
+func _enter(station: StringName) -> StringName:
+	var folder: StringName = folder_of(station)
+	if not folder.is_empty():
+		_station = station
+	return folder
+
+
+## The folder of the station [param offset] away from the current one, wrapping and skipping
+## unavailable stations.
 func _neighbour(offset: int) -> StringName:
-	var index: int = _ids.find(_current)
-	for _step: int in _ids.size():
-		index = posmod(index + offset, _ids.size())
-		if _views[_ids[index]].is_available():
+	var index: int = STATION_ORDER.find(_station)
+	for _step: int in STATION_ORDER.size():
+		index = posmod(index + offset, STATION_ORDER.size())
+		if is_station_available(STATION_ORDER[index]):
 			break
-	return _ids[index]
+	return _enter(STATION_ORDER[index])
 
 
 ## Hides the tab of every view that is not available; leaves a view that stops being
 ## available for the first available one.
 func _refresh_availability() -> void:
+	var folders: Array = STATIONS.get(_station, [])
 	for index: int in _ids.size():
-		_tabs.set_tab_hidden(index, not _views[_ids[index]].is_available())
+		var shown: bool = _views[_ids[index]].is_available() and folders.has(_ids[index])
+		_tabs.set_tab_hidden(index, not shown)
 	if _views.has(_current) and not _views[_current].is_available():
 		_activate(_ids[0])
+	stations_changed.emit()
 
 
 ## Sets each tab's title, with the dot while its view needs attention, and its icon.
@@ -279,46 +364,3 @@ func _on_tab_clicked(index: int) -> void:
 	if index < 0 or index >= _ids.size():
 		return
 	show_view(_ids[index])
-
-
-## Opens the Base with the Capacitor Bank's ghost on the nearest valid spot to
-## the Gate Room.
-func _on_capacitor_bank_requested() -> void:
-	if not _views.has(BASE):
-		return
-	var base: BaseView = _views[BASE] as BaseView
-	if base == null:
-		return
-	show_view(BASE)
-	base.place_capacitor_bank()
-
-
-## Opens the Gate station's mission sheet on [param world_id].
-func _on_plan_requested(world_id: StringName) -> void:
-	if not _views.has(GATE_ROOM):
-		return
-	var gate: GateStationView = _views[GATE_ROOM] as GateStationView
-	if gate == null:
-		return
-	show_view(GATE_ROOM)
-	gate.plan_world(world_id)
-
-
-## Opens the Gate with the team report of the Log's return [param entry].
-func _on_team_report_requested(entry: LogEntry) -> void:
-	if not _views.has(GATE_ROOM):
-		return
-	var gate: GateStationView = _views[GATE_ROOM] as GateStationView
-	if gate != null:
-		gate.show_log_report(entry)
-
-
-## Opens the Base on [param person_id]'s level with their token selected.
-func _on_show_on_plan(person_id: StringName) -> void:
-	if not _views.has(BASE):
-		return
-	var base: BaseView = _views[BASE] as BaseView
-	if base == null:
-		return
-	show_view(BASE)
-	base.get_plan().staff_layer.focus_person(person_id)

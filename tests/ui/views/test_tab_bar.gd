@@ -11,9 +11,7 @@ const KEYS: Dictionary[StringName, Key] = {
 	&"view_gate_room": KEY_F1,
 	&"view_base": KEY_F2,
 	&"view_research": KEY_F3,
-	&"view_personnel": KEY_F4,
-	&"view_archive": KEY_F6,
-	&"view_command": KEY_F7,
+	&"view_office": KEY_F4,
 }
 
 

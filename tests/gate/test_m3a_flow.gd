@@ -133,7 +133,8 @@ func _scan(player: M15Player, scan: MothRules.Scan, target: StringName = &"") ->
 ## Archive (F6), Worlds, SILL: the report shows a threat; Plan expedition opens the Gate's
 ## mission sheet on SILL, prefilled for a Survey with four fit members.
 func _plan_from_the_world_report() -> void:
-	await _key(KEY_F6)
+	_shell.view_switcher.show_view(ViewSwitcher.ARCHIVE)
+	await UiInput.settle(_shell)
 	var archive := _shell.view_switcher.get_view(&"archive") as ArchiveView
 	archive.show_worlds()
 	archive.get_worlds().open_world(SILL)
