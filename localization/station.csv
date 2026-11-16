@@ -115,3 +115,5 @@ STATION_KEY_GATE,"The Gate: dial, send and receive (F1).","O Portal: discar, env
 STATION_KEY_BASE,"The Base: build, power and people (F2).","A Base: construção, energia e pessoal (F2)."
 STATION_KEY_LAB,"The Lab: research (F3).","O Laboratório: pesquisa (F3)."
 STATION_KEY_OFFICE,"The Office: Command, Archive and hiring (F4).","O Escritório: Comando, Arquivo e contratação (F4)."
+FRAME_MONITOR_IDLE,IDLE,PARADO
+FRAME_MONITOR_HINT,"The Ring, live while it dials, is open or something comes through. Opens the Gate.","O Anel, ao vivo enquanto disca, está aberto ou algo atravessa. Abre o Portal."

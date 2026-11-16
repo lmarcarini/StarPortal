@@ -391,5 +391,6 @@ func _fit_below_frame() -> void:
 	view_switcher.offset_bottom = -frame.bottom_height()
 	frame.wire_gap = view_switcher.get_tab_bar().size.y
 	var station: bool = view_switcher.current_view_id() == ViewSwitcher.GATE_ROOM
+	frame.gate_monitor.wanted = not station
 	view_switcher.offset_left = 0.0 if station else frame.wire.size.x + Frame.EDGE * 2.0
 	_rescue_alert.offset_top = frame.band_height() + 48.0

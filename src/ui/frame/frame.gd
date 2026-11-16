@@ -5,7 +5,8 @@ extends Control
 ## play / fast, the slow lamp and the call lamp) and a status plate (the gate chip and the
 ## rescue entry); top centre the alarm strip during an incursion; top right the gauge plate
 ## (funds, power, charge, Confidence). Under the left plates runs the wire, the event cards
-## with their action keys (M4.10-02); bottom left the four station keys (M4.10-03). Save,
+## with their action keys (M4.10-02); bottom left the four station keys (M4.10-03), bottom
+## right the gate monitor (M4.10-04). Save,
 ## Load and the debug button left the screen: they
 ## are in the pause menu and on F12. Redraws on
 ## EventBus signals and on [method bind]. Reads state only.
@@ -43,6 +44,8 @@ var alert_list := AlertList.new()
 var wire := Wire.new()
 ## The four station keys, bottom left.
 var station_keys := StationKeys.new()
+## The gate monitor, bottom right (not on the Gate).
+var gate_monitor := GateMonitor.new()
 ## The incursion strip and alarm look.
 var alarm_strip := AlarmStrip.new()
 
@@ -82,6 +85,8 @@ func _init() -> void:
 	add_child(wire)
 	add_child(station_keys)
 	station_keys.resized.connect(_layout)
+	add_child(gate_monitor)
+	gate_monitor.pressed.connect(open_view.emit.bind(ViewSwitcher.GATE_ROOM, &""))
 	wire.open_view.connect(open_view.emit)
 	wire.entry_chosen.connect(_on_alert_chosen)
 	wire.step_requested.connect(wire_step.emit)
@@ -118,6 +123,7 @@ func bind(simulation: Simulation) -> void:
 	gauge_plate.bind(_state)
 	alert_list.bind(_state)
 	wire.bind(simulation, alert_list)
+	gate_monitor.bind(simulation)
 	refresh()
 
 
@@ -131,7 +137,7 @@ func refresh() -> void:
 
 ## Height of the bottom band the station keys take, in pixels.
 func bottom_height() -> float:
-	return station_keys.size.y + EDGE * 2.0
+	return maxf(station_keys.size.y, gate_monitor.size.y) + EDGE * 2.0
 
 
 ## Height of the top plates' band, in pixels (the scene shows below and between).
@@ -181,6 +187,8 @@ func _layout() -> void:
 	wire.position = Vector2(EDGE, band_height() + wire_gap)
 	station_keys.reset_size()
 	station_keys.position = Vector2(EDGE, size.y - station_keys.size.y - EDGE)
+	gate_monitor.reset_size()
+	gate_monitor.position = size - gate_monitor.size - Vector2(EDGE, EDGE)
 	var bands: float = band_height() + bottom_height() * 1000.0
 	if not is_equal_approx(bands, _band):
 		_band = bands
