@@ -54,13 +54,13 @@ func _init() -> void:
 func _enter_tree() -> void:
 	for event: Signal in _events():
 		event.connect(_on_event)
-	EventBus.check_in_missed.connect(_on_check_in_missed)
+	EventBus.team_distress.connect(_on_check_in_missed)
 
 
 func _exit_tree() -> void:
 	for event: Signal in _events():
 		event.disconnect(_on_event)
-	EventBus.check_in_missed.disconnect(_on_check_in_missed)
+	EventBus.team_distress.disconnect(_on_check_in_missed)
 
 
 func _notification(what: int) -> void:

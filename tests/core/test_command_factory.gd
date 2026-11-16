@@ -58,6 +58,8 @@ const DEFAULT_TYPES: Array[StringName] = [
 	&"set_flag",
 	&"set_shutter",
 	&"signal_team",
+	&"hail_team",
+	&"order_team",
 	&"stand_by",
 	&"start_research",
 	&"switch_room",
@@ -164,6 +166,8 @@ func _samples() -> Array[Command]:
 		SendTeamCommand.new(),
 		RecallTeamCommand.new(),
 		SignalTeamCommand.new(),
+		HailTeamCommand.new(),
+		OrderTeamCommand.create(TeamContactRules.Order.HOLD_ON),
 		ChargeAtMaximumCommand.new(),
 	]
 

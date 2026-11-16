@@ -30,6 +30,9 @@ static func world_of(state: GameState, faction: StringName, conversation: String
 ## Answers the waiting incoming wormhole: locks the Ring, drops the clock to 1×, meets the
 ## faction, starts the conversation and posts incoming_answered.
 static func answer(state: GameState) -> void:
+	if state.gate.incoming_faction == TeamContactRules.TEAM_CALLER:
+		TeamContactRules.answer_call(state)
+		return
 	var gate: GateState = state.gate
 	var faction: StringName = gate.incoming_faction
 	var conversation: StringName = gate.incoming_conversation
@@ -45,6 +48,9 @@ static func answer(state: GameState) -> void:
 ## Ignores the waiting incoming wormhole (by command or timeout): standing −2, the contact is
 ## dropped and incoming_ignored is posted.
 static func ignore(state: GameState) -> void:
+	if state.gate.incoming_faction == TeamContactRules.TEAM_CALLER:
+		TeamContactRules.ignore_call(state)
+		return
 	var faction: StringName = state.gate.incoming_faction
 	state.gate.clear_incoming()
 	FactionRules.change(state, faction, IGNORE_CHANGE, IGNORE_CAUSE)

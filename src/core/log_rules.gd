@@ -98,7 +98,7 @@ static func entries_for(
 			]
 		ExpeditionFieldDay.EVENT:
 			return [_field_event_entry(args, tick)]
-		&"team_checked_in", &"check_in_missed", &"member_deceased", &"team_lost", &"team_rescued":
+		&"team_distress", &"member_deceased", &"team_lost", &"team_rescued":
 			return _expedition_entries(event_name, args, tick)
 	return []
 
@@ -150,7 +150,7 @@ static func _expedition_entries(event_name: StringName, args: Array, tick: int) 
 		&"team_checked_in":
 			details = {"reason": "checked_in", "light": args[1], "serious": args[2]}
 			details["day"] = str(args[3]) if args.size() > 3 else "finding"
-		&"check_in_missed":
+		&"team_distress":
 			details = {"reason": "missed"}
 		&"member_deceased":
 			details = {"reason": "deceased", "name": str(args[0])}

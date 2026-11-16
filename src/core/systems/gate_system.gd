@@ -89,7 +89,8 @@ func _close_reason(state: GameState, end_tick: int) -> StringName:
 
 
 ## While IDLE: an incoming wormhole that waited too long is ignored; with none waiting and no
-## conversation running, the oldest pending incoming contact activates the Ring from the far
+## conversation running, a team in trouble calls first (TeamContactRules), else the oldest
+## pending incoming contact activates the Ring from the far
 ## side for incoming_answer_minutes and asks for a pause.
 func _run_incoming(state: GameState) -> void:
 	var gate: GateState = state.gate
@@ -98,6 +99,10 @@ func _run_incoming(state: GameState) -> void:
 			IncomingRules.ignore(state)
 		return
 	if state.conversations.active != null:
+		return
+	if state.expedition.calling:
+		TeamContactRules.start_call(state)
+		state.events.post(Simulation.PAUSE_EVENT, [INCOMING_PAUSE])
 		return
 	var index: int = ContactRules.next_pending(state, &"incoming")
 	if index < 0:

@@ -112,6 +112,18 @@ signal team_recalled(world_id: StringName)
 ## Emitted when a team misses a check-in and the rescue window opens, with the world id
 ## (posted through the outbox).
 signal check_in_missed(world_id: StringName)
+## A team in trouble will call the base through the gate (M4.9-11).
+signal team_distress(world_id: StringName)
+## A team in trouble, unheard, is past its time plus the grace.
+signal team_overdue(world_id: StringName)
+## The base answered the team's call.
+signal team_called(world_id: StringName)
+## Nobody answered the team's call.
+signal team_call_missed(world_id: StringName)
+## The base hailed its team: days done of days, light and serious injuries.
+signal team_hailed(world_id: StringName, days_done: int, days: int, light: int, serious: int)
+## An order was given to the team (TeamContactRules.ORDER_NAMES).
+signal team_ordered(world_id: StringName, order: String)
 ## Emitted when Signal T-1 is sent, with the world id (posted through the outbox).
 signal rescue_signal_sent(world_id: StringName)
 ## Emitted when the wormhole closes before the signalled team reached the Ring, with the world

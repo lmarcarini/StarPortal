@@ -41,3 +41,9 @@ STATION_PANEL_PENCIL,"Pencil: mark a guess on the lamps, not dialled.","Lápis: 
 STATION_PANEL_BACK,Back to the Gate,Voltar ao Portal
 STATION_STAND_BY,"Stand by: keep the wormhole open, stop slowing time.","Em espera: mantém o buraco de minhoca aberto, sem desacelerar o tempo."
 STATION_REASON_UNAVAILABLE,Not now.,Agora não.
+ALERT_TEAM_OVERDUE,The team is overdue: dial their world and hail,A equipe está atrasada: disque o mundo dela e chame
+STATION_ORDER_CARRY_ON,Carry on,Continuem
+STATION_ORDER_COME_HOME,Come home,Voltem já
+STATION_ORDER_STAY_LONGER,Stay longer,Fiquem mais
+STATION_ORDER_COME_THROUGH,Come through,Atravessem
+STATION_ORDER_HOLD_ON,Hold on,Aguentem

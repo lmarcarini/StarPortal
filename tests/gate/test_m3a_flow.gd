@@ -44,12 +44,9 @@ func before_test() -> void:
 	_runner = scene_runner(_shell)
 	await _runner.await_input_processed()
 	_messages.clear()
-	EventBus.team_checked_in.connect(_on_checked_in)
 
 
 func after_test() -> void:
-	if EventBus.team_checked_in.is_connected(_on_checked_in):
-		EventBus.team_checked_in.disconnect(_on_checked_in)
 	if is_instance_valid(_shell):
 		_shell.free()
 	SaveService.saves_dir = _real_saves_dir
@@ -193,13 +190,10 @@ func _send_and_close(player: M15Player) -> void:
 	assert_bool(player.close_wormhole()).is_true()
 
 
-## The Survey checks in at +24 h (a message, the Expeditions tab's check-in) and comes home at
-## +48 h: SILL is Surveyed and the plan clears.
+## The Survey works silently (a team talks only through an open gate, M4.9-11) and comes home
+## at +48 h: SILL is Surveyed and the plan clears.
 func _check_in_and_come_home(player: M15Player) -> void:
 	var state: GameState = player.state()
-	_wait(player, func() -> bool: return not _messages.is_empty())
-	assert_str(_shell.get_toast_text()).starts_with("T-1 checked in from ")
-	assert_str(_expeditions().get_check_in().texts()[0]).starts_with("CHECK-IN  ")
 	_wait(player, func() -> bool: return state.expedition.mode == ExpeditionState.Mode.IDLE)
 	assert_bool(state.worlds.has_reached(SILL, WorldsState.WorldStatus.SURVEYED)).is_true()
 	var prologue: String = "Prologue complete: the first Threshold team is home."
@@ -236,6 +230,11 @@ func _miss_and_open_the_alert(player: M15Player) -> void:
 	assert_bool(_shell.get_alert_stack().get_rescue_button().visible).is_true()
 	await UiInput.click(alert.get_gate_button())
 	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("gate_room")
+	_wait(player, func() -> bool: return state.gate.has_incoming())
+	assert_bool(player.simulation.submit(AnswerIncomingCommand.new()).is_ok).is_true()
+	var hold: OrderTeamCommand = OrderTeamCommand.create(TeamContactRules.Order.HOLD_ON)
+	assert_bool(player.simulation.submit(hold).is_ok).is_true()
+	assert_int(state.gate.mode).is_equal(GateState.RingMode.IDLE)
 
 
 ## A new lock on SILL and Signal T-1: the team reaches the Ring 15 minutes later; the window
@@ -268,10 +267,6 @@ func _actions() -> WormholeActions:
 
 func _expeditions() -> ExpeditionsView:
 	return _shell.view_switcher.get_view(&"expeditions") as ExpeditionsView
-
-
-func _on_checked_in(_world_id: StringName, _light: int, _serious: int, _day: String) -> void:
-	_messages.append(_shell.get_toast_text())
 
 
 static func _named(display_name: String) -> Callable:

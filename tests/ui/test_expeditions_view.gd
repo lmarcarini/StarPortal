@@ -139,20 +139,6 @@ func test_team_away_shows_the_timeline_and_recall() -> void:
 	assert_str(_view.get_trip().texts()[4]).is_equal("T-1 is already recalled.")
 
 
-func test_check_in_refreshes_while_paused_and_on_showing() -> void:
-	RescueFixture.send(_simulation)
-	var member: PersonState = _state().staff.find_person(_state().expedition.member_ids()[2])
-	InjuryRules.injure(member, PersonState.Injury.LIGHT)
-	_view.visible = false
-	Fixture.advance(_simulation, _state().expedition.next_day_end_tick() - _state().clock.tick + 1)
-	_view.visible = true
-	var texts: Array[String] = _view.get_check_in().texts()
-	assert_str(texts[0]).starts_with("CHECK-IN  ")
-	assert_str(texts[1]).contains("checked in").contains("one light injury")
-	assert_str(texts[2]).starts_with("Injured: " + member.name)
-	assert_str(_view.get_trip().texts()[3]).contains("checked in")
-
-
 func test_past_shows_what_came_back_and_who_did_not() -> void:
 	assert_str(_view.get_trip().texts()[5]).is_equal("None yet.")
 	_state().expedition.add_document("survey_report", Fixture.WORLD_ID, &"", DAY)

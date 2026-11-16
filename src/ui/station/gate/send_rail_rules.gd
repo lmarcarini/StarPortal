@@ -57,6 +57,10 @@ static func command_for(state: GameState, id: StringName) -> Command:
 				return SignalTeamCommand.new()
 			return SendTeamCommand.new()
 		&"hail":
+			if TeamContactRules.can_hail_team(state):
+				return HailTeamCommand.new()
+			if TeamContactRules.is_team_call(state):
+				return null
 			return HailCommand.new()
 	return null
 
@@ -100,8 +104,10 @@ static func team(state: GameState) -> KeyLook:
 
 ## The hail key, shown only when someone can be spoken to.
 static func hail(state: GameState) -> KeyLook:
-	var look: KeyLook = _look(&"hail", HailCommand.new().validate(state))
-	look.shown = GateQueries.can_hail(state)
+	var team: bool = TeamContactRules.can_hail_team(state) or TeamContactRules.is_team_call(state)
+	var check: CommandResult = CommandResult.ok() if team else HailCommand.new().validate(state)
+	var look: KeyLook = _look(&"hail", check)
+	look.shown = team or GateQueries.can_hail(state)
 	return look
 
 

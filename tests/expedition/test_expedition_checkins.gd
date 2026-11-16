@@ -1,8 +1,9 @@
-## Tests for check-ins (ExpeditionSystem): a check-in that is not the return posts its message
-## and writes a Log line without pausing; one due while CAIRN's wormhole is open comes when it
-## closes; Recall team makes the next check-in the return; a missed check-in (the field-event
-## hook, ExpeditionState.DAY_MISSED) pauses, sets the speed to 1× and opens the rescue window.
-## Bible: docs/content/m3-beyond-the-ring.md section 4
+## Tests for field days now that a team talks only through an open gate (M4.9-11): a field
+## day ends silently (no message, no Log line, no pause); one due while CAIRN's wormhole is
+## open comes when it closes; Recall team makes the next day the return; a missed day (the
+## field-event hook, ExpeditionState.DAY_MISSED) puts the team in trouble: it calls the base
+## and the rescue window opens.
+## Bible: docs/content/m3-beyond-the-ring.md section 4; interface-rethink.md section 4
 extends GdUnitTestSuite
 
 const Fixture := preload("res://tests/expedition/expedition_fixture.gd")
@@ -36,20 +37,17 @@ func _expedition_lines() -> Array[String]:
 	return reasons
 
 
-func test_check_in_posts_and_logs_without_pausing() -> void:
+func test_field_day_ends_silently() -> void:
 	var simulation: Simulation = _simulation()
 	RescueFixture.send(simulation)
-	var member: PersonState = _state.staff.find_person(_state.expedition.member_ids()[2])
-	InjuryRules.injure(member, PersonState.Injury.LIGHT)
+	var heard: int = _state.expedition.heard_tick
 	_state.clock.speed_index = 3
 	Fixture.advance(simulation, _state.expedition.next_day_end_tick() - _state.clock.tick + 1)
-	assert_bool(_events.has(ExpeditionSystem.CHECKED_IN_EVENT)).is_true()
+	assert_int(_state.expedition.day_results.size()).is_equal(1)
+	assert_bool(_events.has(&"team_checked_in")).is_false()
 	assert_array(_pauses).is_empty()
-	assert_int(_state.clock.speed_index).is_equal(3)
-	assert_array(_expedition_lines()).is_equal(["departed", "checked_in"])
-	var entry: LogEntry = _state.operations_log.entries.back()
-	assert_int(entry.args["light"]).is_equal(1)
-	assert_str(ExpeditionLogText.injuries(entry.args)).is_equal(tr(&"TEAM_INJURY_LIGHT_ONE"))
+	assert_array(_expedition_lines()).is_equal(["departed"])
+	assert_int(_state.expedition.heard_tick).is_equal(heard)
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.AWAY)
 
 
@@ -79,13 +77,13 @@ func test_recall_turns_the_next_check_in_into_the_return() -> void:
 	Fixture.advance(simulation, DAY + 1)
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.IDLE)
 	assert_bool(_events.has(ExpeditionSystem.RETURNED_EVENT)).is_true()
-	assert_bool(_events.has(ExpeditionSystem.CHECKED_IN_EVENT)).is_false()
+	assert_bool(_events.has(&"team_checked_in")).is_false()
 	assert_array(_expedition_lines()).is_equal(["departed", "returned", "prologue"])
 	assert_int(_state.worlds.status_of(Fixture.WORLD_ID)).is_equal(WorldsState.WorldStatus.PROBED)
 	assert_array(_state.expedition.documents).is_empty()
 
 
-func test_missed_check_in_pauses_at_normal_speed_and_opens_the_window() -> void:
+func test_missed_day_calls_and_opens_the_window() -> void:
 	var simulation: Simulation = _simulation(0)
 	RescueFixture.send(simulation)
 	_state.clock.speed_index = 3
@@ -94,11 +92,12 @@ func test_missed_check_in_pauses_at_normal_speed_and_opens_the_window() -> void:
 	var plan: ExpeditionState = _state.expedition
 	assert_int(plan.mode).is_equal(ExpeditionState.Mode.MISSING)
 	assert_int(plan.missed_tick).is_equal(due)
-	assert_array(_pauses).is_equal([ExpeditionRescue.PAUSE_REASON])
-	assert_int(TimeControl.effective_speed_index(_state.clock)).is_equal(
-		ClockState.NORMAL_SPEED_INDEX
-	)
-	assert_bool(_events.has(ExpeditionSystem.CHECKED_IN_EVENT)).is_false()
+	assert_bool(_events.has(&"team_distress")).is_true()
+	simulation.advance_tick()
+	assert_bool(_state.gate.has_incoming()).is_true()
+	assert_str(String(_state.gate.incoming_faction)).is_equal(String(TeamContactRules.TEAM_CALLER))
+	assert_array(_pauses).is_equal([GateSystem.INCOMING_PAUSE])
+	assert_bool(_events.has(&"team_checked_in")).is_false()
 	assert_array(_expedition_lines()).is_equal(["departed", "missed"])
 	assert_array(plan.away_ids()).has_size(4)
 	assert_str(String(Fixture.survey(_state).validate(_state).error_code)).is_equal(
@@ -115,7 +114,7 @@ func test_missed_return_opens_the_window() -> void:
 	assert_int(_state.worlds.status_of(Fixture.WORLD_ID)).is_equal(WorldsState.WorldStatus.PROBED)
 
 
-func test_only_a_missed_check_in_pauses() -> void:
+func test_only_a_missed_day_pauses() -> void:
 	var simulation: Simulation = _simulation()
 	RescueFixture.send(simulation)
 	Fixture.advance(simulation, 2 * DAY + 1)

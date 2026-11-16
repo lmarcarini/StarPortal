@@ -8,6 +8,8 @@ extends HBoxContainer
 
 ## Key [param id]'s command was accepted.
 signal key_used(id: StringName)
+## HAIL reached the team: show the orders open now.
+signal orders_requested
 ## TEAM was pressed while a team can be sent (the mission sheet opens on it, M4.9-10).
 signal team_requested
 
@@ -76,14 +78,20 @@ func press(id: StringName) -> void:
 	if id == &"team" and team_opens_sheet and not SignalTeamCommand.new().validate(state).is_ok:
 		team_requested.emit()
 		return
-	if not state.gate.operating:
+	var command: Command = SendRailRules.command_for(state, id)
+	if command == null:
+		orders_requested.emit()
+		return
+	if not state.gate.operating and not state.gate.is_incoming_lock():
 		_simulation.submit(OperateGateCommand.new())
-	var result: CommandResult = _simulation.submit(SendRailRules.command_for(state, id))
+	var result: CommandResult = _simulation.submit(command)
 	refresh()
 	if not result.is_ok:
 		_keys[id].set_help(String(SendRailRules.reason_key(result.error_code)))
 		return
 	key_used.emit(id)
+	if command is HailTeamCommand:
+		orders_requested.emit()
 
 
 ## Stands by: the wormhole stays open, the gate stops slowing the clock.
