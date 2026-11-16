@@ -40,21 +40,9 @@ func validate(state: GameState) -> CommandResult:
 	return CommandResult.ok()
 
 
-## Carries the order out.
+## Carries the order out (TeamContactRules.give_order).
 func apply(state: GameState) -> void:
-	var plan: ExpeditionState = state.expedition
-	match order:
-		TeamContactRules.Order.COME_HOME:
-			plan.recalled = true
-			plan.coming_home = true
-		TeamContactRules.Order.STAY_LONGER:
-			plan.delay_ticks += TimeMath.TICKS_PER_DAY
-		TeamContactRules.Order.COME_THROUGH:
-			plan.signal_tick = state.clock.tick
-		TeamContactRules.Order.HOLD_ON:
-			RingControl.close(state.gate)
-			state.events.post(&"wormhole_closed", [&"call_ended"])
-	state.events.post(&"team_ordered", [plan.world_id, TeamContactRules.ORDER_NAMES[order]])
+	TeamContactRules.give_order(state, order)
 
 
 ## Returns JSON-safe data.

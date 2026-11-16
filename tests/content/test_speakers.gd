@@ -29,7 +29,7 @@ func test_every_line_names_a_known_speaker_with_a_portrait() -> void:
 			assert_object(Registry.portrait(speaker.portrait)).is_not_null()
 			assert_bool(node.mood.is_empty() or ConversationNodeDef.MOODS.has(node.mood)).is_true()
 	assert_int(lines).is_greater(10)
-	assert_int(_conversations().size()).is_equal(7)
+	assert_int(_conversations().size()).is_equal(9)
 
 
 func test_speakers_cover_both_portrait_cases_and_the_player() -> void:

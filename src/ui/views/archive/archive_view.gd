@@ -17,6 +17,8 @@ extends GameView
 signal unread_changed
 ## The World Report's **Plan expedition** was pressed, for [param world_id].
 signal plan_requested(world_id: StringName)
+## A team's return in the Log asked for its team report.
+signal team_report_requested(entry: LogEntry)
 
 const _TITLE_KEY: StringName = &"ARCHIVE_TITLE"
 const _TITLE_UNREAD_KEY: StringName = &"ARCHIVE_TITLE_UNREAD"
@@ -72,6 +74,7 @@ func _ready() -> void:
 	_menu.id_pressed.connect(_on_menu_id_pressed)
 	_sections.tab_changed.connect(_link_sections.unbind(1))
 	_log.link_up(_sections.get_tab_bar())
+	_log.team_report_requested.connect(team_report_requested.emit)
 	_worlds.link_up(_sections.get_tab_bar())
 	_worlds.plan_requested.connect(
 		func(world_id: StringName) -> void: plan_requested.emit(world_id)

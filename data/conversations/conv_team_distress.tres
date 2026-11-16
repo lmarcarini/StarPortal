@@ -1,0 +1,72 @@
+[gd_resource type="Resource" script_class="ConversationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/conversation_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/conversation_node_def.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/conversation_choice_def.gd" id="3"]
+[ext_resource type="Script" path="res://src/content/story/effects/team_order_effect.gd" id="4"]
+
+[sub_resource type="Resource" id="r1"]
+script = ExtResource("2")
+id = &"open"
+speaker = &"speaker_team_leader"
+text_key = &"CONV_TEAM_CALL_1"
+next = &"ask"
+
+[sub_resource type="Resource" id="r2"]
+script = ExtResource("4")
+order = 3
+
+[sub_resource type="Resource" id="r3"]
+script = ExtResource("2")
+id = &"end_come_through"
+kind = 2
+effects = Array[Resource]([SubResource("r2")])
+
+[sub_resource type="Resource" id="r4"]
+script = ExtResource("2")
+id = &"ack_come_through"
+speaker = &"speaker_team_leader"
+mood = &"wary"
+text_key = &"CONV_TEAM_ACK_COME_THROUGH"
+next = &"end_come_through"
+
+[sub_resource type="Resource" id="r5"]
+script = ExtResource("3")
+text_key = &"CONV_TEAM_ORDER_COME_THROUGH"
+next = &"ack_come_through"
+
+[sub_resource type="Resource" id="r6"]
+script = ExtResource("4")
+order = 4
+
+[sub_resource type="Resource" id="r7"]
+script = ExtResource("2")
+id = &"end_hold_on"
+kind = 2
+effects = Array[Resource]([SubResource("r6")])
+
+[sub_resource type="Resource" id="r8"]
+script = ExtResource("2")
+id = &"ack_hold_on"
+speaker = &"speaker_team_leader"
+mood = &"wary"
+text_key = &"CONV_TEAM_ACK_HOLD_ON"
+next = &"end_hold_on"
+
+[sub_resource type="Resource" id="r9"]
+script = ExtResource("3")
+text_key = &"CONV_TEAM_ORDER_HOLD_ON"
+next = &"ack_hold_on"
+
+[sub_resource type="Resource" id="r10"]
+script = ExtResource("2")
+id = &"ask"
+kind = 1
+choices = Array[Resource]([SubResource("r5"), SubResource("r9")])
+
+[resource]
+script = ExtResource("1")
+channels = Array[StringName]([&"incoming"])
+start = &"open"
+nodes = Array[Resource]([SubResource("r1"), SubResource("r10"), SubResource("r4"), SubResource("r3"), SubResource("r8"), SubResource("r7")])
+id = &"conv_team_distress"

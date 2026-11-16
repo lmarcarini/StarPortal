@@ -54,22 +54,17 @@ func _rescue(simulation: Simulation) -> bool:
 	return plan.signal_tick >= 0 or _try(simulation, SignalTeamCommand.new())
 
 
-## Answers the team's call (Come through or Hold on) or hails a team it holds a wormhole to
-## and says Carry on; true when it did.
+## Hails a team it holds a wormhole to (the hail conversation's answers are the orders,
+## given by SoakStory like any conversation); true when it did. A team's call is answered
+## and talked through by SoakStory too.
 func _talk(simulation: Simulation) -> bool:
 	var state: GameState = simulation.state
 	var plan: ExpeditionState = state.expedition
-	if TeamContactRules.is_team_call(state) and plan.signal_tick < 0:
-		var order: TeamContactRules.Order = TeamContactRules.Order.COME_THROUGH
-		if plan.missed_tick % 2 == 0:
-			order = TeamContactRules.Order.HOLD_ON
-		return _try(simulation, OrderTeamCommand.create(order))
+	if TeamContactRules.is_team_call(state) or state.conversations.active != null:
+		return false
 	if not TeamContactRules.can_hail_team(state) or plan.heard_tick >= state.gate.lock_started_tick:
 		return false
-	if not _try(simulation, HailTeamCommand.new()):
-		return false
-	_try(simulation, OrderTeamCommand.create(TeamContactRules.Order.CARRY_ON))
-	return true
+	return _try(simulation, HailTeamCommand.new())
 
 
 ## The true address of the missing team's world, or null when no team is missing.

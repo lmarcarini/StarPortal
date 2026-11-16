@@ -25,15 +25,25 @@ static func line(state: GameState, node: ConversationNodeDef) -> String:
 	return _tr(&"CONV_LINE").format({"speaker": speaker_name(state, node.speaker), "text": text})
 
 
-## The name of speaker [param speaker_id]; the id itself when it has no SpeakerDef.
+## The name of speaker [param speaker_id]; the id itself when it has no SpeakerDef. The team
+## leader speaker is named from the roster while a team is out.
 static func speaker_name(state: GameState, speaker_id: StringName) -> String:
+	if speaker_id == TeamContactRules.LEADER_SPEAKER:
+		var leader_id: StringName = state.expedition.team.get("leader", &"")
+		var leader: PersonState = state.staff.find_person(leader_id)
+		if leader != null:
+			return leader.name
 	var def: SpeakerDef = state.speaker_defs.get(speaker_id)
 	return String(speaker_id) if def == null else _tr(def.name_key)
 
 
-## The title of speaker [param speaker_id]; "" when none.
+## The title of speaker [param speaker_id]; "" when none. The team leader's adds the day of
+## the mission ("Threshold team · 2/3").
 static func speaker_title(state: GameState, speaker_id: StringName) -> String:
 	var def: SpeakerDef = state.speaker_defs.get(speaker_id)
+	if speaker_id == TeamContactRules.LEADER_SPEAKER and def != null and state.expedition.is_out():
+		var plan: ExpeditionState = state.expedition
+		return "%s · %d/%d" % [_tr(def.title_key), plan.day_results.size(), plan.days()]
 	return "" if def == null or def.title_key.is_empty() else _tr(def.title_key)
 
 

@@ -158,7 +158,7 @@ func _send_and_close(player: M15Player) -> void:
 
 
 ## The Survey works silently (a team talks only through an open gate, M4.9-11) and comes home
-## at +48 h: SILL is Surveyed and the plan clears.
+## at +48 h: SILL is Surveyed, the plan clears and the team report opens on the Gate; CLOSE.
 func _check_in_and_come_home(player: M15Player) -> void:
 	var state: GameState = player.state()
 	_wait(player, func() -> bool: return state.expedition.mode == ExpeditionState.Mode.IDLE)
@@ -171,6 +171,13 @@ func _check_in_and_come_home(player: M15Player) -> void:
 		func(e: LogEntry) -> bool: return e.args.get("reason", "") == "prologue"
 	)
 	assert_int(lines.size()).is_equal(1)
+	await _runner.await_input_processed()
+	var report: TeamReportScreen = _station().get_team_report()
+	assert_bool(report.visible).is_true()
+	assert_int(report.get_debrief().outcome).is_equal(DebriefRules.Outcome.SUCCESS)
+	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("gate_room")
+	await UiInput.click(report.get_close_key())
+	assert_bool(report.visible).is_false()
 
 
 ## The game's own ExpeditionSystem misses the next team's first check-in (field events' worst
@@ -198,8 +205,16 @@ func _miss_and_open_the_alert(player: M15Player) -> void:
 	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("gate_room")
 	_wait(player, func() -> bool: return state.gate.has_incoming())
 	assert_bool(player.simulation.submit(AnswerIncomingCommand.new()).is_ok).is_true()
-	var hold: OrderTeamCommand = OrderTeamCommand.create(TeamContactRules.Order.HOLD_ON)
-	assert_bool(player.simulation.submit(hold).is_ok).is_true()
+	await _runner.await_input_processed()
+	assert_bool(_shell.get_dialogue_screen().visible).is_true()
+	for guard: int in 20:
+		var active: ActiveConversation = state.conversations.active
+		if active == null:
+			break
+		if active.phase == ActiveConversation.Phase.CHOICE:
+			player.simulation.submit(ChooseOptionCommand.new(1))
+		else:
+			player.simulation.submit(AdvanceConversationCommand.new())
 	assert_int(state.gate.mode).is_equal(GateState.RingMode.IDLE)
 
 

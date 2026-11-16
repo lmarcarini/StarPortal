@@ -37,6 +37,8 @@ const VALUES: Dictionary = {
 		&"switch_to_gate_on_lock": true,
 		# Failure states (M4c-14): off for free play and testing; nothing can end the game.
 		&"failure_states": true,
+		# Open the team report by itself when a team comes home (M4.9-15).
+		&"auto_open_team_report": true,
 	},
 	# One key per InputActions.ACTIONS entry, holding that action's bindings encoded by
 	# InputService. An empty Dictionary means "use the built-in defaults".

@@ -66,11 +66,12 @@ func _return(state: GameState, rng: RandomNumberGenerator) -> void:
 	if plan.day_results.size() >= plan.days():
 		success = ExpeditionReturns.apply(state, rng)
 	var early: bool = plan.coming_home
+	var days: int = plan.day_results.size()
 	plan.clear()
 	TeamContactRules.open_return(state, world_id)
 	state.events.post(RETURNED_EVENT, [world_id, objective, success, team])
 	var summary: Dictionary = {
-		"objective": objective, "success": success, "early": early, "team": team
+		"objective": objective, "success": success, "early": early, "team": team, "days": days
 	}
 	state.events.post(&"team_debrief", [world_id, summary])
 	if state.flags.get(PROLOGUE_FLAG, false) != true:

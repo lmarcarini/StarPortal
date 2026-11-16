@@ -36,7 +36,9 @@ func node(node_id: StringName) -> ConversationNodeDef:
 
 ## The faction, the worlds and every line's speaker.
 func get_references() -> Array[StringName]:
-	var found: Array[StringName] = [faction]
+	var found: Array[StringName] = []
+	if not faction.is_empty():
+		found.append(faction)
 	found.append_array(worlds)
 	for speaker: StringName in speakers():
 		found.append(speaker)

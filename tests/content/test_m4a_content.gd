@@ -20,7 +20,7 @@ func _new_game() -> GameState:
 func test_content_counts() -> void:
 	assert_int(_defs.factions.size()).is_equal(3)
 	assert_int(_defs.requests.size()).is_equal(4)
-	assert_int(_defs.conversations.size()).is_equal(7)
+	assert_int(_defs.conversations.size()).is_equal(9)
 	var state: GameState = _new_game()
 	assert_str(String(state.galaxy.get_world(&"world_hearth").controller)).is_equal(
 		"faction_kindred"

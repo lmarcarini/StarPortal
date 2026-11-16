@@ -25,6 +25,8 @@ var menu_button := Button.new()
 var quit_button := Button.new()
 ## The Failure states setting (M4c-15), until a settings screen exists.
 var failure_toggle := CheckButton.new()
+## Opens the team report by itself when a team comes home (gameplay/auto_open_team_report).
+var report_toggle := CheckButton.new()
 ## The confirm question and its Yes key.
 var question := Label.new()
 var yes_button := Button.new()
@@ -79,6 +81,12 @@ func _build_keys(column: VBoxContainer) -> void:
 	failure_toggle.set_pressed_no_signal(Settings.get_bool(&"gameplay", &"failure_states"))
 	failure_toggle.toggled.connect(_on_failure_toggled)
 	_keys.add_child(failure_toggle)
+	report_toggle.text = &"PAUSE_AUTO_TEAM_REPORT"
+	report_toggle.set_pressed_no_signal(Settings.get_bool(&"gameplay", &"auto_open_team_report"))
+	report_toggle.toggled.connect(
+		func(on: bool) -> void: Settings.set_value(&"gameplay", &"auto_open_team_report", on)
+	)
+	_keys.add_child(report_toggle)
 	column.add_child(_keys)
 	question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(question)
