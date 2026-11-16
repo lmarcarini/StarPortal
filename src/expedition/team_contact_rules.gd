@@ -16,6 +16,12 @@ const TEAM_CALLER: StringName = &"team"
 const RETURN_TICKS: int = 5
 ## Grace after a team's return time before it is overdue (12 hours).
 const GRACE_TICKS: int = 12 * 60
+## The conversation a hail opens (its answers are the hail orders).
+const HAIL_CONVERSATION: StringName = &"conv_team_hail"
+## The conversation the team's answered call opens (its answers are the call orders).
+const CALL_CONVERSATION: StringName = &"conv_team_distress"
+## The speaker of team conversations: the team leader (named from the roster by the UI).
+const LEADER_SPEAKER: StringName = &"speaker_team_leader"
 ## Saved names of the orders.
 const ORDER_NAMES: Array[String] = [
 	"carry_on", "come_home", "stay_longer", "come_through", "hold_on"
@@ -63,6 +69,25 @@ static func open_orders(state: GameState) -> Array[Order]:
 	return []
 
 
+## Carries out [param order]: come home walks the team through this wormhole, stay longer adds
+## a day, come through brings it back now (the mission fails), hold on ends the call (the
+## base dials later). Posts team_ordered. Called by OrderTeamCommand and TeamOrderEffect.
+static func give_order(state: GameState, order: Order) -> void:
+	var plan: ExpeditionState = state.expedition
+	match order:
+		Order.COME_HOME:
+			plan.recalled = true
+			plan.coming_home = true
+		Order.STAY_LONGER:
+			plan.delay_ticks += TimeMath.TICKS_PER_DAY
+		Order.COME_THROUGH:
+			plan.signal_tick = state.clock.tick
+		Order.HOLD_ON:
+			RingControl.close(state.gate)
+			state.events.post(&"wormhole_closed", [&"call_ended"])
+	state.events.post(&"team_ordered", [plan.world_id, ORDER_NAMES[order]])
+
+
 ## The team calls: an incoming friendly wormhole from its world waits for an answer.
 static func start_call(state: GameState) -> void:
 	var gate: GateState = state.gate
@@ -81,6 +106,7 @@ static func answer_call(state: GameState) -> void:
 	plan.calling = false
 	hear(state)
 	state.events.post(&"team_called", [plan.world_id])
+	ConversationRules.start(state, CALL_CONVERSATION, &"incoming", plan.world_id)
 
 
 ## The team comes home through its own friendly wormhole: the Ring opens as an answered

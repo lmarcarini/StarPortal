@@ -161,10 +161,12 @@ func _connect_view(view: GameView) -> void:
 	if view is ArchiveView:
 		(view as ArchiveView).unread_changed.connect(_refresh_titles)
 		(view as ArchiveView).plan_requested.connect(_on_plan_requested)
+		(view as ArchiveView).team_report_requested.connect(_on_team_report_requested)
 	elif view is PersonnelView:
 		(view as PersonnelView).show_on_plan.connect(_on_show_on_plan)
 	elif view is GateStationView:
 		(view as GateStationView).capacitor_bank_requested.connect(_on_capacitor_bank_requested)
+		(view as GateStationView).report_opened.connect(show_view.bind(GATE_ROOM))
 
 
 ## Shows [param view_id] and hides the others, without moving focus.
@@ -300,6 +302,15 @@ func _on_plan_requested(world_id: StringName) -> void:
 		return
 	show_view(GATE_ROOM)
 	gate.plan_world(world_id)
+
+
+## Opens the Gate with the team report of the Log's return [param entry].
+func _on_team_report_requested(entry: LogEntry) -> void:
+	if not _views.has(GATE_ROOM):
+		return
+	var gate: GateStationView = _views[GATE_ROOM] as GateStationView
+	if gate != null:
+		gate.show_log_report(entry)
 
 
 ## Opens the Base on [param person_id]'s level with their token selected.

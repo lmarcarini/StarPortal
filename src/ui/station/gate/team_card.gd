@@ -2,8 +2,14 @@ class_name TeamCard
 extends Button
 ## The team in the field, low on the left of the Gate station: a clock ring of the time left
 ## and the team's world; the hover card gives what the base last heard (days, when). Hidden
-## while no team is out.
+## while no team is out, unless a team report waits: then a report icon that opens it.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Teams)
+
+const _LIT: Color = Color("#e8a33d")
+
+## True while a team report waits to be read (the card then shows a report icon; pressing
+## it opens the report).
+var report_waiting: bool = false
 
 var _simulation: Simulation = null
 var _card: HoverCard = null
@@ -36,8 +42,10 @@ func _process(_delta: float) -> void:
 	if _simulation == null:
 		return
 	var plan: ExpeditionState = _simulation.state.expedition
-	visible = plan.is_out()
-	if not visible:
+	visible = plan.is_out() or report_waiting
+	if not plan.is_out():
+		_card.set_text("HW_ICON_OFFICE")
+		queue_redraw()
 		return
 	var heard: String = GateRoomFormat.date_time(plan.heard_tick) if plan.heard_tick >= 0 else "—"
 	_card.set_text(
@@ -55,6 +63,11 @@ func _process(_delta: float) -> void:
 
 func _draw() -> void:
 	if _simulation == null or not visible:
+		return
+	if not _simulation.state.expedition.is_out():
+		HardwareIcons.draw(
+			self, &"office", Rect2(size.y * 0.2, size.y * 0.2, size.y * 0.6, size.y * 0.6), _LIT
+		)
 		return
 	var c: Vector2 = Vector2(size.y * 0.5, size.y * 0.5)
 	var r: float = size.y * 0.32

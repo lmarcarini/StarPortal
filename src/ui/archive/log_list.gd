@@ -7,6 +7,9 @@ extends VBoxContainer
 ## not. The D-pad path is section tabs, kind filter, search, rows and back. Reads state only.
 ## Bible: game-design.md#core-loop (Archive: the operations log)
 
+## A team's return row was pressed: reopen its team report.
+signal team_report_requested(entry: LogEntry)
+
 ## Kind filter value that shows every kind.
 const ANY_KIND: StringName = &""
 ## Bus events after which the log may hold new entries, with their argument counts.
@@ -215,6 +218,8 @@ func _rebuild() -> void:
 func _make_row(entry: LogEntry) -> ArchiveLogRow:
 	var row: ArchiveLogRow = _ROW_SCENE.instantiate() as ArchiveLogRow
 	row.setup(entry, _simulation.state)
+	if DebriefRules.is_return_entry(entry):
+		row.pressed.connect(team_report_requested.emit.bind(entry))
 	return row
 
 

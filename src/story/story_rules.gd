@@ -79,6 +79,10 @@ static func apply(state: GameState, effect: EffectDef, _source: StringName) -> b
 		return true
 	if effect is AddDocumentEffect:
 		return _add_document(state, (effect as AddDocumentEffect).document)
+	if effect is TeamOrderEffect:
+		var given: int = (effect as TeamOrderEffect).order
+		TeamContactRules.give_order(state, given as TeamContactRules.Order)
+		return true
 	if effect is AddAddressEffect:
 		return _add_address(state, (effect as AddAddressEffect).world)
 	var unlock: Array = UnlockRules.unlock_pair(effect)

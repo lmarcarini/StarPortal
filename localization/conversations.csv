@@ -46,3 +46,17 @@ DIALOG_ESTABLISHING,ESTABLISHING LINK,ESTABELECENDO CONEXÃO
 DIALOG_CONNECTING,CONNECTING SECURE LINE,CONECTANDO LINHA SEGURA
 DIALOG_LINK_CLOSED,LINK CLOSED,CONEXÃO ENCERRADA
 DIALOG_SIGNAL_LOST,SIGNAL LOST,SINAL PERDIDO
+CONV_SPEAKER_TEAM_LEADER,Team leader,Líder da equipe
+SPEAKER_TITLE_TEAM,Threshold team,Equipe Threshold
+CONV_TEAM_HAIL_1,"Base, we read you. All in hand out here.","Base, na escuta. Tudo sob controle aqui."
+CONV_TEAM_CALL_1,"Base, we're in trouble. Need your call.","Base, estamos em apuros. Precisamos de ordens."
+CONV_TEAM_ACK_CARRY_ON,Understood. Carrying on.,Entendido. Seguimos.
+CONV_TEAM_ACK_COME_HOME,Copy. Packing up and coming through.,Copiado. Recolhendo e atravessando.
+CONV_TEAM_ACK_STAY_LONGER,One more day. We'll make it count.,Mais um dia. Vamos aproveitar.
+CONV_TEAM_ACK_COME_THROUGH,Moving now. Keep it open.,Indo agora. Mantenham aberto.
+CONV_TEAM_ACK_HOLD_ON,We'll hold. Don't be long.,Vamos aguentar. Não demorem.
+CONV_TEAM_ORDER_CARRY_ON,Carry on,Continuem
+CONV_TEAM_ORDER_COME_HOME,Come home,Voltem já
+CONV_TEAM_ORDER_STAY_LONGER,Stay longer,Fiquem mais
+CONV_TEAM_ORDER_COME_THROUGH,Come through,Atravessem
+CONV_TEAM_ORDER_HOLD_ON,Hold on,Aguentem

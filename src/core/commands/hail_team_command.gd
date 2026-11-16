@@ -1,8 +1,8 @@
 class_name HailTeamCommand
 extends Command
 ## The base hails its team through the wormhole it holds open to the team's world: the base
-## hears where the team is and how it is (team_hailed), and may then give an order
-## (OrderTeamCommand). Costs nothing beyond holding the wormhole open.
+## hears where the team is and how it is (team_hailed) and the hail conversation opens; its
+## answers are the orders (TeamOrderEffect). Costs nothing beyond holding the wormhole open.
 ## Bible: docs/content/interface-rethink.md section 4 (A team can only talk through an open gate)
 
 ## The command's stable type id.
@@ -32,6 +32,7 @@ func apply(state: GameState) -> void:
 	var plan: ExpeditionState = state.expedition
 	var hurt: Vector2i = ExpeditionSystem.injuries(state)
 	state.events.post(&"team_hailed", [plan.world_id, plan.heard_days, plan.days(), hurt.x, hurt.y])
+	ConversationRules.start(state, TeamContactRules.HAIL_CONVERSATION, &"wormhole", plan.world_id)
 
 
 ## Returns JSON-safe data: just the type.

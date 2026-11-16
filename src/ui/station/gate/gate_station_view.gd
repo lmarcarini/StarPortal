@@ -7,6 +7,8 @@ extends GameView
 
 ## The console asked to build a capacitor bank (open the Base).
 signal capacitor_bank_requested
+## The team report opened by itself (show the Gate).
+signal report_opened
 
 ## The station def shown.
 const STATION_ID: StringName = &"station_gate"
@@ -19,10 +21,9 @@ var _report_panel: WorldReportPanel = WorldReportPanel.new()
 var _rail: SendRail = SendRail.new()
 var _moth: MothScreen = MothScreen.new()
 var _floor: FloorActors = FloorActors.new()
-var _orders: TeamOrders = TeamOrders.new()
 var _sheet: MissionSheet = MissionSheet.new()
 var _team: TeamCard = TeamCard.new()
-var _debrief: DebriefCard = DebriefCard.new()
+var _report_screen: TeamReportScreen = TeamReportScreen.new()
 var _locker: GateLocker = GateLocker.new()
 var _note: LineEdit = LineEdit.new()
 var _note_key: String = ""
@@ -31,6 +32,18 @@ var _note_key: String = ""
 @onready var _console: GateConsole = %GateConsole
 @onready var _rack: DestinationRack = %DestinationRack
 @onready var _panel: AlienPanel = %AlienPanel
+
+
+func _enter_tree() -> void:
+	EventBus.team_debrief.connect(_on_team_debrief)
+	EventBus.team_rescued.connect(_on_team_rescued)
+	EventBus.team_lost.connect(_on_team_lost)
+
+
+func _exit_tree() -> void:
+	EventBus.team_debrief.disconnect(_on_team_debrief)
+	EventBus.team_rescued.disconnect(_on_team_rescued)
+	EventBus.team_lost.disconnect(_on_team_lost)
 
 
 func _ready() -> void:
@@ -51,9 +64,6 @@ func _ready() -> void:
 	move_child(_rail, _station.get_index() + 1)
 	add_child(_moth)
 	_moth.changed.connect(_on_moth_changed)
-	_orders.name = "TeamOrders"
-	add_child(_orders)
-	_rail.orders_requested.connect(_show_orders)
 	_rail.team_opens_sheet = true
 	_rail.team_requested.connect(open_mission_sheet)
 	_sheet.name = "MissionSheet"
@@ -61,13 +71,12 @@ func _ready() -> void:
 	_team.name = "TeamCard"
 	add_child(_team)
 	move_child(_team, _rail.get_index())
-	_debrief.name = "DebriefCard"
-	add_child(_debrief)
 	_locker.name = "GateLocker"
 	_locker.position = Vector2(16, 16)
 	add_child(_locker)
 	add_child(_locker.get_card())
-	_debrief.resized.connect(func() -> void: _debrief.position = (size - _debrief.size) * 0.5)
+	_team.pressed.connect(_open_team_report)
+	_add_report_screen()
 	resized.connect(_layout)
 	_console.resized.connect(_layout)
 	_layout.call_deferred()
@@ -89,12 +98,34 @@ func setup(simulation: Simulation) -> void:
 	_panel.setup(simulation)
 	_rail.setup(simulation)
 	_moth.setup(simulation)
-	_orders.setup(simulation)
 	_sheet.setup(simulation)
 	_team.setup(simulation)
-	_debrief.setup(simulation)
+	_report_screen.setup(simulation)
 	_locker.setup(simulation)
 	_report.visible = false
+
+
+func _open_team_report() -> void:
+	_team.report_waiting = false
+	_report_screen.open(_report_screen.get_debrief())
+
+
+## Reopens the team report of the Log's return [param entry] (report_opened follows).
+func show_log_report(entry: LogEntry) -> void:
+	if _simulation != null:
+		_show_team_report(DebriefRules.of_log(_simulation.state, entry), true)
+
+
+## Shows [param debrief] on the team report: at once (with report_opened) when [param asked]
+## (reopened from the Log) or the setting gameplay/auto_open_team_report is on, else it waits
+## on the team card.
+func _show_team_report(debrief: DebriefRules.Debrief, asked: bool = false) -> void:
+	if not asked and not Settings.get_bool(&"gameplay", &"auto_open_team_report"):
+		_report_screen.keep(debrief)
+		_team.report_waiting = true
+		return
+	_report_screen.open(debrief)
+	report_opened.emit()
 
 
 ## The main key.
@@ -193,9 +224,9 @@ func get_team_card() -> TeamCard:
 	return _team
 
 
-## The debrief card.
-func get_debrief() -> DebriefCard:
-	return _debrief
+## The team report screen.
+func get_team_report() -> TeamReportScreen:
+	return _report_screen
 
 
 ## The locker (holding, MOTH order).
@@ -220,11 +251,6 @@ func plan_world(world_id: StringName) -> void:
 	if galaxy != null and galaxy.get_world(world_id) != null:
 		var address: GateAddress = galaxy.address_of(world_id, galaxy.home().origin_glyph)
 		_open_order_sheet(GateDestination.of(address, "", world_id))
-
-
-## The team orders card.
-func get_team_orders() -> TeamOrders:
-	return _orders
 
 
 ## The World Report card.
@@ -279,9 +305,25 @@ func _on_moth_changed() -> void:
 		_moth.get_default_focus().grab_focus.call_deferred()
 
 
-func _show_orders() -> void:
-	_orders.open()
-	_orders.position = _rail.position + Vector2(0, -_orders.size.y - 12.0)
+func _add_report_screen() -> void:
+	add_child(_report_screen)
+	_report_screen.world_requested.connect(_show_report)
+	_report_screen.holding_requested.connect(_locker.toggle_holding)
+
+
+func _on_team_debrief(world: StringName, summary: Dictionary) -> void:
+	if _simulation != null:
+		_show_team_report(DebriefRules.of_return(_simulation.state, world, summary))
+
+
+func _on_team_rescued(world: StringName, _survivors: int) -> void:
+	if _simulation != null:
+		_show_team_report(DebriefRules.of_end(world, false))
+
+
+func _on_team_lost(world: StringName, _reason: StringName) -> void:
+	if _simulation != null:
+		_show_team_report(DebriefRules.of_end(world, true))
 
 
 func _on_rail_used(id: StringName) -> void:
