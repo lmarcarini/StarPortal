@@ -1,4 +1,4 @@
-## The top bar in the shell: every item is in the focus ring and opens its screen, it is
+## The frame in the shell (M4.10-01): every item is in the focus ring and opens its screen, it is
 ## right after a load and while paused, and pt_BR fits at 150% in a 1280 × 720 window.
 ## Bible: docs/content/interface-pass.md section 3
 extends GdUnitTestSuite
@@ -36,7 +36,7 @@ func after_test() -> void:
 
 
 func test_every_item_is_focusable_and_in_the_ring() -> void:
-	var bar: TopBar = _shell.top_bar
+	var bar: Frame = _shell.frame
 	var buttons: Array[Button] = _shell.get_focus_order()
 	for item: Button in [bar.power_readout, bar.gate_chip, bar.alerts_button, bar.money_label]:
 		assert_bool(buttons.has(item)).is_true()
@@ -44,7 +44,7 @@ func test_every_item_is_focusable_and_in_the_ring() -> void:
 
 
 func test_power_opens_base_on_energy() -> void:
-	_shell.top_bar.power_readout.pressed.emit()
+	_shell.frame.power_readout.pressed.emit()
 	await _runner.simulate_frames(2)
 	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("base")
 	var base: BaseView = _shell.view_switcher.get_view(ViewSwitcher.BASE) as BaseView
@@ -53,13 +53,13 @@ func test_power_opens_base_on_energy() -> void:
 
 func test_gate_chip_opens_the_gate_room() -> void:
 	_shell.view_switcher.show_view(ViewSwitcher.BASE)
-	_shell.top_bar.gate_chip.pressed.emit()
+	_shell.frame.gate_chip.pressed.emit()
 	await _runner.simulate_frames(2)
 	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("gate_room")
 
 
 func test_readouts_show_state_while_paused_and_after_a_load() -> void:
-	var bar: TopBar = _shell.top_bar
+	var bar: Frame = _shell.frame
 	var state: GameState = SimClock.simulation.state
 	assert_str(bar.money_label.text).contains(TopBarText.net_text(TopBarText.net_per_day(state)))
 	assert_str(bar.power_readout.text).starts_with(TopBarText.power_text(state))
@@ -77,12 +77,39 @@ func test_pt_br_fits_at_150_percent_in_1280_by_720() -> void:
 	Settings.setting_changed.emit(&"display", &"ui_scale", 1.5)
 	_shell.theme = UiThemeBuilder.build(1.5)
 	_shell.size = Vector2(1280, 720)
-	await _runner.simulate_frames(4)
-	var bar: TopBar = _shell.top_bar
-	assert_float(bar.size.x).is_less_equal(1280.0)
-	for item: Control in bar.row.get_children():
-		if not item.visible:
-			continue
-		var rect: Rect2 = item.get_global_rect()
-		assert_float(rect.end.x).is_less_equal(1280.0)
-	assert_float(_shell.view_switcher.offset_top).is_equal_approx(bar.size.y, 0.5)
+	await _runner.simulate_frames(6)
+	var plates: Array[Control] = _shell.frame.get_plates()
+	for plate: Control in plates:
+		assert_float(plate.get_global_rect().end.x).is_less_equal(1280.0)
+	var gauges: Rect2 = plates[2].get_global_rect()
+	for plate: Control in [plates[0], plates[1]]:
+		assert_bool(plate.get_global_rect().intersects(gauges)).is_false()
+	assert_float(_shell.view_switcher.offset_top).is_equal_approx(_shell.frame.band_height(), 0.5)
+
+
+func test_the_frame_is_thin_plates_and_save_load_and_debug_left_the_screen() -> void:
+	var frame: Frame = _shell.frame
+	assert_int(frame.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	var covered: float = 0.0
+	for plate: Control in frame.get_plates():
+		covered += plate.size.x
+	assert_float(covered).is_less(_shell.size.x)
+	assert_object(frame.find_child("*Save*", true, false)).is_null()
+	for button: Button in _shell.get_focus_order():
+		assert_str(button.text).is_not_equal(button.tr(&"UI_SAVE"))
+		assert_str(button.text).is_not_equal(button.tr(&"UI_DEBUG_SET_FLAG"))
+
+
+func test_speed_keys_pause_play_and_fast() -> void:
+	var plate: ClockPlate = _shell.frame.clock_plate
+	SimClock.resume()
+	plate.pause_key.pressed.emit()
+	assert_bool(SimClock.simulation.state.clock.is_paused).is_true()
+	plate.play_key.pressed.emit()
+	assert_bool(SimClock.simulation.state.clock.is_paused).is_false()
+	var speed: int = SimClock.simulation.state.clock.speed_index
+	plate.fast_key.pressed.emit()
+	assert_int(SimClock.simulation.state.clock.speed_index).is_equal(speed + 1)
+	plate.play_key.pressed.emit()
+	assert_int(SimClock.simulation.state.clock.speed_index).is_equal(speed)
+	SimClock.pause()

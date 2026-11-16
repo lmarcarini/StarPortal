@@ -39,6 +39,15 @@ var screen_grain := ScreenGrain.new()
 ## Switches to the Gate Room on a lock and stands by on leaving it.
 var gate_focus := GateFocus.new()
 
+## The frame round every station (docs/content/interface-rethink.md section 3).
+var frame := Frame.new()
+## The clock on the frame.
+var time_bar: TimeBar = frame.time_bar
+## The funds number on the frame.
+var money_label: MoneyLabel = frame.money_label
+## The Committee Confidence number on the frame.
+var confidence_readout: ConfidenceReadout = frame.confidence_readout
+
 var _simulation: Simulation = null
 ## Why the last [method _start] failed.
 var _start_error: StringName = &""
@@ -47,19 +56,8 @@ var _rescue_alert := RescueAlert.new()
 var _alert_stack := AlertStack.new()
 var _dialogue := DialogueScreen.new()
 
-## The bar on every screen (docs/content/interface-pass.md section 3).
-@onready var top_bar: TopBar = %TopBar
-## The time bar at the top of the screen.
-@onready var time_bar: TimeBar = top_bar.time_bar
-## The game views and their tabs, under the top bar.
+## The game views, under the frame.
 @onready var view_switcher: ViewSwitcher = %ViewSwitcher
-## The money display in the top bar.
-@onready var money_label: MoneyLabel = top_bar.money_label
-## The Committee Confidence readout beside the funds.
-@onready var confidence_readout: ConfidenceReadout = top_bar.confidence_readout
-@onready var _quick_save_button: Button = top_bar.quick_save_button
-@onready var _quick_load_button: Button = top_bar.quick_load_button
-@onready var _debug_flag_button: Button = top_bar.debug_flag_button
 @onready var _toast: Label = %Toast
 @onready var _toast_timer: Timer = %ToastTimer
 
@@ -68,11 +66,11 @@ func _ready() -> void:
 	_apply_min_window_size()
 	_apply_theme()
 	add_child(screen_grain)
-	_quick_save_button.pressed.connect(quick_save)
-	_quick_load_button.pressed.connect(quick_load)
-	top_bar.open_view.connect(open_view)
-	top_bar.alert_chosen.connect(_on_alert_chosen)
-	top_bar.resized.connect(_fit_below_top_bar)
+	add_child(frame)
+	move_child(frame, view_switcher.get_index() + 1)
+	frame.open_view.connect(open_view)
+	frame.alert_chosen.connect(_on_alert_chosen)
+	frame.band_changed.connect(_fit_below_frame)
 	add_child(log_strip)
 	log_strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	log_strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
@@ -231,7 +229,7 @@ func get_focus_order() -> Array[Button]:
 	var extra: Array[Button] = []
 	if _alert_stack.get_rescue_button().visible:
 		extra.append(_alert_stack.get_rescue_button())
-	return top_bar.get_focus_buttons(extra)
+	return frame.get_focus_buttons(extra)
 
 
 ## Returns the text of the toast on screen, or "" when none is shown.
@@ -270,14 +268,10 @@ func _start(state: GameState, is_new_game: bool = false) -> bool:
 	return true
 
 
-## Adds the debug overlay and keeps the flag button in debug builds; removes the button in
-## release builds, where neither exists.
+## Adds the debug overlay (F12) in debug builds; release builds have none.
 func _setup_debug_tools() -> void:
 	if not OS.is_debug_build():
-		_debug_flag_button.queue_free()
-		_debug_flag_button = null
 		return
-	_debug_flag_button.pressed.connect(_on_debug_flag_pressed)
 	var scene: PackedScene = load(_DEBUG_OVERLAY_SCENE)
 	debug_overlay = scene.instantiate() as DebugOverlay
 	add_child(debug_overlay)
@@ -289,28 +283,28 @@ func _bind_views(simulation: Simulation) -> void:
 	view_switcher.setup(simulation)
 	_rescue_alert.setup(simulation)
 	_dialogue.bind(simulation)
-	top_bar.bind(simulation)
+	frame.bind(simulation)
 	log_strip.refresh(true)
 
 
 ## Puts the alert stack in the top bar after the time bar, and the rescue alert over the top
 ## of the current tab, below the tab bar.
 func _add_alerts() -> void:
-	top_bar.add_after_clock(_alert_stack)
+	frame.add_after_clock(_alert_stack)
 	add_child(_rescue_alert)
 	_rescue_alert.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	_rescue_alert.offset_left = 16.0
 	_rescue_alert.offset_right = -16.0
 	_rescue_alert.offset_top = view_switcher.offset_top + 48.0
-	_fit_below_top_bar()
+	_fit_below_frame()
 	_rescue_alert.gate_room_requested.connect(view_switcher.show_view.bind(ViewSwitcher.GATE_ROOM))
 	_alert_stack.setup(_rescue_alert)
-	top_bar.alert_list.set_rescue(_rescue_alert)
-	_rescue_alert.changed.connect(_relink_top_bar)
+	frame.alert_list.set_rescue(_rescue_alert)
+	_rescue_alert.changed.connect(_relink_frame)
 
 
 ## Links the top bar's buttons again once the alert stack's entry shows or hides.
-func _relink_top_bar() -> void:
+func _relink_frame() -> void:
 	if not is_node_ready():
 		return
 	ShellBoot.link_focus(get_focus_order(), view_switcher.get_tab_bar())
@@ -362,7 +356,8 @@ func _on_day_started(_day_index: int) -> void:
 	_show_toast(&"UI_AUTOSAVE_FAILED")
 
 
-func _on_debug_flag_pressed() -> void:
+## Debug: sets the debug flag to a count of the calls (the debug overlay, F12).
+func set_debug_flag() -> void:
 	_debug_flag_count += 1
 	_simulation.submit(SetFlagCommand.create(DEBUG_FLAG_KEY, _debug_flag_count))
 
@@ -393,8 +388,7 @@ func _on_setting_changed(section: StringName, key: StringName, _value: Variant) 
 		_apply_theme()
 
 
-## Keeps the views and the rescue alert just under the top bar, which grows to two rows in a
-## narrow window.
-func _fit_below_top_bar() -> void:
-	view_switcher.offset_top = top_bar.size.y
-	_rescue_alert.offset_top = top_bar.size.y + 48.0
+## Keeps the views and the rescue alert just under the frame's top plates.
+func _fit_below_frame() -> void:
+	view_switcher.offset_top = frame.band_height()
+	_rescue_alert.offset_top = frame.band_height() + 48.0
