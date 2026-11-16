@@ -68,3 +68,54 @@ func test_along_path() -> void:
 	)
 	assert_vector(ActorCues.along(path, 0.5)).is_equal(Vector2(10, 0))
 	assert_vector(ActorCues.along(path, 1.0)).is_equal(Vector2(10, 10))
+
+
+func test_idle_crew_comes_from_staff_on_base() -> void:
+	var state: GameState = _simulation.state
+	var crew: Dictionary[StringName, int] = ActorCues.idle_crew(state)
+	var has_scientist: bool = false
+	var has_soldier: bool = false
+	for person: PersonState in state.staff.people:
+		has_scientist = has_scientist or person.role == &"role_scientist"
+		has_soldier = has_soldier or person.role == &"role_soldier"
+	assert_bool(crew.has(&"console_left")).is_equal(has_scientist)
+	assert_bool(crew.has(&"blast_door")).is_equal(has_soldier)
+	if has_soldier:
+		assert_int(crew[&"blast_door"]).is_equal(FigureSprite.Kind.SOLDIER)
+
+
+func test_nobody_when_the_base_is_empty_or_under_attack() -> void:
+	var state: GameState = _simulation.state
+	state.incursion.phase = IncursionState.Phase.WARNING
+	assert_dict(ActorCues.idle_crew(state)).is_empty()
+	assert_int(ActorCues.crosser(state, 0.5)).is_equal(-1)
+	state.incursion.phase = IncursionState.Phase.NONE
+	state.staff.people.clear()
+	assert_dict(ActorCues.idle_crew(state)).is_empty()
+	_view.get_floor().refresh_crew(state)
+	assert_array(_view.get_floor().get_idle()).is_empty()
+
+
+func test_someone_crosses_now_and_then() -> void:
+	var floor_layer: FloorActors = _view.get_floor()
+	if ActorCues.crosser(_simulation.state, 0.0) < 0:
+		return
+	floor_layer.advance(ActorCues.CROSS_MIN_SECONDS + ActorCues.CROSS_SPREAD_SECONDS + 0.1)
+	assert_object(floor_layer.get_crosser()).is_not_null()
+	floor_layer.advance(ActorCues.CROSS_SECONDS + 0.1)
+	assert_object(floor_layer.get_crosser()).is_null()
+
+
+func test_no_crossing_with_reduced_motion() -> void:
+	Settings.set_value(&"display", &"ambient_movement", false)
+	var floor_layer: FloorActors = _view.get_floor()
+	floor_layer.advance(ActorCues.CROSS_MIN_SECONDS + ActorCues.CROSS_SPREAD_SECONDS + 0.1)
+	assert_object(floor_layer.get_crosser()).is_null()
+
+
+func test_idle_steps_aside_while_a_team_goes() -> void:
+	var floor_layer: FloorActors = _view.get_floor()
+	var before: Vector2 = floor_layer.path_of(Actor.Route.STAND, &"console_left")[0]
+	EventBus.team_sent.emit(&"w", 1, [&"a"], false)
+	var aside: Vector2 = floor_layer.path_of(Actor.Route.STAND, &"console_left")[0]
+	assert_float(aside.x).is_less(before.x)
