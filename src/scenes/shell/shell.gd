@@ -40,6 +40,8 @@ var screen_grain := ScreenGrain.new()
 var gate_focus := GateFocus.new()
 
 var _simulation: Simulation = null
+## Why the last [method _start] failed.
+var _start_error: StringName = &""
 var _debug_flag_count: int = 0
 var _rescue_alert := RescueAlert.new()
 var _alert_stack := AlertStack.new()
@@ -88,7 +90,13 @@ func _ready() -> void:
 	add_child(gate_focus)
 	gate_focus.attach(view_switcher)
 	var is_new: bool = GameStart.is_new()
-	_start(GameStart.take_state(ShellBoot.choose_seed(new_game_seed), Registry.balance()), is_new)
+	var state: GameState = GameStart.take_state(
+		ShellBoot.choose_seed(new_game_seed), Registry.balance()
+	)
+	if state == null or not _start(state, is_new):
+		GameStart.failure = &"no_state" if state == null else _start_error
+		return_to_menu()
+		return
 	SimClock.pause()
 	_bind_views(_simulation)
 	var buttons: Array[Button] = get_focus_order()
@@ -159,14 +167,8 @@ func quick_load() -> void:
 func load_slot(slot: StringName) -> void:
 	var result: Result = SaveService.load_game(slot, GameDefs.from_registry(Registry))
 	if not result.is_ok:
-		if result.error_code == &"missing_file":
-			_show_toast(&"UI_QUICK_SAVE_MISSING")
-			return
-		if result.error_code == &"old_format_version":
-			_show_toast(&"UI_LOAD_OLD_SAVE")
-			return
 		push_warning("Shell: quick load failed: %s %s" % [result.error_code, result.detail])
-		_show_toast(&"UI_LOAD_FAILED")
+		_show_toast(MainMenu.load_error_key(result.error_code))
 		return
 	var state: GameState = result.value
 	if not _start(state):
@@ -259,6 +261,7 @@ func _start(state: GameState, is_new_game: bool = false) -> bool:
 	)
 	if not built.is_ok:
 		push_warning("Shell: cannot set up the game: %s %s" % [built.error_code, built.detail])
+		_start_error = built.error_code
 		return false
 	_simulation = built.value
 	ShellBoot.apply_settings(_simulation)

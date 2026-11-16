@@ -83,6 +83,15 @@ func _ready() -> void:
 	SimClock.stop()
 	refresh()
 	first_button().grab_focus.call_deferred()
+	show_start_failure()
+
+
+## Shows why the last game could not start (GameStart.failure), once.
+func show_start_failure() -> void:
+	if GameStart.failure.is_empty():
+		return
+	show_message(load_error_key(GameStart.failure))
+	GameStart.failure = &""
 
 
 ## Shows Continue only with a save to continue and Scenarios only with scenarios; Load waits

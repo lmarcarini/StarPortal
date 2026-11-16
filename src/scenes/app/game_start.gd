@@ -19,6 +19,9 @@ static var slot: StringName = &""
 static var scenario_id: StringName = &""
 ## The state the menu already loaded for SLOT or SCENARIO; null for NEW.
 static var loaded: GameState = null
+## Why the last start failed in the shell (the menu shows it, then clears it); &"" when none.
+## Not cleared by [method reset].
+static var failure: StringName = &""
 
 
 ## Sets up a new game with [param new_seed] (-1 for the clock).
@@ -51,7 +54,11 @@ static func is_new() -> bool:
 
 ## The state to start with: the loaded one (then forgotten, so the next start is NEW again),
 ## or a new game with the set seed, else [param fallback_seed]; [param balance] for new games.
+## Null when a slot or scenario start has no loaded state (the shell then goes back to the menu).
 static func take_state(fallback_seed: int, balance: BalanceConfig) -> GameState:
+	if mode != Mode.NEW and loaded == null:
+		reset()
+		return null
 	if loaded != null:
 		var state: GameState = loaded
 		reset()

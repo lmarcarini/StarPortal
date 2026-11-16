@@ -30,6 +30,9 @@ const _SET_WHILE: Dictionary[String, Array] = {
 	"lock_started_tick": ["locked"],
 }
 
+## Ring fields an answered incoming lock may leave unset: it was never dialled.
+const _NOT_DIALLED_KEYS: Array[String] = ["current_address", "dial_started_tick"]
+
 ## Type rule of each scalar field: [check Callable(Variant) -> bool, what it must be].
 ## A static var, not a const: a Callable is not a constant expression.
 static var _field_rules: Dictionary[String, Array] = {
@@ -173,7 +176,8 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	return _mode_errors(data)
 
 
-## Errors of "incoming": an object, empty or with a faction, a conversation and a tick.
+## Errors of "incoming": an object, empty or with a faction, a conversation (may be "" for a
+## team's call or return) and a tick.
 static func _incoming_errors(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	if not data.has("incoming"):
@@ -189,7 +193,8 @@ static func _incoming_errors(data: Dictionary) -> Array[String]:
 	if not errors.is_empty():
 		return errors
 	var ok: bool = SaveFields.is_id(incoming["faction"])
-	ok = ok and SaveFields.is_id(incoming["conversation"])
+	# A team's own call or return wormhole has no conversation id (TeamContactRules).
+	ok = ok and incoming["conversation"] is String
 	if not ok or not SaveFields.is_tick(incoming["until_tick"]):
 		errors.append("'incoming' is not {faction, conversation, until_tick}")
 	return errors
@@ -235,20 +240,26 @@ static func _list_errors(data: Dictionary, key: String, item_check: Callable) ->
 
 
 ## Errors where the Ring fields of type-checked [param data] do not fit its mode.
+## An answered incoming wormhole (a faction's or a team's) may leave the dial fields unset.
 static func _mode_errors(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	var mode_name: String = data["mode"]
+	var incoming: Dictionary = data["incoming"]
+	var answered: bool = mode_name == "locked" and not incoming.is_empty()
 	for key: String in _SET_WHILE:
 		var modes: Array = _SET_WHILE[key]
 		var should_be_set: bool = modes.has(mode_name)
 		var is_set: bool = _is_set(data[key])
+		if answered and key in _NOT_DIALLED_KEYS:
+			# An answered incoming wormhole was never dialled: no address, no dial tick.
+			continue
 		if should_be_set and not is_set:
 			errors.append("'%s' is not set while \"%s\"" % [key, mode_name])
 		elif is_set and not should_be_set:
 			errors.append("'%s' is set while \"%s\"" % [key, mode_name])
 	if data["is_hostile"] == true and mode_name != "locked":
 		errors.append("'is_hostile' is true while \"%s\"" % mode_name)
-	if errors.is_empty() and mode_name == "locked":
+	if errors.is_empty() and mode_name == "locked" and _is_set(data["dial_started_tick"]):
 		var dial_tick: float = data["dial_started_tick"]
 		var lock_tick: float = data["lock_started_tick"]
 		if lock_tick < dial_tick:
