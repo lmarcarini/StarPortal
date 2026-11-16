@@ -12,6 +12,8 @@ const GATE_OPEN: StringName = &"open"
 const GATE_INCOMING: StringName = &"incoming"
 ## The Shutter is closed (M4c-10).
 const GATE_SHUTTER: StringName = &"shutter"
+## A team coming home through its own wormhole (M4.9-13).
+const GATE_RETURNING: StringName = &"returning"
 
 
 ## Today's net change of the funds in $k per day: the Command ledger's net line, rounded.
@@ -49,6 +51,11 @@ static func stored_text(state: GameState) -> String:
 ## to be answered) or idle.
 static func gate_status(state: GameState) -> StringName:
 	var gate: GateState = state.gate
+	if (
+		TeamContactRules.is_team_call(state)
+		and state.expedition.mode != ExpeditionState.Mode.MISSING
+	):
+		return GATE_RETURNING
 	if gate.mode == GateState.RingMode.LOCKED:
 		return GATE_OPEN
 	if gate.mode == GateState.RingMode.DIALING:

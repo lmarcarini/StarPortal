@@ -195,6 +195,7 @@ func _send_and_close(player: M15Player) -> void:
 func _check_in_and_come_home(player: M15Player) -> void:
 	var state: GameState = player.state()
 	_wait(player, func() -> bool: return state.expedition.mode == ExpeditionState.Mode.IDLE)
+	_wait(player, func() -> bool: return state.gate.mode == GateState.RingMode.IDLE)
 	assert_bool(state.worlds.has_reached(SILL, WorldsState.WorldStatus.SURVEYED)).is_true()
 	var prologue: String = "Prologue complete: the first Threshold team is home."
 	assert_str(_shell.get_toast_text()).is_equal(prologue)

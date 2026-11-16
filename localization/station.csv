@@ -54,3 +54,9 @@ STATION_EMPTY_SLOT,Empty slot,Vaga vazia
 STATION_TEAM_HEARD,"{world}: day {days} of {of}, last heard {heard}","{world}: dia {days} de {of}, último contato {heard}"
 STATION_ORDER_MISSION,"Order a mission: dial, send the team, close.","Ordenar missão: discar, enviar a equipe, fechar."
 ALERT_MISSION_ORDER_FAILED,Mission order stopped: {reason},Ordem de missão interrompida: {reason}
+TOPBAR_GATE_RETURNING,GATE: TEAM RETURNING,PORTAL: EQUIPE VOLTANDO
+STATION_DEBRIEF_SUCCESS,Mission done,Missão cumprida
+STATION_DEBRIEF_FAILED,Mission failed,Missão falhou
+STATION_DEBRIEF_EARLY,Came home early,Voltou antes
+STATION_DEBRIEF_LOST,Team lost,Equipe perdida
+STATION_DEBRIEF_RESCUED,Rescued,Resgatada
