@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/ui/station/gate/gate_station_view.gd" id="1"]
 [ext_resource type="PackedScene" path="res://src/ui/station/station_scene.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://src/ui/station/gate/gate_console.tscn" id="3"]
 [ext_resource type="Script" path="res://src/ui/station/gate/destination_rack.gd" id="4"]
+[ext_resource type="PackedScene" path="res://src/ui/station/gate/alien_panel.tscn" id="5"]
 
 [node name="GateStationView" type="Control"]
 layout_mode = 3
@@ -33,3 +34,7 @@ grow_vertical = 0
 unique_name_in_owner = true
 layout_mode = 0
 script = ExtResource("4")
+
+[node name="AlienPanel" parent="." instance=ExtResource("5")]
+unique_name_in_owner = true
+layout_mode = 1

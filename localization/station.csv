@@ -32,3 +32,10 @@ STATION_REASON_INCURSION,Not during an incursion.,Não durante uma incursão.
 STATION_FILTER_ALL,All destinations,Todos os destinos
 STATION_FILTER_TEAM,With a team,Com uma equipe
 STATION_FILTER_UNVISITED,Never reached,Nunca alcançados
+HW_ICON_PREV,Previous,Anterior
+HW_ICON_NEXT,Next,Próximo
+HW_ICON_PENCIL,Pencil,Lápis
+STATION_CLUE_PICK,Clue,Pista
+STATION_PANEL_DIAL,Dial the address in the lamps.,Disca o endereço nas lâmpadas.
+STATION_PANEL_PENCIL,"Pencil: mark a guess on the lamps, not dialled.","Lápis: marca um palpite nas lâmpadas, sem discar."
+STATION_PANEL_BACK,Back to the Gate,Voltar ao Portal
