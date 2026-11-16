@@ -41,7 +41,6 @@ func _draw() -> void:
 		var pts: PackedVector2Array = PackedVector2Array()
 		for step: int in 5:
 			pts.append(c + Vector2.from_angle(lerpf(a0, a1, step / 4.0)) * r)
-		pts.append(c + Vector2.from_angle(a1 + twist) * hole)
-		pts.append(c + Vector2.from_angle(a0 + twist) * hole)
+		pts.append(c + Vector2.from_angle((a0 + a1) * 0.5 + twist) * hole)
 		draw_colored_polygon(pts, _STEEL.darkened(0.05 * (i % 2)))
 		draw_polyline(pts, _EDGE, 2.0)
