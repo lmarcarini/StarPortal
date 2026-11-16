@@ -24,6 +24,7 @@ var _floor: FloorActors = FloorActors.new()
 var _orders: TeamOrders = TeamOrders.new()
 var _sheet: MissionSheet = MissionSheet.new()
 var _team: TeamCard = TeamCard.new()
+var _debrief: DebriefCard = DebriefCard.new()
 
 @onready var _station: StationScene = %Station
 @onready var _console: GateConsole = %GateConsole
@@ -66,6 +67,9 @@ func _ready() -> void:
 	_team.name = "TeamCard"
 	add_child(_team)
 	move_child(_team, _rail.get_index())
+	_debrief.name = "DebriefCard"
+	add_child(_debrief)
+	_debrief.resized.connect(func() -> void: _debrief.position = (size - _debrief.size) * 0.5)
 	resized.connect(_layout)
 	_console.resized.connect(_layout)
 	_layout.call_deferred()
@@ -90,6 +94,7 @@ func setup(simulation: Simulation) -> void:
 	_orders.setup(simulation)
 	_sheet.setup(simulation)
 	_team.setup(simulation)
+	_debrief.setup(simulation)
 	_report.visible = false
 
 
@@ -180,6 +185,11 @@ func get_mission_sheet() -> MissionSheet:
 ## The team card.
 func get_team_card() -> TeamCard:
 	return _team
+
+
+## The debrief card.
+func get_debrief() -> DebriefCard:
+	return _debrief
 
 
 ## The team orders card.

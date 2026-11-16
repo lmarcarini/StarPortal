@@ -49,6 +49,10 @@ func tick(state: GameState) -> void:
 			if end_tick - state.gate.dial_started_tick >= state.balance.dial_duration_ticks:
 				_resolve(state, end_tick)
 		GateState.RingMode.LOCKED:
+			if TeamContactRules.return_done(state):
+				RingControl.close(state.gate)
+				state.events.post(&"wormhole_closed", [&"team_home"])
+				return
 			var reason: StringName = _close_reason(state, end_tick)
 			if not reason.is_empty():
 				RingControl.close(state.gate)

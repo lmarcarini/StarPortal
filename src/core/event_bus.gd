@@ -122,6 +122,10 @@ signal team_called(world_id: StringName)
 signal team_call_missed(world_id: StringName)
 ## The base hailed its team: days done of days, light and serious injuries.
 signal team_hailed(world_id: StringName, days_done: int, days: int, light: int, serious: int)
+## A team's own wormhole opened to bring it home (M4.9-13).
+signal team_arriving(world_id: StringName)
+## A team is home: the debrief of world_id ({objective, success, early, team names}).
+signal team_debrief(world_id: StringName, summary: Dictionary)
 ## A mission order started (M4.9-12).
 signal mission_ordered(world_id: StringName)
 ## A mission order sent its team and closed the gate.

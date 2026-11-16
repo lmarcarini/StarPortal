@@ -12,6 +12,8 @@ enum Order { CARRY_ON, COME_HOME, STAY_LONGER, COME_THROUGH, HOLD_ON }
 
 ## The incoming_faction id of a team's own call.
 const TEAM_CALLER: StringName = &"team"
+## Ticks a returning team's wormhole stays open while it walks down the ramp.
+const RETURN_TICKS: int = 5
 ## Grace after a team's return time before it is overdue (12 hours).
 const GRACE_TICKS: int = 12 * 60
 ## Saved names of the orders.
@@ -79,6 +81,30 @@ static func answer_call(state: GameState) -> void:
 	plan.calling = false
 	hear(state)
 	state.events.post(&"team_called", [plan.world_id])
+
+
+## The team comes home through its own friendly wormhole: the Ring opens as an answered
+## incoming lock from [param world] (no charge, no answer awaited; a closed Shutter opens for
+## the team's code). Does nothing while the Ring is busy.
+static func open_return(state: GameState, world: StringName) -> void:
+	var gate: GateState = state.gate
+	if gate.mode != GateState.RingMode.IDLE or gate.has_incoming():
+		return
+	gate.incoming_faction = TEAM_CALLER
+	gate.incoming_conversation = &""
+	gate.incoming_until_tick = state.clock.tick
+	RingControl.answer_incoming(gate, world, state.clock.tick)
+	gate.shutter = GateState.Shutter.OPEN
+	state.events.post(&"team_arriving", [world])
+
+
+## True when a returning team's wormhole has been open long enough and should close.
+static func return_done(state: GameState) -> bool:
+	return (
+		is_team_call(state)
+		and not state.expedition.is_out()
+		and state.clock.tick - state.gate.lock_started_tick >= RETURN_TICKS
+	)
 
 
 ## Nobody answered the team's call: it stops calling and waits.
