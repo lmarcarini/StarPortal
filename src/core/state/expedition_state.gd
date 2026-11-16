@@ -74,6 +74,9 @@ var calling: bool = false
 var overdue: bool = false
 ## Come home now was ordered on a hail: the team walks through the open wormhole.
 var coming_home: bool = false
+## The last plan sent to each world (M4.9-10, format v24): world id -> {"objective": saved
+## name, "team": {slot: person id}}. Kept across trips; never cleared by clear().
+var last_plans: Dictionary[String, Dictionary] = {}
 
 
 ## Field days of the planned objective.
@@ -184,6 +187,7 @@ func to_dict() -> Dictionary:
 		"calling": calling,
 		"overdue": overdue,
 		"coming_home": coming_home,
+		"last_plans": last_plans.duplicate(true),
 	}
 
 
@@ -216,6 +220,14 @@ static func from_dict(data: Dictionary) -> ExpeditionState:
 	expedition.calling = data.get("calling", false) == true
 	expedition.overdue = data.get("overdue", false) == true
 	expedition.coming_home = data.get("coming_home", false) == true
+	var plans: Variant = data.get("last_plans", {})
+	if plans is Dictionary:
+		var plan_data: Dictionary = plans
+		for world: Variant in plan_data:
+			var entry: Variant = plan_data[world]
+			if entry is Dictionary:
+				var plan_entry: Dictionary = entry
+				expedition.last_plans[str(world)] = plan_entry.duplicate(true)
 	expedition.signal_tick = type_convert(data.get("signal_tick", -1), TYPE_INT)
 	var documents_data: Variant = data.get("documents", [])
 	if documents_data is Array:

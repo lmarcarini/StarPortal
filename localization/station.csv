@@ -47,3 +47,8 @@ STATION_ORDER_COME_HOME,Come home,Voltem já
 STATION_ORDER_STAY_LONGER,Stay longer,Fiquem mais
 STATION_ORDER_COME_THROUGH,Come through,Atravessem
 STATION_ORDER_HOLD_ON,Hold on,Aguentem
+STATION_MISSION_SURVEYED,Survey,Levantamento
+STATION_MISSION_CANISTER,Recover,Recuperar
+STATION_MISSION_CONTACT,Contact (not yet),Contato (ainda não)
+STATION_EMPTY_SLOT,Empty slot,Vaga vazia
+STATION_TEAM_HEARD,"{world}: day {days} of {of}, last heard {heard}","{world}: dia {days} de {of}, último contato {heard}"
