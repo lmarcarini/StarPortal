@@ -20,6 +20,7 @@ func before_test() -> void:
 
 func after_test() -> void:
 	GameStart.reset()
+	GameStart.failure = &""
 	var dir: DirAccess = DirAccess.open(SaveService.saves_dir)
 	if dir != null:
 		for file_name: String in dir.get_files():
@@ -112,4 +113,19 @@ func test_menu_fits_pt_br_at_1280() -> void:
 	assert_float(menu.get_combined_minimum_size().x).is_less_equal(1280.0)
 	assert_float(menu.get_combined_minimum_size().y).is_less_equal(720.0)
 	TranslationServer.set_locale(locale)
+	menu.free()
+
+
+func test_a_slot_start_without_a_state_gives_no_state() -> void:
+	GameStart.start_slot(&"broken", null)
+	assert_object(GameStart.take_state(7, Registry.balance())).is_null()
+	assert_int(GameStart.mode).is_equal(GameStart.Mode.NEW)
+
+
+func test_a_failed_shell_start_shows_its_reason_on_the_menu() -> void:
+	GameStart.failure = &"galaxy_version_mismatch"
+	var menu: MainMenu = _menu()
+	assert_bool(menu.message.visible).is_true()
+	assert_str(menu.message.text).is_equal(menu.tr(&"UI_LOAD_FAILED"))
+	assert_str(GameStart.failure).is_empty()
 	menu.free()

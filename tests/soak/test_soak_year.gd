@@ -59,6 +59,8 @@ class SoakRun:
 	## Probe outcomes seen (SoakProbes): event name, or "moth_lost:<reason>" and
 	## "moth_scan_finished:<scan name>", to count.
 	var probe_outcomes: Dictionary[String, int] = {}
+	## Extra reloads at random moments and mid-conversation (counted there, not as switches).
+	var extra := SoakReloads.new(SEED + 1, YEAR_TICKS)
 	## True from a month boundary until the run handles it after the tick.
 	var month_close_pending: bool = false
 	## Ticks after which stored power was below 0 or above the capacity.
@@ -150,7 +152,7 @@ func before_test() -> void:
 
 
 func after_test() -> void:
-	_remove_dir(_service.saves_dir)
+	SoakReloads.remove_dir(_service.saves_dir)
 	_service.free()
 
 
@@ -161,12 +163,14 @@ func test_year_with_monthly_save_and_load_matches_uninterrupted_run() -> void:
 	await assert_error(_play_both_runs).is_success()
 	var elapsed_msec := Time.get_ticks_msec() - started_msec
 	print(_summary(elapsed_msec))
-	var expected_days := _expected_day_starts()
+	var expected_days := SoakReloads.expected_day_starts(YEAR_TICKS)
 	var expected_closes := _expected_month_closes()
 	for run: SoakRun in [_uninterrupted, _reloaded]:
 		_assert_run_events(run, expected_days, expected_closes)
 	assert_int(_reloaded.switches).is_equal(YEAR_MONTHS)
 	assert_int(_reloaded.mid_scan_switches).is_greater(0)
+	assert_int(_reloaded.extra.random_switches).is_equal(SoakReloads.RANDOM_MOMENTS)
+	assert_int(_reloaded.extra.conversation_switches).is_greater(0)
 	assert_dict(_reloaded.simulation.state.to_dict()).is_equal(
 		_uninterrupted.simulation.state.to_dict()
 	)
@@ -221,6 +225,8 @@ func _play(run: SoakRun, reload_each_month: bool) -> void:
 	while run.simulation.state.clock.tick < YEAR_TICKS:
 		bot.act(run.simulation)
 		SoakGateOps.repair(run.simulation)
+		if reload_each_month and run.extra.take(run.simulation.state, run.months_closed.size()):
+			_reload(run, true, true)
 		if run.simulation.state.clock.is_paused:
 			continue
 		run.simulation.advance_tick()
@@ -245,8 +251,9 @@ func _wants_mid_scan_reload(run: SoakRun) -> bool:
 
 ## Saves the run's state, loads it into a new Simulation and switches the run to it, then
 ## checks the run now drives the loaded copy rather than the original. [param mid_scan]
-## counts it as an extra mid-scan reload rather than a month close's.
-func _reload(run: SoakRun, mid_scan: bool = false) -> void:
+## counts it as an extra mid-scan reload rather than a month close's; [param extra] counts it
+## nowhere (SoakReloads counts it).
+func _reload(run: SoakRun, mid_scan: bool = false, extra: bool = false) -> void:
 	var before: Dictionary = run.simulation.state.to_dict()
 	var saved: Result = _service.save_game(run.simulation.state, SLOT)
 	assert_bool(saved.is_ok).override_failure_message(str(saved.error_code)).is_true()
@@ -262,6 +269,8 @@ func _reload(run: SoakRun, mid_scan: bool = false) -> void:
 	run.attach(copy)
 	assert_object(run.simulation).is_same(copy)
 	assert_object(run.simulation).is_not_same(original)
+	if extra:
+		return
 	if mid_scan:
 		run.mid_scan_switches += 1
 	else:
@@ -360,15 +369,6 @@ func _locks(run: SoakRun) -> int:
 	return count
 
 
-## Counts the ticks in 1..YEAR_TICKS that TimeMath says start a day.
-func _expected_day_starts() -> int:
-	var count := 0
-	for tick: int in range(1, YEAR_TICKS + 1):
-		if TimeMath.is_day_start(tick):
-			count += 1
-	return count
-
-
 ## Lists the month closes TimeMath implies for ticks 1..YEAR_TICKS: {year, month, tick}.
 func _expected_month_closes() -> Array[Dictionary]:
 	var closes: Array[Dictionary] = []
@@ -379,15 +379,6 @@ func _expected_month_closes() -> Array[Dictionary]:
 		var ended: Dictionary = TimeMath.date_of(tick - 1)
 		closes.append({"year": ended["year"], "month": ended["month"], "tick": tick})
 	return closes
-
-
-func _remove_dir(path: String) -> void:
-	var dir := DirAccess.open(path)
-	if dir == null:
-		return
-	for file_name: String in dir.get_files():
-		DirAccess.remove_absolute(path.path_join(file_name))
-	DirAccess.remove_absolute(path)
 
 
 ## Checks [param run] saw every probe outcome at least once.
