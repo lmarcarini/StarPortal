@@ -3,7 +3,6 @@
 [ext_resource type="Script" path="res://src/content/conversation_def.gd" id="1"]
 [ext_resource type="Script" path="res://src/content/conversation_node_def.gd" id="2"]
 [ext_resource type="Script" path="res://src/content/story/effects/add_address_effect.gd" id="3"]
-[ext_resource type="Script" path="res://src/content/story/effects/offer_request_effect.gd" id="4"]
 
 [sub_resource type="Resource" id="r1"]
 script = ExtResource("2")
@@ -28,22 +27,24 @@ text_key = &"CONV_BRIEFING_2"
 effects = Array[Resource]([SubResource("r2"), SubResource("r3")])
 next = &"l3"
 
-[sub_resource type="Resource" id="r5"]
-script = ExtResource("4")
-request = &"request_survey_hearth"
-
 [sub_resource type="Resource" id="r6"]
 script = ExtResource("2")
 id = &"l3"
 speaker = &"speaker_liaison"
 text_key = &"CONV_BRIEFING_3"
-effects = Array[Resource]([SubResource("r5")])
-next = &"end"
+next = &"offer"
 
 [sub_resource type="Resource" id="r7"]
 script = ExtResource("2")
 id = &"end"
 kind = 2
+
+[sub_resource type="Resource" id="offer0"]
+script = ExtResource("2")
+id = &"offer"
+kind = 1
+offer_request = &"request_survey_hearth"
+next = &"end"
 
 [resource]
 script = ExtResource("1")
@@ -51,6 +52,6 @@ faction = &"faction_committee"
 channels = Array[StringName]([&"phone"])
 priority = 10
 start = &"l1"
-nodes = Array[Resource]([SubResource("r1"), SubResource("r4"), SubResource("r6"), SubResource("r7")])
+nodes = Array[Resource]([SubResource("r1"), SubResource("r4"), SubResource("r6"), SubResource("r7"), SubResource("offer0")])
 id = &"conv_committee_briefing"
 once = true

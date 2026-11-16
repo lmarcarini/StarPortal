@@ -3,7 +3,6 @@
 [ext_resource type="Script" path="res://src/content/conversation_def.gd" id="1"]
 [ext_resource type="Script" path="res://src/content/story/conditions/faction_met_condition.gd" id="2"]
 [ext_resource type="Script" path="res://src/content/conversation_node_def.gd" id="3"]
-[ext_resource type="Script" path="res://src/content/story/effects/offer_request_effect.gd" id="4"]
 [ext_resource type="Script" path="res://src/content/conversation_choice_def.gd" id="5"]
 [ext_resource type="Script" path="res://src/content/story/conditions/has_artefact_condition.gd" id="6"]
 [ext_resource type="Script" path="res://src/content/story/effects/take_artefact_effect.gd" id="7"]
@@ -13,21 +12,12 @@
 script = ExtResource("2")
 faction = &"faction_kindred"
 
-[sub_resource type="Resource" id="r2"]
-script = ExtResource("4")
-request = &"request_kindred_research"
-
-[sub_resource type="Resource" id="r3"]
-script = ExtResource("4")
-request = &"request_kindred_handover"
-
 [sub_resource type="Resource" id="r4"]
 script = ExtResource("3")
 id = &"l1"
 speaker = &"speaker_kindred_elder"
 text_key = &"CONV_KINDRED_RETURN_1"
-effects = Array[Resource]([SubResource("r2"), SubResource("r3")])
-next = &"ask"
+next = &"offer_research"
 
 [sub_resource type="Resource" id="r5"]
 script = ExtResource("6")
@@ -73,6 +63,20 @@ script = ExtResource("3")
 id = &"end"
 kind = 2
 
+[sub_resource type="Resource" id="offer0"]
+script = ExtResource("3")
+id = &"offer_research"
+kind = 1
+offer_request = &"request_kindred_research"
+next = &"offer_handover"
+
+[sub_resource type="Resource" id="offer1"]
+script = ExtResource("3")
+id = &"offer_handover"
+kind = 1
+offer_request = &"request_kindred_handover"
+next = &"ask"
+
 [resource]
 script = ExtResource("1")
 faction = &"faction_kindred"
@@ -80,5 +84,5 @@ channels = Array[StringName]([&"wormhole"])
 conditions = Array[Resource]([SubResource("r1")])
 priority = 5
 start = &"l1"
-nodes = Array[Resource]([SubResource("r4"), SubResource("r10"), SubResource("r11"), SubResource("r12")])
+nodes = Array[Resource]([SubResource("r4"), SubResource("r10"), SubResource("r11"), SubResource("r12"), SubResource("offer0"), SubResource("offer1")])
 id = &"conv_kindred_return"

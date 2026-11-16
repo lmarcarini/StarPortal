@@ -12,6 +12,11 @@ enum Kind { LINE, CHOICE, END }
 ## Moods a line may carry; empty means neutral.
 const MOODS: Array[StringName] = [&"neutral", &"pleased", &"wary", &"angry"]
 
+## An offer step's answers: accept, decline, think about it.
+const OFFER_ANSWER_KEYS: Array[StringName] = [
+	&"CONV_OFFER_ACCEPT", &"CONV_OFFER_DECLINE", &"CONV_OFFER_THINK"
+]
+
 ## Id, unique within the conversation.
 @export var id: StringName = &""
 ## What the node is.
@@ -30,6 +35,27 @@ const MOODS: Array[StringName] = [&"neutral", &"pleased", &"wary", &"angry"]
 @export var next: StringName = &""
 ## Choice: the answers, in order.
 @export var choices: Array[ConversationChoiceDef] = []
+## An offer step (M4.10-05): a Choice with this request id offers it on arrival and answers
+## ACCEPT, DECLINE or "I will think about it" (all go to [member next]); its own choices
+## are ignored.
+@export var offer_request: StringName = &""
+
+
+## The answer text key of choice [param index] ("" when out of range).
+func answer_key(index: int) -> StringName:
+	if is_offer():
+		return OFFER_ANSWER_KEYS[index] if index >= 0 and index < OFFER_ANSWER_KEYS.size() else &""
+	return choices[index].text_key if index >= 0 and index < choices.size() else &""
+
+
+## How many answers a Choice has (three for an offer step).
+func answer_count() -> int:
+	return OFFER_ANSWER_KEYS.size() if is_offer() else choices.size()
+
+
+## True for an offer step.
+func is_offer() -> bool:
+	return kind == Kind.CHOICE and not offer_request.is_empty()
 
 
 ## The ids this node can lead to: next for a Line, every choice's next for a Choice, none for
@@ -40,6 +66,9 @@ func next_ids() -> Array[StringName]:
 		Kind.LINE:
 			found.append(next)
 		Kind.CHOICE:
+			if is_offer():
+				found.append(next)
+				return found
 			for choice: ConversationChoiceDef in choices:
 				if choice != null:
 					found.append(choice.next)

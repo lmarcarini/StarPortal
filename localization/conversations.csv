@@ -60,3 +60,6 @@ CONV_TEAM_ORDER_COME_HOME,Come home,Voltem já
 CONV_TEAM_ORDER_STAY_LONGER,Stay longer,Fiquem mais
 CONV_TEAM_ORDER_COME_THROUGH,Come through,Atravessem
 CONV_TEAM_ORDER_HOLD_ON,Hold on,Aguentem
+CONV_OFFER_ACCEPT,Accept.,Aceito.
+CONV_OFFER_DECLINE,Decline.,Recuso.
+CONV_OFFER_THINK,I will think about it.,Vou pensar.

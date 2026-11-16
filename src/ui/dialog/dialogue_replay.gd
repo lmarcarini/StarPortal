@@ -20,4 +20,4 @@ static func replay(screen: DialogueScreen, state: GameState) -> void:
 		if node.kind == ConversationNodeDef.Kind.LINE:
 			screen.show_line(node, false)
 		elif node.kind == ConversationNodeDef.Kind.CHOICE and choice_index >= 0:
-			screen.show_answer(TranslationServer.translate(node.choices[choice_index].text_key))
+			screen.show_answer(TranslationServer.translate(node.answer_key(choice_index)))

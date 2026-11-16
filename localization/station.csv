@@ -66,3 +66,4 @@ FRAME_FUNDS_HINT,"Funds and today's net change. Opens Command.","Verba e o saldo
 FRAME_POWER_HINT,"Power switched on over supply. Opens Base › Energy.","Energia ligada sobre a oferta. Abre Base › Energia."
 FRAME_CHARGE_HINT,"Energy stored in the capacitors. Opens the Gate.","Energia nos capacitores. Abre o Portal."
 FRAME_CONFIDENCE_HINT,"Committee Confidence. Opens Command.","Confiança do Comitê. Abre o Comando."
+REQUEST_TERMS_DAYS,{days} days,{days} dias

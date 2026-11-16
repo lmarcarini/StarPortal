@@ -72,8 +72,8 @@ func test_m4a_loop() -> void:
 	_submit(AnswerCallCommand.new())
 	_talk_to_the_end()
 	assert_int(_state.address_book.entries.size()).is_equal(books + 2)
+	# Accepted inside the briefing (its offer step's first answer, M4.10-05).
 	var survey: RequestRecord = _state.requests.items[0]
-	_submit(AcceptRequestCommand.new(survey.uid))
 	assert_int(survey.state).is_equal(RequestRecord.RequestState.ACTIVE)
 	_build_bank()
 	_dial(&"world_hearth")
