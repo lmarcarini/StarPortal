@@ -2,13 +2,16 @@ class_name GateLightLayer
 extends Control
 ## The open gate's light on the hall: the plate dimmed slightly, then additive blue over the
 ## `floor_glow` polygon and a soft wash round the Ring. Strength follows the [RingLayer]'s
-## open amount, so the hall brightens on a lock and returns on a close.
+## open amount, so the hall brightens on a lock and returns on a close; it flickers gently
+## with the surface (still when motion is reduced, as the shimmer stops).
 ## Bible: docs/content/interface-rethink.md section 7
 
 ## Dimming of the plate at full open.
 const DIM: float = 0.18
 ## Peak light strength.
 const GLOW: float = 0.35
+## Share of the light the flicker moves.
+const FLICKER: float = 0.08
 
 var _ring: RingLayer = null
 var _station: StationScene = null
@@ -32,9 +35,16 @@ func bind(ring: RingLayer, station: StationScene) -> void:
 	_station = station
 
 
-## Light strength now, 0 to 1.
+## Light strength now, 0 to about 1.1.
 func strength() -> float:
-	return _ring.open_amount if _ring != null else 0.0
+	if _ring == null:
+		return 0.0
+	return _ring.open_amount * flicker_at(_ring.shimmer)
+
+
+## The flicker factor at shimmer time [param t]: two slow waves round 1.
+static func flicker_at(t: float) -> float:
+	return 1.0 + FLICKER * (0.6 * sin(t * 3.1) + 0.4 * sin(t * 7.3 + 1.7))
 
 
 func _process(_delta: float) -> void:
