@@ -12,6 +12,8 @@ signal selected(card: DestinationCard)
 signal flipped(card: DestinationCard)
 ## The pin was toggled.
 signal pin_toggled(card: DestinationCard)
+## The card's TEAM key asked for a mission order to its world.
+signal order_requested(card: DestinationCard)
 
 ## Card size at 100%.
 const CARD_SIZE: Vector2 = Vector2(156, 132)
@@ -22,6 +24,7 @@ var _pinned: bool = false
 var _thumb: WorldThumb = WorldThumb.new()
 var _name: Label = Label.new()
 var _glyphs: HBoxContainer = HBoxContainer.new()
+var _team_key: IconKey = IconKey.new()
 
 
 func _init() -> void:
@@ -46,6 +49,13 @@ func _ready() -> void:
 	_glyphs.position = _name.position
 	_glyphs.add_theme_constant_override(&"separation", 1)
 	add_child(_glyphs)
+	_team_key.name = "TeamKey"
+	_team_key.icon_id = &"team"
+	add_child(_team_key)
+	_team_key.custom_minimum_size = Vector2(44, 44)
+	_team_key.position = Vector2(size.x - 52.0 * s, 12.0 * s)
+	_team_key.set_help("STATION_ORDER_MISSION")
+	_team_key.pressed.connect(func() -> void: order_requested.emit(self))
 	pressed.connect(func() -> void: selected.emit(self))
 	if _destination != null:
 		_render()
@@ -77,6 +87,8 @@ func is_pinned() -> bool:
 
 
 func _render() -> void:
+	_team_key.visible = not _destination.world_id.is_empty()
+	_team_key.position.x = custom_minimum_size.x - _team_key.custom_minimum_size.x - 10.0
 	_thumb.show_world(_destination.world_id)
 	_name.text = _destination.title
 	_name.visible = not _destination.title.is_empty()

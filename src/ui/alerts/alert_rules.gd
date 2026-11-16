@@ -129,6 +129,15 @@ static func _artefact_alerts(state: GameState) -> Array[AlertEntry]:
 ## The incursion (M4c-11) and the Shutdown and Bankruptcy countdowns (M4c-14).
 static func _failure_alerts(state: GameState, found: Array[AlertEntry]) -> void:
 	var now: int = state.clock.tick
+	var order: MissionOrder = state.expedition.order
+	if order.phase == MissionOrder.Phase.FAILED and order.reason != &"cancelled":
+		var stopped := AlertEntry.create(
+			&"mission_order_failed", AlertEntry.WARN, ViewSwitcher.GATE_ROOM, order.phase_tick
+		)
+		stopped.args = {
+			"reason": TranslationServer.translate(SendRailRules.reason_key(order.reason))
+		}
+		found.append(stopped)
 	if state.expedition.overdue and state.expedition.is_out():
 		found.append(
 			AlertEntry.create(&"team_overdue", AlertEntry.ALARM, ViewSwitcher.GATE_ROOM, now)

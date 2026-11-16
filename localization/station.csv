@@ -52,3 +52,5 @@ STATION_MISSION_CANISTER,Recover,Recuperar
 STATION_MISSION_CONTACT,Contact (not yet),Contato (ainda não)
 STATION_EMPTY_SLOT,Empty slot,Vaga vazia
 STATION_TEAM_HEARD,"{world}: day {days} of {of}, last heard {heard}","{world}: dia {days} de {of}, último contato {heard}"
+STATION_ORDER_MISSION,"Order a mission: dial, send the team, close.","Ordenar missão: discar, enviar a equipe, fechar."
+ALERT_MISSION_ORDER_FAILED,Mission order stopped: {reason},Ordem de missão interrompida: {reason}

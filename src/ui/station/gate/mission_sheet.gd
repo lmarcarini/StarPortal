@@ -12,6 +12,7 @@ signal sent
 
 var _simulation: Simulation = null
 var _draft: ExpeditionPlanDraft = null
+var _order_address: GateAddress = null
 var _missions: HBoxContainer = HBoxContainer.new()
 var _targets: HBoxContainer = HBoxContainer.new()
 var _faces: HBoxContainer = HBoxContainer.new()
@@ -45,10 +46,12 @@ func setup(simulation: Simulation) -> void:
 	hide()
 
 
-## Opens the sheet for [param world], prefilled.
-func open_for(world: StringName) -> void:
+## Opens the sheet for [param world], prefilled. With [param order_address] GO orders the
+## mission from a closed gate (dial, send, close) instead of sending through the open one.
+func open_for(world: StringName, order_address: GateAddress = null) -> void:
 	if _simulation == null:
 		return
+	_order_address = order_address
 	_draft = MissionDefaults.draft_for(_simulation.state, world)
 	show()
 	_render()
@@ -93,8 +96,10 @@ func reason() -> StringName:
 	if _draft == null:
 		return &"no_plan"
 	var error: StringName = _draft.error(_simulation.state)
-	if error != &"":
+	if error != &"" and not (_order_address != null and error == ExpeditionRules.NO_WORMHOLE):
 		return error
+	if _order_address != null:
+		return MissionOrderRules.refusal(_simulation.state, _order_address, false)
 	if _simulation.state.gate.connected_world_id != _draft.world_id:
 		return ExpeditionRules.NO_WORMHOLE
 	return &""
@@ -104,10 +109,13 @@ func reason() -> StringName:
 func go() -> void:
 	if _simulation == null or _draft == null:
 		return
-	var planned: CommandResult = _simulation.submit(_draft.to_command())
-	var result: CommandResult = planned
-	if planned.is_ok:
-		result = _simulation.submit(SendTeamCommand.new())
+	var result: CommandResult = null
+	if _order_address != null:
+		result = _simulation.submit(OrderMissionCommand.create(_order_address, _draft.to_command()))
+	else:
+		result = _simulation.submit(_draft.to_command())
+		if result.is_ok:
+			result = _simulation.submit(SendTeamCommand.new())
 	if not result.is_ok:
 		_show_reason(result.error_code)
 		return

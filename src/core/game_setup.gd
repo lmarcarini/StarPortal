@@ -75,6 +75,7 @@ static func build(state: GameState, defs: GameDefs) -> Result:
 	var systems: Array[SimSystem] = [
 		PowerSystem.new(defs.balance),
 		GateSystem.new(),
+		MissionOrderSystem.new(),
 		ConversationSystem.new(),
 		RequestSystem.new(),
 		DocumentSystem.new(defs.documents),
