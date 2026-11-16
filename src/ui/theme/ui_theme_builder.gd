@@ -3,7 +3,8 @@ extends RefCounted
 ## Builds the one interface Theme in code: palette, fonts, bezelled panels, raised key
 ## buttons and the type variations later screens use. Screens style nothing by hand.
 ## Variations: PanelBezel (PanelContainer), HeaderStrip, DataLabel, StencilLabel (Label),
-## KeyButton, KeyButtonSelected, ReadoutButton (Button).
+## KeyButton, KeyButtonSelected, ReadoutButton (Button); the hardware kit's variations come
+## from UiThemeHardware.
 ## Bible: docs/content/interface-pass.md section 2, art-and-audio.md#ui-and-typography
 
 ## Labels and headings.
@@ -33,6 +34,7 @@ static func build(scale: float) -> Theme:
 	_add_panels(theme, s)
 	_add_buttons(theme, s)
 	_add_labels(theme, s)
+	UiThemeHardware.add_to(theme, s)
 	return theme
 
 
