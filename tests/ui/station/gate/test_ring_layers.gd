@@ -55,7 +55,7 @@ func test_lock_opens_horizon_and_light() -> void:
 	assert_float(_ring.open_amount).is_equal(1.0)
 	assert_int(_ring.look.seals).is_equal(RingLook.SEALS)
 	var light: GateLightLayer = _station.find_child("GateLight", true, false) as GateLightLayer
-	assert_float(light.strength()).is_equal(1.0)
+	assert_float(light.strength()).is_equal_approx(1.0, GateLightLayer.FLICKER + 0.01)
 	var horizon: HorizonLayer = _station.find_child("Horizon", true, false) as HorizonLayer
 	horizon._process(0.0)
 	var radius: float = horizon.get_shader_material().get_shader_parameter(&"radius")
@@ -86,3 +86,20 @@ func test_reduced_motion_stills_shimmer() -> void:
 	var before: float = _ring.shimmer
 	_ring.advance(1.0)
 	assert_float(_ring.shimmer).is_equal(before)
+
+
+func test_kawoosh_overshoots_then_settles() -> void:
+	assert_float(HorizonLayer.burst_at(-1.0)).is_equal(0.0)
+	assert_float(HorizonLayer.burst_at(0.25)).is_greater(0.5)
+	assert_float(HorizonLayer.burst_at(1.0)).is_less(0.3)
+	assert_float(HorizonLayer.burst_at(HorizonLayer.BURST_SECONDS)).is_equal(0.0)
+
+
+func test_light_flickers_gently_and_stills_without_shimmer() -> void:
+	var seen: Array[float] = []
+	for step: int in 20:
+		seen.append(GateLightLayer.flicker_at(step * 0.37))
+	assert_float(seen.max()).is_less_equal(1.0 + GateLightLayer.FLICKER)
+	assert_float(seen.min()).is_greater_equal(1.0 - GateLightLayer.FLICKER)
+	assert_float(seen.max() - seen.min()).is_greater(0.02)
+	assert_float(GateLightLayer.flicker_at(4.0)).is_equal(GateLightLayer.flicker_at(4.0))
