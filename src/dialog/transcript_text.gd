@@ -69,8 +69,8 @@ static func lines(state: GameState, record: TranscriptRecord) -> Array[String]:
 			if node.kind == ConversationNodeDef.Kind.LINE:
 				found.append(ConversationText.line(state, node))
 			elif node.kind == ConversationNodeDef.Kind.CHOICE:
-				if choice_index >= 0 and choice_index < node.choices.size():
-					var answer: String = _tr(node.choices[choice_index].text_key)
+				if choice_index >= 0 and choice_index < node.answer_count():
+					var answer: String = _tr(node.answer_key(choice_index))
 					found.append(_tr(&"TRANSCRIPT_YOU").format({"text": answer}))
 	if record.cut_off:
 		found.append(_tr(&"CONV_SIGNAL_LOST"))

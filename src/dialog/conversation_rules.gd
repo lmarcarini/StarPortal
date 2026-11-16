@@ -107,6 +107,8 @@ static func choices(state: GameState) -> Array[Dictionary]:
 	var node: ConversationNodeDef = current_node(state)
 	if node == null or node.kind != ConversationNodeDef.Kind.CHOICE:
 		return found
+	if node.is_offer():
+		return OfferStep.choices(state, node)
 	for index: int in node.choices.size():
 		var choice: ConversationChoiceDef = node.choices[index]
 		var failing: Array[ConditionDef] = StoryRules.failing(state, choice.conditions)
@@ -133,6 +135,8 @@ static func choose_error(state: GameState, index: int) -> StringName:
 		return &"no_conversation"
 	if node.kind != ConversationNodeDef.Kind.CHOICE:
 		return &"not_at_choice"
+	if node.is_offer():
+		return OfferStep.choose_error(state, node, index)
 	if index < 0 or index >= node.choices.size():
 		return &"no_such_choice"
 	if not StoryRules.check_all(state, node.choices[index].conditions):
@@ -144,9 +148,14 @@ static func choose_error(state: GameState, index: int) -> StringName:
 ## applies its effects and moves to its next node.
 static func choose(state: GameState, index: int) -> void:
 	var def: ConversationDef = active_def(state)
-	var choice: ConversationChoiceDef = current_node(state).choices[index]
+	var node: ConversationNodeDef = current_node(state)
 	var path: Array[Array] = state.conversations.active.path
 	path[path.size() - 1][1] = index
+	if node.is_offer():
+		OfferStep.choose(state, node, index)
+		arrive(state, node.next)
+		return
+	var choice: ConversationChoiceDef = node.choices[index]
 	StoryRules.apply_all(state, choice.effects, def.id)
 	arrive(state, choice.next)
 
@@ -168,6 +177,8 @@ static func arrive(state: GameState, node_id: StringName) -> void:
 			state.events.post(&"conversation_line", [node_id])
 		ConversationNodeDef.Kind.CHOICE:
 			active.phase = ActiveConversation.Phase.CHOICE
+			if node.is_offer():
+				OfferStep.arrive(state, node)
 			state.events.post(&"conversation_choices", [])
 		ConversationNodeDef.Kind.END:
 			StoryRules.apply_all(state, node.effects, def.id)

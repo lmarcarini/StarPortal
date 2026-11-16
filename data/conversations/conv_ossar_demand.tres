@@ -3,7 +3,6 @@
 [ext_resource type="Script" path="res://src/content/conversation_def.gd" id="1"]
 [ext_resource type="Script" path="res://src/content/story/conditions/standing_below_condition.gd" id="2"]
 [ext_resource type="Script" path="res://src/content/conversation_node_def.gd" id="3"]
-[ext_resource type="Script" path="res://src/content/story/effects/offer_request_effect.gd" id="4"]
 
 [sub_resource type="Resource" id="r1"]
 script = ExtResource("2")
@@ -18,22 +17,24 @@ text_key = &"CONV_OSSAR_DEMAND_1"
 mood = &"angry"
 next = &"l2"
 
-[sub_resource type="Resource" id="r3"]
-script = ExtResource("4")
-request = &"request_ossar_closed"
-
 [sub_resource type="Resource" id="r4"]
 script = ExtResource("3")
 id = &"l2"
 speaker = &"speaker_ossar_warden"
 text_key = &"CONV_OSSAR_DEMAND_2"
-effects = Array[Resource]([SubResource("r3")])
-next = &"end"
+next = &"offer"
 
 [sub_resource type="Resource" id="r5"]
 script = ExtResource("3")
 id = &"end"
 kind = 2
+
+[sub_resource type="Resource" id="offer0"]
+script = ExtResource("3")
+id = &"offer"
+kind = 1
+offer_request = &"request_ossar_closed"
+next = &"end"
 
 [resource]
 script = ExtResource("1")
@@ -42,6 +43,6 @@ channels = Array[StringName]([&"incoming"])
 conditions = Array[Resource]([SubResource("r1")])
 priority = 5
 start = &"l1"
-nodes = Array[Resource]([SubResource("r2"), SubResource("r4"), SubResource("r5")])
+nodes = Array[Resource]([SubResource("r2"), SubResource("r4"), SubResource("r5"), SubResource("offer0")])
 id = &"conv_ossar_demand"
 once = true

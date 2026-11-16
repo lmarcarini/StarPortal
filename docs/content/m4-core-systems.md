@@ -145,6 +145,13 @@ transcripts.
 
 ## 4. Requests
 
+> **Offers inside conversations (M4.10-05).** A conversation offers a request through an
+> *offer step*: a Choice node with `offer_request` set. Arriving offers the request; the
+> answers are Accept and Decline (the same `AcceptRequestCommand` / `DeclineRequestCommand`
+> the Command screen sends) and "I will think about it", which leaves it offered on the wire
+> and in the Office. The dialogue screen shows the terms on a paper card. See
+> `interface-rethink.md` section 6.
+
 A `RequestDef`: id, faction, title and text keys, **objective** (a list of conditions that must
 all hold), optional deadline in days (0 = none), offer lifetime in days, and three effect lists:
 **reward**, **penalty** (on failure) and **on decline**.

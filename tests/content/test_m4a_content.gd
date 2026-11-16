@@ -74,10 +74,11 @@ func _paths(def: ConversationDef, node_id: StringName, prefix: Array[int]) -> Ar
 		ConversationNodeDef.Kind.LINE:
 			found.append_array(_paths(def, node.next, prefix))
 		ConversationNodeDef.Kind.CHOICE:
-			for index: int in node.choices.size():
+			for index: int in node.answer_count():
 				var longer: Array[int] = prefix.duplicate()
 				longer.append(index)
-				found.append_array(_paths(def, node.choices[index].next, longer))
+				var next: StringName = node.next if node.is_offer() else node.choices[index].next
+				found.append_array(_paths(def, next, longer))
 	return found
 
 

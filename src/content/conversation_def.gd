@@ -79,14 +79,17 @@ func all_effects() -> Array[EffectDef]:
 	return found
 
 
-## Problems of the graph and of the channels against [param defs]: see
-## ConversationGraph.errors().
+## Problems of the graph, of the channels and of the offer steps' requests against
+## [param defs]: see ConversationGraph.errors().
 func get_content_errors(defs: Dictionary[StringName, DefBase]) -> Array[String]:
 	var errors: Array[String] = ConversationGraph.errors(self)
 	for speaker: StringName in speakers():
 		var def: DefBase = defs.get(speaker)
 		if def != null and not def is SpeakerDef:
 			errors.append("speaker '%s' is not a speaker" % speaker)
+	for node: ConversationNodeDef in nodes:
+		if node != null and node.is_offer() and not defs.get(node.offer_request) is RequestDef:
+			errors.append("offer '%s' names unknown request '%s'" % [node.id, node.offer_request])
 	var owner: DefBase = defs.get(faction)
 	if owner != null and not owner is FactionDef:
 		errors.append("faction '%s' is not a faction" % faction)

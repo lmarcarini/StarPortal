@@ -47,6 +47,8 @@ var opening_seconds: float = -1.0
 var name_plate := NamePlate.new()
 var transcript := TranscriptView.new()
 var answers := AnswerList.new()
+## The terms of a request offered at an offer step, beside the transcript.
+var terms := RequestTermsCard.new()
 
 var _simulation: Simulation = null
 var _date: Label = null
@@ -164,6 +166,7 @@ func adopt(date: Label, hold: Label, channel: Label, left: VBoxContainer) -> voi
 	_hold = hold
 	_channel = channel
 	_left = left
+	_left.add_child(terms)
 
 
 ## Shows the line [param node] (typed unless [param typed] is false) and its speaker.
@@ -274,6 +277,11 @@ func _show_phase() -> void:
 
 func _show_choices() -> void:
 	var state: GameState = _simulation.state
+	var node: ConversationNodeDef = ConversationRules.current_node(state)
+	var offered: RequestDef = null
+	if node != null and node.is_offer():
+		offered = state.request_defs.get(node.offer_request)
+	terms.show_terms(state, offered)
 	var shown: Array[Dictionary] = []
 	for choice: Dictionary in ConversationRules.choices(state):
 		var key: StringName = choice["text_key"]
@@ -301,7 +309,8 @@ func _choose(index: int) -> void:
 	var command := ChooseOptionCommand.new(index)
 	if not command.validate(_simulation.state).is_ok:
 		return
-	show_answer(tr(node.choices[index].text_key))
+	show_answer(tr(node.answer_key(index)))
+	terms.show_terms(_simulation.state, null)
 	answers.clear()
 	_simulation.submit(command)
 
