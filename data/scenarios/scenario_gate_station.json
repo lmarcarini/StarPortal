@@ -1,0 +1,1445 @@
+{
+	"format_version": 26,
+	"game_version": "0.0.0",
+	"saved_at_unix": 1794842951,
+	"state": {
+		"address_book": {
+			"draft": {
+				"firm": [
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1
+				],
+				"pencil": [
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1
+				]
+			},
+			"entries": [
+				{
+					"address_key": "35-19-10-15-5-6-4-2",
+					"last_dialed_tick": 1826,
+					"last_outcome": "lock",
+					"note": "",
+					"pinned": false,
+					"source": "dialed",
+					"source_id": "",
+					"world_id": "world_lintel"
+				},
+				{
+					"address_key": "35-24-29-10-19-22-8-2",
+					"last_dialed_tick": 942,
+					"last_outcome": "lock",
+					"note": "",
+					"pinned": false,
+					"source": "dialed",
+					"source_id": "",
+					"world_id": "world_sill"
+				}
+			]
+		},
+		"archive": {
+			"read": {},
+			"received": [
+				"doc_sill_order",
+				"doc_sill_sketch",
+				"doc_lintel_note",
+				"doc_lintel_rubbing",
+				"doc_sill_dossier",
+				"doc_lintel_dossier",
+				"doc_milestone_frame_1",
+				"doc_milestone_frame_2",
+				"doc_milestone_letter",
+				"doc_milestone_record"
+			],
+			"received_tick": {
+				"doc_lintel_dossier": 1830,
+				"doc_lintel_note": 946,
+				"doc_lintel_rubbing": 946,
+				"doc_milestone_frame_1": 1830,
+				"doc_milestone_frame_2": 1830,
+				"doc_milestone_letter": 1830,
+				"doc_milestone_record": 1830,
+				"doc_sill_dossier": 946,
+				"doc_sill_order": 0,
+				"doc_sill_sketch": 0
+			}
+		},
+		"artefacts": {
+			"items": [],
+			"next_uid": 0
+		},
+		"base": {
+			"doors": [],
+			"grid_size": [
+				36,
+				20
+			],
+			"levels": [
+				{
+					"dig_ticks_left": 0
+				}
+			],
+			"next_room_number": 41,
+			"rooms": [
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_gate",
+					"demolish_ticks_left": 0,
+					"id": "room_1",
+					"installations": [
+						{
+							"build_ticks_left": 0,
+							"def": "installation_moth_rack",
+							"health": 0,
+							"paid_k": 0
+						}
+					],
+					"level": 1,
+					"origin": [
+						14,
+						2
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_control",
+					"demolish_ticks_left": 0,
+					"id": "room_2",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						15,
+						11
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_power_plant",
+					"demolish_ticks_left": 0,
+					"id": "room_3",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						6,
+						11
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_4",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						0,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_5",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						1,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_6",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						2,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_7",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						3,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_8",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						4,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_9",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						5,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_10",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						6,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_11",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						7,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_12",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						8,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_13",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						9,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_14",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						10,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_15",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						11,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_16",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						12,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_17",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						13,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_18",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						14,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_19",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						15,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_20",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						16,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_21",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						17,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_22",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						18,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_23",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						19,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_24",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						20,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_25",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						21,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_26",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						22,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_27",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						23,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_28",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						24,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_29",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						25,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_30",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						26,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_31",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						27,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_32",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						28,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_33",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						29,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_34",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						30,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_35",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						31,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_36",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						32,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_37",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						33,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_38",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						34,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_corridor",
+					"demolish_ticks_left": 0,
+					"id": "room_39",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						35,
+						10
+					],
+					"paid_k": 0,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				},
+				{
+					"build_ticks_left": 0,
+					"damaged": false,
+					"def_id": "room_capacitor_bank",
+					"demolish_ticks_left": 0,
+					"id": "room_40",
+					"installations": [],
+					"level": 1,
+					"origin": [
+						11,
+						8
+					],
+					"paid_k": 600,
+					"powered_on": true,
+					"repair_ticks_left": 0,
+					"rotated": false,
+					"site": ""
+				}
+			]
+		},
+		"budget": {
+			"funds_k": 5494
+		},
+		"clock": {
+			"holds": [],
+			"mode": "paused",
+			"mode_after_hold": "paused",
+			"overridden": [],
+			"slows": [
+				"awaiting_answer/phone_faction_committee"
+			],
+			"speed_index": 1,
+			"tick": 1861
+		},
+		"committee": {
+			"causes": [
+				{
+					"cause": "locked",
+					"change": 50,
+					"count": 1,
+					"subject": "world_sill",
+					"tick": 941
+				},
+				{
+					"cause": "horizon_record",
+					"change": 20,
+					"count": 1,
+					"subject": "world_sill",
+					"tick": 946
+				},
+				{
+					"cause": "locked",
+					"change": 50,
+					"count": 1,
+					"subject": "world_lintel",
+					"tick": 1825
+				},
+				{
+					"cause": "horizon_record",
+					"change": 20,
+					"count": 1,
+					"subject": "world_lintel",
+					"tick": 1830
+				}
+			],
+			"commendation_paid": false,
+			"confidence": 639,
+			"cost_carry": 15,
+			"credited_locks": [
+				"world_sill",
+				"world_lintel"
+			],
+			"credited_research": [],
+			"credited_surveys": [
+				"world_sill",
+				"world_lintel"
+			],
+			"days_in_red": 0,
+			"funds_history": [
+				5494
+			],
+			"zero_warned": false
+		},
+		"conversations": {
+			"active": {},
+			"count": {},
+			"next_uid": 0,
+			"transcripts": []
+		},
+		"expedition": {
+			"blind": false,
+			"calling": false,
+			"coming_home": false,
+			"day_results": [],
+			"delay_ticks": 0,
+			"departed_tick": -1,
+			"documents": [],
+			"heard_days": 0,
+			"heard_tick": -1,
+			"last_plans": {},
+			"missed_tick": -1,
+			"mode": "idle",
+			"objective": "none",
+			"order": {
+				"address": null,
+				"phase": "none",
+				"phase_tick": -1,
+				"reason": "",
+				"world_id": ""
+			},
+			"overdue": false,
+			"recalled": false,
+			"signal_tick": -1,
+			"target_id": "",
+			"team": {},
+			"world_id": ""
+		},
+		"factions": {
+			"causes": {},
+			"last_contact_tick": {
+				"faction_committee": 1440
+			},
+			"met": [
+				"faction_committee"
+			],
+			"pending": [
+				{
+					"channel": "phone",
+					"conversation": "conv_committee_briefing",
+					"expires_tick": 4320,
+					"faction": "faction_committee",
+					"since_tick": 1440
+				}
+			],
+			"standing": {
+				"faction_kindred": 10,
+				"faction_ossar": -40
+			},
+			"used": []
+		},
+		"flags": {
+			"expeditions_unlocked": true
+		},
+		"gate": {
+			"connected_world_id": "",
+			"current_address": null,
+			"dial_log": [
+				{
+					"address": {
+						"seals": [
+							35,
+							24,
+							29,
+							10,
+							19,
+							22,
+							8,
+							2
+						]
+					},
+					"energy_spent_mwh": "4076e9f1669a1f72",
+					"outcome": "lock",
+					"tick": 942,
+					"world_id": "world_sill"
+				},
+				{
+					"address": {
+						"seals": [
+							35,
+							19,
+							10,
+							15,
+							5,
+							6,
+							4,
+							2
+						]
+					},
+					"energy_spent_mwh": "4076e9f1669a1f72",
+					"outcome": "lock",
+					"tick": 1826,
+					"world_id": "world_lintel"
+				}
+			],
+			"dial_started_tick": -1,
+			"incoming": {},
+			"is_hostile": false,
+			"lock_energy_mwh": "0000000000000000",
+			"lock_started_tick": -1,
+			"mode": "idle",
+			"operating": false,
+			"shutter": "open"
+		},
+		"incursion": {
+			"countdown": 0,
+			"def_id": "",
+			"groups": [],
+			"last_day": {},
+			"phase": "none",
+			"report": {}
+		},
+		"operations_log": {
+			"entries": [
+				{
+					"args": {
+						"document_id": "doc_sill_order"
+					},
+					"kind": "document",
+					"tick": 0,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"document_id": "doc_sill_sketch"
+					},
+					"kind": "document",
+					"tick": 0,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"banks": 1,
+						"capacity_mwh": 400
+					},
+					"kind": "power",
+					"tick": 60,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"address": "35-24-29-10-19-22-8-2",
+						"outcome": "lock"
+					},
+					"kind": "dial",
+					"tick": 942,
+					"world_id": "world_sill"
+				},
+				{
+					"args": {
+						"hostile": false
+					},
+					"kind": "lock",
+					"tick": 942,
+					"world_id": "world_sill"
+				},
+				{
+					"args": {
+						"name": "Maj. Ruth Adair",
+						"reason": "lent",
+						"role": "role_soldier",
+						"skill": 3
+					},
+					"kind": "staff",
+					"tick": 942,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"name": "Sgt Owen Hale",
+						"reason": "lent",
+						"role": "role_soldier",
+						"skill": 3
+					},
+					"kind": "staff",
+					"tick": 942,
+					"world_id": ""
+				},
+				{
+					"args": {},
+					"kind": "horizon",
+					"tick": 947,
+					"world_id": "world_sill"
+				},
+				{
+					"args": {
+						"document_id": "doc_lintel_note"
+					},
+					"kind": "document",
+					"tick": 947,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"document_id": "doc_lintel_rubbing"
+					},
+					"kind": "document",
+					"tick": 947,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"document_id": "doc_sill_dossier"
+					},
+					"kind": "document",
+					"tick": 947,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"reason": "player"
+					},
+					"kind": "close",
+					"tick": 947,
+					"world_id": "world_sill"
+				},
+				{
+					"args": {
+						"address": "35-19-10-15-5-6-4-2",
+						"outcome": "lock"
+					},
+					"kind": "dial",
+					"tick": 1826,
+					"world_id": "world_lintel"
+				},
+				{
+					"args": {
+						"hostile": false
+					},
+					"kind": "lock",
+					"tick": 1826,
+					"world_id": "world_lintel"
+				},
+				{
+					"args": {},
+					"kind": "horizon",
+					"tick": 1831,
+					"world_id": "world_lintel"
+				},
+				{
+					"args": {
+						"document_id": "doc_lintel_dossier"
+					},
+					"kind": "document",
+					"tick": 1831,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"document_id": "doc_milestone_frame_1"
+					},
+					"kind": "document",
+					"tick": 1831,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"document_id": "doc_milestone_frame_2"
+					},
+					"kind": "document",
+					"tick": 1831,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"document_id": "doc_milestone_letter"
+					},
+					"kind": "document",
+					"tick": 1831,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"document_id": "doc_milestone_record"
+					},
+					"kind": "document",
+					"tick": 1831,
+					"world_id": ""
+				},
+				{
+					"args": {
+						"reason": "player"
+					},
+					"kind": "close",
+					"tick": 1831,
+					"world_id": "world_lintel"
+				}
+			]
+		},
+		"outcome": {
+			"cause": "",
+			"negative_funds_days": 0,
+			"overrun_ticks": 0,
+			"status": "running",
+			"tick": -1,
+			"warned": [],
+			"zero_confidence_days": 0
+		},
+		"power": {
+			"charge_rates": {
+				"room_40": 25
+			},
+			"stored_mwh": "4079000000000000"
+		},
+		"probes": {
+			"canister_ticks_left": 0,
+			"canister_world_id": "",
+			"moth": null,
+			"photos": [],
+			"rack": 2,
+			"reorders": [],
+			"ring_scanned": {}
+		},
+		"random": {
+			"base_seed": "20261116",
+			"streams": {
+				"artefacts": {
+					"seed": "-314684916759269990",
+					"state": "5732582149406360484"
+				},
+				"incursion": {
+					"seed": "1323320689915531755",
+					"state": "-6086966931523169055"
+				}
+			}
+		},
+		"recruitment": {
+			"candidates": [
+				{
+					"arrival_ticks": 7200,
+					"id": "candidate_1",
+					"leaves_day": 3,
+					"name": "Dr Ines Moreau",
+					"role": "role_scientist",
+					"salary_k": 30,
+					"skill": 3
+				},
+				{
+					"arrival_ticks": 7200,
+					"id": "candidate_2",
+					"leaves_day": 6,
+					"name": "Dr Kenji Arai",
+					"role": "role_scientist",
+					"salary_k": 30,
+					"skill": 3
+				},
+				{
+					"arrival_ticks": 4320,
+					"id": "candidate_3",
+					"leaves_day": 9,
+					"name": "Sgt Dan Kowalski",
+					"role": "role_engineer",
+					"salary_k": 30,
+					"skill": 3
+				},
+				{
+					"arrival_ticks": 4320,
+					"id": "candidate_4",
+					"leaves_day": 12,
+					"name": "Cpl Sara Lind",
+					"role": "role_engineer",
+					"salary_k": 30,
+					"skill": 3
+				}
+			],
+			"next_candidate_number": 5
+		},
+		"requests": {
+			"items": [],
+			"next_uid": 0
+		},
+		"research": {
+			"active": "",
+			"done": [],
+			"queue": [],
+			"revealed": [],
+			"ticks_done": 0
+		},
+		"security": {
+			"health": {},
+			"squads": []
+		},
+		"staff": {
+			"auto_assign": [
+				"room_research_lab",
+				"room_workshop"
+			],
+			"lent_due": [],
+			"next_person_number": 8,
+			"people": [
+				{
+					"arrives_tick": 0,
+					"id": "person_1",
+					"injury": "none",
+					"lent": false,
+					"name": "Dr Ana Ferreira",
+					"recovery_left": 0,
+					"role": "role_scientist",
+					"room_id": "",
+					"salary_k": 30,
+					"skill": 3
+				},
+				{
+					"arrives_tick": 0,
+					"id": "person_2",
+					"injury": "none",
+					"lent": false,
+					"name": "Dr Tom Okafor",
+					"recovery_left": 0,
+					"role": "role_scientist",
+					"room_id": "",
+					"salary_k": 30,
+					"skill": 3
+				},
+				{
+					"arrives_tick": 0,
+					"id": "person_3",
+					"injury": "none",
+					"lent": false,
+					"name": "Sgt Lena Brandt",
+					"recovery_left": 0,
+					"role": "role_engineer",
+					"room_id": "",
+					"salary_k": 30,
+					"skill": 3
+				},
+				{
+					"arrives_tick": 0,
+					"id": "person_4",
+					"injury": "none",
+					"lent": false,
+					"name": "Cpl Raul Mendes",
+					"recovery_left": 0,
+					"role": "role_engineer",
+					"room_id": "",
+					"salary_k": 25,
+					"skill": 2
+				},
+				{
+					"arrives_tick": 0,
+					"id": "person_5",
+					"injury": "none",
+					"lent": false,
+					"name": "Mira Kovacs",
+					"recovery_left": 0,
+					"role": "role_analyst",
+					"room_id": "room_2",
+					"salary_k": 30,
+					"skill": 3
+				},
+				{
+					"arrives_tick": 941,
+					"id": "person_6",
+					"injury": "none",
+					"lent": true,
+					"name": "Maj. Ruth Adair",
+					"recovery_left": 0,
+					"role": "role_soldier",
+					"room_id": "",
+					"salary_k": 30,
+					"skill": 3
+				},
+				{
+					"arrives_tick": 941,
+					"id": "person_7",
+					"injury": "none",
+					"lent": true,
+					"name": "Sgt Owen Hale",
+					"recovery_left": 0,
+					"role": "role_soldier",
+					"room_id": "",
+					"salary_k": 30,
+					"skill": 3
+				}
+			]
+		},
+		"unlocks": {
+			"bank_cap": 1,
+			"dig_depth": 1,
+			"rooms": [
+				"room_capacitor_bank",
+				"room_research_lab",
+				"room_corridor",
+				"room_quarters",
+				"room_security_post",
+				"room_infirmary"
+			],
+			"upkeep_overrides": {}
+		},
+		"worlds": {
+			"consoles_read": {},
+			"galaxy_seed": "7267394790364957855",
+			"generator_version": 1,
+			"horizon_records": {
+				"world_lintel": true,
+				"world_sill": true
+			},
+			"pole_camera_ticks_left": 0,
+			"pole_camera_world_id": "",
+			"reports": {
+				"world_lintel": {
+					"atmosphere": {
+						"confidence": "fair",
+						"source": "pole_camera",
+						"tick": 1830
+					},
+					"radiation": {
+						"confidence": "fair",
+						"source": "pole_camera",
+						"tick": 1830
+					},
+					"temperature": {
+						"confidence": "fair",
+						"source": "pole_camera",
+						"tick": 1830
+					},
+					"threat": {
+						"confidence": "poor",
+						"source": "pole_camera",
+						"tick": 1830
+					}
+				},
+				"world_sill": {
+					"atmosphere": {
+						"confidence": "fair",
+						"source": "pole_camera",
+						"tick": 946
+					},
+					"radiation": {
+						"confidence": "fair",
+						"source": "pole_camera",
+						"tick": 946
+					},
+					"temperature": {
+						"confidence": "fair",
+						"source": "pole_camera",
+						"tick": 946
+					},
+					"threat": {
+						"confidence": "poor",
+						"source": "pole_camera",
+						"tick": 946
+					}
+				}
+			},
+			"statuses": {
+				"world_lintel": "locked",
+				"world_sill": "locked"
+			},
+			"targets": {}
+		}
+	},
+	"tick": 1861
+}
