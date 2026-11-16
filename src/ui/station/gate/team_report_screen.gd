@@ -45,6 +45,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	add_to_group(Wire.COVER_GROUP)
 	var ground: ColorRect = ColorRect.new()
 	ground.color = DialogueScreen.GROUND
 	ground.mouse_filter = Control.MOUSE_FILTER_IGNORE

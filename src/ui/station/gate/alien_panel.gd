@@ -43,6 +43,7 @@ var _disc: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
+	add_to_group(Wire.COVER_GROUP)
 	z_index = 5
 	_station.setup(Registry.get_def(STATION_ID) as StationSceneDef)
 	for glyph: int in GateAddress.GLYPH_COUNT:

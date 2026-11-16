@@ -181,7 +181,7 @@ func test_time_bar_text_comes_from_translation_keys() -> void:
 ## shown view, moves along the tabs to the other view and through it, and back up.
 func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void:
 	var buttons: Array[Button] = _shell.get_focus_order()
-	assert_int(buttons.size()).is_equal(8)
+	assert_int(buttons.size()).is_greater_equal(8)
 	assert_object(_focus_owner()).is_same(buttons[0])
 	var visited: Array[Control] = []
 	for _step: int in buttons.size():

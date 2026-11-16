@@ -32,8 +32,6 @@ var debug_overlay: DebugOverlay = null
 
 ## The pause menu (Esc / Start when nothing else takes it).
 var pause_menu := PauseMenu.new()
-## The latest Log entries along the bottom of every screen.
-var log_strip := LogStrip.new()
 ## Grain and vignette over the whole screen (display/screen_grain setting).
 var screen_grain := ScreenGrain.new()
 ## Switches to the Gate Room on a lock and stands by on leaving it.
@@ -71,11 +69,9 @@ func _ready() -> void:
 	frame.open_view.connect(open_view)
 	frame.alert_chosen.connect(_on_alert_chosen)
 	frame.band_changed.connect(_fit_below_frame)
-	add_child(log_strip)
-	log_strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	log_strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	log_strip.keep_above(view_switcher)
-	log_strip.open_log.connect(ShellBoot.open_log.bind(view_switcher))
+	view_switcher.view_changed.connect(_fit_below_frame.unbind(1))
+	frame.log_requested.connect(ShellBoot.open_log.bind(view_switcher))
+	frame.wire_step.connect(ShellBoot.wire_step.bind(view_switcher, _rescue_alert).unbind(1))
 	_toast_timer.timeout.connect(_toast.hide)
 	_add_alerts()
 	add_child(_dialogue)
@@ -284,7 +280,6 @@ func _bind_views(simulation: Simulation) -> void:
 	_rescue_alert.setup(simulation)
 	_dialogue.bind(simulation)
 	frame.bind(simulation)
-	log_strip.refresh(true)
 
 
 ## Puts the alert stack in the top bar after the time bar, and the rescue alert over the top
@@ -391,4 +386,7 @@ func _on_setting_changed(section: StringName, key: StringName, _value: Variant) 
 ## Keeps the views and the rescue alert just under the frame's top plates.
 func _fit_below_frame() -> void:
 	view_switcher.offset_top = frame.band_height()
+	frame.wire_gap = view_switcher.get_tab_bar().size.y
+	var station: bool = view_switcher.current_view_id() == ViewSwitcher.GATE_ROOM
+	view_switcher.offset_left = 0.0 if station else frame.wire.size.x + Frame.EDGE * 2.0
 	_rescue_alert.offset_top = frame.band_height() + 48.0

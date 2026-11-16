@@ -2,10 +2,11 @@ class_name Frame
 extends Control
 ## The frame bolted round every station (interface-rethink.md section 3): thin steel plates
 ## over the scene, which shows between them. Top left the clock plate (date flap, pause /
-## play / fast, the slow lamp and the call lamp) and a status plate (the gate chip, and the
-## alerts button and rescue entries until the wire lands); top centre the alarm strip during
-## an incursion; top right the gauge plate (funds, power, charge, Confidence). Save, Load and
-## the debug button left the screen: they are in the pause menu and on F12. Redraws on
+## play / fast, the slow lamp and the call lamp) and a status plate (the gate chip and the
+## rescue entry); top centre the alarm strip during an incursion; top right the gauge plate
+## (funds, power, charge, Confidence). Under the left plates runs the wire, the event cards
+## with their action keys (M4.10-02). Save, Load and the debug button left the screen: they
+## are in the pause menu and on F12. Redraws on
 ## EventBus signals and on [method bind]. Reads state only.
 ## Bible: docs/content/interface-rethink.md section 3
 
@@ -15,6 +16,10 @@ signal open_view(view_id: StringName, sub_tab: StringName)
 signal alert_chosen(entry: AlertEntry)
 ## The band the top plates take changed height.
 signal band_changed
+## The wire asks the shell to run [param step] (&"rescue", &"report") for [param card].
+signal wire_step(step: StringName, card: WireCardData)
+## The wire's stack was pressed: open the full log.
+signal log_requested
 
 ## Gap between the plates and the screen edge, in pixels.
 const EDGE: float = 8.0
@@ -31,12 +36,18 @@ var confidence_readout: ConfidenceReadout = gauge_plate.confidence_readout
 var power_readout: PowerReadout = gauge_plate.power_readout
 ## The gate's state.
 var gate_chip := GateChip.new()
-## Opens the alert list (until the wire replaces it).
-var alerts_button := Button.new()
-## The drop-down list of alerts under the alerts button.
+## The alerts the wire reads (a model: never shown).
 var alert_list := AlertList.new()
+## The wire: event cards with their action keys, under the left plates.
+var wire := Wire.new()
 ## The incursion strip and alarm look.
 var alarm_strip := AlarmStrip.new()
+
+## Extra gap above the wire, below the band (the shell's tab bar until the station keys).
+var wire_gap: float = 0.0:
+	set(value):
+		wire_gap = value
+		_layout()
 
 var _state: GameState = null
 var _band: float = 0.0
@@ -58,18 +69,18 @@ func _init() -> void:
 	status_plate.add_child(_status_row)
 	_status_row.add_theme_constant_override(&"separation", 6)
 	_status_row.add_child(gate_chip)
-	_status_row.add_child(alerts_button)
-	alerts_button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	alerts_button.pressed.connect(toggle_alerts)
 	gate_chip.pressed.connect(open_view.emit.bind(ViewSwitcher.GATE_ROOM, &""))
 	add_child(gauge_plate)
 	gauge_plate.open_view.connect(open_view.emit)
 	add_child(alarm_strip)
-	alert_list.top_level = true
+	alert_list.visible = false
 	add_child(alert_list)
-	alert_list.changed.connect(_show_alert_count)
-	alert_list.alert_chosen.connect(_on_alert_chosen)
-	_show_alert_count()
+	wire.position = Vector2(EDGE, EDGE)
+	add_child(wire)
+	wire.open_view.connect(open_view.emit)
+	wire.entry_chosen.connect(_on_alert_chosen)
+	wire.step_requested.connect(wire_step.emit)
+	wire.log_requested.connect(log_requested.emit)
 
 
 func _ready() -> void:
@@ -94,7 +105,6 @@ func _exit_tree() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		refresh()
-		_show_alert_count()
 
 
 ## Reads [param simulation]'s state (after a start or a load) and redraws every plate.
@@ -102,6 +112,7 @@ func bind(simulation: Simulation) -> void:
 	_state = simulation.state
 	gauge_plate.bind(_state)
 	alert_list.bind(_state)
+	wire.bind(simulation, alert_list)
 	refresh()
 
 
@@ -123,24 +134,15 @@ func add_after_clock(control: Control) -> void:
 	_status_row.add_child(control)
 
 
-## The buttons in focus order: the clock keys, [param extra], the gate chip, the alerts
-## button and the gauge numbers.
+## The buttons in focus order: the clock keys, [param extra], the gate chip, the gauge
+## numbers, then the wire's keys.
 func get_focus_buttons(extra: Array[Button]) -> Array[Button]:
 	var buttons: Array[Button] = clock_plate.get_buttons()
 	buttons.append_array(extra)
-	buttons.append_array([gate_chip, alerts_button])
+	buttons.append(gate_chip)
 	buttons.append_array(gauge_plate.get_buttons())
+	buttons.append_array(wire.get_keys())
 	return buttons.filter(func(b: Button) -> bool: return b.visible)
-
-
-## Opens or closes the alert list under the alerts button. It never pauses the game.
-func toggle_alerts() -> void:
-	var rect: Rect2 = alerts_button.get_global_rect()
-	var width: float = alert_list.get_combined_minimum_size().x
-	var view_width: float = get_viewport_rect().size.x
-	var left: float = clampf(rect.position.x, 0.0, maxf(view_width - width, 0.0))
-	alert_list.global_position = Vector2(left, rect.end.y + 4.0)
-	alert_list.toggle()
 
 
 ## The used width of the left plates' widest row.
@@ -165,17 +167,10 @@ func _layout() -> void:
 	var gap_left: float = _left.position.x + _left_width()
 	var centre: float = (gap_left + gauge_plate.position.x) * 0.5
 	alarm_strip.position = Vector2(centre - alarm_strip.size.x * 0.5, EDGE)
+	wire.position = Vector2(EDGE, band_height() + wire_gap)
 	if not is_equal_approx(band_height(), _band):
 		_band = band_height()
 		band_changed.emit()
-
-
-## "Alerts 3" with the worst severity's lamp; "Alerts" and an unlit lamp with none.
-func _show_alert_count() -> void:
-	var entries: Array[AlertEntry] = alert_list.entries()
-	var title: String = tr(&"TOPBAR_ALERTS")
-	alerts_button.text = title if entries.is_empty() else "%s %d" % [title, entries.size()]
-	alerts_button.icon = StatusLamp.icon(AlertText.lamp_status(AlertRules.worst(entries)), 14)
 
 
 func _on_alert_chosen(entry: AlertEntry) -> void:

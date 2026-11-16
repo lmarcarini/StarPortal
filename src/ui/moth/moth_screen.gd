@@ -33,6 +33,7 @@ var _close_button := Button.new()
 
 
 func _init() -> void:
+	add_to_group(Wire.COVER_GROUP)
 	visible = false
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
