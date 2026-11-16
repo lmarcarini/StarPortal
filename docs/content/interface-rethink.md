@@ -7,8 +7,16 @@ one-line log is a joke; and the whole thing should look like a game, not a slopi
 interface. The owner asked for a complete rethink of every screen, the flow of every action
 and the look, not bound by what exists.
 
-Nothing here is carded. The owner picks a direction first (section 9); cards follow per
-phase (section 8). Mock-ups of the new Gate Room are in the interface canvas.
+Nothing here is carded yet; cards follow per phase (section 8). Mock-ups of the new Gate
+station are in the interface canvas.
+
+**Owner decisions (2026-11-15):** the redesign and the streamlining are approved; four
+stations; dialling a complete known address is the main way to use the gate, and composing
+an address glyph by glyph stays as a second way, on its own full-screen alien panel
+(section 4); a team can only talk to the base through an open gate, so the old check-in
+reports go (section 4); the style is **industrial**, after the owner's second mock-up
+(section 7). The owner has no art yet and asked whether pre-rendered 3D is possible;
+section 7 answers that.
 
 ## 1. What is wrong today
 
@@ -102,15 +110,20 @@ wall of the scene, one per known address, each a picture and a name. Click a car
 is on the destination monitor; press DIAL. Redialling a world is two actions. A card
 flipped over is the world's report.
 
-**New addresses: the Ring is the keyboard.** The 36 glyphs already sit on the Ring. To
-compose an address the player clicks glyphs on the Ring itself, large and always in the
-same place, and each one lights a seal lamp. No separate palette, no names to scan.
+**Composing an address is a second way, on its own screen (owner decision).** Most dials
+are a card and the DIAL key. For an address that has to be worked out, **+ NEW ADDRESS**
+opens the **alien panel**: a full-screen radial control, not part of the base, with the 36
+glyphs as large stone keys in rings around a centre key.
 
-- The view zooms to the Ring while composing, so each glyph is big.
-- A **clue clip** on the console holds one document from the Archive beside the Ring, so
-  the clue and the keyboard are seen together.
-- Pencilled guesses stay, drawn on the seal lamps.
-- Typing a glyph's name still finds it (it pulses on the Ring) for those who prefer it.
+- Glyphs are big, always in the same place, and grouped in sectors, so the hand learns
+  where each one is.
+- Pressing a key lights it and fills the next of the seven seal lamps across the top;
+  pressing a lit key or a lamp clears it. The centre key dials.
+- A **clue clip** at the side holds one document from the filing cabinet, so the clue and
+  the keys are seen together. Pencilled guesses stay, drawn on the lamps.
+- Typing a glyph's name still finds it (the key pulses).
+- An address dialled once becomes a destination card; the panel is not needed for it
+  again.
 
 **With a wormhole open: four things to send, on one rail.** Camera, canister, MOTH and
 team appear as four large icons on a rail at the foot of the ramp, greyed when not
@@ -129,12 +142,20 @@ closes. Three actions instead of nine.
 **Teams come home, and it is seen.** A team already dials home by itself at the end of
 its mission, at no charge to the base, but today that is a line in the log. Now the Ring
 opens as a friendly incoming wormhole, the gate monitor lights on every station, and the
-team walks down the ramp. If the Shutter is closed their code opens it. **The report is
-given on return** (owner decision): a debrief card with what they found, who is hurt and
-what they carried back. The daily check-ins in between are removed **(proposal: the owner
-asked for the report on return; say if a check-in should still arrive as a short radio
-line)**. A team that does not return on time raises an overdue card on the wire, and
-rescue starts from that card.
+team walks down the ramp. If the Shutter is closed their code opens it. A **debrief card**
+follows: what they found, who is hurt, what they carried back.
+
+**A team can only talk through an open gate (owner decision).** The automatic check-ins
+that arrived as messages every 24 hours go: they made no sense with the gate closed.
+Instead:
+
+- While the base holds a wormhole open to a world with a team on it, the **hail** icon
+  reaches the team: a short status (where they are in the mission, injuries) and the
+  orders Carry on, Come home now, or Stay longer.
+- A team in trouble opens the gate from its side and calls: an incoming wormhole with a
+  distress conversation. That is how the base hears of trouble before the return.
+- A team that neither returns nor calls by its time is **overdue**: a card on the wire,
+  and the rescue starts from it.
 
 ### Base
 
@@ -193,20 +214,52 @@ Accept and Decline (and "I will think about it", which puts the paper in the in-
 
 ## 7. The look
 
-The current look is flat panels because everything is drawn by code as rectangles. Looking
-like a game means **pictures of places and things**. Three ways to get there:
+**Style: industrial (owner decision).** After the owner's second mock-up: an underground
+hall of concrete and riveted steel, catwalks, hazard stripes, sodium and fluorescent
+lamps, wet floor reflections. The interface is part of that world: steel plates with
+bolts, stencilled labels, worn paint, a hazard-striped main key, an analogue gauge, a
+green CRT for the destination, indicator lamps for the seals. The Ring's blue stays the
+one cold bright thing.
 
-| | A. Painted backdrops | B. Low-poly 3D rooms | C. Keep code-drawn, restyle |
+Layout taken from that mock-up, which follows the proposal: resources along the top, the
+wire top left, the destination and world cards on the right, the team card low on the
+left, and one bottom bar holding the four station keys, the destination monitor, the
+DIAL/CLOSE key with its seal lamps, the gauge and the Shutter lever. The names stay the
+game's own: the Ring, Site CAIRN.
+
+**Where the pictures come from.** The owner asked whether pre-rendered 3D is possible
+instead of painted backdrops, with no dedicated graphics card needed.
+
+- *Pre-rendered 3D and a painted backdrop are the same thing to the game:* a finished
+  picture of the room that the game shows. It costs nothing to draw, so any computer runs
+  it. The difference is only how the picture was made.
+- *Real-time 3D* is also fine on a modern integrated card at this scale. It is not the
+  limit either.
+- *The limit is who makes the art.* A pre-render needs a modelled, lit 3D scene; so does
+  real-time 3D. Neither the owner nor the agents have that today.
+
+So the design does not depend on the source. Each station is a **plate plus live layers**:
+
+- The **plate** is one picture of the empty room (gate idle, nobody in it).
+- **Live layers** are drawn by the game over it: the seal lamps, the event horizon and its
+  light on the floor, people walking, the Shutter, blinking monitors, arriving crates.
+- A small data file per station ties them together: where the Ring's centre and edge are
+  in the picture, the path up the ramp, where doors and lamps are.
+
+A plate can then be swapped (a generated image now, a real pre-render or a commissioned
+painting later) without touching code. Three sources, in order of how soon they are
+available:
+
+| Source | Now? | Quality | Notes |
 | --- | --- | --- | --- |
-| What | Each station is a painted or pre-rendered picture; moving parts (the Ring, the horizon, people, lamps, needles) are layered on it | Each station is a small 3D model with a fixed camera | Better shapes, colour and motion on what exists |
-| Looks | The richest; matches the bible ("pre-rendered rooms with baked light") and the owner's first mock-up | Consistent, everything can move, but only as good as the models | An improvement, still an interface |
-| Needs | About 6 pictures and 30 to 40 small sprites and props. The owner would supply or approve art (image generation is workable for backdrops) | 3D models. Built in code from boxes they look like the current Ring view | Nothing new |
-| Risk | Art has to be made and kept consistent | Most work, weakest result without an artist | Does not answer the brief |
+| Generated images, like the owner's mock-ups, made without the interface on them | Yes | Already the look the owner wants | One plate per station; consistency between plates needs care |
+| Free 3D kits (industrial and sci-fi sets under open licences) assembled and rendered | Weeks | Consistent, generic | Gives true pre-rendered 3D and matching angles |
+| A commissioned 3D scene or painting | Later | Best | Drops in with no code change |
 
-**Recommendation: A,** with the Ring, event horizon, people and props animated over the
-backdrop, and controls drawn as hardware (keys, levers, needles, lamps, CRT monitors,
-label tape). The palette stays the bible's, used with more nerve: warm sodium light on the
-floor, CRT green on monitors, and the Ring's blue as the one cold, bright thing.
+Until a plate exists, a placeholder plate drawn in code stands in, so work is not blocked.
+
+**The interface hardware** (plates, bolts, keys, lamps, the gauge, hazard stripes) is made
+as small textures generated by script and nine-sliced, so it does not wait for art either.
 
 Text rules: labels of one or two words in the stencil face; numbers only on gauges and
 monitors; body text only in documents, conversations and hover cards.
@@ -224,13 +277,13 @@ Each phase is playable on its own. Cards are written per phase once the directio
 5. **Text purge:** every remaining sentence on screen is cut, shortened or moved to a
    hover card.
 
-## 9. Owner decisions needed
+## 9. Owner decisions
 
-1. **The look:** A (painted backdrops with animated layers), B (3D rooms) or C (restyle)?
-   If A: will the owner supply the backdrop art, or should the first pass use placeholder
-   pictures made in code?
-2. **Four stations** (Gate, Base, Lab, Office) instead of seven tabs?
-3. **Reports on return only:** daily check-ins removed, the team seen arriving, a debrief
-   card, and a missed return starting the rescue?
-4. **The Ring as the keyboard** for new addresses, with the clue clip beside it?
-5. **Phase order:** Gate first, then the frame?
+Settled on 2026-11-15: four stations; direct dialling first, the alien panel for composing;
+talk only through an open gate; industrial style; plate plus live layers.
+
+Open:
+
+1. **Plates:** will the owner generate the station plates (as with the mock-ups, but with
+   no interface and the gate idle and empty), starting with the Gate hall?
+2. **Phase order:** Gate first, then the frame and the wire (assumed unless told otherwise).
