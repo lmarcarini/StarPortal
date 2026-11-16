@@ -42,6 +42,8 @@ const ACTIONS: Array[StringName] = [
 	&"research_pan_right",
 	&"research_pan_up",
 	&"research_pan_down",
+	&"station_flip",
+	&"station_pin",
 ]
 
 ## Gamepad bindings added to Godot's built-in UI actions at start-up, as {action: [encoded]},
@@ -226,6 +228,18 @@ const DEFAULTS: Dictionary = {
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_4}],
 		GAMEPAD: [],
+	},
+	# Gate station destination cards: flip to the report, pin (M4.9-06).
+	&"station_flip":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F}],
+		GAMEPAD:
+		[{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_RIGHT_STICK}],
+	},
+	&"station_pin":
+	{
+		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_U}],
+		GAMEPAD: [{"kind": InputEventCodec.KIND_JOYPAD_BUTTON, "button_index": JOY_BUTTON_MISC1}],
 	},
 	# The research tree pans with the right stick (M4-32).
 	&"research_pan_left":

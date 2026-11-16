@@ -11,7 +11,7 @@ enum Show { BLANK, DESTINATION, COMPOSING }
 const MAX_ICONS: int = 4
 
 var _show: Show = Show.BLANK
-var _picture: TextureRect = TextureRect.new()
+var _picture: WorldThumb = WorldThumb.new()
 var _name: Label = Label.new()
 var _icons: HBoxContainer = HBoxContainer.new()
 
@@ -23,8 +23,6 @@ func _ready() -> void:
 	row.add_theme_constant_override(&"separation", 10)
 	add_child(row)
 	_picture.custom_minimum_size = Vector2(120, 80) * HwMetrics.scale_of(self)
-	_picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	row.add_child(_picture)
 	var column: VBoxContainer = VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -65,7 +63,8 @@ func _render(destination: GateDestination) -> void:
 		return
 	for child: Node in _icons.get_children():
 		child.queue_free()
-	_picture.texture = destination.picture if destination != null else null
+	_picture.show_world(destination.world_id if destination != null else &"")
+	_picture.visible = _show == Show.DESTINATION
 	match _show:
 		Show.BLANK:
 			_name.text = ""
