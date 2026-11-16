@@ -1,20 +1,20 @@
 extends RefCounted
-## Seeded stand-in player for the soak test. It sets random flags (SetFlagCommand) about 20 times
-## a day, pauses and resumes at random, and adds and releases system holds (TimeControl), a dozen
-## or so a month. First it builds the first Capacitor Bank on the nearest valid spot to the Gate
-## Room, waits for it, then gives it all the spare supply as its charge rate once. It then works
-## the Ring on every call with no command waiting: with the Ring idle and no address picked it
-## picks one (a console's Address Book entry the bank can power sometimes, a real world's true
-## address now and then, a missing team's world first, otherwise a random well-formed one whose
-## seal 1 the bank can reach) and dials it once charged (one it can never charge is dropped). On
-## a lock it reads an unread console, extends the pole camera for a record not taken, works the
-## probes (SoakProbes) and expeditions (SoakExpeditions), then closes the wormhole.
-## Once the bank charges it builds a corridor off the Level 1 spine and a Research Lab, lowers
-## the bank's charge rate by just enough to switch the lab on, researches R1-R6 in list order
-## as each may start, and digs each extra level as research and money allow, one at a time.
-## Every random draw comes from the run's own GameState stream &"soak_bot", so two runs from
-## the same seed act identically, and a saved and reloaded state carries the stream on. The
-## picked address is the bot's own, not game state: it carries on across reloads with the bot.
+## Seeded stand-in player for the soak test. It sets random flags (SetFlagCommand) about 20 times a
+## day, pauses and resumes at random, and adds and releases system holds (TimeControl), a dozen or
+## so a month. First it builds the first Capacitor Bank on the nearest valid spot to the Gate Room,
+## waits for it, then gives it all the spare supply as its charge rate once. It then works the Ring
+## on every call with no command waiting: with the Ring idle and no address picked it picks one (a
+## console's Address Book entry the bank can power sometimes, a real world's true address now and
+## then, a missing team's world first, otherwise a random well-formed one whose seal 1 the bank can
+## reach) and dials it once charged (one it can never charge is dropped). On a lock it reads an
+## unread console, extends the pole camera for a record not taken, works the probes (SoakProbes) and
+## expeditions (SoakExpeditions), then closes the wormhole. Once the bank charges it builds a
+## corridor off the Level 1 spine and a Research Lab, lowers the bank's charge rate by just enough
+## to switch the lab on, researches R1-R6 in list order as each may start, and digs each extra level
+## as research and money allow, one at a time. Every random draw comes from the run's own GameState
+## stream &"soak_bot", so two runs from the same seed act identically, and a saved and reloaded
+## state carries the stream on. The picked address is the bot's own, not game state: it carries on
+## across reloads with the bot.
 ## Bible: technical-architecture.md#testing-and-tooling (Soak test),
 ## gate-and-address-spec.md#where-addresses-come-from (Ring consoles)
 
@@ -31,9 +31,8 @@ const RESUME_CHANCE: float = 0.4
 ## (not held) action, that the bot adds a hold (checked after resume).
 const HOLD_CHANCE: float = 0.02
 const PAUSED_HOLD_CHANCE: float = 0.05
-## Chances, per held action, that the bot releases a hold, adds another one, or makes a
-## player pause/resume request (which only sets the mode after the hold); otherwise it
-## submits a command.
+## Chances, per held action, that the bot releases a hold, adds another one, or makes a player
+## pause/resume request (which only sets the mode after the hold); otherwise it submits a command.
 const RELEASE_CHANCE: float = 0.4
 const EXTRA_HOLD_CHANCE: float = 0.1
 const HELD_REQUEST_CHANCE: float = 0.15
@@ -196,8 +195,9 @@ func _work_wormhole(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	elif SoakProbes.work(simulation) or expeditions.work(simulation):
 		return
 	elif state.clock.tick - gate.lock_started_tick >= CLOSE_AFTER_TICKS:
-		simulation.submit(CloseWormholeCommand.new())
-		closes += 1
+		if state.conversations.active == null:
+			simulation.submit(CloseWormholeCommand.new())
+			closes += 1
 
 
 func _pick_address(state: GameState, rng: RandomNumberGenerator) -> void:

@@ -1,19 +1,25 @@
 class_name GateConsole
 extends SteelPanel
 ## The Gate station's console along the bottom: the destination monitor (left), the seal
-## lamps over one big key (centre: DIAL when idle, CLOSE while open) and the charge gauge
-## with the Shutter lever (right). It submits DialCommand, CloseWormholeCommand and
-## SetShutterCommand; a refusal shows as the key's hover reason and a shake, never as text.
+## lamps over one big key (centre: DIAL when idle, CLOSE while open, ANSWER with an IGNORE
+## key while an incoming wormhole waits) and the charge gauge with the Shutter lever (right).
+## It submits DialCommand, CloseWormholeCommand, AnswerIncomingCommand,
+## IgnoreIncomingCommand and SetShutterCommand; a refusal shows as the key's hover reason and
+## a shake, never as text.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Console)
 
 ## The BUILD BANK key was pressed.
 signal build_bank_requested
+
+## The main key's text for each MainKeyRules.Mode.
+const _KEY_TEXT: Array[String] = ["HW_KEY_DIAL", "HW_KEY_CLOSE", "HW_KEY_ANSWER", "HW_KEY_DIAL"]
 
 var _simulation: Simulation = null
 var _destination: GateDestination = null
 var _refusal: StringName = &""
 var _close_busy: Callable = Callable()
 var _shake: Tween = null
+var _ignore: IconKey = IconKey.new()
 
 @onready var _monitor: DestinationMonitor = %DestinationMonitor
 @onready var _seals: SealLampRow = %SealLamps
@@ -27,6 +33,13 @@ func _ready() -> void:
 	_lever.toggled.connect(_on_lever)
 	HoverCard.attach(_lever, "STATION_HELP_SHUTTER")
 	_charge.build_bank_requested.connect(build_bank_requested.emit)
+	_ignore.name = "IgnoreKey"
+	_ignore.icon_id = &"close"
+	_ignore.visible = false
+	_ignore.set_help("GATE_INCOMING_IGNORE")
+	_ignore.pressed.connect(ignore_incoming)
+	_key.get_parent().add_child(_ignore)
+	_ignore.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	set_process(false)
 
 
@@ -71,6 +84,8 @@ func press_main_key() -> void:
 	match MainKeyRules.mode_of(state, address):
 		MainKeyRules.Mode.CLOSE:
 			_simulation.submit(CloseWormholeCommand.new())
+		MainKeyRules.Mode.ANSWER:
+			_simulation.submit(AnswerIncomingCommand.new())
 		MainKeyRules.Mode.DIAL:
 			var result: CommandResult = _simulation.submit(DialCommand.create(address))
 			if not result.is_ok:
@@ -78,6 +93,17 @@ func press_main_key() -> void:
 		MainKeyRules.Mode.OFF:
 			_refuse(MainKeyRules.reason_of(state, address))
 	refresh(RingLook.of(state.gate, state.clock.tick, _dial_ticks()))
+
+
+## Lets the incoming wormhole ring out (IgnoreIncomingCommand).
+func ignore_incoming() -> void:
+	if _simulation != null:
+		_simulation.submit(IgnoreIncomingCommand.new())
+
+
+## The IGNORE key, shown while an incoming wormhole waits.
+func get_ignore_key() -> IconKey:
+	return _ignore
 
 
 ## The hover reason shown on the key now (a refusal or why it is off); "" for none.
@@ -128,17 +154,18 @@ func refresh(look: RingLook) -> void:
 	_seals.show_look(look)
 	var need: float = GateQueries.lock_energy_mwh(state, address) if address != null else 0.0
 	_charge.show_state(state, need)
-	_key.text = "HW_KEY_CLOSE" if mode == MainKeyRules.Mode.CLOSE else "HW_KEY_DIAL"
+	_key.text = _KEY_TEXT[mode]
 	_key.key_style = (
 		BigKey.KeyStyle.HAZARD if mode == MainKeyRules.Mode.CLOSE else BigKey.KeyStyle.AMBER
 	)
+	_ignore.visible = mode == MainKeyRules.Mode.ANSWER
 	var busy: bool = MainKeyRules.close_needs_confirm(state)
 	if _close_busy.is_valid():
 		var extra: bool = _close_busy.call()
 		busy = busy or extra
 	_key.hold_to_confirm = mode == MainKeyRules.Mode.CLOSE and busy
 	var reason: StringName = MainKeyRules.reason_of(state, address)
-	if mode == MainKeyRules.Mode.CLOSE:
+	if mode == MainKeyRules.Mode.CLOSE or mode == MainKeyRules.Mode.ANSWER:
 		reason = &""
 	_set_key_reason(_refusal if _refusal != &"" else reason)
 	_lever.visible = ShutterRules.is_installed(state)

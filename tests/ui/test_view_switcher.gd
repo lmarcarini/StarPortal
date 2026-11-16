@@ -35,22 +35,21 @@ func after_test() -> void:
 
 func test_starts_on_the_gate_room_with_translated_tabs() -> void:
 	assert_array(_switcher.get_view_ids()).is_equal(
-		[&"gate_room", &"base", &"research", &"personnel", &"expeditions", &"archive", &"command"]
+		[&"gate_room", &"base", &"research", &"personnel", &"archive", &"command"]
 	)
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 	var tabs: TabBar = _switcher.get_tab_bar()
-	assert_int(tabs.tab_count).is_equal(7)
-	assert_str(tabs.get_tab_title(0)).is_equal("Gate Room")
-	assert_str(tabs.get_tab_title(5)).is_equal("Archive")
+	assert_int(tabs.tab_count).is_equal(6)
+	assert_str(tabs.get_tab_title(0)).is_equal("Gate")
+	assert_str(tabs.get_tab_title(4)).is_equal("Archive")
 	assert_str(tabs.get_tab_title(1)).is_equal("Base")
 	assert_str(tabs.get_tab_title(2)).is_equal("Research")
 	assert_bool(tabs.is_tab_hidden(2)).is_true()
-	assert_bool(tabs.is_tab_hidden(4)).is_true()
 	TranslationServer.set_locale("pt_BR")
 	await _runner.simulate_frames(2)
-	assert_str(tabs.get_tab_title(0)).is_equal("Sala do Portal")
-	assert_str(tabs.get_tab_title(5)).is_equal("Arquivo")
-	assert_str(_view(&"gate_room").get_title_key()).is_equal("GATE_ROOM_TITLE")
+	assert_str(tabs.get_tab_title(0)).is_equal("Portal")
+	assert_str(tabs.get_tab_title(4)).is_equal("Arquivo")
+	assert_str(_view(&"gate_room").get_title_key()).is_equal("STATION_GATE_TITLE")
 	assert_str(_view(&"archive").get_title_key()).is_equal("ARCHIVE_TITLE")
 	assert_str(_view(&"base").get_title_key()).is_equal("BASE_TITLE")
 	assert_str(tabs.get_tab_title(2)).is_equal("Pesquisa")
@@ -117,7 +116,7 @@ func test_switching_focuses_the_new_views_default_control() -> void:
 
 func test_clicking_a_tab_switches_and_focuses_the_view() -> void:
 	var tabs: TabBar = _switcher.get_tab_bar()
-	var target: Vector2 = tabs.get_global_transform() * tabs.get_tab_rect(5).get_center()
+	var target: Vector2 = tabs.get_global_transform() * tabs.get_tab_rect(4).get_center()
 	for pressed: bool in [true, false]:
 		var click := InputEventMouseButton.new()
 		click.button_index = MOUSE_BUTTON_LEFT
@@ -201,10 +200,10 @@ func test_showing_a_view_restores_only_what_hiding_changed() -> void:
 
 
 func test_hidden_view_keeps_its_nodes() -> void:
-	var console: Control = _view(&"gate_room").find_child("DialConsole", true, false) as Control
+	var console: Control = _view(&"gate_room").find_child("GateConsole", true, false) as Control
 	_switcher.show_view(&"archive")
 	_switcher.show_view(&"gate_room")
-	assert_object(_view(&"gate_room").find_child("DialConsole", true, false)).is_same(console)
+	assert_object(_view(&"gate_room").find_child("GateConsole", true, false)).is_same(console)
 
 
 func test_unknown_view_changes_nothing() -> void:
@@ -228,7 +227,6 @@ func test_setup_reaches_every_view_again_and_again() -> void:
 				&"base",
 				&"research",
 				&"personnel",
-				&"expeditions",
 				&"archive",
 				&"command",
 				&"spy",
@@ -254,7 +252,7 @@ func test_archive_view_holds_the_list_and_the_reader() -> void:
 	await _runner.simulate_frames(2)
 	var view: ArchiveView = _view(&"archive") as ArchiveView
 	assert_object(view).is_not_null()
-	assert_object(view.find_child("DialConsole", true, false)).is_null()
+	assert_object(view.find_child("GateConsole", true, false)).is_null()
 	assert_object(view.get_reader()).is_instanceof(DocumentReader)
 	assert_array(view.get_list().get_rows()).is_empty()
 	assert_object(view.get_default_focus()).is_same(view.get_list().get_filter_button())

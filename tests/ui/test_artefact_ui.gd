@@ -70,14 +70,14 @@ func test_refusal_words() -> void:
 	assert_str(ArtefactText.refusal(&"something_else")).is_equal("something_else")
 
 
-func test_archive_section_and_gate_button() -> void:
+func test_archive_section_and_gate_locker() -> void:
 	StoryRulesItems.give_artefact(_state, &"artefact_plain")
-	var gate: GateRoomView = (
-		(load("res://src/ui/views/gate_room/gate_room_view.tscn") as PackedScene).instantiate()
-		as GateRoomView
-	)
-	add_child(gate)
-	gate.setup(_simulation)
-	assert_bool(gate.get_artefacts_button().visible).is_true()
-	assert_str(gate.get_artefacts_button().text).contains("Holding 1/2")
-	gate.free()
+	var locker: GateLocker = auto_free(GateLocker.new())
+	add_child(locker)
+	var card: PaperCard = auto_free(locker.get_card())
+	add_child(card)
+	locker.setup(_simulation)
+	assert_bool(locker.get_holding_key().visible).is_true()
+	assert_str(locker.get_holding_key().badge_text).is_equal("1")
+	locker.toggle_holding()
+	assert_bool(locker.get_card().visible).is_true()

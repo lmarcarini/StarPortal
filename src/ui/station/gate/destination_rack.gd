@@ -11,8 +11,9 @@ signal destination_selected(destination: GateDestination)
 signal new_address_requested
 ## A card's TEAM key asked for a mission order to [param destination].
 signal order_requested(destination: GateDestination)
-## A card was flipped: show the report of [param world_id] (&"" for none).
-signal report_requested(world_id: StringName)
+## A card was flipped: show the report of [param world_id] (&"" for none) with the note of
+## Address Book entry [param key].
+signal report_requested(world_id: StringName, key: String)
 
 const _FILTER_ICONS: Array[StringName] = [&"base", &"team", &"probed"]
 const _FILTER_HELP: Array[String] = [
@@ -130,7 +131,7 @@ func _on_selected(card: DestinationCard) -> void:
 
 
 func _on_flipped(card: DestinationCard) -> void:
-	report_requested.emit(card.get_destination().world_id)
+	report_requested.emit(card.get_destination().world_id, card.get_key())
 
 
 func _on_pin(card: DestinationCard) -> void:

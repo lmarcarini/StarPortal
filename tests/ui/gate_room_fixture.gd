@@ -1,11 +1,11 @@
 extends RefCounted
-## Test fixture for the Gate Room tests: a paused simulation over the dialing fixture galaxy
+## Test fixture for the Gate station tests: a paused simulation over the dialing fixture galaxy
 ## (every world has a designation, so a test can check where a designation appears), the
 ## address that gives each outcome, and a few tree-walking helpers.
 ## Bible: gate-and-address-spec.md#dialing-outcomes-and-energy
 
 const DialFixture := preload("res://tests/gate/dial_fixture.gd")
-const VIEW_SCENE: String = "res://src/ui/views/gate_room/gate_room_view.tscn"
+const VIEW_SCENE: String = "res://src/ui/station/gate/gate_station_view.tscn"
 const DESIGNATIONS: Dictionary[StringName, String] = {
 	DialFixture.OPEN_ID: "P3X-111",
 	DialFixture.BURIED_ID: "P3X-222",
@@ -41,34 +41,7 @@ static func address_for(state: GameState, outcome: int) -> GateAddress:
 	return DialFixture.address_of(state.galaxy, DialFixture.OPEN_ID)
 
 
-## Makes [param address] the one [param view]'s Dial button dials: loaded into the console's
-## slots when its origin is CAIRN's. The console cannot build an address with another origin
-## (seal 8 is fixed), so for Origin rejected the address goes straight to the dial controls.
-static func select(view: GateRoomView, address: GateAddress) -> void:
-	var console: DialConsole = view.get_console()
-	if address.origin == console.get_address_origin():
-		console.load_address(address)
-	else:
-		console.get_dial_controls().set_address(address)
-
-
-## Shows the open wormhole's action panel, as a click on the portal does; no-op if it shows.
-static func open_actions(view: GateRoomView) -> void:
-	if not view.get_overlays().get_wormhole_screen().are_actions_shown():
-		view.get_ring_view().portal_pressed.emit()
-
-
-## Closes the open wormhole with the action panel's Close the wormhole hold button.
-static func close_wormhole(view: GateRoomView) -> void:
-	open_actions(view)
-	var close: HoldButton = (
-		view.get_overlays().get_wormhole_screen().get_actions().get_close_button()
-	)
-	close.begin_hold()
-	close.advance(HoldButton.HOLD_SECONDS)
-
-
-## Returns a Control of [constant VIEW_SIZE] that holds a new Gate Room view, as the shell's
+## Returns a Control of [constant VIEW_SIZE] that holds a new Gate station view, as the shell's
 ## view area does. The caller adds the holder to the tree and frees it.
 static func mount_view() -> Control:
 	var holder := Control.new()
@@ -77,9 +50,9 @@ static func mount_view() -> Control:
 	return holder
 
 
-## Returns the Gate Room view inside [param holder] from [method mount_view].
-static func view_of(holder: Control) -> GateRoomView:
-	return holder.get_child(0) as GateRoomView
+## Returns the Gate station view inside [param holder] from [method mount_view].
+static func view_of(holder: Control) -> GateStationView:
+	return holder.get_child(0) as GateStationView
 
 
 ## Returns every visible text the player can read under [param root], translated as the

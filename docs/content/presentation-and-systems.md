@@ -1,5 +1,11 @@
 # Presentation and Systems
 
+> **Superseded in part (M4.9, 2026-11).** The Gate Room view, its Address Book drawer and
+> glyph palette, and the Expeditions tab are retired. The Gate tab now hosts the Gate station
+> (`docs/content/interface-rethink.md` section 4): destination cards, the alien panel, the
+> send rail, the mission sheet and the team card. Where this document describes those old
+> screens, read it as history; the rules behind them still hold.
+
 How the hybrid presentation works screen by screen, the base plan, the Archive as the
 player's database, where documents come from, and the contact system. M2 and M3 cards are
 written from it.

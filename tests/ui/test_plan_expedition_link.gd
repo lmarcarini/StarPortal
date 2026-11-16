@@ -1,6 +1,6 @@
 ## Tests for the World Report's **Plan expedition** (docs/content/m3-beyond-the-ring.md
 ## section 7): greyed before the unlock, and once Expeditions unlock a click or (A) opens the
-## Expeditions tab (F7) with that world chosen; F7 reaches the tab.
+## Gate station's mission sheet on that world (interface-rethink.md section 4).
 ## Bible: docs/content/m3-beyond-the-ring.md section 7 (World Report; gamepad: Worlds)
 extends GdUnitTestSuite
 
@@ -39,31 +39,26 @@ func _report() -> WorldReportPanel:
 	return archive.get_worlds().get_report()
 
 
-func _expeditions() -> ExpeditionsView:
-	return _switcher.get_view(ViewSwitcher.EXPEDITIONS) as ExpeditionsView
+func _station() -> GateStationView:
+	return _switcher.get_view(ViewSwitcher.GATE_ROOM) as GateStationView
 
 
-func test_click_opens_expeditions_with_the_world_chosen() -> void:
-	assert_bool(_expeditions().is_available()).is_true()
+func test_click_opens_the_mission_sheet_with_the_world_chosen() -> void:
 	var plan: Button = _report().get_plan_button()
 	await UiInput.settle(_root)
 	assert_bool(plan.disabled).is_false()
 	await UiInput.click(plan)
-	assert_str(String(_switcher.current_view_id())).is_equal("expeditions")
-	var draft: ExpeditionPlanDraft = _expeditions().get_sheet().get_draft()
+	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
+	assert_bool(_station().get_mission_sheet().visible).is_true()
+	var draft: ExpeditionPlanDraft = _station().get_mission_sheet().get_draft()
 	assert_str(String(draft.world_id)).is_equal(String(Fixture.WORLD_ID))
 
 
-func test_gamepad_a_opens_expeditions() -> void:
+func test_gamepad_a_opens_the_gate() -> void:
 	var plan: Button = _report().get_plan_button()
 	await UiInput.settle(_root)
 	await UiInput.pad(plan, JOY_BUTTON_A)
-	assert_str(String(_switcher.current_view_id())).is_equal("expeditions")
-
-
-func test_f7_reaches_the_tab() -> void:
-	await UiInput.key(_switcher.get_tab_bar(), KEY_F5)
-	assert_str(String(_switcher.current_view_id())).is_equal("expeditions")
+	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
 
 
 func test_greyed_before_the_unlock() -> void:

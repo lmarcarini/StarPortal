@@ -1,5 +1,5 @@
 ## M2 end to end on the M2.5 lean start, headless, over the real data/ content: a new game opens on
-## the Gate Room, whose "Build capacitor bank" button switches to the Base tab with the bank's
+## the Gate Room, whose "BUILD BANK" button switches to the Base tab with the bank's
 ## ghost on the nearest valid spot to the Gate Room, and one click builds it. The bank completes
 ## after 1 hour and takes the spare 25 MW; SILL then charges and locks, and the pole camera brings
 ## its documents. The player paints a corridor and builds a Research Lab against it on Level 1 (it
@@ -87,9 +87,9 @@ func _build_bank_from_gate_room(player: M15Player) -> void:
 	switcher.setup(player.simulation)
 	await runner.simulate_frames(2)
 	assert_str(String(switcher.current_view_id())).is_equal("gate_room")
-	var gauge := switcher.find_child("CapacitorGauge", true, false) as CapacitorGauge
-	assert_str(tr(gauge.get_build_button().text)).is_equal("Build capacitor bank")
-	await UiInput.click(gauge.get_build_button())
+	var gauge := switcher.find_child("Charge", true, false) as ChargeGauge
+	assert_str(tr(gauge.get_build_key().text)).is_equal("BUILD BANK")
+	await UiInput.click(gauge.get_build_key())
 	assert_str(String(switcher.current_view_id())).is_equal("base")
 	var base := switcher.get_view(&"base") as BaseView
 	var ghost: PlacementGhost = base.get_build().get_ghost()
@@ -101,7 +101,9 @@ func _build_bank_from_gate_room(player: M15Player) -> void:
 	var funds: int = player.state().budget.funds_k
 	ghost.confirm()
 	assert_int(player.state().budget.funds_k).is_equal(funds - 600)
-	assert_bool(CapacitorGauge.needs_bank(player.state())).is_false()
+	var is_bank: Callable = func(r: RoomState) -> bool:
+		return r.def_id == StartingBase.CAPACITOR_BANK_DEF
+	assert_bool(player.state().base.rooms.any(is_bank)).is_true()
 	_root.free()
 	_root = null
 

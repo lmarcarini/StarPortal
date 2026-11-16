@@ -4,7 +4,7 @@ extends Control
 ## [GameView]; its id is its node name in snake_case ([code]GateRoom[/code] is
 ## [code]&"gate_room"[/code]) and its tab follows child order. The tabs, the view actions
 ## (view_next and view_previous wrap at the ends; view_gate_room F1, view_base F2,
-## view_research F3, view_personnel F4, view_expeditions F5, view_archive F6, view_command F7)
+## view_research F3, view_personnel F4, view_archive F6, view_command F7)
 ## and the gamepad shoulders switch views. Each tab has a code-drawn icon (TabIcon), lit
 ## orange on the current tab, and a dot while its view needs attention
 ## ([method GameView.needs_attention]). A view that is not available
@@ -15,10 +15,9 @@ extends Control
 ## are changed, and showing the view restores the values it had before it was hidden;
 ## descendants inherit and keep their own settings.
 ## The Archive's tab counts its unread documents ("Archive (2)"), as the Archive view
-## reports them. When the Gate Room asks for a document (Read in the Archive on the wormhole
-## screen), the switcher opens the Archive with that document selected. When the Gate Room
-## asks to build the first Capacitor Bank, it opens the Base with the bank's ghost placed.
-## When the World Report asks to plan an expedition, it opens Expeditions with that world chosen.
+## reports them. When the Gate station asks to build the first Capacitor Bank, it opens the
+## Base with the bank's ghost placed.
+## When the World Report asks to plan an expedition, it opens the Gate's mission sheet on it.
 ## The switcher holds no game state: it passes the simulation down and forgets it.
 ## Bible: game-design.md#core-loop, technical-architecture.md#signals-and-scenes,
 ## technical-architecture.md#input-accessibility-and-localisation,
@@ -40,8 +39,6 @@ const RESEARCH: StringName = &"research"
 const PERSONNEL: StringName = &"personnel"
 ## Id of the Command view.
 const COMMAND: StringName = &"command"
-## Id of the Expeditions view.
-const EXPEDITIONS: StringName = &"expeditions"
 
 ## Added to a tab's title while its view needs attention.
 const ATTENTION_DOT: String = " •"
@@ -56,7 +53,6 @@ const _DIRECT_ACTIONS: Dictionary = {
 	&"view_research": RESEARCH,
 	&"view_personnel": PERSONNEL,
 	&"view_command": COMMAND,
-	&"view_expeditions": EXPEDITIONS,
 }
 
 var _ids: Array[StringName] = []
@@ -159,17 +155,16 @@ func _collect_views() -> void:
 		view.title_changed.connect(_refresh_titles)
 
 
-## Listens to the requests of the views that make any: the Archive's unread count and the
-## Gate Room's request to read a document.
+## Listens to the requests of the views that make any: the Archive's unread count and plan
+## requests, Personnel's show on plan and the Gate station's capacitor bank.
 func _connect_view(view: GameView) -> void:
 	if view is ArchiveView:
 		(view as ArchiveView).unread_changed.connect(_refresh_titles)
 		(view as ArchiveView).plan_requested.connect(_on_plan_requested)
 	elif view is PersonnelView:
 		(view as PersonnelView).show_on_plan.connect(_on_show_on_plan)
-	elif view is GateRoomView:
-		(view as GateRoomView).archive_requested.connect(_on_archive_requested)
-		(view as GateRoomView).capacitor_bank_requested.connect(_on_capacitor_bank_requested)
+	elif view is GateStationView:
+		(view as GateStationView).capacitor_bank_requested.connect(_on_capacitor_bank_requested)
 
 
 ## Shows [param view_id] and hides the others, without moving focus.
@@ -284,17 +279,6 @@ func _on_tab_clicked(index: int) -> void:
 	show_view(_ids[index])
 
 
-## Opens the Archive with [param document_id] selected and read, and focuses its row.
-func _on_archive_requested(document_id: StringName) -> void:
-	if not _views.has(ARCHIVE):
-		return
-	var archive: ArchiveView = _views[ARCHIVE] as ArchiveView
-	if archive == null:
-		return
-	archive.open_document(document_id)
-	show_view(ARCHIVE)
-
-
 ## Opens the Base with the Capacitor Bank's ghost on the nearest valid spot to
 ## the Gate Room.
 func _on_capacitor_bank_requested() -> void:
@@ -307,15 +291,15 @@ func _on_capacitor_bank_requested() -> void:
 	base.place_capacitor_bank()
 
 
-## Opens Expeditions with [param world_id] chosen on the plan sheet.
+## Opens the Gate station's mission sheet on [param world_id].
 func _on_plan_requested(world_id: StringName) -> void:
-	if not _views.has(EXPEDITIONS):
+	if not _views.has(GATE_ROOM):
 		return
-	var expeditions: ExpeditionsView = _views[EXPEDITIONS] as ExpeditionsView
-	if expeditions == null or not expeditions.is_available():
+	var gate: GateStationView = _views[GATE_ROOM] as GateStationView
+	if gate == null:
 		return
-	expeditions.plan_world(world_id)
-	show_view(EXPEDITIONS)
+	show_view(GATE_ROOM)
+	gate.plan_world(world_id)
 
 
 ## Opens the Base on [param person_id]'s level with their token selected.

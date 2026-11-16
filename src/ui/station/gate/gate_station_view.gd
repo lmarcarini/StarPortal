@@ -2,13 +2,11 @@ class_name GateStationView
 extends GameView
 ## The Gate station: the Gate hall plate with the Ring's live layers, and the console along
 ## the bottom. Enter or (A) on the station (not on another control) presses the main key.
-## Becomes the Gate tab's view when the old Gate Room retires (M4.9-14).
+## The Gate tab's view. High on the left, the locker (holding, MOTH order).
 ## Bible: docs/content/interface-rethink.md section 4 (Gate)
 
 ## The console asked to build a capacitor bank (open the Base).
 signal capacitor_bank_requested
-## A World Report asked to plan an expedition to [param world_id].
-signal plan_requested(world_id: StringName)
 
 ## The station def shown.
 const STATION_ID: StringName = &"station_gate"
@@ -25,6 +23,9 @@ var _orders: TeamOrders = TeamOrders.new()
 var _sheet: MissionSheet = MissionSheet.new()
 var _team: TeamCard = TeamCard.new()
 var _debrief: DebriefCard = DebriefCard.new()
+var _locker: GateLocker = GateLocker.new()
+var _note: LineEdit = LineEdit.new()
+var _note_key: String = ""
 
 @onready var _station: StationScene = %Station
 @onready var _console: GateConsole = %GateConsole
@@ -36,27 +37,20 @@ func _ready() -> void:
 	_station.setup(Registry.get_def(STATION_ID) as StationSceneDef)
 	_console.build_bank_requested.connect(capacitor_bank_requested.emit)
 	_rack.destination_selected.connect(_console.select_destination)
-	_rack.report_requested.connect(show_report)
-	_rack.order_requested.connect(open_order_sheet)
+	_rack.report_requested.connect(_show_report)
+	_rack.order_requested.connect(_open_order_sheet)
 	_rack.new_address_requested.connect(open_alien_panel)
 	_panel.dial_requested.connect(_on_panel_dial)
 	_panel.closed.connect(func() -> void: _console.get_main_key().grab_focus())
 	_panel.hide()
-	_report.name = "WorldReportCard"
-	_report.z_index = 6
-	_report.visible = false
-	_report_panel.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
-	_report.add_child(_report_panel)
-	_report.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	_report_panel.plan_requested.connect(plan_requested.emit)
-	_report.gui_input.connect(_on_report_input)
-	add_child(_report)
+	_build_report()
 	_rail.name = "SendRail"
 	_rail.key_used.connect(_on_rail_used)
 	visibility_changed.connect(_on_visibility)
 	add_child(_rail)
 	move_child(_rail, _station.get_index() + 1)
 	add_child(_moth)
+	_moth.changed.connect(_on_moth_changed)
 	_orders.name = "TeamOrders"
 	add_child(_orders)
 	_rail.orders_requested.connect(_show_orders)
@@ -69,6 +63,10 @@ func _ready() -> void:
 	move_child(_team, _rail.get_index())
 	_debrief.name = "DebriefCard"
 	add_child(_debrief)
+	_locker.name = "GateLocker"
+	_locker.position = Vector2(16, 16)
+	add_child(_locker)
+	add_child(_locker.get_card())
 	_debrief.resized.connect(func() -> void: _debrief.position = (size - _debrief.size) * 0.5)
 	resized.connect(_layout)
 	_console.resized.connect(_layout)
@@ -95,6 +93,7 @@ func setup(simulation: Simulation) -> void:
 	_sheet.setup(simulation)
 	_team.setup(simulation)
 	_debrief.setup(simulation)
+	_locker.setup(simulation)
 	_report.visible = false
 
 
@@ -123,12 +122,19 @@ func get_rack() -> DestinationRack:
 	return _rack
 
 
-## Shows the World Report of [param world_id] on a paper card; a world never reached shows
-## nothing.
-func show_report(world_id: StringName) -> void:
-	if world_id.is_empty() or _simulation == null:
+## Shows the World Report of [param world_id] on a paper card with the player's note on
+## Address Book entry [param key] under it; a world never reached shows only the note, and
+## nothing without a key.
+func _show_report(world_id: StringName, key: String = "") -> void:
+	if _simulation == null or (world_id.is_empty() and key.is_empty()):
 		return
-	_report_panel.show_world(world_id, _simulation.state)
+	_report_panel.visible = not world_id.is_empty()
+	if _report_panel.visible:
+		_report_panel.show_world(world_id, _simulation.state)
+	_note_key = key
+	var entry: AddressEntry = _simulation.state.address_book.find(key) if key != "" else null
+	_note.visible = entry != null
+	_note.text = entry.note if entry != null else ""
 	_report.visible = true
 	_report.reset_size()
 	_report.position = (size - _report.size) * 0.5
@@ -169,7 +175,7 @@ func open_mission_sheet() -> void:
 
 
 ## Opens the mission sheet to order a mission to [param destination] from a closed gate.
-func open_order_sheet(destination: GateDestination) -> void:
+func _open_order_sheet(destination: GateDestination) -> void:
 	if _simulation == null or destination.world_id.is_empty():
 		return
 	_sheet.open_for(destination.world_id, destination.address)
@@ -190,6 +196,30 @@ func get_team_card() -> TeamCard:
 ## The debrief card.
 func get_debrief() -> DebriefCard:
 	return _debrief
+
+
+## The locker (holding, MOTH order).
+func get_locker() -> GateLocker:
+	return _locker
+
+
+## Opens the mission sheet for [param world_id] (a World Report's plan request): through the
+## wormhole open to it, else as a mission order from its Address Book entry.
+func plan_world(world_id: StringName) -> void:
+	if _simulation == null:
+		return
+	var gate: GateState = _simulation.state.gate
+	if gate.mode == GateState.RingMode.LOCKED and gate.connected_world_id == world_id:
+		open_mission_sheet()
+		return
+	for entry: AddressEntry in _simulation.state.address_book.entries:
+		if entry.world_id == world_id:
+			_open_order_sheet(DestinationRack.destination_of(entry, _simulation.state))
+			return
+	var galaxy: GalaxyCatalogue = _simulation.state.galaxy
+	if galaxy != null and galaxy.get_world(world_id) != null:
+		var address: GateAddress = galaxy.address_of(world_id, galaxy.home().origin_glyph)
+		_open_order_sheet(GateDestination.of(address, "", world_id))
 
 
 ## The team orders card.
@@ -216,6 +246,39 @@ func _on_panel_dial(address: GateAddress) -> void:
 	_panel.close()
 
 
+func _build_report() -> void:
+	_report.name = "WorldReportCard"
+	_report.z_index = 6
+	_report.visible = false
+	_report_panel.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	var sheet: VBoxContainer = VBoxContainer.new()
+	sheet.add_child(_report_panel)
+	_note.name = "Note"
+	_note.max_length = AddressEntry.MAX_NOTE_LENGTH
+	_note.text_submitted.connect(func(_t: String) -> void: _save_note())
+	_note.focus_exited.connect(_save_note)
+	HoverCard.attach(_note, "HW_ICON_PENCIL")
+	sheet.add_child(_note)
+	_report.add_child(sheet)
+	_report.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_report_panel.plan_requested.connect(plan_world)
+	_report.gui_input.connect(_on_report_input)
+	add_child(_report)
+
+
+func _save_note() -> void:
+	if _simulation == null or _note_key.is_empty() or not _note.visible:
+		return
+	var entry: AddressEntry = _simulation.state.address_book.find(_note_key)
+	if entry != null and entry.note != _note.text:
+		_simulation.submit(NoteAddressCommand.create(_note_key, _note.text))
+
+
+func _on_moth_changed() -> void:
+	if _moth.is_open() and is_visible_in_tree():
+		_moth.get_default_focus().grab_focus.call_deferred()
+
+
 func _show_orders() -> void:
 	_orders.open()
 	_orders.position = _rail.position + Vector2(0, -_orders.size.y - 12.0)
@@ -224,6 +287,11 @@ func _show_orders() -> void:
 func _on_rail_used(id: StringName) -> void:
 	if id == &"camera":
 		_floor.play(ActorCues.Cue.CAMERA_PUSH)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE and _floor.get_parent() == null:
+		_floor.free()
 
 
 func _on_visibility() -> void:

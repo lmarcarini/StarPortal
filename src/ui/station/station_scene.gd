@@ -17,8 +17,11 @@ var _depths: Dictionary[Node, int] = {}
 @onready var _layers: Control = %Layers
 
 
-## Shows [param def]: its plate, or the placeholder when it has none.
+## Shows [param def]: its plate, or the placeholder when it has none. A null def (content
+## without stations, in a test) shows an empty placeholder.
 func setup(def: StationSceneDef) -> void:
+	if def == null:
+		def = StationSceneDef.new()
 	_def = def
 	_plate.texture = def.plate
 	_plate.visible = def.plate != null

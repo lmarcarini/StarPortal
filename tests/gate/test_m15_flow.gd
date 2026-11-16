@@ -1,7 +1,7 @@
 ## M1.5 and M1.6 end to end, headless, over the real data/ content: a scripted player who knows
 ## the approved answers starts a new game, finds the opening documents in the Archive, cannot
 ## dial until the Capacitor Bank is built as a room, then enters SILL, LINTEL, MILESTONE and
-## STILLWATER in turn by clicking the real dial console (click to fill, click a slot to remove)
+## STILLWATER in turn by clicking the alien panel's stone keys (click to fill, a lamp clears)
 ## and dials them at 10×; each lock drops the clock to 1×. After each lock it extends the pole
 ## camera for the next documents (the lock alone delivers none), reads the console (2 to 4
 ## addresses) and closes the wormhole; then it dials console addresses the bank can power until
@@ -14,7 +14,7 @@ extends GdUnitTestSuite
 
 const M15Player := preload("res://tests/gate/m15_player.gd")
 const UiInput := preload("res://tests/ui/fixtures/ui_input.gd")
-const CONSOLE_SCENE: String = "res://src/ui/gate_room/console/dial_console.tscn"
+const PANEL_SCENE: String = "res://src/ui/station/gate/alien_panel.tscn"
 ## The fastest clock speed (10×), at which every puzzle is dialed.
 const FASTEST_SPEED: int = 3
 
@@ -29,7 +29,7 @@ const RANDOM_SEED: int = 5858
 const MAX_CONSOLE_TRIES: int = 16
 
 var _defs: GameDefs
-var _console: DialConsole = null
+var _panel: AlienPanel = null
 var _real_locale: String = ""
 
 
@@ -43,9 +43,9 @@ func before_test() -> void:
 
 
 func after_test() -> void:
-	if is_instance_valid(_console):
-		_console.free()
-	_console = null
+	if is_instance_valid(_panel):
+		_panel.free()
+	_panel = null
 	TranslationServer.set_locale(_real_locale)
 
 
@@ -60,9 +60,10 @@ func _new_player(base_seed: int) -> M15Player:
 ## The whole M1.6 flow from a new game to a lock on a console address.
 func test_new_game_to_console_lock() -> void:
 	var player: M15Player = _new_player(SEED)
-	_console = (load(CONSOLE_SCENE) as PackedScene).instantiate() as DialConsole
-	var runner: GdUnitSceneRunner = scene_runner(_console)
-	_console.setup(player.simulation)
+	_panel = (load(PANEL_SCENE) as PackedScene).instantiate() as AlienPanel
+	var runner: GdUnitSceneRunner = scene_runner(_panel)
+	_panel.setup(player.simulation)
+	_panel.open()
 	await runner.await_input_processed()
 	_assert_start(player)
 	_assert_no_dial_before_bank(player)
@@ -76,21 +77,18 @@ func test_new_game_to_console_lock() -> void:
 	assert_array(player.rejections).is_empty()
 
 
-## Empties the console by clicking each filled slot (click to remove), then clicks
-## [param glyphs] on the palette (click to fill, seals 1 to 7 in order); returns the console's
-## address.
+## Empties the alien panel's seals (clearing each filled lamp), then clicks [param glyphs]'
+## stone keys (each fills the next seal, 1 to 7 in order); returns the panel's address.
 func _enter_by_clicks(glyphs: Array) -> GateAddress:
-	var seals: SealRow = _console.get_node("%SealRow") as SealRow
-	var palette: GlyphPalette = _console.get_node("%Palette") as GlyphPalette
-	for seal: int in range(1, GateAddress.COORDINATE_COUNT + 1):
-		if _console.get_placed(seal) >= 0:
-			await UiInput.click(seals.get_slot(seal))
-		assert_int(_console.get_placed(seal)).is_equal(-1)
+	for seal: int in range(GateAddress.COORDINATE_COUNT):
+		if _panel.get_draft().firm[seal] >= 0:
+			_panel.clear_seal(seal)
+		assert_int(_panel.get_draft().firm[seal]).is_equal(-1)
 	var typed: Array[int] = []
 	typed.assign(glyphs)
 	for glyph: int in typed:
-		await UiInput.click(palette.get_button(glyph))
-	return _console.get_address()
+		await UiInput.click(_panel.get_key(glyph))
+	return _panel.get_address()
 
 
 ## A new game holds the two opening documents, unread, and an empty Address Book; nothing is

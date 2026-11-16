@@ -1,7 +1,0 @@
-[gd_scene format=3]
-
-[ext_resource type="Script" path="res://src/ui/gate_room/outcome_icon.gd" id="1_outcome_icon"]
-
-[node name="OutcomeIcon" type="Control"]
-mouse_filter = 2
-script = ExtResource("1_outcome_icon")

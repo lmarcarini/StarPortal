@@ -1,5 +1,11 @@
 # M3 Beyond the Ring
 
+> **Superseded in part (M4.9, 2026-11).** The Gate Room view, its Address Book drawer and
+> glyph palette, and the Expeditions tab are retired. The Gate tab now hosts the Gate station
+> (`docs/content/interface-rethink.md` section 4): destination cards, the alien panel, the
+> send rail, the mission sheet and the team card. Where this document describes those old
+> screens, read it as history; the rules behind them still hold.
+
 Design for the M3 cards: the core loop past the Ring, from a locked world to a returned team
 and the first people out there. It is lean on purpose: the owner wants to play the whole loop
 with placeholder art and iterate on it before M4's consequence systems.

@@ -125,10 +125,12 @@ func _wormhole(state: GameState) -> void:
 	state.gate.mode = GateState.RingMode.LOCKED
 	state.gate.lock_started_tick = state.clock.tick
 	_shell.top_bar.refresh()
-	assert_bool(_shell.top_bar.gate_chip.has_thumbnail()).is_true()
+	assert_str(String(_shell.top_bar.gate_chip.get_status())).is_equal(String(TopBarText.GATE_OPEN))
 	state.gate.mode = GateState.RingMode.IDLE
 	_shell.top_bar.refresh()
-	assert_bool(_shell.top_bar.gate_chip.has_thumbnail()).is_false()
+	assert_str(String(_shell.top_bar.gate_chip.get_status())).is_not_equal(
+		String(TopBarText.GATE_OPEN)
+	)
 
 
 func test_pseudo_localisation_fits_every_tab_at_1280() -> void:

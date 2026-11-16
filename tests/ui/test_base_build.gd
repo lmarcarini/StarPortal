@@ -59,7 +59,9 @@ func test_capacitor_bank_button_places_the_ghost_and_one_click_builds() -> void:
 	assert_int(_simulation.state.budget.funds_k).is_equal(funds - 600)
 	assert_bool(ghost.is_placing()).is_true()
 	assert_str(ghost.reason()).is_not_empty()
-	assert_bool(CapacitorGauge.needs_bank(_simulation.state)).is_false()
+	var is_bank: Callable = func(r: RoomState) -> bool:
+		return r.def_id == StartingBase.CAPACITOR_BANK_DEF
+	assert_bool(_simulation.state.base.rooms.any(is_bank)).is_true()
 
 
 func test_invalid_spots_say_why() -> void:

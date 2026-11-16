@@ -1,13 +1,13 @@
 class_name SendRailRules
 extends RefCounted
 ## What each key of the send rail shows while a wormhole is open: CAMERA, CANISTER, MOTH,
-## TEAM and HAIL, each READY, ACTIVE (in progress), USED (done this lock) or UNAVAILABLE with
-## the reason as a translation key, plus the command a press submits. An answered incoming
-## wormhole shows only HAIL. Pure.
+## TEAM, HAIL and the far Ring's CONSOLE, each READY, ACTIVE (in progress), USED (done this
+## lock) or UNAVAILABLE with the reason as a translation key, plus the command a press
+## submits. An answered incoming wormhole shows only HAIL. Pure.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, With a wormhole open)
 
-## Rail keys, in order (keys 1 to 5).
-const KEYS: Array[StringName] = [&"camera", &"canister", &"moth", &"team", &"hail"]
+## Rail keys, in order (keys 1 to 5, then the far console).
+const KEYS: Array[StringName] = [&"camera", &"canister", &"moth", &"team", &"hail", &"console"]
 ## Reason when a command code has no text of its own.
 const FALLBACK_REASON: StringName = &"STATION_REASON_UNAVAILABLE"
 
@@ -35,7 +35,7 @@ static func is_shown(state: GameState) -> bool:
 ## The look of every key for [param state].
 static func looks(state: GameState) -> Array[KeyLook]:
 	var out: Array[KeyLook] = [
-		camera(state), canister(state), moth(state), team(state), hail(state)
+		camera(state), canister(state), moth(state), team(state), hail(state), console(state)
 	]
 	if state.gate.is_incoming_lock():
 		for look: KeyLook in out:
@@ -48,6 +48,8 @@ static func command_for(state: GameState, id: StringName) -> Command:
 	match id:
 		&"camera":
 			return ExtendPoleCameraCommand.new()
+		&"console":
+			return ReadConsoleCommand.new()
 		&"canister":
 			return LaunchCanisterCommand.new()
 		&"moth":
@@ -72,6 +74,15 @@ static func camera(state: GameState) -> KeyLook:
 		look.state = IconKey.KeyState.ACTIVE
 	elif state.worlds.is_horizon_record_taken(state.gate.connected_world_id):
 		look.state = IconKey.KeyState.USED
+	return look
+
+
+## The far Ring's console key: READY until read, then USED.
+static func console(state: GameState) -> KeyLook:
+	var look: KeyLook = _look(&"console", ReadConsoleCommand.new().validate(state))
+	if state.worlds.is_console_read(state.gate.connected_world_id):
+		look.state = IconKey.KeyState.USED
+		look.reason = &"HW_ICON_CONSOLE"
 	return look
 
 

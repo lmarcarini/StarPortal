@@ -1,14 +1,13 @@
 ## M3a end to end, headless, in the running shell over the real data/ content
 ## (docs/content/m3-beyond-the-ring.md section 1, "The loop in one page"): a new game; the bank
-## is built from the Gate Room's button and SILL is dialed. On the open wormhole the Ring
-## actions throw the sample canister and send the MOTH, whose scan screen runs Look around,
+## is built from the Gate Room's button and SILL is dialed. On the open wormhole the send
+## rail's keys throw the sample canister and send the MOTH, whose scan screen runs Look around,
 ## Close look and Sky and recalls it: SILL is Probed and Expeditions unlock with the two lent
 ## soldiers. The World Report (Archive, Worlds) shows the threat and its Plan expedition opens
-## the Expeditions tab (F7) on SILL; four slots are picked and Ready team plans the Survey; the
-## Ring action Send team sends T-1 through the same lock. The team checks in (a message, the
-## check-in panel) and comes home with SILL Surveyed, ending the Prologue (once). A second
+## the mission sheet on the Gate station, prefilled for a Survey of SILL; GO sends T-1 through
+## the same lock. The team comes home with SILL Surveyed, ending the Prologue (once). A second
 ## Survey, whose first check-in is forced missed, pauses the game and opens the rescue alert;
-## Go to Gate Room, a new lock and Signal T-1 bring the team home and close the window.
+## Go to Gate, a new lock and TEAM (signal T-1) bring the team home and close the window.
 ## Bible: docs/content/m3-beyond-the-ring.md sections 1, 2, 4 and 7,
 ## technical-architecture.md#testing-and-tooling
 extends GdUnitTestSuite
@@ -22,8 +21,6 @@ const SHELL_SCENE: String = "res://src/scenes/shell/shell.tscn"
 const SEED: int = 20_261_105
 const SILL: StringName = &"world_sill"
 const SLAB: StringName = &"slab"
-## Slots filled in this order: the leader (anyone) last, so the roles are taken first.
-const PICK_ORDER: Array[String] = ["scientist", "soldier", "specialist", "leader"]
 ## Most ticks the test waits for anything.
 const MAX_WAIT_TICKS: int = 10 * TimeMath.TICKS_PER_DAY
 
@@ -61,23 +58,23 @@ func test_first_threshold_team_and_a_rescue() -> void:
 	await _lock_sill(player)
 	await _throw_the_canister(player)
 	await _probe_with_the_moth(player)
-	await _plan_from_the_world_report(player)
+	await _plan_from_the_world_report()
 	await _send_and_close(player)
 	await _check_in_and_come_home(player)
 	_force_a_missed_check_in(player)
 	await _lock_sill(player)
-	await _plan_from_the_world_report(player)
+	await _plan_from_the_world_report()
 	await _send_and_close(player)
 	await _miss_and_open_the_alert(player)
 	await _rescue(player)
 	assert_array(player.rejections).is_empty()
 
 
-## "Build capacitor bank" in the Gate Room places the bank's ghost; one confirm builds it.
+## "BUILD BANK" in the Gate Room places the bank's ghost; one confirm builds it.
 func _build_bank_from_gate_room(player: M15Player) -> void:
 	await _key(KEY_F1)
-	var gauge := _shell.find_child("CapacitorGauge", true, false) as CapacitorGauge
-	await UiInput.click(gauge.get_build_button())
+	var gauge := _shell.find_child("Charge", true, false) as ChargeGauge
+	await UiInput.click(gauge.get_build_key())
 	var base := _shell.view_switcher.get_view(&"base") as BaseView
 	base.get_build().get_ghost().confirm()
 	_wait(player, func() -> bool: return not player.state().power.charge_rates.is_empty())
@@ -89,18 +86,14 @@ func _lock_sill(player: M15Player) -> void:
 	assert_bool(player.wait_for_charge(sill)).is_true()
 	assert_int(player.dial(sill).outcome).is_equal(DialOutcome.Kind.LOCK)
 	await _key(KEY_F1)
-	var screen: WormholeScreen = _gate_room().get_overlays().get_wormhole_screen()
-	if not screen.is_showing_open():
-		screen.open()
-	if not screen.are_actions_shown():
-		_gate_room().get_ring_view().portal_pressed.emit()
 	await _runner.await_input_processed()
-	_actions().render(player.state())
+	_rail().refresh()
+	assert_bool(_rail().visible).is_true()
 
 
 ## Throw the sample canister costs $10k and is reeled back 10 minutes later with the biohazard.
 func _throw_the_canister(player: M15Player) -> void:
-	var canister: Button = _actions().get_team_actions().get_canister_button()
+	var canister: IconKey = _rail().get_key(&"canister")
 	assert_bool(canister.disabled).is_false()
 	var funds: int = player.state().budget.funds_k
 	await UiInput.click(canister)
@@ -111,8 +104,8 @@ func _throw_the_canister(player: M15Player) -> void:
 ## Send the MOTH opens the scan screen; Look around, Close look at the slab and Sky run, then
 ## RECALL flies it home. SILL is Probed, the canister is back and Expeditions unlock.
 func _probe_with_the_moth(player: M15Player) -> void:
-	await UiInput.click(_actions().get_moth_button())
-	var moth: MothScreen = _gate_room().get_moth_screen()
+	await UiInput.click(_rail().get_key(&"moth"))
+	var moth: MothScreen = _station().get_moth_screen()
 	assert_bool(moth.is_open()).is_true()
 	await _scan(player, MothRules.Scan.LOOK_AROUND)
 	await _scan(player, MothRules.Scan.CLOSE_LOOK, SLAB)
@@ -128,7 +121,7 @@ func _probe_with_the_moth(player: M15Player) -> void:
 
 
 func _scan(player: M15Player, scan: MothRules.Scan, target: StringName = &"") -> void:
-	var moth: MothScreen = _gate_room().get_moth_screen()
+	var moth: MothScreen = _station().get_moth_screen()
 	var button: Button = moth.get_scan_list().get_button(scan, target)
 	assert_object(button).is_not_null()
 	await UiInput.click(button)
@@ -137,9 +130,9 @@ func _scan(player: M15Player, scan: MothRules.Scan, target: StringName = &"") ->
 	assert_bool(player.state().gate.mode == GateState.RingMode.LOCKED).is_true()
 
 
-## Archive (F2), Worlds, SILL: the report shows a threat; Plan expedition opens F7 on SILL.
-## The four slots are picked from their rosters and Ready team plans a Survey.
-func _plan_from_the_world_report(player: M15Player) -> void:
+## Archive (F6), Worlds, SILL: the report shows a threat; Plan expedition opens the Gate's
+## mission sheet on SILL, prefilled for a Survey with four fit members.
+func _plan_from_the_world_report() -> void:
 	await _key(KEY_F6)
 	var archive := _shell.view_switcher.get_view(&"archive") as ArchiveView
 	archive.show_worlds()
@@ -147,45 +140,19 @@ func _plan_from_the_world_report(player: M15Player) -> void:
 	var report: WorldReportPanel = archive.get_worlds().get_report()
 	assert_str(report.get_value_text(WorldReport.Fact.THREAT)).is_not_empty()
 	await UiInput.click(report.get_plan_button())
-	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("expeditions")
-	var sheet: ExpeditionPlanSheet = _expeditions().get_sheet()
+	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("gate_room")
+	var sheet: MissionSheet = _station().get_mission_sheet()
+	assert_bool(sheet.visible).is_true()
 	assert_str(String(sheet.get_draft().world_id)).is_equal(String(SILL))
-	assert_str(sheet.get_objective_buttons()[0].text).is_equal("Survey")
-	_pick_team(player, sheet)
-	assert_str(sheet.texts()[1]).starts_with("Risk ")
-	await UiInput.click(sheet.get_ready_button())
-	assert_int(player.state().expedition.mode).is_equal(ExpeditionState.Mode.PLANNED)
+	assert_int(sheet.get_draft().objective).is_equal(ExpeditionState.Objective.SURVEY)
+	assert_int(sheet.get_draft().team.size()).is_equal(ExpeditionState.SLOTS.size())
+	assert_str(String(sheet.reason())).is_empty()
 
 
-## Picks, slot by slot, the first fit person who is neither injured nor already picked.
-func _pick_team(player: M15Player, sheet: ExpeditionPlanSheet) -> void:
-	var taken: Array[StringName] = []
-	for slot: String in PICK_ORDER:
-		var picker: OptionButton = sheet.get_slot_picker(slot)
-		for index: int in picker.item_count:
-			var meta: Variant = picker.get_item_metadata(index)
-			if not meta is StringName:
-				continue
-			var id: StringName = meta
-			if id.is_empty() or taken.has(id):
-				continue
-			if player.state().staff.find_person(id).is_injured():
-				continue
-			picker.select(index)
-			picker.item_selected.emit(index)
-			taken.append(id)
-			break
-	assert_int(taken.size()).is_equal(ExpeditionState.SLOTS.size())
-
-
-## Back in the Gate Room the Ring actions offer Send team; it sends T-1 and the wormhole closes.
+## GO on the mission sheet sends T-1 through the open wormhole, which then closes.
 func _send_and_close(player: M15Player) -> void:
-	await _key(KEY_F1)
-	_actions().render(player.state())
-	var send: Button = _actions().get_team_actions().get_team_button()
-	assert_bool(send.visible).is_true()
-	assert_bool(send.disabled).is_false()
-	await UiInput.click(send)
+	_station().get_mission_sheet().go()
+	await _runner.await_input_processed()
 	assert_int(player.state().expedition.mode).is_equal(ExpeditionState.Mode.AWAY)
 	assert_bool(player.close_wormhole()).is_true()
 
@@ -204,8 +171,6 @@ func _check_in_and_come_home(player: M15Player) -> void:
 		func(e: LogEntry) -> bool: return e.args.get("reason", "") == "prologue"
 	)
 	assert_int(lines.size()).is_equal(1)
-	await _key(KEY_F5)
-	assert_str(_expeditions().get_trip().texts()[5]).contains("Survey report")
 
 
 ## The game's own ExpeditionSystem misses the next team's first check-in (field events' worst
@@ -243,9 +208,9 @@ func _miss_and_open_the_alert(player: M15Player) -> void:
 func _rescue(player: M15Player) -> void:
 	var state: GameState = player.state()
 	await _lock_sill(player)
-	var signal_button: Button = _actions().get_team_actions().get_signal_button()
-	assert_bool(signal_button.visible).is_true()
-	await UiInput.click(signal_button)
+	var signal_key: IconKey = _rail().get_key(&"team")
+	assert_bool(signal_key.visible).is_true()
+	await UiInput.click(signal_key)
 	assert_int(state.expedition.signal_tick).is_equal(state.clock.tick)
 	_wait(player, func() -> bool: return state.expedition.mode == ExpeditionState.Mode.IDLE)
 	await _runner.await_input_processed()
@@ -258,16 +223,12 @@ func _rescue(player: M15Player) -> void:
 	assert_int(prologues.size()).is_equal(1)
 
 
-func _gate_room() -> GateRoomView:
-	return _shell.view_switcher.get_view(&"gate_room") as GateRoomView
+func _station() -> GateStationView:
+	return _shell.view_switcher.get_view(&"gate_room") as GateStationView
 
 
-func _actions() -> WormholeActions:
-	return _gate_room().get_overlays().get_wormhole_screen().get_actions()
-
-
-func _expeditions() -> ExpeditionsView:
-	return _shell.view_switcher.get_view(&"expeditions") as ExpeditionsView
+func _rail() -> SendRail:
+	return _station().get_rail()
 
 
 static func _named(display_name: String) -> Callable:

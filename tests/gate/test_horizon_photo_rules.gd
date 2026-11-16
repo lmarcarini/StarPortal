@@ -51,7 +51,7 @@ func test_values_stay_in_range() -> void:
 
 
 func test_no_sky_is_the_event_horizon_blue() -> void:
-	assert_bool(HorizonPhotoRules.is_horizon_blue(EventHorizon.HORIZON_BLUE)).is_true()
+	assert_bool(HorizonPhotoRules.is_horizon_blue(Color(0.22, 0.52, 0.96))).is_true()
 	for id: StringName in _world_ids():
 		var params: HorizonPhotoRules.Params = HorizonPhotoRules.params_for(id)
 		assert_bool(HorizonPhotoRules.is_horizon_blue(params.sky_top)).is_false()

@@ -46,7 +46,7 @@ func _archive() -> ArchiveView:
 
 
 func _title() -> String:
-	return _switcher.get_tab_bar().get_tab_title(5)
+	return _switcher.get_tab_bar().get_tab_title(4)
 
 
 func test_a_new_game_counts_its_start_documents() -> void:
