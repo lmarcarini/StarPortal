@@ -22,6 +22,8 @@ var _rail: SendRail = SendRail.new()
 var _moth: MothScreen = MothScreen.new()
 var _floor: FloorActors = FloorActors.new()
 var _orders: TeamOrders = TeamOrders.new()
+var _sheet: MissionSheet = MissionSheet.new()
+var _team: TeamCard = TeamCard.new()
 
 @onready var _station: StationScene = %Station
 @onready var _console: GateConsole = %GateConsole
@@ -56,6 +58,13 @@ func _ready() -> void:
 	_orders.name = "TeamOrders"
 	add_child(_orders)
 	_rail.orders_requested.connect(_show_orders)
+	_rail.team_opens_sheet = true
+	_rail.team_requested.connect(open_mission_sheet)
+	_sheet.name = "MissionSheet"
+	add_child(_sheet)
+	_team.name = "TeamCard"
+	add_child(_team)
+	move_child(_team, _rail.get_index())
 	resized.connect(_layout)
 	_console.resized.connect(_layout)
 	_layout.call_deferred()
@@ -78,6 +87,8 @@ func setup(simulation: Simulation) -> void:
 	_rail.setup(simulation)
 	_moth.setup(simulation)
 	_orders.setup(simulation)
+	_sheet.setup(simulation)
+	_team.setup(simulation)
 	_report.visible = false
 
 
@@ -142,6 +153,25 @@ func get_floor() -> FloorActors:
 	return _floor
 
 
+## Opens the mission sheet for the world the wormhole is open to.
+func open_mission_sheet() -> void:
+	if _simulation == null:
+		return
+	_sheet.open_for(_simulation.state.gate.connected_world_id)
+	_sheet.reset_size()
+	_sheet.position = Vector2(_rail.position.x, maxf(12.0, _rail.position.y - _sheet.size.y - 12.0))
+
+
+## The mission sheet.
+func get_mission_sheet() -> MissionSheet:
+	return _sheet
+
+
+## The team card.
+func get_team_card() -> TeamCard:
+	return _team
+
+
 ## The team orders card.
 func get_team_orders() -> TeamOrders:
 	return _orders
@@ -192,6 +222,7 @@ func _layout() -> void:
 	var width: float = DestinationCard.CARD_SIZE.x * s + 24.0
 	_rack.position = Vector2(size.x - width - 12.0, 12.0)
 	_rack.size = Vector2(width, maxf(0.0, size.y - _console.size.y - 24.0))
+	_team.position = Vector2(16.0, size.y - _console.size.y - _team.size.y - 16.0)
 	var rail_at: Vector2 = _station.anchor(&"rail")
 	_rail.reset_size()
 	_rail.position = Vector2(
