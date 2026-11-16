@@ -17,8 +17,8 @@ func after_test() -> void:
 
 
 func test_readout_shows_whole_confidence_and_drift() -> void:
-	assert_str(ConfidenceReadout.readout_text(61, -1)).is_equal("Conf. 61 -0.1 \u2193")
-	assert_str(ConfidenceReadout.readout_text(38, -2)).is_equal("Conf. 38 -0.2 \u2193")
+	assert_str(ConfidenceReadout.readout_text(61, -1)).is_equal("Conf. 61 -0.1\u2193")
+	assert_str(ConfidenceReadout.readout_text(38, -2)).is_equal("Conf. 38 -0.2\u2193")
 	assert_str(ConfidenceReadout.readout_text(50, 0)).is_equal("Conf. 50")
 	assert_str(CommitteeText.one_decimal(614)).is_equal("61.4")
 

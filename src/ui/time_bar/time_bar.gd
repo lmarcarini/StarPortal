@@ -105,7 +105,8 @@ func get_call_button() -> Button:
 	return _call_button
 
 
-## Lights the lamp with the caller's name while a phone call waits; disabled while another
+## Lights the lamp with the caller's name (the full line on its tooltip) while a phone call
+## waits; disabled while another
 ## conversation runs.
 func _show_call(state: GameState) -> void:
 	var index: int = ContactRules.next_pending(state, &"phone")
@@ -115,7 +116,8 @@ func _show_call(state: GameState) -> void:
 	var faction_id: StringName = state.factions.pending[index].faction
 	var faction: FactionDef = state.faction_defs.get(faction_id)
 	var name: String = String(faction_id) if faction == null else tr(faction.name_key)
-	_call_button.text = tr(&"UI_CALL_WAITING").format({"name": name})
+	_call_button.text = name
+	_call_button.tooltip_text = tr(&"UI_CALL_WAITING").format({"name": name})
 	_call_button.disabled = state.conversations.active != null
 
 

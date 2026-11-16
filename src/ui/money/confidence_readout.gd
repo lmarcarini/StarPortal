@@ -60,13 +60,13 @@ func refresh() -> void:
 		remove_theme_color_override(&"font_focus_color")
 
 
-## "Conf. 61 -0.1" for [param confidence] whole points and a drift of [param drift] tenths;
-## "Conf. 50" with no drift.
+## "Conf. 61 -0.1↓" (three words at most, M4.10-06) for [param confidence] whole points and
+## a drift of [param drift] tenths; "Conf. 50" with no drift.
 static func readout_text(confidence: int, drift: int) -> String:
 	if drift == 0:
 		return _tr(&"CONFIDENCE_READOUT").format({"value": confidence})
 	return (
-		"%s %s"
+		"%s%s"
 		% [
 			_tr(&"CONFIDENCE_READOUT_DRIFT").format(
 				{"value": confidence, "drift": CommitteeText.signed_tenths(drift)}

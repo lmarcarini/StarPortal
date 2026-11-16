@@ -57,7 +57,7 @@ func test_gate_follows_all_four_states() -> void:
 	_state.gate.mode = GateState.RingMode.LOCKED
 	_state.gate.lock_started_tick = _state.clock.tick
 	assert_str(String(TopBarText.gate_status(_state))).is_equal("open")
-	assert_str(TopBarText.gate_text(_state)).starts_with("GATE: OPEN ")
+	assert_str(TopBarText.gate_text(_state)).starts_with("OPEN ")
 
 
 func test_time_left_in_minutes_and_hours() -> void:

@@ -67,16 +67,24 @@ static func gate_status(state: GameState) -> StringName:
 	return GATE_IDLE
 
 
-## The gate chip text: "GATE: IDLE", "GATE: DIALLING", "GATE: INCOMING", "GATE: SHUTTER" or
-## "GATE: OPEN Abydos 38 min".
+## The gate chip text, three words at most (M4.10-06): "GATE: IDLE", "GATE: DIALLING",
+## "GATE: INCOMING", "GATE: SHUTTER" or "OPEN ABYDOS 38m".
 static func gate_text(state: GameState) -> String:
 	var status: StringName = gate_status(state)
 	if status != GATE_OPEN:
 		return _tr(StringName("TOPBAR_GATE_" + String(status).to_upper()))
 	var world: String = AddressBookText.name_of_world(state.gate.connected_world_id, state)
 	return _tr(&"TOPBAR_GATE_OPEN").format(
-		{"world": world, "left": time_left(GateQueries.open_ticks_left(state))}
+		{"world": world, "left": short_time(GateQueries.open_ticks_left(state))}
 	)
+
+
+## "1h05" or "38m" for [param ticks] in-game minutes: one word, for chips and monitors.
+static func short_time(ticks: int) -> String:
+	var minutes: int = maxi(ticks, 0)
+	if minutes < 60:
+		return "%dm" % minutes
+	return "%dh%02d" % [minutes / 60, minutes % 60]
 
 
 ## "1 h 05 min" or "38 min" for [param ticks] in-game minutes.
