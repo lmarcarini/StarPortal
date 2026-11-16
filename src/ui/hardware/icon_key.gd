@@ -58,9 +58,9 @@ func get_state() -> KeyState:
 
 func _draw() -> void:
 	var s: float = HwMetrics.scale_of(self)
-	var pad: float = size.y * 0.2
+	var side: float = minf(size.x, size.y) * 0.6
 	var shift: float = 4.0 * s if _state == KeyState.ACTIVE else 0.0
-	var area: Rect2 = Rect2(pad, pad * 0.8 + shift, size.x - 2 * pad, size.y - 2 * pad)
+	var area: Rect2 = Rect2((size.x - side) * 0.5, (size.y - side) * 0.4 + shift, side, side)
 	var ink: Color = _LIT if _state == KeyState.ACTIVE else _ICON
 	if _state == KeyState.UNAVAILABLE:
 		ink = Color(_ICON, 0.35)

@@ -1,8 +1,8 @@
 class_name GateDestination
 extends RefCounted
 ## One place the Gate can dial, as the station shows it: the address, the world it reaches
-## when known, the name to stencil, a picture and status icons. Built by the destination rack
-## (or a test); a value, never saved.
+## when known, the name to stencil and status icons (the picture is drawn from the world
+## id). Built by the destination rack (or a test); a value, never saved.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Destinations)
 
 ## The address to dial.
@@ -13,8 +13,6 @@ var world_id: StringName = &""
 var title: String = ""
 ## Status icons (HardwareIcons ids), at most four shown.
 var icons: Array[StringName] = []
-## A small picture of the world; null for none.
-var picture: Texture2D = null
 
 
 ## A destination for [param target] called [param name_text].
