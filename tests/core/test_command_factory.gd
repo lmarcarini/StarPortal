@@ -13,6 +13,8 @@ const DEFAULT_TYPES: Array[StringName] = [
 	&"cancel_build",
 	&"cancel_research",
 	&"charge_at_maximum",
+	&"order_mission",
+	&"cancel_mission_order",
 	&"choose_option",
 	&"close_wormhole",
 	&"debug_cheat",
@@ -168,6 +170,11 @@ func _samples() -> Array[Command]:
 		SignalTeamCommand.new(),
 		HailTeamCommand.new(),
 		OrderTeamCommand.create(TeamContactRules.Order.HOLD_ON),
+		OrderMissionCommand.create(
+			GateAddress.create([0, 1, 2, 3, 4, 5, 6], 7),
+			PlanExpeditionCommand.create(ExpeditionState.Objective.SURVEY, &"w", &"", {})
+		),
+		CancelMissionOrderCommand.new(),
 		ChargeAtMaximumCommand.new(),
 	]
 

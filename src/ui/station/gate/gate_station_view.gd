@@ -36,6 +36,7 @@ func _ready() -> void:
 	_console.build_bank_requested.connect(capacitor_bank_requested.emit)
 	_rack.destination_selected.connect(_console.select_destination)
 	_rack.report_requested.connect(show_report)
+	_rack.order_requested.connect(open_order_sheet)
 	_rack.new_address_requested.connect(open_alien_panel)
 	_panel.dial_requested.connect(_on_panel_dial)
 	_panel.closed.connect(func() -> void: _console.get_main_key().grab_focus())
@@ -160,6 +161,15 @@ func open_mission_sheet() -> void:
 	_sheet.open_for(_simulation.state.gate.connected_world_id)
 	_sheet.reset_size()
 	_sheet.position = Vector2(_rail.position.x, maxf(12.0, _rail.position.y - _sheet.size.y - 12.0))
+
+
+## Opens the mission sheet to order a mission to [param destination] from a closed gate.
+func open_order_sheet(destination: GateDestination) -> void:
+	if _simulation == null or destination.world_id.is_empty():
+		return
+	_sheet.open_for(destination.world_id, destination.address)
+	_sheet.reset_size()
+	_sheet.position = Vector2(_rack.position.x - _sheet.size.x - 12.0, 12.0)
 
 
 ## The mission sheet.

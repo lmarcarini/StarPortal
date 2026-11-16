@@ -45,6 +45,7 @@ func test_build_from_real_content_runs_both_systems() -> void:
 		[
 			&"power",
 			&"gate",
+			&"mission_order",
 			&"conversations",
 			&"requests",
 			&"documents",

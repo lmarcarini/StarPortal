@@ -112,6 +112,8 @@ static func register_defaults() -> void:
 	_types[SignalTeamCommand.TYPE] = SignalTeamCommand
 	_types[HailTeamCommand.TYPE] = HailTeamCommand
 	_types[OrderTeamCommand.TYPE] = OrderTeamCommand
+	_types[OrderMissionCommand.TYPE] = OrderMissionCommand
+	_types[CancelMissionOrderCommand.TYPE] = CancelMissionOrderCommand
 	_types[ChargeAtMaximumCommand.TYPE] = ChargeAtMaximumCommand
 
 

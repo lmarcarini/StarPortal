@@ -13,7 +13,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 24
+const TARGET_VERSION: int = 25
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
 const OLDEST_VERSION: int = 15
 
@@ -30,7 +30,8 @@ static func built_in_steps() -> Dictionary[int, Callable]:
 		20: _v20_to_v21,
 		21: _v21_to_v22,
 		22: _v22_to_v23,
-		23: _v23_to_v24
+		23: _v23_to_v24,
+		24: _v24_to_v25
 	}
 	return built_in
 
@@ -206,6 +207,18 @@ static func _v23_to_v24(data: Dictionary) -> Dictionary:
 	if state.get("expedition") is Dictionary:
 		var trip: Dictionary = state["expedition"]
 		trip["last_plans"] = {}
+	return out
+
+
+## v24 to v25 (M4.9-12): the expedition holds a mission order; none yet.
+static func _v24_to_v25(data: Dictionary) -> Dictionary:
+	var out: Dictionary = data.duplicate(true)
+	if not out.get("state") is Dictionary:
+		return out
+	var state: Dictionary = out["state"]
+	if state.get("expedition") is Dictionary:
+		var trip: Dictionary = state["expedition"]
+		trip["order"] = MissionOrder.new().to_dict()
 	return out
 
 

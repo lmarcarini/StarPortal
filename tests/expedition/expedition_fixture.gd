@@ -30,6 +30,7 @@ static func simulation(game: GameState, field_events: bool = false) -> Simulatio
 	var systems: Array[SimSystem] = [
 		PowerSystem.new(game.balance),
 		GateSystem.new(),
+		MissionOrderSystem.new(),
 		ProbeSystem.new(),
 		expedition,
 		StaffCareSystem.new(),

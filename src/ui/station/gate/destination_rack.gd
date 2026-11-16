@@ -9,6 +9,8 @@ extends VBoxContainer
 signal destination_selected(destination: GateDestination)
 ## + NEW ADDRESS was pressed: open the alien panel.
 signal new_address_requested
+## A card's TEAM key asked for a mission order to [param destination].
+signal order_requested(destination: GateDestination)
 ## A card was flipped: show the report of [param world_id] (&"" for none).
 signal report_requested(world_id: StringName)
 
@@ -78,6 +80,9 @@ func rebuild() -> void:
 		card.selected.connect(_on_selected)
 		card.flipped.connect(_on_flipped)
 		card.pin_toggled.connect(_on_pin)
+		card.order_requested.connect(
+			func(c: DestinationCard) -> void: order_requested.emit(c.get_destination())
+		)
 		_cards.add_child(card)
 
 

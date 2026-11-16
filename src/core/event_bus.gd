@@ -122,6 +122,12 @@ signal team_called(world_id: StringName)
 signal team_call_missed(world_id: StringName)
 ## The base hailed its team: days done of days, light and serious injuries.
 signal team_hailed(world_id: StringName, days_done: int, days: int, light: int, serious: int)
+## A mission order started (M4.9-12).
+signal mission_ordered(world_id: StringName)
+## A mission order sent its team and closed the gate.
+signal mission_order_done(world_id: StringName)
+## A mission order stopped, with the reason code.
+signal mission_order_failed(world_id: StringName, reason: String)
 ## An order was given to the team (TeamContactRules.ORDER_NAMES).
 signal team_ordered(world_id: StringName, order: String)
 ## Emitted when Signal T-1 is sent, with the world id (posted through the outbox).
