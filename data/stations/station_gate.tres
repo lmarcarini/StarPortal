@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="StationSceneDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/station_scene_def.gd" id="1_stn"]
+[ext_resource type="Texture2D" path="res://art/plates/gate_hall.png" id="2_plate"]
+
+[resource]
+script = ExtResource("1_stn")
+id = &"station_gate"
+plate = ExtResource("2_plate")
+plate_size = Vector2i(1672, 941)
+points = Dictionary[StringName, Vector2]({
+&"clamp_0": Vector2(836, 218),
+&"clamp_1": Vector2(964, 263),
+&"clamp_2": Vector2(1008, 379),
+&"clamp_3": Vector2(964, 505),
+&"clamp_4": Vector2(836, 562),
+&"clamp_5": Vector2(704, 501),
+&"clamp_6": Vector2(664, 379),
+&"clamp_7": Vector2(708, 263),
+&"door_left": Vector2(135, 600)
+})
+circles = Dictionary[StringName, Vector3]({
+&"ring_inner": Vector3(836, 390, 146),
+&"ring_outer": Vector3(836, 390, 186)
+})
+paths = Dictionary[StringName, PackedVector2Array]({
+&"ramp": PackedVector2Array(836, 568, 836, 722)
+})
+polygons = Dictionary[StringName, PackedVector2Array]({
+&"floor_glow": PackedVector2Array(745, 560, 927, 560, 1062, 728, 610, 728)
+})
+rects = Dictionary[StringName, Rect2]({
+&"console_left": Rect2(328, 537, 272, 111),
+&"console_right": Rect2(1070, 537, 246, 111)
+})
+depth_scale = Dictionary[StringName, Vector2]({
+&"ramp": Vector2(0.6, 1.0)
+})
+layers = Array[StringName]([&"ring", &"clamps", &"floor_glow", &"floor_actors", &"consoles"])
