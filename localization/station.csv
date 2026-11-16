@@ -39,3 +39,5 @@ STATION_CLUE_PICK,Clue,Pista
 STATION_PANEL_DIAL,Dial the address in the lamps.,Disca o endereço nas lâmpadas.
 STATION_PANEL_PENCIL,"Pencil: mark a guess on the lamps, not dialled.","Lápis: marca um palpite nas lâmpadas, sem discar."
 STATION_PANEL_BACK,Back to the Gate,Voltar ao Portal
+STATION_STAND_BY,"Stand by: keep the wormhole open, stop slowing time.","Em espera: mantém o buraco de minhoca aberto, sem desacelerar o tempo."
+STATION_REASON_UNAVAILABLE,Not now.,Agora não.

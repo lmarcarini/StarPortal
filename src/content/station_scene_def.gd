@@ -23,6 +23,7 @@ const LAYER_ANCHORS: Dictionary[StringName, Array] = {
 	&"floor_actors": [&"ramp", &"door_left"],
 	&"consoles": [&"console_left", &"console_right"],
 	&"glyph_keys": [&"key_ring"],
+	&"send_rail": [&"rail"],
 }
 
 ## The plate picture; null shows a code-drawn placeholder of [member plate_size].

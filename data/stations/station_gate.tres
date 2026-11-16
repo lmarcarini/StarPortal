@@ -17,7 +17,8 @@ points = Dictionary[StringName, Vector2]({
 &"clamp_5": Vector2(704, 501),
 &"clamp_6": Vector2(664, 379),
 &"clamp_7": Vector2(708, 263),
-&"door_left": Vector2(135, 600)
+&"door_left": Vector2(135, 600),
+&"rail": Vector2(1085, 690)
 })
 circles = Dictionary[StringName, Vector3]({
 &"ring_inner": Vector3(836, 390, 146),
@@ -36,4 +37,4 @@ rects = Dictionary[StringName, Rect2]({
 depth_scale = Dictionary[StringName, Vector2]({
 &"ramp": Vector2(0.6, 1.0)
 })
-layers = Array[StringName]([&"ring", &"clamps", &"floor_glow", &"floor_actors", &"consoles"])
+layers = Array[StringName]([&"ring", &"clamps", &"floor_glow", &"floor_actors", &"consoles", &"send_rail"])

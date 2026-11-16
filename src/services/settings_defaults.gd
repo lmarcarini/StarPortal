@@ -73,5 +73,6 @@ const VALUES: Dictionary = {
 		&"research_pan_down": {},
 		&"station_flip": {},
 		&"station_pin": {},
+		&"station_rail_5": {},
 	},
 }
