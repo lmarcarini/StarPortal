@@ -289,6 +289,11 @@ func _on_rail_used(id: StringName) -> void:
 		_floor.play(ActorCues.Cue.CAMERA_PUSH)
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE and _floor.get_parent() == null:
+		_floor.free()
+
+
 func _on_visibility() -> void:
 	if not is_visible_in_tree():
 		_floor.snap_all()
