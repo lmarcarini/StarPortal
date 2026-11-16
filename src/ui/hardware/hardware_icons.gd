@@ -30,18 +30,44 @@ const IDS: Array[StringName] = [
 	&"pencil",
 	&"console",
 	&"crate",
+	&"pause",
+	&"play",
+	&"fast",
+	&"funds",
+	&"power",
+	&"confidence",
+	&"log",
+	&"hire",
+	&"pass",
+	&"accept",
+	&"decline",
+	&"study",
+	&"switch_on",
+	&"assign",
+	&"rescue",
+	&"answer",
+	&"ignore",
+	&"go_to",
+	&"report",
+	&"tree",
+	&"dismiss",
 ]
-
 
 ## Draws icon [param id] in [param rect] with [param colour] on [param ci]. Unknown ids draw a
 ## question mark box. Returns false for an unknown id.
+const _EXTRA: String = "res://src/ui/hardware/hardware_icons_extra.gd"
+
+
 static func draw(ci: CanvasItem, id: StringName, rect: Rect2, colour: Color) -> bool:
 	var pen: _Pen = _Pen.new(ci, rect, colour)
 	var known: bool = IDS.has(id)
 	if not known:
 		pen.box(0.2, 0.2, 0.8, 0.8)
 		return false
-	var script: Script = load("res://src/ui/hardware/hardware_icons.gd")
+	var path: String = (
+		_EXTRA if HardwareIconsExtra.has(id) else "res://src/ui/hardware/hardware_icons.gd"
+	)
+	var script: Script = load(path)
 	script.call("_icon_" + String(id), pen)
 	return true
 

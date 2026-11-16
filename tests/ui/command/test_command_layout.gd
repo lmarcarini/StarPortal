@@ -43,7 +43,7 @@ func test_sub_tabs_by_id() -> void:
 
 func test_top_bar_funds_open_finances_and_request_alerts_open_requests() -> void:
 	_command().show_sub_tab(CommandView.REQUESTS_ID)
-	_shell.top_bar.money_label.pressed.emit()
+	_shell.frame.money_label.pressed.emit()
 	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("command")
 	assert_bool(_command().get_board().visible).is_true()
 	_shell.open_view(ViewSwitcher.COMMAND, &"requests")

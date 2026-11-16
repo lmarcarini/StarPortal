@@ -59,3 +59,10 @@ HW_ICON_CONSOLE,Far console,Console distante
 HW_ICON_CRATE,Holding,Depósito
 HW_KEY_ANSWER,ANSWER,ATENDER
 STATION_ORDER_MOTH,Order a MOTH,Encomendar um MOTH
+FRAME_PAUSE,"Pause the clock (Space).","Pausa o relógio (Espaço)."
+FRAME_PLAY,"Run the clock; while running, one speed slower.","Roda o relógio; rodando, uma velocidade abaixo."
+FRAME_FAST,"One speed faster, or override a slow-down.","Uma velocidade acima, ou ignora uma redução."
+FRAME_FUNDS_HINT,"Funds and today's net change. Opens Command.","Verba e o saldo de hoje. Abre o Comando."
+FRAME_POWER_HINT,"Power switched on over supply. Opens Base › Energy.","Energia ligada sobre a oferta. Abre Base › Energia."
+FRAME_CHARGE_HINT,"Energy stored in the capacitors. Opens the Gate.","Energia nos capacitores. Abre o Portal."
+FRAME_CONFIDENCE_HINT,"Committee Confidence. Opens Command.","Confiança do Comitê. Abre o Comando."

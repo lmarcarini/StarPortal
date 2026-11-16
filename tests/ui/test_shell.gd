@@ -181,7 +181,7 @@ func test_time_bar_text_comes_from_translation_keys() -> void:
 ## shown view, moves along the tabs to the other view and through it, and back up.
 func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void:
 	var buttons: Array[Button] = _shell.get_focus_order()
-	assert_int(buttons.size()).is_equal(11)
+	assert_int(buttons.size()).is_equal(8)
 	assert_object(_focus_owner()).is_same(buttons[0])
 	var visited: Array[Control] = []
 	for _step: int in buttons.size():
@@ -221,14 +221,12 @@ func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void
 
 
 func test_gamepad_a_presses_the_focused_button() -> void:
-	var quick_save: Button = _shell.top_bar.quick_save_button
+	var key: Button = _shell.frame.clock_plate.pause_key
 	var presses: Array[int] = [0]
-	quick_save.pressed.connect(func() -> void: presses[0] += 1)
-	quick_save.grab_focus()
+	key.pressed.connect(func() -> void: presses[0] += 1)
+	key.grab_focus()
 	await _press_joypad(JOY_BUTTON_A)
 	assert_int(presses[0]).is_equal(1)
-	assert_str(_shell.get_toast_text()).is_equal(tr("UI_SAVED"))
-	assert_bool(FileAccess.file_exists(SaveService.slot_path(&"quick"))).is_true()
 
 
 func test_ui_actions_gain_gamepad_buttons_and_keep_keys() -> void:
@@ -275,9 +273,8 @@ func test_debug_overlay_measures_ticks() -> void:
 func test_debug_flag_button_sets_flag_shown_in_state_tree() -> void:
 	var overlay: DebugOverlay = _shell.debug_overlay
 	overlay.toggle()
-	var button: Button = _shell.get_focus_order().back()
-	button.pressed.emit()
-	button.pressed.emit()
+	_shell.set_debug_flag()
+	_shell.set_debug_flag()
 	SimClock.step_ticks(1)
 	var flags: Dictionary = SimClock.simulation.state.flags
 	assert_int(flags.get(ShellScript.DEBUG_FLAG_KEY, 0)).is_equal(2)

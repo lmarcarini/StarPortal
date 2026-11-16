@@ -1,9 +1,0 @@
-[gd_scene format=3]
-
-[ext_resource type="Script" path="res://src/ui/top_bar/top_bar.gd" id="1_top_bar"]
-
-[node name="TopBar" type="PanelContainer"]
-anchors_preset = 10
-anchor_right = 1.0
-grow_horizontal = 2
-script = ExtResource("1_top_bar")

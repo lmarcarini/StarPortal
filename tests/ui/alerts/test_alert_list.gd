@@ -27,7 +27,7 @@ func after_test() -> void:
 
 
 func _list() -> AlertList:
-	return _shell.top_bar.alert_list
+	return _shell.frame.alert_list
 
 
 func test_button_shows_count_and_choosing_opens_the_screen() -> void:
@@ -36,8 +36,8 @@ func test_button_shows_count_and_choosing_opens_the_screen() -> void:
 	_list().refresh()
 	var count: int = _list().entries().size()
 	assert_int(count).is_greater(0)
-	assert_str(_shell.top_bar.alerts_button.text).ends_with(str(count))
-	_shell.top_bar.alerts_button.pressed.emit()
+	assert_str(_shell.frame.alerts_button.text).ends_with(str(count))
+	_shell.frame.alerts_button.pressed.emit()
 	assert_bool(_list().visible).is_true()
 	assert_bool(SimClock.simulation.state.clock.is_paused).is_true()
 	var red: AlertEntry = null
@@ -52,7 +52,7 @@ func test_button_shows_count_and_choosing_opens_the_screen() -> void:
 
 func test_opening_the_list_keeps_a_running_clock_running() -> void:
 	SimClock.resume()
-	_shell.top_bar.toggle_alerts()
+	_shell.frame.toggle_alerts()
 	assert_bool(SimClock.simulation.state.clock.is_paused).is_false()
 	assert_object(_list().first_row()).is_not_null()
 

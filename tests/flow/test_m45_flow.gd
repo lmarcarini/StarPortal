@@ -50,7 +50,7 @@ func _base() -> BaseView:
 
 
 func test_the_interface_pass_end_to_end() -> void:
-	var bar: TopBar = _shell.top_bar
+	var bar: Frame = _shell.frame
 	var state: GameState = SimClock.simulation.state
 	assert_str(bar.money_label.text).starts_with(MoneyLabel.format_k(state.budget.funds_k))
 	assert_str(bar.gate_chip.text).is_equal("GATE: IDLE")
@@ -124,11 +124,11 @@ func _camera(state: GameState) -> void:
 func _wormhole(state: GameState) -> void:
 	state.gate.mode = GateState.RingMode.LOCKED
 	state.gate.lock_started_tick = state.clock.tick
-	_shell.top_bar.refresh()
-	assert_str(String(_shell.top_bar.gate_chip.get_status())).is_equal(String(TopBarText.GATE_OPEN))
+	_shell.frame.refresh()
+	assert_str(String(_shell.frame.gate_chip.get_status())).is_equal(String(TopBarText.GATE_OPEN))
 	state.gate.mode = GateState.RingMode.IDLE
-	_shell.top_bar.refresh()
-	assert_str(String(_shell.top_bar.gate_chip.get_status())).is_not_equal(
+	_shell.frame.refresh()
+	assert_str(String(_shell.frame.gate_chip.get_status())).is_not_equal(
 		String(TopBarText.GATE_OPEN)
 	)
 
@@ -148,4 +148,4 @@ func test_pseudo_localisation_fits_every_tab_at_1280() -> void:
 			)
 			. is_less_equal(1280.0)
 		)
-	assert_float(_shell.top_bar.size.x).is_less_equal(1280.0)
+	assert_float(_shell.frame.size.x).is_less_equal(1280.0)
