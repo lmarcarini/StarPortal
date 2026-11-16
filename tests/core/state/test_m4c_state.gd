@@ -1,5 +1,5 @@
 ## The M4c save shapes (M4c-02): each new state round-trips through JSON, rejects bad data,
-## and an older save migrates with empty sections and loads identically after a save.
+## and the shapes load identically after a save.
 ## Bible: docs/content/m4c-incursions.md section 9
 extends GdUnitTestSuite
 
@@ -74,32 +74,3 @@ func test_door_and_outcome_checks() -> void:
 	outcome_data = _json(outcome.to_dict())
 	assert_array(OutcomeState.validate_dict(outcome_data)).is_empty()
 	assert_dict(_json(OutcomeState.from_dict(outcome_data).to_dict())).is_equal(outcome_data)
-
-
-func test_an_old_save_migrates_and_reloads_identically() -> void:
-	var state := GameState.new_game(8, Registry.balance())
-	GameSetup.build_new(state, GameDefs.from_registry(Registry))
-	state.base.rooms[0].damaged = true
-	var door := DoorState.new()
-	door.cell = Vector2i(24, 9)
-	state.base.doors.append(door)
-	state.incursion = _sample_incursion()
-	var data: Dictionary = _json(state.to_dict())
-	assert_array(GameState.validate_dict(data)).is_empty()
-	assert_dict(_json(GameState.from_dict(data).to_dict())).is_equal(data)
-	var old: Dictionary = {"format_version": 18, "state": data.duplicate(true)}
-	var old_state: Dictionary = old["state"]
-	for key: String in ["incursion", "security", "outcome"]:
-		old_state.erase(key)
-	var old_base: Dictionary = old_state["base"]
-	old_base.erase("doors")
-	var migrated: Result = SaveMigrator.migrate(old)
-	assert_bool(migrated.is_ok).is_true()
-	var root: Dictionary = migrated.value
-	var new_state: Dictionary = root["state"]
-	assert_array(GameState.validate_dict(new_state)).is_empty()
-	var loaded: GameState = GameState.from_dict(new_state)
-	assert_bool(loaded.incursion.is_active()).is_false()
-	assert_array(loaded.base.doors).is_empty()
-	var resaved: Dictionary = _json(loaded.to_dict())
-	assert_dict(_json(GameState.from_dict(resaved).to_dict())).is_equal(resaved)

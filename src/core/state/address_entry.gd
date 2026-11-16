@@ -7,7 +7,7 @@ extends RefCounted
 ## dials of the address report.
 ## Saved shape: {"address_key": GateAddress.key(), "source": "document" | "console" | "dialed",
 ## "source_id", "world_id", "last_outcome": DialOutcome key or "" when never dialed,
-## "last_dialed_tick": -1 when never dialed, "note"}.
+## "last_dialed_tick": -1 when never dialed, "note", "pinned": bool (on the Gate's rack)}.
 ## Bible: gate-and-address-spec.md#the-dial-console (Address Book),
 ## gate-and-address-spec.md#where-addresses-come-from, technical-architecture.md#data-model
 
@@ -23,7 +23,14 @@ const NEVER: int = -1
 const _SOURCE_NAMES: Array[String] = ["document", "console", "dialed"]
 ## Saved fields, in to_dict() order.
 const _KEYS: Array[String] = [
-	"address_key", "source", "source_id", "world_id", "last_outcome", "last_dialed_tick", "note"
+	"address_key",
+	"source",
+	"source_id",
+	"world_id",
+	"last_outcome",
+	"last_dialed_tick",
+	"note",
+	"pinned",
 ]
 
 ## The address's GateAddress.key(), e.g. "3-17-0-22-9-14-30-5".
@@ -40,6 +47,8 @@ var last_outcome: int = -1
 var last_dialed_tick: int = -1
 ## The player's own note, at most MAX_NOTE_LENGTH characters with no control characters.
 var note: String = ""
+## Pinned to the top of the Gate's destination rack.
+var pinned: bool = false
 
 
 ## Returns a never-dialed entry for [param key] from [param from_source] and
@@ -66,6 +75,7 @@ func to_dict() -> Dictionary:
 		"last_outcome": outcome_key,
 		"last_dialed_tick": last_dialed_tick,
 		"note": note,
+		"pinned": pinned,
 	}
 
 
@@ -82,6 +92,7 @@ static func from_dict(data: Dictionary) -> AddressEntry:
 	entry.last_outcome = DialOutcome.from_key(StringName(str(data.get("last_outcome", ""))))
 	entry.last_dialed_tick = type_convert(data.get("last_dialed_tick", NEVER), TYPE_INT)
 	entry.note = str(data.get("note", ""))
+	entry.pinned = data.get("pinned", false) == true
 	return entry
 
 
@@ -91,12 +102,15 @@ static func from_dict(data: Dictionary) -> AddressEntry:
 ## entry set only once it has been dialed (whatever the last outcome: a world learned through
 ## a lock stays known); "last_outcome" "" or a DialOutcome key;
 ## "last_dialed_tick" -1 when never dialed, otherwise a whole number from 0 to 2^53; "note"
-## valid per note_errors().
+## valid per note_errors(); "pinned" a bool.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _KEYS:
 		if not data.has(key):
 			errors.append("missing '%s'" % key)
+		elif key == "pinned":
+			if not data[key] is bool:
+				errors.append("'pinned' is not a bool")
 		elif key != "last_dialed_tick" and not data[key] is String:
 			errors.append("'%s' is not a string" % key)
 	if not errors.is_empty():

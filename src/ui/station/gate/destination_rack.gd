@@ -22,7 +22,6 @@ const _FILTER_HELP: Array[String] = [
 
 var _simulation: Simulation = null
 var _filter: DestinationText.Filter = DestinationText.Filter.ALL
-var _pins: Dictionary[String, bool] = {}
 var _selected_key: String = ""
 var _filter_key: IconKey = IconKey.new()
 var _scroll: ScrollContainer = ScrollContainer.new()
@@ -72,11 +71,9 @@ func rebuild() -> void:
 		_cards.remove_child(child)
 		child.queue_free()
 	var state: GameState = _simulation.state
-	for entry: AddressEntry in DestinationText.ordered(state, _pins, _filter):
+	for entry: AddressEntry in DestinationText.ordered(state, _filter):
 		var card: DestinationCard = DestinationCard.new()
-		card.show_destination(
-			destination_of(entry, state), entry.address_key, _pins.has(entry.address_key)
-		)
+		card.show_destination(destination_of(entry, state), entry.address_key, entry.pinned)
 		card.button_pressed = entry.address_key == _selected_key
 		card.selected.connect(_on_selected)
 		card.flipped.connect(_on_flipped)
@@ -135,11 +132,8 @@ func _on_flipped(card: DestinationCard) -> void:
 
 
 func _on_pin(card: DestinationCard) -> void:
-	if _pins.has(card.get_key()):
-		_pins.erase(card.get_key())
-	else:
-		_pins[card.get_key()] = true
-	rebuild()
+	if _simulation != null:
+		_simulation.submit(PinAddressCommand.create(card.get_key(), not card.is_pinned()))
 
 
 func _on_world_changed(_world_id: StringName, _status: int) -> void:

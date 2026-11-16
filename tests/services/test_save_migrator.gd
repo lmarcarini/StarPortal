@@ -29,36 +29,18 @@ func test_current_version_is_pass_through() -> void:
 	assert_dict(result.value).is_equal(data)
 
 
-## The target is 22 (M4.8) and the oldest loadable version 15 (the M3 clean break), with one
-## step from 15.
-func test_target_version_is_twenty_five() -> void:
-	assert_int(SaveMigrator.TARGET_VERSION).is_equal(25)
-	assert_int(SaveMigrator.OLDEST_VERSION).is_equal(15)
-	assert_array(SaveMigrator.built_in_steps().keys()).is_equal(
-		[15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
-	)
+## The target is 26 (M4.9-16) and also the oldest loadable version (owner: no migration
+## before alpha); no built-in steps.
+func test_target_version_is_twenty_six_with_no_steps() -> void:
+	assert_int(SaveMigrator.TARGET_VERSION).is_equal(26)
+	assert_int(SaveMigrator.OLDEST_VERSION).is_equal(26)
+	assert_dict(SaveMigrator.built_in_steps()).is_empty()
 
 
-## A v15 save of a real game migrates to v16 with empty M4 sections and then validates.
-func test_v15_save_migrates_to_v16() -> void:
-	var state_data: Dictionary = GameState.new_game(3).to_dict()
-	for key: String in ["factions", "conversations", "requests", "artefacts"]:
-		state_data.erase(key)
-	var research: Dictionary = state_data["research"]
-	research.erase("queue")
-	research.erase("revealed")
-	var gate: Dictionary = state_data["gate"]
-	gate.erase("incoming")
-	var v15: Dictionary = {"format_version": 15, "tick": 0, "state": state_data}
-	assert_array(GameState.validate_dict(state_data)).is_not_empty()
-	var result: Result = SaveMigrator.migrate(v15)
-	assert_bool(result.is_ok).is_true()
-	var migrated: Dictionary = result.value
-	assert_int(migrated["format_version"]).is_equal(25)
-	var state: Dictionary = migrated["state"]
-	assert_array(GameState.validate_dict(state)).is_empty()
-	assert_dict(state["requests"]).is_equal({"items": [], "next_uid": 0})
-	assert_dict(state["gate"]["incoming"]).is_empty()
+## A v25 save is refused cleanly.
+func test_v25_save_is_refused() -> void:
+	var result: Result = SaveMigrator.migrate({"format_version": 25, "tick": 0, "state": {}})
+	assert_str(String(result.error_code)).is_equal("old_format_version")
 
 
 ## Every version before the clean break fails with &"old_format_version".
@@ -78,7 +60,7 @@ func test_v14_save_is_rejected() -> void:
 
 ## A JSON-parsed version (a float such as 1.0) is accepted.
 func test_json_float_version_is_accepted() -> void:
-	var parsed: Variant = JSON.parse_string('{"format_version": 15, "tick": 3}')
+	var parsed: Variant = JSON.parse_string('{"format_version": 26, "tick": 3}')
 	var data: Dictionary = parsed
 	var result := SaveMigrator.migrate(data)
 	assert_bool(result.is_ok).is_true()

@@ -87,7 +87,7 @@ func test_json_round_trip() -> void:
 	var book := _book()
 	book.record_dial(_log_entry(KEY_C, DialOutcome.Kind.HOSTILE_LOCK, &"world_guarded"))
 	var data := book.to_dict()
-	assert_array(data.keys()).is_equal(["entries"])
+	assert_array(data.keys()).is_equal(["entries", "draft"])
 	var parsed: Dictionary = JSON.parse_string(JSON.stringify(data))
 	assert_array(AddressBookState.validate_dict(parsed)).is_empty()
 	assert_dict(AddressBookState.from_dict(parsed).to_dict()).is_equal(data)

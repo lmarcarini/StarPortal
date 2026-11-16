@@ -54,7 +54,7 @@ func test_pause_and_holds_unchanged() -> void:
 	assert_int(clock.mode).is_equal(ClockState.Mode.RUNNING)
 
 
-func test_save_round_trip_and_old_saves() -> void:
+func test_save_round_trip() -> void:
 	var clock := ClockState.new()
 	TimeControl.add_slow(clock, &"awaiting_answer", &"kindred")
 	TimeControl.add_slow(clock, &"dialling")
@@ -68,13 +68,6 @@ func test_save_round_trip_and_old_saves() -> void:
 	data.erase("slows")
 	data.erase("overridden")
 	assert_array(ClockState.from_dict(data).slows).is_empty()
-	var old: Dictionary = {"format_version": 16, "tick": 0, "state": {"clock": {}}}
-	var migrated: Result = SaveMigrator.migrate(old)
-	assert_bool(migrated.is_ok).is_true()
-	var root: Dictionary = migrated.value
-	var state: Dictionary = root["state"]
-	var clock_dict: Dictionary = state["clock"]
-	assert_array(clock_dict["slows"]).is_empty()
 
 
 func test_override_command() -> void:
