@@ -49,16 +49,17 @@ func get_text() -> String:
 	return _label.text
 
 
-## Shows the card just below its control (above it near the bottom of the screen).
+## Shows the card beside its control: to the right, or to the left near the screen's edge.
 func show_card() -> void:
 	if _owner_control == null:
 		return
 	reset_size()
 	var r: Rect2 = _owner_control.get_global_rect()
-	var at: Vector2 = Vector2(r.position.x, r.end.y + _GAP)
 	var screen: Vector2 = get_viewport_rect().size
-	if at.y + size.y > screen.y:
-		at.y = r.position.y - size.y - _GAP
+	var at: Vector2 = Vector2(r.end.x + _GAP, r.position.y)
+	if at.x + size.x > screen.x:
+		at.x = r.position.x - size.x - _GAP
 	at.x = clampf(at.x, 0.0, maxf(0.0, screen.x - size.x))
+	at.y = clampf(at.y, 0.0, maxf(0.0, screen.y - size.y))
 	global_position = at
 	show()

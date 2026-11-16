@@ -21,3 +21,11 @@ HW_ICON_NEW,New,Novo
 HW_KEY_DIAL,DIAL,DISCAR
 HW_KEY_CLOSE,CLOSE,FECHAR
 HW_KEY_GO,GO,IR
+STATION_GATE_TITLE,Gate,Portal
+STATION_NEW_ADDRESS,NEW ADDRESS,NOVO ENDEREÇO
+STATION_BUILD_BANK,BUILD BANK,CONSTRUIR BANCO
+STATION_HELP_MAIN_KEY,Dial the destination on the monitor; close an open wormhole.,Disca o destino do monitor; fecha um buraco de minhoca aberto.
+STATION_HELP_CHARGE,"Charge stored, in MWh; while open, the drain in MW.","Carga armazenada, em MWh; com o portal aberto, o consumo em MW."
+STATION_HELP_SHUTTER,The Shutter over the Ring.,O Obturador sobre o Anel.
+STATION_REASON_NO_DESTINATION,Pick a destination.,Escolha um destino.
+STATION_REASON_INCURSION,Not during an incursion.,Não durante uma incursão.
