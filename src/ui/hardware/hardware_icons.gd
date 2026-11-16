@@ -24,7 +24,10 @@ const IDS: Array[StringName] = [
 	&"clock",
 	&"charge",
 	&"close",
-	&"new"
+	&"new",
+	&"prev",
+	&"next",
+	&"pencil",
 ]
 
 
@@ -148,6 +151,19 @@ static func _icon_close(p: _Pen) -> void:
 static func _icon_new(p: _Pen) -> void:
 	p.line(0.5, 0.18, 0.5, 0.82)
 	p.line(0.18, 0.5, 0.82, 0.5)
+
+
+static func _icon_prev(p: _Pen) -> void:
+	p.poly([0.65, 0.2, 0.3, 0.5, 0.65, 0.8])
+
+
+static func _icon_next(p: _Pen) -> void:
+	p.poly([0.35, 0.2, 0.7, 0.5, 0.35, 0.8])
+
+
+static func _icon_pencil(p: _Pen) -> void:
+	p.poly([0.2, 0.8, 0.25, 0.62, 0.68, 0.18, 0.82, 0.32, 0.38, 0.75, 0.2, 0.8])
+	p.line(0.6, 0.26, 0.74, 0.4)
 
 
 ## Draws strokes in unit coordinates inside a rect.

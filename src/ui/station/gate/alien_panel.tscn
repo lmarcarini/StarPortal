@@ -1,0 +1,85 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/ui/station/gate/alien_panel.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/ui/station/station_scene.tscn" id="2"]
+[ext_resource type="Script" path="res://src/ui/hardware/big_key.gd" id="3"]
+[ext_resource type="Script" path="res://src/ui/station/gate/seal_slots.gd" id="4"]
+[ext_resource type="Script" path="res://src/ui/station/gate/clue_clip.gd" id="5"]
+[ext_resource type="Script" path="res://src/ui/hardware/icon_key.gd" id="6"]
+
+[node name="AlienPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Station" parent="." instance=ExtResource("2")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="Keys" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DialKey" type="Button" parent="Keys"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 128.0
+text = "HW_KEY_DIAL"
+script = ExtResource("3")
+key_style = 1
+
+[node name="SealSlots" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 120.0
+offset_top = 16.0
+offset_right = -540.0
+offset_bottom = 96.0
+grow_horizontal = 2
+script = ExtResource("4")
+
+[node name="ClueClip" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("5")
+
+[node name="BackKey" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 80.0
+offset_bottom = 80.0
+script = ExtResource("6")
+
+[node name="PencilKey" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 96.0
+offset_right = 80.0
+offset_bottom = 160.0
+script = ExtResource("6")

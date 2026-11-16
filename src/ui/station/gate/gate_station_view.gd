@@ -9,8 +9,6 @@ extends GameView
 signal capacitor_bank_requested
 ## A World Report asked to plan an expedition to [param world_id].
 signal plan_requested(world_id: StringName)
-## + NEW ADDRESS was pressed.
-signal new_address_requested
 
 ## The station def shown.
 const STATION_ID: StringName = &"station_gate"
@@ -24,6 +22,7 @@ var _report_panel: WorldReportPanel = WorldReportPanel.new()
 @onready var _station: StationScene = %Station
 @onready var _console: GateConsole = %GateConsole
 @onready var _rack: DestinationRack = %DestinationRack
+@onready var _panel: AlienPanel = %AlienPanel
 
 
 func _ready() -> void:
@@ -31,8 +30,12 @@ func _ready() -> void:
 	_console.build_bank_requested.connect(capacitor_bank_requested.emit)
 	_rack.destination_selected.connect(_console.select_destination)
 	_rack.report_requested.connect(show_report)
-	_rack.new_address_requested.connect(new_address_requested.emit)
+	_rack.new_address_requested.connect(open_alien_panel)
+	_panel.dial_requested.connect(_on_panel_dial)
+	_panel.closed.connect(func() -> void: _console.get_main_key().grab_focus())
+	_panel.hide()
 	_report.name = "WorldReportCard"
+	_report.z_index = 6
 	_report.visible = false
 	_report_panel.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	_report.add_child(_report_panel)
@@ -54,6 +57,7 @@ func setup(simulation: Simulation) -> void:
 		_ring.bind(simulation, _station)
 	_console.setup(simulation)
 	_rack.setup(simulation)
+	_panel.setup(simulation)
 	_report.visible = false
 
 
@@ -93,6 +97,16 @@ func show_report(world_id: StringName) -> void:
 	_report.position = (size - _report.size) * 0.5
 
 
+## Opens the alien panel (+ NEW ADDRESS).
+func open_alien_panel() -> void:
+	_panel.open()
+
+
+## The alien panel.
+func get_alien_panel() -> AlienPanel:
+	return _panel
+
+
 ## The World Report card.
 func get_report_card() -> PaperCard:
 	return _report
@@ -101,6 +115,15 @@ func get_report_card() -> PaperCard:
 ## The Ring's layer.
 func get_ring_layer() -> RingLayer:
 	return _ring
+
+
+func _on_panel_dial(address: GateAddress) -> void:
+	_console.select_composing(address)
+	_console.press_main_key()
+	if _simulation.state.gate.mode == GateState.RingMode.IDLE:
+		_panel.show_refusal(_console.get_key_reason())
+		return
+	_panel.close()
 
 
 func _on_report_input(event: InputEvent) -> void:
@@ -117,7 +140,7 @@ func _layout() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_visible_in_tree():
+	if not is_visible_in_tree() or _panel.visible:
 		return
 	if _report.visible and event.is_action_pressed(&"ui_cancel"):
 		_report.visible = false

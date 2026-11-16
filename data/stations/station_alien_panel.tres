@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StationSceneDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/station_scene_def.gd" id="1_stn"]
+
+[resource]
+script = ExtResource("1_stn")
+id = &"station_alien_panel"
+plate_size = Vector2i(1920, 1080)
+circles = Dictionary[StringName, Vector3]({
+&"key_ring": Vector3(800, 590, 440)
+})
+layers = Array[StringName]([&"glyph_keys"])
