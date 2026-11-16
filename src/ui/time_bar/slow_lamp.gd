@@ -29,14 +29,16 @@ func show_clock(clock: ClockState) -> void:
 	visible = not key.is_empty()
 	if not visible:
 		return
-	_label.text = tr(&"UI_SLOW").format({"reason": tr(label_key(key))})
+	# One word on the plate (M4.10-06); the reason is on the hover.
+	_label.text = tr(&"UI_SLOW_SHORT")
+	tooltip_text = tr(&"UI_SLOW").format({"reason": tr(label_key(key))})
 	var can_override: bool = TimeControl.OVERRIDABLE.has(TimeControl.reason_of(key))
 	_lamp.set_status(&"warn" if can_override else &"alarm")
 
 
-## The text shown now ("" when hidden).
+## The full line, "SLOW · reason", on the lamp's hover ("" when hidden).
 func get_text() -> String:
-	return _label.text if visible else ""
+	return tooltip_text if visible else ""
 
 
 ## The lamp's status now.

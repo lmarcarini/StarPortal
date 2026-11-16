@@ -131,7 +131,7 @@ func _lock_sill_and_settle_a_day(player: M15Player) -> void:
 	var locked: int = before + ConfidenceRules.LOCK_CHANGE
 	assert_int(state.committee.confidence).is_equal(locked)
 	assert_bool(player.close_wormhole()).is_true()
-	assert_str(_shell.confidence_readout.text).is_equal("Conf. 55 -0.1 \u2193")
+	assert_str(_shell.confidence_readout.text).is_equal("Conf. 55 -0.1\u2193")
 	var eve: int = (TimeMath.day_index(state.clock.tick) + 1) * TimeMath.TICKS_PER_DAY - 1
 	_wait(player, func() -> bool: return state.clock.tick == eve)
 	assert_int(state.committee.confidence).is_equal(locked)
@@ -145,7 +145,7 @@ func _lock_sill_and_settle_a_day(player: M15Player) -> void:
 	player.step()
 	assert_int(state.budget.funds_k).is_equal(funds + allocation - charge.x)
 	assert_int(state.committee.confidence).is_equal(locked - ConfidenceRules.SETTLING_STEP)
-	assert_str(_shell.confidence_readout.text).is_equal("Conf. 54 -0.1 \u2193")
+	assert_str(_shell.confidence_readout.text).is_equal("Conf. 54 -0.1\u2193")
 
 
 ## F4, the Excavation survey node and Start begin the survey while the bank charges.
