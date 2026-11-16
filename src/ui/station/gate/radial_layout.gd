@@ -11,6 +11,9 @@ const PER_RING: int = 12
 const RINGS: int = 3
 ## Ring radii as a share of the panel's radius, inner to outer.
 const RADII: Array[float] = [0.4, 0.67, 0.94]
+## Largest key side as a share of the panel radius (the inner ring's neighbour spacing is
+## about 0.21 of it).
+const SIDE_SHARE: float = 0.19
 ## Stick length below which it points at nothing.
 const DEADZONE: float = 0.3
 
@@ -53,3 +56,15 @@ static func glyph_at_stick(stick: Vector2) -> int:
 	var turns: float = fposmod(stick.angle() + PI / 2.0, TAU) / TAU * PER_RING - stagger
 	var slot: int = posmod(roundi(turns), PER_RING)
 	return ring * PER_RING + slot
+
+
+## Panel radius whose outer ring of keys [param key_size] wide fits inside [param area].
+static func radius_for(area: Vector2, key_size: float) -> float:
+	var half: float = minf(area.x, area.y) * 0.5 - key_size * 0.5
+	return maxf(0.0, half / RADII[RINGS - 1])
+
+
+## Side of a glyph key on a panel of [param radius]: [param base], shrunk so neighbours on the
+## inner ring and keys on the next ring never touch.
+static func key_side(radius: float, base: float) -> float:
+	return minf(base, radius * SIDE_SHARE)

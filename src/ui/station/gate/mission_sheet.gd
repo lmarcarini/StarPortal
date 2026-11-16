@@ -58,6 +58,22 @@ func open_for(world: StringName, order_address: GateAddress = null) -> void:
 	_go.grab_focus.call_deferred()
 
 
+## Closes the sheet without sending (Esc, (B), the wormhole closing, the alien panel).
+func close() -> void:
+	hide()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if visible and event.is_action_pressed(&"ui_cancel"):
+		close()
+		get_viewport().set_input_as_handled()
+
+
+## True when the sheet orders a mission from a closed gate (not a send through the open one).
+func is_order() -> bool:
+	return _order_address != null
+
+
 ## The draft shown.
 func get_draft() -> ExpeditionPlanDraft:
 	return _draft
