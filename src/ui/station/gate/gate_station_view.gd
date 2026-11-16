@@ -38,12 +38,14 @@ func _enter_tree() -> void:
 	EventBus.team_debrief.connect(_on_team_debrief)
 	EventBus.team_rescued.connect(_on_team_rescued)
 	EventBus.team_lost.connect(_on_team_lost)
+	EventBus.wormhole_closed.connect(_on_wormhole_closed)
 
 
 func _exit_tree() -> void:
 	EventBus.team_debrief.disconnect(_on_team_debrief)
 	EventBus.team_rescued.disconnect(_on_team_rescued)
 	EventBus.team_lost.disconnect(_on_team_lost)
+	EventBus.wormhole_closed.disconnect(_on_wormhole_closed)
 
 
 func _ready() -> void:
@@ -173,6 +175,7 @@ func _show_report(world_id: StringName, key: String = "") -> void:
 
 ## Opens the alien panel (+ NEW ADDRESS).
 func open_alien_panel() -> void:
+	_sheet.close()
 	_panel.open()
 
 
@@ -339,6 +342,12 @@ func _notification(what: int) -> void:
 func _on_visibility() -> void:
 	if not is_visible_in_tree():
 		_floor.snap_all()
+		_sheet.close()
+
+
+func _on_wormhole_closed(_reason: StringName) -> void:
+	if not _sheet.is_order():
+		_sheet.close()
 
 
 func _on_report_input(event: InputEvent) -> void:

@@ -1,10 +1,16 @@
 class_name ClueClip
 extends PaperCard
-## The clue clipped beside the alien panel: one received document at a time, shown by the
-## Archive's reader, with keys to swap to the previous or next document without leaving.
+## The clue clipped beside the alien panel: one received document at a time on off-white
+## paper under a steel clip, typed in the data face, shown by the Archive's reader (long ones
+## scroll inside it), with keys to swap to the previous or next document without leaving.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Composing)
 
 const _READER: PackedScene = preload("res://src/ui/archive/document_reader.tscn")
+const _TYPE_FONT: Font = preload("res://art/fonts/ibm_plex_mono/IBMPlexMono-Regular.ttf")
+## The steel clip at the top of the board, in pixels.
+const CLIP_SIZE: Vector2 = Vector2(140.0, 30.0)
+const CLIP_STEEL: Color = Color("#8a8d8f")
+const CLIP_DARK: Color = Color("#3d4043")
 
 var _simulation: Simulation = null
 var _index: int = -1
@@ -15,8 +21,17 @@ var _next: IconKey = IconKey.new()
 
 func _ready() -> void:
 	super()
+	var paper: StyleBoxFlat = StyleBoxFlat.new()
+	paper.bg_color = UiThemeHardware.PAPER
+	paper.set_content_margin_all(18.0)
+	paper.shadow_color = Color(0, 0, 0, 0.5)
+	paper.shadow_size = 6
+	add_theme_stylebox_override(&"panel", paper)
 	var column: VBoxContainer = VBoxContainer.new()
 	add_child(column)
+	var under_clip: Control = Control.new()
+	under_clip.custom_minimum_size.y = CLIP_SIZE.y * 0.6
+	column.add_child(under_clip)
 	var keys: HBoxContainer = HBoxContainer.new()
 	column.add_child(keys)
 	_prev.name = "PrevClue"
@@ -34,6 +49,27 @@ func _ready() -> void:
 	column.add_child(_reader)
 	_reader.get_close_button().visible = false
 	_reader.get_read_with_button().visible = false
+	_type_on_paper(_reader)
+
+
+## Paper look for [param reader]: no panel of its own, ink text in the typewriter face.
+static func _type_on_paper(reader: DocumentReader) -> void:
+	reader.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	var paper: Theme = Theme.new()
+	paper.set_color(&"font_color", &"Label", UiThemeHardware.INK)
+	paper.set_color(&"default_color", &"RichTextLabel", UiThemeHardware.INK)
+	paper.set_font(&"normal_font", &"RichTextLabel", _TYPE_FONT)
+	paper.set_font(&"font", &"Label", _TYPE_FONT)
+	paper.set_stylebox(&"panel", &"ScrollContainer", StyleBoxEmpty.new())
+	paper.set_stylebox(&"panel", &"PanelContainer", StyleBoxEmpty.new())
+	reader.theme = paper
+
+
+func _draw() -> void:
+	var at: Vector2 = Vector2((size.x - CLIP_SIZE.x) * 0.5, -CLIP_SIZE.y * 0.4)
+	draw_rect(Rect2(at, CLIP_SIZE), CLIP_DARK)
+	draw_rect(Rect2(at + Vector2(6, 4), CLIP_SIZE - Vector2(12, 12)), CLIP_STEEL)
+	draw_circle(at + Vector2(CLIP_SIZE.x * 0.5, CLIP_SIZE.y * 0.35), 5.0, CLIP_DARK)
 
 
 ## Reads [param simulation]'s received documents; keeps the shown one if still received.

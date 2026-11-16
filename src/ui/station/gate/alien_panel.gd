@@ -16,6 +16,13 @@ signal closed
 const STATION_ID: StringName = &"station_alien_panel"
 ## Seconds a typed name stays in the search.
 const TYPE_SECONDS: float = 1.2
+## Gap kept round the key rings, in pixels.
+const MARGIN: float = 12.0
+## Largest side of the centre DIAL key, before the interface scale.
+const DIAL_SIZE: Vector2 = Vector2(128.0, 128.0)
+## The stone disc behind the keys and its rim.
+const DISC_COLOUR: Color = Color("#232220")
+const DISC_RIM: Color = Color("#5a564e")
 
 var _simulation: Simulation = null
 var _compose: AddressDraft = AddressDraft.new()
@@ -23,6 +30,8 @@ var _keys: Array[GlyphKey] = []
 var _typed: String = ""
 var _typed_left: float = 0.0
 var _found: int = -1
+## The stone disc behind the keys: centre x, y and radius.
+var _disc: Vector3 = Vector3.ZERO
 
 @onready var _station: StationScene = %Station
 @onready var _key_area: Control = %Keys
@@ -55,8 +64,8 @@ func _ready() -> void:
 	_pencil.toggle_mode = true
 	_pencil.set_help("STATION_PANEL_PENCIL")
 	_lamps.seal_pressed.connect(clear_seal)
-	_station.anchors_changed.connect(_place_keys)
 	resized.connect(_place_keys)
+	_key_area.draw.connect(_draw_disc)
 	_place_keys.call_deferred()
 
 
@@ -177,12 +186,38 @@ func _unhandled_input(event: InputEvent) -> void:
 func _place_keys() -> void:
 	if not is_node_ready():
 		return
-	var centre: Vector2 = _station.anchor(&"key_ring")
-	var radius: float = _station.radius(&"key_ring")
+	var area: Rect2 = key_area()
+	var base: float = HwMetrics.target(self, Vector2(GlyphKey.SIDE, GlyphKey.SIDE)).x
+	var radius: float = RadialLayout.radius_for(area.size, base)
+	var side: float = RadialLayout.key_side(radius, base)
+	var centre: Vector2 = area.get_center()
+	_disc = Vector3(centre.x, centre.y, radius * RadialLayout.RADII[2] + side * 0.5 + MARGIN)
+	_key_area.queue_redraw()
 	for key: GlyphKey in _keys:
+		key.custom_minimum_size = Vector2(side, side)
+		key.size = key.custom_minimum_size
 		var at: Vector2 = RadialLayout.position_of(key.get_glyph(), centre, radius)
 		key.position = at - key.size * 0.5
+	var inner: float = radius * RadialLayout.RADII[0] * 2.0 - side - MARGIN * 2.0
+	var dial_side: float = minf(HwMetrics.target(self, DIAL_SIZE).x, inner)
+	_dial.custom_minimum_size = Vector2(dial_side, dial_side)
+	_dial.size = _dial.custom_minimum_size
 	_dial.position = centre - _dial.size * 0.5
+
+
+## The free area the key rings fit in: below the seal lamps, right of the side keys, left of
+## the clue clip, above the bottom edge.
+func key_area() -> Rect2:
+	var top: float = _lamps.position.y + _lamps.size.y + MARGIN
+	var left: float = _pencil.position.x + _pencil.size.x + MARGIN
+	var right: float = _clue.position.x - MARGIN
+	return Rect2(left, top, maxf(0.0, right - left), maxf(0.0, size.y - MARGIN - top))
+
+
+func _draw_disc() -> void:
+	var centre: Vector2 = Vector2(_disc.x, _disc.y)
+	_key_area.draw_circle(centre, _disc.z, DISC_COLOUR)
+	_key_area.draw_arc(centre, _disc.z, 0.0, TAU, 96, DISC_RIM, 4.0)
 
 
 func _render() -> void:

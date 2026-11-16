@@ -110,3 +110,24 @@ func test_clue_clip_swaps() -> void:
 	var first: StringName = clip.get_document_id()
 	clip.step(1)
 	assert_str(String(clip.get_document_id())).is_not_equal(String(first))
+
+
+## Every round key sits inside the free area and no two keys touch, at each size.
+func test_keys_fit_without_overlap_at_every_size() -> void:
+	for size: Vector2 in [
+		Vector2(1280, 600), Vector2(1920, 960), Vector2(2560, 1300), Vector2(3440, 1300)
+	]:
+		_holder.size = size
+		_view.size = size
+		_panel().size = size
+		_panel()._place_keys()
+		var rects: Array[Rect2] = []
+		for glyph: int in GateAddress.GLYPH_COUNT:
+			var key: GlyphKey = _panel().get_key(glyph)
+			rects.append(Rect2(key.position, key.size))
+		var area: Rect2 = _panel().key_area()
+		for index: int in rects.size():
+			assert_bool(area.grow(1.0).encloses(rects[index])).is_true()
+			for other: int in range(index + 1, rects.size()):
+				var gap: float = rects[index].get_center().distance_to(rects[other].get_center())
+				assert_float(gap).is_greater_equal(rects[index].size.x)

@@ -61,3 +61,31 @@ func test_refusal_without_wormhole() -> void:
 	_view.get_rail().press(&"team")
 	_simulation.submit(CloseWormholeCommand.new())
 	assert_str(String(_view.get_mission_sheet().reason())).is_not_empty()
+
+
+func test_sheet_closes_when_the_wormhole_closes() -> void:
+	_view.get_rail().press(&"team")
+	assert_bool(_view.get_mission_sheet().visible).is_true()
+	_simulation.submit(CloseWormholeCommand.new())
+	_simulation.advance_tick()
+	await get_tree().process_frame
+	assert_bool(_view.get_mission_sheet().visible).is_false()
+
+
+func test_sheet_closes_for_the_alien_panel_and_on_cancel() -> void:
+	_view.get_rail().press(&"team")
+	_view.open_alien_panel()
+	assert_bool(_view.get_mission_sheet().visible).is_false()
+	_view.get_alien_panel().close()
+	_view.get_rail().press(&"team")
+	var cancel := InputEventAction.new()
+	cancel.action = &"ui_cancel"
+	cancel.pressed = true
+	_view.get_mission_sheet()._unhandled_input(cancel)
+	assert_bool(_view.get_mission_sheet().visible).is_false()
+
+
+func test_sheet_closes_when_the_station_hides() -> void:
+	_view.get_rail().press(&"team")
+	_view.hide()
+	assert_bool(_view.get_mission_sheet().visible).is_false()
