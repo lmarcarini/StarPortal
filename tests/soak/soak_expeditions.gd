@@ -10,7 +10,7 @@ extends RefCounted
 
 ## Expedition outcomes the soak must see at least once (outcome_key()).
 const OUTCOMES: Array[String] = [
-	"field_event", "field_event:injury", "check_in_missed", "team_rescued"
+	"field_event", "field_event:injury", "team_distress", "team_rescued"
 ]
 ## Most teams the bot sends in a run.
 const MAX_SENDS: int = 12
@@ -19,15 +19,17 @@ const MAX_SENDS: int = 12
 var sends: int = 0
 
 
-## Submits at most one expedition command on [param simulation]; true when it did or a
-## Signal is waiting (the bot must not close the wormhole yet).
+## Submits at most one expedition command on [param simulation] (a hail with its order counts
+## as one); true when it did or a Signal is waiting (the bot must not close the wormhole yet).
+## It answers a team's call with Come through or Hold on and hails a team it holds a wormhole
+## to (M4.9-11).
 func work(simulation: Simulation) -> bool:
 	var state: GameState = simulation.state
 	var plan: ExpeditionState = state.expedition
+	if _talk(simulation):
+		return true
 	if plan.mode == ExpeditionState.Mode.MISSING:
-		if not ExpeditionRescue.is_open_to_team(state):
-			return false
-		return plan.signal_tick >= 0 or _try(simulation, SignalTeamCommand.new())
+		return _rescue(simulation)
 	if plan.mode == ExpeditionState.Mode.PLANNED and _try(simulation, SendTeamCommand.new()):
 		sends += 1
 		return true
@@ -42,6 +44,34 @@ func work(simulation: Simulation) -> bool:
 	return _try(simulation, command)
 
 
+## Gives Signal T-1 when the base holds a wormhole to the missing team; true when it did or
+## a Signal is waiting.
+func _rescue(simulation: Simulation) -> bool:
+	var state: GameState = simulation.state
+	var plan: ExpeditionState = state.expedition
+	if not ExpeditionRescue.is_open_to_team(state):
+		return false
+	return plan.signal_tick >= 0 or _try(simulation, SignalTeamCommand.new())
+
+
+## Answers the team's call (Come through or Hold on) or hails a team it holds a wormhole to
+## and says Carry on; true when it did.
+func _talk(simulation: Simulation) -> bool:
+	var state: GameState = simulation.state
+	var plan: ExpeditionState = state.expedition
+	if TeamContactRules.is_team_call(state) and plan.signal_tick < 0:
+		var order: TeamContactRules.Order = TeamContactRules.Order.COME_THROUGH
+		if plan.missed_tick % 2 == 0:
+			order = TeamContactRules.Order.HOLD_ON
+		return _try(simulation, OrderTeamCommand.create(order))
+	if not TeamContactRules.can_hail_team(state) or plan.heard_tick >= state.gate.lock_started_tick:
+		return false
+	if not _try(simulation, HailTeamCommand.new()):
+		return false
+	_try(simulation, OrderTeamCommand.create(TeamContactRules.Order.CARRY_ON))
+	return true
+
+
 ## The true address of the missing team's world, or null when no team is missing.
 static func rescue_address(state: GameState) -> GateAddress:
 	if state.expedition.mode != ExpeditionState.Mode.MISSING:
@@ -54,7 +84,7 @@ static func outcome_key(event_name: StringName, args: Array) -> String:
 	match event_name:
 		ExpeditionFieldDay.EVENT:
 			return "field_event:injury" if str(args[2]) in ["light", "serious"] else "field_event"
-		&"check_in_missed", &"team_rescued":
+		&"team_distress", &"team_rescued":
 			return String(event_name)
 	return ""
 

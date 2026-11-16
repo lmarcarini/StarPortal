@@ -64,6 +64,16 @@ var documents: Array[Dictionary] = []
 ## one step higher and its first check-in comes delay_ticks later. Optional when loading.
 var blind: bool = false
 var delay_ticks: int = 0
+## Talk only through an open gate (M4.9-11, format v23): the tick and the field days done when
+## the base last heard from the team (departure, a hail or a call); -1 / 0 when never.
+var heard_tick: int = -1
+var heard_days: int = 0
+## The team in trouble is calling (an incoming wormhole waits for the base, or will).
+var calling: bool = false
+## The team is overdue: not home by its time and no call answered (the alert is posted once).
+var overdue: bool = false
+## Come home now was ordered on a hail: the team walks through the open wormhole.
+var coming_home: bool = false
 
 
 ## Field days of the planned objective.
@@ -136,6 +146,11 @@ func clear() -> void:
 	delay_ticks = 0
 	missed_tick = -1
 	signal_tick = -1
+	heard_tick = -1
+	heard_days = 0
+	calling = false
+	overdue = false
+	coming_home = false
 
 
 ## Records a document of [param kind] brought back from [param world] at [param tick].
@@ -164,6 +179,11 @@ func to_dict() -> Dictionary:
 		"documents": documents.duplicate(true),
 		"blind": blind,
 		"delay_ticks": delay_ticks,
+		"heard_tick": heard_tick,
+		"heard_days": heard_days,
+		"calling": calling,
+		"overdue": overdue,
+		"coming_home": coming_home,
 	}
 
 
@@ -191,6 +211,11 @@ static func from_dict(data: Dictionary) -> ExpeditionState:
 	var delay: int = type_convert(data.get("delay_ticks", 0), TYPE_INT)
 	expedition.delay_ticks = maxi(0, delay)
 	expedition.missed_tick = type_convert(data.get("missed_tick", -1), TYPE_INT)
+	expedition.heard_tick = type_convert(data.get("heard_tick", -1), TYPE_INT)
+	expedition.heard_days = type_convert(data.get("heard_days", 0), TYPE_INT)
+	expedition.calling = data.get("calling", false) == true
+	expedition.overdue = data.get("overdue", false) == true
+	expedition.coming_home = data.get("coming_home", false) == true
 	expedition.signal_tick = type_convert(data.get("signal_tick", -1), TYPE_INT)
 	var documents_data: Variant = data.get("documents", [])
 	if documents_data is Array:

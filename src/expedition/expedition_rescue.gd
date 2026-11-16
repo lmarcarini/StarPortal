@@ -1,16 +1,17 @@
 class_name ExpeditionRescue
 extends RefCounted
-## A missed check-in and the rescue (docs/content/m3-beyond-the-ring.md section 4, Missed
-## check-in and rescue; A rescue is not a sure thing, owner 2026-11-07), run by
-## ExpeditionSystem. A missed check-in pauses the game (pause_requested), slows it
-## (awaiting_answer) until a Signal and opens a WINDOW_DAYS window. Signal T-1 on a wormhole
-## open to the world brings the team to the Ring SIGNAL_TICKS later; closing it before fails
-## the Signal.
+## A team in trouble and the rescue (docs/content/m3-beyond-the-ring.md section 4; talk only
+## through an open gate, interface-rethink.md section 4), run by ExpeditionSystem. Trouble
+## (a missed day) makes the team call the base (GateSystem opens its incoming wormhole) and
+## opens a WINDOW_DAYS window; past its time plus a grace, unheard, it is overdue. Signal T-1
+## (or Come through) on a wormhole open to the world brings the team to the Ring SIGNAL_TICKS
+## later; closing it before fails the Signal.
 ## On arrival each member rolls to have survived (SurvivalRules): the deceased leave the
 ## roster (Confidence -3 each), the rest come home; if nobody survived there is no answer and
 ## the team is lost, as when the window runs out (all four leave, Confidence -10). Lost
 ## people go through ExpeditionUnlock.lose_person (lent soldiers are replaced). Call only
-## from SimSystem.tick(). Events: check_in_missed(world id), rescue_signal_failed(world id),
+## from SimSystem.tick(). Events: team_distress(world id), team_overdue(world id),
+## rescue_signal_failed(world id),
 ## member_deceased(name, world id), team_rescued(world id, survivors), team_lost(world id,
 ## reason).
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
@@ -22,8 +23,6 @@ const SIGNAL_TICKS: int = 15
 ## Why a team is lost: the window ran out, or nobody answered the Signal.
 const LOST_WINDOW: StringName = &"window"
 const LOST_NO_ANSWER: StringName = &"no_answer"
-## Reason of the pause a missed check-in asks for (the clock pauses through SimClock).
-const PAUSE_REASON: StringName = &"check_in_missed"
 
 
 ## The tick [param plan]'s rescue window closes at.
@@ -37,11 +36,11 @@ static func miss(state: GameState) -> void:
 	var plan: ExpeditionState = state.expedition
 	plan.mode = ExpeditionState.Mode.MISSING
 	plan.recalled = false
+	plan.coming_home = false
 	plan.missed_tick = state.clock.tick
 	plan.signal_tick = -1
-	TimeControl.add_slow(state.clock, &"awaiting_answer", &"rescue")
-	state.events.post(&"check_in_missed", [plan.world_id])
-	state.events.post(Simulation.PAUSE_EVENT, [PAUSE_REASON])
+	plan.calling = true
+	state.events.post(&"team_distress", [plan.world_id])
 
 
 ## One tick of an open rescue window in [param state]: a waiting Signal fails if the wormhole
@@ -50,6 +49,7 @@ static func miss(state: GameState) -> void:
 static func tick(state: GameState, rng: RandomNumberGenerator) -> void:
 	var plan: ExpeditionState = state.expedition
 	if plan.signal_tick < 0:
+		_check_overdue(state)
 		if state.clock.tick >= window_end_tick(plan):
 			lose_team(state, LOST_WINDOW)
 		return
@@ -59,6 +59,21 @@ static func tick(state: GameState, rng: RandomNumberGenerator) -> void:
 		return
 	if state.clock.tick >= plan.signal_tick + SIGNAL_TICKS:
 		_arrive(state, rng)
+
+
+## A team in trouble that has not been heard since and is past its time plus the grace is
+## overdue: posted once (team_overdue).
+static func _check_overdue(state: GameState) -> void:
+	var plan: ExpeditionState = state.expedition
+	if plan.overdue or plan.calling or plan.heard_tick >= plan.missed_tick:
+		return
+	if (
+		state.clock.tick
+		< maxi(TeamContactRules.due_tick_of(plan), plan.missed_tick) + TeamContactRules.GRACE_TICKS
+	):
+		return
+	plan.overdue = true
+	state.events.post(&"team_overdue", [plan.world_id])
 
 
 ## True when [param state]'s wormhole is open to the missing team's world.
@@ -80,7 +95,15 @@ static func lose_team(state: GameState, reason: StringName) -> void:
 		state, ConfidenceRules.TEAM_LOST, world_id, Vector2i(1, ConfidenceRules.TEAM_LOST_CHANGE)
 	)
 	plan.clear()
+	_end_team_call(state)
 	state.events.post(&"team_lost", [world_id, reason])
+
+
+## Closes the team's own call wormhole once it has nobody left to bring through.
+static func _end_team_call(state: GameState) -> void:
+	if TeamContactRules.is_team_call(state):
+		RingControl.close(state.gate)
+		state.events.post(&"wormhole_closed", [&"call_ended"])
 
 
 ## The team reaches the Ring: survival rolls, then the deceased leave and the rest come home.
@@ -109,4 +132,5 @@ static func _arrive(state: GameState, rng: RandomNumberGenerator) -> void:
 			state, ConfidenceRules.DECEASED, world_id, Vector2i(deceased.size(), change)
 		)
 	plan.clear()
+	_end_team_call(state)
 	state.events.post(&"team_rescued", [world_id, members.size() - deceased.size()])

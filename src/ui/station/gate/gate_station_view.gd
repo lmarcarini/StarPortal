@@ -21,6 +21,7 @@ var _report_panel: WorldReportPanel = WorldReportPanel.new()
 var _rail: SendRail = SendRail.new()
 var _moth: MothScreen = MothScreen.new()
 var _floor: FloorActors = FloorActors.new()
+var _orders: TeamOrders = TeamOrders.new()
 
 @onready var _station: StationScene = %Station
 @onready var _console: GateConsole = %GateConsole
@@ -52,6 +53,9 @@ func _ready() -> void:
 	add_child(_rail)
 	move_child(_rail, _station.get_index() + 1)
 	add_child(_moth)
+	_orders.name = "TeamOrders"
+	add_child(_orders)
+	_rail.orders_requested.connect(_show_orders)
 	resized.connect(_layout)
 	_console.resized.connect(_layout)
 	_layout.call_deferred()
@@ -73,6 +77,7 @@ func setup(simulation: Simulation) -> void:
 	_panel.setup(simulation)
 	_rail.setup(simulation)
 	_moth.setup(simulation)
+	_orders.setup(simulation)
 	_report.visible = false
 
 
@@ -137,6 +142,11 @@ func get_floor() -> FloorActors:
 	return _floor
 
 
+## The team orders card.
+func get_team_orders() -> TeamOrders:
+	return _orders
+
+
 ## The World Report card.
 func get_report_card() -> PaperCard:
 	return _report
@@ -154,6 +164,11 @@ func _on_panel_dial(address: GateAddress) -> void:
 		_panel.show_refusal(_console.get_key_reason())
 		return
 	_panel.close()
+
+
+func _show_orders() -> void:
+	_orders.open()
+	_orders.position = _rail.position + Vector2(0, -_orders.size.y - 12.0)
 
 
 func _on_rail_used(id: StringName) -> void:

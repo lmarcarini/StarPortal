@@ -13,7 +13,7 @@ extends RefCounted
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 22
+const TARGET_VERSION: int = 23
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
 const OLDEST_VERSION: int = 15
 
@@ -28,7 +28,8 @@ static func built_in_steps() -> Dictionary[int, Callable]:
 		18: _v18_to_v19,
 		19: _v19_to_v20,
 		20: _v20_to_v21,
-		21: _v21_to_v22
+		21: _v21_to_v22,
+		22: _v22_to_v23
 	}
 	return built_in
 
@@ -163,6 +164,35 @@ static func _v21_to_v22(data: Dictionary) -> Dictionary:
 			clock["mode"] = "held"
 		if not holds.has("conversation"):
 			holds.append("conversation")
+	return out
+
+
+## v22 to v23 (M4.9-11, talk only through an open gate): a team in the field last heard from
+## at its last check-in (departure plus delay and a day per field day done); a team that missed
+## its check-in is treated as having called and been heard then.
+static func _v22_to_v23(data: Dictionary) -> Dictionary:
+	var out: Dictionary = data.duplicate(true)
+	if not out.get("state") is Dictionary:
+		return out
+	var state: Dictionary = out["state"]
+	var trip: Dictionary = SaveFields.dict_or_empty(state.get("expedition"))
+	var mode: String = str(trip.get("mode", "idle"))
+	if mode != "away" and mode != "missing":
+		return out
+	var results: Variant = trip.get("day_results", [])
+	var days: int = 0
+	if results is Array:
+		var listed: Array = results
+		days = listed.size()
+	var departed: int = type_convert(trip.get("departed_tick", -1), TYPE_INT)
+	var delay: int = type_convert(trip.get("delay_ticks", 0), TYPE_INT)
+	trip["heard_tick"] = departed + delay + days * TimeMath.TICKS_PER_DAY
+	trip["heard_days"] = days
+	if mode == "missing":
+		trip["heard_tick"] = type_convert(trip.get("missed_tick", -1), TYPE_INT)
+	trip["calling"] = false
+	trip["overdue"] = false
+	trip["coming_home"] = false
 	return out
 
 

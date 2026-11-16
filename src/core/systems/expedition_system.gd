@@ -2,15 +2,15 @@ class_name ExpeditionSystem
 extends SimSystem
 ## Runs the team away each tick, after GateSystem and ProbeSystem
 ## (docs/content/m3-beyond-the-ring.md section 4): every 24 hours from departure a field day
-## ends (ExpeditionFieldDay) at its check-in, and the last one is the return, at departure plus
-## the objective's days; Recall team makes the next check-in the return. A check-in that falls
+## ends (ExpeditionFieldDay), silently: a team talks to the base only through an open gate
+## (TeamContactRules, interface-rethink.md section 4). The last day is the return, at departure
+## plus the objective's days; Recall team or Come home now makes the return come at once. A day
 ## due while CAIRN's wormhole is open comes when it closes. A day whose result is
-## ExpeditionState.DAY_MISSED (a field event's worst setback, card M3-11) is a missed check-in:
-## ExpeditionRescue opens the rescue window and runs it until the team is home or lost. On
+## ExpeditionState.DAY_MISSED (a field event's worst setback) leaves the team in trouble: it
+## calls the base (ExpeditionRescue.miss) and the rescue window runs until it is home or lost. On
 ## return the team brings back what ExpeditionReturns gives (nothing when recalled before its
 ## last day) and goes back to the rooms it kept; the plan clears.
-## Events: team_checked_in(world id, light injuries, serious injuries, day summary),
-## team_sent (SendTeamCommand) and team_returned(world id, objective, success,
+## Events: team_sent (SendTeamCommand) and team_returned(world id, objective, success,
 ## team names), prologue_completed(world id) once at the first return (section 1), and
 ## ExpeditionRescue's.
 ## Bible: docs/content/m3-beyond-the-ring.md section 4
@@ -19,8 +19,6 @@ extends SimSystem
 const ID: StringName = &"expedition"
 ## Event posted when the team comes home.
 const RETURNED_EVENT: StringName = &"team_returned"
-## Event posted at a check-in that is not the return.
-const CHECKED_IN_EVENT: StringName = &"team_checked_in"
 ## Event posted once, at the first team's first return home (not a rescue): the Prologue ends.
 const PROLOGUE_EVENT: StringName = &"prologue_completed"
 ## Flag set (true) once the Prologue has ended.
@@ -43,35 +41,20 @@ func tick(state: GameState) -> void:
 	if plan.mode == ExpeditionState.Mode.MISSING:
 		ExpeditionRescue.tick(state, state.random.stream(ID))
 		return
+	if plan.mode == ExpeditionState.Mode.AWAY and plan.coming_home:
+		_return(state, state.random.stream(ID))
+		return
 	if plan.mode != ExpeditionState.Mode.AWAY or state.clock.tick < plan.next_day_end_tick():
 		return
 	if state.gate.mode == GateState.RingMode.LOCKED:
 		return
 	var rng: RandomNumberGenerator = state.random.stream(ID)
-	var hurt_before: Vector2i = _injuries(state)
 	var result: String = resolve_day.call(state, plan.day_results.size(), rng)
 	plan.day_results.append(result)
 	if result == ExpeditionState.DAY_MISSED:
 		ExpeditionRescue.miss(state)
-	elif plan.day_results.size() < plan.days() and not plan.recalled:
-		_check_in(state, _day_summary(result, _injuries(state) != hurt_before))
-	else:
+	elif plan.day_results.size() >= plan.days() or plan.recalled:
 		_return(state, rng)
-
-
-## A check-in that is not the return: a Log line and a non-blocking message with the team's
-## injuries; no pause, no speed change.
-func _check_in(state: GameState, day: String) -> void:
-	var counts: Vector2i = _injuries(state)
-	state.events.post(CHECKED_IN_EVENT, [state.expedition.world_id, counts.x, counts.y, day])
-
-
-## What a field day brought, for its check-in: "wasted", "injury" (someone was hurt) or
-## "finding".
-static func _day_summary(result: String, hurt: bool) -> String:
-	if result == ExpeditionState.DAY_WASTED:
-		return "wasted"
-	return "injury" if hurt else "finding"
 
 
 func _return(state: GameState, rng: RandomNumberGenerator) -> void:
@@ -100,7 +83,7 @@ static func team_names(state: GameState) -> Array[String]:
 
 
 ## (light, serious) injuries among [param state]'s team.
-static func _injuries(state: GameState) -> Vector2i:
+static func injuries(state: GameState) -> Vector2i:
 	var counts := Vector2i.ZERO
 	for person_id: StringName in state.expedition.member_ids():
 		var person: PersonState = state.staff.find_person(person_id)

@@ -21,7 +21,8 @@ func get_type() -> StringName:
 func validate(state: GameState) -> CommandResult:
 	if not state.gate.has_incoming():
 		return CommandResult.fail(&"no_incoming")
-	if ShutterRules.is_closed(state):
+	var team: bool = state.gate.incoming_faction == TeamContactRules.TEAM_CALLER
+	if ShutterRules.is_closed(state) and not team:
 		return CommandResult.fail(&"shutter_closed")
 	return CommandResult.ok()
 

@@ -36,6 +36,7 @@ func validate(state: GameState) -> CommandResult:
 func apply(state: GameState) -> void:
 	state.expedition.mode = ExpeditionState.Mode.AWAY
 	state.expedition.departed_tick = state.clock.tick
+	TeamContactRules.hear(state)
 	var plan: ExpeditionState = state.expedition
 	plan.blind = ExpeditionRules.is_blind(state, plan)
 	plan.delay_ticks = (

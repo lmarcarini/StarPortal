@@ -20,14 +20,14 @@ func _init() -> void:
 
 func _enter_tree() -> void:
 	EventBus.tick_advanced.connect(_on_event)
-	EventBus.check_in_missed.connect(_on_event)
+	EventBus.team_distress.connect(_on_event)
 	EventBus.team_rescued.connect(_on_event)
 	EventBus.team_lost.connect(_on_event)
 
 
 func _exit_tree() -> void:
 	EventBus.tick_advanced.disconnect(_on_event)
-	EventBus.check_in_missed.disconnect(_on_event)
+	EventBus.team_distress.disconnect(_on_event)
 	EventBus.team_rescued.disconnect(_on_event)
 	EventBus.team_lost.disconnect(_on_event)
 

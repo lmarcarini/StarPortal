@@ -44,19 +44,6 @@ func test_field_event_writes_a_log_line() -> void:
 	assert_str(ExpeditionLogText.line(found[0].args, "")).starts_with("Thin ice: The ice was")
 
 
-func test_check_in_line_says_what_the_day_brought() -> void:
-	TranslationServer.set_locale("en")
-	for day: String in ["finding", "injury", "wasted"]:
-		var entries: Array[LogEntry] = LogRules.entries_for(
-			&"team_checked_in", [WORLD, 1, 0, day], null, 5
-		)
-		var line: String = ExpeditionLogText.line(entries[0].args, "STILLWATER")
-		var expected: String = tr(StringName("TEAM_DAY_" + day.to_upper()))
-		assert_str(line).is_equal(
-			"T-1 checked in from STILLWATER (%s): one light injury." % expected
-		)
-
-
 func test_longest_pt_br_line_fits_a_log_row() -> void:
 	TranslationServer.set_locale("pt_BR")
 	var longest: Dictionary = {}
