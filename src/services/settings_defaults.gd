@@ -71,5 +71,7 @@ const VALUES: Dictionary = {
 		&"research_pan_right": {},
 		&"research_pan_up": {},
 		&"research_pan_down": {},
+		&"station_flip": {},
+		&"station_pin": {},
 	},
 }

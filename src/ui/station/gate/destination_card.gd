@@ -2,7 +2,8 @@ class_name DestinationCard
 extends Button
 ## One known address on the Gate station's rack: a picture, a name (or, for an address never
 ## reached, its glyphs), up to four status icons and a pin. Click or (A) selects it; right
-## click, F or (Y) flips it to its World Report; P or (X) pins it.
+## click, F or the right stick's click flips it to its World Report; U or the gamepad's
+## Share button pins it (actions station_flip and station_pin).
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Destinations)
 
 ## The card was chosen.
@@ -96,20 +97,12 @@ func _gui_input(event: InputEvent) -> void:
 		flipped.emit(self)
 		accept_event()
 		return
-	if _is_key(event, KEY_F, JOY_BUTTON_Y):
+	if event.is_action_pressed(&"station_flip"):
 		flipped.emit(self)
 		accept_event()
-	elif _is_key(event, KEY_P, JOY_BUTTON_X):
+	elif event.is_action_pressed(&"station_pin"):
 		pin_toggled.emit(self)
 		accept_event()
-
-
-static func _is_key(event: InputEvent, key: Key, button: JoyButton) -> bool:
-	var k: InputEventKey = event as InputEventKey
-	if k != null:
-		return k.pressed and not k.echo and k.keycode == key
-	var j: InputEventJoypadButton = event as InputEventJoypadButton
-	return j != null and j.pressed and j.button_index == button
 
 
 func _draw() -> void:
