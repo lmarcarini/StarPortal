@@ -20,6 +20,7 @@ var _report: PaperCard = PaperCard.new()
 var _report_panel: WorldReportPanel = WorldReportPanel.new()
 var _rail: SendRail = SendRail.new()
 var _moth: MothScreen = MothScreen.new()
+var _floor: FloorActors = FloorActors.new()
 
 @onready var _station: StationScene = %Station
 @onready var _console: GateConsole = %GateConsole
@@ -46,6 +47,8 @@ func _ready() -> void:
 	_report.gui_input.connect(_on_report_input)
 	add_child(_report)
 	_rail.name = "SendRail"
+	_rail.key_used.connect(_on_rail_used)
+	visibility_changed.connect(_on_visibility)
 	add_child(_rail)
 	move_child(_rail, _station.get_index() + 1)
 	add_child(_moth)
@@ -59,6 +62,10 @@ func setup(simulation: Simulation) -> void:
 	_simulation = simulation
 	if _ring == null:
 		_ring = RingLayer.install(_station, simulation)
+		_floor.name = "FloorActors"
+		_station.add_layer(_floor, 35)
+		_floor.bind(_station)
+		_console.set_close_busy_check(_floor.is_busy)
 	else:
 		_ring.bind(simulation, _station)
 	_console.setup(simulation)
@@ -125,6 +132,11 @@ func get_moth_screen() -> MothScreen:
 	return _moth
 
 
+## The floor actors layer.
+func get_floor() -> FloorActors:
+	return _floor
+
+
 ## The World Report card.
 func get_report_card() -> PaperCard:
 	return _report
@@ -142,6 +154,16 @@ func _on_panel_dial(address: GateAddress) -> void:
 		_panel.show_refusal(_console.get_key_reason())
 		return
 	_panel.close()
+
+
+func _on_rail_used(id: StringName) -> void:
+	if id == &"camera":
+		_floor.play(ActorCues.Cue.CAMERA_PUSH)
+
+
+func _on_visibility() -> void:
+	if not is_visible_in_tree():
+		_floor.snap_all()
 
 
 func _on_report_input(event: InputEvent) -> void:
