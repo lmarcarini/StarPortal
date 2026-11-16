@@ -25,14 +25,16 @@ circles = Dictionary[StringName, Vector3]({
 &"ring_outer": Vector3(836, 390, 186)
 })
 paths = Dictionary[StringName, PackedVector2Array]({
-&"ramp": PackedVector2Array(836, 568, 836, 722)
+&"ramp": PackedVector2Array(836, 568, 836, 722),
+&"crossing": PackedVector2Array(300, 790, 1400, 790)
 })
 polygons = Dictionary[StringName, PackedVector2Array]({
 &"floor_glow": PackedVector2Array(745, 560, 927, 560, 1062, 728, 610, 728)
 })
 rects = Dictionary[StringName, Rect2]({
 &"console_left": Rect2(328, 537, 272, 111),
-&"console_right": Rect2(1070, 537, 246, 111)
+&"console_right": Rect2(1070, 537, 246, 111),
+&"blast_door": Rect2(215, 560, 50, 112)
 })
 depth_scale = Dictionary[StringName, Vector2]({
 &"ramp": Vector2(0.6, 1.0)

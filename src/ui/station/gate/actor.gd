@@ -6,8 +6,8 @@ extends RefCounted
 ## Bible: docs/content/interface-rethink.md section 2 (Show it happening)
 
 ## Routes. OUT: left door, ramp foot, ramp top (into the horizon). IN: the reverse. RAMP_UP
-## and RAMP_DOWN: the ramp only. STAND: still, at a console bank.
-enum Route { OUT, IN, RAMP_UP, RAMP_DOWN, STAND }
+## and RAMP_DOWN: the ramp only. STAND: still, at an idle spot. CROSS: across the floor.
+enum Route { OUT, IN, RAMP_UP, RAMP_DOWN, STAND, CROSS }
 
 ## Route.
 var route: Route = Route.OUT
@@ -23,7 +23,7 @@ var duration: float = 5.0
 var elapsed: float = 0.0
 ## A fade in place instead of a walk (reduced motion).
 var fade_only: bool = false
-## Where a STAND actor stands (a console bank's anchor name).
+## Where a STAND actor stands (an idle spot's anchor name).
 var spot: StringName = &""
 
 

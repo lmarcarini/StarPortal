@@ -3,28 +3,34 @@ extends Control
 ## The Gate floor's live layer: plays a short cue for each event from [ActorCues]. Teams walk
 ## from the left door up the ramp into the horizon and come back down it; a MOTH flies in or
 ## out; a canister rolls; the pole camera arm pushes; a crate lands at the ramp foot;
-## intruders come out. Two technicians stand at the console banks when the hall is quiet.
+## intruders come out. The hall is lived in: staff on base stand at the console banks and a
+## soldier at the blast door (nobody when the base has no one), someone walks across the floor
+## every half minute or so, they step aside while a cue plays and take cover in an incursion.
 ## Presentation only: a cue that arrives while the station is not shown is skipped.
 ## Reduced motion (ambient movement off) turns cues into short fades.
 ## Bible: docs/content/interface-rethink.md section 2 (Show it happening)
 
 const _STAGGER: float = 0.7
+## Seconds between two reads of who is on base.
+const _CREW_SECONDS: float = 2.0
+## How far idle figures step aside while a cue plays, as a share of their bank's width.
+const _ASIDE_SHARE: float = 0.3
 
 var _station: StationScene = null
 var _actors: Array[Actor] = []
 var _idle: Array[Actor] = []
 var _signals: Array[Signal] = []
 var _calls: Array[Callable] = []
+## The walker crossing the floor, or null; seconds until the next one; until the next crew read.
+var _crosser: Actor = null
+var _cross_in: float = ActorCues.CROSS_MIN_SECONDS
+var _crew_in: float = 0.0
+var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for spot: StringName in [&"console_left", &"console_right"]:
-		var tech: Actor = Actor.new()
-		tech.route = Actor.Route.STAND
-		tech.figure = FigureSprite.Kind.SCIENTIST
-		tech.spot = spot
-		_idle.append(tech)
+	_rng.seed = 4870
 
 
 func _enter_tree() -> void:
@@ -102,7 +108,59 @@ func advance(delta: float) -> void:
 	for actor: Actor in _idle:
 		actor.advance(delta)
 	_actors = _actors.filter(func(a: Actor) -> bool: return not a.is_done())
+	_crew_in -= delta
+	if _crew_in <= 0.0:
+		_crew_in = _CREW_SECONDS
+		refresh_crew(_state())
+	_advance_crosser(delta)
 	queue_redraw()
+
+
+## Reads who stands idle from [param state] (null: nobody).
+func refresh_crew(state: GameState) -> void:
+	var crew: Dictionary[StringName, int] = ActorCues.idle_crew(state)
+	_idle.clear()
+	for spot: StringName in crew:
+		var person: Actor = Actor.new()
+		person.route = Actor.Route.STAND
+		person.figure = crew[spot]
+		person.spot = spot
+		_idle.append(person)
+
+
+## The idle figures standing now.
+func get_idle() -> Array[Actor]:
+	return _idle
+
+
+## The walker crossing the floor, or null.
+func get_crosser() -> Actor:
+	return _crosser
+
+
+func _advance_crosser(delta: float) -> void:
+	if _crosser != null:
+		_crosser.advance(delta)
+		if _crosser.is_done() or is_busy():
+			_crosser = null
+		return
+	if not Settings.get_bool(&"display", &"ambient_movement"):
+		return
+	_cross_in -= delta
+	if _cross_in > 0.0:
+		return
+	_cross_in = ActorCues.CROSS_MIN_SECONDS + _rng.randf() * ActorCues.CROSS_SPREAD_SECONDS
+	var figure: int = ActorCues.crosser(_state(), _rng.randf())
+	if figure < 0 or is_busy():
+		return
+	_crosser = Actor.new()
+	_crosser.route = Actor.Route.CROSS
+	_crosser.figure = figure
+	_crosser.duration = ActorCues.CROSS_SECONDS
+
+
+func _state() -> GameState:
+	return SimClock.simulation.state if SimClock.simulation != null else null
 
 
 func _process(delta: float) -> void:
@@ -156,9 +214,10 @@ func _on_simple(event_name: StringName) -> void:
 func _draw() -> void:
 	if _station == null:
 		return
-	if _actors.is_empty() and Settings.get_bool(&"display", &"ambient_movement"):
-		for tech: Actor in _idle:
-			_draw_actor(tech)
+	for person: Actor in _idle:
+		_draw_actor(person)
+	if _crosser != null:
+		_draw_actor(_crosser)
 	for actor: Actor in _actors:
 		if actor.has_started():
 			_draw_actor(actor)
@@ -175,12 +234,22 @@ func path_of(route: Actor.Route, spot: StringName = &"") -> PackedVector2Array:
 			return PackedVector2Array([door, ramp[1], ramp[0]])
 		Actor.Route.IN:
 			return PackedVector2Array([ramp[0], ramp[1], door])
-		Actor.Route.RAMP_UP:
-			return PackedVector2Array([ramp[1], ramp[0]])
-		Actor.Route.RAMP_DOWN:
-			return PackedVector2Array([ramp[0], ramp[1]])
+		Actor.Route.RAMP_UP, Actor.Route.RAMP_DOWN:
+			var up: bool = route == Actor.Route.RAMP_UP
+			return PackedVector2Array([ramp[1], ramp[0]] if up else [ramp[0], ramp[1]])
+		Actor.Route.CROSS:
+			return _station.shape(&"crossing")
+	return PackedVector2Array([_stand_at(spot, ramp[0].x)])
+
+
+## Where an idle figure at [param spot] stands; aside from the ramp at [param ramp_x] while a
+## cue plays.
+func _stand_at(spot: StringName, ramp_x: float) -> Vector2:
 	var bank: Rect2 = _station.rect_of(spot)
-	return PackedVector2Array([Vector2(bank.get_center().x, bank.end.y + 6.0)])
+	var at: Vector2 = Vector2(bank.get_center().x, bank.end.y + 6.0)
+	if is_busy():
+		at.x += signf(at.x - ramp_x) * bank.size.x * _ASIDE_SHARE
+	return at
 
 
 ## Where [param actor] is now on screen.
