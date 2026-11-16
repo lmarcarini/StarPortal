@@ -3,7 +3,7 @@ extends RefCounted
 ## Code-drawn tab icons, one per view, as small textures: no imported art. Each is a few
 ## strokes of plain geometry so it reads at 80% UI scale.
 ## Gate Room: the Ring. Base: a floor plan. Research: a flask. Personnel: a person.
-## Expeditions: a flag. Archive: stacked papers. Command: a chevron over a bar.
+## Archive: stacked papers. Command: a chevron over a bar.
 ## Bible: docs/content/interface-pass.md sections 2 and 4
 
 ## Icon side at 100% UI scale, in pixels.
@@ -42,7 +42,6 @@ static func has_icon(view_id: StringName) -> bool:
 			&"base",
 			&"research",
 			&"personnel",
-			&"expeditions",
 			&"archive",
 			&"command",
 		]
@@ -75,10 +74,6 @@ static func _distance(view_id: StringName, p: Vector2) -> float:
 			var head: float = p.distance_to(Vector2(0.5, 0.3)) - 0.15
 			var torso: float = maxf(p.distance_to(Vector2(0.5, 0.92)) - 0.38, 0.55 - p.y)
 			return minf(head, torso)
-		&"expeditions":
-			var pole: float = _segment(p, Vector2(0.28, 0.12), Vector2(0.28, 0.9)) - line
-			var cloth: float = _box(p, Vector2(0.55, 0.32), Vector2(0.24, 0.17))
-			return minf(pole, cloth)
 		&"archive":
 			var back: float = absf(_box(p, Vector2(0.58, 0.42), Vector2(0.26, 0.3))) - line
 			var front: float = _box(p, Vector2(0.44, 0.58), Vector2(0.26, 0.3))

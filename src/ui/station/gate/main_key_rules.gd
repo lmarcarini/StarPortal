@@ -1,12 +1,13 @@
 class_name MainKeyRules
 extends RefCounted
 ## What the console's main key is now, from the state and the selected address: DIAL when the
-## Ring is idle and an address is chosen, CLOSE while a wormhole is open, otherwise OFF with
-## the reason as a translation key for its hover card. Pure.
+## Ring is idle and an address is chosen, CLOSE while a wormhole is open, ANSWER while an
+## incoming wormhole waits, otherwise OFF with the reason as a translation key for its hover
+## card. Pure.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Console)
 
 ## Key modes.
-enum Mode { DIAL, CLOSE, OFF }
+enum Mode { DIAL, CLOSE, ANSWER, OFF }
 
 ## Hover reason for each dial refusal code.
 const REFUSALS: Dictionary[StringName, StringName] = {
@@ -22,6 +23,8 @@ const REFUSALS: Dictionary[StringName, StringName] = {
 static func mode_of(state: GameState, address: GateAddress) -> Mode:
 	if state.gate.mode == GateState.RingMode.LOCKED:
 		return Mode.CLOSE
+	if state.gate.has_incoming():
+		return Mode.ANSWER
 	if reason_of(state, address) != &"":
 		return Mode.OFF
 	return Mode.DIAL

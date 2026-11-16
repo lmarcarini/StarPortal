@@ -1,5 +1,5 @@
 ## M2.5 end to end, headless, over the real data/ content (docs/content/m25-lean-start.md):
-## a new game opens on the Gate Room, whose "Build capacitor bank" button builds the bank in one
+## a new game opens on the Gate Room, whose "BUILD BANK" button builds the bank in one
 ## click; it charges at the spare 25 MW. A Research Lab built as soon as the bank is done
 ## finishes on, lowering charging to 20 MW with its message, and SILL locks about 17.3 hours in.
 ## The Research tab (F4) starts Excavation survey through its real row and Start button; Level 2
@@ -80,14 +80,14 @@ func _free_ui() -> void:
 	_root = null
 
 
-## "Build capacitor bank" places the bank's ghost on the nearest spot; one click builds it,
+## "BUILD BANK" places the bank's ghost on the nearest spot; one click builds it,
 ## and it charges at the spare 25 MW after 1 hour.
 func _build_bank_from_gate_room(player: M15Player) -> void:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
-	var gauge := switcher.find_child("CapacitorGauge", true, false) as CapacitorGauge
-	assert_str(tr(gauge.get_build_button().text)).is_equal("Build capacitor bank")
-	await UiInput.click(gauge.get_build_button())
+	var gauge := switcher.find_child("Charge", true, false) as ChargeGauge
+	assert_str(tr(gauge.get_build_key().text)).is_equal("BUILD BANK")
+	await UiInput.click(gauge.get_build_key())
 	var base := switcher.get_view(&"base") as BaseView
 	var ghost: PlacementGhost = base.get_build().get_ghost()
 	assert_str(ghost.reason()).is_empty()

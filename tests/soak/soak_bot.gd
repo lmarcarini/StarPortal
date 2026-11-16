@@ -196,6 +196,8 @@ func _work_wormhole(simulation: Simulation, rng: RandomNumberGenerator) -> void:
 	elif SoakProbes.work(simulation) or expeditions.work(simulation):
 		return
 	elif state.clock.tick - gate.lock_started_tick >= CLOSE_AFTER_TICKS:
+		if not CloseWormholeCommand.new().validate(state).is_ok:
+			return
 		simulation.submit(CloseWormholeCommand.new())
 		closes += 1
 

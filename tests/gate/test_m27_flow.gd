@@ -92,11 +92,11 @@ func _cancel_a_quarters_placement(player: M15Player) -> void:
 	assert_int(player.state().budget.funds_k).is_equal(funds)
 
 
-## "Build capacitor bank" in the Gate Room places the bank's ghost; one confirm builds it.
+## "BUILD BANK" in the Gate Room places the bank's ghost; one confirm builds it.
 func _build_bank_from_gate_room(player: M15Player) -> void:
 	await _key(KEY_F1)
-	var gauge := _shell.find_child("CapacitorGauge", true, false) as CapacitorGauge
-	await UiInput.click(gauge.get_build_button())
+	var gauge := _shell.find_child("Charge", true, false) as ChargeGauge
+	await UiInput.click(gauge.get_build_key())
 	var base := _shell.view_switcher.get_view(&"base") as BaseView
 	base.get_build().get_ghost().confirm()
 	var charging: Callable = func() -> bool: return not player.state().power.charge_rates.is_empty()

@@ -60,3 +60,7 @@ STATION_DEBRIEF_FAILED,Mission failed,Missão falhou
 STATION_DEBRIEF_EARLY,Came home early,Voltou antes
 STATION_DEBRIEF_LOST,Team lost,Equipe perdida
 STATION_DEBRIEF_RESCUED,Rescued,Resgatada
+HW_ICON_CONSOLE,Far console,Console distante
+HW_ICON_CRATE,Holding,Depósito
+HW_KEY_ANSWER,ANSWER,ATENDER
+STATION_ORDER_MOTH,Order a MOTH,Encomendar um MOTH

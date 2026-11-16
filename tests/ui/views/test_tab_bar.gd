@@ -5,26 +5,25 @@ extends GdUnitTestSuite
 
 const SWITCHER_SCENE: String = "res://src/ui/views/view_switcher.tscn"
 const ORDER: Array[StringName] = [
-	&"gate_room", &"base", &"research", &"personnel", &"expeditions", &"archive", &"command"
+	&"gate_room", &"base", &"research", &"personnel", &"archive", &"command"
 ]
 const KEYS: Dictionary[StringName, Key] = {
 	&"view_gate_room": KEY_F1,
 	&"view_base": KEY_F2,
 	&"view_research": KEY_F3,
 	&"view_personnel": KEY_F4,
-	&"view_expeditions": KEY_F5,
 	&"view_archive": KEY_F6,
 	&"view_command": KEY_F7,
 }
 
 
-func test_seven_tabs_in_the_new_order() -> void:
+func test_six_tabs_in_the_new_order() -> void:
 	var switcher: ViewSwitcher = auto_free(
 		(load(SWITCHER_SCENE) as PackedScene).instantiate() as ViewSwitcher
 	)
 	add_child(switcher)
 	assert_array(switcher.get_view_ids()).is_equal(ORDER)
-	assert_int(switcher.get_tab_bar().tab_count).is_equal(7)
+	assert_int(switcher.get_tab_bar().tab_count).is_equal(6)
 	for index: int in ORDER.size():
 		assert_object(switcher.get_tab_bar().get_tab_icon(index)).is_not_null()
 

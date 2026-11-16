@@ -11,7 +11,7 @@ const SLACK: float = 1.0
 
 var _simulation: Simulation = null
 var _holder: Control = null
-var _view: GateRoomView = null
+var _view: GateStationView = null
 var _real_locale: String = ""
 
 

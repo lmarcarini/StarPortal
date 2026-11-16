@@ -62,18 +62,10 @@ func test_no_answer_logs_and_changes_nothing() -> void:
 	assert_str(ArchiveLogRow.line_for(entries[0], _state)).contains("no answer")
 
 
-func test_button_follows_can_hail() -> void:
-	var actions: WormholeActions = auto_free(
-		(load("res://src/ui/gate_room/sequence/wormhole_actions.tscn") as PackedScene).instantiate()
-	)
-	add_child(actions)
+func test_rail_key_follows_can_hail() -> void:
 	_record().controller = KINDRED
-	actions.render(_state)
-	assert_bool(actions.get_hail_button().visible).is_true()
-	assert_array(actions.get_focusables()).contains([actions.get_hail_button()])
+	assert_bool(SendRailRules.hail(_state).shown).is_true()
 	_record().controller = &""
 	var facts: WorldFacts = WorldFactRules.facts_for_id(_state.galaxy, WORLD)
 	facts.life = WorldDef.Life.NONE
-	actions.render(_state)
-	assert_bool(actions.get_hail_button().visible).is_equal(GateQueries.can_hail(_state))
-	assert_array(actions.get_focusables()).not_contains([actions.get_hail_button()])
+	assert_bool(SendRailRules.hail(_state).shown).is_equal(GateQueries.can_hail(_state))

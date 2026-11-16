@@ -1,8 +1,8 @@
-## Tests for the MOTH scan screen over the Gate Room: Send the MOTH opens it; every scan runs
-## from it by mouse and by gamepad (D-pad, A), taking its battery minutes; finished scans say
+## Tests for the MOTH scan screen over the Gate station: the rail's MOTH key opens it; every scan
+## runs from it by mouse and by gamepad (D-pad, A), taking its battery minutes; finished scans say
 ## "done"; RECALL (or B) flies the drone back and hides the screen; a run that leaves no battery
-## for a recall ends in SIGNAL LOST, closed with Close or B; the frame is generated from the
-## world scene as it stands now; it refreshes while paused.
+## for a recall ends in SIGNAL LOST, closed with Close or B; the frame is generated from the world
+## scene as it stands now; it refreshes while paused.
 ## Bible: docs/content/m3-beyond-the-ring.md section 2 (MOTH) and section 7 (MOTH scan screen)
 extends GdUnitTestSuite
 
@@ -11,7 +11,7 @@ const ProbeFixture := preload("res://tests/gate/probe_fixture.gd")
 
 var _simulation: Simulation = null
 var _holder: Control = null
-var _view: GateRoomView = null
+var _view: GateStationView = null
 var _real_locale: String = ""
 
 
@@ -31,7 +31,6 @@ func before_test() -> void:
 	_view.setup(_simulation)
 	ProbeFixture.open(_simulation)
 	SimClock.pause()
-	Fixture.open_actions(_view)
 	await get_tree().process_frame
 
 
@@ -47,7 +46,7 @@ func _moth() -> MothScreen:
 
 
 func _launch() -> void:
-	_view.get_overlays().get_wormhole_screen().get_actions().get_moth_button().pressed.emit()
+	_view.get_rail().press(&"moth")
 	await get_tree().process_frame
 	await get_tree().process_frame
 
@@ -84,7 +83,8 @@ func test_send_the_moth_opens_the_screen_with_focus() -> void:
 	assert_str(_moth().get_battery_text()).is_equal("20 min left")
 	var focused: Control = get_viewport().gui_get_focus_owner()
 	assert_object(focused).is_same(_moth().get_scan_list().get_button(MothRules.Scan.LOOK_AROUND))
-	assert_bool(_view.get_overlays().get_wormhole_screen().get_actions().get_moth_button().disabled)
+	_view.get_rail().refresh()
+	assert_int(_view.get_rail().get_key(&"moth").get_state()).is_equal(IconKey.KeyState.ACTIVE)
 	assert_object(_moth().get_frame().get_params()).is_not_null()
 
 
@@ -167,34 +167,3 @@ func test_the_frame_shows_the_world_as_it_is_now() -> void:
 	_moth().refresh()
 	params = _moth().get_frame().get_params()
 	assert_int(ScenePhotoRules.silhouette_of(params, ProbeFixture.ANCHOR_ID)).is_equal(-1)
-
-
-func test_the_horizon_photo_drops_a_recovered_object() -> void:
-	_simulation.submit(ExtendPoleCameraCommand.new())
-	SimClock.step_ticks(ExtendPoleCameraCommand.EXTEND_TICKS)
-	await get_tree().process_frame
-	var photo: HorizonPhoto = _view.get_horizon_photo()
-	assert_int(photo.get_phase()).is_equal(HorizonPhoto.Phase.PHOTO)
-	var anchor: StringName = ProbeFixture.ANCHOR_ID
-	assert_int(ScenePhotoRules.silhouette_of(photo.get_params(), anchor)).is_greater_equal(0)
-	_simulation.submit(_RecoverCommand.new())
-	assert_int(ScenePhotoRules.silhouette_of(photo.get_params(), anchor)).is_equal(-1)
-
-
-## Stands in for a team's Recover (a later card): raises the anchor to RECOVERED.
-class _RecoverCommand:
-	extends Command
-
-	func get_type() -> StringName:
-		return &"test_recover"
-
-	func validate(_state: GameState) -> CommandResult:
-		return CommandResult.ok()
-
-	func apply(state: GameState) -> void:
-		WorldProgress.raise_target(
-			state, ProbeFixture.WORLD_ID, ProbeFixture.ANCHOR_ID, TargetStates.State.RECOVERED
-		)
-
-	func to_dict() -> Dictionary:
-		return {"type": "test_recover"}

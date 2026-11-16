@@ -28,6 +28,8 @@ const IDS: Array[StringName] = [
 	&"prev",
 	&"next",
 	&"pencil",
+	&"console",
+	&"crate",
 ]
 
 
@@ -164,6 +166,23 @@ static func _icon_next(p: _Pen) -> void:
 static func _icon_pencil(p: _Pen) -> void:
 	p.poly([0.2, 0.8, 0.25, 0.62, 0.68, 0.18, 0.82, 0.32, 0.38, 0.75, 0.2, 0.8])
 	p.line(0.6, 0.26, 0.74, 0.4)
+
+
+static func _icon_console(p: _Pen) -> void:
+	p.ring(0.5, 0.5, 0.4)
+	p.ring(0.5, 0.5, 0.12)
+	for i: int in 9:
+		var a: float = TAU * i / 9.0
+		p.ring(0.5 + 0.27 * cos(a), 0.5 + 0.27 * sin(a), 0.03)
+
+
+static func _icon_crate(p: _Pen) -> void:
+	p.box(0.15, 0.3, 0.85, 0.85)
+	p.line(0.15, 0.3, 0.3, 0.15)
+	p.line(0.3, 0.15, 0.85, 0.15)
+	p.line(0.85, 0.15, 0.85, 0.3)
+	p.line(0.15, 0.3, 0.85, 0.85)
+	p.line(0.85, 0.3, 0.15, 0.85)
 
 
 ## Draws strokes in unit coordinates inside a rect.

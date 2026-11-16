@@ -189,7 +189,7 @@ static func _from_log(entry: LogEntry) -> AlertEntry:
 		return done
 	if entry.kind == &"expedition" and reason == "checked_in":
 		var check := AlertEntry.create(
-			&"team_check_in", AlertEntry.INFO, ViewSwitcher.EXPEDITIONS, entry.tick
+			&"team_check_in", AlertEntry.INFO, ViewSwitcher.GATE_ROOM, entry.tick
 		)
 		check.target = entry.world_id
 		check.args = {"world_id": String(entry.world_id)}

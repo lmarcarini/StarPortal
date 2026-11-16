@@ -123,15 +123,10 @@ func test_world_falls_back_to_the_conversation() -> void:
 	assert_str(String(IncomingRules.world_of(_state, KINDRED, def.id))).is_equal("world_x")
 
 
-func test_banner() -> void:
-	var banner: IncomingBanner = auto_free(IncomingBanner.new())
-	add_child(banner)
-	banner.setup(_simulation)
-	assert_bool(banner.visible).is_false()
+func test_main_key_answers_and_ignore_lets_it_ring_out() -> void:
+	assert_int(MainKeyRules.mode_of(_state, null)).is_not_equal(MainKeyRules.Mode.ANSWER)
 	_ticks(1)
-	banner.render(_state)
-	assert_bool(banner.visible).is_true()
-	banner.get_ignore_button().pressed.emit()
+	assert_int(MainKeyRules.mode_of(_state, null)).is_equal(MainKeyRules.Mode.ANSWER)
+	assert_bool(_simulation.submit(IgnoreIncomingCommand.new()).is_ok).is_true()
 	_ticks(1)
-	banner.render(_state)
-	assert_bool(banner.visible).is_false()
+	assert_int(MainKeyRules.mode_of(_state, null)).is_not_equal(MainKeyRules.Mode.ANSWER)

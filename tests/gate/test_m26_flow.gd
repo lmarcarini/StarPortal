@@ -106,12 +106,12 @@ func _free_ui() -> void:
 	_root = null
 
 
-## "Build capacitor bank" places the bank's ghost; one click builds it; it charges after 1 hour.
+## "BUILD BANK" places the bank's ghost; one click builds it; it charges after 1 hour.
 func _build_bank_from_gate_room(player: M15Player) -> void:
 	var switcher: ViewSwitcher = _make_switcher(player)
 	await UiInput.settle(switcher)
-	var gauge := switcher.find_child("CapacitorGauge", true, false) as CapacitorGauge
-	await UiInput.click(gauge.get_build_button())
+	var gauge := switcher.find_child("Charge", true, false) as ChargeGauge
+	await UiInput.click(gauge.get_build_key())
 	var base := switcher.get_view(&"base") as BaseView
 	base.get_build().get_ghost().confirm()
 	_free_ui()

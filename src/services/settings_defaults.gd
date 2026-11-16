@@ -58,7 +58,6 @@ const VALUES: Dictionary = {
 		&"view_research": {},
 		&"view_personnel": {},
 		&"view_command": {},
-		&"view_expeditions": {},
 		&"base_level_up": {},
 		&"base_level_down": {},
 		&"base_energy_layer": {},

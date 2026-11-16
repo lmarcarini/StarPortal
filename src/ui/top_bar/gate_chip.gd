@@ -1,19 +1,12 @@
 class_name GateChip
 extends Button
 ## The top bar's gate chip: IDLE, DIALLING, OPEN (world and time left) or INCOMING, each with
-## its own shape (ring, half disc, filled disc, triangle). While open it shows a live
-## 96-pixel thumbnail of the Ring from the Gate Room's own viewport instead of the disc. The
-## Ring blue is used only while OPEN. Pressing it opens the Gate Room (the top bar connects it).
+## its own shape (ring, half disc, filled disc, triangle). The Ring blue is used only while
+## OPEN. Pressing it opens the Gate (the top bar connects it).
 ## Bible: docs/content/interface-pass.md section 3
 
 ## Side of the shape icon, in pixels.
 const ICON_SIZE: int = 14
-## Width of the live thumbnail of the Ring while a wormhole is open.
-const THUMBNAIL_WIDTH: int = 96
-const THUMBNAIL_SIZE: Vector2i = Vector2i(96, 54)
-
-## The Gate Room's Ring view, whose feed the thumbnail reuses (no second 3D scene).
-var ring: RingView = null
 
 var _status: StringName = &""
 
@@ -37,24 +30,9 @@ func show_state(state: GameState) -> void:
 		add_theme_color_override(name, color)
 
 
-## True while the chip shows the live thumbnail.
-func has_thumbnail() -> bool:
-	return ring != null and icon == ring.feed_texture()
-
-
-## Open (with a Ring view): the Ring's live feed, kept rendering while the Gate Room is
-## hidden. Otherwise the state's shape, and the feed stops when its view is hidden.
+## Shows the shape of [param status].
 func _show_icon(status: StringName) -> void:
-	var open: bool = status == TopBarText.GATE_OPEN and ring != null
-	if ring != null:
-		ring.keep_live = open
-	if open:
-		icon = ring.feed_texture()
-		add_theme_constant_override(&"icon_max_width", THUMBNAIL_WIDTH)
-		custom_minimum_size.y = THUMBNAIL_SIZE.y + 8
-		return
 	icon = shape_icon(status)
-	remove_theme_constant_override(&"icon_max_width")
 	custom_minimum_size.y = 40
 
 
