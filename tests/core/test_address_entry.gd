@@ -41,6 +41,7 @@ func test_create_is_never_dialed() -> void:
 				"last_outcome": "",
 				"last_dialed_tick": -1,
 				"note": "",
+				"pinned": false,
 			}
 		)
 	)

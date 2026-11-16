@@ -63,6 +63,9 @@ func _ready() -> void:
 ## Reads [param simulation] (CAIRN's mark, the clue documents).
 func setup(simulation: Simulation) -> void:
 	_simulation = simulation
+	_compose = AddressDraft.new()
+	_compose.firm = simulation.state.address_book.draft_firm.duplicate()
+	_compose.pencil = simulation.state.address_book.draft_pencil.duplicate()
 	_clue.setup(simulation)
 	_render()
 
@@ -86,13 +89,21 @@ func close() -> void:
 ## pencil while the pencil is down).
 func press_glyph(glyph: int) -> void:
 	_compose.press(glyph, _pencil.button_pressed)
+	_keep()
 	_render()
 
 
 ## Clears seal [param seal] (firm glyph and guess).
 func clear_seal(seal: int) -> void:
 	_compose.clear(seal)
+	_keep()
 	_render()
+
+
+## Keeps the draft in the state (SetAddressDraftCommand), so it survives a save.
+func _keep() -> void:
+	if _simulation != null:
+		_simulation.submit(SetAddressDraftCommand.create(_compose.firm, _compose.pencil))
 
 
 ## The draft being composed.

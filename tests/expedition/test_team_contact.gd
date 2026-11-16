@@ -1,6 +1,6 @@
 ## Tests for talking to a team only through an open gate (M4.9-11): hail and Carry on, hail
 ## and Come home now, the team's distress call and Come through, a closed Shutter opening for
-## the team's code, overdue then a rescue, and the v22 to v23 migration.
+## the team's code, overdue then a rescue.
 ## Bible: docs/content/interface-rethink.md section 4; m3-beyond-the-ring.md section 4
 extends GdUnitTestSuite
 
@@ -96,18 +96,3 @@ func test_overdue_then_rescue() -> void:
 	assert_bool(RescueFixture.signal_team(simulation).is_ok).is_true()
 	Fixture.advance(simulation, ExpeditionRescue.SIGNAL_TICKS + 2)
 	assert_int(_state.expedition.mode).is_equal(ExpeditionState.Mode.IDLE)
-
-
-func test_migration_sets_last_heard() -> void:
-	var data: Dictionary = {
-		"format_version": 22,
-		"state":
-		{
-			"expedition":
-			{"mode": "away", "departed_tick": 100, "delay_ticks": 0, "day_results": ["ok"]}
-		}
-	}
-	var out: Dictionary = SaveMigrator._v22_to_v23(data)
-	var trip: Dictionary = out["state"]["expedition"]
-	assert_int(trip["heard_tick"]).is_equal(100 + DAY)
-	assert_int(trip["heard_days"]).is_equal(1)

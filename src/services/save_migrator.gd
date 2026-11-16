@@ -8,220 +8,28 @@ extends RefCounted
 ## docs/content/m27-daily-rhythm.md section 7) and M3 (v15,
 ## docs/content/m3-beyond-the-ring.md section 9) are clean breaks: saves older
 ## than [constant OLDEST_VERSION] are not migrated but
-## rejected with &"old_format_version" (owner ruling on card #133). Steps for later versions
-## go in built_in_steps().
+## rejected with &"old_format_version" (owner ruling on card #133). v26 (M4.9-16, address pins
+## and the alien panel's draft) is a clean break too: save compatibility does not matter
+## before alpha (owner, 2026-11-16). Steps for later versions go in built_in_steps().
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 25
+const TARGET_VERSION: int = 26
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
-const OLDEST_VERSION: int = 15
+const OLDEST_VERSION: int = 26
 
 
 ## Returns the built-in steps, keyed by the version they migrate from. (A function, not a
 ## constant: a Callable is not a constant expression.)
 static func built_in_steps() -> Dictionary[int, Callable]:
-	var built_in: Dictionary[int, Callable] = {
-		15: _v15_to_v16,
-		16: _v16_to_v17,
-		17: _v17_to_v18,
-		18: _v18_to_v19,
-		19: _v19_to_v20,
-		20: _v20_to_v21,
-		21: _v21_to_v22,
-		22: _v22_to_v23,
-		23: _v23_to_v24,
-		24: _v24_to_v25
-	}
+	var built_in: Dictionary[int, Callable] = {}
 	return built_in
-
-
-## v15 → v16 (M4, docs/content/m4-core-systems.md section 9): adds the empty factions,
-## conversations, requests and artefacts sections, an empty research queue and revealed list
-## and no incoming wormhole. Factions start empty in an old save (no standings, none met).
-static func _v15_to_v16(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	state["factions"] = FactionsState.new().to_dict()
-	state["conversations"] = ConversationsState.new().to_dict()
-	state["requests"] = RequestsState.new().to_dict()
-	state["artefacts"] = ArtefactsState.new().to_dict()
-	for key: String in ["research", "gate"]:
-		if not state.get(key) is Dictionary:
-			continue
-		var section: Dictionary = state[key]
-		if key == "research":
-			section["queue"] = []
-			section["revealed"] = []
-		else:
-			section["incoming"] = {}
-	return out
 
 
 ## Returns [param data] migrated to [constant TARGET_VERSION] with the built-in steps.
 ## Fails with &"bad_format_version", &"old_format_version" (below
 ## [constant OLDEST_VERSION]), &"newer_format_version", &"missing_migration_step" or
 ## &"migration_failed". The input dictionary is never modified.
-## v17 (M4.7-02): the clock gains its slow reasons and overrides, both empty.
-static func _v16_to_v17(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	if state.get("clock") is Dictionary:
-		var clock: Dictionary = state["clock"]
-		clock["slows"] = []
-		clock["overridden"] = []
-	return out
-
-
-## v18 (M4.7-04): the gate gains operating, false.
-static func _v17_to_v18(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	if state.get("gate") is Dictionary:
-		var gate: Dictionary = state["gate"]
-		gate["operating"] = false
-	return out
-
-
-## v19 (M4c-02): empty incursion, security and outcome sections, and no blast doors.
-static func _v18_to_v19(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	state["incursion"] = IncursionState.new().to_dict()
-	state["security"] = SecurityState.new().to_dict()
-	state["outcome"] = OutcomeState.new().to_dict()
-	if state.get("base") is Dictionary:
-		var base: Dictionary = state["base"]
-		base["doors"] = []
-	return out
-
-
-## v20 (M4c-10): the Shutter, open.
-static func _v19_to_v20(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	if state.get("gate") is Dictionary:
-		var gate: Dictionary = state["gate"]
-		gate["shutter"] = "open"
-	return out
-
-
-## v21 (M4c-20): MOTHs are built to order from a researched rack; an old save keeps its
-## MOTHs, gets Survey drones done and a built rack in the Gate Room.
-static func _v20_to_v21(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	if state.get("research") is Dictionary:
-		var research: Dictionary = state["research"]
-		if research.get("done") is Array:
-			var done: Array = research["done"]
-			if not done.has("survey_drones"):
-				done.append("survey_drones")
-	var base: Dictionary = SaveFields.dict_or_empty(state.get("base"))
-	for room: Dictionary in SaveFields.dicts_in(base.get("rooms")):
-		if room.get("def_id") == "room_gate":
-			var items: Array = room.get("installations", [])
-			items.append(
-				{"def": "installation_moth_rack", "build_ticks_left": 0, "paid_k": 0, "health": 0}
-			)
-			room["installations"] = items
-	return out
-
-
-## v22 (M4.8-02, docs/content/dialogue-screen.md section 7): a conversation holds the clock
-## instead of slowing it. A running conversation gets a phase (LINE; GameSetup puts one at a
-## choice at CHOICE), no cut-off and the conversation hold; the old conversation slow goes.
-static func _v21_to_v22(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	var clock: Dictionary = SaveFields.dict_or_empty(state.get("clock"))
-	for key: String in ["slows", "overridden"]:
-		if clock.get(key) is Array:
-			var keys: Array = clock[key]
-			clock[key] = keys.filter(func(entry: Variant) -> bool: return entry != "conversation")
-	var conversations: Dictionary = SaveFields.dict_or_empty(state.get("conversations"))
-	var active: Dictionary = SaveFields.dict_or_empty(conversations.get("active"))
-	if active.is_empty():
-		return out
-	active["phase"] = "line"
-	active["cut_off"] = false
-	if clock.get("holds") is Array and not clock.is_empty():
-		var holds: Array = clock["holds"]
-		if holds.is_empty():
-			clock["mode_after_hold"] = "running" if clock.get("mode") == "running" else "paused"
-			clock["mode"] = "held"
-		if not holds.has("conversation"):
-			holds.append("conversation")
-	return out
-
-
-## v22 to v23 (M4.9-11, talk only through an open gate): a team in the field last heard from
-## at its last check-in (departure plus delay and a day per field day done); a team that missed
-## its check-in is treated as having called and been heard then.
-static func _v22_to_v23(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	var trip: Dictionary = SaveFields.dict_or_empty(state.get("expedition"))
-	var mode: String = str(trip.get("mode", "idle"))
-	if mode != "away" and mode != "missing":
-		return out
-	var results: Variant = trip.get("day_results", [])
-	var days: int = 0
-	if results is Array:
-		var listed: Array = results
-		days = listed.size()
-	var departed: int = type_convert(trip.get("departed_tick", -1), TYPE_INT)
-	var delay: int = type_convert(trip.get("delay_ticks", 0), TYPE_INT)
-	trip["heard_tick"] = departed + delay + days * TimeMath.TICKS_PER_DAY
-	trip["heard_days"] = days
-	if mode == "missing":
-		trip["heard_tick"] = type_convert(trip.get("missed_tick", -1), TYPE_INT)
-	trip["calling"] = false
-	trip["overdue"] = false
-	trip["coming_home"] = false
-	return out
-
-
-## v23 to v24 (M4.9-10): the expedition remembers the last plan per world; none yet.
-static func _v23_to_v24(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	if state.get("expedition") is Dictionary:
-		var trip: Dictionary = state["expedition"]
-		trip["last_plans"] = {}
-	return out
-
-
-## v24 to v25 (M4.9-12): the expedition holds a mission order; none yet.
-static func _v24_to_v25(data: Dictionary) -> Dictionary:
-	var out: Dictionary = data.duplicate(true)
-	if not out.get("state") is Dictionary:
-		return out
-	var state: Dictionary = out["state"]
-	if state.get("expedition") is Dictionary:
-		var trip: Dictionary = state["expedition"]
-		trip["order"] = MissionOrder.new().to_dict()
-	return out
-
-
 static func migrate(data: Dictionary) -> Result:
 	var version_result := read_version(data)
 	if not version_result.is_ok:

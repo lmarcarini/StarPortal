@@ -47,25 +47,19 @@ static func has_team(entry: AddressEntry, state: GameState) -> bool:
 	return not entry.world_id.is_empty() and trip.is_out() and trip.world_id == entry.world_id
 
 
-## The entries to show under [param filter], in rack order; [param pins] holds pinned keys.
-static func ordered(
-	state: GameState, pins: Dictionary[String, bool], filter: Filter
-) -> Array[AddressEntry]:
+## The entries to show under [param filter], in rack order.
+static func ordered(state: GameState, filter: Filter) -> Array[AddressEntry]:
 	var shown: Array[AddressEntry] = []
 	for entry: AddressEntry in state.address_book.entries:
 		if _passes(entry, state, filter):
 			shown.append(entry)
-	shown.sort_custom(
-		func(a: AddressEntry, b: AddressEntry) -> bool: return _before(a, b, state, pins)
-	)
+	shown.sort_custom(func(a: AddressEntry, b: AddressEntry) -> bool: return _before(a, b, state))
 	return shown
 
 
-static func _before(
-	a: AddressEntry, b: AddressEntry, state: GameState, pins: Dictionary[String, bool]
-) -> bool:
-	var ra: float = _rank(a, state, pins)
-	var rb: float = _rank(b, state, pins)
+static func _before(a: AddressEntry, b: AddressEntry, state: GameState) -> bool:
+	var ra: float = _rank(a, state)
+	var rb: float = _rank(b, state)
 	if ra != rb:
 		return ra > rb
 	return a.address_key < b.address_key
@@ -81,10 +75,10 @@ static func _passes(entry: AddressEntry, state: GameState, filter: Filter) -> bo
 
 
 ## Sort key: pinned, then team there, then last dialled tick (never dialled last).
-static func _rank(entry: AddressEntry, state: GameState, pins: Dictionary[String, bool]) -> float:
+static func _rank(entry: AddressEntry, state: GameState) -> float:
 	var rank: float = float(entry.last_dialed_tick + 1)
 	if has_team(entry, state):
 		rank += 1.0e12
-	if pins.get(entry.address_key, false):
+	if entry.pinned:
 		rank += 1.0e14
 	return rank
