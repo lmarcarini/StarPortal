@@ -24,11 +24,9 @@ const ACTIONS: Array[StringName] = [
 	&"view_next",
 	&"view_previous",
 	&"view_gate_room",
-	&"view_archive",
 	&"view_base",
 	&"view_research",
-	&"view_personnel",
-	&"view_command",
+	&"view_office",
 	&"base_level_up",
 	&"base_level_down",
 	&"base_energy_layer",
@@ -152,11 +150,6 @@ const DEFAULTS: Dictionary = {
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F1}],
 		GAMEPAD: [],
 	},
-	&"view_archive":
-	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F6}],
-		GAMEPAD: [],
-	},
 	&"view_base":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F2}],
@@ -167,14 +160,9 @@ const DEFAULTS: Dictionary = {
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F3}],
 		GAMEPAD: [],
 	},
-	&"view_personnel":
+	&"view_office":
 	{
 		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F4}],
-		GAMEPAD: [],
-	},
-	&"view_command":
-	{
-		KEYBOARD: [{"kind": InputEventCodec.KIND_KEY, "physical_keycode": KEY_F7}],
 		GAMEPAD: [],
 	},
 	&"base_level_up":

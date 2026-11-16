@@ -107,3 +107,11 @@ WIRE_KEY_REPORT,Team report,Relatório da equipe
 WIRE_KEY_DISMISS,Dismiss,Dispensar
 WIRE_STACK,Older events; opens the full log.,Eventos antigos; abre o registro completo.
 WIRE_REFUSED,Not now ({code}),Agora não ({code})
+STATION_GATE,GATE,PORTAL
+STATION_BASE,BASE,BASE
+STATION_LAB,LAB,LAB
+STATION_OFFICE,OFFICE,ESCRITÓRIO
+STATION_KEY_GATE,"The Gate: dial, send and receive (F1).","O Portal: discar, enviar e receber (F1)."
+STATION_KEY_BASE,"The Base: build, power and people (F2).","A Base: construção, energia e pessoal (F2)."
+STATION_KEY_LAB,"The Lab: research (F3).","O Laboratório: pesquisa (F3)."
+STATION_KEY_OFFICE,"The Office: Command, Archive and hiring (F4).","O Escritório: Comando, Arquivo e contratação (F4)."

@@ -55,28 +55,37 @@ func test_starts_on_the_gate_room_with_translated_tabs() -> void:
 	assert_str(tabs.get_tab_title(2)).is_equal("Pesquisa")
 
 
-func test_view_actions_switch_and_wrap() -> void:
-	var forward: Array[String] = ["base", "personnel", "archive", "command", "gate_room"]
+func test_view_actions_switch_stations_and_wrap() -> void:
+	var forward: Array[String] = ["base", "office", "gate"]
 	for id: String in forward:
 		await _press_action(&"view_next")
-		assert_str(String(_switcher.current_view_id())).is_equal(id)
-	var backward: Array[String] = ["command", "archive", "personnel", "base", "gate_room"]
+		assert_str(String(_switcher.current_station())).is_equal(id)
+	var backward: Array[String] = ["office", "base", "gate"]
 	for id: String in backward:
 		await _press_action(&"view_previous")
-		assert_str(String(_switcher.current_view_id())).is_equal(id)
+		assert_str(String(_switcher.current_station())).is_equal(id)
 	await _press_action(&"view_base")
 	assert_str(String(_switcher.current_view_id())).is_equal("base")
-	await _press_action(&"view_archive")
-	assert_str(String(_switcher.current_view_id())).is_equal("archive")
-	await _press_action(&"view_archive")
-	assert_str(String(_switcher.current_view_id())).is_equal("archive")
+	await _press_action(&"view_office")
+	assert_str(String(_switcher.current_view_id())).is_equal("command")
+	_switcher.show_view(ViewSwitcher.ARCHIVE)
 	await _press_action(&"view_gate_room")
-	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
-	var expected: Array[StringName] = [&"gate_room", &"base", &"personnel", &"archive"]
-	expected.append_array([&"command", &"gate_room", &"command", &"archive", &"personnel"])
-	expected.append_array([&"base", &"gate_room"])
-	expected.append_array([&"base", &"archive", &"gate_room"])
-	assert_array(_changes).is_equal(expected)
+	await _press_action(&"view_office")
+	assert_str(String(_switcher.current_view_id())).is_equal("archive")
+
+
+func test_personnel_is_a_folder_of_the_base_and_the_office() -> void:
+	_switcher.show_station(&"base")
+	_switcher.show_view(ViewSwitcher.PERSONNEL)
+	assert_str(String(_switcher.current_station())).is_equal("base")
+	_switcher.show_station(&"office")
+	_switcher.show_view(ViewSwitcher.PERSONNEL)
+	assert_str(String(_switcher.current_station())).is_equal("office")
+	var tabs: TabBar = _switcher.get_tab_bar()
+	var shown: int = 0
+	for index: int in tabs.tab_count:
+		shown += 0 if tabs.is_tab_hidden(index) else 1
+	assert_int(shown).is_equal(3)
 
 
 func test_default_keys_and_gamepad_shoulders_switch_views() -> void:
@@ -84,30 +93,14 @@ func test_default_keys_and_gamepad_shoulders_switch_views() -> void:
 	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _runner.simulate_key_pressed(KEY_F1)
 	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
-	await _runner.simulate_key_pressed(KEY_F6)
-	assert_str(String(_switcher.current_view_id())).is_equal("archive")
-	await _runner.simulate_key_pressed(KEY_Q)
-	assert_str(String(_switcher.current_view_id())).is_equal("personnel")
-	await _runner.simulate_key_pressed(KEY_F2)
-	assert_str(String(_switcher.current_view_id())).is_equal("base")
-	# The shoulders step the Base tab's sub-tabs (Build -> Energy -> Staff), then the tabs.
-	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
-	assert_str(String(_switcher.current_view_id())).is_equal("base")
-	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
-	assert_str(String(_switcher.current_view_id())).is_equal("base")
-	await _press_joypad(JOY_BUTTON_RIGHT_SHOULDER)
-	assert_str(String(_switcher.current_view_id())).is_equal("personnel")
-	await _press_joypad(JOY_BUTTON_LEFT_SHOULDER)
-	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _runner.simulate_key_pressed(KEY_F4)
-	assert_str(String(_switcher.current_view_id())).is_equal("personnel")
-	await _runner.simulate_key_pressed(KEY_F7)
 	assert_str(String(_switcher.current_view_id())).is_equal("command")
+	await _runner.simulate_key_pressed(KEY_Q)
+	assert_str(String(_switcher.current_station())).is_equal("base")
 
 
 func test_switching_focuses_the_new_views_default_control() -> void:
-	await _press_action(&"view_archive")
-	assert_object(_focus_owner()).is_same(_view(&"archive").get_default_focus())
+	_switcher.show_view(&"archive")
 	await _press_action(&"view_gate_room")
 	assert_object(_focus_owner()).is_same(_view(&"gate_room").get_default_focus())
 	_switcher.show_view(&"archive")
@@ -115,6 +108,8 @@ func test_switching_focuses_the_new_views_default_control() -> void:
 
 
 func test_clicking_a_tab_switches_and_focuses_the_view() -> void:
+	_switcher.show_station(&"office")
+	await _runner.await_input_processed()
 	var tabs: TabBar = _switcher.get_tab_bar()
 	var target: Vector2 = tabs.get_global_transform() * tabs.get_tab_rect(4).get_center()
 	for pressed: bool in [true, false]:
@@ -130,27 +125,15 @@ func test_clicking_a_tab_switches_and_focuses_the_view() -> void:
 
 
 func test_moving_along_the_focused_tabs_keeps_focus_on_them() -> void:
+	_switcher.show_station(&"office")
 	var tabs: TabBar = _switcher.get_tab_bar()
 	tabs.grab_focus()
-	# Base, Personnel, then Archive: the hidden Research and Expeditions tabs are skipped.
-	for _step: int in 3:
-		await _press_action(&"ui_right")
+	# Command, then back along the Office's folders to Archive.
+	await _press_action(&"ui_left")
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 	assert_object(_focus_owner()).is_same(tabs)
 	await _press_action(&"ui_down")
 	assert_object(_focus_owner()).is_same(_view(&"archive").get_default_focus())
-	await _press_action(&"ui_right")
-	assert_object(_focus_owner()).is_same(_view(&"archive").get_default_focus())
-	await _press_action(&"ui_up")
-	var sections: TabContainer = _view(&"archive").get_node("%Sections") as TabContainer
-	assert_object(_focus_owner()).is_same(sections.get_tab_bar())
-	await _press_action(&"ui_up")
-	assert_object(_focus_owner()).is_same(tabs)
-	for _step: int in 3:
-		await _press_action(&"ui_left")
-	assert_str(String(_switcher.current_view_id())).is_equal("gate_room")
-	await _press_action(&"ui_down")
-	assert_object(_focus_owner()).is_same(_view(&"gate_room").get_default_focus())
 
 
 func test_only_the_shown_view_is_visible_focusable_and_processing() -> void:
@@ -173,9 +156,9 @@ func test_view_action_on_an_axis_fires_once_per_pull() -> void:
 	await _move_axis(JOY_AXIS_RIGHT_X, [0.1, 0.4, 0.8, 1.0, 1.0, 0.6, 0.3, 0.0])
 	assert_str(String(_switcher.current_view_id())).is_equal("base")
 	await _move_axis(JOY_AXIS_RIGHT_X, [0.9, 1.0, 0.0])
-	assert_str(String(_switcher.current_view_id())).is_equal("personnel")
+	assert_str(String(_switcher.current_station())).is_equal("office")
 	await _move_axis(JOY_AXIS_RIGHT_X, [-0.9, -1.0, 0.0])
-	assert_str(String(_switcher.current_view_id())).is_equal("personnel")
+	assert_str(String(_switcher.current_station())).is_equal("office")
 
 
 ## Hiding and showing a view restores its root's own modes and leaves a descendant that is
@@ -240,7 +223,7 @@ func test_setup_reaches_every_view_again_and_again() -> void:
 	_switcher.setup(second)
 	assert_array(spy.received).is_equal([first, second])
 	assert_object(_switcher.get_view(&"spy")).is_same(spy)
-	await _press_action(&"view_previous")
+	_switcher.show_view(&"spy")
 	assert_str(String(_switcher.current_view_id())).is_equal("spy")
 	assert_object(_focus_owner()).is_same(spy.get_default_focus())
 

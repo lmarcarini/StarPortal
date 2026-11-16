@@ -121,7 +121,7 @@ func test_f5_opens_personnel_from_the_start() -> void:
 	shell.new_game_seed = 12345
 	var runner: GdUnitSceneRunner = scene_runner(shell)
 	await runner.await_input_processed()
-	runner.simulate_action_pressed("view_personnel")
+	shell.view_switcher.show_view(ViewSwitcher.PERSONNEL)
 	await runner.await_input_processed()
 	assert_str(String(shell.view_switcher.current_view_id())).is_equal("personnel")
 	var view: PersonnelView = shell.view_switcher.get_view(ViewSwitcher.PERSONNEL) as PersonnelView

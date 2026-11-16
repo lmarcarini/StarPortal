@@ -61,11 +61,9 @@ func test_default_bindings() -> void:
 	_assert_keys(service, &"view_next", [KEY_E])
 	_assert_keys(service, &"view_previous", [KEY_Q])
 	_assert_keys(service, &"view_gate_room", [KEY_F1])
-	_assert_keys(service, &"view_archive", [KEY_F6])
 	_assert_keys(service, &"view_base", [KEY_F2])
 	_assert_keys(service, &"view_research", [KEY_F3])
-	_assert_keys(service, &"view_personnel", [KEY_F4])
-	_assert_keys(service, &"view_command", [KEY_F7])
+	_assert_keys(service, &"view_office", [KEY_F4])
 	_assert_keys(service, &"base_level_up", [KEY_PAGEUP])
 	_assert_keys(service, &"base_level_down", [KEY_PAGEDOWN])
 	_assert_keys(service, &"base_energy_layer", [KEY_P])
@@ -78,11 +76,9 @@ func test_default_bindings() -> void:
 	_assert_pad(service, &"view_next", [JOY_BUTTON_RIGHT_SHOULDER])
 	_assert_pad(service, &"view_previous", [JOY_BUTTON_LEFT_SHOULDER])
 	_assert_pad(service, &"view_gate_room", [])
-	_assert_pad(service, &"view_archive", [])
 	_assert_pad(service, &"view_base", [])
 	_assert_pad(service, &"view_research", [])
-	_assert_pad(service, &"view_personnel", [])
-	_assert_pad(service, &"view_command", [])
+	_assert_pad(service, &"view_office", [])
 	_assert_pad(service, &"base_level_up", [JOY_BUTTON_Y])
 	_assert_pad(service, &"base_level_down", [JOY_BUTTON_X])
 	_assert_pad(service, &"base_energy_layer", [JOY_BUTTON_BACK])
@@ -142,9 +138,9 @@ func test_is_new_press_for_keys_and_buttons() -> void:
 	shoulder.pressed = true
 	assert_bool(InputActions.is_new_press(shoulder, &"view_previous")).is_true()
 	var action := InputEventAction.new()
-	action.action = &"view_archive"
+	action.action = &"view_office"
 	action.pressed = true
-	assert_bool(InputActions.is_new_press(action, &"view_archive")).is_true()
+	assert_bool(InputActions.is_new_press(action, &"view_office")).is_true()
 
 
 ## Returns an InputService on a fresh Settings instance at TEST_PATH, added to the tree.

@@ -10,9 +10,7 @@ const SHELL_SCENE: String = "res://src/scenes/shell/shell.tscn"
 const KEYS: Dictionary[StringName, Key] = {
 	&"gate_room": KEY_F1,
 	&"base": KEY_F2,
-	&"personnel": KEY_F4,
-	&"archive": KEY_F6,
-	&"command": KEY_F7,
+	&"command": KEY_F4,
 }
 
 var _shell: ShellScript = null
@@ -64,7 +62,8 @@ func test_the_interface_pass_end_to_end() -> void:
 	# Every tab by key.
 	for view_id: StringName in KEYS:
 		await _runner.simulate_key_pressed(KEYS[view_id])
-		assert_str(String(_shell.view_switcher.current_view_id())).is_equal(String(view_id))
+		var station: StringName = _shell.view_switcher.station_of(view_id)
+		assert_str(String(_shell.view_switcher.current_station())).is_equal(String(station))
 	await _place_a_person(state)
 	await _camera(state)
 	_wormhole(state)
@@ -82,6 +81,7 @@ func test_the_interface_pass_end_to_end() -> void:
 
 func _place_a_person(state: GameState) -> void:
 	await _runner.simulate_key_pressed(KEY_F2)
+	_shell.view_switcher.show_view(ViewSwitcher.BASE)
 	var plan: BasePlan = _base().get_plan()
 	var person: PersonState = null
 	for candidate: PersonState in StaffLayer.on_base(state):
