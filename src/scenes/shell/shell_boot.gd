@@ -67,3 +67,16 @@ static func add_game_over(shell: Node) -> GameOverScreen:
 	screen.menu_requested.connect(Callable(shell, &"return_to_menu"))
 	shell.add_child(AfterActionReport.new())
 	return screen
+
+
+## The wire's own steps: [param step] &"rescue" opens [param rescue]'s window; &"report" opens
+## the team report on the Gate of [param switcher].
+static func wire_step(step: StringName, switcher: ViewSwitcher, rescue: RescueAlert) -> void:
+	if step == &"rescue":
+		rescue.open()
+		return
+	switcher.show_view(ViewSwitcher.GATE_ROOM)
+	var gate: GameView = switcher.get_view(ViewSwitcher.GATE_ROOM)
+	var team: TeamCard = gate.find_child("TeamCard", false, false) as TeamCard
+	if team != null:
+		team.pressed.emit()

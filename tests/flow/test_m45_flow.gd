@@ -55,11 +55,10 @@ func test_the_interface_pass_end_to_end() -> void:
 	assert_str(bar.money_label.text).starts_with(MoneyLabel.format_k(state.budget.funds_k))
 	assert_str(bar.gate_chip.text).is_equal("GATE: IDLE")
 	assert_str(bar.power_readout.text).starts_with("PWR ")
-	# Follow an alert.
-	bar.toggle_alerts()
+	# Follow an alert (its wire card's GO TO).
 	var entries: Array[AlertEntry] = bar.alert_list.entries()
 	assert_array(entries).is_not_empty()
-	bar.alert_list.alert_chosen.emit(entries[0])
+	bar.wire.entry_chosen.emit(entries[0])
 	await _runner.simulate_frames(1)
 	assert_str(String(_shell.view_switcher.current_view_id())).is_equal(String(entries[0].view_id))
 	# Every tab by key.

@@ -38,7 +38,7 @@ func after_test() -> void:
 func test_every_item_is_focusable_and_in_the_ring() -> void:
 	var bar: Frame = _shell.frame
 	var buttons: Array[Button] = _shell.get_focus_order()
-	for item: Button in [bar.power_readout, bar.gate_chip, bar.alerts_button, bar.money_label]:
+	for item: Button in [bar.power_readout, bar.gate_chip, bar.money_label]:
 		assert_bool(buttons.has(item)).is_true()
 		assert_int(item.focus_mode).is_equal(Control.FOCUS_ALL)
 
