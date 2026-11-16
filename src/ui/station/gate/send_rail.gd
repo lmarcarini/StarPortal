@@ -6,6 +6,8 @@ extends HBoxContainer
 ## key's command; a refusal becomes the key's hover reason. Keys 1 to 5 press them.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, With a wormhole open)
 
+## Key [param id]'s command was accepted.
+signal key_used(id: StringName)
 ## TEAM was pressed while a team can be sent (the mission sheet opens on it, M4.9-10).
 signal team_requested
 
@@ -80,6 +82,8 @@ func press(id: StringName) -> void:
 	refresh()
 	if not result.is_ok:
 		_keys[id].set_help(String(SendRailRules.reason_key(result.error_code)))
+		return
+	key_used.emit(id)
 
 
 ## Stands by: the wormhole stays open, the gate stops slowing the clock.
