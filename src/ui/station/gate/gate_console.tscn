@@ -7,47 +7,35 @@
 [ext_resource type="Script" path="res://src/ui/station/gate/charge_gauge.gd" id="5"]
 [ext_resource type="Script" path="res://src/ui/hardware/lever.gd" id="6"]
 
-[node name="GateConsole" type="PanelContainer"]
+[node name="GateConsole" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
 script = ExtResource("1")
 
-[node name="Row" type="HBoxContainer" parent="."]
-layout_mode = 2
-theme_override_constants/separation = 24
-
-[node name="DestinationMonitor" type="PanelContainer" parent="Row"]
+[node name="DestinationMonitor" type="Control" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 4
+layout_mode = 0
 script = ExtResource("2")
 
-[node name="Centre" type="VBoxContainer" parent="Row"]
-layout_mode = 2
-size_flags_horizontal = 6
-alignment = 1
-
-[node name="SealLamps" type="HBoxContainer" parent="Row/Centre"]
+[node name="SealLamps" type="Control" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+mouse_filter = 2
 script = ExtResource("3")
 
-[node name="MainKey" type="Button" parent="Row/Centre"]
+[node name="MainKey" type="Button" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
+layout_mode = 0
 text = "HW_KEY_DIAL"
 script = ExtResource("4")
 
-[node name="Power" type="HBoxContainer" parent="Row"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Charge" type="VBoxContainer" parent="Row/Power"]
+[node name="Charge" type="Control" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
 script = ExtResource("5")
 
-[node name="ShutterLever" type="Button" parent="Row/Power"]
+[node name="ShutterLever" type="Button" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 4
+layout_mode = 0
 script = ExtResource("6")

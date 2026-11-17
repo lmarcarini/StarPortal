@@ -1,9 +1,13 @@
 class_name SendRail
 extends HBoxContainer
-## The send rail on the floor right of the ramp while a wormhole is open: CAMERA, CANISTER,
-## MOTH, TEAM and HAIL as icon keys (states and hover reasons from [SendRailRules]) and a
-## small STAND BY key. A press operates the gate first if it is standing by, then submits the
-## key's command; a refusal becomes the key's hover reason. Keys 1 to 5 press them.
+## The send rail on the floor right of the ramp while a wormhole is open
+## (interface-reference.md section 5, send_rail): CAMERA, CANISTER, MOTH, TEAM and HAIL as
+## 96 x 100 keys 10 px apart, icon over label, badges as paper discs; used keys are off, the
+## key whose sheet is open is lit (states and hover reasons from [SendRailRules]); a small
+## STAND BY key after them while the gate operates. The far console key lives beside the
+## Gate's locker in the right panel's header (the host moves it there). A press operates the
+## gate first if it is standing by, then submits the key's command; a refusal becomes the
+## key's hover reason. Keys 1 to 5 press them.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, With a wormhole open)
 
 ## Key [param id]'s command was accepted.
@@ -20,6 +24,9 @@ const RAIL_ACTIONS: Array[StringName] = [
 	&"station_rail_5"
 ]
 
+## Key size, in pixels.
+const CAP_SIZE: Vector2 = Vector2(96, 100)
+
 ## When set, TEAM emits team_requested instead of sending at once.
 var team_opens_sheet: bool = false
 
@@ -34,6 +41,8 @@ func _ready() -> void:
 		var key: IconKey = IconKey.new()
 		key.name = "Rail" + String(id).capitalize()
 		key.icon_id = id
+		key.look = IconKey.Look.STEEL
+		key.label = "STATION_RAIL_" + String(id).to_upper()
 		key.pressed.connect(press.bind(id))
 		_keys[id] = key
 		add_child(key)
@@ -42,7 +51,13 @@ func _ready() -> void:
 	_stand_by.set_help("STATION_STAND_BY")
 	_stand_by.pressed.connect(stand_by)
 	add_child(_stand_by)
-	_stand_by.custom_minimum_size = HwMetrics.target(self, Vector2(44, 44))
+	_stand_by.look = IconKey.Look.STEEL
+	_stand_by.custom_minimum_size = Vector2(44, 44)
+	_stand_by.size_flags_vertical = Control.SIZE_SHRINK_END
+	for key: IconKey in _keys.values():
+		key.custom_minimum_size = CAP_SIZE
+	_keys[&"console"].label = ""
+	_keys[&"console"].custom_minimum_size = Vector2(44, 44)
 
 
 ## Reads [param simulation].
@@ -58,6 +73,7 @@ func refresh() -> void:
 	var state: GameState = _simulation.state
 	visible = SendRailRules.is_shown(state)
 	if not visible:
+		_keys[&"console"].visible = false
 		return
 	for look: SendRailRules.KeyLook in SendRailRules.looks(state):
 		var key: IconKey = _keys[look.id]
@@ -70,7 +86,11 @@ func refresh() -> void:
 
 ## Presses key [param id].
 func press(id: StringName) -> void:
-	if _simulation == null or not visible or not _keys[id].visible:
+	if (
+		_simulation == null
+		or not SendRailRules.is_shown(_simulation.state)
+		or not _keys[id].visible
+	):
 		return
 	var state: GameState = _simulation.state
 	if id == &"team" and team_opens_sheet and not SignalTeamCommand.new().validate(state).is_ok:
@@ -94,6 +114,11 @@ func stand_by() -> void:
 	if _simulation != null and _simulation.state.gate.operating:
 		_simulation.submit(StandByCommand.new())
 	refresh()
+
+
+## Moves the far console key (the reference's rail has five keys) into [param holder].
+func move_console_key(holder: Control) -> void:
+	_keys[&"console"].reparent(holder)
 
 
 ## The key for [param id].

@@ -1,7 +1,8 @@
 class_name BigKey
 extends Button
-## The main console key (DIAL, CLOSE, GO): a large steel key with a stencilled word. AMBER is
-## a lit amber cap, HAZARD has a hazard-striped collar, RED a red cap. With hold-to-confirm a
+## The main console key (DIAL, CLOSE, GO), drawn as the interface reference's key: AMBER an
+## amber key, HAZARD yellow-black stripes round a dark face, RED a steel key with red ink; off
+## while disabled. The word is its text at [member label_size]. With hold-to-confirm a
 ## ring round the key fills while held and [signal activated] fires when it closes; without
 ## it, a press fires at once. Mouse, keyboard and gamepad all reach it as button_down/up.
 ## Bible: docs/content/interface-rethink.md sections 4 (Gate console) and 7
@@ -27,15 +28,26 @@ const _CAPS: Dictionary[KeyStyle, Color] = {
 		queue_redraw()
 ## Whether the key must be held to fire.
 @export var hold_to_confirm: bool = false
+## Size of the word, in pixels (DIAL 50, CLOSE 46, GO 36).
+@export var label_size: int = 36
 
 var _held: float = 0.0
 var _holding: bool = false
-var _hazard: Texture2D = preload("res://art/ui/hardware/hazard.png")
 
 
 func _init() -> void:
 	theme_type_variation = &"BigKey"
 	focus_mode = Control.FOCUS_ALL
+	RefKeyLook.clear_boxes(self)
+	for colour: StringName in [
+		&"font_color",
+		&"font_hover_color",
+		&"font_pressed_color",
+		&"font_focus_color",
+		&"font_disabled_color",
+		&"font_hover_pressed_color"
+	]:
+		add_theme_color_override(colour, Color(0, 0, 0, 0))
 
 
 func _ready() -> void:
@@ -90,19 +102,31 @@ func _on_pressed() -> void:
 
 
 func _draw() -> void:
-	var s: float = HwMetrics.scale_of(self)
-	var cap: Color = _CAPS[key_style]
-	if disabled:
-		cap = cap.darkened(0.6)
-	var lip: float = 4.0 * s
-	var top: Rect2 = Rect2(lip, lip, size.x - 2 * lip, 6 * s)
-	if key_style == KeyStyle.HAZARD:
-		draw_texture_rect(_hazard, Rect2(0, 0, size.x, lip * 2), true)
-		draw_texture_rect(_hazard, Rect2(0, size.y - lip * 2, size.x, lip * 2), true)
-	draw_rect(top, cap)
-	if key_style == KeyStyle.RED:
-		draw_rect(Rect2(size.x * 0.5 - 6 * s, top.end.y, 12 * s, 4 * s), cap)
+	var rect: Rect2 = Rect2(Vector2.ZERO, size)
+	var styles: Dictionary[KeyStyle, RefPaint.KeyStyle] = {
+		KeyStyle.AMBER: RefPaint.KeyStyle.AMBER,
+		KeyStyle.HAZARD: RefPaint.KeyStyle.HAZARD,
+		KeyStyle.RED: RefPaint.KeyStyle.STEEL,
+	}
+	var style: RefPaint.KeyStyle = RefPaint.KeyStyle.OFF if disabled else styles[key_style]
+	var ink: Color = RefPaint.key(self, rect, style)
+	if key_style == KeyStyle.RED and not disabled:
+		ink = RefPaint.RED
+	if is_hovered() and not disabled:
+		draw_polygon(RefPaint.rounded(rect, 6.0), [Color(1, 1, 1, 0.06)])
+	var word: RefText = RefText.make(RefText.LABEL, label_size, ink, 3.0)
+	word.draw(self, Vector2(size.x * 0.5, size.y * 0.5 + 2.0), tr(text), "mm")
+	if has_focus():
+		RefPaint.outline(self, rect.grow(3.0), RefPaint.AMBER_HI, 2.0)
 	if _holding:
 		var r: float = minf(size.x, size.y) * 0.5 - 2.0
-		var c: Vector2 = size * 0.5
-		draw_arc(c, r, -PI / 2, -PI / 2 + TAU * get_hold_progress(), 48, cap, 4 * s, true)
+		draw_arc(
+			size * 0.5,
+			r,
+			-PI / 2,
+			-PI / 2 + TAU * get_hold_progress(),
+			48,
+			RefPaint.AMBER_HI,
+			4.0,
+			true
+		)

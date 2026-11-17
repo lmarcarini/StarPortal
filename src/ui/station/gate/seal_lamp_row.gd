@@ -1,36 +1,37 @@
 class_name SealLampRow
-extends HBoxContainer
-## The console's eight seal lamps, a row of [IndicatorLamp]s lit as the Ring's seals lock
-## (the eighth is CAIRN's mark), blue while a wormhole is open.
-## Bible: docs/content/interface-rethink.md section 4 (Gate, Console)
+extends Control
+## The dial block's eight seal lamps in a row (interface-reference.md section 5), lit amber as
+## the Ring's seals lock (the eighth is CAIRN's mark); all lit while a wormhole is open.
+## Bible: docs/content/interface-reference.md section 5 (dial_block)
 
-const _LIT: Color = Color("#ffb347")
+## Lamp radius and pitch, in pixels.
+const RADIUS: float = 10.0
+const PITCH: float = 50.0
 
-var _lamps: Array[IndicatorLamp] = []
+var _lit: int = 0
 
 
-func _ready() -> void:
-	add_theme_constant_override(&"separation", 6)
-	alignment = BoxContainer.ALIGNMENT_CENTER
-	for i: int in RingLook.SEALS:
-		var lamp: IndicatorLamp = IndicatorLamp.new()
-		lamp.custom_minimum_size = Vector2(22, 22) * HwMetrics.scale_of(self)
-		_lamps.append(lamp)
-		add_child(lamp)
+func _init() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 ## Lights the lamps for [param look].
 func show_look(look: RingLook) -> void:
-	for i: int in _lamps.size():
-		var lit: bool = i < look.seals
-		var colour: Color = UiPalette.RING if look.phase == RingLook.Phase.OPEN else _LIT
-		_lamps[i].set_lit(lit, colour)
+	var lit: int = clampi(look.seals, 0, RingLook.SEALS)
+	if lit != _lit:
+		_lit = lit
+		queue_redraw()
 
 
 ## Lamps lit now.
 func lit_count() -> int:
-	var count: int = 0
-	for lamp: IndicatorLamp in _lamps:
-		if lamp.is_lit():
-			count += 1
-	return count
+	return _lit
+
+
+func _draw() -> void:
+	for i: int in RingLook.SEALS:
+		var centre: Vector2 = Vector2(25.0 + i * PITCH, 18.0)
+		if i < _lit:
+			RefPaint.lamp_on(self, centre, RADIUS, RefPaint.AMBER)
+		else:
+			RefPaint.lamp_off(self, centre, RADIUS, false)

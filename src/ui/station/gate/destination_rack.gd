@@ -1,9 +1,13 @@
 class_name DestinationRack
-extends VBoxContainer
-## The rack of destination cards on the right wall of the Gate station: a filter key on top
-## (all, with team, unvisited), every Address Book entry as a card in rack order, scrolling
-## when there are more than fit, and + NEW ADDRESS at the foot.
-## Bible: docs/content/interface-rethink.md section 4 (Gate, Destinations)
+extends Control
+## The right panel DESTINATIONS (interface-reference.md section 5, right_panel): a steel
+## plate with the header (Ring icon, title 24), the selected destination large (picture
+## 328 x 180 framed amber, or blue while its wormhole is open; name 34; one dim line; status
+## icons right), every Address Book entry as a 164 x 132 card in a two-column grid in rack
+## order (scrolling when there are more than fit) and + NEW ADDRESS at the foot, 64 high.
+## The filter (all, with team, unvisited) is kept as a method; the reference has no key for
+## it.
+## Bible: docs/content/interface-reference.md section 5
 
 ## A card was chosen: put [param destination] on the monitor.
 signal destination_selected(destination: GateDestination)
@@ -25,24 +29,38 @@ var _filter: DestinationText.Filter = DestinationText.Filter.ALL
 var _selected_key: String = ""
 var _filter_key: IconKey = IconKey.new()
 var _scroll: ScrollContainer = ScrollContainer.new()
-var _cards: VBoxContainer = VBoxContainer.new()
-var _new: IconKey = IconKey.new()
+var _cards: GridContainer = GridContainer.new()
+var _new: RefKey = RefKey.new()
+var _picture: WorldThumb = WorldThumb.new()
+var _selected: GateDestination = null
+var _open: bool = false
 
 
 func _ready() -> void:
-	add_theme_constant_override(&"separation", 8)
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	_filter_key.name = "FilterKey"
+	_filter_key.visible = false
 	_filter_key.pressed.connect(cycle_filter)
 	add_child(_filter_key)
+	_picture.position = RackLook.PICTURE.position + Vector2(3, 3)
+	_picture.size = RackLook.PICTURE.size - Vector2(6, 6)
+	add_child(_picture)
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_scroll.position = RackLook.GRID.position
+	_scroll.size = RackLook.GRID.size
+	_cards.columns = 2
+	_cards.add_theme_constant_override(&"h_separation", 12)
+	_cards.add_theme_constant_override(&"v_separation", 12)
 	_scroll.add_child(_cards)
 	add_child(_scroll)
 	_new.name = "NewAddress"
-	_new.icon_id = &"new"
+	_new.label = "STATION_NEW_ADDRESS_KEY"
+	_new.label_size = 24
 	_new.set_help("STATION_NEW_ADDRESS")
 	_new.pressed.connect(new_address_requested.emit)
 	add_child(_new)
+	resized.connect(_layout)
+	_layout()
 	_show_filter()
 
 
@@ -121,10 +139,37 @@ func _show_filter() -> void:
 
 func _on_selected(card: DestinationCard) -> void:
 	_selected_key = card.get_key()
+	_selected = card.get_destination()
+	_picture.show_world(_selected.world_id)
+	queue_redraw()
 	for other: DestinationCard in get_cards():
 		other.set_pressed_no_signal(other == card)
 		other.queue_redraw()
 	destination_selected.emit(card.get_destination())
+
+
+## The destination shown large, or null.
+func get_selected() -> GateDestination:
+	return _selected
+
+
+func _layout() -> void:
+	_new.position = Vector2(14, size.y - 80)
+	_new.size = Vector2(size.x - 28, 64)
+	_scroll.size = Vector2(RackLook.GRID.size.x, size.y - 96 - RackLook.GRID.position.y)
+
+
+func _process(_delta: float) -> void:
+	if _simulation != null and _selected != null:
+		var open: bool = RackLook.is_open(_simulation.state, _selected)
+		if open != _open:
+			_open = open
+			queue_redraw()
+
+
+func _draw() -> void:
+	var state: GameState = null if _simulation == null else _simulation.state
+	RackLook.draw(self, _selected, _open, RackLook.line_of(state, _selected_key))
 
 
 func _on_flipped(card: DestinationCard) -> void:

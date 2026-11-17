@@ -1,10 +1,12 @@
 class_name DestinationCard
 extends Button
-## One known address on the Gate station's rack: a picture, a name (or, for an address never
-## reached, its glyphs), up to four status icons and a pin. Click or (A) selects it; right
-## click, F or the right stick's click flips it to its World Report; U or the gamepad's
-## Share button pins it (actions station_flip and station_pin).
-## Bible: docs/content/interface-rethink.md section 4 (Gate, Destinations)
+## One known address in the right panel's grid (interface-reference.md section 5): a
+## 164 x 132 well with the picture, the name (20) or, for an address never reached, its
+## glyphs, and status dots; an amber frame when selected. The TEAM key (a mission order) shows
+## on hover or focus. Click or (A) selects it; right click, F or the right stick's click flips
+## it to its World Report; U or the gamepad's Share button pins it (actions station_flip and
+## station_pin).
+## Bible: docs/content/interface-reference.md section 5
 
 ## The card was chosen.
 signal selected(card: DestinationCard)
@@ -16,7 +18,7 @@ signal pin_toggled(card: DestinationCard)
 signal order_requested(card: DestinationCard)
 
 ## Card size at 100%.
-const CARD_SIZE: Vector2 = Vector2(156, 132)
+const CARD_SIZE: Vector2 = Vector2(164, 132)
 
 var _destination: GateDestination = null
 var _key: String = ""
@@ -28,35 +30,36 @@ var _team_key: IconKey = IconKey.new()
 
 
 func _init() -> void:
-	theme_type_variation = &"IconKey"
 	focus_mode = Control.FOCUS_ALL
 	toggle_mode = true
 	clip_contents = true
+	RefKeyLook.clear_boxes(self)
 
 
 func _ready() -> void:
-	custom_minimum_size = HwMetrics.target(self, CARD_SIZE)
-	var s: float = HwMetrics.scale_of(self)
-	_thumb.position = Vector2(8, 8) * s
-	_thumb.size = Vector2(CARD_SIZE.x - 16, 68) * s
+	custom_minimum_size = CARD_SIZE
+	_thumb.position = Vector2(6, 6)
+	_thumb.size = Vector2(CARD_SIZE.x - 12, CARD_SIZE.y - 42)
 	add_child(_thumb)
-	_name.theme_type_variation = &"HwStencil"
-	_name.position = Vector2(8, 80) * s
-	_name.size = Vector2(CARD_SIZE.x - 16, 24) * s
-	_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_name.visible = false
 	_name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	add_child(_name)
-	_glyphs.position = _name.position
-	_glyphs.add_theme_constant_override(&"separation", 1)
+	_glyphs.position = Vector2(8, 40)
+	_glyphs.scale = Vector2(0.85, 0.85)
+	_glyphs.add_theme_constant_override(&"separation", 0)
 	add_child(_glyphs)
 	_team_key.name = "TeamKey"
 	_team_key.icon_id = &"team"
+	_team_key.look = IconKey.Look.STEEL
 	add_child(_team_key)
 	_team_key.custom_minimum_size = Vector2(44, 44)
-	_team_key.position = Vector2(size.x - 52.0 * s, 12.0 * s)
+	_team_key.size = Vector2(44, 44)
+	_team_key.position = Vector2(CARD_SIZE.x - 50.0, 6.0)
 	_team_key.set_help("STATION_ORDER_MISSION")
 	_team_key.pressed.connect(func() -> void: order_requested.emit(self))
 	pressed.connect(func() -> void: selected.emit(self))
+	for hint: Signal in [mouse_entered, mouse_exited, focus_entered, focus_exited]:
+		hint.connect(_show_team_key)
 	if _destination != null:
 		_render()
 
@@ -87,20 +90,22 @@ func is_pinned() -> bool:
 
 
 func _render() -> void:
-	_team_key.visible = not _destination.world_id.is_empty()
-	_team_key.position.x = custom_minimum_size.x - _team_key.custom_minimum_size.x - 10.0
 	_thumb.show_world(_destination.world_id)
 	_name.text = _destination.title
-	_name.visible = not _destination.title.is_empty()
 	for child: Node in _glyphs.get_children():
 		child.queue_free()
 	if _destination.title.is_empty():
 		for glyph: int in _destination.address.coordinates:
 			var icon: GlyphIcon = GlyphIcon.new()
 			icon.glyph_index = glyph
-			icon.custom_minimum_size = Vector2(18, 22) * HwMetrics.scale_of(self)
 			_glyphs.add_child(icon)
+	_show_team_key()
 	queue_redraw()
+
+
+func _show_team_key() -> void:
+	var near: bool = is_hovered() or has_focus() or _team_key.has_focus()
+	_team_key.visible = near and _destination != null and not _destination.world_id.is_empty()
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -120,15 +125,15 @@ func _gui_input(event: InputEvent) -> void:
 func _draw() -> void:
 	if _destination == null:
 		return
-	var s: float = HwMetrics.scale_of(self)
-	var side: float = 20.0 * s
-	var x: float = 8.0 * s
-	for id: StringName in _destination.icons.slice(0, DestinationMonitor.MAX_ICONS):
-		HardwareIcons.draw(self, id, Rect2(x, size.y - side - 6 * s, side, side), Color("#ece6d2"))
-		x += side + 4 * s
+	RefPaint.recess(self, Rect2(Vector2.ZERO, size))
+	var name: RefText = RefText.make(RefText.LABEL, 20, RefPaint.TEXT, 2.0)
+	name.draw(self, Vector2(10, size.y - 20), _destination.title.to_upper(), "lm")
+	var dots: int = mini(_destination.icons.size(), 3)
+	for k: int in dots:
+		draw_circle(Vector2(size.x - 12 - k * 12, size.y - 20), 4.0, RefPaint.DIM)
 	if _pinned:
-		var pin: Vector2 = Vector2(size.x - 14 * s, 14 * s)
-		draw_circle(pin, 6 * s, Color("#c8432f"))
-		draw_line(pin, pin + Vector2(0, 10) * s, Color("#c8432f"), 2 * s)
+		draw_circle(Vector2(14, 14), 6.0, RefPaint.RED)
 	if button_pressed:
-		draw_rect(Rect2(Vector2.ZERO, size), UiThemeHardware.AMBER, false, 3 * s)
+		RefPaint.outline(self, Rect2(Vector2.ZERO, size), RefPaint.AMBER, 3.0)
+	if has_focus():
+		RefPaint.outline(self, Rect2(Vector2.ZERO, size).grow(2.0), RefPaint.AMBER_HI, 2.0)

@@ -151,6 +151,17 @@ static func lamp_off(item: CanvasItem, centre: Vector2, r: float, green: bool) -
 	item.draw_circle(centre + Vector2(-r * 0.2, -r * 0.3), r * 0.22, Color8(84, 70, 44))
 
 
+## A paper sheet over [param rect] with a hard shadow; a [param strip] (alpha > 0) is the
+## coloured strip on its left edge.
+static func paper(item: CanvasItem, rect: Rect2, strip: Color) -> void:
+	item.draw_rect(Rect2(rect.position + Vector2(6, 8), rect.size), Color(0, 0, 0, 0.85))
+	gradient(item, rect, 0.0, [Color8(236, 231, 212), Color8(216, 210, 188)])
+	grain(item, rect, 1.6)
+	item.draw_rect(rect, Color8(120, 112, 90), false, 1.0)
+	if strip.a > 0.0:
+		item.draw_rect(Rect2(rect.position, Vector2(8, rect.size.y)), strip)
+
+
 ## A sunk well over [param rect] (the destination picture, the cards' wells).
 static func recess(item: CanvasItem, rect: Rect2) -> void:
 	item.draw_polygon(rounded(rect, 4.0), [Color8(16, 17, 15)])

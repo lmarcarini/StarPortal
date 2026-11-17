@@ -20,11 +20,15 @@ func _ready() -> void:
 	_holding.icon_id = &"crate"
 	_holding.set_help("HW_ICON_CRATE")
 	_holding.pressed.connect(toggle_holding)
+	_holding.look = IconKey.Look.STEEL
 	add_child(_holding)
 	_order.name = "MothOrderKey"
 	_order.icon_id = &"moth"
 	_order.pressed.connect(order_moth)
+	_order.look = IconKey.Look.STEEL
 	add_child(_order)
+	for key: IconKey in [_holding, _order]:
+		key.custom_minimum_size = Vector2(44, 44)
 	_card.name = "HoldingCard"
 	_card.visible = false
 	_card.z_index = 6
