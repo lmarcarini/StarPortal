@@ -65,6 +65,7 @@ func _ready() -> void:
 	add_child(_rail)
 	move_child(_rail, _station.get_index() + 1)
 	add_child(_moth)
+	_moth.z_index = 5
 	_moth.changed.connect(_on_moth_changed)
 	_rail.team_opens_sheet = true
 	_rail.team_requested.connect(open_mission_sheet)
@@ -74,13 +75,12 @@ func _ready() -> void:
 	add_child(_team)
 	move_child(_team, _rail.get_index())
 	_locker.name = "GateLocker"
-	_locker.position = Vector2(16, 16)
 	add_child(_locker)
 	add_child(_locker.get_card())
+	_rail.move_console_key(_locker)
 	_team.pressed.connect(_open_team_report)
 	_add_report_screen()
 	resized.connect(_layout)
-	_console.resized.connect(_layout)
 	_layout.call_deferred()
 
 
@@ -204,8 +204,7 @@ func open_mission_sheet() -> void:
 	if _simulation == null:
 		return
 	_sheet.open_for(_simulation.state.gate.connected_world_id)
-	_sheet.reset_size()
-	_sheet.position = Vector2(_rail.position.x, maxf(12.0, _rail.position.y - _sheet.size.y - 12.0))
+	_place_sheet()
 
 
 ## Opens the mission sheet to order a mission to [param destination] from a closed gate.
@@ -213,8 +212,14 @@ func _open_order_sheet(destination: GateDestination) -> void:
 	if _simulation == null or destination.world_id.is_empty():
 		return
 	_sheet.open_for(destination.world_id, destination.address)
+	_place_sheet()
+
+
+## Puts the mission sheet on its region, above the rail and clear of the Ring.
+func _place_sheet() -> void:
 	_sheet.reset_size()
-	_sheet.position = Vector2(_rack.position.x - _sheet.size.x - 12.0, 12.0)
+	var region: Rect2 = GateLayout.REGIONS[&"mission_sheet"]
+	_sheet.position = region.position + Vector2(GateLayout.centre_shift(size.x), 0)
 
 
 ## The mission sheet.
@@ -357,16 +362,13 @@ func _on_report_input(event: InputEvent) -> void:
 
 
 func _layout() -> void:
-	var s: float = HwMetrics.scale_of(self)
-	var width: float = DestinationCard.CARD_SIZE.x * s + 24.0
-	_rack.position = Vector2(size.x - width - 12.0, 12.0)
-	_rack.size = Vector2(width, maxf(0.0, size.y - _console.size.y - 24.0))
-	_team.position = Vector2(16.0, size.y - _console.size.y - _team.size.y - 16.0)
-	var rail_at: Vector2 = _station.anchor(&"rail")
+	GateLayout.place(self, _rack, _console)
+	GateLayout.put(_team, &"team_card", 0.0)
+	var centre: float = GateLayout.centre_shift(size.x)
 	_rail.reset_size()
-	_rail.position = Vector2(
-		rail_at.x, minf(rail_at.y, size.y - _console.size.y - _rail.size.y - 8.0)
-	)
+	_rail.position = GateLayout.REGIONS[&"send_rail"].position + Vector2(centre, 0)
+	_locker.reset_size()
+	_locker.position = _rack.position + Vector2(_rack.size.x - _locker.size.x - 14.0, 8.0)
 
 
 func _unhandled_input(event: InputEvent) -> void:

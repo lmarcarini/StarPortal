@@ -1,8 +1,10 @@
 class_name GateConsole
-extends SteelPanel
-## The Gate station's console along the bottom: the destination monitor (left), the seal
-## lamps over one big key (centre: DIAL when idle, CLOSE while open, ANSWER with an IGNORE
-## key while an incoming wormhole waits) and the charge gauge with the Shutter lever (right).
+extends Control
+## The Gate station's console in the frame's bottom bar (interface-reference.md section 5):
+## the destination CRT (dest_crt), the dial block (eight seal lamps in a row over one
+## 400 x 104 key: DIAL amber when idle, CLOSE hazard while open, ANSWER amber with an IGNORE
+## key while an incoming wormhole waits), the charge gauge and the Shutter lever. Laid out
+## from its own top left at (656, 896); the gauge and the lever keep to the right edge.
 ## It submits DialCommand, CloseWormholeCommand, AnswerIncomingCommand,
 ## IgnoreIncomingCommand and SetShutterCommand; a refusal shows as the key's hover reason and
 ## a shake, never as text.
@@ -13,6 +15,15 @@ signal build_bank_requested
 
 ## The main key's text for each MainKeyRules.Mode.
 const _KEY_TEXT: Array[String] = ["HW_KEY_DIAL", "HW_KEY_CLOSE", "HW_KEY_ANSWER", "HW_KEY_DIAL"]
+
+## Regions inside the console (screen region minus (656, 896)); the right group by its
+## distance from the right edge.
+const DEST_CRT: Rect2 = Rect2(0, 0, 400, 168)
+const DIAL_BLOCK: Rect2 = Rect2(416, 0, 432, 168)
+const SEAL_LAMPS: Rect2 = Rect2(432, 4, 400, 36)
+const MAIN_KEY: Rect2 = Rect2(432, 52, 400, 104)
+const CHARGE_FROM_RIGHT: float = 384.0
+const SHUTTER_FROM_RIGHT: float = 128.0
 
 var _simulation: Simulation = null
 var _destination: GateDestination = null
@@ -38,8 +49,12 @@ func _ready() -> void:
 	_ignore.visible = false
 	_ignore.set_help("GATE_INCOMING_IGNORE")
 	_ignore.pressed.connect(ignore_incoming)
-	_key.get_parent().add_child(_ignore)
-	_ignore.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_ignore.look = IconKey.Look.STEEL
+	add_child(_ignore)
+	_key.label_size = 50
+	z_index = 1
+	resized.connect(_layout)
+	_layout()
 	set_process(false)
 
 
@@ -155,10 +170,13 @@ func refresh(look: RingLook) -> void:
 	var need: float = GateQueries.lock_energy_mwh(state, address) if address != null else 0.0
 	_charge.show_state(state, need)
 	_key.text = _KEY_TEXT[mode]
+	_key.label_size = 46 if mode == MainKeyRules.Mode.CLOSE else 50
 	_key.key_style = (
 		BigKey.KeyStyle.HAZARD if mode == MainKeyRules.Mode.CLOSE else BigKey.KeyStyle.AMBER
 	)
-	_ignore.visible = mode == MainKeyRules.Mode.ANSWER
+	if _ignore.visible != (mode == MainKeyRules.Mode.ANSWER):
+		_ignore.visible = mode == MainKeyRules.Mode.ANSWER
+		_layout()
 	var busy: bool = MainKeyRules.close_needs_confirm(state)
 	if _close_busy.is_valid():
 		var extra: bool = _close_busy.call()
@@ -168,8 +186,31 @@ func refresh(look: RingLook) -> void:
 	if mode == MainKeyRules.Mode.CLOSE or mode == MainKeyRules.Mode.ANSWER:
 		reason = &""
 	_set_key_reason(_refusal if _refusal != &"" else reason)
-	_lever.visible = ShutterRules.is_installed(state)
+	_lever.disabled = not ShutterRules.is_installed(state)
 	_lever.set_pressed_no_signal(ShutterRules.is_closed(state))
+
+
+func _layout() -> void:
+	_place(_monitor, DEST_CRT)
+	_place(_seals, SEAL_LAMPS)
+	var key: Rect2 = MAIN_KEY
+	if _ignore.visible:
+		key.size.x -= 104.0
+		_place(_ignore, Rect2(key.end.x + 8.0, key.position.y, 96.0, key.size.y))
+	_place(_key, key)
+	_place(_charge, Rect2(size.x - CHARGE_FROM_RIGHT, 0, 240, 168))
+	_place(_lever, Rect2(size.x - SHUTTER_FROM_RIGHT, 0, 128, 168))
+	queue_redraw()
+
+
+static func _place(control: Control, rect: Rect2) -> void:
+	control.custom_minimum_size = Vector2.ZERO
+	control.position = rect.position
+	control.size = rect.size
+
+
+func _draw() -> void:
+	RefPaint.steel_plate(self, DIAL_BLOCK, false, true)
 
 
 func _set_key_reason(key: StringName) -> void:

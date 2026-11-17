@@ -31,6 +31,11 @@ static func drawers() -> Dictionary[StringName, Callable]:
 		&"plus": plus,
 		&"list": list,
 		&"candidate": person,
+		&"camera": camera,
+		&"canister": canister,
+		&"moth": moth,
+		&"team": team,
+		&"hail": hail,
 	}
 
 
@@ -180,3 +185,34 @@ static func plus(p: RefPen) -> void:
 static func list(p: RefPen) -> void:
 	for k: float in [-0.5, 0.0, 0.5]:
 		p.line([Vector2(-0.7, k), Vector2(0.7, k)])
+
+
+static func camera(p: RefPen) -> void:
+	p.box(Vector2(-1, -0.55), Vector2(0.45, 0.55))
+	p.line([Vector2(0.45, -0.2), Vector2(1, -0.5), Vector2(1, 0.5), Vector2(0.45, 0.2)])
+	p.ellipse(Vector2(-0.55, -0.3), Vector2(0.05, 0.3))
+
+
+static func canister(p: RefPen) -> void:
+	p.box(Vector2(-0.45, -1), Vector2(0.45, 1))
+	p.line([Vector2(-0.45, -0.35), Vector2(0.45, -0.35)])
+	p.line([Vector2(-0.45, 0.35), Vector2(0.45, 0.35)])
+
+
+static func moth(p: RefPen) -> void:
+	p.line([Vector2(0, -0.6), Vector2(0, 0.8)])
+	p.shape([Vector2(0, -0.2), Vector2(-1, -0.7), Vector2(-0.75, 0.35), Vector2(0, 0.15)])
+	p.shape([Vector2(0, -0.2), Vector2(1, -0.7), Vector2(0.75, 0.35), Vector2(0, 0.15)])
+
+
+static func team(p: RefPen) -> void:
+	for dx: float in [-0.45, 0.45]:
+		p.ellipse(Vector2(dx - 0.28, -0.85), Vector2(dx + 0.28, -0.3))
+		p.arc(Vector2(dx - 0.55, -0.1), Vector2(dx + 0.55, 1.5), 180, 360)
+
+
+static func hail(p: RefPen) -> void:
+	p.arc(Vector2(-1, -1), Vector2(1, 1), 200, 340)
+	p.arc(Vector2(-0.6, -0.6), Vector2(0.6, 0.6), 200, 340)
+	p.ellipse(Vector2(-0.18, -0.05), Vector2(0.18, 0.3))
+	p.line([Vector2(0, 0.3), Vector2(0, 1)])

@@ -85,6 +85,7 @@ func _ready() -> void:
 	ShellBoot.add_game_over(self)
 	add_child(gate_focus)
 	gate_focus.attach(view_switcher)
+	ShellLayout.raise_overlays(self, frame)
 	var is_new: bool = GameStart.is_new()
 	var state: GameState = GameStart.take_state(
 		ShellBoot.choose_seed(new_game_seed), Registry.balance()

@@ -7,6 +7,9 @@ extends Button
 
 ## Key states.
 enum KeyState { READY, ACTIVE, USED, UNAVAILABLE }
+## Looks: the old kit, the reference's steel key, or a key printed on paper (the mission
+## sheet).
+enum Look { CLASSIC, STEEL, PAPER }
 
 const _ICON: Color = Color("#ece6d2")
 const _LIT: Color = Color("#e8a33d")
@@ -21,6 +24,18 @@ const _LIT: Color = Color("#e8a33d")
 	set(value):
 		badge_text = value
 		queue_redraw()
+
+## The look (CLASSIC by default).
+var look: Look = Look.CLASSIC:
+	set(value):
+		look = value
+		if value != Look.CLASSIC:
+			RefKeyLook.clear_boxes(self)
+		queue_redraw()
+## Label under the icon (reference looks); a translation key or text.
+var label: String = ""
+## Label size, in pixels.
+var label_size: int = 18
 
 var _state: KeyState = KeyState.READY
 var _card: HoverCard = null
@@ -57,6 +72,9 @@ func get_state() -> KeyState:
 
 
 func _draw() -> void:
+	if look != Look.CLASSIC:
+		RefKeyLook.draw(self, look == Look.PAPER, _state)
+		return
 	var s: float = HwMetrics.scale_of(self)
 	var side: float = minf(size.x, size.y) * 0.6
 	var shift: float = 4.0 * s if _state == KeyState.ACTIVE else 0.0

@@ -1,20 +1,26 @@
 class_name FaceTile
 extends Button
-## A team member as a face tile: a code-drawn head and shoulders, the initials, and an injury
-## cross when hurt; the name and role on the hover card. Empty slot: a dashed outline.
+## A team member as a face tile (interface-reference.md section 5): a coloured tile with the
+## head and shoulders and an injury cross when hurt; the name and role on the hover card.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Teams)
+
+## Background colours of a face, picked by the person's id.
+const TONES: Array[Color] = [
+	Color8(150, 106, 72), Color8(110, 122, 94), Color8(154, 118, 86), Color8(94, 106, 122)
+]
 
 var _person: PersonState = null
 var _card: HoverCard = null
 
 
 func _init() -> void:
-	theme_type_variation = &"IconKey"
 	focus_mode = Control.FOCUS_ALL
+	RefKeyLook.clear_boxes(self)
 
 
 func _ready() -> void:
-	custom_minimum_size = HwMetrics.target(self, Vector2(64, 76))
+	if custom_minimum_size == Vector2.ZERO:
+		custom_minimum_size = Vector2(68, 68)
 
 
 ## Shows [param person] (null for an empty slot).
@@ -28,27 +34,26 @@ func show_person(person: PersonState) -> void:
 	queue_redraw()
 
 
-func _draw() -> void:
-	var c: Vector2 = Vector2(size.x * 0.5, size.y * 0.38)
-	var ink: Color = Color("#ece6d2")
-	if _person == null:
-		draw_arc(c, size.x * 0.2, 0, TAU, 16, Color(ink, 0.3), 2.0)
+## Draws the face of [param person] (null: an empty slot) in [param rect] on [param item]:
+## a coloured tile with an ink edge, the head and the shoulders.
+static func draw_face(item: CanvasItem, rect: Rect2, person: PersonState) -> void:
+	if person == null:
+		item.draw_rect(rect, Color(RefPaint.INK, 0.4), false, 2.0)
 		return
-	draw_circle(c, size.x * 0.17, Color("#b48a6a"))
-	draw_rect(
-		Rect2(size.x * 0.25, c.y + size.x * 0.17, size.x * 0.5, size.y * 0.2), Color("#4b5a3c")
-	)
-	var initials: String = ""
-	for word: String in _person.name.split(" ", false):
-		initials += word.left(1)
-	draw_string(
-		UiThemeBuilder.data_font(),
-		Vector2(0, size.y - 4),
-		initials,
-		HORIZONTAL_ALIGNMENT_CENTER,
-		size.x,
-		13,
-		ink
-	)
-	if _person.injury != PersonState.Injury.NONE:
-		HardwareIcons.draw(self, &"injured", Rect2(size.x - 22, 2, 20, 20), Color("#e5533d"))
+	item.draw_rect(rect, TONES[hash(person.id) % TONES.size()])
+	var s: float = rect.size.x / 52.0
+	var head: Vector2 = rect.position + Vector2(26, 18) * s
+	item.draw_circle(head, 10.0 * s, Color8(214, 190, 160))
+	var body: Vector2 = rect.position + Vector2(26, 48) * s
+	item.draw_arc(body, 9.0 * s, PI, TAU, 16, Color8(54, 60, 50), 18.0 * s)
+	item.draw_rect(rect, RefPaint.INK, false, 2.0)
+	if person.injury != PersonState.Injury.NONE:
+		HardwareIcons.draw(
+			item, &"injured", Rect2(rect.end.x - 20, rect.position.y + 2, 18, 18), RefPaint.RED
+		)
+
+
+func _draw() -> void:
+	draw_face(self, Rect2(Vector2.ZERO, size), _person)
+	if has_focus():
+		RefPaint.outline(self, Rect2(Vector2.ZERO, size).grow(3.0), RefPaint.AMBER, 2.0)

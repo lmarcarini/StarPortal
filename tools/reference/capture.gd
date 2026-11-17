@@ -1,8 +1,9 @@
 extends Node
 ## Captures the game in the three reference states at the window size (1920 x 1080 in
-## scripts/reference.sh): gate_idle (SILL selected), gate_open (wormhole to SILL, mission
-## sheet open) and other_station (Base). Writes <state>.png into REF_OUT (default
-## build/reference/). Not part of the game: lives in tools/, never in src/.
+## scripts/reference.sh), the clock running at fast speed: gate_idle (SILL selected),
+## gate_open (SILL dialled and open, send rail and mission sheet) and other_station (Base).
+## Writes <state>.png into REF_OUT (default build/reference/). Not part of the game: lives
+## in tools/, never in src/.
 ## Reference: docs/content/interface-reference.md section 6
 
 const SCENARIO: String = "res://data/scenarios/scenario_gate_station.json"
@@ -57,7 +58,8 @@ func _gate() -> GateStationView:
 
 
 func _to_idle() -> void:
-	SimClock.pause()
+	SimClock.resume()
+	SimClock.set_speed_index(ClockState.NORMAL_SPEED_INDEX + 1)
 	for card: DestinationCard in _gate().get_rack().get_cards():
 		if card.get_destination().world_id == SILL:
 			card.selected.emit(card)
@@ -66,10 +68,11 @@ func _to_idle() -> void:
 func _to_open() -> void:
 	var gate_view: GateStationView = _gate()
 	var sim: Simulation = SimClock.simulation
-	var gate: GateState = sim.state.gate
-	gate.incoming_faction = &"team"
-	gate.incoming_until_tick = sim.state.clock.tick + 10
-	RingControl.answer_incoming(gate, SILL, sim.state.clock.tick)
+	var state: GameState = sim.state
+	var galaxy: GalaxyCatalogue = state.galaxy
+	state.power.stored_mwh = PowerRules.capacity_mwh(state)
+	sim.submit(DialCommand.create(galaxy.address_of(SILL, galaxy.home().origin_glyph)))
+	SimClock.step_ticks(state.balance.dial_duration_ticks + 1)
 	gate_view.open_mission_sheet()
 
 
@@ -78,6 +81,9 @@ func _to_other() -> void:
 
 
 func _shoot(state_name: String) -> void:
+	get_viewport().gui_release_focus()
+	await get_tree().process_frame
+	await get_tree().process_frame
 	var img: Image = get_viewport().get_texture().get_image()
 	img.save_png(_out.path_join(state_name + ".png"))
 	print("reference: wrote ", state_name)

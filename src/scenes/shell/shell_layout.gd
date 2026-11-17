@@ -6,8 +6,18 @@ extends RefCounted
 ## inside it when the station has more than one folder, on the plain backdrop.
 ## Bible: docs/content/interface-reference.md sections 1, 2 and 4
 
-## Z index of the Gate console over the frame's bottom bar.
-const CONSOLE_Z: int = 1
+## Z index of everything the shell puts over the frame (pause menu, conversations, the
+## game over and after-action screens, alerts, toasts): above the station and the frame,
+## whose own layers stay below 100.
+const OVERLAY_Z: int = 200
+
+
+## Raises every child of [param shell] after [param frame] to [constant OVERLAY_Z].
+static func raise_overlays(shell: Node, frame: Frame) -> void:
+	for child: Node in shell.get_children():
+		var item: CanvasItem = child as CanvasItem
+		if item != null and child.get_index() > frame.get_index():
+			item.z_index = maxi(item.z_index, OVERLAY_Z)
 
 
 ## Lays out [param switcher], [param backdrop] and [param frame] for the current station.
@@ -21,7 +31,6 @@ static func fit(switcher: ViewSwitcher, backdrop: Control, frame: Frame) -> void
 	if gate:
 		switcher.position = Vector2.ZERO
 		switcher.size = frame.size
-		_raise_console(switcher)
 		return
 	var area: Rect2 = FrameLayout.station_area(frame.size.x)
 	switcher.position = area.position
@@ -37,14 +46,3 @@ static func focus_below(switcher: ViewSwitcher) -> Control:
 	var view: GameView = switcher.get_view(switcher.current_view_id())
 	var focus: Control = null if view == null else view.get_default_focus()
 	return tabs if focus == null else focus
-
-
-## Puts the Gate console over the frame's bottom bar, right of the station keys (its own
-## layout is the Gate station's: M4.11-03).
-static func _raise_console(switcher: ViewSwitcher) -> void:
-	var gate: GateStationView = switcher.get_view(ViewSwitcher.GATE_ROOM) as GateStationView
-	if gate == null or not gate.is_node_ready():
-		return
-	var console: Control = gate.get_console()
-	console.z_index = CONSOLE_Z
-	console.offset_left = FrameLayout.REGIONS[&"station_console"].position.x

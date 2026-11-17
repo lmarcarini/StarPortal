@@ -1,14 +1,19 @@
 class_name MissionSheet
 extends PaperCard
-## The mission sheet, a paper card opened in place by TEAM on the send rail: the mission as
-## icon keys (Survey, Recover; Contact greyed), the Recover target as icon keys, the team as
-## four face tiles (tap one to swap to the next fit person of that slot) and GO, which submits
+## The mission sheet (interface-reference.md section 5, mission_sheet): paper, 336 x 352,
+## opened above the send rail clear of the Ring by TEAM: the title, the mission as three
+## 96 x 78 paper keys (Survey, Recover; Contact greyed), the Recover target as small keys,
+## the team as four 68 x 68 faces (tap one to swap to the next fit person of that slot), the
+## days, and the GO hazard key (160 x 68), which submits
 ## PlanExpeditionCommand then SendTeamCommand. Prefilled by [MissionDefaults]. A refusal shows
 ## as a warning icon beside the team with the reason on its hover card.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Teams)
 
 ## GO sent the team (or, from a mission order, was accepted).
 signal sent
+
+## Sheet size, in pixels.
+const SIZE: Vector2 = Vector2(336, 352)
 
 var _simulation: Simulation = null
 var _draft: ExpeditionPlanDraft = null
@@ -18,26 +23,53 @@ var _targets: HBoxContainer = HBoxContainer.new()
 var _faces: HBoxContainer = HBoxContainer.new()
 var _warning: IconKey = IconKey.new()
 var _go: BigKey = BigKey.new()
+var _body: Control = Control.new()
 
 
 func _ready() -> void:
 	super()
 	z_index = 6
-	var column: VBoxContainer = VBoxContainer.new()
-	column.add_theme_constant_override(&"separation", 8)
-	add_child(column)
-	for row: HBoxContainer in [_missions, _targets, _faces]:
-		row.add_theme_constant_override(&"separation", 8)
-		column.add_child(row)
+	add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	custom_minimum_size = SIZE
+	_body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_body.draw.connect(_draw_paper)
+	add_child(_body)
+	var rows: Dictionary[HBoxContainer, Vector2] = {
+		_missions: Vector2(16, 54), _faces: Vector2(16, 148), _targets: Vector2(130, 222)
+	}
+	for row: HBoxContainer in rows:
+		row.add_theme_constant_override(&"separation", 8 if row == _missions else 10)
+		row.position = rows[row]
+		_body.add_child(row)
 	_warning.name = "Warning"
 	_warning.icon_id = &"threat"
-	_faces.add_child(_warning)
+	_warning.look = IconKey.Look.PAPER
+	_warning.position = Vector2(SIZE.x - 232, SIZE.y - 74)
+	_body.add_child(_warning)
+	_warning.custom_minimum_size = Vector2(44, 44)
 	_go.name = "Go"
 	_go.text = "HW_KEY_GO"
 	_go.key_style = BigKey.KeyStyle.HAZARD
+	_go.label_size = 36
 	_go.activated.connect(go)
-	column.add_child(_go)
+	_body.add_child(_go)
+	_go.custom_minimum_size = Vector2.ZERO
+	_go.position = Vector2(SIZE.x - 176, SIZE.y - 84)
+	_go.size = Vector2(160, 68)
 	hide()
+
+
+func _draw_paper() -> void:
+	RefPaint.paper(_body, Rect2(Vector2.ZERO, SIZE), Color(0, 0, 0, 0))
+	if _draft == null or _simulation == null:
+		return
+	var world: String = AddressBookText.name_of_world(_draft.world_id, _simulation.state)
+	var title: String = tr(&"STATION_MISSION_TITLE").format({"world": world.to_upper()})
+	RefText.make(RefText.LABEL, 26, RefPaint.INK, 3.0).draw(_body, Vector2(16, 14), title)
+	var days: String = str(ExpeditionState.OBJECTIVE_DAYS[_draft.objective])
+	RefText.make(RefText.MONO_BOLD, 44, RefPaint.INK).draw(_body, Vector2(16, 262), days, "lm")
+	var unit: RefText = RefText.make(RefText.LABEL, 18, Color8(90, 84, 66), 2.0)
+	unit.draw(_body, Vector2(52, 266), tr(&"STATION_DAYS"), "lm")
 
 
 ## Reads [param simulation].
@@ -147,6 +179,7 @@ func _render() -> void:
 	_render_faces()
 	var why: StringName = reason()
 	_show_reason(why)
+	_body.queue_redraw()
 
 
 func _render_missions() -> void:
@@ -154,15 +187,17 @@ func _render_missions() -> void:
 	var objectives: Array[ExpeditionState.Objective] = [
 		ExpeditionState.Objective.SURVEY, ExpeditionState.Objective.RECOVER
 	]
-	var icons: Array[StringName] = [&"surveyed", &"canister"]
+	var icons: Array[StringName] = [&"eye", &"canister"]
+	var names: Array[String] = ["SURVEY", "RECOVER"]
+	var helps: Array[String] = ["STATION_MISSION_SURVEYED", "STATION_MISSION_CANISTER"]
 	for i: int in objectives.size():
-		var key: IconKey = _key(
-			_missions, icons[i], "STATION_MISSION_" + String(icons[i]).to_upper()
-		)
+		var key: IconKey = _key(_missions, icons[i], helps[i])
+		key.label = "STATION_MISSION_KEY_" + names[i]
 		var active: bool = _draft.objective == objectives[i]
 		key.set_state(IconKey.KeyState.ACTIVE if active else IconKey.KeyState.READY)
 		key.pressed.connect(choose.bind(objectives[i]))
-	var contact: IconKey = _key(_missions, &"people", "STATION_MISSION_CONTACT")
+	var contact: IconKey = _key(_missions, &"hail", "STATION_MISSION_CONTACT")
+	contact.label = "STATION_MISSION_KEY_CONTACT"
 	contact.set_state(IconKey.KeyState.UNAVAILABLE)
 
 
@@ -171,6 +206,7 @@ func _render_targets() -> void:
 	_targets.visible = _draft.objective == ExpeditionState.Objective.RECOVER
 	for target: WorldTarget in ExpeditionPlanDraft.targets(_simulation.state, _draft.world_id):
 		var key: IconKey = _key(_targets, &"base", String(target.name_key))
+		key.custom_minimum_size = Vector2(44, 44)
 		key.set_state(
 			IconKey.KeyState.ACTIVE if target.id == _draft.target_id else IconKey.KeyState.READY
 		)
@@ -178,19 +214,16 @@ func _render_targets() -> void:
 
 
 func _render_faces() -> void:
-	for child: Node in _faces.get_children():
-		if child != _warning:
-			_faces.remove_child(child)
-			child.queue_free()
+	_clear(_faces)
 	for slot: String in ExpeditionState.SLOTS:
 		var face: FaceTile = FaceTile.new()
 		face.name = "Face_" + slot
+		face.custom_minimum_size = Vector2(68, 68)
 		var person_id: StringName = _draft.team.get(slot, &"")
 		var person: PersonState = _simulation.state.staff.find_person(person_id)
 		face.show_person(person)
 		face.pressed.connect(swap.bind(slot))
 		_faces.add_child(face)
-	_faces.move_child(_warning, -1)
 
 
 func _show_reason(code: StringName) -> void:
@@ -203,7 +236,10 @@ func _show_reason(code: StringName) -> void:
 func _key(row: HBoxContainer, icon: StringName, help: String) -> IconKey:
 	var key: IconKey = IconKey.new()
 	key.icon_id = icon
+	key.look = IconKey.Look.PAPER
+	key.label_size = 16
 	row.add_child(key)
+	key.custom_minimum_size = Vector2(96, 78)
 	key.set_help(help)
 	return key
 
