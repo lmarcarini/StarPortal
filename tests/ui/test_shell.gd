@@ -177,8 +177,9 @@ func test_time_bar_text_comes_from_translation_keys() -> void:
 	assert_str(_shell.time_bar.get_buttons()[0].text).is_equal("Pause")
 
 
-## Focus navigation alone walks the top bar ring, goes down to the view tabs and into the
-## shown view, moves along the tabs to the other view and through it, and back up.
+## Focus navigation alone walks the top bar ring, goes down into the Gate (no tab strip) or
+## to a station's folder tabs and into the shown view, moves along the tabs to the other view
+## and through it, and back up.
 func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void:
 	var buttons: Array[Button] = _shell.get_focus_order()
 	assert_int(buttons.size()).is_greater_equal(8)
@@ -196,15 +197,10 @@ func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void
 	var switcher: ViewSwitcher = _shell.view_switcher
 	var tabs: TabBar = switcher.get_tab_bar()
 	var archive: GameView = switcher.get_view(&"archive")
-	await _press_action(&"ui_down")
-	assert_object(_focus_owner()).is_same(tabs)
+	# The Gate has one folder and no tab strip: down goes straight into the station.
+	assert_bool(tabs.visible).is_false()
 	await _press_action(&"ui_down")
 	assert_object(_focus_owner()).is_same(switcher.get_view(&"gate_room").get_default_focus())
-	# The console's palette sits under its seal slots: up goes through the slots to the tabs.
-	for _step: int in 3:
-		if _focus_owner() != tabs:
-			await _press_action(&"ui_up")
-	assert_object(_focus_owner()).is_same(tabs)
 	# The Office's folders: from Command back along its tabs to Archive.
 	switcher.show_station(&"office")
 	tabs.grab_focus()
@@ -222,7 +218,7 @@ func test_focus_navigation_reaches_every_button_the_tabs_and_each_view() -> void
 
 
 func test_gamepad_a_presses_the_focused_button() -> void:
-	var key: Button = _shell.frame.clock_plate.pause_key
+	var key: Button = _shell.frame.speed_plate.pause_key
 	var presses: Array[int] = [0]
 	key.pressed.connect(func() -> void: presses[0] += 1)
 	key.grab_focus()

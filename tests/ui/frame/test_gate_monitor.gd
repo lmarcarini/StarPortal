@@ -39,14 +39,13 @@ func test_hidden_on_the_gate_shown_elsewhere() -> void:
 func test_idle_costs_nothing_and_a_dial_lights_it() -> void:
 	_shell.view_switcher.show_station(&"base")
 	await _runner.simulate_frames(2)
-	assert_bool(_monitor().is_rendering()).is_false()
+	assert_bool(_monitor().is_live()).is_false()
 	var state: GameState = SimClock.simulation.state
 	state.power.stored_mwh = 1.0e6
 	var address: GateAddress = DialFixture.address_of(state.galaxy, state.galaxy.home().id)
 	SimClock.simulation.submit(DialCommand.create(address))
 	await _runner.simulate_frames(2)
 	assert_bool(_monitor().is_live()).is_true()
-	assert_bool(_monitor().is_rendering()).is_true()
 	assert_int(_monitor().current_look().phase).is_equal(RingLook.Phase.DIALING)
 
 

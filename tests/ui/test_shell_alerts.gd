@@ -51,7 +51,7 @@ func test_a_rescue_alert_takes_focus_and_the_gamepad_reaches_its_stack_entry() -
 	alert.get_close_button().pressed.emit()
 	var entry: Button = _shell.get_alert_stack().get_rescue_button()
 	assert_bool(entry.visible).is_true()
-	var faster: Button = _shell.frame.clock_plate.fast_key
+	var faster: Button = _shell.frame.speed_plate.settings_key
 	faster.grab_focus()
 	faster.find_valid_focus_neighbor(SIDE_RIGHT).grab_focus()
 	assert_object(_shell.get_viewport().gui_get_focus_owner()).is_same(entry)

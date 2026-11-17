@@ -1,8 +1,9 @@
 class_name Wire
-extends VBoxContainer
-## The wire (interface-rethink.md sections 3 and 6): a column of event cards top left that
-## replaces the log line and the alert list. Each card carries its own action keys; at most
-## [constant VISIBLE] show, older ones collapse into a stack whose count opens the full log.
+extends Control
+## The wire (interface-reference.md section 4; interface-rethink.md section 6): a column of
+## event cards top left, 368 px wide, cards 96 high and 10 px apart. Each card carries its own
+## action keys; at most [constant VISIBLE] show, then a +N key (the older cards) that opens
+## the full log.
 ## Event cards can be dismissed; condition cards go when their cause does. It never pauses
 ## the game. A key's command is submitted here (the UI builds commands, never mutates);
 ## screens and the shell's own steps (rescue, report) go out as signals.
@@ -20,8 +21,12 @@ signal entry_chosen(entry: AlertEntry)
 ## Screens that cover the station whole (the alien panel, the MOTH screen, the team report)
 ## join this group; the wire hides while one is shown.
 const COVER_GROUP: StringName = &"covers_frame"
-## Width of the wire's column, in pixels at UI scale 1.
-const WIDTH: float = 330.0
+## Width of the wire's column, in pixels.
+const WIDTH: float = 368.0
+## Gap between two cards, in pixels.
+const GAP: float = 10.0
+## Size of the +N key.
+const STACK_SIZE: Vector2 = Vector2(120, 44)
 ## Cards shown at most; the rest are in the stack.
 const VISIBLE: int = 5
 
@@ -33,20 +38,19 @@ var _cards: Array[WireCardData] = []
 var _shown: Dictionary[String, bool] = {}
 var _signature: String = ""
 var _dismissed: Dictionary[String, bool] = {}
-var _stack: IconKey = IconKey.new()
-var _column: VBoxContainer = VBoxContainer.new()
+var _stack: RefKey = RefKey.new()
+var _column: Control = Control.new()
 
 
 func _init() -> void:
 	name = &"Wire"
-	custom_minimum_size.x = WIDTH
+	size = Vector2(WIDTH, (WireCard.SIZE.y + GAP) * VISIBLE + STACK_SIZE.y)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_theme_constant_override(&"separation", 6)
-	_column.add_theme_constant_override(&"separation", 6)
 	_column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_column)
 	_stack.name = "WireStack"
-	_stack.icon_id = &"log"
+	_stack.size = STACK_SIZE
+	_stack.label_size = 20
 	_stack.visible = false
 	_stack.pressed.connect(log_requested.emit)
 	add_child(_stack)
@@ -112,8 +116,8 @@ func get_card_nodes() -> Array[WireCard]:
 	return found
 
 
-## The stack key (its badge counts the stacked cards).
-func get_stack() -> IconKey:
+## The +N key (its label counts the stacked cards).
+func get_stack() -> RefKey:
 	return _stack
 
 
@@ -163,16 +167,21 @@ func _rebuild(state: GameState) -> void:
 	for child: Node in _column.get_children():
 		_column.remove_child(child)
 		child.queue_free()
+	var y: float = 0.0
 	for data: WireCardData in _cards.slice(0, VISIBLE):
 		var card: WireCard = WireCard.new()
+		card.position = Vector2(0, y)
 		_column.add_child(card)
 		var fresh: bool = not _shown.has(data.key())
 		_shown[data.key()] = true
 		card.show_card(data, state, fresh)
 		card.action_pressed.connect(press)
+		y += WireCard.SIZE.y + GAP
 	var stacked: int = maxi(0, _cards.size() - VISIBLE)
 	_stack.visible = true
-	_stack.badge_text = str(stacked) if stacked > 0 else ""
+	_stack.position = Vector2(0, y)
+	_stack.label = "+%d" % stacked if stacked > 0 else ""
+	_stack.icon_id = &"" if stacked > 0 else &"log"
 
 
 ## What the cards look like now: kinds, keys and which keys are refused.

@@ -84,8 +84,8 @@ func test_a_refused_key_is_greyed_with_its_reason() -> void:
 	var card: WireCard = auto_free(WireCard.new())
 	add_child(card)
 	card.show_card(data, state, false)
-	var accept: IconKey = card.get_keys()[0]
-	assert_int(accept.get_state()).is_equal(IconKey.KeyState.UNAVAILABLE)
+	var accept: RefKey = card.get_keys()[0]
+	assert_bool(accept.disabled).is_true()
 
 
 func test_at_most_five_show_and_the_rest_stack() -> void:
@@ -97,7 +97,7 @@ func test_at_most_five_show_and_the_rest_stack() -> void:
 	var total: int = _wire().get_cards().size()
 	assert_int(_wire().get_card_nodes().size()).is_equal(mini(total, Wire.VISIBLE))
 	if total > Wire.VISIBLE:
-		assert_str(_wire().get_stack().badge_text).is_equal(str(total - Wire.VISIBLE))
+		assert_str(_wire().get_stack().label).is_equal("+%d" % (total - Wire.VISIBLE))
 	var opened: Array[bool] = [false]
 	_shell.frame.log_requested.connect(func() -> void: opened[0] = true)
 	_wire().get_stack().pressed.emit()
@@ -109,7 +109,7 @@ func test_event_cards_dismiss_and_condition_cards_follow_their_cause() -> void:
 	EventBus.room_built.emit(state.base.rooms[0].id)
 	var site: WireCard = _wire().card_of(&"site_finished")
 	assert_object(site).is_not_null()
-	var dismiss: IconKey = site.get_keys().back()
+	var dismiss: RefKey = site.get_keys().back()
 	dismiss.pressed.emit()
 	await _runner.simulate_frames(1)
 	assert_object(_wire().card_of(&"site_finished")).is_null()

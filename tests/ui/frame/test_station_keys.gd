@@ -1,5 +1,5 @@
 ## The four station keys (M4.10-03): Gate, Base, Lab and Office reach every screen; the
-## current key is lit; lamps follow the hosted views' needs_attention(); Lab hides until a
+## current key is lit; lamps follow the hosted views' needs_attention(); Lab is off until a
 ## Research Lab exists; F1-F4 and the mouse.
 ## Bible: docs/content/interface-rethink.md section 3
 extends GdUnitTestSuite
@@ -40,24 +40,23 @@ func test_every_old_screen_is_reachable_from_a_station() -> void:
 		assert_str(String(switcher.current_view_id())).is_equal(String(view_id))
 
 
-func test_keys_light_the_current_station_and_hide_the_lab() -> void:
+func test_keys_light_the_current_station_and_the_lab_is_off() -> void:
 	_keys().refresh()
-	assert_int(_keys().get_key(&"gate").get_state()).is_equal(IconKey.KeyState.ACTIVE)
+	assert_bool(_keys().is_current(&"gate")).is_true()
+	assert_bool(_keys().get_key(&"lab").disabled).is_true()
 	assert_bool(_keys().get_buttons().has(_keys().get_key(&"lab"))).is_false()
 	_keys().get_key(&"office").pressed.emit()
 	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("command")
 	_keys().refresh()
-	assert_int(_keys().get_key(&"office").get_state()).is_equal(IconKey.KeyState.ACTIVE)
-	assert_int(_keys().get_key(&"gate").get_state()).is_equal(IconKey.KeyState.READY)
+	assert_bool(_keys().is_current(&"office")).is_true()
+	assert_bool(_keys().is_current(&"gate")).is_false()
 
 
 func test_lamps_follow_needs_attention() -> void:
 	var switcher: ViewSwitcher = _shell.view_switcher
 	_keys().refresh()
 	for station: StringName in ViewSwitcher.STATION_ORDER:
-		assert_bool(_keys().get_lamp(station).is_lit()).is_equal(
-			switcher.station_needs_attention(station)
-		)
+		assert_bool(_keys().has_lamp(station)).is_equal(switcher.station_needs_attention(station))
 
 
 func test_f_keys_reach_the_stations() -> void:
