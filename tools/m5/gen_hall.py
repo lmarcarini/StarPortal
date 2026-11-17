@@ -4,7 +4,7 @@
 Usage: python3 tools/m5/gen_hall.py src/scenes/stations/gate_hall.tscn
 The art target is art/plates/gate_hall.png from the camera in data/stations/station_gate.tres.
 """
-import math, sys
+import math, os, sys
 OUT = sys.argv[1]
 ext = []      # (type, path, id)
 subs = []     # text blocks
@@ -64,7 +64,7 @@ def path(name, pts, parent="Markers"):
 RING_Y = 4.9; R_IN = 2.9; R_OUT = 3.7; PED = 0.9; CW = 5.0
 env = sub("Environment", {
     "background_mode": "1", "background_color": "Color(0, 0, 0, 1)",
-    "ambient_light_source": "2", "ambient_light_color": "Color(0.42, 0.46, 0.52, 1)", "ambient_light_energy": "1.0",
+    "ambient_light_source": "2", "ambient_light_color": "Color(0.42, 0.46, 0.52, 1)", "ambient_light_energy": "1.3",
     "tonemap_mode": "3", "tonemap_exposure": "2.3", "tonemap_white": "6.0",
     "glow_enabled": "true", "glow_intensity": "0.6", "glow_bloom": "0.02", "glow_hdr_threshold": "1.0",
     "fog_enabled": "true", "fog_light_color": "Color(0.09, 0.085, 0.08, 1)", "fog_density": "0.006",
@@ -171,12 +171,18 @@ for i, (x, y, z) in enumerate(LAMPS):
     node("Bulb%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, y - 0.22, z)), "mesh": 'SubResource("%s")' % bulb, "material_override": MAT("lamp_glow")})
     node("Cable%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, (14.4 + y) / 2, z)), "mesh": 'SubResource("%s")' % cable, "material_override": MAT("gunmetal")})
     node("Sodium%d" % i, "SpotLight3D", "Lights", {"transform": xf((x, y - 0.35, z), rot_x=-90), "light_color": "Color(1, 0.7, 0.4, 1)", "light_energy": "22.0", "spot_range": "%g" % (y + 4), "spot_angle": "36.0", "spot_attenuation": "0.7", "spot_angle_attenuation": "1.3", "shadow_enabled": "true" if y < 9 else "false", "light_bake_mode": "2"})
-node("RingWash", "SpotLight3D", "Lights", {"transform": xf((0, 11.0, 9), rot_x=-28), "light_color": "Color(0.95, 0.88, 0.78, 1)", "light_energy": "9.0", "spot_range": "22", "spot_angle": "22", "spot_attenuation": "1.0", "shadow_enabled": "false", "light_bake_mode": "2"})
+node("RingWash", "SpotLight3D", "Lights", {"transform": xf((0, 11.0, 9), rot_x=-28), "light_color": "Color(0.95, 0.88, 0.78, 1)", "light_energy": "12.0", "spot_range": "22", "spot_angle": "22", "spot_attenuation": "1.0", "shadow_enabled": "false", "light_bake_mode": "2"})
 probe = {"transform": xf((0, 4, 8)), "size": "Vector3(34, 10, 26)", "update_mode": "0", "intensity": "0.6", "interior": "true", "box_projection": "true", "ambient_mode": "0"}
 node("FloorProbe", "ReflectionProbe", "Lights", probe)
 for i, (x, y, z) in enumerate([(-9, 9, 0.5), (9, 9, 0.5), (-13, 2.5, 6), (13, 2.5, 6)]):
     node("Wash%d" % i, "OmniLight3D", "Lights", {"transform": xf((x, y, z)), "light_color": "Color(0.95, 0.78, 0.58, 1)", "light_energy": "0.9", "omni_range": "9.0", "omni_attenuation": "1.8", "light_bake_mode": "2"}, groups=["secondary_light"])
-lm = {"quality": "2", "bounces": "3", "use_denoiser": "true", "directional": "false", "interior": "true", "environment_mode": "0", "texel_scale": "1.0"}
+# bake-only fill (#529): broad, low, unshadowed static lights on the upper walls and ceiling
+for i, (x, y, z) in enumerate([(-12, 11.5, 0), (12, 11.5, 0), (0, 13.0, 3), (-14, 11, 12), (14, 11, 12), (0, 13.5, 14)]):
+    node("Fill%d" % i, "OmniLight3D", "Lights", {"transform": xf((x, y, z)), "light_color": "Color(0.78, 0.76, 0.72, 1)", "light_energy": "0.4", "light_indirect_energy": "1.8", "omni_range": "13.0", "omni_attenuation": "0.9", "light_bake_mode": "1"}, groups=["secondary_light"])
+lm = {"quality": "2", "bounces": "4", "bounce_indirect_energy": "1.5", "use_denoiser": "true", "directional": "false", "interior": "true", "environment_mode": "3", "environment_custom_color": "Color(0.36, 0.4, 0.46, 1)", "environment_custom_energy": "0.6", "texel_scale": "1.0"}
+if os.path.exists("src/scenes/stations/gate_hall.lmbake"):
+    lm["light_data"] = 'ExtResource("lmbake")'
+    ext.append(("LightmapGIData", "res://src/scenes/stations/gate_hall.lmbake", "lmbake"))
 node("LightmapGI", "LightmapGI", ".", lm)
 # the Ring itself is built in code (src/scenes/stations/ring/ring_3d.gd, M5-03)
 for i in range(8):

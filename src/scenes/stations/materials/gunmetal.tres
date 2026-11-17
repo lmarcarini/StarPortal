@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" path="res://art/3d/textures/PaintedMetal004/PaintedMetal004_1K-JPG_Roughness.jpg" id="4"]
 
 [resource]
-albedo_color = Color(0.2, 0.2, 0.19, 1)
+albedo_color = Color(0.26, 0.26, 0.245, 1)
 metallic = 0.3
 metallic_texture = ExtResource("2")
 roughness = 1.0
