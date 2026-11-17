@@ -118,3 +118,16 @@ STATION_KEY_OFFICE,"The Office: Command, Archive and hiring (F4).","O Escritóri
 FRAME_MONITOR_IDLE,IDLE,PARADO
 FRAME_MONITOR_HINT,"The Ring, live while it dials, is open or something comes through. Opens the Gate.","O Anel, ao vivo enquanto disca, está aberto ou algo atravessa. Abre o Portal."
 UI_SLOW_SHORT,SLOW,LENTO
+FRAME_SITE_TITLE,SITE CAIRN,SÍTIO CAIRN
+FRAME_SITE_LINE,RING PROGRAMME · LEVEL 27,PROGRAMA ANEL · NÍVEL 27
+FRAME_NO_CALL,NO CALL,SEM LIGAÇÃO
+FRAME_SETTINGS,"Settings, save and load (Esc).","Ajustes, salvar e carregar (Esc)."
+FRAME_MONITOR_GATE,GATE,PORTAL
+FRAME_MONITOR_DIALLING,DIALLING,DISCANDO
+FRAME_MONITOR_INCOMING,INCOMING,CHEGANDO
+FRAME_MONITOR_SHUTTER,SHUTTER,OBTURADOR
+FRAME_MONITOR_RETURNING,TEAM RETURNING,EQUIPE VOLTANDO
+FRAME_MONITOR_OPEN,OPEN · {world},ABERTO · {world}
+WIRE_LINE_LAB,Research Lab · {n} scientists,Laboratório · {n} cientistas
+WIRE_LINE_CANDIDATE,{role} · skill {skill},{role} · nível {skill}
+WIRE_LINE_INCOMING,Unscheduled wormhole,Buraco de minhoca imprevisto

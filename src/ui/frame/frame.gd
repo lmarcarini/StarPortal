@@ -1,91 +1,76 @@
 class_name Frame
 extends Control
-## The frame bolted round every station (interface-rethink.md section 3): thin steel plates
-## over the scene, which shows between them. Top left the clock plate (date flap, pause /
-## play / fast, the slow lamp and the call lamp) and a status plate (the gate chip and the
-## rescue entry); top centre the alarm strip during an incursion; top right the gauge plate
-## (funds, power, charge, Confidence). Under the left plates runs the wire, the event cards
-## with their action keys (M4.10-02); bottom left the four station keys (M4.10-03), bottom
-## right the gate monitor (M4.10-04). Save,
-## Load and the debug button left the screen: they
-## are in the pause menu and on F12. Redraws on
-## EventBus signals and on [method bind]. Reads state only.
-## Bible: docs/content/interface-rethink.md section 3
+## The frame bolted round every station, laid out exactly as the interface reference
+## (interface-reference.md sections 2 and 4; regions at 1920 x 1080). The top bar: a dark
+## band with five steel plates (site, clock, resources, call, speed). The wire on the left
+## under it. The bottom bar, full width, with the four station keys; on every station but the
+## Gate the station console and the gate monitor (the Gate draws its own console there). The
+## scene shows full bleed behind. Wider windows add space between the left group and the
+## right group; nothing stretches. Redraws on EventBus signals and on [method bind]. Reads
+## state only.
+## Bible: docs/content/interface-reference.md sections 2 and 4
 
 ## Asks the shell to show [param view_id], on [param sub_tab] when not empty.
 signal open_view(view_id: StringName, sub_tab: StringName)
 ## The player chose [param entry] in the alert list (the shell selects its target).
 signal alert_chosen(entry: AlertEntry)
-## The band the top plates take changed height.
-signal band_changed
 ## The wire asks the shell to run [param step] (&"rescue", &"report") for [param card].
 signal wire_step(step: StringName, card: WireCardData)
 ## The wire's stack was pressed: open the full log.
 signal log_requested
+## The settings key was pressed.
+signal settings_requested
 
-## Gap between the plates and the screen edge, in pixels.
-const EDGE: float = 8.0
-
-## The plates.
+## The bands behind the plates.
+var band := FrameBand.new()
+## The top plates.
+var site_plate := SitePlate.new()
 var clock_plate := ClockPlate.new()
-var status_plate := SteelPanel.new()
-var gauge_plate := GaugePlate.new()
-## Clock, speed, slow lamp and call lamp.
+var resources_plate := ResourcesPlate.new()
+var call_plate := CallPlate.new()
+var speed_plate := SpeedPlate.new()
+## Clock and call logic (hidden, on the clock plate).
 var time_bar: TimeBar = clock_plate.time_bar
-## Funds, Confidence and power numbers (on the gauge plate).
-var money_label: MoneyLabel = gauge_plate.money_label
-var confidence_readout: ConfidenceReadout = gauge_plate.confidence_readout
-var power_readout: PowerReadout = gauge_plate.power_readout
-## The gate's state.
+## The resource cells (the old readouts, drawn by the resources plate).
+var money_label: MoneyLabel = resources_plate.money_label
+var confidence_readout: ConfidenceReadout = resources_plate.confidence_readout
+var power_readout: PowerReadout = resources_plate.power_readout
+## The gate's state (hidden: the gate monitor and the Gate station show it).
 var gate_chip := GateChip.new()
 ## The alerts the wire reads (a model: never shown).
 var alert_list := AlertList.new()
-## The wire: event cards with their action keys, under the left plates.
+## The wire: event cards with their action keys.
 var wire := Wire.new()
 ## The four station keys, bottom left.
 var station_keys := StationKeys.new()
-## The gate monitor, bottom right (not on the Gate).
+## The console plate and the gate monitor, bottom right (not on the Gate).
+var station_console := StationConsole.new()
 var gate_monitor := GateMonitor.new()
 ## The incursion strip and alarm look.
 var alarm_strip := AlarmStrip.new()
 
-## Extra gap above the wire, below the band (the shell's tab bar until the station keys).
-var wire_gap: float = 0.0:
-	set(value):
-		wire_gap = value
-		_layout()
-
 var _state: GameState = null
-var _band: float = 0.0
-var _left: HFlowContainer = HFlowContainer.new()
-var _status_row: HBoxContainer = HBoxContainer.new()
+var _extras: VBoxContainer = VBoxContainer.new()
 
 
 func _init() -> void:
 	name = &"Frame"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_left.add_theme_constant_override(&"h_separation", 6)
-	_left.add_theme_constant_override(&"v_separation", 6)
-	_left.position = Vector2(EDGE, EDGE)
-	add_child(_left)
-	_left.add_child(clock_plate)
-	_left.add_child(status_plate)
-	status_plate.name = &"StatusPlate"
-	status_plate.add_child(_status_row)
-	_status_row.add_theme_constant_override(&"separation", 6)
-	_status_row.add_child(gate_chip)
+	for child: Control in [band, site_plate, clock_plate, resources_plate, call_plate, speed_plate]:
+		add_child(child)
+	gate_chip.visible = false
+	add_child(gate_chip)
 	gate_chip.pressed.connect(open_view.emit.bind(ViewSwitcher.GATE_ROOM, &""))
-	add_child(gauge_plate)
-	gauge_plate.open_view.connect(open_view.emit)
+	resources_plate.open_view.connect(open_view.emit)
+	call_plate.setup(time_bar.get_call_button())
+	speed_plate.setup(time_bar)
+	speed_plate.settings_requested.connect(settings_requested.emit)
 	add_child(alarm_strip)
 	alert_list.visible = false
 	add_child(alert_list)
-	wire.position = Vector2(EDGE, EDGE)
-	add_child(wire)
-	add_child(station_keys)
-	station_keys.resized.connect(_layout)
-	add_child(gate_monitor)
+	for child: Control in [wire, _extras, station_keys, station_console, gate_monitor]:
+		add_child(child)
 	gate_monitor.pressed.connect(open_view.emit.bind(ViewSwitcher.GATE_ROOM, &""))
 	wire.open_view.connect(open_view.emit)
 	wire.entry_chosen.connect(_on_alert_chosen)
@@ -95,9 +80,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	resized.connect(_layout)
-	gauge_plate.resized.connect(_layout)
-	_left.resized.connect(_layout)
-	_layout.call_deferred()
+	_layout()
 
 
 func _enter_tree() -> void:
@@ -120,7 +103,7 @@ func _notification(what: int) -> void:
 ## Reads [param simulation]'s state (after a start or a load) and redraws every plate.
 func bind(simulation: Simulation) -> void:
 	_state = simulation.state
-	gauge_plate.bind(_state)
+	resources_plate.bind(_state)
 	alert_list.bind(_state)
 	wire.bind(simulation, alert_list)
 	gate_monitor.bind(simulation)
@@ -131,68 +114,61 @@ func bind(simulation: Simulation) -> void:
 func refresh() -> void:
 	if _state == null:
 		return
-	gauge_plate.show_state(_state)
+	resources_plate.show_state(_state)
 	_refresh_live()
 
 
-## Height of the bottom band the station keys take, in pixels.
-func bottom_height() -> float:
-	return maxf(station_keys.size.y, gate_monitor.size.y) + EDGE * 2.0
+## Shows the station console and the gate monitor ([param on]: every station but the Gate).
+func show_station_console(on: bool) -> void:
+	station_console.visible = on
+	gate_monitor.wanted = on
 
 
-## Height of the top plates' band, in pixels (the scene shows below and between).
-func band_height() -> float:
-	return maxf(_left.size.y, gauge_plate.size.y) + EDGE * 2.0
-
-
-## Puts [param control] on the status plate (the shell's rescue entries).
+## Puts [param control] under the wire's +N key (the shell's rescue entries).
 func add_after_clock(control: Control) -> void:
-	_status_row.add_child(control)
+	_extras.add_child(control)
 
 
-## The buttons in focus order: the clock keys, [param extra], the gate chip, the gauge
-## numbers, then the wire's keys.
+## The buttons in focus order: the speed keys, [param extra], the call plate, the resource
+## cells, the wire's keys, then the station keys.
 func get_focus_buttons(extra: Array[Button]) -> Array[Button]:
-	var buttons: Array[Button] = clock_plate.get_buttons()
+	var buttons: Array[Button] = speed_plate.get_buttons()
 	buttons.append_array(extra)
-	buttons.append(gate_chip)
-	buttons.append_array(gauge_plate.get_buttons())
+	if call_plate.is_waiting():
+		buttons.append(call_plate)
+	buttons.append_array(resources_plate.get_buttons())
 	buttons.append_array(wire.get_keys())
 	buttons.append_array(station_keys.get_buttons())
 	return buttons.filter(func(b: Button) -> bool: return b.visible)
 
 
-## The used width of the left plates' widest row.
-func _left_width() -> float:
-	var right: float = 0.0
-	for plate: Control in _left.get_children():
-		right = maxf(right, plate.position.x + plate.size.x)
-	return right
-
-
-## The left plates and the gauge plate, in screen space (for tests).
+## The top plates (for tests).
 func get_plates() -> Array[Control]:
-	return [clock_plate, status_plate, gauge_plate]
+	return [site_plate, clock_plate, resources_plate, call_plate, speed_plate]
 
 
 func _layout() -> void:
-	gauge_plate.reset_size()
-	gauge_plate.position = Vector2(size.x - gauge_plate.size.x - EDGE, EDGE)
-	# The left plates wrap to a second row rather than run under the gauges.
-	_left.size = Vector2(maxf(0.0, gauge_plate.position.x - EDGE * 2.0), 0.0)
+	var right: float = size.x - FrameLayout.WIDTH
+	var left_group: Dictionary[Control, StringName] = {
+		site_plate: &"top_site",
+		clock_plate: &"top_clock",
+		resources_plate: &"top_resources",
+		wire: &"wire",
+		station_keys: &"station_keys",
+		station_console: &"station_console",
+	}
+	for control: Control in left_group:
+		FrameLayout.place(control, left_group[control], 0.0)
+	var right_group: Dictionary[Control, StringName] = {
+		call_plate: &"top_call", speed_plate: &"top_speed", gate_monitor: &"gate_monitor"
+	}
+	for control: Control in right_group:
+		FrameLayout.place(control, right_group[control], right)
+	_extras.position = (
+		wire.position + Vector2(Wire.STACK_SIZE.x + 10.0, wire.size.y - Wire.STACK_SIZE.y)
+	)
 	alarm_strip.reset_size()
-	var gap_left: float = _left.position.x + _left_width()
-	var centre: float = (gap_left + gauge_plate.position.x) * 0.5
-	alarm_strip.position = Vector2(centre - alarm_strip.size.x * 0.5, EDGE)
-	wire.position = Vector2(EDGE, band_height() + wire_gap)
-	station_keys.reset_size()
-	station_keys.position = Vector2(EDGE, size.y - station_keys.size.y - EDGE)
-	gate_monitor.reset_size()
-	gate_monitor.position = size - gate_monitor.size - Vector2(EDGE, EDGE)
-	var bands: float = band_height() + bottom_height() * 1000.0
-	if not is_equal_approx(bands, _band):
-		_band = bands
-		band_changed.emit()
+	alarm_strip.position = Vector2((size.x - alarm_strip.size.x) * 0.5, FrameBand.TOP + 8.0)
 
 
 func _on_alert_chosen(entry: AlertEntry) -> void:
@@ -201,10 +177,12 @@ func _on_alert_chosen(entry: AlertEntry) -> void:
 
 
 func _refresh_live() -> void:
-	gauge_plate.show_power(_state)
+	resources_plate.show_power(_state)
 	gate_chip.show_state(_state)
 	alarm_strip.show_state(_state)
-	_layout()
+	call_plate.refresh()
+	speed_plate.refresh()
+	clock_plate.queue_redraw()
 
 
 static func _redraw_signals() -> Array[StringName]:
@@ -226,6 +204,13 @@ static func _redraw_signals() -> Array[StringName]:
 		&"incursion_warning",
 		&"incursion_breached",
 		&"incursion_ended",
+		&"speed_changed",
+		&"paused_changed",
+		&"slow_changed",
+		&"contact_pending",
+		&"call_missed",
+		&"conversation_started",
+		&"conversation_ended",
 	]
 
 

@@ -68,7 +68,8 @@ func _ready() -> void:
 	move_child(frame, view_switcher.get_index() + 1)
 	frame.open_view.connect(open_view)
 	frame.alert_chosen.connect(_on_alert_chosen)
-	frame.band_changed.connect(_fit_below_frame)
+	frame.resized.connect(_fit_below_frame)
+	frame.settings_requested.connect(pause_menu.open)
 	frame.station_keys.station_chosen.connect(view_switcher.show_station)
 	view_switcher.view_changed.connect(_fit_below_frame.unbind(1))
 	frame.log_requested.connect(ShellBoot.open_log.bind(view_switcher))
@@ -95,7 +96,7 @@ func _ready() -> void:
 	SimClock.pause()
 	_bind_views(_simulation)
 	var buttons: Array[Button] = get_focus_order()
-	ShellBoot.link_focus(buttons, view_switcher.get_tab_bar())
+	ShellBoot.link_focus(buttons, ShellLayout.focus_below(view_switcher))
 	view_switcher.set_focus_above(buttons[0])
 	buttons[0].grab_focus()
 
@@ -290,9 +291,8 @@ func _add_alerts() -> void:
 	frame.add_after_clock(_alert_stack)
 	add_child(_rescue_alert)
 	_rescue_alert.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	_rescue_alert.offset_left = 16.0
-	_rescue_alert.offset_right = -16.0
-	_rescue_alert.offset_top = view_switcher.offset_top + 48.0
+	_rescue_alert.offset_left = 400.0
+	_rescue_alert.offset_right = -400.0
 	_fit_below_frame()
 	_rescue_alert.gate_room_requested.connect(view_switcher.show_view.bind(ViewSwitcher.GATE_ROOM))
 	_alert_stack.setup(_rescue_alert)
@@ -304,7 +304,7 @@ func _add_alerts() -> void:
 func _relink_frame() -> void:
 	if not is_node_ready():
 		return
-	ShellBoot.link_focus(get_focus_order(), view_switcher.get_tab_bar())
+	ShellBoot.link_focus(get_focus_order(), ShellLayout.focus_below(view_switcher))
 
 
 func _on_team_checked_in(world_id: StringName, light: int, serious: int, _day: String) -> void:
@@ -385,12 +385,9 @@ func _on_setting_changed(section: StringName, key: StringName, _value: Variant) 
 		_apply_theme()
 
 
-## Keeps the views and the rescue alert just under the frame's top plates.
+## Puts the views full bleed (Gate) or in the station area, and the rescue alert in it.
 func _fit_below_frame() -> void:
-	view_switcher.offset_top = frame.band_height()
-	view_switcher.offset_bottom = -frame.bottom_height()
-	frame.wire_gap = view_switcher.get_tab_bar().size.y
-	var station: bool = view_switcher.current_view_id() == ViewSwitcher.GATE_ROOM
-	frame.gate_monitor.wanted = not station
-	view_switcher.offset_left = 0.0 if station else frame.wire.size.x + Frame.EDGE * 2.0
-	_rescue_alert.offset_top = frame.band_height() + 48.0
+	ShellLayout.fit(view_switcher, %Backdrop as Control, frame)
+	var area: Rect2 = FrameLayout.station_area(frame.size.x)
+	_rescue_alert.offset_top = area.position.y + 48.0
+	_relink_frame()

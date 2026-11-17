@@ -38,7 +38,7 @@ func after_test() -> void:
 func test_every_item_is_focusable_and_in_the_ring() -> void:
 	var bar: Frame = _shell.frame
 	var buttons: Array[Button] = _shell.get_focus_order()
-	for item: Button in [bar.power_readout, bar.gate_chip, bar.money_label]:
+	for item: Button in [bar.power_readout, bar.money_label, bar.confidence_readout]:
 		assert_bool(buttons.has(item)).is_true()
 		assert_int(item.focus_mode).is_equal(Control.FOCUS_ALL)
 
@@ -72,19 +72,21 @@ func test_readouts_show_state_while_paused_and_after_a_load() -> void:
 	assert_str(String(bar.gate_chip.get_status())).is_equal("idle")
 
 
-func test_pt_br_fits_at_150_percent_in_1280_by_720() -> void:
+## The interface scales with the window height (canvas_items, expand): a wider window adds
+## space between the left and the right groups; the plates keep their size and never overlap.
+func test_wider_windows_add_space_and_nothing_stretches() -> void:
 	TranslationServer.set_locale("pt_BR")
-	Settings.setting_changed.emit(&"display", &"ui_scale", 1.5)
-	_shell.theme = UiThemeBuilder.build(1.5)
-	_shell.size = Vector2(1280, 720)
-	await _runner.simulate_frames(6)
-	var plates: Array[Control] = _shell.frame.get_plates()
-	for plate: Control in plates:
-		assert_float(plate.get_global_rect().end.x).is_less_equal(1280.0)
-	var gauges: Rect2 = plates[2].get_global_rect()
-	for plate: Control in [plates[0], plates[1]]:
-		assert_bool(plate.get_global_rect().intersects(gauges)).is_false()
-	assert_float(_shell.view_switcher.offset_top).is_equal_approx(_shell.frame.band_height(), 0.5)
+	for width: float in [1920.0, 2560.0]:
+		_shell.size = Vector2(width, 1080)
+		await _runner.simulate_frames(2)
+		var plates: Array[Control] = _shell.frame.get_plates()
+		for i: int in plates.size() - 1:
+			var next: Rect2 = plates[i + 1].get_global_rect()
+			assert_bool(plates[i].get_global_rect().intersects(next)).is_false()
+		var speed: Rect2 = plates[4].get_global_rect()
+		assert_float(speed.end.x).is_equal_approx(width - 8.0, 0.5)
+		assert_float(speed.size.x).is_equal_approx(204.0, 0.5)
+		assert_float(plates[0].get_global_rect().position.x).is_equal_approx(8.0, 0.5)
 
 
 func test_the_frame_is_thin_plates_and_save_load_and_debug_left_the_screen() -> void:
@@ -101,7 +103,7 @@ func test_the_frame_is_thin_plates_and_save_load_and_debug_left_the_screen() -> 
 
 
 func test_speed_keys_pause_play_and_fast() -> void:
-	var plate: ClockPlate = _shell.frame.clock_plate
+	var plate: SpeedPlate = _shell.frame.speed_plate
 	SimClock.resume()
 	plate.pause_key.pressed.emit()
 	assert_bool(SimClock.simulation.state.clock.is_paused).is_true()

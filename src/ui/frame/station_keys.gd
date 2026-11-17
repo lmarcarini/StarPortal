@@ -1,32 +1,44 @@
 class_name StationKeys
-extends SteelPanel
-## The frame's four station keys, bottom left (interface-rethink.md section 3): Gate, Base,
-## Lab and Office as large icon keys with a one-word stencil label. The current station's key
-## is lit (pressed in); a lamp on a key glows when something there needs the player (the
-## hosted views' needs_attention()). Lab is hidden until a Research Lab exists. Keyboard (F1-F4,
-## Q/E), mouse and gamepad.
-## Bible: docs/content/interface-rethink.md section 3
+extends Control
+## The frame's four station keys, bottom left (interface-reference.md section 4,
+## station_keys): Gate, Base, Lab and Office, 148 x 168 and 10 px apart, each a 56 px icon
+## over a 26 px label. The current station's key is amber; a red lamp in its top right corner
+## when something there needs the player (the hosted views' needs_attention()). The Lab key is
+## off (dim, unavailable) until a Research Lab exists. Keyboard (F1-F4, Q/E), mouse and
+## gamepad.
+## Bible: docs/content/interface-reference.md section 4
 
 ## The player pressed the key of [param station].
 signal station_chosen(station: StringName)
 
+## Key size and gap, in pixels.
+const KEY: Vector2 = Vector2(148, 168)
+const GAP: float = 10.0
 ## Seconds between two reads of the attention lamps.
 const POLL_SECONDS: float = 0.5
 
 var _switcher: ViewSwitcher = null
-var _keys: Dictionary[StringName, IconKey] = {}
-var _lamps: Dictionary[StringName, IndicatorLamp] = {}
-var _row: HBoxContainer = HBoxContainer.new()
+var _keys: Dictionary[StringName, RefKey] = {}
 var _poll: float = 0.0
 
 
 func _init() -> void:
-	super()
 	name = &"StationKeys"
-	_row.add_theme_constant_override(&"separation", 6)
-	add_child(_row)
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var x: float = 0.0
 	for station: StringName in ViewSwitcher.STATION_ORDER:
-		_row.add_child(_unit(station))
+		var key: RefKey = RefKey.new()
+		key.name = String(station).capitalize() + "Station"
+		key.icon_id = station
+		key.label = "STATION_" + String(station).to_upper()
+		key.label_size = 26
+		key.position = Vector2(x, 0)
+		key.size = KEY
+		key.pressed.connect(station_chosen.emit.bind(station))
+		add_child(key)
+		_keys[station] = key
+		x += KEY.x + GAP
+	size = Vector2(x - GAP, KEY.y)
 
 
 func _ready() -> void:
@@ -42,33 +54,39 @@ func bind(switcher: ViewSwitcher) -> void:
 	refresh()
 
 
-## Lights the current station's key, the attention lamps, and hides unavailable stations.
+## Lights the current station's key and the attention lamps; an unavailable station's key
+## is off.
 func refresh() -> void:
 	if _switcher == null:
 		return
 	for station: StringName in _keys:
-		var key: IconKey = _keys[station]
-		(key.get_parent() as Control).visible = _switcher.is_station_available(station)
+		var key: RefKey = _keys[station]
+		key.disabled = not _switcher.is_station_available(station)
 		var current: bool = station == _switcher.current_station()
-		key.set_state(IconKey.KeyState.ACTIVE if current else IconKey.KeyState.READY)
-		_lamps[station].set_lit(_switcher.station_needs_attention(station), UiThemeHardware.AMBER)
+		key.style = RefPaint.KeyStyle.AMBER if current else RefPaint.KeyStyle.STEEL
+		key.lamp = _switcher.station_needs_attention(station)
 
 
 ## The key of [param station].
-func get_key(station: StringName) -> IconKey:
+func get_key(station: StringName) -> RefKey:
 	return _keys[station]
 
 
-## The lamp of [param station].
-func get_lamp(station: StringName) -> IndicatorLamp:
-	return _lamps[station]
+## Whether [param station]'s key is the current one (amber).
+func is_current(station: StringName) -> bool:
+	return _keys[station].style == RefPaint.KeyStyle.AMBER
 
 
-## The visible keys in order.
+## Whether [param station]'s attention lamp is lit.
+func has_lamp(station: StringName) -> bool:
+	return _keys[station].lamp
+
+
+## The keys that can be pressed, in order.
 func get_buttons() -> Array[Button]:
 	var found: Array[Button] = []
 	for station: StringName in ViewSwitcher.STATION_ORDER:
-		if (_keys[station].get_parent() as Control).visible:
+		if not _keys[station].disabled:
 			found.append(_keys[station])
 	return found
 
@@ -78,27 +96,3 @@ func _process(delta: float) -> void:
 	if _poll <= 0.0:
 		_poll = POLL_SECONDS
 		refresh()
-
-
-func _unit(station: StringName) -> Control:
-	var column: VBoxContainer = VBoxContainer.new()
-	column.add_theme_constant_override(&"separation", 2)
-	var key: IconKey = IconKey.new()
-	key.name = String(station).capitalize() + "Station"
-	key.icon_id = station
-	key.custom_minimum_size = Vector2(64, 64)
-	key.pressed.connect(station_chosen.emit.bind(station))
-	var lamp: IndicatorLamp = IndicatorLamp.new()
-	lamp.custom_minimum_size = Vector2(12, 12)
-	lamp.position = Vector2(48, 4)
-	lamp.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	key.add_child(lamp)
-	column.add_child(key)
-	var label: Label = Label.new()
-	label.theme_type_variation = &"HwStencil"
-	label.text = "STATION_" + String(station).to_upper()
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(label)
-	_keys[station] = key
-	_lamps[station] = lamp
-	return column

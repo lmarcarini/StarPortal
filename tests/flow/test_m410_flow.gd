@@ -44,9 +44,9 @@ func _press(kind: StringName, key_id: StringName) -> void:
 	_wire().refresh()
 	var card: WireCard = _wire().card_of(kind)
 	assert_object(card).override_failure_message("no %s card" % kind).is_not_null()
-	for key: IconKey in card.get_keys():
+	for key: RefKey in card.get_keys():
 		if key.name == String(key_id):
-			assert_int(key.get_state()).is_not_equal(IconKey.KeyState.UNAVAILABLE)
+			assert_bool(key.disabled).is_false()
 			key.pressed.emit()
 			await _runner.simulate_frames(1)
 			return
@@ -73,22 +73,27 @@ func _hire_from_the_base() -> void:
 	assert_object(_sim().state.recruitment.find_candidate(candidate)).is_null()
 
 
-## A finished, powered lab with nothing to do: the lab idle card starts a project.
+## A finished, powered lab with nothing to do: the lab idle card's one key opens the Lab.
 func _start_research_from_the_wire() -> void:
 	var state: GameState = _sim().state
 	var lab: RoomState = PowerFixture.lab(state)
 	lab.build_ticks_left = 0
 	lab.powered_on = true
+	EventBus.room_built.emit(lab.id)
 	_shell.frame.alert_list.refresh()
 	await _runner.simulate_frames(1)
 	var card: WireCard = _wire().card_of(&"lab_idle")
 	assert_object(card).is_not_null()
-	var first: IconKey = card.get_keys()[0]
-	assert_int(first.get_state()).is_not_equal(IconKey.KeyState.UNAVAILABLE)
-	var project: String = first.name
+	assert_int(card.get_keys().size()).is_equal(1)
+	var first: RefKey = card.get_keys()[0]
+	assert_bool(first.disabled).is_false()
 	first.pressed.emit()
 	await _runner.simulate_frames(1)
-	assert_str(String(state.research.active)).is_equal(project)
+	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("research")
+	var project: StringName = WireActions.research(state)[0].id
+	assert_bool(_sim().submit(StartResearchCommand.create(project)).is_ok).is_true()
+	_shell.frame.alert_list.refresh()
+	await _runner.simulate_frames(1)
 
 
 ## The phone card's ANSWER starts the briefing; ACCEPT at its offer step takes the request.
@@ -117,7 +122,7 @@ func _monitor_lights_during_a_dial() -> void:
 	await _runner.simulate_frames(2)
 	var monitor: GateMonitor = _shell.frame.gate_monitor
 	assert_bool(monitor.visible).is_true()
-	assert_bool(monitor.is_rendering()).is_false()
+	assert_bool(monitor.is_live()).is_false()
 	var state: GameState = _sim().state
 	var world: StringName = state.address_book.entries[0].world_id
 	var address: GateAddress = state.galaxy.address_of(world, state.galaxy.home().origin_glyph)
@@ -125,7 +130,6 @@ func _monitor_lights_during_a_dial() -> void:
 	assert_bool(_sim().submit(DialCommand.create(address)).is_ok).is_true()
 	await _runner.simulate_frames(2)
 	assert_bool(monitor.is_live()).is_true()
-	assert_bool(monitor.is_rendering()).is_true()
 	assert_int(monitor.current_look().phase).is_equal(RingLook.Phase.DIALING)
 
 
