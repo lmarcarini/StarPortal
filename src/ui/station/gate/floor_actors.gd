@@ -26,6 +26,7 @@ var _crosser: Actor = null
 var _cross_in: float = ActorCues.CROSS_MIN_SECONDS
 var _crew_in: float = 0.0
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var _floor_3d: FloorActors3D = null
 
 
 func _init() -> void:
@@ -63,9 +64,16 @@ func _exit_tree() -> void:
 	_calls.clear()
 
 
-## Plays over [param station].
+## Plays over [param station]; on a 3D station the figures are drawn in its hall
+## ([FloorActors3D]) and this layer draws nothing.
 func bind(station: StationScene) -> void:
 	_station = station
+	_floor_3d = FloorActors3D.install(station, self)
+
+
+## The 3D floor, or null on the plate.
+func get_floor_3d() -> FloorActors3D:
+	return _floor_3d
 
 
 ## True while a cue is playing (CLOSE then asks to be held).
@@ -212,7 +220,7 @@ func _on_simple(event_name: StringName) -> void:
 
 
 func _draw() -> void:
-	if _station == null:
+	if _station == null or _floor_3d != null:
 		return
 	for person: Actor in _idle:
 		_draw_actor(person)
