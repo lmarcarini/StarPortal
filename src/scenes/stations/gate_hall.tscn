@@ -26,9 +26,9 @@ background_mode = 1
 background_color = Color(0, 0, 0, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.42, 0.46, 0.52, 1)
-ambient_light_energy = 0.55
+ambient_light_energy = 1.0
 tonemap_mode = 3
-tonemap_exposure = 1.9
+tonemap_exposure = 2.3
 tonemap_white = 6.0
 glow_enabled = true
 glow_intensity = 0.6
@@ -1003,9 +1003,9 @@ material_override = ExtResource("e13")
 [node name="DoorLight" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.6, 3.4, 1.6)
 light_color = Color(0.8, 0.88, 1, 1)
-light_energy = 2.2
-omni_range = 6.0
-omni_attenuation = 1.2
+light_energy = 0.8
+omni_range = 4.5
+omni_attenuation = 1.6
 light_bake_mode = 2
 
 [node name="ConsoleBodyLeft" type="MeshInstance3D" parent="Shell"]
@@ -1183,11 +1183,11 @@ shadow_enabled = true
 light_bake_mode = 2
 
 [node name="RingWash" type="SpotLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 0.6157, 0.788, 0, -0.788, 0.6157, 0, 13.5, 6)
-light_color = Color(0.9, 0.82, 0.7, 1)
-light_energy = 6.0
-spot_range = 18
-spot_angle = 24
+transform = Transform3D(1, 0, 0, 0, 0.8829, 0.4695, 0, -0.4695, 0.8829, 0, 11, 9)
+light_color = Color(0.95, 0.88, 0.78, 1)
+light_energy = 9.0
+spot_range = 22
+spot_angle = 22
 spot_attenuation = 1.0
 shadow_enabled = true
 light_bake_mode = 2

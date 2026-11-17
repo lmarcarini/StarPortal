@@ -64,8 +64,8 @@ def path(name, pts, parent="Markers"):
 RING_Y = 4.9; R_IN = 2.9; R_OUT = 3.7; PED = 0.9; CW = 5.0
 env = sub("Environment", {
     "background_mode": "1", "background_color": "Color(0, 0, 0, 1)",
-    "ambient_light_source": "2", "ambient_light_color": "Color(0.42, 0.46, 0.52, 1)", "ambient_light_energy": "0.55",
-    "tonemap_mode": "3", "tonemap_exposure": "1.9", "tonemap_white": "6.0",
+    "ambient_light_source": "2", "ambient_light_color": "Color(0.42, 0.46, 0.52, 1)", "ambient_light_energy": "1.0",
+    "tonemap_mode": "3", "tonemap_exposure": "2.3", "tonemap_white": "6.0",
     "glow_enabled": "true", "glow_intensity": "0.6", "glow_bloom": "0.02", "glow_hdr_threshold": "1.0",
     "fog_enabled": "true", "fog_light_color": "Color(0.09, 0.085, 0.08, 1)", "fog_density": "0.006",
     "adjustment_enabled": "true", "adjustment_saturation": "0.8", "adjustment_contrast": "1.08",
@@ -152,7 +152,7 @@ kit("DoorFrame", "Door_Frame_SquareTall", (-13.6, 0, 0.75), 0, (0.72, 0.68, 1))
 kit("DoorA", "Door_DarkMetal", (-13.6, 0, 0.72), 0, (0.72, 0.68, 1))
 kit("DoorB", "Door_DarkMetal", (-12.08, 0, 0.72), 0, (0.72, 0.68, 1))
 box("DoorLamp", (1.2, 0.08, 0.15), (-13.6, 3.75, 0.85), "strip_glow")
-node("DoorLight", "OmniLight3D", "Lights", {"transform": xf((-13.6, 3.4, 1.6)), "light_color": "Color(0.8, 0.88, 1, 1)", "light_energy": "2.2", "omni_range": "6.0", "omni_attenuation": "1.2", "light_bake_mode": "2"}, groups=["secondary_light"])
+node("DoorLight", "OmniLight3D", "Lights", {"transform": xf((-13.6, 3.4, 1.6)), "light_color": "Color(0.8, 0.88, 1, 1)", "light_energy": "0.8", "omni_range": "4.5", "omni_attenuation": "1.6", "light_bake_mode": "2"}, groups=["secondary_light"])
 # console banks at the Ring's base: grey steel cabinets with dark screens
 for side, nm in ((-1, "Left"), (1, "Right")):
     cx = side * 6.9
@@ -171,7 +171,7 @@ for i, (x, y, z) in enumerate(LAMPS):
     node("Bulb%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, y - 0.22, z)), "mesh": 'SubResource("%s")' % bulb, "material_override": MAT("lamp_glow")})
     node("Cable%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, (14.4 + y) / 2, z)), "mesh": 'SubResource("%s")' % cable, "material_override": MAT("gunmetal")})
     node("Sodium%d" % i, "SpotLight3D", "Lights", {"transform": xf((x, y - 0.35, z), rot_x=-90), "light_color": "Color(1, 0.7, 0.4, 1)", "light_energy": "22.0", "spot_range": "%g" % (y + 4), "spot_angle": "36.0", "spot_attenuation": "0.7", "spot_angle_attenuation": "1.3", "shadow_enabled": "true", "light_bake_mode": "2"})
-node("RingWash", "SpotLight3D", "Lights", {"transform": xf((0, 13.5, 6), rot_x=-52), "light_color": "Color(0.9, 0.82, 0.7, 1)", "light_energy": "6.0", "spot_range": "18", "spot_angle": "24", "spot_attenuation": "1.0", "shadow_enabled": "true", "light_bake_mode": "2"})
+node("RingWash", "SpotLight3D", "Lights", {"transform": xf((0, 11.0, 9), rot_x=-28), "light_color": "Color(0.95, 0.88, 0.78, 1)", "light_energy": "9.0", "spot_range": "22", "spot_angle": "22", "spot_attenuation": "1.0", "shadow_enabled": "true", "light_bake_mode": "2"})
 probe = {"transform": xf((0, 4, 8)), "size": "Vector3(34, 10, 26)", "update_mode": "0", "intensity": "0.6", "interior": "true", "box_projection": "true", "ambient_mode": "0"}
 node("FloorProbe", "ReflectionProbe", "Lights", probe)
 for i, (x, y, z) in enumerate([(-9, 9, 0.5), (9, 9, 0.5), (-13, 2.5, 6), (13, 2.5, 6)]):
