@@ -75,20 +75,15 @@ for g in ["Shell", "Kit", "Ring", "Lights", "Markers"]:
     node(g, "Node3D", ".", {})
 # shell: floor, ceiling, back walls (outer, dark), side walls
 box("Floor", (36, 0.4, 34), (0, -0.2, 11), "floor")
+for i, (x, z) in enumerate([(-10, 4), (9, 12), (-6, 18), (12, 2)]):
+    box("FloorPatch%d" % i, (6, 0.02, 5), (x, 0.004, z), "floor_b")
 box("Ceiling", (36, 0.4, 34), (0, 15.2, 11), "gunmetal")
 box("BackOuterL", (12, 15, 0.8), (-11, 7.5, -4.4), "concrete_dark")
 box("BackOuterR", (12, 15, 0.8), (11, 7.5, -4.4), "concrete_dark")
 box("WallLeft", (0.8, 15, 34), (-17.4, 7.5, 11), "concrete_dark")
 box("WallRight", (0.8, 15, 34), (17.4, 7.5, 11), "concrete_dark")
 # the Ring's wall: a concrete panel between two steel pilasters, with seams
-box("RingWall", (10.4, 15, 0.8), (0, 7.5, -1.8), "concrete")
-# seams kept clear of the Ring's hole (x within the outer radius, y 1.2 to 8.6)
-for x in (-4.4, 4.4):
-    box("SeamV%+g" % x, (0.05, 15, 0.05), (x, 7.5, -1.38), "seam")
-for x in (-2.6, 0, 2.6):
-    box("SeamVTop%+g" % x, (0.05, 5.4, 0.05), (x, 12.3, -1.38), "seam")
-for y in (9.6, 12.0):
-    box("SeamH%g" % y, (10.4, 0.05, 0.05), (0, y, -1.38), "seam")
+box("RingWall", (10.4, 15, 0.8), (0, 7.5, -1.8), "plates")
 for side in (-1, 1):
     box("Pilaster%d" % side, (1.3, 15, 1.4), (side * 5.85, 7.5, -1.4), "gunmetal")
     box("PilasterFace%d" % side, (0.9, 15, 0.1), (side * 5.85, 7.5, -0.65), "concrete")
@@ -130,7 +125,7 @@ for x in range(-16, 17, 4):
     node("FloorSeamX%d" % x, "MeshInstance3D", "Shell", {"transform": xf((x, 0.011, 11)), "mesh": 'SubResource("%s")' % seam2, "material_override": MAT("seam")})
 # catwalks along both walls at mid height
 for side, nm in ((-1, "Left"), (1, "Right")):
-    box("Catwalk" + nm, (5.0, 0.25, 26), (side * 14.5, CW, 7), "gunmetal")
+    box("Catwalk" + nm, (5.0, 0.25, 26), (side * 14.5, CW, 7), "tread")
     box("CatwalkLip" + nm, (0.15, 0.45, 26), (side * 12.0, CW - 0.1, 7), "gunmetal")
     for h in (0.55, 1.1):
         box("CatwalkRail%s%g" % (nm, h), (0.06, 0.06, 26), (side * 12.05, CW + h, 7), "rail")

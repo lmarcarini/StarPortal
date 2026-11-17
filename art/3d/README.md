@@ -10,4 +10,4 @@ All CC0 (public domain), by Quaternius (https://quaternius.com), supplied by the
 
 No characters are included in these packs.
 
-`textures/`: CC0 PBR sets for the Gate hall (see its README).
+`textures/`: CC0 PBR sets from ambientCG for the Gate hall (see its README.txt).
