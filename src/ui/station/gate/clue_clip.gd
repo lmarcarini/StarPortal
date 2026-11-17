@@ -9,7 +9,6 @@ const _READER: PackedScene = preload("res://src/ui/archive/document_reader.tscn"
 const _TYPE_FONT: Font = preload("res://art/fonts/ibm_plex_mono/IBMPlexMono-Regular.ttf")
 ## The steel clip at the top of the board, in pixels.
 const CLIP_SIZE: Vector2 = Vector2(140.0, 30.0)
-const CLIP_STEEL: Color = Color("#8a8d8f")
 const CLIP_DARK: Color = Color("#3d4043")
 
 var _simulation: Simulation = null
@@ -22,10 +21,13 @@ var _next: IconKey = IconKey.new()
 func _ready() -> void:
 	super()
 	var paper: StyleBoxFlat = StyleBoxFlat.new()
-	paper.bg_color = UiThemeHardware.PAPER
+	paper.bg_color = RefPaint.PAPER
 	paper.set_content_margin_all(18.0)
-	paper.shadow_color = Color(0, 0, 0, 0.5)
-	paper.shadow_size = 6
+	paper.set_border_width_all(1)
+	paper.border_color = Color8(120, 112, 90)
+	paper.shadow_color = Color(0, 0, 0, 0.85)
+	paper.shadow_size = 1
+	paper.shadow_offset = Vector2(6, 8)
 	add_theme_stylebox_override(&"panel", paper)
 	var column: VBoxContainer = VBoxContainer.new()
 	add_child(column)
@@ -36,11 +38,13 @@ func _ready() -> void:
 	column.add_child(keys)
 	_prev.name = "PrevClue"
 	_prev.icon_id = &"prev"
+	_prev.look = IconKey.Look.STEEL
 	_prev.set_help("HW_ICON_PREV")
 	_prev.pressed.connect(step.bind(-1))
 	keys.add_child(_prev)
 	_next.name = "NextClue"
 	_next.icon_id = &"next"
+	_next.look = IconKey.Look.STEEL
 	_next.set_help("HW_ICON_NEXT")
 	_next.pressed.connect(step.bind(1))
 	keys.add_child(_next)
@@ -67,8 +71,7 @@ static func _type_on_paper(reader: DocumentReader) -> void:
 
 func _draw() -> void:
 	var at: Vector2 = Vector2((size.x - CLIP_SIZE.x) * 0.5, -CLIP_SIZE.y * 0.4)
-	draw_rect(Rect2(at, CLIP_SIZE), CLIP_DARK)
-	draw_rect(Rect2(at + Vector2(6, 4), CLIP_SIZE - Vector2(12, 12)), CLIP_STEEL)
+	RefPaint.steel_plate(self, Rect2(at, CLIP_SIZE), false, false)
 	draw_circle(at + Vector2(CLIP_SIZE.x * 0.5, CLIP_SIZE.y * 0.35), 5.0, CLIP_DARK)
 
 

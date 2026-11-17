@@ -121,9 +121,7 @@ func _add_key(text: String) -> Button:
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override(&"font_size", roundi(FONT_SIZE * _scale))
 	button.custom_minimum_size.y = BUTTON_HEIGHT * _scale
-	var font: Font = UiThemeBuilder.data_font()
-	if font != null:
-		button.add_theme_font_override(&"font", font)
+	DialogueKeys.style(button)
 	_keys.add_child(button)
 	return button
 

@@ -16,7 +16,7 @@ const CHARS_PER_SECOND: float = 40.0
 const CURRENT_SIZE: int = 20
 const HISTORY_SIZE: int = 16
 ## Name labels' size at UI scale 1.
-const NAME_SIZE: int = 22
+const NAME_SIZE: int = 24
 
 var _entries := VBoxContainer.new()
 var _current: Label = null
@@ -74,7 +74,7 @@ func clear() -> void:
 func add_line(speaker: String, accent: Color, text: String, typed: bool = true) -> void:
 	finish_typing()
 	var entry := VBoxContainer.new()
-	_current_name = _label(speaker, UiThemeBuilder.label_font())
+	_current_name = _label(speaker, RefText.make(RefText.LABEL, 0, accent, 2.0).get_font())
 	_current_name.add_theme_color_override(&"font_color", accent)
 	_current_name.visible = not speaker.is_empty()
 	entry.add_child(_current_name)

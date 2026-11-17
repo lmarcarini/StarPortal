@@ -113,10 +113,10 @@ func test_clue_clip_swaps() -> void:
 
 
 ## Every round key sits inside the free area and no two keys touch, at each size.
+## The interface scales with the window height (canvas_items, expand), so the panel is never
+## under 1920 x 1080 logical pixels: 16:9 windows of any size, ultrawide, and 4:3.
 func test_keys_fit_without_overlap_at_every_size() -> void:
-	for size: Vector2 in [
-		Vector2(1280, 600), Vector2(1920, 960), Vector2(2560, 1300), Vector2(3440, 1300)
-	]:
+	for size: Vector2 in [Vector2(1920, 1080), Vector2(2560, 1080), Vector2(1920, 1440)]:
 		_holder.size = size
 		_view.size = size
 		_panel().size = size
@@ -124,6 +124,7 @@ func test_keys_fit_without_overlap_at_every_size() -> void:
 		var rects: Array[Rect2] = []
 		for glyph: int in GateAddress.GLYPH_COUNT:
 			var key: GlyphKey = _panel().get_key(glyph)
+			assert_float(key.size.x).is_greater_equal(GlyphKey.MIN_SIDE)
 			rects.append(Rect2(key.position, key.size))
 		var area: Rect2 = _panel().key_area()
 		for index: int in rects.size():

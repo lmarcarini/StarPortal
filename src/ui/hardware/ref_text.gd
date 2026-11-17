@@ -73,6 +73,11 @@ func draw(item: CanvasItem, pos: Vector2, text: String, anchor: String = "la") -
 	)
 
 
+## The face with this style's tracking (for Labels and Buttons).
+func get_font() -> Font:
+	return _font()
+
+
 func _font() -> Font:
 	if is_zero_approx(tracking):
 		return face

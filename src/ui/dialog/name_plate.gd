@@ -5,8 +5,8 @@ extends VBoxContainer
 ## Bible: docs/content/dialogue-screen.md section 1
 
 ## Font sizes at UI scale 1: name, then title and standing.
-const NAME_SIZE: int = 24
-const LINE_SIZE: int = 15
+const NAME_SIZE: int = 28
+const LINE_SIZE: int = 16
 
 var _name := Label.new()
 var _title := Label.new()
@@ -18,12 +18,11 @@ func _init() -> void:
 	for label: Label in [_name, _title, _standing]:
 		label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		var font: Font = UiThemeBuilder.label_font()
-		if font != null:
-			label.add_theme_font_override(&"font", font)
+		var face: Font = RefText.LABEL if label == _name else RefText.LABEL_MEDIUM
+		label.add_theme_font_override(&"font", RefText.make(face, 0, RefPaint.TEXT, 2.0).get_font())
 		add_child(label)
-	_title.add_theme_color_override(&"font_color", UiPalette.TEXT_DIM)
-	_standing.add_theme_color_override(&"font_color", UiPalette.TEXT_DIM)
+	_title.add_theme_color_override(&"font_color", RefPaint.DIM)
+	_standing.add_theme_color_override(&"font_color", RefPaint.DIM)
 	set_ui_scale(1.0)
 
 

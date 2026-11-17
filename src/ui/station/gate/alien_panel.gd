@@ -20,9 +20,11 @@ const TYPE_SECONDS: float = 1.2
 const MARGIN: float = 12.0
 ## Largest side of the centre DIAL key, before the interface scale.
 const DIAL_SIZE: Vector2 = Vector2(128.0, 128.0)
-## The stone disc behind the keys and its rim.
-const DISC_COLOUR: Color = Color("#232220")
-const DISC_RIM: Color = Color("#5a564e")
+## The well behind the keys and its rim (the reference's recess).
+const DISC_COLOUR: Color = Color8(16, 17, 15)
+const DISC_RIM: Color = RefPaint.EDGE
+## Plain dark ground until the panel's plate arrives.
+const GROUND: Color = Color8(22, 24, 23)
 
 var _simulation: Simulation = null
 var _compose: AddressDraft = AddressDraft.new()
@@ -46,6 +48,7 @@ func _ready() -> void:
 	add_to_group(Wire.COVER_GROUP)
 	z_index = 5
 	_station.setup(Registry.get_def(STATION_ID) as StationSceneDef)
+	_station.visible = false
 	for glyph: int in GateAddress.GLYPH_COUNT:
 		var key: GlyphKey = GlyphKey.new()
 		key.name = "Glyph%02d" % glyph
@@ -59,6 +62,10 @@ func _ready() -> void:
 	_dial.activated.connect(_on_dial)
 	HoverCard.attach(_dial, "STATION_PANEL_DIAL")
 	_back.icon_id = &"close"
+	_back.look = IconKey.Look.STEEL
+	_pencil.look = IconKey.Look.STEEL
+	_dial.key_style = BigKey.KeyStyle.AMBER
+	_dial.label_size = 40
 	_back.set_help("STATION_PANEL_BACK")
 	_back.pressed.connect(close)
 	_pencil.icon_id = &"pencil"
@@ -87,6 +94,9 @@ func open() -> void:
 		_clue.setup(_simulation)
 	_render()
 	_dial.grab_focus()
+	var card: HoverCard = _dial.find_child("HoverCard", false, false) as HoverCard
+	if card != null:
+		card.hide()
 
 
 ## Closes the panel, keeping the entered glyphs and guesses.
@@ -190,7 +200,7 @@ func _place_keys() -> void:
 	var area: Rect2 = key_area()
 	var base: float = HwMetrics.target(self, Vector2(GlyphKey.SIDE, GlyphKey.SIDE)).x
 	var radius: float = RadialLayout.radius_for(area.size, base)
-	var side: float = RadialLayout.key_side(radius, base)
+	var side: float = maxf(GlyphKey.MIN_SIDE, RadialLayout.key_side(radius, base))
 	var centre: Vector2 = area.get_center()
 	_disc = Vector3(centre.x, centre.y, radius * RadialLayout.RADII[2] + side * 0.5 + MARGIN)
 	_key_area.queue_redraw()
@@ -215,10 +225,17 @@ func key_area() -> Rect2:
 	return Rect2(left, top, maxf(0.0, right - left), maxf(0.0, size.y - MARGIN - top))
 
 
+func _draw() -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), GROUND)
+
+
 func _draw_disc() -> void:
 	var centre: Vector2 = Vector2(_disc.x, _disc.y)
+	_key_area.draw_circle(centre, _disc.z + 10.0, RefPaint.STEEL_BOTTOM)
+	_key_area.draw_arc(centre, _disc.z + 9.0, PI * 1.1, PI * 1.9, 48, RefPaint.BEVEL, 1.0, true)
+	_key_area.draw_arc(centre, _disc.z + 10.0, 0.0, TAU, 96, RefPaint.EDGE, 2.0, true)
 	_key_area.draw_circle(centre, _disc.z, DISC_COLOUR)
-	_key_area.draw_arc(centre, _disc.z, 0.0, TAU, 96, DISC_RIM, 4.0)
+	_key_area.draw_arc(centre, _disc.z, 0.0, TAU, 96, DISC_RIM, 4.0, true)
 
 
 func _render() -> void:
