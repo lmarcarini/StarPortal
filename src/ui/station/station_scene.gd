@@ -9,6 +9,8 @@ extends Control
 
 ## Emitted after a resize moved the anchors; layers re-read them.
 signal anchors_changed
+## The view switched between the plate and the 3D scene (display/stations_3d changed).
+signal mode_changed
 
 var _def: StationSceneDef = null
 var _overlay: AnchorOverlay = null
@@ -36,6 +38,24 @@ func setup(def: StationSceneDef) -> void:
 	anchors_changed.emit()
 
 
+func _enter_tree() -> void:
+	Settings.setting_changed.connect(_on_setting_changed)
+
+
+func _exit_tree() -> void:
+	Settings.setting_changed.disconnect(_on_setting_changed)
+
+
+func _on_setting_changed(section: StringName, key: StringName, _value: Variant) -> void:
+	if section != &"display" or key != &"stations_3d" or _def == null or _def.scene == null:
+		return
+	_set_3d(_def)
+	_plate.visible = _def.plate != null and _view_3d == null
+	_placeholder.visible = _def.plate == null and _view_3d == null
+	anchors_changed.emit()
+	mode_changed.emit()
+
+
 ## The 3D view, or null while the plate shows.
 func get_3d() -> Station3D:
 	return _view_3d
@@ -45,7 +65,7 @@ func _set_3d(def: StationSceneDef) -> void:
 	var wanted: bool = def.scene != null and Station3D.is_enabled()
 	if not wanted:
 		if _view_3d != null:
-			_view_3d.queue_free()
+			_view_3d.free()
 			_view_3d = null
 		return
 	if _view_3d == null:

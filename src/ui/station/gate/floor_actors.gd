@@ -69,6 +69,12 @@ func _exit_tree() -> void:
 func bind(station: StationScene) -> void:
 	_station = station
 	_floor_3d = FloorActors3D.install(station, self)
+	station.mode_changed.connect(_refit_3d)
+
+
+func _refit_3d() -> void:
+	_floor_3d = FloorActors3D.install(_station, self)
+	queue_redraw()
 
 
 ## The 3D floor, or null on the plate.
