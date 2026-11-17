@@ -44,7 +44,7 @@ _boxes = {}
 def box(name, size, pos, mat, parent="Shell", rot_x=0.0, rot_y=0.0, rot_z=0.0):
     key = tuple(size)
     if key not in _boxes:
-        _boxes[key] = sub("BoxMesh", {"size": "Vector3(%g, %g, %g)" % tuple(size)})
+        _boxes[key] = sub("BoxMesh", {"size": "Vector3(%g, %g, %g)" % tuple(size), "add_uv2": "true"})
     node(name, "MeshInstance3D", parent, {"transform": xf(pos, rot_y, rot_x=rot_x, rot_z=rot_z), "mesh": 'SubResource("%s")' % _boxes[key], "material_override": MAT(mat)})
 def kit(name, piece, pos, rot_y=0.0, scale=(1,1,1), parent="Kit"):
     i = ext_id("PackedScene", "res://art/3d/megakit/%s.gltf" % piece)
@@ -82,9 +82,12 @@ box("WallLeft", (0.8, 15, 34), (-17.4, 7.5, 11), "concrete_dark")
 box("WallRight", (0.8, 15, 34), (17.4, 7.5, 11), "concrete_dark")
 # the Ring's wall: a concrete panel between two steel pilasters, with seams
 box("RingWall", (10.4, 15, 0.8), (0, 7.5, -1.8), "concrete")
-for x in (-2.6, 0, 2.6):
+# seams kept clear of the Ring's hole (x within the outer radius, y 1.2 to 8.6)
+for x in (-4.4, 4.4):
     box("SeamV%+g" % x, (0.05, 15, 0.05), (x, 7.5, -1.38), "seam")
-for y in (2.5, 5.5, 8.5, 11.5):
+for x in (-2.6, 0, 2.6):
+    box("SeamVTop%+g" % x, (0.05, 5.4, 0.05), (x, 12.3, -1.38), "seam")
+for y in (9.6, 12.0):
     box("SeamH%g" % y, (10.4, 0.05, 0.05), (0, y, -1.38), "seam")
 for side in (-1, 1):
     box("Pilaster%d" % side, (1.3, 15, 1.4), (side * 5.85, 7.5, -1.4), "gunmetal")
@@ -99,7 +102,7 @@ for side in (-1, 1):
     box("Tray%d" % side, (0.9, 0.12, 30), (side * 9.0, 13.6, 10), "gunmetal")
     for k in range(5):
         kit("Cable%d_%d" % (side, k), "Prop_Cable_1", (side * 9.0, 13.68, -2 + k * 6.5), 0, (0.8, 1, 3.6))
-pipe = sub("CylinderMesh", {"top_radius": "0.28", "bottom_radius": "0.28", "height": "30", "radial_segments": "12"})
+pipe = sub("CylinderMesh", {"add_uv2": "true", "top_radius": "0.28", "bottom_radius": "0.28", "height": "30", "radial_segments": "12"})
 for i, (x, y) in enumerate([(12.5, 12.6), (13.4, 12.2), (-12.8, 12.8)]):
     node("Pipe%d" % i, "MeshInstance3D", "Shell", {"transform": xf((x, y, 10), rot_x=90), "mesh": 'SubResource("%s")' % pipe, "material_override": MAT("gunmetal")})
 # pedestal, ramp, railings and the hazard border at the ramp's foot
@@ -114,15 +117,15 @@ for side in (-1, 1):
         box("RampRail%d_%g" % (side, h), (0.06, 0.06, math.hypot(L, PED)), (side * RW / 2, PED / 2 + h, 1.1 + L / 2), "rail", rot_x=ang)
 node("Hazard", "Node3D", "Shell", {})
 for nm, size, pos in (("Foot", (RW + 2.4, 0.7), (0, 0.01, 8.6)), ("SideL", (0.7, 7.6), (-(RW / 2 + 0.85), 0.01, 4.9)), ("SideR", (0.7, 7.6), (RW / 2 + 0.85, 0.01, 4.9))):
-    q = sub("PlaneMesh", {"size": "Vector2(%g, %g)" % size})
+    q = sub("PlaneMesh", {"add_uv2": "true", "size": "Vector2(%g, %g)" % size})
     node("Hazard" + nm, "MeshInstance3D", "Shell/Hazard", {"transform": xf(pos), "mesh": 'SubResource("%s")' % q, "material_override": MAT("hazard")})
-line = sub("PlaneMesh", {"size": "Vector2(30, 0.12)"})
+line = sub("PlaneMesh", {"add_uv2": "true", "size": "Vector2(30, 0.12)"})
 for z in (10.2, 14.0):
     node("FloorLine%g" % z, "MeshInstance3D", "Shell/Hazard", {"transform": xf((0, 0.012, z)), "mesh": 'SubResource("%s")' % line, "material_override": MAT("paint_yellow")})
-seam = sub("PlaneMesh", {"size": "Vector2(36, 0.03)"})
+seam = sub("PlaneMesh", {"add_uv2": "true", "size": "Vector2(36, 0.03)"})
 for z in range(-1, 26, 4):
     node("FloorSeam%d" % z, "MeshInstance3D", "Shell", {"transform": xf((0, 0.011, z)), "mesh": 'SubResource("%s")' % seam, "material_override": MAT("seam")})
-seam2 = sub("PlaneMesh", {"size": "Vector2(0.03, 34)"})
+seam2 = sub("PlaneMesh", {"add_uv2": "true", "size": "Vector2(0.03, 34)"})
 for x in range(-16, 17, 4):
     node("FloorSeamX%d" % x, "MeshInstance3D", "Shell", {"transform": xf((x, 0.011, 11)), "mesh": 'SubResource("%s")' % seam2, "material_override": MAT("seam")})
 # catwalks along both walls at mid height
@@ -138,7 +141,7 @@ for side, nm in ((-1, "Left"), (1, "Right")):
     for k in range(2):
         z = 2.0 + k * 7.0
         box("Strip%s%d" % (nm, k), (1.6, 0.06, 0.3), (side * 14.0, CW - 0.2, z), "strip_glow")
-        node("Cool%s%d" % (nm, k), "OmniLight3D", "Lights", {"transform": xf((side * 14.0, CW - 0.6, z)), "light_color": "Color(0.78, 0.86, 1, 1)", "light_energy": "1.4", "omni_range": "5.5", "omni_attenuation": "1.6"}, groups=["secondary_light"])
+        node("Cool%s%d" % (nm, k), "OmniLight3D", "Lights", {"transform": xf((side * 14.0, CW - 0.6, z)), "light_color": "Color(0.78, 0.86, 1, 1)", "light_energy": "1.4", "omni_range": "5.5", "omni_attenuation": "1.6", "light_bake_mode": "2"}, groups=["secondary_light"])
 # staircase on the left: from the catwalk down toward the left console bank
 STEPS = 13; RUN = 0.42; X0 = -11.6
 for k in range(STEPS):
@@ -154,7 +157,7 @@ kit("DoorFrame", "Door_Frame_SquareTall", (-13.6, 0, 0.75), 0, (0.72, 0.68, 1))
 kit("DoorA", "Door_DarkMetal", (-13.6, 0, 0.72), 0, (0.72, 0.68, 1))
 kit("DoorB", "Door_DarkMetal", (-12.08, 0, 0.72), 0, (0.72, 0.68, 1))
 box("DoorLamp", (1.2, 0.08, 0.15), (-13.6, 3.75, 0.85), "strip_glow")
-node("DoorLight", "OmniLight3D", "Lights", {"transform": xf((-13.6, 3.4, 1.6)), "light_color": "Color(0.8, 0.88, 1, 1)", "light_energy": "2.2", "omni_range": "6.0", "omni_attenuation": "1.2"}, groups=["secondary_light"])
+node("DoorLight", "OmniLight3D", "Lights", {"transform": xf((-13.6, 3.4, 1.6)), "light_color": "Color(0.8, 0.88, 1, 1)", "light_energy": "2.2", "omni_range": "6.0", "omni_attenuation": "1.2", "light_bake_mode": "2"}, groups=["secondary_light"])
 # console banks at the Ring's base: grey steel cabinets with dark screens
 for side, nm in ((-1, "Left"), (1, "Right")):
     cx = side * 6.9
@@ -165,19 +168,21 @@ for side, nm in ((-1, "Left"), (1, "Right")):
         box("Vent%s%d" % (nm, k), (1.1, 0.5, 0.03), (x, 0.55, 2.12), "seam")
 # hanging lamps: two high, two low, visible below the top bar
 LAMPS = [(-6.5, 10.0, 2.0), (6.5, 10.0, 2.0), (-4.1, 7.0, 6.0), (4.1, 7.0, 6.0)]
-shade = sub("CylinderMesh", {"top_radius": "0.12", "bottom_radius": "0.55", "height": "0.45", "radial_segments": "16"})
+shade = sub("CylinderMesh", {"add_uv2": "true", "top_radius": "0.12", "bottom_radius": "0.55", "height": "0.45", "radial_segments": "16"})
 bulb = sub("SphereMesh", {"radius": "0.2", "height": "0.24"})
 for i, (x, y, z) in enumerate(LAMPS):
-    cable = sub("CylinderMesh", {"top_radius": "0.015", "bottom_radius": "0.015", "height": "%g" % (14.4 - y)})
+    cable = sub("CylinderMesh", {"add_uv2": "true", "top_radius": "0.015", "bottom_radius": "0.015", "height": "%g" % (14.4 - y)})
     node("Shade%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, y, z)), "mesh": 'SubResource("%s")' % shade, "material_override": MAT("gunmetal")})
     node("Bulb%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, y - 0.22, z)), "mesh": 'SubResource("%s")' % bulb, "material_override": MAT("lamp_glow")})
     node("Cable%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, (14.4 + y) / 2, z)), "mesh": 'SubResource("%s")' % cable, "material_override": MAT("gunmetal")})
-    node("Sodium%d" % i, "SpotLight3D", "Lights", {"transform": xf((x, y - 0.35, z), rot_x=-90), "light_color": "Color(1, 0.7, 0.4, 1)", "light_energy": "22.0", "spot_range": "%g" % (y + 4), "spot_angle": "36.0", "spot_attenuation": "0.7", "spot_angle_attenuation": "1.3", "shadow_enabled": "true"})
-node("RingWash", "SpotLight3D", "Lights", {"transform": xf((0, 13.5, 6), rot_x=-52), "light_color": "Color(0.9, 0.82, 0.7, 1)", "light_energy": "6.0", "spot_range": "18", "spot_angle": "24", "spot_attenuation": "1.0", "shadow_enabled": "true"})
+    node("Sodium%d" % i, "SpotLight3D", "Lights", {"transform": xf((x, y - 0.35, z), rot_x=-90), "light_color": "Color(1, 0.7, 0.4, 1)", "light_energy": "22.0", "spot_range": "%g" % (y + 4), "spot_angle": "36.0", "spot_attenuation": "0.7", "spot_angle_attenuation": "1.3", "shadow_enabled": "true", "light_bake_mode": "2"})
+node("RingWash", "SpotLight3D", "Lights", {"transform": xf((0, 13.5, 6), rot_x=-52), "light_color": "Color(0.9, 0.82, 0.7, 1)", "light_energy": "6.0", "spot_range": "18", "spot_angle": "24", "spot_attenuation": "1.0", "shadow_enabled": "true", "light_bake_mode": "2"})
 probe = {"transform": xf((0, 4, 8)), "size": "Vector3(34, 10, 26)", "update_mode": "0", "intensity": "0.6", "interior": "true", "box_projection": "true", "ambient_mode": "0"}
 node("FloorProbe", "ReflectionProbe", "Lights", probe)
 for i, (x, y, z) in enumerate([(-9, 9, 0.5), (9, 9, 0.5), (-13, 2.5, 6), (13, 2.5, 6)]):
-    node("Wash%d" % i, "OmniLight3D", "Lights", {"transform": xf((x, y, z)), "light_color": "Color(0.95, 0.78, 0.58, 1)", "light_energy": "0.9", "omni_range": "9.0", "omni_attenuation": "1.8"}, groups=["secondary_light"])
+    node("Wash%d" % i, "OmniLight3D", "Lights", {"transform": xf((x, y, z)), "light_color": "Color(0.95, 0.78, 0.58, 1)", "light_energy": "0.9", "omni_range": "9.0", "omni_attenuation": "1.8", "light_bake_mode": "2"}, groups=["secondary_light"])
+lm = {"quality": "2", "bounces": "3", "use_denoiser": "true", "directional": "false", "interior": "true", "environment_mode": "0", "texel_scale": "1.0"}
+node("LightmapGI", "LightmapGI", ".", lm)
 # ring placeholder (M5-03 builds the real Ring)
 torus = sub("TorusMesh", {"inner_radius": "%g" % R_IN, "outer_radius": "%g" % R_OUT, "rings": "64", "ring_segments": "12"})
 node("RingPlaceholder", "MeshInstance3D", "Ring", {"transform": xf((0, RING_Y, -0.6), rot_x=90, scale=(1, 0.3, 1)), "mesh": 'SubResource("%s")' % torus, "material_override": MAT("ring_stone")})

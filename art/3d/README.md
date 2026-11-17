@@ -9,3 +9,5 @@ All CC0 (public domain), by Quaternius (https://quaternius.com), supplied by the
   lockers, shelves, barrels, a mug and a satellite dish.
 
 No characters are included in these packs.
+
+`textures/`: CC0 PBR sets for the Gate hall (see its README).
