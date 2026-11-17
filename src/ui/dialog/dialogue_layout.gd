@@ -49,6 +49,14 @@ static func _strip(rows: VBoxContainer) -> Array[Label]:
 		)
 		labels.append(label)
 		strip.add_child(label)
+	var time := Label.new()
+	time.name = "Time"
+	time.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	time.add_theme_color_override(&"font_color", RefPaint.AMBER)
+	time.add_theme_font_override(&"font", RefText.MONO_BOLD)
+	time.add_theme_font_size_override(&"font_size", STRIP_SIZE)
+	strip.add_child(time)
+	strip.move_child(time, 1)
 	labels[2].size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	labels[2].horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	labels[2].text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS

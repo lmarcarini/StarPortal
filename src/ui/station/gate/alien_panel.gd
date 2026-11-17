@@ -23,6 +23,8 @@ const DIAL_SIZE: Vector2 = Vector2(128.0, 128.0)
 ## The well behind the keys and its rim (the reference's recess).
 const DISC_COLOUR: Color = Color8(16, 17, 15)
 const DISC_RIM: Color = RefPaint.EDGE
+## Plain dark ground until the panel's plate arrives.
+const GROUND: Color = Color8(22, 24, 23)
 
 var _simulation: Simulation = null
 var _compose: AddressDraft = AddressDraft.new()
@@ -46,6 +48,7 @@ func _ready() -> void:
 	add_to_group(Wire.COVER_GROUP)
 	z_index = 5
 	_station.setup(Registry.get_def(STATION_ID) as StationSceneDef)
+	_station.visible = false
 	for glyph: int in GateAddress.GLYPH_COUNT:
 		var key: GlyphKey = GlyphKey.new()
 		key.name = "Glyph%02d" % glyph
@@ -91,6 +94,9 @@ func open() -> void:
 		_clue.setup(_simulation)
 	_render()
 	_dial.grab_focus()
+	var card: HoverCard = _dial.find_child("HoverCard", false, false) as HoverCard
+	if card != null:
+		card.hide()
 
 
 ## Closes the panel, keeping the entered glyphs and guesses.
@@ -217,6 +223,10 @@ func key_area() -> Rect2:
 	var left: float = _pencil.position.x + _pencil.size.x + MARGIN
 	var right: float = _clue.position.x - MARGIN
 	return Rect2(left, top, maxf(0.0, right - left), maxf(0.0, size.y - MARGIN - top))
+
+
+func _draw() -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), GROUND)
 
 
 func _draw_disc() -> void:

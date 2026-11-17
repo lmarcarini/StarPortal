@@ -36,7 +36,7 @@ func test_opens_at_the_first_line_typing() -> void:
 	assert_bool(_screen.visible).is_true()
 	assert_int(_phase()).is_equal(ActiveConversation.Phase.LINE)
 	var strip: Array[String] = _screen.get_strip_texts()
-	assert_int(strip[0].length()).is_equal(16)
+	assert_str(strip[0]).is_equal(ClockPlate.date_text(_screen.get_simulation().state.clock.tick))
 	assert_str(strip[1]).is_equal("BASE ON HOLD")
 	assert_str(strip[2]).is_equal("TRANSMISSION · RING · LINTEL")
 	assert_int(_screen.transcript.get_current_label().visible_characters).is_equal(0)

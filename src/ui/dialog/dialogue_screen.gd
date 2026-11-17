@@ -347,11 +347,9 @@ func _close_screen() -> void:
 
 func _refresh_strip() -> void:
 	var state: GameState = _simulation.state
-	var date: Dictionary = TimeMath.date_of(state.clock.tick)
-	_date.text = (
-		"%04d-%02d-%02d %02d:%02d"
-		% [date["year"], date["month"], date["day"], date["hour"], date["minute"]]
-	)
+	_date.text = ClockPlate.date_text(state.clock.tick)
+	var time: Label = _date.get_parent().get_node("Time") as Label
+	time.text = ClockPlate.time_text(state.clock.tick)
 	_hold.text = tr(&"DIALOG_BASE_ON_HOLD")
 	var active: ActiveConversation = state.conversations.active
 	_channel.text = "" if active == null else ConversationText.channel(state, active)
