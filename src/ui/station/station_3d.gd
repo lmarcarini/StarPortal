@@ -19,6 +19,9 @@ const MAX_SHADOWED_LIGHTS: int = 6
 ## Tests set this to build 3D stations in a headless run (they are skipped headless by
 ## default, so the soak and the flow tests stay cheap).
 static var force_enabled: bool = false
+## Capture tools set this to drop the baked lightmap: software GL (llvmpipe, used for
+## headless captures) renders lightmapped scenes too slowly. Static lights then light live.
+static var skip_lightmaps: bool = false
 
 var _viewport: SubViewport = SubViewport.new()
 var _camera: Camera3D = Camera3D.new()
@@ -69,6 +72,9 @@ func setup(def: StationSceneDef) -> void:
 	if scene_env != null:
 		_environment.environment = scene_env.environment
 		scene_env.environment = null
+	if skip_lightmaps:
+		for node: Node in _root.find_children("*", "LightmapGI", true, false):
+			(node as LightmapGI).light_data = null
 	_camera.fov = def.camera_fov
 	_camera.position = def.camera_position
 	_camera.look_at_from_position(def.camera_position, def.camera_target, Vector3.UP)

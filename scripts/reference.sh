@@ -20,6 +20,6 @@ mkdir -p "$OUT_DIR"
 rm -f "$OUT_DIR"/*.png
 
 "$GODOT_BIN" --headless --path "$PROJECT_DIR" --import > /dev/null 2>&1 || true
-REF_OUT="$OUT_DIR" timeout 180 xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT_BIN" --path "$PROJECT_DIR" \
+REF_OUT="$OUT_DIR" timeout 600 xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT_BIN" --path "$PROJECT_DIR" \
 	--rendering-driver opengl3 --resolution 1920x1080 res://tools/reference/capture.tscn
 python3 "$PROJECT_DIR/tools/reference/compare.py" "$OUT_DIR" "$PROJECT_DIR/docs/reference"
