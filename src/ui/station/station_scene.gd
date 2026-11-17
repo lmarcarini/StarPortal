@@ -1,8 +1,10 @@
 class_name StationScene
 extends Control
-## A station on screen: its plate covering the rect, live layers drawn over it, and anchors
-## from its [StationSceneDef] mapped to screen pixels (local to this control) and kept up to
-## date on resize. Reads nothing from the simulation; layers do their own work.
+## A station on screen: its plate covering the rect, or (M5-01) its 3D scene full bleed from a
+## fixed camera, live layers drawn over it, and anchors from its [StationSceneDef] mapped to
+## screen pixels (local to this control) and kept up to date on resize. In 3D the anchors are
+## the scene's projected Marker3D and Path3D nodes; any the scene lacks fall back to the
+## plate's. Reads nothing from the simulation; layers do their own work.
 ## Bible: docs/content/interface-rethink.md section 7 (plate plus live layers)
 
 ## Emitted after a resize moved the anchors; layers re-read them.
@@ -11,6 +13,7 @@ signal anchors_changed
 var _def: StationSceneDef = null
 var _overlay: AnchorOverlay = null
 var _depths: Dictionary[Node, int] = {}
+var _view_3d: Station3D = null
 
 @onready var _plate: TextureRect = %Plate
 @onready var _placeholder: PlaceholderPlate = %Placeholder
@@ -24,12 +27,32 @@ func setup(def: StationSceneDef) -> void:
 		def = StationSceneDef.new()
 	_def = def
 	_plate.texture = def.plate
-	_plate.visible = def.plate != null
-	_placeholder.visible = def.plate == null
+	_set_3d(def)
+	_plate.visible = def.plate != null and _view_3d == null
+	_placeholder.visible = def.plate == null and _view_3d == null
 	_placeholder.setup(def)
 	if _overlay != null:
 		_overlay.setup(def)
 	anchors_changed.emit()
+
+
+## The 3D view, or null while the plate shows.
+func get_3d() -> Station3D:
+	return _view_3d
+
+
+func _set_3d(def: StationSceneDef) -> void:
+	var wanted: bool = def.scene != null and Station3D.is_enabled()
+	if not wanted:
+		if _view_3d != null:
+			_view_3d.queue_free()
+			_view_3d = null
+		return
+	if _view_3d == null:
+		_view_3d = Station3D.new()
+		add_child(_view_3d)
+		move_child(_view_3d, 0)
+	_view_3d.setup(def)
 
 
 ## The def shown, or null.
@@ -53,6 +76,9 @@ func add_layer(node: Control, z: int) -> void:
 func anchor(anchor_name: StringName) -> Vector2:
 	if _def == null:
 		return Vector2.ZERO
+	var node: Node3D = _marker(anchor_name)
+	if node != null:
+		return _view_3d.project(node.global_position)
 	if _def.points.has(anchor_name):
 		return PlateSpace.to_screen(_def, _rect(), _def.points[anchor_name])
 	if _def.circles.has(anchor_name):
@@ -65,6 +91,9 @@ func anchor(anchor_name: StringName) -> Vector2:
 
 ## Screen radius of circle [param anchor_name]; 0 when absent.
 func radius(anchor_name: StringName) -> float:
+	var node: Node3D = _marker(anchor_name)
+	if node != null and node.has_meta(&"radius"):
+		return _view_3d.project_radius(node)
 	if _def == null or not _def.circles.has(anchor_name):
 		return 0.0
 	return PlateSpace.to_screen_length(_def, _rect(), _def.circles[anchor_name].z)
@@ -74,6 +103,9 @@ func radius(anchor_name: StringName) -> float:
 func shape(anchor_name: StringName) -> PackedVector2Array:
 	if _def == null:
 		return PackedVector2Array()
+	var path: Path3D = _marker(anchor_name) as Path3D
+	if path != null:
+		return _view_3d.project_path(path)
 	if _def.paths.has(anchor_name):
 		return PlateSpace.to_screen_all(_def, _rect(), _def.paths[anchor_name])
 	if _def.polygons.has(anchor_name):
@@ -114,6 +146,10 @@ func set_anchors_visible(on: bool) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED and _def != null:
 		anchors_changed.emit()
+
+
+func _marker(anchor_name: StringName) -> Node3D:
+	return null if _view_3d == null else _view_3d.marker(anchor_name)
 
 
 func _rect() -> Rect2:
