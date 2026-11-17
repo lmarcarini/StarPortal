@@ -1,4 +1,4 @@
-[gd_scene load_steps=69 format=3]
+[gd_scene load_steps=66 format=3]
 
 [ext_resource type="Script" path="res://src/scenes/stations/gate_hall.gd" id="script"]
 [ext_resource type="Material" path="res://src/scenes/stations/materials/floor.tres" id="e1"]
@@ -19,7 +19,6 @@
 [ext_resource type="Material" path="res://src/scenes/stations/materials/cabinet.tres" id="e16"]
 [ext_resource type="Material" path="res://src/scenes/stations/materials/screen.tres" id="e17"]
 [ext_resource type="Material" path="res://src/scenes/stations/materials/lamp_glow.tres" id="e18"]
-[ext_resource type="Material" path="res://src/scenes/stations/materials/ring_stone.tres" id="e19"]
 
 [sub_resource type="Environment" id="s1"]
 background_mode = 1
@@ -227,24 +226,14 @@ top_radius = 0.015
 bottom_radius = 0.015
 height = 7.4
 
-[sub_resource type="TorusMesh" id="s45"]
-inner_radius = 2.9
-outer_radius = 3.7
-rings = 64
-ring_segments = 12
-
-[sub_resource type="BoxMesh" id="s46"]
-size = Vector3(0.7, 0.7, 0.8)
-add_uv2 = true
-
-[sub_resource type="Curve3D" id="s47"]
+[sub_resource type="Curve3D" id="s45"]
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0.9, 1.1, 0, 0, 0, 0, 0, 0, 0, 0, 8.1),
 "tilts": PackedFloat32Array(0, 0)
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="s48"]
+[sub_resource type="Curve3D" id="s46"]
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, -10, 0, 9.5, 0, 0, 0, 0, 0, 0, 10, 0, 9.5),
 "tilts": PackedFloat32Array(0, 0)
@@ -1242,71 +1231,26 @@ interior = true
 environment_mode = 0
 texel_scale = 1.0
 
-[node name="RingPlaceholder" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1.837e-17, -1, 0, 0.3, 6.123e-17, 0, 4.9, -0.6)
-mesh = SubResource("s45")
-material_override = ExtResource("e19")
-
-[node name="Clamp0" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -0.4)
-mesh = SubResource("s46")
-material_override = ExtResource("e3")
-
 [node name="clamp_0" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.2, 0.1)
-
-[node name="Clamp1" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.546, 7.446, -0.4)
-mesh = SubResource("s46")
-material_override = ExtResource("e3")
 
 [node name="clamp_1" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.333, 7.233, 0.1)
 
-[node name="Clamp2" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.9, -0.4)
-mesh = SubResource("s46")
-material_override = ExtResource("e3")
-
 [node name="clamp_2" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 4.9, 0.1)
-
-[node name="Clamp3" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.546, 2.354, -0.4)
-mesh = SubResource("s46")
-material_override = ExtResource("e3")
 
 [node name="clamp_3" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.333, 2.567, 0.1)
 
-[node name="Clamp4" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.409e-16, 1.3, -0.4)
-mesh = SubResource("s46")
-material_override = ExtResource("e3")
-
 [node name="clamp_4" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.041e-16, 1.6, 0.1)
-
-[node name="Clamp5" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.546, 2.354, -0.4)
-mesh = SubResource("s46")
-material_override = ExtResource("e3")
 
 [node name="clamp_5" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.333, 2.567, 0.1)
 
-[node name="Clamp6" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6, 4.9, -0.4)
-mesh = SubResource("s46")
-material_override = ExtResource("e3")
-
 [node name="clamp_6" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 4.9, 0.1)
-
-[node name="Clamp7" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.546, 7.446, -0.4)
-mesh = SubResource("s46")
-material_override = ExtResource("e3")
 
 [node name="clamp_7" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.333, 7.233, 0.1)
@@ -1332,7 +1276,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 1.9, 1.6)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9, 1.9, 1.6)
 
 [node name="ramp" type="Path3D" parent="Markers"]
-curve = SubResource("s47")
+curve = SubResource("s45")
 
 [node name="crossing" type="Path3D" parent="Markers"]
-curve = SubResource("s48")
+curve = SubResource("s46")

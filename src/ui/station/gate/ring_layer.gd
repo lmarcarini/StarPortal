@@ -22,6 +22,8 @@ var shimmer: float = 0.0
 var look: RingLook = RingLook.new()
 ## How closed the Shutter is, 0 to 1.
 var shutter_amount: float = 0.0
+## The 3D Ring when the station is 3D (it draws the lamps, horizon, light and Shutter).
+var ring_3d: Ring3D = null
 
 var _simulation: Simulation = null
 var _station: StationScene = null
@@ -85,7 +87,7 @@ func _on_dial_resolved(outcome: int, _key: String) -> void:
 
 
 func _draw() -> void:
-	if _station == null:
+	if _station == null or ring_3d != null:
 		return
 	var r: float = maxf(4.0, _station.radius(&"ring_outer") * 0.05)
 	for i: int in RingLook.SEALS:
@@ -120,4 +122,9 @@ static func install(station: StationScene, simulation: Simulation) -> RingLayer:
 	light.bind(ring, station)
 	horizon.bind(ring, station)
 	shutter.bind(ring, station)
+	ring.ring_3d = Ring3D.install(station, ring)
+	if ring.ring_3d != null:
+		for layer: CanvasItem in [light, horizon, shutter]:
+			layer.visible = false
+			layer.process_mode = Node.PROCESS_MODE_DISABLED
 	return ring

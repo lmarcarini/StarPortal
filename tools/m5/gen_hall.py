@@ -178,12 +178,9 @@ for i, (x, y, z) in enumerate([(-9, 9, 0.5), (9, 9, 0.5), (-13, 2.5, 6), (13, 2.
     node("Wash%d" % i, "OmniLight3D", "Lights", {"transform": xf((x, y, z)), "light_color": "Color(0.95, 0.78, 0.58, 1)", "light_energy": "0.9", "omni_range": "9.0", "omni_attenuation": "1.8", "light_bake_mode": "2"}, groups=["secondary_light"])
 lm = {"quality": "2", "bounces": "3", "use_denoiser": "true", "directional": "false", "interior": "true", "environment_mode": "0", "texel_scale": "1.0"}
 node("LightmapGI", "LightmapGI", ".", lm)
-# ring placeholder (M5-03 builds the real Ring)
-torus = sub("TorusMesh", {"inner_radius": "%g" % R_IN, "outer_radius": "%g" % R_OUT, "rings": "64", "ring_segments": "12"})
-node("RingPlaceholder", "MeshInstance3D", "Ring", {"transform": xf((0, RING_Y, -0.6), rot_x=90, scale=(1, 0.3, 1)), "mesh": 'SubResource("%s")' % torus, "material_override": MAT("ring_stone")})
+# the Ring itself is built in code (src/scenes/stations/ring/ring_3d.gd, M5-03)
 for i in range(8):
-    a = math.radians(i * 45); r = R_OUT - 0.1
-    box("Clamp%d" % i, (0.7, 0.7, 0.8), (r * math.sin(a), RING_Y + r * math.cos(a), -0.4), "gunmetal", parent="Ring")
+    a = math.radians(i * 45)
     marker("clamp_%d" % i, (((R_IN + R_OUT) / 2) * math.sin(a), RING_Y + ((R_IN + R_OUT) / 2) * math.cos(a), 0.1))
 # markers
 marker("ring_inner", (0, RING_Y, -0.2), R_IN)
