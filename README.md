@@ -78,6 +78,14 @@ only: no game file refers to it, and a test checks that).
   1..20, the generator (early reach, unique addresses). It prints one line per problem and exits
   non-zero on any; the run takes about 5 seconds and prints its timing. CI runs it after the
   tests.
+- **Reference capture:** `GODOT_BIN=/path/to/godot scripts/reference.sh` (needs `xvfb-run` and
+  Python with Pillow) runs `scenario_gate_station` at 1920 × 1080 through
+  `tools/reference/capture.tscn`, captures the three reference states (`gate_idle` with SILL
+  selected, `gate_open` with the mission sheet, `other_station` on the Base) and writes into
+  `build/reference/` (git-ignored): `<state>.png`, `<state>_compare.png` (capture | reference over
+  capture under the overlay | difference, half size) and `<state>_overlay.png` (full size, for
+  checking regions against `docs/reference/layout.json`). Every UI PR embeds the three
+  `_compare.png` images (docs/content/interface-reference.md section 6).
 - **Export:** the project has no `export_presets.cfg` yet. When export presets are added, their
   exclude filter must list `tools/*` (and a test fails if a preset file exists without it).
 
