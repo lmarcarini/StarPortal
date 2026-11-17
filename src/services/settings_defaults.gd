@@ -15,6 +15,9 @@ const VALUES: Dictionary = {
 		&"text_size": 1.0,
 		&"screen_grain": true,
 		&"ambient_movement": true,
+		# 3D stations (M5-01): "medium" (full resolution, shadows, glow) or "low" (75%
+		# resolution, no shadows from secondary lights, no glow).
+		&"quality": "medium",
 	},
 	&"audio":
 	{
