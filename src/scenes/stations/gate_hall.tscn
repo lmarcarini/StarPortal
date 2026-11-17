@@ -1,158 +1,210 @@
-[gd_scene load_steps=51 format=3]
+[gd_scene load_steps=68 format=3]
 
 [ext_resource type="Script" path="res://src/scenes/stations/gate_hall.gd" id="script"]
 [ext_resource type="Material" path="res://src/scenes/stations/materials/floor.tres" id="e1"]
-[ext_resource type="Material" path="res://src/scenes/stations/materials/concrete.tres" id="e2"]
-[ext_resource type="PackedScene" path="res://art/3d/megakit/Column_Large_Straight.gltf" id="e3"]
-[ext_resource type="Material" path="res://src/scenes/stations/materials/steel.tres" id="e4"]
-[ext_resource type="Material" path="res://src/scenes/stations/materials/hazard.tres" id="e5"]
-[ext_resource type="Material" path="res://src/scenes/stations/materials/strip_glow.tres" id="e6"]
-[ext_resource type="PackedScene" path="res://art/3d/megakit/Door_Frame_SquareTall.gltf" id="e7"]
-[ext_resource type="PackedScene" path="res://art/3d/megakit/Door_DarkMetal.gltf" id="e8"]
-[ext_resource type="Material" path="res://src/scenes/stations/materials/screen.tres" id="e9"]
-[ext_resource type="Material" path="res://src/scenes/stations/materials/lamp_glow.tres" id="e10"]
-[ext_resource type="Material" path="res://src/scenes/stations/materials/stone.tres" id="e11"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/gunmetal.tres" id="e2"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/concrete_dark.tres" id="e3"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/concrete.tres" id="e4"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/seam.tres" id="e5"]
+[ext_resource type="PackedScene" path="res://art/3d/megakit/Prop_Cable_1.gltf" id="e6"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/tread.tres" id="e7"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/rail.tres" id="e8"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/hazard.tres" id="e9"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/paint_yellow.tres" id="e10"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/strip_glow.tres" id="e11"]
+[ext_resource type="PackedScene" path="res://art/3d/megakit/Door_Frame_SquareTall.gltf" id="e12"]
+[ext_resource type="PackedScene" path="res://art/3d/megakit/Door_DarkMetal.gltf" id="e13"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/cabinet.tres" id="e14"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/screen.tres" id="e15"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/lamp_glow.tres" id="e16"]
+[ext_resource type="Material" path="res://src/scenes/stations/materials/ring_stone.tres" id="e17"]
 
 [sub_resource type="Environment" id="s1"]
 background_mode = 1
-background_color = Color(0.02, 0.02, 0.018, 1)
+background_color = Color(0, 0, 0, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.5, 0.42, 0.32, 1)
-ambient_light_energy = 0.6
-tonemap_mode = 2
-tonemap_exposure = 1.1
+ambient_light_color = Color(0.42, 0.46, 0.52, 1)
+ambient_light_energy = 0.55
+tonemap_mode = 3
+tonemap_exposure = 1.9
+tonemap_white = 6.0
 glow_enabled = true
-glow_intensity = 0.5
-glow_bloom = 0.05
-glow_hdr_threshold = 1.2
+glow_intensity = 0.6
+glow_bloom = 0.02
+glow_hdr_threshold = 1.0
 fog_enabled = true
-fog_light_color = Color(0.22, 0.17, 0.11, 1)
-fog_density = 0.012
-fog_aerial_perspective = 0.3
+fog_light_color = Color(0.09, 0.085, 0.08, 1)
+fog_density = 0.006
+adjustment_enabled = true
+adjustment_saturation = 0.8
+adjustment_contrast = 1.08
 
 [sub_resource type="BoxMesh" id="s2"]
-size = Vector3(34, 0.4, 32)
+size = Vector3(36, 0.4, 34)
 
 [sub_resource type="BoxMesh" id="s3"]
-size = Vector3(10, 16, 0.8)
+size = Vector3(12, 15, 0.8)
 
 [sub_resource type="BoxMesh" id="s4"]
-size = Vector3(12, 16, 0.8)
+size = Vector3(0.8, 15, 34)
 
 [sub_resource type="BoxMesh" id="s5"]
-size = Vector3(0.8, 16, 4)
+size = Vector3(10.4, 15, 0.8)
 
 [sub_resource type="BoxMesh" id="s6"]
-size = Vector3(12, 3, 4.4)
+size = Vector3(0.05, 15, 0.05)
 
 [sub_resource type="BoxMesh" id="s7"]
-size = Vector3(0.8, 16, 32)
+size = Vector3(10.4, 0.05, 0.05)
 
 [sub_resource type="BoxMesh" id="s8"]
-size = Vector3(32, 0.8, 0.6)
+size = Vector3(1.3, 15, 1.4)
 
 [sub_resource type="BoxMesh" id="s9"]
-size = Vector3(10, 1.2, 3.2)
+size = Vector3(0.9, 15, 0.1)
 
 [sub_resource type="BoxMesh" id="s10"]
-size = Vector3(4, 0.25, 9.57549)
+size = Vector3(0.8, 5, 0.8)
 
 [sub_resource type="BoxMesh" id="s11"]
-size = Vector3(0.08, 1, 0.08)
+size = Vector3(0.8, 15, 3)
 
 [sub_resource type="BoxMesh" id="s12"]
-size = Vector3(0.08, 0.08, 9.57549)
+size = Vector3(10.4, 1, 1.2)
 
-[sub_resource type="PlaneMesh" id="s13"]
-size = Vector2(9, 1.2)
+[sub_resource type="BoxMesh" id="s13"]
+size = Vector3(34, 0.9, 0.7)
 
-[sub_resource type="PlaneMesh" id="s14"]
-size = Vector2(1.0, 9)
+[sub_resource type="BoxMesh" id="s14"]
+size = Vector3(0.9, 0.12, 30)
 
-[sub_resource type="BoxMesh" id="s15"]
-size = Vector3(6, 0.3, 22)
+[sub_resource type="CylinderMesh" id="s15"]
+top_radius = 0.28
+bottom_radius = 0.28
+height = 30
+radial_segments = 12
 
 [sub_resource type="BoxMesh" id="s16"]
-size = Vector3(0.08, 0.08, 22)
+size = Vector3(12, 0.9, 2.6)
 
 [sub_resource type="BoxMesh" id="s17"]
-size = Vector3(0.06, 0.06, 22)
+size = Vector3(4.2, 0.2, 7.05762)
 
 [sub_resource type="BoxMesh" id="s18"]
-size = Vector3(0.08, 1.1, 0.08)
+size = Vector3(0.07, 1.05, 0.07)
 
 [sub_resource type="BoxMesh" id="s19"]
-size = Vector3(0.3, 5.5, 0.3)
+size = Vector3(0.06, 0.06, 7.05762)
 
-[sub_resource type="BoxMesh" id="s20"]
-size = Vector3(1.6, 0.08, 0.2)
+[sub_resource type="PlaneMesh" id="s20"]
+size = Vector2(6.6, 0.7)
 
-[sub_resource type="BoxMesh" id="s21"]
-size = Vector3(0.36, 0.12, 1.6)
+[sub_resource type="PlaneMesh" id="s21"]
+size = Vector2(0.7, 7.6)
 
-[sub_resource type="BoxMesh" id="s22"]
-size = Vector3(7.46, 0.3, 0.12)
+[sub_resource type="PlaneMesh" id="s22"]
+size = Vector2(0.7, 7.6)
 
-[sub_resource type="BoxMesh" id="s23"]
-size = Vector3(7.46, 0.06, 0.06)
+[sub_resource type="PlaneMesh" id="s23"]
+size = Vector2(30, 0.12)
 
-[sub_resource type="BoxMesh" id="s24"]
-size = Vector3(7.46, 0.3, 0.12)
+[sub_resource type="PlaneMesh" id="s24"]
+size = Vector2(36, 0.03)
 
-[sub_resource type="BoxMesh" id="s25"]
-size = Vector3(7.46, 0.06, 0.06)
+[sub_resource type="PlaneMesh" id="s25"]
+size = Vector2(0.03, 34)
 
 [sub_resource type="BoxMesh" id="s26"]
-size = Vector3(9.8, 5.5, 0.8)
+size = Vector3(5, 0.25, 26)
 
 [sub_resource type="BoxMesh" id="s27"]
-size = Vector3(4.2, 1, 1.2)
+size = Vector3(0.15, 0.45, 26)
 
 [sub_resource type="BoxMesh" id="s28"]
-size = Vector3(1, 1.7, 0.9)
+size = Vector3(0.06, 0.06, 26)
 
 [sub_resource type="BoxMesh" id="s29"]
-size = Vector3(0.7, 0.45, 0.04)
+size = Vector3(0.07, 1.1, 0.07)
 
-[sub_resource type="CylinderMesh" id="s30"]
-top_radius = 0.12
-bottom_radius = 0.7
-height = 0.5
+[sub_resource type="BoxMesh" id="s30"]
+size = Vector3(0.35, 5, 0.35)
 
-[sub_resource type="SphereMesh" id="s31"]
-radius = 0.22
-height = 0.3
+[sub_resource type="BoxMesh" id="s31"]
+size = Vector3(1.6, 0.06, 0.3)
 
-[sub_resource type="CylinderMesh" id="s32"]
-top_radius = 0.02
-bottom_radius = 0.02
-height = 4
+[sub_resource type="BoxMesh" id="s32"]
+size = Vector3(0.42, 0.08, 1.4)
 
 [sub_resource type="BoxMesh" id="s33"]
-size = Vector3(10, 0.5, 0.3)
+size = Vector3(7.40349, 0.28, 0.1)
 
 [sub_resource type="BoxMesh" id="s34"]
-size = Vector3(0.3, 0.5, 32)
+size = Vector3(7.40349, 0.05, 0.05)
 
-[sub_resource type="TorusMesh" id="s35"]
+[sub_resource type="BoxMesh" id="s35"]
+size = Vector3(8.4, 5, 0.6)
+
+[sub_resource type="BoxMesh" id="s36"]
+size = Vector3(1.2, 0.08, 0.15)
+
+[sub_resource type="BoxMesh" id="s37"]
+size = Vector3(4.8, 1.9, 1)
+
+[sub_resource type="BoxMesh" id="s38"]
+size = Vector3(1.1, 0.55, 0.04)
+
+[sub_resource type="BoxMesh" id="s39"]
+size = Vector3(1.1, 0.5, 0.03)
+
+[sub_resource type="CylinderMesh" id="s40"]
+top_radius = 0.12
+bottom_radius = 0.55
+height = 0.45
+radial_segments = 16
+
+[sub_resource type="SphereMesh" id="s41"]
+radius = 0.2
+height = 0.24
+
+[sub_resource type="CylinderMesh" id="s42"]
+top_radius = 0.015
+bottom_radius = 0.015
+height = 4.4
+
+[sub_resource type="CylinderMesh" id="s43"]
+top_radius = 0.015
+bottom_radius = 0.015
+height = 4.4
+
+[sub_resource type="CylinderMesh" id="s44"]
+top_radius = 0.015
+bottom_radius = 0.015
+height = 7.4
+
+[sub_resource type="CylinderMesh" id="s45"]
+top_radius = 0.015
+bottom_radius = 0.015
+height = 7.4
+
+[sub_resource type="TorusMesh" id="s46"]
 inner_radius = 2.9
 outer_radius = 3.7
 rings = 64
 ring_segments = 12
 
-[sub_resource type="BoxMesh" id="s36"]
-size = Vector3(0.6, 0.6, 0.9)
+[sub_resource type="BoxMesh" id="s47"]
+size = Vector3(0.7, 0.7, 0.8)
 
-[sub_resource type="Curve3D" id="s37"]
+[sub_resource type="Curve3D" id="s48"]
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 1.2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 10.5),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0.9, 1.1, 0, 0, 0, 0, 0, 0, 0, 0, 8.1),
 "tilts": PackedFloat32Array(0, 0)
 }
 point_count = 2
 
-[sub_resource type="Curve3D" id="s38"]
+[sub_resource type="Curve3D" id="s49"]
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -9, 0, 12.5, 0, 0, 0, 0, 0, 0, 9, 0, 12.5),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -10, 0, 9.5, 0, 0, 0, 0, 0, 0, 10, 0, 9.5),
 "tilts": PackedFloat32Array(0, 0)
 }
 point_count = 2
@@ -179,909 +231,1058 @@ mesh = SubResource("s2")
 material_override = ExtResource("e1")
 
 [node name="Ceiling" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.2, 11)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.2, 11)
 mesh = SubResource("s2")
 material_override = ExtResource("e2")
 
-[node name="BackLeft" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 8, -2.4)
+[node name="BackOuterL" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 7.5, -4.4)
 mesh = SubResource("s3")
-material_override = ExtResource("e2")
+material_override = ExtResource("e3")
 
-[node name="BackRight" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 8, -2.4)
+[node name="BackOuterR" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 7.5, -4.4)
 mesh = SubResource("s3")
-material_override = ExtResource("e2")
-
-[node name="BackBay" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -6.4)
-mesh = SubResource("s4")
-material_override = ExtResource("e2")
-
-[node name="BayLeft" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.4, 8, -4.4)
-mesh = SubResource("s5")
-material_override = ExtResource("e2")
-
-[node name="BayRight" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4, 8, -4.4)
-mesh = SubResource("s5")
-material_override = ExtResource("e2")
-
-[node name="BayLintel" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.5, -4.2)
-mesh = SubResource("s6")
-material_override = ExtResource("e2")
+material_override = ExtResource("e3")
 
 [node name="WallLeft" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.4, 8, 11)
-mesh = SubResource("s7")
-material_override = ExtResource("e2")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.4, 7.5, 11)
+mesh = SubResource("s4")
+material_override = ExtResource("e3")
 
 [node name="WallRight" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.4, 8, 11)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4, 7.5, 11)
+mesh = SubResource("s4")
+material_override = ExtResource("e3")
+
+[node name="RingWall" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, -1.8)
+mesh = SubResource("s5")
+material_override = ExtResource("e4")
+
+[node name="SeamV-2.6" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 7.5, -1.38)
+mesh = SubResource("s6")
+material_override = ExtResource("e5")
+
+[node name="SeamV+0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, -1.38)
+mesh = SubResource("s6")
+material_override = ExtResource("e5")
+
+[node name="SeamV+2.6" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 7.5, -1.38)
+mesh = SubResource("s6")
+material_override = ExtResource("e5")
+
+[node name="SeamH2.5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -1.38)
 mesh = SubResource("s7")
+material_override = ExtResource("e5")
+
+[node name="SeamH5.5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, -1.38)
+mesh = SubResource("s7")
+material_override = ExtResource("e5")
+
+[node name="SeamH8.5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -1.38)
+mesh = SubResource("s7")
+material_override = ExtResource("e5")
+
+[node name="SeamH11.5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.5, -1.38)
+mesh = SubResource("s7")
+material_override = ExtResource("e5")
+
+[node name="Pilaster-1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.85, 7.5, -1.4)
+mesh = SubResource("s8")
 material_override = ExtResource("e2")
 
-[node name="Pilaster-6" parent="Kit" groups=["kit"] instance=ExtResource("e3")]
-transform = Transform3D(1, 0, 0, 0, 1.6, 0, 0, 0, 1, -6.8, 0, -1.6)
-
-[node name="Pilaster+6" parent="Kit" groups=["kit"] instance=ExtResource("e3")]
-transform = Transform3D(1, 0, 0, 0, 1.6, 0, 0, 0, 1, 6.8, 0, -1.6)
-
-[node name="Pilaster-12" parent="Kit" groups=["kit"] instance=ExtResource("e3")]
-transform = Transform3D(1, 0, 0, 0, 1.6, 0, 0, 0, 1, -12, 0, -1.6)
-
-[node name="Pilaster+12" parent="Kit" groups=["kit"] instance=ExtResource("e3")]
-transform = Transform3D(1, 0, 0, 0, 1.6, 0, 0, 0, 1, 12, 0, -1.6)
-
-[node name="PilasterL4" parent="Kit" groups=["kit"] instance=ExtResource("e3")]
-transform = Transform3D(6.123e-17, 0, 1, 0, 1.6, 0, -1, 0, 6.123e-17, -15.4, 0, 4)
-
-[node name="PilasterR4" parent="Kit" groups=["kit"] instance=ExtResource("e3")]
-transform = Transform3D(6.123e-17, 0, -1, 0, 1.6, 0, 1, 0, 6.123e-17, 15.4, 0, 4)
-
-[node name="PilasterL10" parent="Kit" groups=["kit"] instance=ExtResource("e3")]
-transform = Transform3D(6.123e-17, 0, 1, 0, 1.6, 0, -1, 0, 6.123e-17, -15.4, 0, 10)
-
-[node name="PilasterR10" parent="Kit" groups=["kit"] instance=ExtResource("e3")]
-transform = Transform3D(6.123e-17, 0, -1, 0, 1.6, 0, 1, 0, 6.123e-17, 15.4, 0, 10)
-
-[node name="Beam0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.8, 0)
-mesh = SubResource("s8")
+[node name="PilasterFace-1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.85, 7.5, -0.65)
+mesh = SubResource("s9")
 material_override = ExtResource("e4")
 
-[node name="Beam6" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.8, 6)
+[node name="Brace-1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(0.8192, 0.5736, 0, -0.5736, 0.8192, 0, 0, 0, 1, -4.2, 12.6, -1.2)
+mesh = SubResource("s10")
+material_override = ExtResource("e2")
+
+[node name="SideBay-1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.6, 7.5, -3)
+mesh = SubResource("s11")
+material_override = ExtResource("e3")
+
+[node name="Pilaster1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.85, 7.5, -1.4)
 mesh = SubResource("s8")
+material_override = ExtResource("e2")
+
+[node name="PilasterFace1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.85, 7.5, -0.65)
+mesh = SubResource("s9")
 material_override = ExtResource("e4")
 
-[node name="Beam12" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.8, 12)
-mesh = SubResource("s8")
-material_override = ExtResource("e4")
+[node name="Brace1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(0.8192, -0.5736, 0, 0.5736, 0.8192, 0, 0, 0, 1, 4.2, 12.6, -1.2)
+mesh = SubResource("s10")
+material_override = ExtResource("e2")
+
+[node name="SideBay1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6, 7.5, -3)
+mesh = SubResource("s11")
+material_override = ExtResource("e3")
+
+[node name="Lintel" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.2, -1.2)
+mesh = SubResource("s12")
+material_override = ExtResource("e2")
+
+[node name="Beam-0.5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.4, -0.5)
+mesh = SubResource("s13")
+material_override = ExtResource("e2")
+
+[node name="Beam5.5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.4, 5.5)
+mesh = SubResource("s13")
+material_override = ExtResource("e2")
+
+[node name="Beam11.5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.4, 11.5)
+mesh = SubResource("s13")
+material_override = ExtResource("e2")
+
+[node name="Tray-1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 13.6, 10)
+mesh = SubResource("s14")
+material_override = ExtResource("e2")
+
+[node name="Cable-1_0" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, -9, 13.68, -2)
+
+[node name="Cable-1_1" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, -9, 13.68, 4.5)
+
+[node name="Cable-1_2" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, -9, 13.68, 11)
+
+[node name="Cable-1_3" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, -9, 13.68, 17.5)
+
+[node name="Cable-1_4" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, -9, 13.68, 24)
+
+[node name="Tray1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 13.6, 10)
+mesh = SubResource("s14")
+material_override = ExtResource("e2")
+
+[node name="Cable1_0" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, 9, 13.68, -2)
+
+[node name="Cable1_1" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, 9, 13.68, 4.5)
+
+[node name="Cable1_2" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, 9, 13.68, 11)
+
+[node name="Cable1_3" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, 9, 13.68, 17.5)
+
+[node name="Cable1_4" parent="Kit" groups=["kit"] instance=ExtResource("e6")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 3.6, 9, 13.68, 24)
+
+[node name="Pipe0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 12.5, 12.6, 10)
+mesh = SubResource("s15")
+material_override = ExtResource("e2")
+
+[node name="Pipe1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, 13.4, 12.2, 10)
+mesh = SubResource("s15")
+material_override = ExtResource("e2")
+
+[node name="Pipe2" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, -1, 0, 1, 6.123e-17, -12.8, 12.8, 10)
+mesh = SubResource("s15")
+material_override = ExtResource("e2")
 
 [node name="Pedestal" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -0.6)
-mesh = SubResource("s9")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -0.2)
+mesh = SubResource("s16")
 material_override = ExtResource("e2")
 
 [node name="Ramp" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 0.9921, -0.1253, 0, 0.1253, 0.9921, 0, 0.5, 5.75)
-mesh = SubResource("s10")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 0.9918, -0.1275, 0, 0.1275, 0.9918, 0, 0.35, 4.6)
+mesh = SubResource("s17")
+material_override = ExtResource("e7")
 
 [node name="RampPost-1_0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.7, 1)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1, 1.407, 1.2)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
 [node name="RampPost-1_1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.46, 2.9)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1, 1.189, 2.9)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
 [node name="RampPost-1_2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.22, 4.8)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1, 0.97, 4.6)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
 [node name="RampPost-1_3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.98, 6.7)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1, 0.7514, 6.3)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
 [node name="RampPost-1_4" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.74, 8.6)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1, 0.5329, 8)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
-[node name="RampPost-1_5" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, 10.5)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+[node name="RampRail-1_0.55" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 0.9918, -0.1275, 0, 0.1275, 0.9918, -2.1, 1, 4.6)
+mesh = SubResource("s19")
+material_override = ExtResource("e8")
 
-[node name="RampRail-1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 0.9921, -0.1253, 0, 0.1253, 0.9921, -2, 1.6, 5.75)
-mesh = SubResource("s12")
-material_override = ExtResource("e4")
+[node name="RampRail-1_1.05" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 0.9918, -0.1275, 0, 0.1275, 0.9918, -2.1, 1.5, 4.6)
+mesh = SubResource("s19")
+material_override = ExtResource("e8")
 
 [node name="RampPost1_0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.7, 1)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 1.407, 1.2)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
 [node name="RampPost1_1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.46, 2.9)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 1.189, 2.9)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
 [node name="RampPost1_2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.22, 4.8)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 0.97, 4.6)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
 [node name="RampPost1_3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.98, 6.7)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 0.7514, 6.3)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
 [node name="RampPost1_4" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.74, 8.6)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 0.5329, 8)
+mesh = SubResource("s18")
+material_override = ExtResource("e8")
 
-[node name="RampPost1_5" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 10.5)
-mesh = SubResource("s11")
-material_override = ExtResource("e4")
+[node name="RampRail1_0.55" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 0.9918, -0.1275, 0, 0.1275, 0.9918, 2.1, 1, 4.6)
+mesh = SubResource("s19")
+material_override = ExtResource("e8")
 
-[node name="RampRail1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 0.9921, -0.1253, 0, 0.1253, 0.9921, 2, 1.6, 5.75)
-mesh = SubResource("s12")
-material_override = ExtResource("e4")
+[node name="RampRail1_1.05" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 0.9918, -0.1275, 0, 0.1275, 0.9918, 2.1, 1.5, 4.6)
+mesh = SubResource("s19")
+material_override = ExtResource("e8")
 
 [node name="Hazard" type="Node3D" parent="Shell"]
 
 [node name="HazardFoot" type="MeshInstance3D" parent="Shell/Hazard"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 11.7)
-mesh = SubResource("s13")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 8.6)
+mesh = SubResource("s20")
+material_override = ExtResource("e9")
+
+[node name="HazardSideL" type="MeshInstance3D" parent="Shell/Hazard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.95, 0.01, 4.9)
+mesh = SubResource("s21")
+material_override = ExtResource("e9")
+
+[node name="HazardSideR" type="MeshInstance3D" parent="Shell/Hazard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.95, 0.01, 4.9)
+mesh = SubResource("s22")
+material_override = ExtResource("e9")
+
+[node name="FloorLine10.2" type="MeshInstance3D" parent="Shell/Hazard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, 10.2)
+mesh = SubResource("s23")
+material_override = ExtResource("e10")
+
+[node name="FloorLine14" type="MeshInstance3D" parent="Shell/Hazard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, 14)
+mesh = SubResource("s23")
+material_override = ExtResource("e10")
+
+[node name="FloorSeam-1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.011, -1)
+mesh = SubResource("s24")
 material_override = ExtResource("e5")
 
-[node name="HazardSide-1" type="MeshInstance3D" parent="Shell/Hazard"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0.01, 7)
-mesh = SubResource("s14")
+[node name="FloorSeam3" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.011, 3)
+mesh = SubResource("s24")
 material_override = ExtResource("e5")
 
-[node name="HazardSide1" type="MeshInstance3D" parent="Shell/Hazard"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.01, 7)
-mesh = SubResource("s14")
+[node name="FloorSeam7" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.011, 7)
+mesh = SubResource("s24")
+material_override = ExtResource("e5")
+
+[node name="FloorSeam11" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.011, 11)
+mesh = SubResource("s24")
+material_override = ExtResource("e5")
+
+[node name="FloorSeam15" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.011, 15)
+mesh = SubResource("s24")
+material_override = ExtResource("e5")
+
+[node name="FloorSeam19" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.011, 19)
+mesh = SubResource("s24")
+material_override = ExtResource("e5")
+
+[node name="FloorSeam23" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.011, 23)
+mesh = SubResource("s24")
+material_override = ExtResource("e5")
+
+[node name="FloorSeamX-16" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0.011, 11)
+mesh = SubResource("s25")
+material_override = ExtResource("e5")
+
+[node name="FloorSeamX-12" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.011, 11)
+mesh = SubResource("s25")
+material_override = ExtResource("e5")
+
+[node name="FloorSeamX-8" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.011, 11)
+mesh = SubResource("s25")
+material_override = ExtResource("e5")
+
+[node name="FloorSeamX-4" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.011, 11)
+mesh = SubResource("s25")
+material_override = ExtResource("e5")
+
+[node name="FloorSeamX0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.011, 11)
+mesh = SubResource("s25")
+material_override = ExtResource("e5")
+
+[node name="FloorSeamX4" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.011, 11)
+mesh = SubResource("s25")
+material_override = ExtResource("e5")
+
+[node name="FloorSeamX8" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.011, 11)
+mesh = SubResource("s25")
+material_override = ExtResource("e5")
+
+[node name="FloorSeamX12" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.011, 11)
+mesh = SubResource("s25")
+material_override = ExtResource("e5")
+
+[node name="FloorSeamX16" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.011, 11)
+mesh = SubResource("s25")
 material_override = ExtResource("e5")
 
 [node name="CatwalkLeft" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 5.5, 8)
-mesh = SubResource("s15")
-material_override = ExtResource("e4")
-
-[node name="CatwalkRailLeft" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.6, 8)
-mesh = SubResource("s16")
-material_override = ExtResource("e4")
-
-[node name="CatwalkMidLeft" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.1, 8)
-mesh = SubResource("s17")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, -2.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, -0.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 1.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 3.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft4" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 5.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft5" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 7.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft6" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 9.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft7" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 11.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft8" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 13.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft9" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 15.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft10" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 17.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostLeft11" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.05, 6.05, 19.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkStrutLeft0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.3, 2.75, -1)
-mesh = SubResource("s19")
-material_override = ExtResource("e4")
-
-[node name="CatwalkStrutLeft1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.3, 2.75, 5)
-mesh = SubResource("s19")
-material_override = ExtResource("e4")
-
-[node name="CatwalkStrutLeft2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.3, 2.75, 11)
-mesh = SubResource("s19")
-material_override = ExtResource("e4")
-
-[node name="CatwalkStrutLeft3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.3, 2.75, 17)
-mesh = SubResource("s19")
-material_override = ExtResource("e4")
-
-[node name="StripLeft0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 5.25, 1)
-mesh = SubResource("s20")
-material_override = ExtResource("e6")
-
-[node name="StripLeft1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 5.25, 7)
-mesh = SubResource("s20")
-material_override = ExtResource("e6")
-
-[node name="StripLeft2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 5.25, 13)
-mesh = SubResource("s20")
-material_override = ExtResource("e6")
-
-[node name="CatwalkRight" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 5.5, 8)
-mesh = SubResource("s15")
-material_override = ExtResource("e4")
-
-[node name="CatwalkRailRight" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.6, 8)
-mesh = SubResource("s16")
-material_override = ExtResource("e4")
-
-[node name="CatwalkMidRight" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.1, 8)
-mesh = SubResource("s17")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, -2.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, -0.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 1.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 3.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight4" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 5.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight5" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 7.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight6" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 9.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight7" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 11.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight8" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 13.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight9" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 15.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight10" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 17.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkPostRight11" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.05, 6.05, 19.5)
-mesh = SubResource("s18")
-material_override = ExtResource("e4")
-
-[node name="CatwalkStrutRight0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.3, 2.75, -1)
-mesh = SubResource("s19")
-material_override = ExtResource("e4")
-
-[node name="CatwalkStrutRight1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.3, 2.75, 5)
-mesh = SubResource("s19")
-material_override = ExtResource("e4")
-
-[node name="CatwalkStrutRight2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.3, 2.75, 11)
-mesh = SubResource("s19")
-material_override = ExtResource("e4")
-
-[node name="CatwalkStrutRight3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.3, 2.75, 17)
-mesh = SubResource("s19")
-material_override = ExtResource("e4")
-
-[node name="StripRight0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 5.25, 1)
-mesh = SubResource("s20")
-material_override = ExtResource("e6")
-
-[node name="StripRight1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 5.25, 7)
-mesh = SubResource("s20")
-material_override = ExtResource("e6")
-
-[node name="StripRight2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 5.25, 13)
-mesh = SubResource("s20")
-material_override = ExtResource("e6")
-
-[node name="Step0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.82, 5.44, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.46, 5.047, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.1, 4.654, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.74, 4.261, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step4" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.38, 3.869, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step5" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.02, 3.476, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step6" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.66, 3.083, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step7" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.3, 2.69, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step8" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.94, 2.297, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step9" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.58, 1.904, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step10" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.22, 1.511, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step11" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.86, 1.119, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step12" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.7257, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Step13" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.14, 0.3329, 3)
-mesh = SubResource("s21")
-material_override = ExtResource("e4")
-
-[node name="Stringer2.2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(0.6756, 0.7373, 0, -0.7373, 0.6756, 0, 0, 0, 1, -7.48, 2.75, 2.2)
-mesh = SubResource("s22")
-material_override = ExtResource("e4")
-
-[node name="StairRail2.2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(0.6756, 0.7373, 0, -0.7373, 0.6756, 0, 0, 0, 1, -7.48, 3.75, 2.2)
-mesh = SubResource("s23")
-material_override = ExtResource("e4")
-
-[node name="Stringer3.8" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(0.6756, 0.7373, 0, -0.7373, 0.6756, 0, 0, 0, 1, -7.48, 2.75, 3.8)
-mesh = SubResource("s24")
-material_override = ExtResource("e4")
-
-[node name="StairRail3.8" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(0.6756, 0.7373, 0, -0.7373, 0.6756, 0, 0, 0, 1, -7.48, 3.75, 3.8)
-mesh = SubResource("s25")
-material_override = ExtResource("e4")
-
-[node name="DoorWall" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.1, 2.75, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 5, 7)
 mesh = SubResource("s26")
 material_override = ExtResource("e2")
 
-[node name="DoorFrame" parent="Kit" groups=["kit"] instance=ExtResource("e7")]
-transform = Transform3D(0.5, 0, 0, 0, 0.6, 0, 0, 0, 1, -8.6, 0, 8.55)
-
-[node name="DoorA" parent="Kit" groups=["kit"] instance=ExtResource("e8")]
-transform = Transform3D(0.5, 0, 0, 0, 0.6, 0, 0, 0, 1, -8.6, 0, 8.5)
-
-[node name="DoorB" parent="Kit" groups=["kit"] instance=ExtResource("e8")]
-transform = Transform3D(0.5, 0, 0, 0, 0.6, 0, 0, 0, 1, -7.545, 0, 8.5)
-
-[node name="ConsoleBaseLeft" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 0.5, 6)
+[node name="CatwalkLipLeft" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 4.9, 7)
 mesh = SubResource("s27")
-material_override = ExtResource("e4")
+material_override = ExtResource("e2")
 
-[node name="CabinetLeft0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.7, 0.85, 5.3)
+[node name="CatwalkRailLeft0.55" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 7)
 mesh = SubResource("s28")
-material_override = ExtResource("e4")
+material_override = ExtResource("e8")
+
+[node name="CatwalkRailLeft1.1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 6.1, 7)
+mesh = SubResource("s28")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, -5.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, -3.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft2" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, -1.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft3" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 0.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft4" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 2.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 4.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft6" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 6.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft7" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 8.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft8" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 10.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft9" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 12.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft10" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 14.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft11" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 16.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft12" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 18.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostLeft13" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.05, 5.55, 20.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkStrutLeft0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.3, 2.5, -3)
+mesh = SubResource("s30")
+material_override = ExtResource("e2")
+
+[node name="CatwalkStrutLeft1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.3, 2.5, 4)
+mesh = SubResource("s30")
+material_override = ExtResource("e2")
+
+[node name="CatwalkStrutLeft2" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.3, 2.5, 11)
+mesh = SubResource("s30")
+material_override = ExtResource("e2")
+
+[node name="CatwalkStrutLeft3" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.3, 2.5, 18)
+mesh = SubResource("s30")
+material_override = ExtResource("e2")
+
+[node name="StripLeft0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.8, 2)
+mesh = SubResource("s31")
+material_override = ExtResource("e11")
+
+[node name="CoolLeft0" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.4, 2)
+light_color = Color(0.78, 0.86, 1, 1)
+light_energy = 1.4
+omni_range = 5.5
+omni_attenuation = 1.6
+
+[node name="StripLeft1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.8, 9)
+mesh = SubResource("s31")
+material_override = ExtResource("e11")
+
+[node name="CoolLeft1" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.4, 9)
+light_color = Color(0.78, 0.86, 1, 1)
+light_energy = 1.4
+omni_range = 5.5
+omni_attenuation = 1.6
+
+[node name="CatwalkRight" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 5, 7)
+mesh = SubResource("s26")
+material_override = ExtResource("e2")
+
+[node name="CatwalkLipRight" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4.9, 7)
+mesh = SubResource("s27")
+material_override = ExtResource("e2")
+
+[node name="CatwalkRailRight0.55" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 7)
+mesh = SubResource("s28")
+material_override = ExtResource("e8")
+
+[node name="CatwalkRailRight1.1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 6.1, 7)
+mesh = SubResource("s28")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, -5.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, -3.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight2" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, -1.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight3" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 0.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight4" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 2.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 4.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight6" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 6.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight7" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 8.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight8" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 10.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight9" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 12.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight10" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 14.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight11" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 16.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight12" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 18.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkPostRight13" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.05, 5.55, 20.5)
+mesh = SubResource("s29")
+material_override = ExtResource("e8")
+
+[node name="CatwalkStrutRight0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.5, -3)
+mesh = SubResource("s30")
+material_override = ExtResource("e2")
+
+[node name="CatwalkStrutRight1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.5, 4)
+mesh = SubResource("s30")
+material_override = ExtResource("e2")
+
+[node name="CatwalkStrutRight2" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.5, 11)
+mesh = SubResource("s30")
+material_override = ExtResource("e2")
+
+[node name="CatwalkStrutRight3" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3, 2.5, 18)
+mesh = SubResource("s30")
+material_override = ExtResource("e2")
+
+[node name="StripRight0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4.8, 2)
+mesh = SubResource("s31")
+material_override = ExtResource("e11")
+
+[node name="CoolRight0" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4.4, 2)
+light_color = Color(0.78, 0.86, 1, 1)
+light_energy = 1.4
+omni_range = 5.5
+omni_attenuation = 1.6
+
+[node name="StripRight1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4.8, 9)
+mesh = SubResource("s31")
+material_override = ExtResource("e11")
+
+[node name="CoolRight1" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4.4, 9)
+light_color = Color(0.78, 0.86, 1, 1)
+light_energy = 1.4
+omni_range = 5.5
+omni_attenuation = 1.6
+
+[node name="Step0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.39, 4.96, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.97, 4.575, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step2" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.55, 4.191, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step3" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.13, 3.806, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step4" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.71, 3.422, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step5" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.29, 3.037, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step6" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.87, 2.652, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step7" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.45, 2.268, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step8" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.03, 1.883, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step9" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.61, 1.498, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step10" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.19, 1.114, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step11" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.77, 0.7292, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Step12" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.35, 0.3446, 2.6)
+mesh = SubResource("s32")
+material_override = ExtResource("e2")
+
+[node name="Stringer1.9" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(0.7375, 0.6754, 0, -0.6754, 0.7375, 0, 0, 0, 1, -8.87, 2.5, 1.9)
+mesh = SubResource("s33")
+material_override = ExtResource("e2")
+
+[node name="StairRail1.9" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(0.7375, 0.6754, 0, -0.6754, 0.7375, 0, 0, 0, 1, -8.87, 3.5, 1.9)
+mesh = SubResource("s34")
+material_override = ExtResource("e8")
+
+[node name="Stringer3.3" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(0.7375, 0.6754, 0, -0.6754, 0.7375, 0, 0, 0, 1, -8.87, 2.5, 3.3)
+mesh = SubResource("s33")
+material_override = ExtResource("e2")
+
+[node name="StairRail3.3" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(0.7375, 0.6754, 0, -0.6754, 0.7375, 0, 0, 0, 1, -8.87, 3.5, 3.3)
+mesh = SubResource("s34")
+material_override = ExtResource("e8")
+
+[node name="DoorBay" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.2, 2.5, 0.4)
+mesh = SubResource("s35")
+material_override = ExtResource("e3")
+
+[node name="DoorFrame" parent="Kit" groups=["kit"] instance=ExtResource("e12")]
+transform = Transform3D(0.72, 0, 0, 0, 0.68, 0, 0, 0, 1, -13.6, 0, 0.75)
+
+[node name="DoorA" parent="Kit" groups=["kit"] instance=ExtResource("e13")]
+transform = Transform3D(0.72, 0, 0, 0, 0.68, 0, 0, 0, 1, -13.6, 0, 0.72)
+
+[node name="DoorB" parent="Kit" groups=["kit"] instance=ExtResource("e13")]
+transform = Transform3D(0.72, 0, 0, 0, 0.68, 0, 0, 0, 1, -12.08, 0, 0.72)
+
+[node name="DoorLamp" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.6, 3.75, 0.85)
+mesh = SubResource("s36")
+material_override = ExtResource("e11")
+
+[node name="DoorLight" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.6, 3.4, 1.6)
+light_color = Color(0.8, 0.88, 1, 1)
+light_energy = 2.2
+omni_range = 6.0
+omni_attenuation = 1.2
+
+[node name="ConsoleBodyLeft" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 0.95, 1.6)
+mesh = SubResource("s37")
+material_override = ExtResource("e14")
 
 [node name="ScreenLeft0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.7, 1.35, 5.77)
-mesh = SubResource("s29")
-material_override = ExtResource("e9")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.4, 1.45, 2.12)
+mesh = SubResource("s38")
+material_override = ExtResource("e15")
 
-[node name="CabinetLeft1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.75, 0.85, 5.3)
-mesh = SubResource("s28")
-material_override = ExtResource("e4")
+[node name="VentLeft0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.4, 0.55, 2.12)
+mesh = SubResource("s39")
+material_override = ExtResource("e5")
 
 [node name="ScreenLeft1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.75, 1.35, 5.77)
-mesh = SubResource("s29")
-material_override = ExtResource("e9")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 1.45, 2.12)
+mesh = SubResource("s38")
+material_override = ExtResource("e15")
 
-[node name="CabinetLeft2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 0.85, 5.3)
-mesh = SubResource("s28")
-material_override = ExtResource("e4")
+[node name="VentLeft1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 0.55, 2.12)
+mesh = SubResource("s39")
+material_override = ExtResource("e5")
 
 [node name="ScreenLeft2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 1.35, 5.77)
-mesh = SubResource("s29")
-material_override = ExtResource("e9")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4, 1.45, 2.12)
+mesh = SubResource("s38")
+material_override = ExtResource("e15")
 
-[node name="CabinetLeft3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.85, 0.85, 5.3)
-mesh = SubResource("s28")
-material_override = ExtResource("e4")
+[node name="VentLeft2" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4, 0.55, 2.12)
+mesh = SubResource("s39")
+material_override = ExtResource("e5")
 
-[node name="ScreenLeft3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.85, 1.35, 5.77)
-mesh = SubResource("s29")
-material_override = ExtResource("e9")
-
-[node name="ConsoleBaseRight" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.5, 6)
-mesh = SubResource("s27")
-material_override = ExtResource("e4")
-
-[node name="CabinetRight0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, 0.85, 5.3)
-mesh = SubResource("s28")
-material_override = ExtResource("e4")
+[node name="ConsoleBodyRight" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9, 0.95, 1.6)
+mesh = SubResource("s37")
+material_override = ExtResource("e14")
 
 [node name="ScreenRight0" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, 1.35, 5.77)
-mesh = SubResource("s29")
-material_override = ExtResource("e9")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.4, 1.45, 2.12)
+mesh = SubResource("s38")
+material_override = ExtResource("e15")
 
-[node name="CabinetRight1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 0.85, 5.3)
-mesh = SubResource("s28")
-material_override = ExtResource("e4")
+[node name="VentRight0" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.4, 0.55, 2.12)
+mesh = SubResource("s39")
+material_override = ExtResource("e5")
 
 [node name="ScreenRight1" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.35, 5.77)
-mesh = SubResource("s29")
-material_override = ExtResource("e9")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9, 1.45, 2.12)
+mesh = SubResource("s38")
+material_override = ExtResource("e15")
 
-[node name="CabinetRight2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0.85, 5.3)
-mesh = SubResource("s28")
-material_override = ExtResource("e4")
+[node name="VentRight1" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9, 0.55, 2.12)
+mesh = SubResource("s39")
+material_override = ExtResource("e5")
 
 [node name="ScreenRight2" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 1.35, 5.77)
-mesh = SubResource("s29")
-material_override = ExtResource("e9")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4, 1.45, 2.12)
+mesh = SubResource("s38")
+material_override = ExtResource("e15")
 
-[node name="CabinetRight3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.85, 0.85, 5.3)
-mesh = SubResource("s28")
-material_override = ExtResource("e4")
-
-[node name="ScreenRight3" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.85, 1.35, 5.77)
-mesh = SubResource("s29")
-material_override = ExtResource("e9")
+[node name="VentRight2" type="MeshInstance3D" parent="Shell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4, 0.55, 2.12)
+mesh = SubResource("s39")
+material_override = ExtResource("e5")
 
 [node name="Shade0" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 10.2, 4)
-mesh = SubResource("s30")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 10, 2)
+mesh = SubResource("s40")
+material_override = ExtResource("e2")
 
 [node name="Bulb0" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 9.95, 4)
-mesh = SubResource("s31")
-material_override = ExtResource("e10")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 9.78, 2)
+mesh = SubResource("s41")
+material_override = ExtResource("e16")
 
 [node name="Cable0" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 12.4, 4)
-mesh = SubResource("s32")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 12.2, 2)
+mesh = SubResource("s42")
+material_override = ExtResource("e2")
 
 [node name="Sodium0" type="SpotLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 6.123e-17, 1, 0, -1, 6.123e-17, -4.6, 9.8, 4)
-light_color = Color(1, 0.8, 0.58, 1)
-light_energy = 5.5
-spot_range = 18.0
-spot_angle = 40.0
-spot_attenuation = 0.6
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, 1, 0, -1, 6.123e-17, -6.5, 9.65, 2)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 22.0
+spot_range = 14
+spot_angle = 36.0
+spot_attenuation = 0.7
+spot_angle_attenuation = 1.3
 shadow_enabled = true
 
 [node name="Shade1" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 10.2, 4)
-mesh = SubResource("s30")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 10, 2)
+mesh = SubResource("s40")
+material_override = ExtResource("e2")
 
 [node name="Bulb1" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 9.95, 4)
-mesh = SubResource("s31")
-material_override = ExtResource("e10")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 9.78, 2)
+mesh = SubResource("s41")
+material_override = ExtResource("e16")
 
 [node name="Cable1" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 12.4, 4)
-mesh = SubResource("s32")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 12.2, 2)
+mesh = SubResource("s43")
+material_override = ExtResource("e2")
 
 [node name="Sodium1" type="SpotLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 6.123e-17, 1, 0, -1, 6.123e-17, 4.6, 9.8, 4)
-light_color = Color(1, 0.8, 0.58, 1)
-light_energy = 5.5
-spot_range = 18.0
-spot_angle = 40.0
-spot_attenuation = 0.6
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, 1, 0, -1, 6.123e-17, 6.5, 9.65, 2)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 22.0
+spot_range = 14
+spot_angle = 36.0
+spot_attenuation = 0.7
+spot_angle_attenuation = 1.3
 shadow_enabled = true
 
 [node name="Shade2" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 8.4, 9)
-mesh = SubResource("s30")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1, 7, 6)
+mesh = SubResource("s40")
+material_override = ExtResource("e2")
 
 [node name="Bulb2" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 8.15, 9)
-mesh = SubResource("s31")
-material_override = ExtResource("e10")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1, 6.78, 6)
+mesh = SubResource("s41")
+material_override = ExtResource("e16")
 
 [node name="Cable2" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 10.6, 9)
-mesh = SubResource("s32")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1, 10.7, 6)
+mesh = SubResource("s44")
+material_override = ExtResource("e2")
 
 [node name="Sodium2" type="SpotLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 6.123e-17, 1, 0, -1, 6.123e-17, -3.8, 8, 9)
-light_color = Color(1, 0.8, 0.58, 1)
-light_energy = 5.5
-spot_range = 18.0
-spot_angle = 40.0
-spot_attenuation = 0.6
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, 1, 0, -1, 6.123e-17, -4.1, 6.65, 6)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 22.0
+spot_range = 11
+spot_angle = 36.0
+spot_attenuation = 0.7
+spot_angle_attenuation = 1.3
 shadow_enabled = true
 
 [node name="Shade3" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 8.4, 9)
-mesh = SubResource("s30")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.1, 7, 6)
+mesh = SubResource("s40")
+material_override = ExtResource("e2")
 
 [node name="Bulb3" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 8.15, 9)
-mesh = SubResource("s31")
-material_override = ExtResource("e10")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.1, 6.78, 6)
+mesh = SubResource("s41")
+material_override = ExtResource("e16")
 
 [node name="Cable3" type="MeshInstance3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 10.6, 9)
-mesh = SubResource("s32")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.1, 10.7, 6)
+mesh = SubResource("s45")
+material_override = ExtResource("e2")
 
 [node name="Sodium3" type="SpotLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 6.123e-17, 1, 0, -1, 6.123e-17, 3.8, 8, 9)
-light_color = Color(1, 0.8, 0.58, 1)
-light_energy = 5.5
-spot_range = 18.0
-spot_angle = 40.0
-spot_attenuation = 0.6
+transform = Transform3D(1, 0, 0, 0, 6.123e-17, 1, 0, -1, 6.123e-17, 4.1, 6.65, 6)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 22.0
+spot_range = 11
+spot_angle = 36.0
+spot_attenuation = 0.7
+spot_angle_attenuation = 1.3
 shadow_enabled = true
 
-[node name="CoolLeft0" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 4.9, 1)
-light_color = Color(0.72, 0.84, 1, 1)
-light_energy = 1.2
-omni_range = 5.0
-shadow_enabled = false
+[node name="RingWash" type="SpotLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 0.6157, 0.788, 0, -0.788, 0.6157, 0, 13.5, 6)
+light_color = Color(0.9, 0.82, 0.7, 1)
+light_energy = 6.0
+spot_range = 18
+spot_angle = 24
+spot_attenuation = 1.0
+shadow_enabled = true
 
-[node name="CoolLeft1" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 4.9, 7)
-light_color = Color(0.72, 0.84, 1, 1)
-light_energy = 1.2
-omni_range = 5.0
-shadow_enabled = false
-
-[node name="CoolLeft2" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 4.9, 13)
-light_color = Color(0.72, 0.84, 1, 1)
-light_energy = 1.2
-omni_range = 5.0
-shadow_enabled = false
-
-[node name="CoolRight0" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 4.9, 1)
-light_color = Color(0.72, 0.84, 1, 1)
-light_energy = 1.2
-omni_range = 5.0
-shadow_enabled = false
-
-[node name="CoolRight1" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 4.9, 7)
-light_color = Color(0.72, 0.84, 1, 1)
-light_energy = 1.2
-omni_range = 5.0
-shadow_enabled = false
-
-[node name="CoolRight2" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 4.9, 13)
-light_color = Color(0.72, 0.84, 1, 1)
-light_energy = 1.2
-omni_range = 5.0
-shadow_enabled = false
-
-[node name="BandBackL5" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 5, -1.9)
-mesh = SubResource("s33")
-material_override = ExtResource("e4")
-
-[node name="BandBackR5" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 5, -1.9)
-mesh = SubResource("s33")
-material_override = ExtResource("e4")
-
-[node name="BandLeft5" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.9, 5, 11)
-mesh = SubResource("s34")
-material_override = ExtResource("e4")
-
-[node name="BandRight5" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.9, 5, 11)
-mesh = SubResource("s34")
-material_override = ExtResource("e4")
-
-[node name="BandBackL10" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 10.5, -1.9)
-mesh = SubResource("s33")
-material_override = ExtResource("e4")
-
-[node name="BandBackR10" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 10.5, -1.9)
-mesh = SubResource("s33")
-material_override = ExtResource("e4")
-
-[node name="BandLeft10" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.9, 10.5, 11)
-mesh = SubResource("s34")
-material_override = ExtResource("e4")
-
-[node name="BandRight10" type="MeshInstance3D" parent="Shell"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.9, 10.5, 11)
-mesh = SubResource("s34")
-material_override = ExtResource("e4")
+[node name="FloorProbe" type="ReflectionProbe" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 8)
+size = Vector3(34, 10, 26)
+update_mode = 0
+intensity = 0.6
+interior = true
+box_projection = true
+ambient_mode = 0
 
 [node name="Wash0" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 4)
-light_color = Color(1, 0.7, 0.42, 1)
-light_energy = 2.2
-omni_range = 11.0
-omni_attenuation = 1.4
-shadow_enabled = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 9, 0.5)
+light_color = Color(0.95, 0.78, 0.58, 1)
+light_energy = 0.9
+omni_range = 9.0
+omni_attenuation = 1.8
 
 [node name="Wash1" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 9, 3)
-light_color = Color(1, 0.7, 0.42, 1)
-light_energy = 1.6
-omni_range = 11.0
-omni_attenuation = 1.4
-shadow_enabled = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 9, 0.5)
+light_color = Color(0.95, 0.78, 0.58, 1)
+light_energy = 0.9
+omni_range = 9.0
+omni_attenuation = 1.8
 
 [node name="Wash2" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 9, 3)
-light_color = Color(1, 0.7, 0.42, 1)
-light_energy = 1.6
-omni_range = 11.0
-omni_attenuation = 1.4
-shadow_enabled = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 2.5, 6)
+light_color = Color(0.95, 0.78, 0.58, 1)
+light_energy = 0.9
+omni_range = 9.0
+omni_attenuation = 1.8
 
 [node name="Wash3" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 3, 4.5)
-light_color = Color(1, 0.7, 0.42, 1)
-light_energy = 1.6
-omni_range = 11.0
-omni_attenuation = 1.4
-shadow_enabled = false
-
-[node name="Wash4" type="OmniLight3D" parent="Lights" groups=["secondary_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3, 10)
-light_color = Color(1, 0.7, 0.42, 1)
-light_energy = 1.6
-omni_range = 11.0
-omni_attenuation = 1.4
-shadow_enabled = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 2.5, 6)
+light_color = Color(0.95, 0.78, 0.58, 1)
+light_energy = 0.9
+omni_range = 9.0
+omni_attenuation = 1.8
 
 [node name="RingPlaceholder" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 2.143e-17, -1, 0, 0.35, 6.123e-17, 0, 4.9, 0)
-mesh = SubResource("s35")
-material_override = ExtResource("e11")
+transform = Transform3D(1, 0, 0, 0, 1.837e-17, -1, 0, 0.3, 6.123e-17, 0, 4.9, -0.6)
+mesh = SubResource("s46")
+material_override = ExtResource("e17")
 
 [node name="Clamp0" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.2, 0.2)
-mesh = SubResource("s36")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -0.4)
+mesh = SubResource("s47")
+material_override = ExtResource("e2")
 
 [node name="clamp_0" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.2, 0.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.2, 0.1)
 
 [node name="Clamp1" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.333, 7.233, 0.2)
-mesh = SubResource("s36")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.546, 7.446, -0.4)
+mesh = SubResource("s47")
+material_override = ExtResource("e2")
 
 [node name="clamp_1" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.333, 7.233, 0.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.333, 7.233, 0.1)
 
 [node name="Clamp2" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 4.9, 0.2)
-mesh = SubResource("s36")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.9, -0.4)
+mesh = SubResource("s47")
+material_override = ExtResource("e2")
 
 [node name="clamp_2" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 4.9, 0.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 4.9, 0.1)
 
 [node name="Clamp3" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.333, 2.567, 0.2)
-mesh = SubResource("s36")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.546, 2.354, -0.4)
+mesh = SubResource("s47")
+material_override = ExtResource("e2")
 
 [node name="clamp_3" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.333, 2.567, 0.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.333, 2.567, 0.1)
 
 [node name="Clamp4" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.041e-16, 1.6, 0.2)
-mesh = SubResource("s36")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.409e-16, 1.3, -0.4)
+mesh = SubResource("s47")
+material_override = ExtResource("e2")
 
 [node name="clamp_4" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.041e-16, 1.6, 0.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.041e-16, 1.6, 0.1)
 
 [node name="Clamp5" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.333, 2.567, 0.2)
-mesh = SubResource("s36")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.546, 2.354, -0.4)
+mesh = SubResource("s47")
+material_override = ExtResource("e2")
 
 [node name="clamp_5" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.333, 2.567, 0.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.333, 2.567, 0.1)
 
 [node name="Clamp6" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 4.9, 0.2)
-mesh = SubResource("s36")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6, 4.9, -0.4)
+mesh = SubResource("s47")
+material_override = ExtResource("e2")
 
 [node name="clamp_6" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 4.9, 0.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 4.9, 0.1)
 
 [node name="Clamp7" type="MeshInstance3D" parent="Ring"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.333, 7.233, 0.2)
-mesh = SubResource("s36")
-material_override = ExtResource("e4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.546, 7.446, -0.4)
+mesh = SubResource("s47")
+material_override = ExtResource("e2")
 
 [node name="clamp_7" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.333, 7.233, 0.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.333, 7.233, 0.1)
 
 [node name="ring_inner" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.9, 0.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.9, -0.2)
 metadata/radius = 2.9
 
 [node name="ring_outer" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.9, 0.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.9, -0.2)
 metadata/radius = 3.7
 
 [node name="door_left" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.6, 0, 9.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.6, 0, 1.3)
 
 [node name="rail" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 8)
 
 [node name="console_left" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 1, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 1.9, 1.6)
 
 [node name="console_right" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 1, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9, 1.9, 1.6)
 
 [node name="ramp" type="Path3D" parent="Markers"]
-curve = SubResource("s37")
+curve = SubResource("s48")
 
 [node name="crossing" type="Path3D" parent="Markers"]
-curve = SubResource("s38")
+curve = SubResource("s49")

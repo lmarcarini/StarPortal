@@ -17,6 +17,7 @@ var _out: String = ""
 
 
 func _ready() -> void:
+	Station3D.force_enabled = OS.get_environment("REF_3D") == "1"
 	_out = OS.get_environment("REF_OUT")
 	if _out.is_empty():
 		_out = ProjectSettings.globalize_path("res://build/reference/")

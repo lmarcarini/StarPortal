@@ -49,9 +49,12 @@ func _exit_tree() -> void:
 	Settings.setting_changed.disconnect(_on_setting_changed)
 
 
-## True when 3D stations are built in this run (not headless, unless a test forces it).
+## True when 3D stations are built in this run: the display/stations_3d setting is on and
+## the run is not headless, or a test or the reference capture forces it.
 static func is_enabled() -> bool:
-	return force_enabled or DisplayServer.get_name() != "headless"
+	if force_enabled:
+		return true
+	return DisplayServer.get_name() != "headless" and Settings.get_bool(&"display", &"stations_3d")
 
 
 ## Shows [param def]'s scene from its camera, at the current quality.
