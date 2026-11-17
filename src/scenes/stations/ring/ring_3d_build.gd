@@ -117,10 +117,10 @@ static func flash_on(ring: RingLayer) -> bool:
 
 static func _lamp(on: bool) -> StandardMaterial3D:
 	var m: StandardMaterial3D = StandardMaterial3D.new()
-	m.albedo_color = Color(1.0, 0.7, 0.28) if on else Color(0.16, 0.12, 0.07)
+	m.albedo_color = Color(0.95, 0.5, 0.08) if on else Color(0.16, 0.12, 0.07)
 	m.roughness = 0.2
 	if on:
 		m.emission_enabled = true
-		m.emission = Color(1.0, 0.62, 0.22)
+		m.emission = Color(1.0, 0.45, 0.05)
 		m.emission_energy_multiplier = 0.6
 	return m

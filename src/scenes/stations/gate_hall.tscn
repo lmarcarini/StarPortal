@@ -1090,7 +1090,7 @@ spot_range = 14
 spot_angle = 36.0
 spot_attenuation = 0.7
 spot_angle_attenuation = 1.3
-shadow_enabled = true
+shadow_enabled = false
 light_bake_mode = 2
 
 [node name="Shade1" type="MeshInstance3D" parent="Lights"]
@@ -1116,7 +1116,7 @@ spot_range = 14
 spot_angle = 36.0
 spot_attenuation = 0.7
 spot_angle_attenuation = 1.3
-shadow_enabled = true
+shadow_enabled = false
 light_bake_mode = 2
 
 [node name="Shade2" type="MeshInstance3D" parent="Lights"]
@@ -1178,7 +1178,7 @@ light_energy = 9.0
 spot_range = 22
 spot_angle = 22
 spot_attenuation = 1.0
-shadow_enabled = true
+shadow_enabled = false
 light_bake_mode = 2
 
 [node name="FloorProbe" type="ReflectionProbe" parent="Lights"]

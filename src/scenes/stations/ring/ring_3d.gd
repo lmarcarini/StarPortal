@@ -86,6 +86,7 @@ func advance(delta: float) -> void:
 	_horizon_material.set_shader_parameter(&"amount", open)
 	_horizon_material.set_shader_parameter(&"time", _ring.shimmer)
 	_horizon_material.set_shader_parameter(&"burst", HorizonLayer.burst_at(_burst_age))
+	_horizon_material.set_shader_parameter(&"settle", settle_at(_burst_age))
 	_horizon_material.set_shader_parameter(&"hostile", 1.0 if _ring.look.hostile else 0.0)
 	var flicker: float = 0.9 + 0.1 * sin(_ring.shimmer * 7.0) * sin(_ring.shimmer * 2.3)
 	var surge: float = 1.0 + 2.0 * HorizonLayer.burst_at(_burst_age)
@@ -116,6 +117,15 @@ func _step_burst(delta: float) -> void:
 		_burst_age += delta
 		if _burst_age >= HorizonLayer.BURST_SECONDS:
 			_burst_age = -1.0
+
+
+## The ripple ring's progress [param age] seconds into the surge: 0 until the surge peaks,
+## then 0 to 1 as it settles; 0 outside it.
+static func settle_at(age: float) -> float:
+	var peak: float = HorizonLayer.BURST_SECONDS * 0.35
+	if age < peak or age >= HorizonLayer.BURST_SECONDS:
+		return 0.0
+	return (age - peak) / (HorizonLayer.BURST_SECONDS - peak)
 
 
 ## The surge strength now, 0 to 1.

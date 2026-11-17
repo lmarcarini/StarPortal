@@ -170,8 +170,8 @@ for i, (x, y, z) in enumerate(LAMPS):
     node("Shade%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, y, z)), "mesh": 'SubResource("%s")' % shade, "material_override": MAT("gunmetal")})
     node("Bulb%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, y - 0.22, z)), "mesh": 'SubResource("%s")' % bulb, "material_override": MAT("lamp_glow")})
     node("Cable%d" % i, "MeshInstance3D", "Lights", {"transform": xf((x, (14.4 + y) / 2, z)), "mesh": 'SubResource("%s")' % cable, "material_override": MAT("gunmetal")})
-    node("Sodium%d" % i, "SpotLight3D", "Lights", {"transform": xf((x, y - 0.35, z), rot_x=-90), "light_color": "Color(1, 0.7, 0.4, 1)", "light_energy": "22.0", "spot_range": "%g" % (y + 4), "spot_angle": "36.0", "spot_attenuation": "0.7", "spot_angle_attenuation": "1.3", "shadow_enabled": "true", "light_bake_mode": "2"})
-node("RingWash", "SpotLight3D", "Lights", {"transform": xf((0, 11.0, 9), rot_x=-28), "light_color": "Color(0.95, 0.88, 0.78, 1)", "light_energy": "9.0", "spot_range": "22", "spot_angle": "22", "spot_attenuation": "1.0", "shadow_enabled": "true", "light_bake_mode": "2"})
+    node("Sodium%d" % i, "SpotLight3D", "Lights", {"transform": xf((x, y - 0.35, z), rot_x=-90), "light_color": "Color(1, 0.7, 0.4, 1)", "light_energy": "22.0", "spot_range": "%g" % (y + 4), "spot_angle": "36.0", "spot_attenuation": "0.7", "spot_angle_attenuation": "1.3", "shadow_enabled": "true" if y < 9 else "false", "light_bake_mode": "2"})
+node("RingWash", "SpotLight3D", "Lights", {"transform": xf((0, 11.0, 9), rot_x=-28), "light_color": "Color(0.95, 0.88, 0.78, 1)", "light_energy": "9.0", "spot_range": "22", "spot_angle": "22", "spot_attenuation": "1.0", "shadow_enabled": "false", "light_bake_mode": "2"})
 probe = {"transform": xf((0, 4, 8)), "size": "Vector3(34, 10, 26)", "update_mode": "0", "intensity": "0.6", "interior": "true", "box_projection": "true", "ambient_mode": "0"}
 node("FloorProbe", "ReflectionProbe", "Lights", probe)
 for i, (x, y, z) in enumerate([(-9, 9, 0.5), (9, 9, 0.5), (-13, 2.5, 6), (13, 2.5, 6)]):

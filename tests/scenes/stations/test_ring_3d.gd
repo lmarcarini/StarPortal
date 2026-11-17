@@ -101,3 +101,9 @@ func test_a_failed_dial_flashes_then_goes_dark() -> void:
 	assert_bool(lit == 0 or lit == RingLook.SEALS).is_true()
 	_step(1.0)
 	assert_int(_ring.ring_3d.lit_lamps()).is_equal(0)
+
+
+func test_a_ripple_ring_runs_out_as_the_surge_settles() -> void:
+	assert_float(Ring3D.settle_at(0.1)).is_equal(0.0)
+	assert_float(Ring3D.settle_at(HorizonLayer.BURST_SECONDS * 0.7)).is_between(0.01, 0.99)
+	assert_float(Ring3D.settle_at(HorizonLayer.BURST_SECONDS)).is_equal(0.0)
