@@ -99,7 +99,10 @@ Vulkan-capable machine:
 2. Open `src/scenes/stations/gate_hall.tscn`, select the `LightmapGI` node and press **Bake
    Lightmaps**.
 3. Commit the `.lmbake` and `.exr` files written beside the scene. The Compatibility renderer
-   shows them. Rebake after `python3 tools/m5/gen_hall.py src/scenes/stations/gate_hall.tscn`.
+   shows them. Rebake after `python3 tools/m5/gen_hall.py src/scenes/stations/gate_hall.tscn`
+   (it keeps the reference to an existing `.lmbake`) and after any change to the lights or
+   materials. The bake uses 4 bounces, a dim grey-blue custom environment and six static
+   bake-only fill lights (`Fill0`–`Fill5`) that lift the upper walls and ceiling.
 
 ## Translations
 
