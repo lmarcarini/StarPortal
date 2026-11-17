@@ -74,7 +74,30 @@ func test_headless_keeps_the_plate() -> void:
 	assert_bool((_scene.get_node("%Plate") as CanvasItem).visible).is_true()
 
 
-func test_the_gate_keeps_its_plate_until_the_hall_lands() -> void:
+func test_the_gate_is_the_hall_with_the_plate_as_fallback() -> void:
 	var gate: StationSceneDef = Registry.get_def(&"station_gate") as StationSceneDef
-	assert_object(gate.scene).is_null()
+	assert_object(gate.scene).is_not_null()
 	assert_object(gate.plate).is_not_null()
+
+
+## The hall keeps the M5-01 budget: triangles under the cap, at most six shadowed lights, and
+## no kit logos or letters.
+func test_the_hall_keeps_the_budget() -> void:
+	var gate: StationSceneDef = Registry.get_def(&"station_gate") as StationSceneDef
+	var hall: Node3D = auto_free(gate.scene.instantiate() as Node3D)
+	var triangles: int = 0
+	for node: Node in hall.find_children("*", "MeshInstance3D", true, false):
+		var mesh: Mesh = (node as MeshInstance3D).mesh
+		for i: int in mesh.get_surface_count():
+			var arrays: Array = mesh.surface_get_arrays(i)
+			var index: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+			var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+			triangles += (index.size() if not index.is_empty() else vertices.size()) / 3
+	assert_int(triangles).is_less(Station3D.MAX_TRIANGLES)
+	var shadowed: int = 0
+	for node: Node in hall.find_children("*", "Light3D", true, false):
+		if (node as Light3D).shadow_enabled:
+			shadowed += 1
+	assert_int(shadowed).is_less_equal(Station3D.MAX_SHADOWED_LIGHTS)
+	for node: Node in hall.find_children("*", "", true, false):
+		assert_str(node.scene_file_path).not_contains("Decal_Logo")
