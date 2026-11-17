@@ -18,8 +18,8 @@ const VALUES: Dictionary = {
 		# 3D stations (M5-01): "medium" (full resolution, shadows, glow) or "low" (75%
 		# resolution, no shadows from secondary lights, no glow).
 		&"quality": "medium",
-		# 3D stations (M5) are a preview until the hall is approved: off keeps the plates.
-		&"stations_3d": false,
+		# 3D stations (M5): the Gate hall in 3D; off falls back to the 2D plate (low-end machines).
+		&"stations_3d": true,
 	},
 	&"audio":
 	{
