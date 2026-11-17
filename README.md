@@ -89,6 +89,18 @@ only: no game file refers to it, and a test checks that).
 - **Export:** the project has no `export_presets.cfg` yet. When export presets are added, their
   exclude filter must list `tools/*` (and a test fails if a preset file exists without it).
 
+## Baking the Gate hall
+
+The 3D Gate hall (`src/scenes/stations/gate_hall.tscn`, preview behind the
+`display/stations_3d` setting) has a LightmapGI node; its lamps are static. Baking needs a
+Vulkan-capable machine:
+
+1. Open the editor with Forward+: `godot --rendering-method forward_plus -e`.
+2. Open `src/scenes/stations/gate_hall.tscn`, select the `LightmapGI` node and press **Bake
+   Lightmaps**.
+3. Commit the `.lmbake` and `.exr` files written beside the scene. The Compatibility renderer
+   shows them. Rebake after `python3 tools/m5/gen_hall.py src/scenes/stations/gate_hall.tscn`.
+
 ## Translations
 
 All visible text comes from translation tables, one CSV per area in `localization/` (`core`,
