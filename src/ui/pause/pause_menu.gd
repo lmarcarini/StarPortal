@@ -35,6 +35,9 @@ var slots := SlotList.new()
 ## The tick of the last save or load; the game has unsaved time when the clock is past it.
 var saved_tick: int = -1
 
+## The GRAPHICS section.
+var graphics := GraphicsPanel.new()
+
 var _keys := VBoxContainer.new()
 var _confirm := HBoxContainer.new()
 var _pending: Callable = Callable()
@@ -87,6 +90,7 @@ func _build_keys(column: VBoxContainer) -> void:
 		func(on: bool) -> void: Settings.set_value(&"gameplay", &"auto_open_team_report", on)
 	)
 	_keys.add_child(report_toggle)
+	_keys.add_child(graphics)
 	column.add_child(_keys)
 	question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(question)

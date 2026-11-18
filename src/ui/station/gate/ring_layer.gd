@@ -122,9 +122,23 @@ static func install(station: StationScene, simulation: Simulation) -> RingLayer:
 	light.bind(ring, station)
 	horizon.bind(ring, station)
 	shutter.bind(ring, station)
-	ring.ring_3d = Ring3D.install(station, ring)
-	if ring.ring_3d != null:
-		for layer: CanvasItem in [light, horizon, shutter]:
-			layer.visible = false
-			layer.process_mode = Node.PROCESS_MODE_DISABLED
+	var layers: Array[CanvasItem] = [light, horizon, shutter]
+	ring.fit_3d(layers)
+	station.mode_changed.connect(ring.fit_3d.bind(layers))
 	return ring
+
+
+## Shows the 3D Ring when the station is 3D (the 2D [param layers] stand down), else the 2D
+## layers.
+func fit_3d(layers: Array[CanvasItem]) -> void:
+	if not is_instance_valid(ring_3d):
+		ring_3d = null
+	if _station.get_3d() == null:
+		ring_3d = null
+	elif ring_3d == null:
+		ring_3d = Ring3D.install(_station, self)
+	var on_3d: bool = ring_3d != null
+	for layer: CanvasItem in layers:
+		layer.visible = not on_3d
+		layer.process_mode = Node.PROCESS_MODE_DISABLED if on_3d else Node.PROCESS_MODE_INHERIT
+	queue_redraw()
