@@ -1,7 +1,8 @@
 extends Node
 ## Captures the game in the three reference states at the window size (1920 x 1080 in
 ## scripts/reference.sh), the clock running at fast speed: gate_idle (SILL selected),
-## gate_open (SILL dialled and open, send rail and mission sheet) and other_station (Base).
+## gate_open (SILL dialled and open, send rail and mission sheet), other_station (Base) and
+## the Base states base_build, base_power and base_staff (BaseCapture).
 ## Writes <state>.png into REF_OUT (default build/reference/). Not part of the game: lives
 ## in tools/, never in src/.
 ## Reference: docs/content/interface-reference.md section 6
@@ -18,7 +19,7 @@ var _out: String = ""
 
 func _ready() -> void:
 	Station3D.force_enabled = OS.get_environment("REF_3D") == "1"
-	Station3D.skip_lightmaps = Station3D.force_enabled
+	Station3D.skip_lightmaps = true
 	_out = OS.get_environment("REF_OUT")
 	if _out.is_empty():
 		_out = ProjectSettings.globalize_path("res://build/reference/")
@@ -42,6 +43,12 @@ func _process(_delta: float) -> void:
 		_shoot.bind("gate_open"),
 		_to_other,
 		_shoot.bind("other_station"),
+		_to_base.bind(BaseSubTabs.BUILD),
+		_shoot.bind("base_build"),
+		_to_base.bind(BaseSubTabs.ENERGY),
+		_shoot.bind("base_power"),
+		_to_base.bind(BaseSubTabs.STAFF),
+		_shoot.bind("base_staff"),
 		get_tree().quit,
 	]
 	if _step < steps.size():
@@ -80,6 +87,11 @@ func _to_open() -> void:
 
 func _to_other() -> void:
 	_switcher().show_station(&"base")
+
+
+func _to_base(mode: StringName) -> void:
+	BaseCapture.furnish(SimClock.simulation.state)
+	BaseCapture.show(_switcher(), mode)
 
 
 func _shoot(state_name: String) -> void:
