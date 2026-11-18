@@ -177,3 +177,43 @@ The owner decided on 2026-11-16 that the stations are rendered as real-time 3D s
 (nothing fancy, playable on a modern integrated graphics card) instead of 2D plates. The
 frame above does not change; only what is behind it does. The plate stays as the stand-in
 until the 3D Gate hall exists, and the reference images keep using it.
+
+## 8. Base station (owner decision 2026-11-17: the lit plan table, option B)
+
+The owner preferred the 3D cut-away (option A) but put it in the backlog: the interface
+comes first, so the Base is a lit 2D plan table for now.
+
+**Images:** `docs/reference/ref_base_build.png`, `ref_base_power.png`, `ref_base_staff.png`,
+`overlay_base.png`. Regions are in `layout.json` (`base_*`, `room_panel`,
+`base_plan_grid`). Drawn by `tools/reference/base_ref.py` with the shared kit
+`tools/reference/refkit.py`.
+
+- **Background:** the station area is a steel table surface; the frame is the same as on
+  every station.
+- `base_table`: a steel plate; inside it `base_glass`, dark glass with a faint grid.
+- `base_plan_grid`: the level's cells, 80 px each at 1080p (origin and size in
+  layout.json). The plan zooms and pans when a level is larger than the glass.
+- **Rooms:** tiles inset 4 px from their cells: fill by state (on: dark green with a soft
+  glow and a green rim; off: dark grey; site: dark ochre with a progress bar and what is
+  being built), a 24 px type icon and the name (18) top left, a green lamp top right when
+  on. Staff slots along the bottom: filled discs with the role letter, empty rings for
+  free slots. The selected room has a 4 px amber outline. The Gate Room shows the Ring.
+- **Corridors:** darker strips inset 8 px.
+- `base_levels`: keys L1 to L4, 56 × 52, 8 px apart; current amber, dug steel, undug off.
+- `base_dig`: **DIG** key right under the level keys (owner request), 56 × 88, a down
+  arrow; the next level and its cost on a dim line under it. Pressing it starts digging
+  the next level (the same command as today's Dig card).
+- `room_panel`: the selected room (replaces the Gate's destinations panel): title with
+  icon, what it is doing with a progress bar, a POWER key showing state and MW, staff
+  faces (filled) and empty slots (+), installed items and + INSTALL, DEMOLISH at the foot.
+- **Console** (`station_console`): four mode keys on the left (`base_console_modes`):
+  BUILD, POWER, STAFF, SECURITY; the current one lit. The tray (`base_console_tray`)
+  depends on the mode:
+  - BUILD: room cards 106 wide (icon, name, price in amber, size). Pick one and a green
+    ghost follows the cursor on the plan; click to place; right click or Esc cancels.
+  - POWER: supply, use and charging on one line; one breaker per powered room (lever up
+    amber = on). Rooms on the plan turn amber or grey and show their MW.
+  - STAFF: everyone on base as face tiles (name, role letter, room); drag a tile onto a
+    room's empty slot (a dashed amber line follows), or onto the tray to unassign.
+  - SECURITY: squads and doors, same tile style (no reference image yet; follow BUILD's
+    layout).
