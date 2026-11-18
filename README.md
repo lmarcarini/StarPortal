@@ -80,8 +80,9 @@ only: no game file refers to it, and a test checks that).
   tests.
 - **Reference capture:** `GODOT_BIN=/path/to/godot scripts/reference.sh` (needs `xvfb-run` and
   Python with Pillow) runs `scenario_gate_station` at 1920 × 1080 through
-  `tools/reference/capture.tscn`, captures the three reference states (`gate_idle` with SILL
-  selected, `gate_open` with the mission sheet, `other_station` on the Base) and writes into
+  `tools/reference/capture.tscn`, captures the reference states (`gate_idle` with SILL
+  selected, `gate_open` with the mission sheet, `other_station` on the Base, and the Base's
+  `base_build`, `base_power` and `base_staff`, with the reference rooms added on L1) and writes into
   `build/reference/` (git-ignored): `<state>.png`, `<state>_compare.png` (capture | reference over
   capture under the overlay | difference, half size) and `<state>_overlay.png` (full size, for
   checking regions against `docs/reference/layout.json`). Every UI PR embeds the three

@@ -14,7 +14,9 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
-STATES = ("gate_idle", "gate_open", "other_station")
+STATES = ("gate_idle", "gate_open", "other_station", "base_build", "base_power", "base_staff")
+# The overlay drawn for each state (the Base states share one).
+OVERLAYS = {"base_build": "base", "base_power": "base", "base_staff": "base"}
 SIZE = (1920, 1080)
 
 
@@ -64,7 +66,7 @@ def main(capture_dir, reference_dir):
             continue
         capture = load(cap_path)
         reference = load(ref_dir / f"ref_{state}.png")
-        overlay = load(ref_dir / f"overlay_{state}.png")
+        overlay = load(ref_dir / f"overlay_{OVERLAYS.get(state, state)}.png")
         sheet(state, capture, reference, overlay).save(cap_dir / f"{state}_compare.png")
         under_overlay(capture, overlay).save(cap_dir / f"{state}_overlay.png")
         print(f"compare: wrote {cap_dir / (state + '_compare.png')}")
