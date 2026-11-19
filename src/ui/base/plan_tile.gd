@@ -13,6 +13,10 @@ var progress: float = 0.0
 var caption: String = ""
 var slots: int = 0
 var letters: Array[String] = []
+## POWER mode: the room's MW tag ("+30 MW", "5 MW") and whether it produces.
+var power_view: bool = false
+var mw: String = ""
+var produces: bool = false
 
 
 ## The tile of [param room] built from [param def] in [param state_now], with [param site]
@@ -27,6 +31,8 @@ static func of(room: RoomState, def: RoomDef, state_now: GameState, site: SitePr
 	if site != null:
 		tile.progress = clampf(site.fraction, 0.0, 1.0)
 		tile.caption = "%s · %s" % [tile.name, ProgressText.caption(site).to_upper()]
+	tile.mw = PowerTrayText.tag(room, def)
+	tile.produces = def.power_output_mw > 0.0
 	tile.slots = def.staff_slots
 	if state_now != null:
 		for person: PersonState in state_now.staff.people:

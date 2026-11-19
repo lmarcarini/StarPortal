@@ -59,7 +59,6 @@ func test_panel_switch_goes_through_the_command() -> void:
 	var lab: RoomState = PowerFixture.lab(_simulation.state)
 	_view.get_plan().select(lab.id)
 	var button: Button = _power.room_switch.get_button()
-	assert_bool(_power.room_switch.visible).is_true()
 	assert_str(button.text).is_equal("ON · switch off")
 	button.pressed.emit()
 	assert_bool(lab.powered_on).is_false()
@@ -187,3 +186,22 @@ func _action(action: StringName) -> InputEventAction:
 func _press_action(action: StringName) -> void:
 	_runner.simulate_action_pressed(String(action))
 	await _runner.await_input_processed()
+
+
+## POWER tray (M6-04): a breaker per switchable room; a press goes through the switch command.
+func test_breakers_switch_rooms() -> void:
+	var lab: RoomState = PowerFixture.lab(_simulation.state)
+	var tray: PowerTray = PowerTray.new()
+	add_child(tray)
+	tray.toggle_requested.connect(_power.room_switch.toggle_requested.emit)
+	tray.show_state(_simulation.state)
+	var found: Breaker = null
+	for breaker: Breaker in tray.get_breakers():
+		if breaker.room_id == lab.id:
+			found = breaker
+	assert_object(found).is_not_null()
+	assert_bool(found.is_on()).is_true()
+	found.pressed.emit()
+	assert_bool(lab.powered_on).is_false()
+	assert_str(PowerTrayText.line(_simulation.state)).starts_with("SUPPLY ")
+	tray.free()

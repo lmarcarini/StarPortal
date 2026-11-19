@@ -105,6 +105,8 @@ func refresh() -> void:
 	var state: GameState = _simulation.state
 	strip.show_state(state, layer.visible)
 	layer.queue_redraw()
+	if _plan != null:
+		_plan.queue_redraw()
 	_show_selection()
 	_signature = _power_signature(state)
 
@@ -128,6 +130,8 @@ func _show_selection() -> void:
 	if def == null:
 		return
 	room_switch.show_room(state, room, def)
+	# The lit plan table switches rooms from the room card's POWER key and the breakers.
+	room_switch.visible = false
 	charge.show_room(state, room, def)
 
 

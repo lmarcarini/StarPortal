@@ -14,6 +14,7 @@ const SITE_FILL: Color = Color8(52, 46, 26)
 const OFF_RIM: Color = Color8(90, 92, 86)
 const SITE_RIM: Color = Color8(180, 140, 60)
 const CORRIDOR: Color = Color8(38, 46, 44)
+const POWER_FILL: Color = Color8(60, 52, 26)
 const SLOT_PITCH: float = 30.0
 
 
@@ -42,7 +43,10 @@ static func corridor(canvas: CanvasItem, area: Rect2, open: Array[bool]) -> void
 static func room(canvas: CanvasItem, area: Rect2, tile: PlanTile) -> void:
 	var fill: Color = {&"on": ON_FILL, &"site": SITE_FILL}.get(tile.state, OFF_FILL)
 	var rim: Color = {&"on": RefPaint.GREEN, &"site": SITE_RIM}.get(tile.state, OFF_RIM)
-	if tile.state == &"on":
+	if tile.power_view:
+		fill = POWER_FILL if tile.state == &"on" else Color8(28, 30, 32)
+		rim = RefPaint.AMBER if tile.state == &"on" else OFF_RIM
+	if tile.state == &"on" and not tile.power_view:
 		for k: int in 4:
 			canvas.draw_rect(area.grow(2.0 + k * 3.0), Color(RefPaint.GREEN, 0.05), false, 3.0)
 	canvas.draw_rect(area, fill)
@@ -54,6 +58,11 @@ static func room(canvas: CanvasItem, area: Rect2, tile: PlanTile) -> void:
 	RoomIcon.draw(canvas, area.position + Vector2(24, 24), 24.0, tile.def_id, RefPaint.TEXT)
 	var name_style: RefText = RefText.make(RefText.LABEL, 18, RefPaint.TEXT, 2.0)
 	name_style.draw(canvas, area.position + Vector2(44, 24), tile.name, "lm")
+	if tile.power_view:
+		var ink: Color = RefPaint.GREEN if tile.produces else RefPaint.AMBER
+		var tag: RefText = RefText.make(RefText.MONO_BOLD, 15, ink)
+		tag.draw(canvas, Vector2(area.end.x - 10, area.position.y + 24), tile.mw, "rm")
+		return
 	if tile.state == &"on":
 		RefPaint.lamp_on(
 			canvas, Vector2(area.end.x - 18, area.position.y + 22), 6.0, RefPaint.GREEN

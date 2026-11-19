@@ -56,7 +56,8 @@ func tag_of(room_id: StringName) -> String:
 
 
 func _draw() -> void:
-	if _plan == null or _state == null:
+	# The lit plan table tints the rooms itself in POWER mode (M6-04).
+	if _plan == null or _state == null or _plan.power_view:
 		return
 	draw_rect(Rect2(Vector2.ZERO, size), DIM)
 	for room: RoomState in BaseRules.rooms_on_level(_state.base, _plan.level):
