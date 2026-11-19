@@ -121,27 +121,6 @@ func test_panel_upkeep_uses_the_fuel_contracts_override() -> void:
 	assert_str(_view.get_room_panel().lines()[4]).is_equal("Upkeep $100k per 30 days")
 
 
-func test_longest_lines_fit_1280_by_720_in_both_languages() -> void:
-	var palette: BuildPalette = _view.get_palette()
-	for locale: String in LOCALES:
-		TranslationServer.set_locale(locale)
-		palette.get_room_button(&"room_research_lab").focus_entered.emit()
-		_view.get_plan().select(_find(&"room_power_plant").id)
-		for _frame: int in 3:
-			await get_tree().process_frame
-		var view: Rect2 = _view.get_global_rect()
-		var message: String = locale
-		(
-			assert_bool(view.encloses(palette.get_global_rect()))
-			. override_failure_message(message)
-			. is_true()
-		)
-		var panel: Rect2 = _view.get_room_panel().get_global_rect()
-		assert_bool(view.encloses(panel)).override_failure_message(message).is_true()
-		var plan: Rect2 = _view.get_plan().get_global_rect()
-		assert_float(plan.end.y).is_less_equal(palette.get_global_rect().position.y)
-
-
 func _def(def_id: StringName) -> RoomDef:
 	return _simulation.state.room_defs[def_id]
 

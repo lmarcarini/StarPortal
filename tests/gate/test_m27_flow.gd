@@ -182,7 +182,7 @@ func _dig_n2_from_the_build_sub_tab(player: M15Player) -> void:
 	await _runner.await_input_processed()
 	assert_int(player.state().base.digging_level()).is_equal(2)
 	var tabs := base.find_child("LevelTabs", true, false) as LevelTabs
-	assert_str((tabs.get_child(1) as Button).text).is_equal("L2 0%")
+	assert_str(tabs.get_key(2).label).is_equal("L2 0%")
 	_wait(player, func() -> bool: return player.state().base.digging_level() == 0)
 	assert_int(player.state().base.level_count).is_equal(2)
 

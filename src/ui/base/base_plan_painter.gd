@@ -18,8 +18,8 @@ const OFF: StringName = &"off"
 const SITE: StringName = &"site"
 const COMING_DOWN: StringName = &"coming_down"
 ## Schematic colours, all from UiPalette.
-const ROCK: Color = UiPalette.GROUND
-const GRID: Color = Color(UiPalette.RULE, 0.35)
+const ROCK: Color = Color(0, 0, 0, 0)
+const GRID: Color = Color8(26, 36, 36)
 const FLOOR: Color = Color("#232c2b")
 const FLOOR_OFF: Color = Color("#191e20")
 const CORRIDOR: Color = UiPalette.HEADER

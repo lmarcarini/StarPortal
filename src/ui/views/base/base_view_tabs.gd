@@ -40,7 +40,7 @@ func attach(
 	_power.layer.visibility_changed.connect(_on_energy_layer_toggled)
 	_move_message_line()
 	_attach_staff()
-	_plan.get_parent().add_child(security_tab)
+	_palette.get_parent().add_child(security_tab)
 	security_tab.squad_picked.connect(_on_squad_picked)
 	show_sub_tab()
 
@@ -48,7 +48,7 @@ func attach(
 ## Puts the Staff strip under the plan, in the plan's column (so it never overlaps the plan,
 ## the sub-tabs or the message line), and joins it to the plan's staff layer.
 func _attach_staff() -> void:
-	_plan.get_parent().add_child(staff_tab)
+	_palette.get_parent().add_child(staff_tab)
 	staff_tab.person_chosen.connect(_on_staff_person)
 	staff_tab.assign_pressed.connect(_on_assign_pressed)
 	_plan.placement_message.connect(_on_placement_message)
@@ -107,7 +107,6 @@ func show_sub_tab() -> void:
 	_show_security(security)
 	_plan.staff_layer.tint = staff
 	_refresh_staff()
-	_levels.next_tab.visible = _palette.visible and _levels.has_next()
 	_keep_focus()
 
 
@@ -149,7 +148,7 @@ func _order_move(cell: Vector3i) -> void:
 func _move_message_line() -> void:
 	var line: HBoxContainer = _palette.message_line
 	line.get_parent().remove_child(line)
-	_plan.get_parent().add_child(line)
+	_palette.get_parent().add_child(line)
 
 
 ## Handles the shoulders (sub-tabs) and Esc or (B) on the plan in Energy; true when it did.
@@ -182,12 +181,12 @@ func _on_sub_tab_changed(tab: StringName) -> void:
 		show_sub_tab()
 
 
-## The ghost level tab: back to Build and onto the palette's Dig entry, which holds to dig.
+## DIG under the level keys: digs the next level at once (the palette's Dig command); when
+## refused, the message line says why.
 func _on_dig_chosen() -> void:
-	_sub_tabs.show_tab(BaseSubTabs.BUILD)
 	var dig: DigButton = _palette.get_dig_button()
-	if dig.visible:
-		dig.grab_focus()
+	if dig.press_now():
+		return
 	_palette.show_message(dig.text if dig.get_reason().is_empty() else dig.get_reason())
 
 

@@ -28,6 +28,7 @@ var _command: Command = null
 
 func _ready() -> void:
 	add_child(install_list)
+	move_child(install_list, _action.get_index() - 1)
 
 
 ## Shows nothing selected.
@@ -75,7 +76,7 @@ func _set_lines(texts: Array) -> void:
 	for index: int in labels.size():
 		var text: String = texts[index]
 		labels[index].text = text
-		labels[index].visible = not text.is_empty()
+		labels[index].visible = false
 
 
 ## Offers [param command] on the action button as [param text]; when [param reason] is not
@@ -110,7 +111,12 @@ func _add_later() -> Label:
 
 
 func _add_action() -> HoldButton:
+	var spacer := Control.new()
+	spacer.size_flags_vertical = SIZE_EXPAND_FILL
+	spacer.mouse_filter = MOUSE_FILTER_IGNORE
+	add_child(spacer)
 	var button := HoldButton.new()
+	DialogueKeys.style(button)
 	button.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	button.visible = false
 	button.size_flags_horizontal = SIZE_SHRINK_BEGIN

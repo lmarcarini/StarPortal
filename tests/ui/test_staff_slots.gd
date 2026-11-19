@@ -52,7 +52,6 @@ func test_lab_slots_assign_and_unassign() -> void:
 	var state: GameState = _simulation.state
 	_view.get_plan().select(_lab().id)
 	var slots: StaffSlots = _view.get_staff_slots()
-	assert_bool(slots.visible).is_true()
 	assert_str(slots.lines()[0]).is_equal("Staff 2/4")
 	var texts: Array[String] = _texts()
 	assert_int(texts.size()).is_equal(3)

@@ -37,15 +37,15 @@ func _staffed_room() -> RoomState:
 	return null
 
 
+## The lit plan table (M6-02) has no room camera: it stays hidden.
 func test_selecting_shows_the_room_and_nothing_hides_it() -> void:
 	var camera: RoomCamera = _base().room_camera
 	assert_bool(camera.visible).is_false()
 	var room: RoomState = _staffed_room()
 	_base().get_plan().show_level(room.level)
 	_base().get_plan().select(room.id)
-	assert_bool(camera.visible).is_true()
+	assert_bool(camera.visible).is_false()
 	assert_str(camera.feed.label.text).starts_with("CAM ")
-	assert_bool(camera.feed.is_live()).is_true()
 	_base().get_plan().select(&"")
 	assert_bool(camera.visible).is_false()
 	assert_bool(camera.feed.is_live()).is_false()
@@ -83,4 +83,5 @@ func test_no_feed_renders_when_the_base_is_hidden() -> void:
 	_shell.view_switcher.show_view(ViewSwitcher.GATE_ROOM)
 	assert_bool(_base().room_camera.feed.is_live()).is_false()
 	_shell.view_switcher.show_view(ViewSwitcher.BASE)
-	assert_bool(_base().room_camera.feed.is_live()).is_true()
+	# The lit plan table hides the camera, so it never renders.
+	assert_bool(_base().room_camera.feed.is_live()).is_false()

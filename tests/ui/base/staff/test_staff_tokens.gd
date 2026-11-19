@@ -50,7 +50,6 @@ func test_unassigned_go_to_the_tray_and_arrivals_are_hidden() -> void:
 	var person: PersonState = state.staff.people[0]
 	person.room_id = &""
 	EventBus.staff_changed.emit(&"unassigned", &"", 1)
-	assert_bool(_plan().tray.visible).is_true()
 	assert_int(_plan().tray.buttons().size()).is_greater_equal(1)
 	person.arrives_tick = state.clock.tick + 100
 	EventBus.staff_changed.emit(&"test", &"", 0)

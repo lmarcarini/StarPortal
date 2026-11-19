@@ -79,7 +79,7 @@ func place_at(def_id: StringName, cell: Vector2i) -> void:
 	_plan.cursor = cell
 	start_placing(def_id)
 	var centre: Vector2 = (Vector2(_ghost.area().get_center())) * BasePlanPainter.CELL
-	_plan.view.zoom_centred(2.0 / _plan.view.zoom)
+	_plan.frame_rooms()
 	var wanted: Vector2 = _plan.size * 0.5 - centre * _plan.view.scale()
 	_plan.view.pan(wanted - _plan.view.offset)
 	_plan.queue_redraw()
