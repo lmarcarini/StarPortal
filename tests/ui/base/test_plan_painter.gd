@@ -52,7 +52,7 @@ func test_icon_sits_top_right_inside_the_room() -> void:
 
 
 func test_colours_come_from_the_palette() -> void:
-	assert_object(BasePlanPainter.ROCK).is_equal(UiPalette.GROUND)
+	assert_float(BasePlanPainter.ROCK.a).is_equal(0.0)
 	assert_object(BasePlanPainter.SELECTED).is_equal(UiPalette.SELECT)
 	assert_object(BasePlanPainter.GLOW).is_equal(UiPalette.GOOD)
 	assert_object(EnergyLayer.ON).is_equal(UiPalette.GOOD)

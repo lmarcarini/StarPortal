@@ -37,8 +37,8 @@ func after_test() -> void:
 	TranslationServer.set_locale(_real_locale)
 
 
-## Research R1 with the Base tab hidden, press F3: the Dig entry and the "L2 +" ghost tab are
-## available at once; holding Dig shows "L2 0%"; when the dig ends, the L2 tab shows level 2.
+## Research R1 with the Base tab hidden, press F3: DIG under the level keys is available at
+## once; pressing it shows "L2 0%"; when the dig ends, the L2 key shows level 2.
 func test_research_then_dig_shows_a_selectable_level_tab() -> void:
 	var base: BaseView = await _open_base()
 	var dig: DigButton = base.get_palette().get_dig_button()
@@ -50,20 +50,19 @@ func test_research_then_dig_shows_a_selectable_level_tab() -> void:
 	await _finish_survey()
 	await _key(KEY_F2)
 	assert_bool(dig.disabled).is_false()
-	assert_bool(tabs.next_tab.visible).is_true()
 	assert_bool(tabs.next_tab.disabled).is_false()
-	assert_str(tabs.next_tab.text).is_equal("L2 +")
-	dig.confirmed.emit()
+	assert_bool(tabs.has_next()).is_true()
+	tabs.next_tab.pressed.emit()
 	await _runner.await_input_processed()
 	assert_int(tabs.level_count()).is_equal(2)
-	assert_str((tabs.get_child(1) as Button).text).is_equal("L2 0%")
-	assert_bool(tabs.next_tab.visible).is_false()
+	assert_str(tabs.get_key(2).label).is_equal("L2 0%")
+	assert_bool(tabs.has_next()).is_false()
 	var state: GameState = SimClock.simulation.state
 	while state.base.digging_level() != 0:
 		SimClock.step_ticks(120)
 	await _runner.await_input_processed()
-	var l2: Button = tabs.get_child(1) as Button
-	assert_str(l2.text).is_equal("L2")
+	var l2: RefKey = tabs.get_key(2)
+	assert_str(l2.label).is_equal("L2")
 	l2.pressed.emit()
 	assert_int(base.get_plan().level).is_equal(2)
 
@@ -153,7 +152,7 @@ func test_cancelling_a_dig_rebuilds_the_level_column() -> void:
 	await _runner.await_input_processed()
 	assert_int(SimClock.simulation.state.base.digging_level()).is_equal(0)
 	assert_int(tabs.level_count()).is_equal(1)
-	assert_str(tabs.next_tab.text).is_equal("L2 +")
+	assert_bool(tabs.has_next()).is_true()
 
 
 ## LevelTabs.refresh() with fewer levels than tabs (before the rebuild) labels what it can.
@@ -163,7 +162,8 @@ func test_level_tabs_refresh_with_a_shorter_level_list() -> void:
 	tabs.show_levels(levels, 1)
 	levels.pop_back()
 	tabs.mark(1)
-	assert_bool((tabs.get_child(0) as Button).button_pressed).is_true()
+	assert_bool(tabs.get_key(1).style == RefPaint.KeyStyle.AMBER).is_true()
+	assert_bool(tabs.get_key(2).disabled).is_true()
 	tabs.free()
 
 

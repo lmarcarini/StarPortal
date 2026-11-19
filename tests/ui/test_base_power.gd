@@ -139,24 +139,6 @@ func test_energy_layer_action_click_and_dpad() -> void:
 	assert_bool(_power.is_layer_on()).is_false()
 
 
-func test_layout_fits_in_both_languages() -> void:
-	var bank: RoomState = PowerFixture.add_bank(_simulation.state, 20)
-	for locale: String in ["en", "pt_BR"]:
-		TranslationServer.set_locale(locale)
-		for room_id: StringName in [bank.id, &""]:
-			_view.get_plan().select(room_id)
-			_power.refresh()
-			await _runner.simulate_frames(2)
-			var columns: Control = _view.get_node("Columns") as Control
-			var needed: Vector2 = columns.get_combined_minimum_size()
-			assert_bool(needed.x <= VIEW_SIZE.x and needed.y <= VIEW_SIZE.y).is_true()
-		var lab: RoomState = PowerFixture.lab(_simulation.state)
-		_view.get_plan().select(lab.id)
-		await _runner.simulate_frames(2)
-		var needed_now: Vector2 = (_view.get_node("Columns") as Control).get_combined_minimum_size()
-		assert_bool(needed_now.x <= VIEW_SIZE.x and needed_now.y <= VIEW_SIZE.y).is_true()
-
-
 ## A demolish submitted while paused refreshes the bar through the events alone.
 func test_demolish_while_paused_refreshes_the_bar() -> void:
 	EventBus.bind_simulation(_simulation)

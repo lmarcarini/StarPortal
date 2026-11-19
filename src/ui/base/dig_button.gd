@@ -64,6 +64,14 @@ func refresh(state: GameState) -> void:
 		tooltip_text = ProgressText.dig(digging, SiteProgress.of_dig(state))
 
 
+## Submits the button's command now (DIG under the level keys); false when it is refused.
+func press_now() -> bool:
+	if disabled or _command == null:
+		return false
+	command_held.emit(_command)
+	return true
+
+
 ## Why the button is disabled, or "".
 func get_reason() -> String:
 	return _reason

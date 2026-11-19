@@ -21,6 +21,13 @@ signal placement_message(text: String)
 ## A click or press on a built blast door: toggle it.
 signal door_toggled(level: int, cell: Vector2i)
 
+## Screen pixels per cell on the plan table at 1080p (interface-reference.md section 8).
+const CELL_PX: float = 80.0
+
+## Where the table's cell grid starts inside the glass (base_plan_grid minus base_glass); the
+## default view snaps cell lines to it.
+const GRID_ORIGIN: Vector2 = Vector2(16, 40)
+
 ## Level shown, 1 the top one.
 var level: int = 1
 ## Cell under the keyboard and gamepad cursor.
@@ -67,11 +74,51 @@ func show_base(base: BaseState, defs: Dictionary) -> void:
 	_defs = defs
 	level = clampi(level, 1, maxi(1, base.level_count))
 	view.reset(Vector2(base.grid_size) * BasePlanPainter.CELL, size)
+	frame_rooms()
 	if base.find_room(_selected) == null:
 		select(&"")
 	var simulation: Simulation = SimClock.simulation
 	if simulation != null and simulation.state.base == base:
 		staff_layer.rebuild(simulation.state)
+	queue_redraw()
+
+
+## Zooms to the table's 80 px cells and centres the shown level's rooms (corridors left out).
+func frame_rooms() -> void:
+	if _base == null:
+		return
+	var image: Vector2 = Vector2(_base.grid_size) * BasePlanPainter.CELL
+	var fit: float = minf(size.x / image.x, size.y / image.y) if size.x > 0.0 else 1.0
+	view.zoom = clampf(CELL_PX / BasePlanPainter.CELL / fit, ZoomPan.MIN_ZOOM, ZoomPan.MAX_ZOOM)
+	var box: Rect2i = Rect2i()
+	for room: RoomState in BaseRules.rooms_on_level(_base, level):
+		var def: RoomDef = _def(room.def_id)
+		if def != null and room.def_id != StartingBase.CORRIDOR_DEF:
+			var cells: Rect2i = BaseRules.footprint(room, def)
+			box = cells if box.size == Vector2i.ZERO else box.merge(cells)
+	var centre: Vector2 = Vector2(box.get_center()) * BasePlanPainter.CELL
+	view.offset = size * 0.5 - centre * view.scale()
+	_snap()
+	queue_redraw()
+
+
+## Snaps the cell lines onto the table grid (GRID_ORIGIN, CELL_PX) after the pan clamp.
+func _snap() -> void:
+	view.pan(Vector2.ZERO)
+	view.offset = ((view.offset - GRID_ORIGIN) / CELL_PX).round() * CELL_PX + GRID_ORIGIN
+
+
+## Centres the plan on room [param id] at the table's zoom.
+func centre_on(id: StringName) -> void:
+	var room: RoomState = _base.find_room(id) if _base != null else null
+	var def: RoomDef = null if room == null else _def(room.def_id)
+	if def == null:
+		return
+	var centre: Vector2 = (
+		Vector2(BaseRules.footprint(room, def).get_center()) * BasePlanPainter.CELL
+	)
+	view.offset = size * 0.5 - centre * view.scale()
+	_snap()
 	queue_redraw()
 
 
@@ -136,41 +183,43 @@ func _draw() -> void:
 		return
 	draw_set_transform(view.offset, 0.0, Vector2.ONE * view.scale())
 	BasePlanPainter.draw_ground(self, _base.grid_size)
-	var font: Font = UiThemeBuilder.stencil_font()
+	draw_set_transform(Vector2.ZERO)
 	for room: RoomState in BaseRules.rooms_on_level(_base, level):
-		_draw_room(room, font)
+		_draw_room(room)
+	draw_set_transform(view.offset, 0.0, Vector2.ONE * view.scale())
 	for door: DoorState in _base.doors:
 		if door.level == level:
 			BasePlanPainter.draw_door(self, door)
+	draw_set_transform(Vector2.ZERO)
 	var chosen: Rect2i = _selected_cells()
 	if chosen.size != Vector2i.ZERO:
-		BasePlanPainter.draw_selection(self, chosen)
+		PlanTiles.selection(self, PlanTiles.rect_of(self, chosen, 4.0))
 	if has_focus():
-		BasePlanPainter.draw_cursor(self, cursor)
-	draw_set_transform(Vector2.ZERO)
+		draw_rect(
+			PlanTiles.rect_of(self, Rect2i(cursor, Vector2i.ONE), 1.0), RefPaint.DIM, false, 1.5
+		)
 	staff_layer.queue_redraw()
 
 
-func _draw_room(room: RoomState, font: Font) -> void:
+func _draw_room(room: RoomState) -> void:
 	var def: RoomDef = _def(room.def_id)
 	if def == null:
 		return
 	var cells: Rect2i = BaseRules.footprint(room, def)
-	var plan_state: StringName = BasePlanPainter.state_of(room, def)
-	if plan_state == BasePlanPainter.SITE or plan_state == BasePlanPainter.COMING_DOWN:
-		BasePlanPainter.draw_site(self, cells, plan_state == BasePlanPainter.COMING_DOWN)
-	elif room.def_id == StartingBase.CORRIDOR_DEF:
-		BasePlanPainter.draw_corridor(self, cells)
-	else:
-		BasePlanPainter.draw_room(self, cells, room.def_id, plan_state, view.scale())
-	if room.def_id != StartingBase.CORRIDOR_DEF or not room.is_built():
-		BasePlanPainter.draw_label(self, cells, tr(def.name_key).to_upper(), font)
-	BasePlanPainter.draw_installations(self, cells, room.installations)
-	var progress: SiteProgress = progress_of(room.id)
-	if progress != null:
-		var cell: float = BasePlanPainter.CELL
-		var area := Rect2(Vector2(cells.position) * cell, Vector2(cells.size) * cell)
-		SiteBar.draw(self, area, progress, ProgressText.caption(progress), font)
+	if room.def_id == StartingBase.CORRIDOR_DEF and room.is_built():
+		var open: Array[bool] = []
+		for step: Vector2i in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			open.append(_is_corridor(cells.position + step))
+		PlanTiles.corridor(self, PlanTiles.rect_of(self, cells, 0.0), open)
+		return
+	var state: GameState = SimClock.simulation.state if SimClock.simulation != null else null
+	var tile: PlanTile = PlanTile.of(room, def, state, progress_of(room.id))
+	PlanTiles.room(self, PlanTiles.rect_of(self, cells, 4.0), tile)
+
+
+func _is_corridor(cell: Vector2i) -> bool:
+	var room: RoomState = _base.find_room(item_at(cell))
+	return room != null and room.def_id == StartingBase.CORRIDOR_DEF
 
 
 func _selected_cells() -> Rect2i:
@@ -327,8 +376,11 @@ func _notification(what: int) -> void:
 
 
 func _on_resized() -> void:
-	view.resize(size)
-	queue_redraw()
+	if _base == null:
+		view.resize(size)
+		return
+	view.reset(Vector2(_base.grid_size) * BasePlanPainter.CELL, size)
+	frame_rooms()
 
 
 ## The RoomDef with id [param def_id], or null.

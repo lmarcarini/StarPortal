@@ -8,6 +8,8 @@ extends PanelContainer
 ## The player chose [param person_id] in the tray.
 signal person_chosen(person_id: StringName)
 
+## False keeps the tray hidden (the Base table shows the people in its STAFF tray, M6).
+var enabled: bool = true
 var _row := HFlowContainer.new()
 var _title := Label.new()
 
@@ -36,7 +38,7 @@ func show_tokens(tokens: Array[StaffToken]) -> void:
 		button.text = "%s %s" % [StaffToken.letter_of(token.role), token.name]
 		button.pressed.connect(person_chosen.emit.bind(token.person_id))
 		_row.add_child(button)
-	visible = not tokens.is_empty()
+	visible = enabled and not tokens.is_empty()
 
 
 ## The buttons, one per unassigned person.

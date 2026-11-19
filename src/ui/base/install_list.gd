@@ -15,6 +15,10 @@ func _init() -> void:
 	visible = false
 	_title.text = &"INSTALL_TITLE"
 	_title.add_theme_font_size_override(&"font_size", 16)
+	_title.add_theme_color_override(&"font_color", RefPaint.DIM)
+	_title.add_theme_font_override(
+		&"font", RefText.make(RefText.LABEL_MEDIUM, 0, RefPaint.DIM, 2.0).get_font()
+	)
 	add_child(_title)
 
 
@@ -114,11 +118,14 @@ func _add_installed(state: GameState, item: InstallationState) -> void:
 		name_text = tr(&"INSTALL_BUILDING").format({"name": name_text, "percent": done})
 	label.text = name_text
 	row.add_child(label)
-	var remove := Button.new()
-	remove.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	var remove := RefKey.new()
+	remove.label = &"INSTALL_REMOVE_KEY"
+	remove.label_size = 16
+	remove.custom_minimum_size = Vector2(110, 40)
 	remove.text = tr(&"INSTALL_REMOVE").format(
 		{"refund": MoneyLabel.format_k(InstallationRules.refund_k(item))}
 	)
+	remove.set_help(remove.text)
 	remove.pressed.connect(_submit.bind(RemoveInstallationCommand.create(_room_id, item.def)))
 	row.add_child(remove)
 	add_child(row)
@@ -126,19 +133,16 @@ func _add_installed(state: GameState, item: InstallationState) -> void:
 
 func _add_offer(state: GameState, room: RoomState, def: InstallationDef) -> void:
 	var texts: Array[String] = offer_text(state, room, def)
-	var button := Button.new()
-	button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	var button := RefKey.new()
+	button.label = &"INSTALL_KEY"
+	button.label_size = 18
+	button.custom_minimum_size = Vector2(160, 48)
+	button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	button.text = texts[0]
 	button.disabled = not texts[1].is_empty()
-	button.tooltip_text = texts[1]
+	button.set_help(texts[0] if texts[1].is_empty() else "%s\n%s" % [texts[0], texts[1]])
 	button.pressed.connect(_submit.bind(InstallCommand.create(_room_id, def.id)))
 	add_child(button)
-	if not texts[1].is_empty():
-		var reason := Label.new()
-		reason.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-		reason.text = texts[1]
-		reason.modulate = Color(1, 1, 1, 0.6)
-		add_child(reason)
 
 
 func _submit(command: Command) -> void:

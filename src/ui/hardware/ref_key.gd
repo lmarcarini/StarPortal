@@ -38,6 +38,15 @@ func _init() -> void:
 		&"normal", &"hover", &"pressed", &"disabled", &"focus", &"hover_pressed"
 	]:
 		add_theme_stylebox_override(box, StyleBoxEmpty.new())
+	for colour: StringName in [
+		&"font_color",
+		&"font_hover_color",
+		&"font_pressed_color",
+		&"font_focus_color",
+		&"font_disabled_color",
+		&"font_hover_pressed_color"
+	]:
+		add_theme_color_override(colour, Color(0, 0, 0, 0))
 	mouse_entered.connect(queue_redraw)
 	mouse_exited.connect(queue_redraw)
 	focus_entered.connect(queue_redraw)

@@ -200,14 +200,24 @@ func test_wheel_zooms_and_drag_pans() -> void:
 	assert_float(plan.view.offset.x).is_equal_approx(before.x - 30.0, 0.01)
 
 
-func test_layout_fits_in_both_languages() -> void:
+## The lit plan table (M6-02): the level keys, glass, room panel and tray sit on their
+## layout.json regions, and the room panel names the selection in both languages.
+func test_parts_sit_on_their_regions() -> void:
+	_view.size = Vector2(1920, 1080)
+	await _runner.simulate_frames(2)
+	var regions: Dictionary[String, StringName] = {
+		"%LevelTabs": &"base_levels",
+		"%Glass": &"base_glass",
+		"%RoomCard": &"room_panel",
+		"%Tray": &"base_console_tray",
+	}
+	for path: String in regions:
+		var part: Control = _view.get_node(path) as Control
+		var want: Rect2 = BaseLayout.region(regions[path], 1920.0)
+		assert_vector(part.position).override_failure_message(path).is_equal(want.position)
 	for locale: String in ["en", "pt_BR"]:
 		TranslationServer.set_locale(locale)
 		_view.get_plan().select(_view.get_plan().item_at(Vector2i(16, 13)))
-		await _runner.simulate_frames(2)
-		var columns: Control = _view.get_node("Columns") as Control
-		var needed: Vector2 = columns.get_combined_minimum_size()
-		assert_bool(needed.x <= VIEW_SIZE.x and needed.y <= VIEW_SIZE.y).is_true()
 		assert_str(_view.get_room_panel().lines()[1]).is_not_empty()
 
 

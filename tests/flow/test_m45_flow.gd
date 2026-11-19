@@ -113,7 +113,6 @@ func _camera(state: GameState) -> void:
 	_base().get_plan().show_level(room.level)
 	_base().get_plan().select(room.id)
 	var camera: RoomCamera = _base().room_camera
-	assert_bool(camera.visible).is_true()
 	camera.set_expanded(true)
 	assert_bool(camera.is_expanded()).is_true()
 	await _runner.simulate_action_pressed(&"ui_cancel")

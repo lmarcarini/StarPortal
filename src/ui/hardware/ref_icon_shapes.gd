@@ -9,6 +9,7 @@ extends RefCounted
 static func drawers() -> Dictionary[StringName, Callable]:
 	return {
 		&"gate": gate,
+		&"down": down,
 		&"base": base,
 		&"lab": lab,
 		&"office": office,
@@ -216,3 +217,8 @@ static func hail(p: RefPen) -> void:
 	p.arc(Vector2(-0.6, -0.6), Vector2(0.6, 0.6), 200, 340)
 	p.ellipse(Vector2(-0.18, -0.05), Vector2(0.18, 0.3))
 	p.line([Vector2(0, 0.3), Vector2(0, 1)])
+
+
+static func down(p: RefPen) -> void:
+	p.line([Vector2(0, -0.7), Vector2(0, 0.7)])
+	p.line([Vector2(-0.5, 0.2), Vector2(0, 0.7), Vector2(0.5, 0.2)])

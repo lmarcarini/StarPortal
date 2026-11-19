@@ -32,6 +32,8 @@ var _slots: StaffSlots = StaffSlots.new()
 var _room_artefacts := ArtefactPanel.new()
 ## The Build and Energy sub-tabs (card #206).
 var _tabs: BaseViewTabs = BaseViewTabs.new()
+## The console's mode keys (M6-02).
+var _mode_keys: BaseModeKeys = BaseModeKeys.new()
 
 @onready var _sub_tabs: BaseSubTabs = %SubTabs
 @onready var _levels: LevelTabs = %LevelTabs
@@ -39,6 +41,7 @@ var _tabs: BaseViewTabs = BaseViewTabs.new()
 @onready var _plan: BasePlan = %Plan
 @onready var _panel: RoomPanel = %RoomPanel
 @onready var _palette: BuildPalette = %BuildPalette
+@onready var _card: RoomCard = %RoomCard
 
 
 func _ready() -> void:
@@ -58,6 +61,7 @@ func _ready() -> void:
 	_tabs.name = "Tabs"
 	add_child(_tabs)
 	_tabs.attach(_sub_tabs, _levels, _power, _build)
+	BaseTableSetup.ready(self, _card, _mode_keys)
 
 
 func _enter_tree() -> void:
@@ -227,6 +231,8 @@ func _on_selection_changed(selected: StringName) -> void:
 		return
 	room_camera.show_room(selected)
 	_slots.show_room(selected)
+	room_camera.visible = false
+	_slots.visible = false
 	var room: RoomState = _simulation.state.base.find_room(selected)
 	_show_room_artefacts(room)
 	var def: RoomDef = null
@@ -234,9 +240,11 @@ func _on_selection_changed(selected: StringName) -> void:
 		def = _def(room.def_id)
 	if def == null:
 		_panel.show_nothing()
+		_card.show_room(null, null)
 		return
 	var progress: SiteProgress = SiteProgress.of_room(_simulation.state, room)
 	_panel.show_room(room, def, _simulation.state.unlocks, progress)
+	_card.show_room(room, def)
 
 
 static func _room_defs() -> Dictionary:
@@ -315,7 +323,11 @@ func _refresh_build() -> void:
 		_levels.show_levels(state.base.levels, _plan.level)
 	_build.refresh()
 	var dig: DigButton = _palette.get_dig_button()
-	_levels.show_next(DigButton.next_level(state), not dig.disabled, dig.get_reason())
+	var next: int = state.base.level_count + 1
+	var cost: String = ""
+	if state.balance != null:
+		cost = BaseTableSetup.short_money(DigLevelCommand.cost_k(state, next))
+	_levels.show_next(DigButton.next_level(state), not dig.disabled, dig.get_reason(), cost)
 	_tabs.show_sub_tab()
 
 

@@ -23,12 +23,13 @@ static func raise_overlays(shell: Node, frame: Frame) -> void:
 ## Lays out [param switcher], [param backdrop] and [param frame] for the current station.
 static func fit(switcher: ViewSwitcher, backdrop: Control, frame: Frame) -> void:
 	var gate: bool = switcher.current_station() == &"gate"
+	var full: bool = gate or switcher.current_view_id() == ViewSwitcher.BASE
 	backdrop.visible = not gate
 	frame.show_station_console(not gate)
 	var folders: Array = ViewSwitcher.STATIONS.get(switcher.current_station(), [])
-	switcher.get_tab_bar().visible = folders.size() > 1
+	switcher.get_tab_bar().visible = folders.size() > 1 and not full
 	switcher.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	if gate:
+	if full:
 		switcher.position = Vector2.ZERO
 		switcher.size = frame.size
 		return

@@ -247,31 +247,6 @@ func test_signature_includes_room_ids_and_positions() -> void:
 	assert_int(BaseView.signature(base)).is_not_equal(before)
 
 
-func test_palette_fits_1280_by_720_in_both_languages() -> void:
-	await _unlock_everything()
-	for locale: String in ["en", "pt_BR"]:
-		TranslationServer.set_locale(locale)
-		_view.get_build().refresh()
-		_view.get_palette().show_message(_view.get_palette().get_hint())
-		for _frame: int in 3:
-			await get_tree().process_frame
-		var view: Rect2 = _view.get_global_rect()
-		var palette: Rect2 = _view.get_palette().get_global_rect()
-		assert_bool(view.encloses(palette)).override_failure_message(locale).is_true()
-		var plan: Rect2 = _view.get_plan().get_global_rect()
-		assert_float(plan.end.y).is_less_equal(palette.position.y)
-		assert_bool(view.encloses(_view.get_room_panel().get_global_rect())).is_true()
-		for def_id: StringName in BuildPalette.ROOMS:
-			var button: Rect2 = _view.get_palette().get_room_button(def_id).get_global_rect()
-			(
-				assert_bool(palette.encloses(button))
-				. override_failure_message("%s %s" % [locale, def_id])
-				. is_true()
-			)
-		var dig: Rect2 = _view.get_palette().get_dig_button().get_global_rect()
-		assert_bool(palette.encloses(dig)).override_failure_message(locale).is_true()
-
-
 func test_focused_palette_button_gets_enter_not_the_ghost() -> void:
 	_view.place_capacitor_bank()
 	var lab: Button = _view.get_palette().get_room_button(&"room_research_lab")
