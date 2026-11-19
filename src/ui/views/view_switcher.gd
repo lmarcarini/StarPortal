@@ -49,7 +49,7 @@ const COMMAND: StringName = &"command"
 ## Personnel is the Base's roster and the Office's hiring folder.
 const STATIONS: Dictionary[StringName, Array] = {
 	&"gate": [GATE_ROOM],
-	&"base": [BASE, PERSONNEL],
+	&"base": [BASE],
 	&"lab": [RESEARCH],
 	&"office": [COMMAND, ARCHIVE, PERSONNEL],
 }

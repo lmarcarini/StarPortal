@@ -13,6 +13,7 @@ static func ready(view: BaseView, card: RoomCard, modes: BaseModeKeys) -> void:
 	view.add_child(table)
 	view.move_child(table, 0)
 	view.add_child(modes)
+	view.add_child(StaffDragLine.new())
 	modes.bind(view.get_sub_tabs())
 	view.room_camera.visible = false
 	view.get_staff_slots().visible = false

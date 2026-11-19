@@ -56,6 +56,7 @@ func _attach_staff() -> void:
 	_palette.get_parent().add_child(staff_tab)
 	staff_tab.person_chosen.connect(_on_staff_person)
 	staff_tab.assign_pressed.connect(_on_assign_pressed)
+	staff_tab.tray_drop.connect(_on_tray_drop)
 	_plan.placement_message.connect(_on_placement_message)
 	_plan.drag_moved.connect(_on_drag_moved)
 	_plan.staff_layer.token_selected.connect(_refresh_staff.unbind(1))
@@ -68,8 +69,20 @@ func _refresh_staff() -> void:
 		staff_tab.show_state(simulation.state, _plan.staff_layer.selected())
 
 
+func _on_tray_drop(person_id: StringName) -> void:
+	var simulation: Simulation = SimClock.simulation
+	if simulation == null:
+		return
+	_plan.staff_layer.assign.start(simulation.state, person_id)
+	if not _plan.staff_layer.assign.unassign(simulation):
+		_palette.show_message(_plan.staff_layer.assign.last_reason)
+	_plan.staff_layer.assign.cancel()
+	_refresh_staff()
+
+
 func _on_staff_person(person_id: StringName) -> void:
 	_plan.staff_layer.focus_person(person_id)
+	_plan.start_placing(person_id)
 
 
 func _on_assign_pressed() -> void:
