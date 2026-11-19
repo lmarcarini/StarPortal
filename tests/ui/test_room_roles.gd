@@ -81,11 +81,11 @@ func test_locked_rooms_hidden_and_capped_rooms_greyed() -> void:
 		&"room_power_plant", &"room_lift", &"room_stairs", &"room_infirmary"
 	]:
 		(
-			assert_object(palette.get_room_button(def_id))
+			assert_bool(palette.get_room_button(def_id).disabled)
 			. override_failure_message(String(def_id))
-			. is_null()
+			. is_true()
 		)
-	assert_object(palette.first_button()).is_equal(palette.get_room_button(&"room_capacitor_bank"))
+	assert_object(palette.first_button()).is_equal(palette.get_room_button(&"room_quarters"))
 	var state: GameState = _simulation.state
 	for _bank: int in state.unlocks.bank_cap:
 		state.base.add_room(&"room_capacitor_bank", 1, Vector2i(2 + _bank * 4, 2))
