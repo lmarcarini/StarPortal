@@ -173,3 +173,4 @@ BASE_CARD_BANK,CAP. BANK,BANCO CAP.
 BASE_CARD_PLANT,POWER PLANT,USINA
 BASE_CARD_VAULT,VAULT,COFRE
 BASE_CARD_LOCKED,Locked: needs research,Bloqueado: requer pesquisa
+BASE_POWER_LINE,SUPPLY {supply} MW · USED {used} · CHARGING {charging},OFERTA {supply} MW · USO {used} · CARGA {charging}

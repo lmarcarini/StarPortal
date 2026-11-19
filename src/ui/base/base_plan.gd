@@ -28,6 +28,11 @@ const CELL_PX: float = 80.0
 ## default view snaps cell lines to it.
 const GRID_ORIGIN: Vector2 = Vector2(16, 40)
 
+## POWER mode: rooms tinted amber or grey with their MW (M6-04).
+var power_view: bool = false:
+	set(value):
+		power_view = value
+		queue_redraw()
 ## Level shown, 1 the top one.
 var level: int = 1
 ## Cell under the keyboard and gamepad cursor.
@@ -214,6 +219,7 @@ func _draw_room(room: RoomState) -> void:
 		return
 	var state: GameState = SimClock.simulation.state if SimClock.simulation != null else null
 	var tile: PlanTile = PlanTile.of(room, def, state, progress_of(room.id))
+	tile.power_view = power_view
 	PlanTiles.room(self, PlanTiles.rect_of(self, cells, 4.0), tile)
 
 

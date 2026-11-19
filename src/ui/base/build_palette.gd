@@ -19,6 +19,8 @@ signal build_held
 signal cancel_held
 ## Emitted when the player leaves the palette with (B) or Esc.
 signal back_requested
+## Emitted with each message shown (the POWER tray shows the power news, M6-04).
+signal message_shown(text: String)
 
 ## Buildable rooms, in palette order. The Infirmary shows only from the Expeditions unlock
 ## (m3-beyond-the-ring.md section 9): no research unlocks it.
@@ -71,6 +73,7 @@ func _init() -> void:
 	_scroll.size_flags_horizontal = SIZE_EXPAND_FILL
 	_scroll.add_child(_rooms)
 	add_child(_scroll)
+	TrayArrow.new().attach(_scroll)
 	var line := message_line
 	add_child(line)
 	_hint.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
@@ -224,6 +227,7 @@ func first_button() -> Button:
 ## Shows [param text] on the hint line until the next hover or message.
 func show_message(text: String) -> void:
 	_message = text
+	message_shown.emit(text)
 	_role.visible = false
 	_refresh_hint()
 

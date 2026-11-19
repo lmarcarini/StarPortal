@@ -84,7 +84,7 @@ func test_p_and_shoulders_switch_sub_tabs() -> void:
 	assert_str(String(sub_tabs.shown())).is_equal("energy")
 	assert_bool(base.get_power().is_layer_on()).is_true()
 	assert_bool(base.get_palette().visible).is_false()
-	assert_bool(base.get_power().strip.visible).is_true()
+	assert_bool((base.find_child("PowerTray", true, false) as Control).visible).is_true()
 	await _key(KEY_P)
 	assert_str(String(sub_tabs.shown())).is_equal("build")
 	await _joypad(JOY_BUTTON_RIGHT_SHOULDER)
@@ -133,9 +133,9 @@ func test_message_line_shows_on_energy() -> void:
 	var state: GameState = SimClock.simulation.state
 	var lab: RoomState = PowerFixture.lab(state)
 	EventBus.charging_lowered.emit(lab.id, 20)
-	var line: Control = base.get_palette().message_line
-	assert_bool(line.is_visible_in_tree()).is_true()
-	assert_str(base.get_palette().get_hint()).contains("20 MW")
+	var tray: PowerTray = base.find_child("PowerTray", true, false) as PowerTray
+	assert_bool(tray.is_visible_in_tree()).is_true()
+	assert_str(tray.get_news()).contains("20 MW")
 
 
 ## Cancelling a dig with the tab shown rebuilds the level column without reading past it.

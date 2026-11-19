@@ -14,6 +14,8 @@ extends Node
 var staff_tab := StaffSubTab.new()
 ## The Security strip (M4c-12), shown in place of the palette.
 var security_tab := SecuritySubTab.new()
+## The POWER tray (M6-04).
+var power_tray: PowerTray = PowerTray.new()
 
 var _sub_tabs: BaseSubTabs = null
 var _levels: LevelTabs = null
@@ -40,6 +42,9 @@ func attach(
 	_power.layer.visibility_changed.connect(_on_energy_layer_toggled)
 	_move_message_line()
 	_attach_staff()
+	_palette.get_parent().add_child(power_tray)
+	power_tray.toggle_requested.connect(_power.room_switch.toggle_requested.emit)
+	_palette.message_shown.connect(power_tray.show_news)
 	_palette.get_parent().add_child(security_tab)
 	security_tab.squad_picked.connect(_on_squad_picked)
 	show_sub_tab()
@@ -103,8 +108,10 @@ func show_sub_tab() -> void:
 	_sub_tabs.show_tab(tab)
 	_sub_tabs.set_block_signals(false)
 	_palette.visible = not energy and not staff and not security
-	_power.strip.visible = energy
-	_palette.message_line.visible = energy
+	_power.strip.visible = false
+	_palette.message_line.visible = false
+	_plan.power_view = energy
+	power_tray.visible = energy
 	staff_tab.visible = staff
 	_show_security(security)
 	_plan.staff_layer.tint = staff
