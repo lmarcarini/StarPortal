@@ -30,6 +30,7 @@ static func begin(tile: Control) -> void:
 func follow(tile: Control) -> void:
 	_from = tile
 	_fixed = false
+	queue_redraw()
 
 
 ## Shows a still line from [param tile] to global point [param to] (screenshots, tests).

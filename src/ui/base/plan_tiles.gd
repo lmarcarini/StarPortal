@@ -70,6 +70,13 @@ static func room(canvas: CanvasItem, area: Rect2, tile: PlanTile) -> void:
 	if tile.state == &"site":
 		_site(canvas, area, tile)
 	_slots(canvas, area, tile)
+	if tile.assign == &"no":
+		canvas.draw_rect(area, Color(0, 0, 0, 0.55))
+	elif tile.assign == &"ok":
+		for k: int in 4:
+			canvas.draw_rect(
+				area.grow(1.0 + k * 3.0), Color(RefPaint.AMBER, 0.18 - k * 0.04), false, 3.0
+			)
 
 
 ## The amber selection round [param area].

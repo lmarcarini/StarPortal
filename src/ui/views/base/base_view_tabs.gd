@@ -57,6 +57,7 @@ func _attach_staff() -> void:
 	staff_tab.person_chosen.connect(_on_staff_person)
 	staff_tab.assign_pressed.connect(_on_assign_pressed)
 	staff_tab.tray_drop.connect(_on_tray_drop)
+	staff_tab.drag_started.connect(_on_drag_started)
 	_plan.placement_message.connect(_on_placement_message)
 	_plan.drag_moved.connect(_on_drag_moved)
 	_plan.staff_layer.token_selected.connect(_refresh_staff.unbind(1))
@@ -67,6 +68,13 @@ func _refresh_staff() -> void:
 	var simulation: Simulation = SimClock.simulation
 	if simulation != null and staff_tab.visible:
 		staff_tab.show_state(simulation.state, _plan.staff_layer.selected())
+
+
+func _on_drag_started(person_id: StringName) -> void:
+	var simulation: Simulation = SimClock.simulation
+	if simulation != null:
+		_plan.staff_layer.assign.start(simulation.state, person_id)
+		_plan.queue_redraw()
 
 
 func _on_tray_drop(person_id: StringName) -> void:
