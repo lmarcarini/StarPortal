@@ -74,10 +74,9 @@ func test_view_actions_switch_stations_and_wrap() -> void:
 	assert_str(String(_switcher.current_view_id())).is_equal("archive")
 
 
-func test_personnel_is_a_folder_of_the_base_and_the_office() -> void:
-	_switcher.show_station(&"base")
-	_switcher.show_view(ViewSwitcher.PERSONNEL)
-	assert_str(String(_switcher.current_station())).is_equal("base")
+## Personnel is the Office's folder only (M6-05: the Base's STAFF mode replaces its roster).
+func test_personnel_is_a_folder_of_the_office() -> void:
+	assert_bool(ViewSwitcher.STATIONS[&"base"].has(ViewSwitcher.PERSONNEL)).is_false()
 	_switcher.show_station(&"office")
 	_switcher.show_view(ViewSwitcher.PERSONNEL)
 	assert_str(String(_switcher.current_station())).is_equal("office")

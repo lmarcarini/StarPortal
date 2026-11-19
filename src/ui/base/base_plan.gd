@@ -90,41 +90,14 @@ func show_base(base: BaseState, defs: Dictionary) -> void:
 
 ## Zooms to the table's 80 px cells and centres the shown level's rooms (corridors left out).
 func frame_rooms() -> void:
-	if _base == null:
-		return
-	var image: Vector2 = Vector2(_base.grid_size) * BasePlanPainter.CELL
-	var fit: float = minf(size.x / image.x, size.y / image.y) if size.x > 0.0 else 1.0
-	view.zoom = clampf(CELL_PX / BasePlanPainter.CELL / fit, ZoomPan.MIN_ZOOM, ZoomPan.MAX_ZOOM)
-	var box: Rect2i = Rect2i()
-	for room: RoomState in BaseRules.rooms_on_level(_base, level):
-		var def: RoomDef = _def(room.def_id)
-		if def != null and room.def_id != StartingBase.CORRIDOR_DEF:
-			var cells: Rect2i = BaseRules.footprint(room, def)
-			box = cells if box.size == Vector2i.ZERO else box.merge(cells)
-	var centre: Vector2 = Vector2(box.get_center()) * BasePlanPainter.CELL
-	view.offset = size * 0.5 - centre * view.scale()
-	_snap()
-	queue_redraw()
-
-
-## Snaps the cell lines onto the table grid (GRID_ORIGIN, CELL_PX) after the pan clamp.
-func _snap() -> void:
-	view.pan(Vector2.ZERO)
-	view.offset = ((view.offset - GRID_ORIGIN) / CELL_PX).round() * CELL_PX + GRID_ORIGIN
+	if _base != null:
+		PlanFraming.frame(self, _base, _defs)
 
 
 ## Centres the plan on room [param id] at the table's zoom.
 func centre_on(id: StringName) -> void:
-	var room: RoomState = _base.find_room(id) if _base != null else null
-	var def: RoomDef = null if room == null else _def(room.def_id)
-	if def == null:
-		return
-	var centre: Vector2 = (
-		Vector2(BaseRules.footprint(room, def).get_center()) * BasePlanPainter.CELL
-	)
-	view.offset = size * 0.5 - centre * view.scale()
-	_snap()
-	queue_redraw()
+	if _base != null:
+		PlanFraming.centre_on(self, _base, _defs, id)
 
 
 ## Shows the bars of [param progress] (SiteProgress by room id, SiteProgress.for_rooms).
@@ -280,6 +253,19 @@ func drop_at(point: Vector2) -> bool:
 	staff_layer.assign.cancel()
 	staff_layer.queue_redraw()
 	return true
+
+
+## A face tile dragged from the STAFF tray (M6-05) can drop on a room.
+func _can_drop_data(_at: Vector2, data: Variant) -> bool:
+	var payload: Dictionary = data if data is Dictionary else {}
+	return payload.has("person")
+
+
+func _drop_data(at: Vector2, data: Variant) -> void:
+	var payload: Dictionary = data if data is Dictionary else {}
+	var person: StringName = payload.get("person", &"")
+	start_placing(person)
+	drop_at(at)
 
 
 func _drag_motion(motion: InputEventMouseMotion) -> bool:

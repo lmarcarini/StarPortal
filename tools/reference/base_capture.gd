@@ -47,3 +47,24 @@ static func show(switcher: ViewSwitcher, mode: StringName) -> void:
 	if mode == BaseSubTabs.BUILD:
 		base.get_build().place_at(&"room_quarters", Vector2i(27, 8))
 		base.get_plan().centre_on(LAB)
+	if mode == BaseSubTabs.STAFF:
+		_drag_to_lab(base)
+
+
+## A drag in progress: the dashed line from the third face tile (a free engineer) to the
+## lab's third slot.
+static func _drag_to_lab(base: BaseView) -> void:
+	var tray: Node = base.find_child("StaffSubTab", true, false)
+	var tiles: Array[Node] = tray.find_children("*", "StaffFaceKey", true, false)
+	if tiles.is_empty():
+		return
+	var pick: Node = tiles[mini(2, tiles.size() - 1)]
+	var tile: StaffFaceKey = pick as StaffFaceKey
+	tile.button_pressed = true
+	var plan: BasePlan = base.get_plan()
+	var room: RoomState = SimClock.simulation.state.base.find_room(LAB)
+	var def: RoomDef = SimClock.simulation.state.room_defs.get(room.def_id)
+	var area: Rect2 = PlanTiles.rect_of(plan, BaseRules.footprint(room, def), 4.0)
+	var slot: Vector2 = Vector2(area.position.x + 24 + 2 * PlanTiles.SLOT_PITCH, area.end.y - 22)
+	var line: StaffDragLine = base.find_child("StaffDragLine", true, false) as StaffDragLine
+	line.show_line(tile, plan.get_global_transform() * slot)
