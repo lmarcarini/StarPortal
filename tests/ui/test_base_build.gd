@@ -86,6 +86,7 @@ func test_invalid_spots_say_why() -> void:
 ## (m25-lean-start.md section 1, m26-staff-and-money.md section 3); research-locked rooms
 ## show disabled until research adds them. The Infirmary is not shown at all until the
 ## Expeditions unlock, and no research unlocks it (m3-beyond-the-ring.md section 9).
+## Every room has a card; locked ones are off with the research on their hover card.
 func test_palette_offers_only_unlocked_rooms() -> void:
 	var palette: BuildPalette = _view.get_palette()
 	for def_id: StringName in BuildPalette.ROOMS:
@@ -100,12 +101,11 @@ func test_palette_offers_only_unlocked_rooms() -> void:
 			]
 		)
 		var button: Button = palette.get_room_button(def_id)
-		assert_bool(button != null).override_failure_message(String(def_id)).is_equal(wanted)
-		if button != null:
-			assert_bool(button.disabled).override_failure_message(String(def_id)).is_false()
+		assert_object(button).override_failure_message(String(def_id)).is_not_null()
+		assert_bool(button.disabled).override_failure_message(String(def_id)).is_equal(not wanted)
 	ConstructionFixture.unlock_all(_simulation.state)
 	_view.get_build().refresh()
-	assert_object(palette.get_room_button(ExpeditionUnlock.INFIRMARY_DEF)).is_null()
+	assert_bool(palette.get_room_button(ExpeditionUnlock.INFIRMARY_DEF).disabled).is_true()
 	await _unlock_everything()
 	for def_id: StringName in BuildPalette.ROOMS:
 		assert_bool(palette.get_room_button(def_id).disabled).is_false()

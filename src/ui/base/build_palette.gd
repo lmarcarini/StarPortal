@@ -26,10 +26,10 @@ signal back_requested
 const DOOR_ID: StringName = &"blast_door"
 
 const ROOMS: Array[StringName] = [
+	&"room_quarters",
+	&"room_research_lab",
 	&"room_power_plant",
 	&"room_capacitor_bank",
-	&"room_research_lab",
-	&"room_quarters",
 	&"room_workshop",
 	&"room_infirmary",
 	&"room_artefact_vault",
@@ -47,7 +47,8 @@ var notes: Dictionary[StringName, String] = {}
 ## moves it out of the palette, so the Energy sub-tab shows it too.
 var message_line: HBoxContainer = HBoxContainer.new()
 
-var _rooms: HFlowContainer = HFlowContainer.new()
+var _rooms: HBoxContainer = HBoxContainer.new()
+var _scroll: ScrollContainer = ScrollContainer.new()
 var _dig: DigButton = DigButton.new()
 var _hint: Label = Label.new()
 var _build: Button = Button.new()
@@ -63,12 +64,13 @@ var _picked: StringName = &""
 
 func _init() -> void:
 	add_theme_constant_override(&"separation", 4)
-	_rooms.add_theme_constant_override(&"h_separation", 4)
-	_rooms.add_theme_constant_override(&"v_separation", 4)
-	add_child(_rooms)
-	var title := Label.new()
-	title.text = "BASE_BUILD_TITLE"
-	_rooms.add_child(title)
+	_rooms.add_theme_constant_override(&"separation", 8)
+	_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	_scroll.custom_minimum_size = Vector2(0, RoomCardKey.SIZE.y + 16)
+	_scroll.size_flags_horizontal = SIZE_EXPAND_FILL
+	_scroll.add_child(_rooms)
+	add_child(_scroll)
 	var line := message_line
 	add_child(line)
 	_hint.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
@@ -79,7 +81,8 @@ func _init() -> void:
 	_build.text = "BASE_BUILD_BUILD"
 	_build.visible = false
 	_build.pressed.connect(build_held.emit)
-	_rooms.add_child(_dig)
+	_dig.visible = false
+	add_child(_dig)
 	_dig.mouse_entered.connect(_show_dig_summary)
 	_dig.focus_entered.connect(_show_dig_summary)
 	line.add_child(_build)
@@ -92,6 +95,7 @@ func _init() -> void:
 	_role.add_theme_font_size_override(&"font_size", 14)
 	_role.visible = false
 	add_child(_role)
+	line.visible = false
 
 
 ## Fills the palette with the rooms of [param defs] (RoomDef by id) in [constant ROOMS] that
@@ -110,12 +114,16 @@ func show_rooms(
 	_buttons.clear()
 	for def_id: StringName in ROOMS:
 		var def: RoomDef = _defs.get(def_id)
-		if def == null or not def_id in unlocked:
+		if def == null:
 			continue
-		var button := Button.new()
-		button.text = def.name_key
-		button.disabled = _blocked.has(def_id)
-		button.toggle_mode = true
+		var button: RoomCardKey = _card(def_id, def)
+		button.disabled = _blocked.has(def_id) or not def_id in unlocked
+		if not def_id in unlocked:
+			button.set_help(BuildCardText.locked_reason(def_id))
+		elif _blocked.has(def_id):
+			button.set_help(_blocked[def_id])
+		else:
+			button.set_help(BuildText.summary(def))
 		button.set_pressed_no_signal(def_id == _picked)
 		button.pressed.connect(room_picked.emit.bind(def_id))
 		button.mouse_entered.connect(_show_summary.bind(def_id))
@@ -124,14 +132,27 @@ func show_rooms(
 		_rooms.add_child(button)
 		_buttons[def_id] = button
 	_add_door_button()
-	_rooms.move_child(_dig, -1)
 	_refresh_hint()
 
 
+func _card(def_id: StringName, def: RoomDef) -> RoomCardKey:
+	var card := RoomCardKey.new()
+	card.name = String(def_id)
+	card.def_id = def_id
+	card.text = def.name_key
+	card.title = BuildCardText.title(def)
+	card.price = BaseTableSetup.short_money(def.build_cost_k)
+	card.cells = "%d×%d" % [def.size_cells.x, def.size_cells.y]
+	return card
+
+
 func _add_door_button() -> void:
-	var button := Button.new()
+	var button := RoomCardKey.new()
 	button.text = &"BASE_DOOR_NAME"
-	button.toggle_mode = true
+	button.title = tr(&"BASE_DOOR_NAME").to_upper()
+	button.def_id = DOOR_ID
+	button.cells = "1×1"
+	button.set_help(tr(&"BASE_DOOR_SUMMARY"))
 	button.set_pressed_no_signal(_picked == DOOR_ID)
 	button.pressed.connect(room_picked.emit.bind(DOOR_ID))
 	button.mouse_entered.connect(show_message.bind(tr(&"BASE_DOOR_SUMMARY")))
@@ -217,7 +238,6 @@ func set_placing(on: bool, valid: bool) -> void:
 	_build.visible = on
 	_build.disabled = not valid
 	_cancel.visible = on
-	_dig.visible = not on
 
 
 func _show_summary(def_id: StringName) -> void:

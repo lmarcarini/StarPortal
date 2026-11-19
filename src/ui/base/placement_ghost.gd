@@ -20,8 +20,6 @@ signal checked(reason: String)
 ## Emitted when placing ends without building.
 signal cancelled
 
-const _OK := Color(0.35, 0.85, 0.45, 0.45)
-const _BAD := Color(0.9, 0.3, 0.25, 0.45)
 const _NO_START := Vector2i(-1000000, -1000000)
 
 ## Def being placed, or &"" when not placing.
@@ -303,16 +301,26 @@ func _reason_of(result: CommandResult) -> String:
 func _draw() -> void:
 	if not is_placing() or _plan == null:
 		return
-	draw_set_transform(_plan.view.offset, 0.0, Vector2.ONE * _plan.view.scale())
-	var color: Color = _OK if _reason.is_empty() else _BAD
+	var color: Color = RefPaint.GREEN if _reason.is_empty() else RefPaint.RED
+	_plan.tooltip_text = _reason
 	if is_corridor():
 		for cell: Vector2i in run:
-			draw_rect(_pixels(Rect2i(cell, Vector2i.ONE)), color)
-	else:
-		var box: Rect2 = _pixels(area())
-		draw_rect(box, color)
-		draw_rect(box, color.lightened(0.4), false, 2.0)
-	draw_set_transform(Vector2.ZERO)
+			_draw_box(PlanTiles.rect_of(_plan, Rect2i(cell, Vector2i.ONE), 2.0), color, "")
+		return
+	var def: RoomDef = _def()
+	var title: String = "" if def == null else BuildCardText.title(def)
+	_draw_box(PlanTiles.rect_of(_plan, area(), 2.0), color, title)
+
+
+## The reference ghost: a tinted box with a 3 px outline, ticks along the top and the name.
+func _draw_box(box: Rect2, color: Color, title: String) -> void:
+	draw_rect(box, Color(color, 0.12))
+	draw_rect(box, color, false, 3.0)
+	var x: float = box.position.x
+	while x < box.end.x:
+		draw_line(Vector2(x, box.position.y), Vector2(x, box.position.y + 6), color, 2.0)
+		x += 14.0
+	RefText.make(RefText.LABEL, 16, color, 2.0).draw(self, box.get_center(), title, "mm")
 
 
 static func _pixels(cells: Rect2i) -> Rect2:

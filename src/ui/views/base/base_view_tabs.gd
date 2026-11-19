@@ -103,6 +103,8 @@ func show_sub_tab() -> void:
 	_sub_tabs.show_tab(tab)
 	_sub_tabs.set_block_signals(false)
 	_palette.visible = not energy and not staff and not security
+	_power.strip.visible = energy
+	_palette.message_line.visible = energy
 	staff_tab.visible = staff
 	_show_security(security)
 	_plan.staff_layer.tint = staff
