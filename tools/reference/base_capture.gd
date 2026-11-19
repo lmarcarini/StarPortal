@@ -9,10 +9,10 @@ extends RefCounted
 const LAB: StringName = &"room_ref_lab"
 ## Rooms added: id, def, origin (cells on L1), powered, build ticks left.
 const ROOMS: Array[Array] = [
-	[&"room_ref_lab", &"room_research_lab", Vector2i(14, 15), true, 0],
-	[&"room_ref_workshop", &"room_workshop", Vector2i(19, 15), true, 0],
-	[&"room_ref_quarters", &"room_quarters", Vector2i(23, 15), false, 0],
-	[&"room_ref_site", &"room_quarters", Vector2i(27, 15), false, 300],
+	[&"room_ref_lab", &"room_research_lab", Vector2i(23, 11), true, 0],
+	[&"room_ref_workshop", &"room_workshop", Vector2i(27, 11), true, 0],
+	[&"room_ref_quarters", &"room_quarters", Vector2i(32, 11), false, 0],
+	[&"room_ref_site", &"room_quarters", Vector2i(24, 14), false, 300],
 ]
 
 
@@ -45,5 +45,5 @@ static func show(switcher: ViewSwitcher, mode: StringName) -> void:
 	base.get_plan().select(LAB)
 	base.get_plan().centre_on(LAB)
 	if mode == BaseSubTabs.BUILD:
-		base.get_build().place_at(&"room_quarters", Vector2i(18, 12))
+		base.get_build().place_at(&"room_quarters", Vector2i(27, 8))
 		base.get_plan().centre_on(LAB)

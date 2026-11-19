@@ -209,7 +209,7 @@ SECURITY_ERR_NO_PATH,No open path there,Sem caminho aberto até lá
 SECURITY_ERR_SQUAD_DOWN,Nobody in the squad can fight,Ninguém no esquadrão pode lutar
 SECURITY_ERR_NO_SQUAD,Pick a squad first,Escolha um esquadrão primeiro
 SECURITY_PICK_TARGET,Pick a room or corridor for Squad {number},Escolha uma sala ou corredor para o Esquadrão {number}
-INSTALL_TITLE,INSTALLATIONS,INSTALAÇÕES
+INSTALL_TITLE,INSTALLED,INSTALADO
 INSTALL_OFFER,"Install {name} ({cost}, {time})","Instalar {name} ({cost}, {time})"
 INSTALL_LOCKED,Needs research: {name},Requer pesquisa: {name}
 INSTALL_BUILDING,{name}: installing {percent}%,{name}: instalando {percent}%

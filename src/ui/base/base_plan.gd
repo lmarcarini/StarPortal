@@ -24,6 +24,10 @@ signal door_toggled(level: int, cell: Vector2i)
 ## Screen pixels per cell on the plan table at 1080p (interface-reference.md section 8).
 const CELL_PX: float = 80.0
 
+## Where the table's cell grid starts inside the glass (base_plan_grid minus base_glass); the
+## default view snaps cell lines to it.
+const GRID_ORIGIN: Vector2 = Vector2(16, 40)
+
 ## Level shown, 1 the top one.
 var level: int = 1
 ## Cell under the keyboard and gamepad cursor.
@@ -94,8 +98,14 @@ func frame_rooms() -> void:
 			box = cells if box.size == Vector2i.ZERO else box.merge(cells)
 	var centre: Vector2 = Vector2(box.get_center()) * BasePlanPainter.CELL
 	view.offset = size * 0.5 - centre * view.scale()
-	view.pan(Vector2.ZERO)
+	_snap()
 	queue_redraw()
+
+
+## Snaps the cell lines onto the table grid (GRID_ORIGIN, CELL_PX) after the pan clamp.
+func _snap() -> void:
+	view.pan(Vector2.ZERO)
+	view.offset = ((view.offset - GRID_ORIGIN) / CELL_PX).round() * CELL_PX + GRID_ORIGIN
 
 
 ## Centres the plan on room [param id] at the table's zoom.
@@ -108,7 +118,7 @@ func centre_on(id: StringName) -> void:
 		Vector2(BaseRules.footprint(room, def).get_center()) * BasePlanPainter.CELL
 	)
 	view.offset = size * 0.5 - centre * view.scale()
-	view.pan(Vector2.ZERO)
+	_snap()
 	queue_redraw()
 
 

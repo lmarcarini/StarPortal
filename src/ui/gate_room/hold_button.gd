@@ -15,6 +15,19 @@ signal confirmed
 const HOLD_SECONDS: float = 0.6
 const _BAR_HEIGHT: float = 4.0
 
+## Draws as the interface reference's steel key with the first words of its text (the
+## full text is the hover tooltip) and the hold as an amber bar (M6-02).
+var ref_look: bool = false:
+	set(value):
+		ref_look = value
+		if value:
+			RefKeyLook.clear_boxes(self)
+			add_theme_color_override(&"font_color", Color(0, 0, 0, 0))
+			add_theme_color_override(&"font_disabled_color", Color(0, 0, 0, 0))
+			add_theme_color_override(&"font_hover_color", Color(0, 0, 0, 0))
+			add_theme_color_override(&"font_focus_color", Color(0, 0, 0, 0))
+		queue_redraw()
+
 var _held_seconds: float = 0.0
 var _is_holding: bool = false
 
@@ -36,6 +49,9 @@ func _notification(what: int) -> void:
 
 
 func _draw() -> void:
+	if ref_look:
+		_draw_ref()
+		return
 	var width: float = size.x * get_progress()
 	if width <= 0.0:
 		return
@@ -82,3 +98,16 @@ func get_progress() -> float:
 ## True while a hold is in progress.
 func is_holding() -> bool:
 	return _is_holding
+
+
+func _draw_ref() -> void:
+	tooltip_text = text
+	var style: RefPaint.KeyStyle = RefPaint.KeyStyle.OFF if disabled else RefPaint.KeyStyle.STEEL
+	var ink: Color = RefPaint.key(self, Rect2(Vector2.ZERO, size), style)
+	var word: String = text.get_slice(" (", 0).get_slice(":", 0).to_upper()
+	RefText.make(RefText.LABEL, 18, ink, 3.0).draw(self, size * 0.5 + Vector2(0, 2), word, "mm")
+	var width: float = (size.x - 12.0) * get_progress()
+	if width > 0.0:
+		draw_rect(Rect2(6.0, size.y - 8.0, width, 4.0), RefPaint.AMBER)
+	if has_focus():
+		RefPaint.outline(self, Rect2(Vector2.ZERO, size).grow(3.0), RefPaint.AMBER_HI, 2.0)

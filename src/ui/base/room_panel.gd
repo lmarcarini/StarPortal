@@ -116,10 +116,11 @@ func _add_action() -> HoldButton:
 	spacer.mouse_filter = MOUSE_FILTER_IGNORE
 	add_child(spacer)
 	var button := HoldButton.new()
-	DialogueKeys.style(button)
+	button.ref_look = true
+	button.custom_minimum_size = Vector2(160, 48)
+	button.size_flags_horizontal = SIZE_SHRINK_END
 	button.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	button.visible = false
-	button.size_flags_horizontal = SIZE_SHRINK_BEGIN
 	button.confirmed.connect(_on_action_confirmed)
 	add_child(button)
 	return button
