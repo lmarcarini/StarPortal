@@ -156,7 +156,7 @@ func _start_survey_from_the_tree(player: M15Player) -> void:
 	var start: Button = view.get_panel().get_button()
 	assert_str(start.text).is_equal("Start")
 	await UiInput.click(start)
-	assert_str(String(player.state().research.active)).is_equal(String(SURVEY))
+	assert_array(player.state().research.running()).is_equal([SURVEY])
 
 
 ## The survey finishes and, on the next tick, adds +3.

@@ -39,7 +39,7 @@ func test_charge_fills_the_capacitors() -> void:
 
 
 func test_finish_research_and_unlock_all() -> void:
-	_state.research.active = &"excavation_survey"
+	_state.research.ensure_bench(&"room_1").active = &"excavation_survey"
 	_cheat(&"finish_research")
 	assert_bool(_state.research.is_done(&"excavation_survey")).is_true()
 	_cheat(&"unlock_all_research")

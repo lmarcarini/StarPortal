@@ -370,7 +370,7 @@ func _on_visibility_changed() -> void:
 		_on_build_event()
 
 
-func _on_build_event(_arg: Variant = null) -> void:
+func _on_build_event(_arg: Variant = null, _more: Variant = null) -> void:
 	if _simulation == null:
 		return
 	_signature = signature(_simulation.state.base)

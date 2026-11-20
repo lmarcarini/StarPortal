@@ -54,7 +54,7 @@ func show_project(state: GameState, def: ResearchDef) -> void:
 	_state.text = ResearchText.state_word(state, def)
 	_bar.visible = kind == ResearchText.Kind.ACTIVE
 	if _bar.visible:
-		_bar.value = ResearchRules.progress(state)
+		_bar.value = ResearchSpeed.progress(state, state.research.room_running(def.id))
 		var left: String = ResearchText.time_left(state)
 		_state.text = left if not left.is_empty() else _state.text
 	var dim: bool = kind == ResearchText.Kind.NEEDS or kind == ResearchText.Kind.LOCKED

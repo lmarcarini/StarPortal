@@ -99,8 +99,9 @@ func act(project_id: StringName) -> void:
 	if _simulation == null or project_id.is_empty():
 		return
 	var command: Command = StartResearchCommand.create(project_id)
-	if _simulation.state.research.active == project_id:
-		command = CancelResearchCommand.new()
+	var running_at: StringName = _simulation.state.research.room_running(project_id)
+	if not running_at.is_empty():
+		command = CancelResearchCommand.new(running_at)
 	var result: CommandResult = _simulation.submit(command)
 	refresh()
 	_panel.show_notice("" if result.is_ok else ResearchText.refusal(result, _simulation.state))
@@ -199,7 +200,7 @@ func _on_staff_changed(_reason: StringName, _room_def_id: StringName, _count: in
 	refresh()
 
 
-func _on_event(_arg: Variant = null) -> void:
+func _on_event(_arg: Variant = null, _more: Variant = null) -> void:
 	_check_available()
 	refresh()
 
@@ -216,10 +217,9 @@ func _on_tick(_tick: int) -> void:
 static func _research_signature(state: GameState) -> int:
 	return hash(
 		[
-			state.research.active,
-			ceili(ResearchRules.ticks_left(state) / 60.0),
-			state.research.done.size(),
-			ResearchRules.has_lab_on(state),
+			state.research.to_dict(),
+			state.clock.tick / 60,
+			ResearchRules.open_disciplines(state),
 		]
 	)
 

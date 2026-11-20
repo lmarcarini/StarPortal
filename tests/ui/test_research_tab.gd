@@ -89,7 +89,7 @@ func test_palette_notes_a_second_lab() -> void:
 	EventBus.room_built.emit(&"lab")
 	button = palette.get_room_button(ResearchRules.LAB_DEF)
 	button.focus_entered.emit()
-	assert_str(palette.get_role()).ends_with("More labs hold more scientists.")
+	assert_str(palette.get_role()).ends_with("A second lab runs a second project.")
 	assert_bool(button.disabled).is_false()
 	root.free()
 

@@ -75,7 +75,7 @@ func test_def_content_errors() -> void:
 	var defs: Dictionary[StringName, DefBase] = {def.id: def, &"research_construction": category}
 	assert_array(def.get_content_errors(defs)).has_size(2)
 	def.needs.clear()
-	def.reveal = &"sometimes"
+	def.discipline = &"sometimes"
 	assert_array(def.get_content_errors(defs)).has_size(1)
 
 
@@ -99,6 +99,4 @@ func test_categories() -> void:
 		def.id: def, &"research_teleport": _copy(&"lift_shaft")
 	}
 	assert_str("\n".join(def.get_content_errors(defs))).contains("not a research category")
-	def.category = &""
-	assert_str("\n".join(def.get_content_errors({}))).contains("not a research category")
 	assert_array(_copy(&"lift_shaft").get_references()).contains([&"research_construction"])

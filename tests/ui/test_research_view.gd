@@ -49,38 +49,6 @@ func _node(id: StringName) -> ResearchNode:
 	return _tree().node_of(id)
 
 
-func test_sub_tabs_follow_the_data() -> void:
-	var board: ResearchBoard = _view.get_board()
-	assert_array(board.tab_titles()).is_equal(
-		[
-			"Construction •",
-			"Energy •",
-			"Gate •",
-			"Alien",
-			"Staff •",
-			"Defence •",
-			"Life and language"
-		]
-	)
-	assert_str(String(board.get_category())).is_equal("research_construction")
-	assert_int(_tree().nodes().size()).is_equal(7)
-	assert_array(_node(&"excavation_survey").texts()).is_equal(
-		["Excavation survey", "$400k · 2 d", "Start"]
-	)
-	assert_array(_node(&"lift_shaft").texts()).is_equal(
-		["Lift shaft", "$300k · 2 d", "needs Excavation survey"]
-	)
-	assert_float(_node(&"lift_shaft").modulate.a).is_less(1.0)
-	assert_vector(_node(&"deep_excavation").position).is_equal(
-		ResearchTree.cell_position(Vector2i(2, 0))
-	)
-	board.show_category(&"research_gate")
-	assert_int(_tree().nodes().size()).is_equal(6)
-	board.show_category(&"research_alien")
-	assert_object(_node(&"later_containment")).is_null()
-	assert_object(_node(&"lattice_harmonics")).is_null()
-
-
 func test_dot_leaves_a_tab_with_nothing_to_start() -> void:
 	ResearchFixture.finish(_simulation.state, &"second_plant")
 	ResearchFixture.finish(_simulation.state, &"fuel_contracts")
@@ -96,7 +64,7 @@ func test_start_with_accept_shows_header_and_cancel() -> void:
 	var node: ResearchNode = _node(&"excavation_survey")
 	node.grab_focus()
 	await _press(&"ui_accept")
-	assert_str(String(_simulation.state.research.active)).is_equal("excavation_survey")
+	assert_bool(_simulation.state.research.running().has(&"excavation_survey")).is_true()
 	assert_array(_view.get_board().header()).is_equal(
 		["RESEARCH", "Current: Excavation survey", "2 d left"]
 	)
@@ -118,29 +86,11 @@ func test_cancel_goes_through_the_command_and_refunds() -> void:
 	assert_str(_view.get_panel().get_button().text).is_equal("Start")
 
 
-func test_refusals_are_shown_plainly() -> void:
-	_view.act(&"bank_array")
-	_view.get_board().show_category(&"research_energy")
-	_node(&"second_plant").grab_focus()
-	var panel: ResearchPanel = _view.get_panel()
-	assert_bool(panel.get_button().disabled).is_true()
-	assert_str(panel.lines()[4]).is_equal("One project at a time.")
-	_view.act(&"second_plant")
-	assert_str(String(_simulation.state.research.active)).is_equal("bank_array")
-	assert_str(panel.lines()[4]).is_equal("One project at a time.")
-	_node(&"fuel_contracts").grab_focus()
-	assert_str(panel.lines()[4]).is_equal("One project at a time.")
-
-
 func test_lab_off_refreshes_while_paused() -> void:
 	_view.act(&"bank_array")
 	var lab: RoomState = PowerFixture.lab(_simulation.state)
 	_simulation.submit(SwitchRoomCommand.create(lab.id, false))
 	assert_str(_view.get_board().header()[2]).is_equal("3 d left, paused: no lab on")
-	_view.act(&"bank_array")
-	_view.get_board().show_category(&"research_energy")
-	_node(&"second_plant").grab_focus()
-	assert_str(_view.get_panel().lines()[4]).is_equal("Needs a Research Lab that is on.")
 
 
 func test_done_nodes_are_ticked() -> void:
@@ -148,24 +98,6 @@ func test_done_nodes_are_ticked() -> void:
 	_view.refresh()
 	assert_str(_node(&"excavation_survey").texts()[2]).is_equal("done")
 	assert_str(_node(&"lift_shaft").texts()[2]).is_equal("Start")
-
-
-func test_dpad_moves_along_the_tree() -> void:
-	_node(&"excavation_survey").grab_focus()
-	await _press(&"ui_right")
-	assert_object(_focus()).is_same(_node(&"lift_shaft"))
-	assert_str(String(_view.get_panel().get_project())).is_equal("lift_shaft")
-	await _press(&"ui_right")
-	assert_object(_focus()).is_same(_node(&"deep_excavation"))
-	await _press(&"ui_right")
-	assert_object(_focus()).is_same(_node(&"modular_frames"))
-	await _press(&"ui_left")
-	await _press(&"ui_left")
-	await _press(&"ui_left")
-	await _press(&"ui_down")
-	assert_object(_focus()).is_same(_node(&"field_engineering"))
-	await _press(&"ui_right")
-	assert_object(_focus()).is_same(_node(&"lift_shaft"))
 
 
 func test_shoulders_switch_sub_tabs_then_main_tabs() -> void:

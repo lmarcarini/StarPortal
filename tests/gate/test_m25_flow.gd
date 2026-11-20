@@ -143,7 +143,7 @@ func _start_survey_from_research_tab(player: M15Player) -> void:
 	var funds: int = player.state().budget.funds_k
 	await UiInput.click(start)
 	_free_ui()
-	assert_str(String(player.state().research.active)).is_equal("excavation_survey")
+	assert_array(player.state().research.running()).is_equal([&"excavation_survey"])
 	assert_int(player.state().budget.funds_k).is_equal(funds - 400)
 	var done: Callable = func() -> bool:
 		return player.state().research.is_done(&"excavation_survey")

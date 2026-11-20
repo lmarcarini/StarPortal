@@ -110,7 +110,7 @@ func test_research_time_follows_staffing() -> void:
 	for person: PersonState in state.staff.people.duplicate():
 		if person.room_id == _lab().id:
 			state.staff.remove_person(person.id)
-	assert_str(ResearchText.duration(ResearchText.planned_ticks(state, def))).is_equal("8 d")
+	assert_int(ResearchText.planned_ticks(state, def)).is_equal(0)
 
 
 func test_f5_opens_personnel_from_the_start() -> void:

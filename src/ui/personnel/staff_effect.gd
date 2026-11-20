@@ -15,10 +15,12 @@ static func of_assign(state: GameState, room: RoomState, person: PersonState) ->
 	var leaving: RoomState = state.base.find_room(person.room_id)
 	if leaving != null and leaving.def_id == room.def_id:
 		gain = 0
+	if room.def_id == ResearchRules.LAB_DEF:
+		var skill: int = ResearchSpeed.skill(state, room)
+		if leaving == room:
+			return ""
+		return _line(&"STAFF_EFFECT_SPEED", _speed(skill), _speed(skill + person.skill))
 	match room.def_id:
-		ResearchRules.LAB_DEF:
-			var skill: int = ResearchRules.scientist_skill(state, true)
-			return _line(&"STAFF_EFFECT_SPEED", _speed(skill), _speed(skill + gain))
 		BuildSpeed.WORKSHOP_DEF:
 			var crew: int = _engineer_skill(state)
 			return _line(&"STAFF_EFFECT_BUILD", _bonus(crew), _bonus(crew + gain))
@@ -26,10 +28,12 @@ static func of_assign(state: GameState, room: RoomState, person: PersonState) ->
 
 
 static func _speed(skill: int) -> int:
+	if skill <= 0:
+		return 0
 	var rate: int = clampi(
-		ResearchRules.SPEED_PER_SKILL * skill, ResearchRules.MIN_SPEED, ResearchRules.MAX_SPEED
+		ResearchSpeed.SPEED_PER_SKILL * skill, ResearchSpeed.MIN_SPEED, ResearchSpeed.MAX_SPEED
 	)
-	return rate * 100 / ResearchRules.SPEED_DENOMINATOR
+	return rate * 100 / ResearchSpeed.SPEED_DENOMINATOR
 
 
 static func _bonus(skill: int) -> int:

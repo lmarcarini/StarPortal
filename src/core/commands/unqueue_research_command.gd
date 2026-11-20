@@ -1,7 +1,7 @@
 class_name UnqueueResearchCommand
 extends Command
-## The player takes [member project_id] out of the research queue.
-## Bible: docs/content/m4-core-systems.md section 7 (4)
+## The player takes [member project_id] out of whichever bench queue holds it.
+## Bible: docs/content/research-and-progression.md section 3
 
 ## The command's stable type id.
 const TYPE: StringName = &"unqueue_research"
@@ -28,15 +28,16 @@ func get_type() -> StringName:
 
 ## Rejects with &"not_queued".
 func validate(state: GameState) -> CommandResult:
-	if state.research.queue.has(project_id):
-		return CommandResult.ok()
-	return CommandResult.fail(&"not_queued")
+	if state.research.room_queuing(project_id).is_empty():
+		return CommandResult.fail(&"not_queued")
+	return CommandResult.ok()
 
 
 ## Removes it.
 func apply(state: GameState) -> void:
-	state.research.queue.erase(project_id)
-	state.events.post(&"research_queue_changed", [])
+	var room_id: StringName = state.research.room_queuing(project_id)
+	state.research.bench_of(room_id).queue.erase(project_id)
+	state.events.post(&"research_queue_changed", [room_id])
 
 
 ## Returns JSON-safe data.

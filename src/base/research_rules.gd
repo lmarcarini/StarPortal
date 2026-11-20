@@ -1,73 +1,165 @@
 class_name ResearchRules
 extends RefCounted
-## Pure rules of research (docs/content/m25-lean-start.md section 3): the project list, whether
-## a lab is on, whether a project may start (with the reason when not), its length, progress
-## and refund. One project runs at a time. Its speed comes from the scientists in every lab
-## that is on (docs/content/m26-staff-and-money.md section 3): max(25%, total skill ÷ 6), at
-## most 200%, so a second lab adds scientist slots, not a second project or a higher cap. The
-## listed days are the time for a standard crew (total skill 6, 100%). Never touches a Node or
-## an autoload, and never changes the state.
-## Bible: docs/content/m25-lean-start.md section 3, docs/content/m26-staff-and-money.md section 3
+## Pure rules of research (docs/content/research-and-progression.md sections 2-3): which
+## projects the player can see, which can start where, and the queues. Each research
+## building (a room whose def names a discipline) runs one project with its own queue;
+## progress comes from that building's own staff (ResearchSpeed). A project is visible only
+## once revealed: done, running or queued, recorded as revealed, or its discipline is open
+## (from the start, or by a building) and its needs and reveal conditions hold. Story
+## projects never show until the story reveals them. Never touches a Node or an autoload,
+## and never changes the state.
+## Bible: docs/content/research-and-progression.md sections 2-3
 
 ## The Research Lab's def id.
 const LAB_DEF: StringName = &"room_research_lab"
 ## Share of the cost a cancel refunds, in percent.
 const REFUND_PERCENT: int = 50
-## Speed is counted in 1 / SPEED_DENOMINATOR of the standard crew's (one skill point = 2).
-const SPEED_DENOMINATOR: int = 12
-## Speed per scientist skill point, in twelfths (skill ÷ 6).
-const SPEED_PER_SKILL: int = 2
-## Slowest speed, an empty lab, in twelfths (25%).
-const MIN_SPEED: int = 3
-## Fastest speed, in twelfths (200%).
-const MAX_SPEED: int = 24
+## Disciplines open from the start (section 3): their projects show before their building
+## stands (they cannot start until it does).
+const START_DISCIPLINES: Array[StringName] = [&"engineering", &"science"]
+## Ticks in an hour.
+const TICKS_PER_HOUR: int = TimeMath.TICKS_PER_DAY / 24
+
+static var _cached_defs_id: int = 0
+static var _cached_size: int = -1
+static var _cached_list: Array[ResearchDef] = []
 
 
-## Every ResearchDef of [param state], in list order (by order, then id).
+## Every ResearchDef of [param state], in list order (discipline order, then order, then id).
+## Cached per set of def objects (the list is read only).
 static func projects(state: GameState) -> Array[ResearchDef]:
+	var defs_id: int = hash(state.research_defs.values())
+	if defs_id == _cached_defs_id and state.research_defs.size() == _cached_size:
+		return _cached_list
 	var list: Array[ResearchDef] = []
 	list.assign(state.research_defs.values())
 	list.sort_custom(_before)
+	_cached_defs_id = defs_id
+	_cached_size = list.size()
+	_cached_list = list
 	return list
 
 
-## True when [param state]'s base has a Research Lab that is built, not being demolished and
-## switched on.
-static func has_lab_on(state: GameState) -> bool:
-	var def: RoomDef = state.room_defs.get(LAB_DEF)
+## The research buildings of [param discipline] in [param state] that stand (built, not
+## coming down), in base order.
+static func buildings(state: GameState, discipline: StringName) -> Array[RoomState]:
+	var found: Array[RoomState] = []
 	for room: RoomState in state.base.rooms:
-		if room.def_id == LAB_DEF and PowerRules.is_running(room, def):
-			return true
-	return false
+		var def: RoomDef = state.room_defs.get(room.def_id)
+		if def != null and def.research_discipline == discipline and PowerRules.is_standing(room):
+			found.append(room)
+	return found
 
 
-## Whether [param project_id] may start now: ok, or failed with &"unknown_project" (also for a
-## hidden project not yet visible), &"project_done", &"needs_lab" ("Needs a Research Lab
-## that is on."), &"research_running" (detail: the running project; "One project at a
-## time."), &"needs_project" (detail: the first unmet need), &"requirement_unmet" (detail:
-## the project; first_failing() gives the condition) or &"insufficient_funds"
-## (detail: the cost in $k).
-static func can_start(state: GameState, project_id: StringName) -> CommandResult:
+## The open disciplines: those of the start and those with a standing building, in
+## ResearchDef.DISCIPLINES order.
+static func open_disciplines(state: GameState) -> Array[StringName]:
+	var found: Array[StringName] = []
+	for discipline: StringName in ResearchDef.DISCIPLINES:
+		if discipline in START_DISCIPLINES or not buildings(state, discipline).is_empty():
+			found.append(discipline)
+	return found
+
+
+## True when [param def] may be shown: done, running, queued or revealed; or (not a story
+## project) its discipline is open, its needs are done and its reveal conditions hold.
+static func visible(state: GameState, def: ResearchDef) -> bool:
+	var research: ResearchState = state.research
+	if research.is_done(def.id) or research.revealed.has(def.id):
+		return true
+	if not research.room_running(def.id).is_empty() or not research.room_queuing(def.id).is_empty():
+		return true
+	return reveals_now(state, def)
+
+
+## True when [param def] (not yet revealed) qualifies to be revealed in [param state].
+static func reveals_now(state: GameState, def: ResearchDef) -> bool:
+	if def.story:
+		return false
+	if not def.discipline in START_DISCIPLINES and buildings(state, def.discipline).is_empty():
+		return false
+	for need: StringName in def.needs:
+		if not state.research.is_done(need):
+			return false
+	return StoryRules.failing(state, def.reveal_when).is_empty()
+
+
+## True when [param def] is visible, not done, not running or queued, and its start
+## requirements hold (it may still wait for money, materials or an idle bench).
+static func available(state: GameState, def: ResearchDef) -> bool:
+	var research: ResearchState = state.research
+	if not visible(state, def) or research.is_done(def.id):
+		return false
+	if not research.room_running(def.id).is_empty():
+		return false
+	return first_failing(state, def) == null
+
+
+## The visible projects of [param state], in list order; with [param discipline], of that
+## discipline only. Nothing invisible is ever returned.
+static func visible_projects(state: GameState, discipline: StringName = &"") -> Array[ResearchDef]:
+	var found: Array[ResearchDef] = []
+	for def: ResearchDef in projects(state):
+		if (discipline.is_empty() or def.discipline == discipline) and visible(state, def):
+			found.append(def)
+	return found
+
+
+## The visible projects not yet recorded as revealed (to reveal, with an event, once).
+static func newly_visible(state: GameState) -> Array[ResearchDef]:
+	var found: Array[ResearchDef] = []
+	if state.research.revealed.size() >= state.research_defs.size():
+		return found
+	var open: Array[StringName] = open_disciplines(state)
+	for def: ResearchDef in projects(state):
+		if state.research.revealed.has(def.id) or not def.discipline in open:
+			continue
+		if visible(state, def):
+			found.append(def)
+	return found
+
+
+## Whether [param project_id] may start now in [param room_id] (&"" picks the first idle
+## building of its discipline): ok, or failed with &"unknown_project" (also when not
+## visible), &"project_done", &"project_running", &"needs_building", &"wrong_building",
+## &"bench_busy", &"needs_project" (detail: the first unmet need), &"requirement_unmet",
+## &"needs_pieces", &"needs_specimens" or &"insufficient_funds" (detail: the cost in $k).
+static func can_start(
+	state: GameState, project_id: StringName, room_id: StringName = &""
+) -> CommandResult:
 	var def: ResearchDef = state.research_defs.get(project_id)
-	if def == null:
-		return CommandResult.fail(&"unknown_project", String(project_id))
-	if not is_visible(state, def):
+	if def == null or not visible(state, def):
 		return CommandResult.fail(&"unknown_project", String(project_id))
 	if state.research.is_done(project_id):
 		return CommandResult.fail(&"project_done", String(project_id))
-	if not has_lab_on(state):
-		return CommandResult.fail(&"needs_lab")
-	if state.research.is_running():
-		return CommandResult.fail(&"research_running", String(state.research.active))
+	if not state.research.room_running(project_id).is_empty():
+		return CommandResult.fail(&"project_running", String(project_id))
+	var where: CommandResult = _bench_check(state, def, room_id)
+	if not where.is_ok:
+		return where
 	for need: StringName in def.needs:
 		if not state.research.is_done(need):
 			return CommandResult.fail(&"needs_project", String(need))
 	if first_failing(state, def) != null:
 		return CommandResult.fail(&"requirement_unmet", String(project_id))
+	var material: StringName = ResearchMaterials.missing(state, def)
+	if not material.is_empty():
+		return CommandResult.fail(material, String(project_id))
 	var funds_error: StringName = state.budget.spend_error(def.cost_k)
 	if not funds_error.is_empty():
 		return CommandResult.fail(funds_error, "%d" % def.cost_k)
 	return CommandResult.ok()
+
+
+## The room [param def] would start in when the player names none: the first idle building
+## of its discipline, else the first; &"" when there is none.
+static func pick_room(state: GameState, def: ResearchDef) -> StringName:
+	var rooms: Array[RoomState] = buildings(state, def.discipline)
+	for room: RoomState in rooms:
+		var bench: ResearchBench = state.research.bench_of(room.id)
+		if bench == null or not bench.is_running():
+			return room.id
+	return &"" if rooms.is_empty() else rooms[0].id
 
 
 ## The first of [param def]'s requires that does not hold in [param state], or null.
@@ -76,143 +168,82 @@ static func first_failing(state: GameState, def: ResearchDef) -> ConditionDef:
 	return null if failing.is_empty() else failing[0]
 
 
-## True when [param def]'s needs are done and its requires hold in [param state].
-static func is_available(state: GameState, def: ResearchDef) -> bool:
-	for need: StringName in def.needs:
-		if not state.research.is_done(need):
-			return false
-	return first_failing(state, def) == null
-
-
-## True when [param def] is drawn: shown locked, available, revealed, done or running.
-static func is_visible(state: GameState, def: ResearchDef) -> bool:
-	if not def.is_hidden() or state.research.is_done(def.id):
-		return true
-	if state.research.active == def.id or state.research.revealed.has(def.id):
-		return true
-	return is_available(state, def)
-
-
-## The visible projects of [param state], in list order.
-static func visible_projects(state: GameState) -> Array[ResearchDef]:
-	var found: Array[ResearchDef] = []
-	for def: ResearchDef in projects(state):
-		if is_visible(state, def):
-			found.append(def)
-	return found
-
-
-## Ticks of work [param def] needs: its days in ticks, the time at 100% (a standard crew).
+## Ticks of work [param def] needs: its hours in ticks, the time for a standard crew.
 static func total_ticks(def: ResearchDef) -> int:
-	return def.days * TimeMath.TICKS_PER_DAY
+	return def.hours * TICKS_PER_HOUR
 
 
-## Total skill of the scientists assigned to [param state]'s labs that are on; with
-## [param standing], of every lab standing, on or off.
-static func scientist_skill(state: GameState, standing: bool = false) -> int:
-	var def: RoomDef = state.room_defs.get(LAB_DEF)
-	var total: int = 0
-	for room: RoomState in state.base.rooms:
-		if room.def_id != LAB_DEF:
-			continue
-		if PowerRules.is_running(room, def) or (standing and PowerRules.is_standing(room)):
-			for person: PersonState in StaffRules.working(state, room):
-				total += person.skill
-	return total
-
-
-## Research speed of [param state] in twelfths of the standard crew's: 2 per skill point,
-## between MIN_SPEED (25%) and MAX_SPEED (200%).
-static func speed(state: GameState) -> int:
-	var base: int = clampi(SPEED_PER_SKILL * scientist_skill(state), MIN_SPEED, MAX_SPEED)
-	return with_modifier(state, base)
-
-
-## [param base_speed] with the research_speed_pct modifier applied (M4), at least 1.
-static func with_modifier(state: GameState, base_speed: int) -> int:
-	var percent: int = ModifierRules.total(state, &"research_speed_pct")
-	return maxi(1, base_speed * (100 + percent) / 100)
-
-
-## Research speed of [param state] as a whole percentage, rounded down (25 to 200).
-static func speed_percent(state: GameState) -> int:
-	return speed(state) * 100 / SPEED_DENOMINATOR
-
-
-## Ticks of work the active project gets on [param state]'s current clock tick while a lab
-## is on (RateSteps: whole ticks, exact across saves).
-static func step(state: GameState) -> int:
-	return RateSteps.step(state.clock.tick, speed(state), SPEED_DENOMINATOR)
-
-
-## Ticks of work left on [param state]'s active project; 0 when none runs or its def is unknown.
-static func work_left(state: GameState) -> int:
-	var def: ResearchDef = state.research_defs.get(state.research.active)
-	if def == null:
-		return 0
-	return maxi(0, total_ticks(def) - state.research.ticks_done)
-
-
-## Clock ticks until [param state]'s active project finishes at the current speed, the lab
-## staying on; while no lab is on (paused), at the speed the standing labs' scientists would
-## give once switched back on. 0 when none runs.
-static func ticks_left(state: GameState) -> int:
-	var rate: int = speed(state)
-	if not has_lab_on(state):
-		rate = with_modifier(
-			state, clampi(SPEED_PER_SKILL * scientist_skill(state, true), MIN_SPEED, MAX_SPEED)
-		)
-	return RateSteps.ticks_to(work_left(state), state.clock.tick, rate, SPEED_DENOMINATOR)
-
-
-## Share of the active project done, 0.0 to 1.0; 0.0 when none runs.
-static func progress(state: GameState) -> float:
-	var def: ResearchDef = state.research_defs.get(state.research.active)
-	if def == null:
-		return 0.0
-	return clampf(float(state.research.ticks_done) / float(total_ticks(def)), 0.0, 1.0)
-
-
-## What cancelling [param def] refunds, in $k: half its cost, rounded down.
+## What cancelling [param def] refunds, in $k: half its cost, rounded down (materials spent
+## are not returned).
 static func refund_k(def: ResearchDef) -> int:
 	return def.cost_k * REFUND_PERCENT / 100
 
 
-static func _before(a: ResearchDef, b: ResearchDef) -> bool:
-	if a.order != b.order:
-		return a.order < b.order
-	return String(a.id) < String(b.id)
-
-
-## Why the first queued project of [param state] has not started: &"" when nothing waits or it
-## runs; &"waiting_for_funds", &"requirements_not_met" or the can_start() code otherwise.
-static func queue_wait(state: GameState) -> StringName:
-	if state.research.is_running() or state.research.queue.is_empty():
+## Why the first queued project of [param room_id] has not started: &"" when nothing waits
+## or it runs; &"waiting_for_funds", &"requirements_not_met" or the can_start() code.
+static func queue_wait(state: GameState, room_id: StringName) -> StringName:
+	var bench: ResearchBench = state.research.bench_of(room_id)
+	if bench == null or bench.is_running() or bench.queue.is_empty():
 		return &""
-	var result: CommandResult = can_start(state, state.research.queue[0])
+	var result: CommandResult = can_start(state, bench.queue[0], room_id)
 	if result.is_ok:
 		return &""
 	match result.error_code:
 		&"insufficient_funds":
 			return &"waiting_for_funds"
-		&"requirement_unmet", &"needs_project":
+		&"requirement_unmet", &"needs_project", &"needs_pieces", &"needs_specimens":
 			return &"requirements_not_met"
 	return result.error_code
 
 
-## Why [param project_id] cannot be queued: &"" when it can; &"unknown_project" (also hidden),
-## &"project_done", &"already_queued", &"project_running" or &"queue_full".
-static func queue_error(state: GameState, project_id: StringName) -> StringName:
+## Why [param project_id] cannot be queued at [param room_id]: &"" when it can;
+## &"unknown_project" (also not visible), &"project_done", &"already_queued",
+## &"project_running", &"wrong_building" or &"queue_full".
+static func queue_error(
+	state: GameState, project_id: StringName, room_id: StringName
+) -> StringName:
 	var def: ResearchDef = state.research_defs.get(project_id)
-	if def == null or not is_visible(state, def):
+	if def == null or not visible(state, def):
 		return &"unknown_project"
 	if state.research.is_done(project_id):
 		return &"project_done"
-	if state.research.queue.has(project_id):
+	if not state.research.room_queuing(project_id).is_empty():
 		return &"already_queued"
-	if state.research.active == project_id:
+	if not state.research.room_running(project_id).is_empty():
 		return &"project_running"
+	if not _is_building_of(state, room_id, def.discipline):
+		return &"wrong_building"
+	var bench: ResearchBench = state.research.bench_of(room_id)
 	var most: int = 5 if state.balance == null else state.balance.research_queue_max
-	if state.research.queue.size() >= most:
+	if bench != null and bench.queue.size() >= most:
 		return &"queue_full"
 	return &""
+
+
+static func _bench_check(state: GameState, def: ResearchDef, room_id: StringName) -> CommandResult:
+	if buildings(state, def.discipline).is_empty():
+		return CommandResult.fail(&"needs_building", String(def.discipline))
+	var room: StringName = room_id if not room_id.is_empty() else pick_room(state, def)
+	if not _is_building_of(state, room, def.discipline):
+		return CommandResult.fail(&"wrong_building", String(room))
+	var bench: ResearchBench = state.research.bench_of(room)
+	if bench != null and bench.is_running():
+		return CommandResult.fail(&"bench_busy", String(bench.active))
+	return CommandResult.ok()
+
+
+static func _is_building_of(state: GameState, room_id: StringName, discipline: StringName) -> bool:
+	for room: RoomState in buildings(state, discipline):
+		if room.id == room_id:
+			return true
+	return false
+
+
+static func _before(a: ResearchDef, b: ResearchDef) -> bool:
+	var da: int = ResearchDef.DISCIPLINES.find(a.discipline)
+	var db: int = ResearchDef.DISCIPLINES.find(b.discipline)
+	if da != db:
+		return da < db
+	if a.order != b.order:
+		return a.order < b.order
+	return String(a.id) < String(b.id)

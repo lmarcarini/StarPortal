@@ -136,10 +136,13 @@ static func _missing_content(defs: GameDefs) -> String:
 ## change): from done, queue and revealed, and the active project with its progress.
 static func _drop_unknown_research(state: GameState) -> void:
 	var research: ResearchState = state.research
-	for list: Array[StringName] in [research.done, research.queue, research.revealed]:
+	var lists: Array = [research.done, research.revealed, research.opened]
+	for bench: ResearchBench in research.benches.values():
+		lists.append(bench.queue)
+		if bench.is_running() and not state.research_defs.has(bench.active):
+			bench.active = &""
+			bench.ticks_done = 0
+	for list: Array[StringName] in lists:
 		for project_id: StringName in list.duplicate():
 			if not state.research_defs.has(project_id):
 				list.erase(project_id)
-	if research.is_running() and not state.research_defs.has(research.active):
-		research.active = &""
-		research.ticks_done = 0

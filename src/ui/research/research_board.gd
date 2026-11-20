@@ -91,7 +91,12 @@ func show_state(state: GameState) -> void:
 	_current.text = ResearchText.current(state)
 	_left.text = ResearchText.time_left(state)
 	_bar.visible = state.research.is_running()
-	_bar.value = ResearchRules.progress(state)
+	var running: Array[StringName] = state.research.running()
+	_bar.value = (
+		0.0
+		if running.is_empty()
+		else ResearchSpeed.progress(state, state.research.room_running(running[0]))
+	)
 	for index: int in _categories.size():
 		var category: ResearchCategoryDef = _categories[index]
 		var dot: String = DOT if has_available(state, category.id) else ""

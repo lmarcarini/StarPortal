@@ -79,6 +79,7 @@ func _start_research_from_the_wire() -> void:
 	var lab: RoomState = PowerFixture.lab(state)
 	lab.build_ticks_left = 0
 	lab.powered_on = true
+	StaffChanges.auto_assign(state, lab)
 	EventBus.room_built.emit(lab.id)
 	_shell.frame.alert_list.refresh()
 	await _runner.simulate_frames(1)

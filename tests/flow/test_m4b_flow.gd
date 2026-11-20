@@ -87,19 +87,22 @@ func test_m4b_loop() -> void:
 		SwitchRoomCommand.create(PowerFixture.first_room(_state, &"room_research_lab").id, true)
 	)
 	var pedagogy: ResearchDef = _state.research_defs[&"loom_pedagogy"]
-	assert_bool(ResearchRules.is_visible(_state, pedagogy)).is_false()
+	assert_bool(ResearchRules.visible(_state, pedagogy)).is_false()
 	ResearchFixture.finish(_state, &"study_kindred_loom")
 	assert_int(ArtefactRules.find(_state, loom).state).is_equal(
 		ArtefactRecord.ArtefactState.STUDIED
 	)
-	assert_bool(ResearchRules.is_visible(_state, pedagogy)).is_true()
-	# Queue three projects behind the running one.
+	assert_bool(ResearchRules.visible(_state, pedagogy)).is_true()
+	# Queue three visible projects behind the running one.
 	_submit(StartResearchCommand.create(&"excavation_survey"))
-	for project: StringName in [&"lift_shaft", &"second_plant", &"fuel_contracts"]:
-		_submit(QueueResearchCommand.new(project))
-	assert_array(_state.research.queue).is_equal(
-		[&"lift_shaft", &"second_plant", &"fuel_contracts"]
-	)
+	var lab_id: StringName = PowerFixture.first_room(_state, &"room_research_lab").id
+	var queued: Array[StringName] = []
+	for def: ResearchDef in ResearchRules.visible_projects(_state):
+		if queued.size() < 3 and ResearchRules.queue_error(_state, def.id, lab_id).is_empty():
+			_submit(QueueResearchCommand.new(def.id, lab_id))
+			queued.append(def.id)
+	assert_array(_state.research.bench_of(lab_id).queue).is_equal(queued)
+	assert_int(queued.size()).is_equal(3)
 	# The Effigy: a Vault refuses it, and in holding its hazard goes off.
 	StoryRulesItems.give_artefact(_state, &"ossar_effigy")
 	var effigy: int = _uid_of(&"ossar_effigy")

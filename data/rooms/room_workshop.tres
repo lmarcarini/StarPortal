@@ -19,4 +19,5 @@ staff_role = &"role_engineer"
 staff_slots = 2
 name_key = &"ROOM_WORKSHOP_NAME"
 description_key = &"ROOM_WORKSHOP_NOW"
+research_discipline = &"engineering"
 id = &"room_workshop"

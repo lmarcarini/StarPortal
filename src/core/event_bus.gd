@@ -174,14 +174,15 @@ signal supply_dropped(room_id: StringName, charge_mw: int, rooms_off: int)
 ## Emitted when a dug level's lift segment is refused for lack of funds, with the level and
 ## the segment's cost in $k (posted through the outbox).
 signal lift_segment_refused(level: int, cost_k: int)
-## Emitted when a research project starts, with its id (posted through the outbox).
-signal research_started(project_id: StringName)
-## Emitted when the running research project is cancelled, with its id (posted through the
-## outbox).
-signal research_cancelled(project_id: StringName)
-## Emitted when a research project finishes and its unlocks apply, with its id (posted
+## Emitted when a research project starts, with its id and its building's room id (posted
 ## through the outbox).
-signal research_done(project_id: StringName)
+signal research_started(project_id: StringName, room_id: StringName)
+## Emitted when a bench's project is cancelled, with its id and room id (posted through the
+## outbox).
+signal research_cancelled(project_id: StringName, room_id: StringName)
+## Emitted when a research project finishes and its unlocks apply, with its id and the room
+## id of its bench (&"" when finished outside a bench) (posted through the outbox).
+signal research_done(project_id: StringName, room_id: StringName)
 ## Emitted when people change rooms or join or leave the roster, with the reason
 ## (StaffChanges: &"assigned", &"unassigned", &"auto_assigned", &"released"; RecruitmentRules:
 ## &"hired", &"dismissed"), the def id of the room concerned and how many people moved
@@ -202,13 +203,13 @@ signal request_changed(uid: int, state: int)
 signal artefact_arrived(uid: int)
 ## An artefact was housed, taken back to holding or retrieved from the gate.
 signal artefact_moved(uid: int)
-## The research queue changed (queued, removed or reordered).
-signal research_queue_changed
-## The queue started its next project (logged).
-signal research_queue_started(project_id: StringName)
+## A bench's research queue changed (queued, removed or reordered), with its room id.
+signal research_queue_changed(room_id: StringName)
+## A bench's queue started its next project (logged).
+signal research_queue_started(project_id: StringName, room_id: StringName)
 ## An artefact's hazard struck (logged, non-pausing message).
 signal artefact_hazard(artefact_id: StringName)
-## A hidden research project was revealed.
+## A research project became visible for the first time ("new research").
 signal research_revealed(project_id: StringName)
 ## A story effect set a flag.
 signal flag_changed(flag: StringName)

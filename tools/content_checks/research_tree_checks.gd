@@ -1,8 +1,8 @@
 class_name ContentCheckResearchTree
 extends RefCounted
 ## Checks that keep a large research tree sound (m4-core-systems.md section 7 (6)): no needs
-## cycle, no need on a project that can never be visible (hidden, with requirements, and no
-## UnlockResearchEffect anywhere), unique orders within a branch; and a size report (projects
+## cycle, no need on a project that can never be visible (a story project no
+## UnlockResearchEffect reveals), unique orders within a discipline; and a size report (projects
 ## per branch, the deepest chain). Pure; one line per problem.
 ## Bible: docs/content/m4-core-systems.md section 7 (6)
 
@@ -18,7 +18,7 @@ static func check(
 	var errors: Array[String] = _cycle_errors(by_id)
 	var orders: Dictionary[String, StringName] = {}
 	for def: ResearchDef in research:
-		var key: String = "%s/%d" % [def.category, def.order]
+		var key: String = "%s/%d" % [def.discipline, def.order]
 		if orders.has(key):
 			errors.append(
 				"research %s: order %d repeats %s in its branch" % [def.id, def.order, orders[key]]
@@ -33,9 +33,9 @@ static func check(
 	return errors
 
 
-## True when [param def] is hidden behind requirements and nothing reveals it.
+## True when [param def] is a story project that nothing reveals.
 static func _never_visible(def: ResearchDef, revealed: Dictionary[StringName, bool]) -> bool:
-	return def.is_hidden() and not def.requires.is_empty() and not revealed.has(def.id)
+	return def.story and not revealed.has(def.id)
 
 
 ## Every project an UnlockResearchEffect names in [param defs] (any definition kind; nested
@@ -67,7 +67,7 @@ static func report(research: Array[ResearchDef]) -> Array[String]:
 	var counts: Dictionary[StringName, int] = {}
 	for def: ResearchDef in research:
 		by_id[def.id] = def
-		counts[def.category] = counts.get(def.category, 0) + 1
+		counts[def.discipline] = counts.get(def.discipline, 0) + 1
 	var lines: Array[String] = []
 	var branches: Array = counts.keys()
 	branches.sort()

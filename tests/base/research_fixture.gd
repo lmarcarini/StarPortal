@@ -2,10 +2,12 @@ class_name ResearchFixture
 extends RefCounted
 ## Shared setup for the research tests: a new game over the real balance, room defs and
 ## research defs, with a built, switched-on Research Lab on Level 1 staffed by the starting
-## scientists (two skill-3: 100%, the listed time).
+## scientists (two skill-3: 100%, the listed time); workshop() adds an Engineering bench.
 ## Bible: docs/content/m25-lean-start.md section 3, docs/content/m26-staff-and-money.md section 3
 
 const RESEARCH_DIR: String = "res://data/research/"
+## Where workshop() puts the Workshop: Level 1, east of the Control Room, on the spine.
+const WORKSHOP_ORIGIN: Vector2i = Vector2i(24, 11)
 
 
 ## A new game (ConstructionFixture.state()) with every real ResearchDef and, when
@@ -28,6 +30,18 @@ static func load_research_defs(game: GameState) -> void:
 			game.research_defs[def.id] = def
 
 
+## Returns [param game]'s first Workshop, adding a built, switched-on one staffed with the
+## waiting engineers when there is none (the Engineering bench).
+static func workshop(game: GameState) -> RoomState:
+	PowerFixture.load_room_defs(game)
+	var found: RoomState = PowerFixture.first_room(game, &"room_workshop")
+	if found == null:
+		found = game.base.add_room(&"room_workshop", 1, WORKSHOP_ORIGIN)
+		StaffChanges.auto_assign(game, found)
+		game.events.drain()
+	return found
+
+
 ## Starts [param project_id] on [param game] (it must be allowed) and ticks a ResearchSystem
 ## and the clock until it is done; returns the ticks it took.
 static func finish(game: GameState, project_id: StringName) -> int:
@@ -37,7 +51,7 @@ static func finish(game: GameState, project_id: StringName) -> int:
 	assert(result.is_ok, "ResearchFixture.finish(): %s refused" % result.error_code)
 	var system := ResearchSystem.new()
 	var ticks: int = 0
-	while game.research.is_running():
+	while not game.research.room_running(project_id).is_empty():
 		system.tick(game)
 		game.clock.tick += 1
 		ticks += 1

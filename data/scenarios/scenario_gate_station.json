@@ -1,5 +1,5 @@
 {
-	"format_version": 26,
+	"format_version": 27,
 	"game_version": "0.0.0",
 	"saved_at_unix": 1794842951,
 	"state": {
@@ -1261,11 +1261,10 @@
 			"next_uid": 0
 		},
 		"research": {
-			"active": "",
+			"benches": {},
 			"done": [],
-			"queue": [],
-			"revealed": [],
-			"ticks_done": 0
+			"opened": [],
+			"revealed": []
 		},
 		"security": {
 			"health": {},

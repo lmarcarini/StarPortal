@@ -19,7 +19,7 @@ func _init() -> void:
 		add_child(label)
 	add_child(_rows)
 	_add.text = &"RESEARCH_QUEUE_ADD"
-	_add.pressed.connect(func() -> void: _submit(QueueResearchCommand.new(_selected)))
+	_add.pressed.connect(func() -> void: _submit(QueueResearchCommand.new(_selected, _room())))
 	add_child(_add)
 
 
@@ -43,18 +43,38 @@ func refresh() -> void:
 	if _simulation == null:
 		return
 	var state: GameState = _simulation.state
-	var queue: Array[StringName] = state.research.queue
+	var room_id: StringName = _room()
+	var bench: ResearchBench = state.research.bench_of(room_id)
+	var queue: Array[StringName] = []
+	if bench != null:
+		queue = bench.queue
 	var most: int = 5 if state.balance == null else state.balance.research_queue_max
 	_title.text = tr(&"RESEARCH_QUEUE_TITLE").format({"count": queue.size(), "max": most})
-	var wait: StringName = ResearchRules.queue_wait(state)
+	var wait: StringName = ResearchRules.queue_wait(state, room_id)
 	_wait.text = (
 		"" if wait.is_empty() else tr(StringName("RESEARCH_QUEUE_" + String(wait).to_upper()))
 	)
 	for index: int in queue.size():
 		_rows.add_child(_row(state, queue[index], index))
 	_add.visible = (
-		not _selected.is_empty() and ResearchRules.queue_error(state, _selected).is_empty()
+		not _selected.is_empty() and ResearchRules.queue_error(state, _selected, room_id).is_empty()
 	)
+
+
+# The bench shown: where the selected project is queued, else where it would run; else the
+# first bench with a queue.
+func _room() -> StringName:
+	if _simulation == null:
+		return &""
+	var state: GameState = _simulation.state
+	var def: ResearchDef = state.research_defs.get(_selected)
+	if def != null:
+		var queued: StringName = state.research.room_queuing(def.id)
+		return queued if not queued.is_empty() else ResearchRules.pick_room(state, def)
+	for room_id: StringName in state.research.benches:
+		if not state.research.benches[room_id].queue.is_empty():
+			return room_id
+	return &""
 
 
 ## Returns the queued project names shown, in order.
@@ -92,8 +112,8 @@ func _row(state: GameState, project_id: StringName, index: int) -> HBoxContainer
 	name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(name)
 	var moves: Array = [
-		[&"RESEARCH_QUEUE_UP", QueueResearchCommand.new(project_id, maxi(index - 1, 0))],
-		[&"RESEARCH_QUEUE_DOWN", QueueResearchCommand.new(project_id, index + 1)],
+		[&"RESEARCH_QUEUE_UP", QueueResearchCommand.new(project_id, _room(), maxi(index - 1, 0))],
+		[&"RESEARCH_QUEUE_DOWN", QueueResearchCommand.new(project_id, _room(), index + 1)],
 		[&"RESEARCH_QUEUE_REMOVE", UnqueueResearchCommand.new(project_id)],
 	]
 	for move: Array in moves:

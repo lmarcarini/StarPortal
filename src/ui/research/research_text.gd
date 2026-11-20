@@ -14,7 +14,7 @@ enum Kind { START, NEEDS, ACTIVE, DONE, LOCKED }
 static func kind(state: GameState, def: ResearchDef) -> Kind:
 	if state.research.is_done(def.id):
 		return Kind.DONE
-	if state.research.active == def.id:
+	if not state.research.room_running(def.id).is_empty():
 		return Kind.ACTIVE
 	if not first_unmet(state, def).is_empty():
 		return Kind.NEEDS
@@ -62,7 +62,8 @@ static func name_of(state: GameState, project_id: StringName) -> String:
 
 ## "Current: Excavation survey", or "No project running".
 static func current(state: GameState) -> String:
-	var def: ResearchDef = state.research_defs.get(state.research.active)
+	var running: Array[StringName] = state.research.running()
+	var def: ResearchDef = null if running.is_empty() else state.research_defs.get(running[0])
 	if def == null:
 		return _tr(&"RESEARCH_CURRENT_NONE")
 	return _tr(&"RESEARCH_CURRENT").format({"name": _tr(def.name_key)})
@@ -70,24 +71,28 @@ static func current(state: GameState) -> String:
 
 ## "1 d 6 h left" for the active project, with "paused: no lab on" while no lab is on; "".
 static func time_left(state: GameState) -> String:
-	if not state.research.is_running():
+	var running: Array[StringName] = state.research.running()
+	if running.is_empty():
+		return ""
+	var room: RoomState = state.base.find_room(state.research.room_running(running[0]))
+	if room == null:
 		return ""
 	var key: StringName = &"RESEARCH_LEFT"
-	if not ResearchRules.has_lab_on(state):
+	if ResearchSpeed.speed(state, room) <= 0:
 		key = &"RESEARCH_LEFT_PAUSED"
-	return _tr(key).format({"time": duration(ResearchRules.ticks_left(state))})
+	return _tr(key).format({"time": duration(maxi(0, ResearchSpeed.ticks_left(state, room)))})
 
 
 ## Clock ticks [param def] would take from the start at [param state]'s current staffing: the
 ## scientists of every standing lab (ResearchRules' speed), from the current tick.
 static func planned_ticks(state: GameState, def: ResearchDef) -> int:
-	var rate: int = clampi(
-		ResearchRules.SPEED_PER_SKILL * ResearchRules.scientist_skill(state, true),
-		ResearchRules.MIN_SPEED,
-		ResearchRules.MAX_SPEED
-	)
+	var room: RoomState = state.base.find_room(ResearchRules.pick_room(state, def))
+	var skill: int = 0 if room == null else ResearchSpeed.skill(state, room)
+	var rate: int = ResearchSpeed.from_skill(state, skill)
+	if rate <= 0:
+		return 0
 	return RateSteps.ticks_to(
-		ResearchRules.total_ticks(def), state.clock.tick, rate, ResearchRules.SPEED_DENOMINATOR
+		ResearchRules.total_ticks(def), state.clock.tick, rate, ResearchSpeed.SPEED_DENOMINATOR
 	)
 
 

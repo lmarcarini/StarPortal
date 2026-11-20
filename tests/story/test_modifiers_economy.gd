@@ -26,13 +26,14 @@ func _give(key: StringName, amount: int) -> void:
 
 
 func test_research_speed() -> void:
-	assert_int(ResearchRules.with_modifier(_state, 40)).is_equal(40)
+	assert_int(ResearchSpeed.from_skill(_state, 10)).is_equal(20)
 	_give(&"research_speed_pct", 50)
-	assert_int(ResearchRules.with_modifier(_state, 40)).is_equal(60)
+	assert_int(ResearchSpeed.from_skill(_state, 10)).is_equal(30)
 	_give(&"research_speed_pct", -90)
-	assert_int(ResearchRules.with_modifier(_state, 40)).is_equal(4)
+	assert_int(ResearchSpeed.from_skill(_state, 10)).is_equal(2)
 	_give(&"research_speed_pct", -90)
-	assert_int(ResearchRules.with_modifier(_state, 5)).is_equal(1)
+	assert_int(ResearchSpeed.from_skill(_state, 2)).is_equal(1)
+	assert_int(ResearchSpeed.from_skill(_state, 0)).is_equal(0)
 
 
 func test_build_speed() -> void:

@@ -24,8 +24,7 @@ func test_projects_match_the_old_table() -> void:
 func test_finishing_applies_the_effects() -> void:
 	var state: GameState = ResearchFixture.state(false)
 	var def: ResearchDef = state.research_defs[&"excavation_survey"]
-	state.research.active = def.id
-	ResearchSystem.finish(state, def)
+	ResearchSystem.finish(state, def, &"")
 	assert_int(state.unlocks.dig_depth).is_equal(2)
 	assert_bool(state.unlocks.has_room(&"room_stairs")).is_true()
 
