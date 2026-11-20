@@ -2,7 +2,8 @@ extends Node
 ## Captures the game in the three reference states at the window size (1920 x 1080 in
 ## scripts/reference.sh), the clock running at fast speed: gate_idle (SILL selected),
 ## gate_open (SILL dialled and open, send rail and mission sheet), other_station (Base) and
-## the Base states base_build, base_power and base_staff (BaseCapture).
+## the Base states base_build, base_power, base_staff and base_security (BaseCapture),
+## then the pause menu (pause_menu) and its confirm question (pause_confirm).
 ## Writes <state>.png into REF_OUT (default build/reference/). Not part of the game: lives
 ## in tools/, never in src/.
 ## Reference: docs/content/interface-reference.md section 6
@@ -51,6 +52,10 @@ func _process(_delta: float) -> void:
 		_shoot.bind("base_staff"),
 		_to_base.bind(BaseSubTabs.SECURITY),
 		_shoot.bind("base_security"),
+		_to_pause,
+		_shoot.bind("pause_menu"),
+		_to_pause_confirm,
+		_shoot.bind("pause_confirm"),
 		get_tree().quit,
 	]
 	if _step < steps.size():
@@ -94,6 +99,18 @@ func _to_other() -> void:
 func _to_base(mode: StringName) -> void:
 	BaseCapture.furnish(SimClock.simulation.state)
 	BaseCapture.show(_switcher(), mode)
+
+
+func _to_pause() -> void:
+	var found: Object = _shell.get("pause_menu")
+	var menu: PauseMenu = found as PauseMenu
+	menu.open()
+
+
+func _to_pause_confirm() -> void:
+	var found: Object = _shell.get("pause_menu")
+	var menu: PauseMenu = found as PauseMenu
+	menu.quit_button.pressed.emit()
 
 
 func _shoot(state_name: String) -> void:

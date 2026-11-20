@@ -17,19 +17,22 @@ signal menu_requested
 ## The SimClock hold reason while the menu is open.
 const HOLD: StringName = &"pause_menu"
 
-## The menu's keys.
-var resume_button := Button.new()
-var save_button := Button.new()
-var load_button := Button.new()
-var menu_button := Button.new()
-var quit_button := Button.new()
+## Size of a main key, in pixels.
+const KEY: Vector2 = Vector2(520, 56)
+
+## The menu's keys (steel keys of the interface reference; Resume amber).
+var resume_button := RefKey.new()
+var save_button := RefKey.new()
+var load_button := RefKey.new()
+var menu_button := RefKey.new()
+var quit_button := RefKey.new()
 ## The Failure states setting (M4c-15), until a settings screen exists.
-var failure_toggle := CheckButton.new()
+var failure_toggle := LampSwitch.new()
 ## Opens the team report by itself when a team comes home (gameplay/auto_open_team_report).
-var report_toggle := CheckButton.new()
+var report_toggle := LampSwitch.new()
 ## The confirm question and its Yes key.
 var question := Label.new()
-var yes_button := Button.new()
+var yes_button := RefKey.new()
 ## The save list.
 var slots := SlotList.new()
 ## The tick of the last save or load; the game has unsaved time when the clock is past it.
@@ -55,10 +58,10 @@ func _init() -> void:
 	var centre := CenterContainer.new()
 	centre.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(centre)
-	var panel := PanelContainer.new()
-	panel.theme_type_variation = &"PanelBezel"
+	var panel := PausePlate.new()
 	centre.add_child(panel)
 	var column := VBoxContainer.new()
+	column.add_theme_constant_override(&"separation", 10)
 	panel.add_child(column)
 	_build_keys(column)
 	slots.visible = false
@@ -68,45 +71,62 @@ func _init() -> void:
 
 
 func _build_keys(column: VBoxContainer) -> void:
-	var labels: Dictionary[Button, StringName] = {
+	_keys.add_theme_constant_override(&"separation", 10)
+	var labels: Dictionary[RefKey, StringName] = {
 		resume_button: &"PAUSE_RESUME",
 		save_button: &"PAUSE_SAVE",
 		load_button: &"PAUSE_LOAD",
 		menu_button: &"MENU_RETURN",
 		quit_button: &"PAUSE_QUIT",
 	}
-	for button: Button in labels:
-		button.text = labels[button]
-		button.theme_type_variation = &"KeyButton"
-		button.custom_minimum_size = Vector2(320, 40)
+	for button: RefKey in labels:
+		_style_key(button, labels[button], KEY)
 		_keys.add_child(button)
-	failure_toggle.text = &"PAUSE_FAILURE_STATES"
-	failure_toggle.set_pressed_no_signal(Settings.get_bool(&"gameplay", &"failure_states"))
+	resume_button.style = RefPaint.KeyStyle.AMBER
+	_keys.add_child(PauseMenuParts.heading(&"PAUSE_GAMEPLAY"))
+	_switch(failure_toggle, &"PAUSE_FAILURE_STATES", &"failure_states")
 	failure_toggle.toggled.connect(_on_failure_toggled)
-	_keys.add_child(failure_toggle)
-	report_toggle.text = &"PAUSE_AUTO_TEAM_REPORT"
-	report_toggle.set_pressed_no_signal(Settings.get_bool(&"gameplay", &"auto_open_team_report"))
+	_switch(report_toggle, &"PAUSE_AUTO_TEAM_REPORT", &"auto_open_team_report")
 	report_toggle.toggled.connect(
 		func(on: bool) -> void: Settings.set_value(&"gameplay", &"auto_open_team_report", on)
 	)
-	_keys.add_child(report_toggle)
 	_keys.add_child(graphics)
 	column.add_child(_keys)
-	question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	column.add_child(question)
-	yes_button.text = &"PAUSE_YES"
-	yes_button.pressed.connect(_on_yes)
-	_confirm.add_child(yes_button)
-	var no := Button.new()
-	no.text = &"PAUSE_NO"
-	no.pressed.connect(_show_keys)
-	_confirm.add_child(no)
-	column.add_child(_confirm)
+	_build_confirm(column)
 	resume_button.pressed.connect(close)
 	save_button.pressed.connect(_show_slots.bind(SlotList.Mode.SAVE))
 	load_button.pressed.connect(_ask_load)
 	menu_button.pressed.connect(_ask.bind(&"PAUSE_CONFIRM_MENU", menu_requested.emit))
 	quit_button.pressed.connect(_ask.bind(&"PAUSE_CONFIRM_QUIT", _quit))
+
+
+func _build_confirm(column: VBoxContainer) -> void:
+	PauseMenuParts.style_question(question)
+	column.add_child(question)
+	_confirm.add_theme_constant_override(&"separation", 10)
+	_style_key(yes_button, &"PAUSE_YES", Vector2(255, 56))
+	yes_button.style = RefPaint.KeyStyle.HAZARD
+	yes_button.pressed.connect(_on_yes)
+	_confirm.add_child(yes_button)
+	var no := RefKey.new()
+	_style_key(no, &"PAUSE_NO", Vector2(255, 56))
+	no.pressed.connect(_show_keys)
+	_confirm.add_child(no)
+	column.add_child(_confirm)
+
+
+func _style_key(key: RefKey, label: StringName, key_size: Vector2) -> void:
+	key.name = String(label).capitalize().replace(" ", "")
+	key.label = tr(label).to_upper()
+	key.label_size = 20
+	key.custom_minimum_size = key_size
+
+
+func _switch(toggle: LampSwitch, label: StringName, setting: StringName) -> void:
+	toggle.label = label
+	toggle.custom_minimum_size = Vector2(KEY.x, 48)
+	toggle.set_pressed_no_signal(Settings.get_bool(&"gameplay", setting))
+	_keys.add_child(toggle)
 
 
 ## Opens the menu and holds the clock.
