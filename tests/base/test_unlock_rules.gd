@@ -17,7 +17,11 @@ func _code(def_id: StringName) -> String:
 ## rest say why.
 func test_start_locks() -> void:
 	var open: Array[StringName] = [
-		&"room_capacitor_bank", &"room_research_lab", &"room_corridor", &"room_quarters"
+		&"room_capacitor_bank",
+		&"room_research_lab",
+		&"room_corridor",
+		&"room_quarters",
+		&"room_workshop",
 	]
 	for def_id: StringName in open:
 		assert_bool(BaseRules.can_build_room(_game, def_id).is_ok).is_true()
@@ -25,7 +29,6 @@ func test_start_locks() -> void:
 		&"room_stairs": "excavation_survey",
 		&"room_lift": "lift_shaft",
 		&"room_power_plant": "second_plant",
-		&"room_workshop": "field_engineering",
 	}
 	for def_id: StringName in cases:
 		var result: CommandResult = BaseRules.can_build_room(_game, def_id)
@@ -38,11 +41,11 @@ func test_start_locks() -> void:
 
 ## Placing a locked room is refused by the command with the same reason, before placement.
 func test_place_room_uses_it() -> void:
-	var result: CommandResult = (
-		PlaceRoomCommand.create(&"room_workshop", 1, Vector2i(0, 11)).validate(_game)
+	var result: CommandResult = PlaceRoomCommand.create(&"room_lift", 1, Vector2i(0, 11)).validate(
+		_game
 	)
 	assert_str(String(result.error_code)).is_equal("needs_research")
-	assert_str(result.detail).is_equal("field_engineering")
+	assert_str(result.detail).is_equal("lift_shaft")
 
 
 ## A second bank is refused at cap 1 until Bank array; then three, and no fourth.

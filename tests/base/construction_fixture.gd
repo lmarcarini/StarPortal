@@ -34,7 +34,14 @@ static func state() -> GameState:
 static func unlock_all(game: GameState) -> GameState:
 	for project_id: StringName in UnlockFixture.projects():
 		UnlockFixture.apply_project(game.unlocks, project_id)
-	for storage: StringName in [&"room_artefact_vault", &"room_containment"]:
+	for storage: StringName in [
+		&"room_artefact_vault",
+		&"room_containment",
+		&"room_personnel_office",
+		&"room_xenotech_lab",
+		&"room_bio_lab",
+		&"room_ready_room",
+	]:
 		UnlockRules.apply(game.unlocks, UnlockRules.EFFECT_UNLOCK_ROOM, storage)
 	return game
 

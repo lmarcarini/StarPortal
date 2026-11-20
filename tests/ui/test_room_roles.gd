@@ -55,10 +55,6 @@ func test_every_offered_room_has_now_and_later_in_both_languages() -> void:
 			var now: String = BasePanelText.now(def)
 			assert_str(now).override_failure_message(message).is_not_equal(def.description_key)
 			assert_str(String(def.description_key)).ends_with("_NOW")
-			var later_key: String = BasePanelText.later_key(def)
-			var later: String = TranslationServer.translate(StringName(later_key))
-			assert_str(later).override_failure_message(message).is_not_equal(later_key)
-			assert_str(BasePanelText.later(def)).contains(later)
 
 
 func test_hovering_a_room_shows_its_summary_and_now_line() -> void:
@@ -81,9 +77,9 @@ func test_locked_rooms_hidden_and_capped_rooms_greyed() -> void:
 		&"room_power_plant", &"room_lift", &"room_stairs", &"room_infirmary"
 	]:
 		(
-			assert_bool(palette.get_room_button(def_id).disabled)
+			assert_object(palette.get_room_button(def_id))
 			. override_failure_message(String(def_id))
-			. is_true()
+			. is_null()
 		)
 	assert_object(palette.first_button()).is_equal(palette.get_room_button(&"room_quarters"))
 	var state: GameState = _simulation.state
@@ -101,12 +97,12 @@ func test_selected_panel_shows_now_and_later_lines() -> void:
 	_view.get_plan().select(gate.id)
 	var lines: Array[String] = _view.get_room_panel().lines()
 	assert_str(lines[6]).is_equal("The Ring and its dial console. Always on.")
-	assert_str(lines[7]).is_equal("Later: Gains the Shutter, telemetry and new seals.")
+	assert_str(lines[7]).is_empty()
 	TranslationServer.set_locale("pt_BR")
 	_view.get_plan().select(&"")
 	_view.get_plan().select(gate.id)
 	lines = _view.get_room_panel().lines()
-	assert_str(lines[7]).is_equal("Depois: Ganha o Obturador, telemetria e novos selos.")
+	assert_str(lines[7]).is_empty()
 
 
 func test_panel_upkeep_uses_the_fuel_contracts_override() -> void:

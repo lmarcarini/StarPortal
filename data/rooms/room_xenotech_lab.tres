@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RoomDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/room_def.gd" id="1_room"]
+
+; docs/content/research-and-progression.md sections 3 and 9 (M7-02).
+[resource]
+script = ExtResource("1_room")
+size_cells = Vector2i(4, 3)
+rotatable = true
+build_cost_k = 1200
+build_ticks = 600
+power_draw_mw = 10.0
+upkeep_k = 80
+staff_role = &"role_scientist"
+staff_slots = 3
+name_key = &"ROOM_XENOTECH_LAB_NAME"
+description_key = &"ROOM_XENOTECH_LAB_NOW"
+research_discipline = &"xenotech"
+id = &"room_xenotech_lab"
