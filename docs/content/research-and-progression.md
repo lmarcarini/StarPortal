@@ -1,6 +1,6 @@
 # Research and progression
 
-A proposal written with the owner on 2026-11-20, for discussion. It replaces the current
+A proposal written with the owner on 2026-11-20, revised the same day with the owner's answers. It replaces the current
 research tree (41 projects, one slot, mostly small percentages) and sets out how the game
 opens up over time: what the player can do at each stage and what opens the next.
 
@@ -24,10 +24,11 @@ opens up over time: what the player can do at each stage and what opens the next
    machine, a new gate action, a new mission type, a new conversation option, a new rule.
    Pure number boosts exist but are rare (about one project in five), and when they exist
    they are large (+50%, ×2, a cost halved), never +5%.
-2. **Hidden until earned.** A project appears only when all of these hold: its research
-   building exists; its prerequisites are done; and its *discovery* has happened (a
-   story or world event: an artefact found, a faction met, an incursion survived, a
-   document read). There are no greyed-out nodes, no "???" boxes and no locked rooms in
+2. **Hidden until earned, and earned by the player.** A project appears only when its
+   research building exists and its prerequisites are done; some also need something the
+   player went out and got (an artefact, an alien specimen, a translated text, a
+   faction's trust). Nothing opens just because time passed or an attack happened
+   (owner decision). There are no greyed-out nodes, no "???" boxes and no locked rooms in
    the BUILD tray. When something new appears, the Lab key and the wire say so: "NEW
    RESEARCH · 2".
 3. **Where you research is part of the choice.** Each discipline has its own building.
@@ -41,21 +42,34 @@ opens up over time: what the player can do at each stage and what opens the next
 
 ## 3. Disciplines and their buildings
 
-| Discipline | Building (one slot each) | What it researches | Opens with |
-| --- | --- | --- | --- |
-| Science | Research Lab | Gate physics, survey and sensors, xenobiology, xenolinguistics | Available at the start |
-| Engineering | Workshop | Machines and their upgrades: MOTH, canister, sentries, the Shutter, power, digging, construction | Available at the start |
-| Medicine | Infirmary | Treatment, recovery, field medicine, later disease and the Murmur's effects on people | First serious injury (usually the first expedition) |
-| Office | Personnel Office | Recruitment (HR tiers), administration, the Committee, income, counter-intelligence | Committee asks for a staff plan (first quarter) |
-| Military | Security Post | Squad doctrine, equipment, base defence, expedition security | First hostile contact |
-| Xenotech | Xenotech Lab (new) | Alien technology: studying and copying artefacts; costs alien pieces | First artefact brought home |
-| Linguistics | Translation Office (new, an Office room) | Alien languages, glyph meaning, diplomacy | First alien conversation |
+Owner decisions (2026-11-20): disciplines open through the player's own choices, not in
+reaction to events; there are no periodic reports to hang them on; Medicine is alien-only
+research in its own building; Military is spread over the other disciplines; research
+needs staff of the building's own field; each building has its own queue; a handful of
+projects is available at the start.
 
-Later arcs add more (Signals for the Murmur, an Anterite refinery, the Keystone workshop),
-each appearing only when its arc begins.
+| Discipline | Research building (one slot each) | Staff | Researches | How the player opens it |
+| --- | --- | --- | --- | --- |
+| Engineering | Workshop | Engineering | Construction (most building plans), machines and their upgrades (MOTH, canister, blast doors, sentries, the Shutter), power, digging | Available at the start |
+| Science | Research Lab | Science | Gate physics, survey and sensors, addresses, alien languages | Available at the start |
+| Office | Personnel Office | Office (analysts) | HR tiers, administration and income, Committee relations, counter-intelligence, squad doctrine and training | Its plan comes from an early Engineering project |
+| Xenotech | Xenotech Lab | Science | Alien technology: studying and copying artefacts; costs artefact pieces | Its plan comes from a Science project that needs an artefact in holding |
+| Xenobiology | Bio Lab | Medicine | Alien life only: medicine, treatment, resistance, later the Murmur's effect on people; each project costs specimens of alien life brought back by teams or the MOTH | Its plan comes from a Science project that needs a first specimen |
 
-**Slots and staff.** Each research building runs one project at a time, with its own queue
-of up to three. Its staff's field and skill set its speed, as now. A second building of the
+**Military is spread out:** defence machines are Engineering (blast doors, sentries, the
+Shutter); squad doctrine, training and equipment are Office; the Security Post is a plan
+from Engineering. **Building plans** mostly come from Engineering (it is construction);
+a discipline's own specialist rooms come from that discipline (the Bio Lab's isolation
+ward from Xenobiology, say).
+
+The Infirmary stays as the room that treats people; what it can do improves through
+Xenobiology research.
+
+Later the story adds more disciplines and buildings (signals, anterite, the Keystone);
+which ones and when is left for the story discussion.
+
+**Slots, staff and queues.** Each research building runs one project at a time with its
+own queue, and needs staff of its field: no staff, no research. A second building of the
 same kind is a second slot.
 
 ## 4. What a project gives
@@ -83,29 +97,19 @@ same kind is a second slot.
 
 ## 6. How the game opens up
 
-Each row is a moment in the game: what has just happened, what becomes researchable, and
-what new gameplay that leads to.
+Story details are left for later (owner decision); this shows the shape, with every step
+driven by something the player does.
 
-| When | Trigger | New research appears | New gameplay |
-| --- | --- | --- | --- |
-| Day 1 | Start | Science: Gate calibration, Survey drones. Engineering: Capacitor bank, Excavation survey | Dial with a full charge; build the MOTH rack; dig level 2 |
-| Day 1–2 | First lock | Science: Horizon photography (the pole camera gives better pictures), Address triangulation | The first world documents; working out addresses from clues |
-| Day 2–4 | First MOTH run | Engineering: MOTH Mk II (longer range), Field kit. Science: Atmospheric sampling | Probe worlds properly; prepare teams |
-| Week 1 | First expedition, first injury | Infirmary plan appears. Medicine: Field medicine, Triage | Expedition risk can be managed; injured staff recover faster |
-| Week 1–2 | First alien conversation (Kindred) | Translation Office plan. Linguistics: Kindred dialects | New answers in Kindred conversations; trade requests |
-| Week 2 | First artefact home | Xenotech Lab plan. Xenotech: Study (the artefact) | Artefacts can be studied; their hazards can be controlled |
-| Week 2–3 | First quarter report | Personnel Office plan. Office: HR tiers, Budget office | Better recruits; more control of the budget |
-| Week 3–4 | First hostile contact (Ossar) | Security Post plan. Military: Squad doctrine. Engineering: Blast doors, Sentry guns | Base defence |
-| Arc 1 end | First incursion survived | Engineering: Iris studies → the Shutter | Close the Ring |
-| Arc 2 | Continuity audit | Office: Black funds, Counter-intelligence, Halcyon contracts | Money outside the budget; finding plants among staff |
-| Arc 3 | The Toll, anterite | Anterite refinery plan. Xenotech: Anterite cells | Alien power; outposts |
-| Arc 4 | Ninth seal | Science: Domain glyphs, 9-seal dialing. Engineering: Large power projects | Dialing other domains |
-| Arc 5 | Disclosure | Office: Public affairs; Meridian partners | International staff and funding |
-| Arc 6 | The Murmur | Signals plan. Medicine: Quarantine. Science: Ring memory | Quarantine rules; puzzles from old logs |
-| Arc 7 | The Keystone | Keystone workshop plan | The final dial |
-
-Faction trust also opens research: Kindred trust opens their crafts; Halvane gifts open
-deep technology; Allied standing opens alien recruits (a surprise, never shown in advance).
+| The player | Opens |
+| --- | --- |
+| Starts | Engineering and Science, with a handful of quick projects each: capacitor bank, excavation survey, survey drones, gate calibration, and the Personnel Office plan |
+| Builds the Personnel Office | Office: HR tiers, budget office |
+| Locks a world and sends the MOTH | Science: horizon photography, address triangulation, atmospheric sampling |
+| Brings an artefact home | Science: the Xenotech Lab plan, then Xenotech projects that consume pieces |
+| Brings a specimen home (an expedition or a MOTH with a sampler) | Science: the Bio Lab plan, then Xenobiology projects that consume specimens |
+| Talks to an alien faction and wins its trust | Science: its language; then diplomacy options; then its crafts and, at Allied, alien recruits |
+| Builds a Security Post | Office: squad doctrine; Engineering: sentries and blast-door upgrades |
+| Goes deeper in each tree | Long chains: MOTH Mk II and Mk III, the Shutter and its upgrades, 9-seal dialing, alien power |
 
 ## 7. What the Lab station shows
 
@@ -121,18 +125,17 @@ This replaces the current Research view's hidden "stubs" and greyed nodes.
 
 - **BUILD tray:** locked rooms are not shown (today they are dimmed with the unlock on
   hover, changed in M6). Only rooms with a known plan appear.
-- **Research speed:** pooled across labs today; becomes per building.
+- **Research speed:** pooled across labs today; becomes per building, from that building's
+  staff of its own field.
+- **Medicine staff** (the new field in `recruitment.md`) run the Bio Lab and the Infirmary.
 - **Existing projects** are re-sorted into the new disciplines; small boosts are merged
   or removed.
 
-## 9. Questions for the owner
+## 9. Owner decisions so far
 
-1. Are these seven disciplines right? Any to merge (Linguistics into Office or Science?)
-   or add?
-2. Should research buildings need staff of their own field (Science in the Lab,
-   Engineering in the Workshop, Medicine in the Infirmary), or can anyone research
-   slowly?
-3. Is a queue of three per building right?
-4. Should the first tier always be visible at the start (a handful of projects in Science
-   and Engineering), or should even those appear one by one?
-5. Is the arc table the right shape, so it can be filled in with real projects?
+Settled on 2026-11-20: player-driven unlocks; no periodic reports; Medicine as alien-only
+research in a Bio Lab; Military spread out; plans mostly from Engineering; staff of the
+building's field; a queue per building; a handful of projects at the start; story details
+later.
+
+Open: whether alien languages stay in Science or get a building of their own.
