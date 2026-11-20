@@ -217,3 +217,27 @@ comes first, so the Base is a lit 2D plan table for now.
     room's empty slot (a dashed amber line follows), or onto the tray to unassign.
   - SECURITY: squads and doors, same tile style (no reference image yet; follow BUILD's
     layout).
+
+## 9. Lab station
+
+**Images:** `docs/reference/ref_lab.png`, `overlay_lab.png`; regions `lab_*` in
+`layout.json`; drawn by `tools/reference/lab_ref.py`. Research rules:
+`docs/content/research-and-progression.md`.
+
+- `lab_tabs`: one steel tab key per discipline the player has opened (icon and name);
+  the current one amber; an amber lamp on a tab with NEW projects. A tab appears only
+  when its discipline opens.
+- `lab_board`: dark glass inside a steel plate. Projects are tiles 260 × 68: a round icon
+  well with a progress ring (green when done, amber in progress), the name (17) and one
+  status line in mono (DONE in green, time and cost in dim, progress and time left in
+  amber, QUEUED n, NEW with a lamp). Edges are 3 px lines from a project to what it
+  opened. Only projects the player can see are drawn; nothing locked appears. The
+  selected tile has an amber outline.
+- `lab_panel` (right): the selected project: icon and name, discipline and tier, a GIVES
+  box with one icon line per effect, three tiles for time, cost and the staff needed (and
+  pieces or specimens when they apply), NEEDS as lit keys for done prerequisites, and
+  START (amber) and ADD TO QUEUE at the foot.
+- Console: one **bench** per research building (`lab_benches`), 268 wide, scrolling when
+  there are more: the building and its staff of the right field, the current project with
+  a progress bar, its queue as small icon chips; an idle bench says IDLE with a lit amber
+  lamp.
