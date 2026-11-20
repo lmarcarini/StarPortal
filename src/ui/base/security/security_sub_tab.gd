@@ -12,6 +12,9 @@ extends Control
 ## A squad was picked (its post's room id), or &"" when none is.
 signal squad_picked(squad_id: StringName)
 
+## Width of a door tile: its place line is longer than a squad's.
+const DOOR_WIDTH: float = 210.0
+
 ## The squad picked, or &"".
 var selected: StringName = &""
 ## The reason the last order was refused, or the last order given.
@@ -102,8 +105,9 @@ func show_state(state: GameState) -> void:
 	for door: DoorState in state.base.doors:
 		var toggle := SecurityTile.new()
 		toggle.icon_id = &"cross" if door.mode == DoorState.Mode.SEALED else &"office"
-		toggle.title = tr(&"SECURITY_DOOR_KEY").format({"level": door.level})
-		toggle.value = "%d,%d" % [door.cell.x, door.cell.y]
+		toggle.title = tr(&"SECURITY_DOOR_KEY")
+		toggle.value = SecurityText.door_place(state, door)
+		toggle.custom_minimum_size.x = DOOR_WIDTH
 		toggle.detail = SecurityText.door_row(door).get_slice(": ", 1).to_upper()
 		toggle.lit = door.mode == DoorState.Mode.SEALED
 		toggle.disabled = not door.is_built()

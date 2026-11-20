@@ -24,6 +24,10 @@ static func handle(plan: BasePlan, event: InputEvent) -> bool:
 		plan.view.pan((event as InputEventMouseMotion).relative)
 		plan.queue_redraw()
 		return true
+	if event is InputEventMouseMotion and not plan.security_layer.preview_squad.is_empty():
+		plan.cursor = plan.cell_at((event as InputEventMouseMotion).position)
+		plan.move_cursor(Vector2i.ZERO)
+		return false
 	if event.is_action_pressed(&"ui_accept"):
 		plan.select_at_cursor()
 		return true

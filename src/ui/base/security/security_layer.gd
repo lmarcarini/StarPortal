@@ -8,7 +8,6 @@ extends Control
 ## Bible: docs/content/m4c-incursions.md section 7
 
 const _GLIDE: float = 10.0
-const _SQUAD: Color = Color("#7fb3d5")
 
 ## Where each mark is drawn now (plan pixels), by key ("squad:<post>", "group:<index>").
 var shown: Dictionary[String, Vector2] = {}
@@ -100,12 +99,21 @@ func _draw() -> void:
 		var key: String = "group:%d" % index
 		if group.pos().z == _plan.level and shown.has(key) and SightRules.visible(state, group):
 			SecurityMarks.diamond(self, shown[key], group.standing().size(), font, true)
+	draw_set_transform(Vector2.ZERO)
+	_draw_squads(state)
+
+
+func _draw_squads(state: GameState) -> void:
+	var picked: SquadState = state.security.squad_of(preview_squad)
 	for squad: SquadState in state.security.squads:
 		var key: String = "squad:" + String(squad.post_room)
 		if squad.pos.z == _plan.level and shown.has(key):
 			var number: int = SquadRules.number_of(state, squad.post_room)
-			SecurityMarks.square(self, shown[key], number, font, _SQUAD)
-	draw_set_transform(Vector2.ZERO)
+			SecurityMarks.tag(self, _screen(shown[key]), number, squad == picked)
+
+
+func _screen(at: Vector2) -> Vector2:
+	return _plan.view.offset + at * _plan.view.scale()
 
 
 func _draw_preview(state: GameState) -> void:
@@ -117,9 +125,11 @@ func _draw_preview(state: GameState) -> void:
 	var points := PackedVector2Array()
 	for point: Vector3 in path:
 		if int(point.z) == _plan.level:
-			points.append(Vector2(point.x, point.y) * BasePlanPainter.CELL)
+			points.append(_screen(Vector2(point.x, point.y) * BasePlanPainter.CELL))
 	if points.size() >= 2:
-		draw_polyline(points, Color(0.5, 0.7, 0.85, 0.8), 3.0)
+		draw_set_transform(Vector2.ZERO)
+		SecurityMarks.path(self, points)
+		draw_set_transform(_plan.view.offset, 0.0, Vector2.ONE * _plan.view.scale())
 
 
 func _draw_last_seen(state: GameState) -> void:

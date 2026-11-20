@@ -193,7 +193,7 @@ func _draw_room(room: RoomState) -> void:
 	var state: GameState = SimClock.simulation.state if SimClock.simulation != null else null
 	var tile: PlanTile = PlanTile.of(room, def, state, progress_of(room.id))
 	tile.power_view = power_view
-	if staff_layer.assign.is_active() and tile.state != &"site":
+	if staff_layer.assign.is_active():
 		tile.assign = &"ok" if staff_layer.assign.allows(room.id) else &"no"
 	PlanTiles.room(self, PlanTiles.rect_of(self, cells, 4.0), tile)
 

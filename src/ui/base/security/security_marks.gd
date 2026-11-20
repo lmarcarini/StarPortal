@@ -6,6 +6,7 @@ extends RefCounted
 ## Bible: docs/content/m4c-incursions.md section 7
 
 const _SIZE: float = 9.0
+const _TAG: float = 15.0
 
 
 ## A squad tag: a filled square with [param number] in it.
@@ -14,6 +15,25 @@ static func square(canvas: CanvasItem, at: Vector2, number: int, font: Font, ink
 	canvas.draw_rect(box, ink)
 	canvas.draw_rect(box, UiPalette.GROUND, false, 1.5)
 	_text(canvas, at, str(number), font, UiPalette.GROUND)
+
+
+## A squad tag on the plan, in screen pixels: a steel square with [param number], amber
+## when [param lit] (the picked squad).
+static func tag(canvas: CanvasItem, at: Vector2, number: int, lit: bool) -> void:
+	var box := Rect2(at - Vector2(_TAG, _TAG), Vector2(_TAG, _TAG) * 2.0)
+	canvas.draw_rect(box.grow(2.0), Color(0, 0, 0, 0.6))
+	canvas.draw_rect(box, RefPaint.AMBER if lit else RefPaint.TEXT)
+	canvas.draw_rect(box, RefPaint.EDGE, false, 1.5)
+	RefText.make(RefText.LABEL, 18, RefPaint.INK).draw(canvas, at, str(number), "mm")
+
+
+## A squad's planned path: a dashed amber line through [param points] (screen pixels)
+## ending in a ring.
+static func path(canvas: CanvasItem, points: PackedVector2Array) -> void:
+	for k: int in points.size() - 1:
+		canvas.draw_dashed_line(points[k], points[k + 1], RefPaint.AMBER, 3.0, 10.0)
+	var end: Vector2 = points[points.size() - 1]
+	canvas.draw_arc(end, 12.0, 0.0, TAU, 32, RefPaint.AMBER, 3.0, true)
 
 
 ## An intruder group: a red diamond with [param count].

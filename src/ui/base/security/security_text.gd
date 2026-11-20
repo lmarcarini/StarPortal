@@ -37,6 +37,29 @@ static func door_row(door: DoorState) -> String:
 	return _tr(key).format({"level": door.level, "x": door.cell.x, "y": door.cell.y})
 
 
+## Where [param door] stands, for a player: "L1 · BY RESEARCH LAB" (the nearest room
+## within two cells) or "L1 · CORRIDOR".
+static func door_place(state: GameState, door: DoorState) -> String:
+	var best: RoomState = null
+	var best_distance: float = 2.5
+	for room: RoomState in BaseRules.rooms_on_level(state.base, door.level):
+		var def: RoomDef = state.room_defs.get(room.def_id)
+		if def == null or room.def_id == StartingBase.CORRIDOR_DEF:
+			continue
+		var cells: Rect2i = BaseRules.footprint(room, def)
+		var inside: Vector2 = Vector2(door.cell).clamp(
+			Vector2(cells.position), Vector2(cells.end - Vector2i.ONE)
+		)
+		var distance: float = inside.distance_to(Vector2(door.cell))
+		if distance < best_distance:
+			best = room
+			best_distance = distance
+	if best == null:
+		return _tr(&"SECURITY_DOOR_CORRIDOR").format({"level": door.level})
+	var room_name: String = _tr(state.room_defs[best.def_id].name_key).to_upper()
+	return _tr(&"SECURITY_DOOR_BY").format({"level": door.level, "room": room_name})
+
+
 ## The line after an order: what was ordered, or why it was refused.
 static func result(outcome: CommandResult, what: SquadState.Order) -> String:
 	if outcome.is_ok:

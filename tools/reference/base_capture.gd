@@ -57,11 +57,22 @@ static func show(switcher: ViewSwitcher, mode: StringName) -> void:
 		_arm(SimClock.simulation.state)
 		base.get_sub_tabs().show_tab(BaseSubTabs.BUILD)
 		base.get_sub_tabs().show_tab(BaseSubTabs.SECURITY)
-		base.get_plan().centre_on(LAB)
+		_pick_squad(base)
+
+
+## SECURITY: squad 1 picked and its path previewed to the hovered workshop.
+static func _pick_squad(base: BaseView) -> void:
+	var tab: SecuritySubTab = base.find_child("SecuritySubTab", true, false) as SecuritySubTab
+	if tab.selected.is_empty():
+		tab.pick(&"room_ref_post")
+	var plan: BasePlan = base.get_plan()
+	plan.centre_on(&"room_ref_post")
+	plan.cursor = Vector2i(28, 12)
+	plan.move_cursor(Vector2i.ZERO)
 
 
 ## A drag in progress: the dashed line from the third face tile (a free engineer) to the
-## lab's third slot.
+## workshop's first slot (the engineer's role: the workshop glows, the rest dim).
 static func _drag_to_lab(base: BaseView) -> void:
 	var tray: Node = base.find_child("StaffSubTab", true, false)
 	var tiles: Array[Node] = tray.find_children("*", "StaffFaceKey", true, false)
@@ -72,12 +83,13 @@ static func _drag_to_lab(base: BaseView) -> void:
 	tile.button_pressed = true
 	tile.drag_started.emit(tile.person_id)
 	var plan: BasePlan = base.get_plan()
-	var room: RoomState = SimClock.simulation.state.base.find_room(LAB)
+	var room: RoomState = SimClock.simulation.state.base.find_room(&"room_ref_workshop")
 	var def: RoomDef = SimClock.simulation.state.room_defs.get(room.def_id)
 	var area: Rect2 = PlanTiles.rect_of(plan, BaseRules.footprint(room, def), 4.0)
-	var slot: Vector2 = Vector2(area.position.x + 24 + 2 * PlanTiles.SLOT_PITCH, area.end.y - 22)
+	var slot: Vector2 = Vector2(area.position.x + 24, area.end.y - 22)
 	var line: StaffDragLine = base.find_child("StaffDragLine", true, false) as StaffDragLine
 	line.show_line(tile, plan.get_global_transform() * slot)
+	plan.queue_redraw()
 
 
 ## A security post with its soldiers on L1 and a sealed blast door, so the tray has a squad
@@ -86,7 +98,7 @@ static func _arm(state: GameState) -> void:
 	if state.base.find_room(&"room_ref_post") != null:
 		return
 	state.base.rooms.append(
-		RoomState.create(&"room_ref_post", &"room_security_post", 1, Vector2i(33, 8))
+		RoomState.create(&"room_ref_post", &"room_security_post", 1, Vector2i(31, 8))
 	)
 	var armed: int = 0
 	for person: PersonState in state.staff.people:
