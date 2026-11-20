@@ -136,6 +136,109 @@ This replaces the current Research view's hidden "stubs" and greyed nodes.
 Settled on 2026-11-20: player-driven unlocks; no periodic reports; Medicine as alien-only
 research in a Bio Lab; Military spread out; plans mostly from Engineering; staff of the
 building's field; a queue per building; a handful of projects at the start; story details
-later.
+later. Alien languages stay in Science. The owner approved the project list below to be
+drafted and the Lab station to follow; personnel is discussed next.
 
-Open: whether alien languages stay in Science or get a building of their own.
+**Added to fill gaps:** a **Ready Room** (expedition kit; where team equipment goes), a
+**specimen cold store** (an installation in the Bio Lab), and **Contract work** (an
+installation in the Workshop that earns money while it has no build to speed up), so the
+Office's income research has something to act on.
+
+## 10. The project list (first draft)
+
+Times and costs follow the pace table. "Needs" lists prerequisites; "Shows when" is the
+extra thing the player must have done. Projects marked *story* are placeholders for the
+story discussion. Existing projects are folded in where they fit; the rest are retired.
+
+### Engineering (Workshop, engineers)
+
+| Id | Project | Tier | Gives | Needs | Shows when |
+| --- | --- | --- | --- | --- | --- |
+| E01 | Excavation survey | 1 | Dig level 2 | | Start |
+| E02 | Personnel Office | 1 | Plan: Personnel Office | | Start |
+| E03 | Survey drones | 1 | Machine: MOTH rack | | Start |
+| E04 | Capacitor bank array | 1 | Plan: second capacitor bank; charging 2× faster | | Start |
+| E05 | Prefab modules | 2 | Boost: building time halved | E01 | |
+| E06 | Lift shaft | 2 | Plan: lift; levels connect | E01 | |
+| E07 | Deep excavation | 3 | Dig levels 3 and 4 | E06 | |
+| E08 | Second plant | 2 | Plan: second power plant | | Base uses over 80% of supply |
+| E09 | Security Post | 2 | Plan: Security Post | | |
+| E10 | Blast doors | 2 | Plan: blast door | E09 | |
+| E11 | Sentry gun | 3 | Installation: sentry gun | E09 | |
+| E12 | Door plating | 3 | Installation: door plating | E10 | |
+| E13 | Iris studies | 3 | Installation: the Shutter | | Ten locks made |
+| E14 | Shutter Mk II | 4 | A stopped wave costs no charge | E13 | |
+| E15 | Sample canister | 2 | The canister brings back specimens | | First canister sent |
+| E16 | MOTH Mk II | 3 | MOTH range doubled; sampler arm (specimens) | E03 | |
+| E17 | MOTH Mk III | 4 | MOTH relay: hail a team without opening your own wormhole for long | E16 | |
+| E18 | Ready Room | 2 | Plan: Ready Room | | First expedition sent |
+| E19 | Field camp | 3 | Teams can stay up to twice as long | E18 | |
+| E20 | Artefact Vault | 2 | Plan: Vault | | An artefact in holding |
+| E21 | Containment | 3 | Plan: Containment | E20 | A hazardous artefact in holding |
+| E22 | Contract work | 2 | Installation: Workshop earns money when idle | E02 | |
+| E23 | Capacitor lattice | 4 | Boost: bank capacity 2× | E04, X02 | |
+| E24 | Outpost kit | 4 | *story* | E19 | *story* |
+
+### Science (Research Lab, scientists)
+
+| Id | Project | Tier | Gives | Needs | Shows when |
+| --- | --- | --- | --- | --- | --- |
+| S01 | Gate calibration | 1 | The charge gauge shows what a dial needs | | Start |
+| S02 | Horizon photography | 1 | The pole camera brings a world picture and its sky | | First lock |
+| S03 | Atmospheric sampling | 2 | A world's hazards known before a team goes | S02 | First MOTH run |
+| S04 | Glyph frequency | 2 | The alien panel marks glyphs seen in the clipped document | | Three addresses deduced |
+| S05 | Wormhole stabiliser | 3 | An open wormhole lasts twice as long on the same charge | S01 | |
+| S06 | Origin tracing | 3 | An incoming wormhole shows where it comes from; an incursion warning shows its objective | S01 | First incursion warning |
+| S07 | Xenoarchaeology | 2 | Plan: Xenotech Lab | | An artefact in holding |
+| S08 | Exobiology | 2 | Plan: Bio Lab | | A specimen in holding |
+| S09 | Xenolinguistics | 2 | Alien text in documents partly translated | | First alien conversation |
+| S10 | Dialects (one per faction) | 3 | New answers in that faction's conversations | S09 | Faction at Friendly |
+| S11 | Cultural exchange (one per faction) | 3 | Envoy exchange: the faction's daily favour | S10 | Faction at Trusted |
+| S12 | Long-range dialing | 4 | *story* | S05 | *story* |
+| S13 | Domain glyphs | 4 | *story* (ninth seal) | S12 | *story* |
+
+### Office (Personnel Office, analysts)
+
+| Id | Project | Tier | Gives | Needs | Shows when |
+| --- | --- | --- | --- | --- | --- |
+| O01 | Headhunter network I | 1 | Candidate tier 2 | | Personnel Office built |
+| O02 | Recruitment drive I | 1 | 5 candidates per batch | | Personnel Office built |
+| O03 | Fast-track I | 2 | Board refreshes every 5 days | | Personnel Office built |
+| O04 | Headhunter network II | 3 | Candidate tier 3, specialists | O01 | |
+| O05 | Recruitment drive II | 3 | 7 candidates per batch | O02 | |
+| O06 | Fast-track II | 3 | Board refreshes every 3 days | O03 | |
+| O07 | Committee liaison | 2 | A new call to the Committee: emergency funds, once a month | | Confidence over 60 |
+| O08 | Squad doctrine | 2 | Squads hold doorways and fall back by themselves when losing | | Security Post built |
+| O09 | Rapid response | 3 | Squads move twice as fast | O08 | |
+| O10 | Expedition training | 2 | Teams of five | | Ready Room built |
+| O11 | Survival training | 3 | The blind-expedition penalty is removed | O10 | |
+| O12 | Shift system | 3 | Boost: research and building continue at night at full speed | | |
+| O13 | Halcyon contracts | 3 | *story*: contract income | E22 | *story* |
+| O14 | Black funds, Counter-intelligence | 4 | *story* (Arc 2) | | *story* |
+
+### Xenotech (Xenotech Lab, scientists; costs artefact pieces)
+
+| Id | Project | Tier | Gives | Needs | Shows when |
+| --- | --- | --- | --- | --- | --- |
+| X01 | Study (one per artefact) | 2 | The artefact's hazard controlled; its follow-ups revealed | | That artefact in holding |
+| X02 | Lattice harmonics | 3 | The Resonant Lattice recharges capacitors | X01 (Lattice) | |
+| X03 | Loom translator | 3 | All Kindred text readable | X01 (Loom), S09 | |
+| X04 | Effigy wards | 3 | Incursion warnings come twice as early | X01 (Effigy) | |
+| X05 | Alien weapon copy | 4 | *story*: a squad weapon from an Ossar piece | X01 | *story* |
+| X06 | Anterite cells | 4 | *story*: alien power | | *story* |
+
+### Xenobiology (Bio Lab, medicine staff; costs specimens)
+
+| Id | Project | Tier | Gives | Needs | Shows when |
+| --- | --- | --- | --- | --- | --- |
+| B01 | Specimen analysis | 1 | A world's life shown in its report; specimens graded | | Bio Lab built |
+| B02 | Cold store | 2 | Installation: specimen cold store (specimens no longer spoil) | B01 | |
+| B03 | Field medicine | 2 | Injured team members are treated in the field (no worsening) | B01 | |
+| B04 | Isolation ward | 3 | Installation in the Infirmary: contagious cases contained | B01 | *story*: first contagion |
+| B05 | Regenerative compounds | 3 | Serious injuries heal twice as fast | B03 | |
+| B06 | Toxin resistance | 3 | Hazardous worlds' risk lowered one step | B03 | |
+| B07 | Alien physiology | 4 | Alien recruits possible (a surprise) | B05 | A faction at Allied |
+
+That is 60 projects, about a quarter of them boosts, with Engineering and Science open
+at the start (eight projects) and three disciplines opened by what the player builds or
+brings home.
