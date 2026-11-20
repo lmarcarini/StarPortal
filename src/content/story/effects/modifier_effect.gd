@@ -15,6 +15,8 @@ const KEYS: Array[StringName] = [
 	&"wormhole_minutes",
 	&"field_check_bonus",
 	&"moth_battery_pct",
+	&"wormhole_open_pct",
+	&"bank_capacity_pct",
 ]
 
 ## One of KEYS.

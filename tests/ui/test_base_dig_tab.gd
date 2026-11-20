@@ -182,6 +182,7 @@ func _level_tabs(base: BaseView) -> LevelTabs:
 
 func _finish_survey() -> void:
 	var state: GameState = SimClock.simulation.state
+	ResearchFixture.workshop(SimClock.simulation.state)
 	var result: CommandResult = SimClock.simulation.submit(StartResearchCommand.create(SURVEY))
 	assert_bool(result.is_ok).is_true()
 	while state.research.is_running():

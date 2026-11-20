@@ -3,14 +3,13 @@ extends Control
 ## The charge gauge (interface-reference.md section 5, charge_gauge): a steel plate with a
 ## cream analogue dial of stored MWh against the bank's capacity (red zone at the low end,
 ## the needle, MWh), the value below in mono 20 and, while a wormhole is open, its drain in
-## red. With no capacitor bank the dial gives way to a BUILD BANK key.
+## red. With Gate calibration (S01) an amber mark shows what the selected dial needs. With
+## no capacitor bank the dial gives way to a BUILD BANK key.
 ## Bible: docs/content/interface-reference.md section 5
 
 ## The BUILD BANK key was pressed: open the Base.
 signal build_bank_requested
 
-## Research that shows the need mark. None exists yet, so the mark stays hidden.
-const ESTIMATOR_RESEARCH: StringName = &"research_lock_estimator"
 ## Dial sweep: from 200 degrees, 140 degrees wide (PIL angles, clockwise from 3 o'clock).
 const SWEEP_FROM: float = 200.0
 const SWEEP: float = 140.0
@@ -20,6 +19,7 @@ var _share: float = 0.0
 var _value: String = ""
 var _drain: String = ""
 var _has_bank: bool = true
+var _need_share: float = -1.0
 
 
 func _ready() -> void:
@@ -35,9 +35,12 @@ func _ready() -> void:
 
 
 ## Shows [param state]'s charge and, while a wormhole is open, its drain.
-func show_state(state: GameState, _need_mwh: float) -> void:
+func show_state(state: GameState, need_mwh: float) -> void:
 	var capacity: float = PowerRules.capacity_mwh(state)
 	_has_bank = capacity > 0.0
+	_need_share = -1.0
+	if need_mwh > 0.0 and ResearchPerks.has(state, ResearchPerks.GATE_CALIBRATION):
+		_need_share = clampf(need_mwh / maxf(capacity, 1.0), 0.0, 1.0)
 	_build.visible = not _has_bank
 	_share = clampf(state.power.stored_mwh / maxf(capacity, 1.0), 0.0, 1.0)
 	_value = str(floori(state.power.stored_mwh))
@@ -55,6 +58,11 @@ func get_build_key() -> BigKey:
 ## The needle's share of the dial, 0 to 1.
 func get_share() -> float:
 	return _share
+
+
+## The share of the dial the selected dial needs (Gate calibration, S01), or -1 when no mark.
+func get_need_share() -> float:
+	return _need_share
 
 
 func _draw() -> void:
@@ -87,6 +95,9 @@ func _draw_dial(face: Rect2) -> void:
 		8.0,
 		true
 	)
+	if _need_share >= 0.0:
+		var mark: Vector2 = Vector2.from_angle(deg_to_rad(SWEEP_FROM + _need_share * SWEEP))
+		draw_line(c + mark * (r - 18.0), c + mark * (r + 2.0), RefPaint.AMBER, 5.0, true)
 	var needle: float = deg_to_rad(SWEEP_FROM + _share * SWEEP)
 	draw_line(c, c + Vector2(cos(needle), sin(needle)) * (r - 6.0), RefPaint.INK, 4.0, true)
 	draw_circle(c, 6.0, RefPaint.INK)

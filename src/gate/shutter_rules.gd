@@ -27,10 +27,13 @@ static func is_closed(state: GameState) -> bool:
 
 
 ## At the end of the warning: true when the closed Shutter stops the wave (taking its energy),
-## false when it is open, the def breaches it or the capacitors hold too little.
+## false when it is open, the def breaches it or the capacitors hold too little. With Shutter
+## Mk II (E14) a stopped wave costs no charge.
 static func stops_wave(state: GameState, def: IncursionDef) -> bool:
 	if not is_closed(state) or (def != null and def.breaches_shutter):
 		return false
+	if ResearchPerks.has(state, ResearchPerks.SHUTTER_MK2):
+		return true
 	if state.power.stored_mwh < STOP_COST_MWH:
 		return false
 	state.power.stored_mwh -= STOP_COST_MWH

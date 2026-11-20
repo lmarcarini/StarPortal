@@ -11,6 +11,7 @@ var _post: RoomState
 
 func before_test() -> void:
 	_state = GameState.new_game(5, Registry.balance())
+	UnlockFixture.defence_plans(_state)
 	_simulation = GameSetup.build_new(_state, GameDefs.from_registry(Registry)).value
 	_post = _place_post()
 	_hire(&"soldier_a")

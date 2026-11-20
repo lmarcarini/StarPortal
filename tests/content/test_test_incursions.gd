@@ -15,6 +15,7 @@ var _ended: Array = []
 
 func _setup() -> void:
 	_state = GameState.new_game(21, Registry.balance())
+	UnlockFixture.defence_plans(_state)
 	_simulation = GameSetup.build_new(_state, GameDefs.from_registry(Registry)).value
 	_simulation.event_posted.connect(_on_event)
 	_ended.clear()

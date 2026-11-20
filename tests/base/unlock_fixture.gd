@@ -9,7 +9,7 @@ static func projects() -> Dictionary:
 	var defs: Array[ResearchDef] = []
 	for def: DefBase in Registry.get_all_of(ResearchDef):
 		var research: ResearchDef = def
-		if research.order <= 7:
+		if research.discipline == &"engineering" and research.order <= 7:
 			defs.append(research)
 	defs.sort_custom(func(a: ResearchDef, b: ResearchDef) -> bool: return a.order < b.order)
 	var found: Dictionary = {}
@@ -34,3 +34,11 @@ static func research() -> Dictionary[StringName, ResearchDef]:
 	for def: DefBase in Registry.get_all_of(ResearchDef):
 		found[def.id] = def as ResearchDef
 	return found
+
+
+## Grants [param state] the defence plans research gives in M7 (the Security Post, E09, and
+## blast doors, E10), for tests of squads, doors and incursions on a new game.
+static func defence_plans(state: GameState) -> void:
+	if not state.unlocks.rooms.has(&"room_security_post"):
+		state.unlocks.rooms.append(&"room_security_post")
+	state.flags[ResearchPerks.BLAST_DOOR] = true

@@ -137,7 +137,8 @@ func show_rooms(
 		button.gui_input.connect(_on_button_input)
 		_rooms.add_child(button)
 		_buttons[def_id] = button
-	_add_door_button()
+	if DOOR_ID in unlocked:
+		_add_door_button()
 	_refresh_hint()
 
 

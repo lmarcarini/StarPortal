@@ -1,8 +1,8 @@
 class_name WorldThumb
 extends Control
 ## A small picture of a world for a destination card: its sky and ground from the horizon
-## photo's rules once the base has seen it through the gate, else a generic dark frame with
-## the Ring's mark (an address never reached).
+## photo's rules once the base has seen it through the gate and Horizon photography (S02) is
+## done, else a generic dark frame with the Ring's mark.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Destinations)
 
 var _params: HorizonPhotoRules.Params = null
@@ -13,9 +13,14 @@ func _init() -> void:
 	custom_minimum_size = Vector2(120, 68)
 
 
-## Shows [param world_id] (&"" for a never-reached address).
+## Shows [param world_id] (&"" for a never-reached address). The picture needs Horizon
+## photography (S02); before it every world shows the dark frame.
 func show_world(world_id: StringName) -> void:
-	_params = null if world_id.is_empty() else HorizonPhotoRules.params_for(world_id)
+	var state: GameState = SimClock.simulation.state if SimClock.simulation != null else null
+	var photographed: bool = ResearchPerks.has(state, ResearchPerks.HORIZON_PHOTOGRAPHY)
+	_params = null
+	if not world_id.is_empty() and photographed:
+		_params = HorizonPhotoRules.params_for(world_id)
 	queue_redraw()
 
 

@@ -45,7 +45,7 @@ func setup(simulation: Simulation, defs: Dictionary) -> void:
 	_ghost.stop()
 	_ghost.attach(_plan, simulation.state)
 	_defs.assign(defs)
-	_palette.show_rooms(defs, simulation.state.unlocks.rooms, blocked(simulation.state))
+	_palette.show_rooms(defs, ResearchPerks.plans(simulation.state), blocked(simulation.state))
 	_palette.set_placing(false, false)
 	refresh()
 
@@ -91,8 +91,9 @@ func refresh() -> void:
 		return
 	var state: GameState = _simulation.state
 	var now_blocked: Dictionary[StringName, String] = blocked(state)
-	if _palette.unlocks_changed(state.unlocks.rooms, now_blocked):
-		_palette.show_rooms(_defs, state.unlocks.rooms, now_blocked)
+	var plans: Array[StringName] = ResearchPerks.plans(state)
+	if _palette.unlocks_changed(plans, now_blocked):
+		_palette.show_rooms(_defs, plans, now_blocked)
 	_palette.get_dig_button().refresh(_simulation.state)
 	_ghost.recheck()
 	show_action(_plan.selected())

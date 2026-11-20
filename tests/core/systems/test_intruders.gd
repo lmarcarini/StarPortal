@@ -12,6 +12,7 @@ var _ended: Array = []
 
 func before_test() -> void:
 	_state = GameState.new_game(7, Registry.balance())
+	UnlockFixture.defence_plans(_state)
 	_simulation = GameSetup.build_new(_state, GameDefs.from_registry(Registry)).value
 	_simulation.event_posted.connect(_on_event)
 	var unit := UnitDef.new()

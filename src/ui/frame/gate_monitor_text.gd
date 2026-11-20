@@ -16,6 +16,8 @@ static func status_of(state: GameState) -> StringName:
 ## The state line of [param state], upper case.
 static func line(state: GameState) -> String:
 	var status: StringName = status_of(state)
+	if status == TopBarText.GATE_INCOMING:
+		return _tr("FRAME_MONITOR_INCOMING") + OriginText.incoming(state)
 	if status != TopBarText.GATE_OPEN:
 		return _tr("FRAME_MONITOR_" + String(status).to_upper())
 	var world: String = AddressBookText.name_of_world(state.gate.connected_world_id, state)

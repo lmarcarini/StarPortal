@@ -13,9 +13,9 @@ func test_new_game_unlocks() -> void:
 			[
 				&"room_capacitor_bank",
 				&"room_research_lab",
+				&"room_workshop",
 				&"room_corridor",
 				&"room_quarters",
-				&"room_security_post",
 			]
 		)
 	)
@@ -35,8 +35,7 @@ func test_round_trip_in_game_state() -> void:
 	assert_dict(loaded.unlocks.to_dict()).is_equal(state.unlocks.to_dict())
 	assert_bool(loaded.unlocks.has_room(&"room_workshop")).is_true()
 	assert_int(loaded.unlocks.dig_depth).is_equal(4)
-	assert_int(loaded.unlocks.bank_cap).is_equal(3)
-	assert_int(loaded.unlocks.upkeep_overrides[&"room_power_plant"]).is_equal(100)
+	assert_int(loaded.unlocks.bank_cap).is_equal(2)
 
 
 ## A save without "unlocks" is invalid.

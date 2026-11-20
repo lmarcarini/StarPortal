@@ -2,9 +2,9 @@ keys,en,pt_BR
 RESEARCH_EXCAVATION_SURVEY_LINE,Dig Level 2 and build Stairs.,Escavar o Nível 2 e construir Escadas.
 RESEARCH_LIFT_SHAFT_LINE,Build Lifts.,Construir Elevadores.
 RESEARCH_DEEP_EXCAVATION_LINE,Dig Levels 3 and 4.,Escavar os Níveis 3 e 4.
-RESEARCH_SECOND_PLANT_LINE,Build more diesel Power Plants (+30 MW each).,Construir mais Usinas a diesel (+30 MW cada).
+RESEARCH_SECOND_PLANT_LINE,"Plan: a second power plant.","Planta: uma segunda usina."
 RESEARCH_FUEL_CONTRACTS_LINE,Diesel plant upkeep from $150k to $100k per 30 days.,Manutenção da usina a diesel de $150k para $100k a cada 30 dias.
-RESEARCH_BANK_ARRAY_LINE,Up to 3 Capacitor Banks.,Até 3 Bancos de Capacitores.
+RESEARCH_BANK_ARRAY_LINE,"A second Capacitor Bank; banks charge twice as fast.","Um segundo Banco de Capacitores; carregam duas vezes mais rápido."
 RESEARCH_FIELD_ENGINEERING_LINE,Workshop (sites build faster).,Oficina (obras ficam prontas mais rápido).
 RESEARCH_UNKNOWN_NAME,Unknown,Desconhecido
 RESEARCH_LOCK_ALIEN_FIND,Requires an alien find,Requer achado alienígena
@@ -72,9 +72,9 @@ RESEARCH_PLANT_TUNING_LINE,Each plant gives 2 MW more.,[EN] Each plant gives 2 M
 RESEARCH_FUEL_CELLS_NAME,Fuel cells,[EN] Fuel cells
 RESEARCH_FUEL_CELLS_LINE,Room upkeep is 10% lower.,[EN] Room upkeep is 10% lower.
 RESEARCH_GATE_CALIBRATION_NAME,Gate calibration,[EN] Gate calibration
-RESEARCH_GATE_CALIBRATION_LINE,Dialing and holding cost 10% less energy.,[EN] Dialing and holding cost 10% less energy.
+RESEARCH_GATE_CALIBRATION_LINE,"The charge gauge shows what a dial needs.","O medidor de carga mostra o que uma discagem exige."
 RESEARCH_WORMHOLE_STABILISER_NAME,Wormhole stabiliser,[EN] Wormhole stabiliser
-RESEARCH_WORMHOLE_STABILISER_LINE,Wormholes stay open 15 minutes longer.,[EN] Wormholes stay open 15 minutes longer.
+RESEARCH_WORMHOLE_STABILISER_LINE,"An open wormhole lasts twice as long.","Um buraco de minhoca aberto dura o dobro."
 RESEARCH_LONG_RANGE_DIALING_NAME,Long-range dialing,[EN] Long-range dialing
 RESEARCH_LONG_RANGE_DIALING_LINE,Dialing costs another 10% less energy.,[EN] Dialing costs another 10% less energy.
 RESEARCH_MOTH_BATTERIES_NAME,MOTH batteries,[EN] MOTH batteries
@@ -104,13 +104,13 @@ RESEARCH_STAFF_WELFARE_LINE,Room upkeep is 5% lower.,[EN] Room upkeep is 5% lowe
 RESEARCH_PERIMETER_ALARMS_NAME,Perimeter alarms,[EN] Perimeter alarms
 RESEARCH_PERIMETER_ALARMS_LINE,Room upkeep is 5% lower.,[EN] Room upkeep is 5% lower.
 RESEARCH_IRIS_STUDIES_NAME,Iris studies,[EN] Iris studies
-RESEARCH_IRIS_STUDIES_LINE,Dialing costs 5% less energy.,[EN] Dialing costs 5% less energy.
+RESEARCH_IRIS_STUDIES_LINE,"Installation: the Shutter.","Instalação: o Obturador."
 RESEARCH_HARDENED_CORRIDORS_NAME,Hardened corridors,[EN] Hardened corridors
 RESEARCH_HARDENED_CORRIDORS_LINE,Sites and digs finish 10% faster.,[EN] Sites and digs finish 10% faster.
 RESEARCH_SENTRY_DRILLS_NAME,Sentry drills,[EN] Sentry drills
 RESEARCH_SENTRY_DRILLS_LINE,Field checks are a little easier.,[EN] Field checks are a little easier.
 RESEARCH_XENOLINGUISTICS_NAME,Xenolinguistics,[EN] Xenolinguistics
-RESEARCH_XENOLINGUISTICS_LINE,Research is 5% faster.,[EN] Research is 5% faster.
+RESEARCH_XENOLINGUISTICS_LINE,"Alien text in documents partly translated.","Texto alienígena em documentos parcialmente traduzido."
 RESEARCH_KINDRED_DIALECTS_NAME,Kindred dialects,[EN] Kindred dialects
 RESEARCH_KINDRED_DIALECTS_LINE,The Committee adds $15k a day.,[EN] The Committee adds $15k a day.
 RESEARCH_CULTURAL_EXCHANGE_NAME,Cultural exchange,[EN] Cultural exchange
@@ -125,3 +125,55 @@ RESEARCH_AUTOMATED_DEFENCE_NAME,Automated defence,Defesa automatizada
 RESEARCH_AUTOMATED_DEFENCE_LINE,Sentry guns for rooms and plating for blast doors.,Torretas para salas e blindagem para portas.
 RESEARCH_SURVEY_DRONES_NAME,Survey drones,Drones de reconhecimento
 RESEARCH_SURVEY_DRONES_LINE,"Unlocks the MOTH rack for the Gate Room; each MOTH is then built to order.","Libera o suporte de MOTH na Sala do Portal; cada MOTH é construído sob encomenda."
+RESEARCH_PLAN_PERSONNEL_OFFICE_NAME,"Personnel Office","Departamento de Pessoal"
+RESEARCH_PLAN_PERSONNEL_OFFICE_LINE,"Plan: the Personnel Office (Office research).","Planta: o Departamento de Pessoal (pesquisa do Escritório)."
+RESEARCH_PREFAB_MODULES_NAME,"Prefab modules","Módulos pré-fabricados"
+RESEARCH_PREFAB_MODULES_LINE,"Building time halved.","Tempo de construção pela metade."
+RESEARCH_PLAN_SECURITY_POST_NAME,"Security Post","Posto de Segurança"
+RESEARCH_PLAN_SECURITY_POST_LINE,"Plan: the Security Post.","Planta: o Posto de Segurança."
+RESEARCH_BLAST_DOORS_NAME,"Blast doors","Portas blindadas"
+RESEARCH_BLAST_DOORS_LINE,"Plan: blast doors on corridors.","Planta: portas blindadas nos corredores."
+RESEARCH_SENTRY_GUN_NAME,"Sentry gun","Torre de sentinela"
+RESEARCH_SENTRY_GUN_LINE,"Installation: the sentry gun.","Instalação: a torre de sentinela."
+RESEARCH_DOOR_PLATING_NAME,"Door plating","Blindagem de portas"
+RESEARCH_DOOR_PLATING_LINE,"Installation: door plating.","Instalação: blindagem de portas."
+RESEARCH_SHUTTER_MK2_NAME,"Shutter Mk II","Obturador Mk II"
+RESEARCH_SHUTTER_MK2_LINE,"A stopped wave costs the Shutter no charge.","Uma onda barrada não custa carga ao Obturador."
+RESEARCH_SAMPLE_CANISTER_NAME,"Sample canister","Coletor de amostras"
+RESEARCH_SAMPLE_CANISTER_LINE,"The canister brings back specimens of alien life.","O coletor traz espécimes de vida alienígena."
+RESEARCH_MOTH_MK2_NAME,"MOTH Mk II","MOTH Mk II"
+RESEARCH_MOTH_MK2_LINE,"MOTH range doubled; a sampler arm brings specimens.","Alcance do MOTH dobrado; um braço coletor traz espécimes."
+RESEARCH_MOTH_MK3_NAME,"MOTH Mk III","MOTH Mk III"
+RESEARCH_MOTH_MK3_LINE,"The MOTH relays a hail to a team in the field.","O MOTH retransmite um chamado à equipe em campo."
+RESEARCH_PLAN_READY_ROOM_NAME,"Ready Room","Sala de Preparação"
+RESEARCH_PLAN_READY_ROOM_LINE,"Plan: the Ready Room.","Planta: a Sala de Preparação."
+RESEARCH_FIELD_CAMP_NAME,"Field camp","Acampamento"
+RESEARCH_FIELD_CAMP_LINE,"Teams can stay twice as long.","Equipes podem ficar o dobro do tempo."
+RESEARCH_ARTEFACT_VAULT_NAME,"Artefact Vault","Cofre de Artefatos"
+RESEARCH_ARTEFACT_VAULT_LINE,"Plan: the Artefact Vault.","Planta: o Cofre de Artefatos."
+RESEARCH_CONTRACT_WORK_NAME,"Contract work","Serviços contratados"
+RESEARCH_CONTRACT_WORK_LINE,"Installation: the Workshop earns money when idle.","Instalação: a Oficina rende dinheiro quando ociosa."
+RESEARCH_OUTPOST_KIT_NAME,"Outpost kit","Kit de posto avançado"
+RESEARCH_OUTPOST_KIT_LINE,"Story.","História."
+RESEARCH_HORIZON_PHOTOGRAPHY_NAME,"Horizon photography","Fotografia do horizonte"
+RESEARCH_HORIZON_PHOTOGRAPHY_LINE,"The pole camera brings a world picture and its sky.","A câmera de haste traz uma imagem do mundo e seu céu."
+RESEARCH_ATMOSPHERIC_SAMPLING_NAME,"Atmospheric sampling","Amostragem atmosférica"
+RESEARCH_ATMOSPHERIC_SAMPLING_LINE,"A world's hazards known before a team goes.","Os perigos de um mundo conhecidos antes da equipe ir."
+RESEARCH_GLYPH_FREQUENCY_NAME,"Glyph frequency","Frequência de glifos"
+RESEARCH_GLYPH_FREQUENCY_LINE,"The alien panel marks glyphs seen in the clipped document.","O painel alienígena marca glifos vistos no documento preso."
+RESEARCH_ORIGIN_TRACING_NAME,"Origin tracing","Rastreamento de origem"
+RESEARCH_ORIGIN_TRACING_LINE,"Incoming wormholes show their origin; warnings their objective.","Buracos de minhoca recebidos mostram a origem; alertas, o objetivo."
+RESEARCH_XENOARCHAEOLOGY_NAME,"Xenoarchaeology","Xenoarqueologia"
+RESEARCH_XENOARCHAEOLOGY_LINE,"Plan: the Xenotech Lab.","Planta: o Laboratório Xenotec."
+RESEARCH_EXOBIOLOGY_NAME,"Exobiology","Exobiologia"
+RESEARCH_EXOBIOLOGY_LINE,"Plan: the Bio Lab.","Planta: o Laboratório Bio."
+RESEARCH_DIALECTS_KINDRED_NAME,"Kindred dialects","Dialetos Kindred"
+RESEARCH_DIALECTS_KINDRED_LINE,"New answers in Kindred conversations.","Novas respostas nas conversas com os Kindred."
+RESEARCH_DIALECTS_OSSAR_NAME,"Ossar dialects","Dialetos Ossar"
+RESEARCH_DIALECTS_OSSAR_LINE,"New answers in Ossar conversations.","Novas respostas nas conversas com os Ossar."
+RESEARCH_CULTURAL_EXCHANGE_KINDRED_NAME,"Kindred envoys","Enviados Kindred"
+RESEARCH_CULTURAL_EXCHANGE_KINDRED_LINE,"Envoy exchange: the Kindred's daily favour.","Troca de enviados: o favor diário dos Kindred."
+RESEARCH_CULTURAL_EXCHANGE_OSSAR_NAME,"Ossar envoys","Enviados Ossar"
+RESEARCH_CULTURAL_EXCHANGE_OSSAR_LINE,"Envoy exchange: the Ossar's daily favour.","Troca de enviados: o favor diário dos Ossar."
+RESEARCH_DOMAIN_GLYPHS_NAME,"Domain glyphs","Glifos de domínio"
+RESEARCH_DOMAIN_GLYPHS_LINE,"Story.","História."

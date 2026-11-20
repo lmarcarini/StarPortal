@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/dig_depth_effect.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/effects/unlock_room_effect.gd" id="3"]
+
+; docs/content/research-and-progression.md section 10 (E01).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+levels = 2
+
+[sub_resource type="Resource" id="fx1"]
+script = ExtResource("3")
+room = &"room_stairs"
+
+[resource]
+script = ExtResource("1")
+order = 1
+discipline = &"engineering"
+tier = 1
+cost_k = 200
+hours = 6
+needs = Array[StringName]([])
+reveal_when = Array[Resource]([])
+requires = Array[Resource]([])
+story = false
+effects = Array[Resource]([SubResource("fx0"), SubResource("fx1")])
+name_key = &"RESEARCH_EXCAVATION_SURVEY_NAME"
+line_key = &"RESEARCH_EXCAVATION_SURVEY_LINE"
+id = &"excavation_survey"

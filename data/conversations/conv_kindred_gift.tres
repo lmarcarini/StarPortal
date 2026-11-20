@@ -49,7 +49,7 @@ choices = Array[Resource]([SubResource("r4"), SubResource("r6")])
 
 [sub_resource type="Resource" id="r8"]
 script = ExtResource("7")
-project = &"kindred_dialects"
+project = &"dialects_kindred"
 
 [sub_resource type="Resource" id="r9"]
 script = ExtResource("3")

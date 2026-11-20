@@ -46,12 +46,12 @@ const MAX_INT_VALUE: int = 1000000
 const BOOK_CHANCE: float = 0.3
 ## Chance that a newly picked address is a real world's true address.
 const TARGET_CHANCE: float = 0.1
-## The corridor run and the Research Lab the bot builds on Level 1 (as in test_m2_flow.gd).
+## The corridor run and the Workshop (the Engineering bench, M7) the bot builds on Level 1.
 const LAB_LEVEL: int = 1
 const LAB_CORRIDOR: Array[Vector2i] = [
 	Vector2i(24, 9), Vector2i(24, 8), Vector2i(24, 7), Vector2i(24, 6), Vector2i(24, 5)
 ]
-const LAB_DEF: StringName = &"room_research_lab"
+const LAB_DEF: StringName = &"room_workshop"
 const LAB_ORIGIN: Vector2i = Vector2i(25, 5)
 ## Ticks an open wormhole stays open before the bot closes it.
 const CLOSE_AFTER_TICKS: int = 5

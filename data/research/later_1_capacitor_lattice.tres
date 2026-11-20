@@ -11,7 +11,7 @@ amount = 25
 
 [resource]
 script = ExtResource("1_research")
-order = 8
+order = 60
 cost_k = 1200
 hours = 96
 needs = Array[StringName]([&"bank_array"])

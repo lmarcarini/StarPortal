@@ -11,6 +11,7 @@ var _post: RoomState
 
 func _setup(seed_value: int) -> void:
 	_state = GameState.new_game(seed_value, Registry.balance())
+	UnlockFixture.defence_plans(_state)
 	_simulation = GameSetup.build_new(_state, GameDefs.from_registry(Registry)).value
 	_post = null
 	for x: int in range(2, _state.base.grid_size.x - 2):

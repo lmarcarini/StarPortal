@@ -99,4 +99,6 @@ func test_categories() -> void:
 		def.id: def, &"research_teleport": _copy(&"lift_shaft")
 	}
 	assert_str("\n".join(def.get_content_errors(defs))).contains("not a research category")
-	assert_array(_copy(&"lift_shaft").get_references()).contains([&"research_construction"])
+	var categorised: ResearchDef = _copy(&"lift_shaft")
+	categorised.category = &"research_construction"
+	assert_array(categorised.get_references()).contains([&"research_construction"])

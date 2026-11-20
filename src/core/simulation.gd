@@ -122,6 +122,7 @@ func _emit_events() -> void:
 
 
 func _emit_event(event: SimEvent) -> void:
+	ProgressCounters.count(state, event.name, event.args)
 	for entry: LogEntry in LogRules.entries_for(event.name, event.args, state, state.clock.tick):
 		state.operations_log.add(entry)
 	if event.name == PAUSE_EVENT:

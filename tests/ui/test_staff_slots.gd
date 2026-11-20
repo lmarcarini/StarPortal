@@ -103,10 +103,10 @@ func test_beds_needed_refusal_has_words() -> void:
 
 func test_research_time_follows_staffing() -> void:
 	var state: GameState = _simulation.state
-	var def: ResearchDef = state.research_defs[&"excavation_survey"]
-	assert_str(ResearchText.duration(ResearchText.planned_ticks(state, def))).is_equal("2 d")
+	var def: ResearchDef = state.research_defs[&"gate_calibration"]
+	assert_str(ResearchText.duration(ResearchText.planned_ticks(state, def))).is_equal("6 h")
 	StaffFixture.scientists(state, _lab(), [3, 3])
-	assert_str(ResearchText.duration(ResearchText.planned_ticks(state, def))).is_equal("1 d")
+	assert_str(ResearchText.duration(ResearchText.planned_ticks(state, def))).is_equal("3 h")
 	for person: PersonState in state.staff.people.duplicate():
 		if person.room_id == _lab().id:
 			state.staff.remove_person(person.id)

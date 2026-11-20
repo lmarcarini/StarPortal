@@ -59,7 +59,7 @@ next = &"end"
 
 [sub_resource type="Resource" id="r9"]
 script = ExtResource("5")
-project = &"later_containment"
+project = &"containment"
 
 [sub_resource type="Resource" id="r10"]
 script = ExtResource("2")

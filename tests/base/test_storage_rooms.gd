@@ -15,14 +15,14 @@ func test_defs() -> void:
 	assert_float(containment.power_draw_mw).is_equal(10.0)
 
 
-## Owner change 2026-11-14: the Vault needs Secure storage; Containment needs its project.
+## Owner change 2026-11-14: the Vault needs Artefact Vault (E20); Containment needs its project.
 func test_vault_and_containment_need_research() -> void:
 	var game: GameState = ConstructionFixture.state()
 	var vault: CommandResult = UnlockRules.can_build_room(game, &"room_artefact_vault")
 	assert_bool(vault.is_ok).is_false()
-	assert_str(vault.detail).is_equal("secure_storage")
+	assert_str(vault.detail).is_equal("artefact_vault")
 	assert_bool(UnlockRules.can_build_room(game, &"room_containment").is_ok).is_false()
-	UnlockFixture.apply_project(game.unlocks, &"secure_storage")
+	UnlockFixture.apply_project(game.unlocks, &"artefact_vault")
 	assert_bool(UnlockRules.can_build_room(game, &"room_artefact_vault").is_ok).is_true()
 
 

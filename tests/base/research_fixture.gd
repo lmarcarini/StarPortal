@@ -45,6 +45,9 @@ static func workshop(game: GameState) -> RoomState:
 ## Starts [param project_id] on [param game] (it must be allowed) and ticks a ResearchSystem
 ## and the clock until it is done; returns the ticks it took.
 static func finish(game: GameState, project_id: StringName) -> int:
+	var def: ResearchDef = game.research_defs.get(project_id)
+	if def != null and def.discipline == &"engineering":
+		workshop(game)
 	var result: CommandResult = ConstructionFixture.run(
 		game, StartResearchCommand.create(project_id)
 	)
@@ -56,3 +59,11 @@ static func finish(game: GameState, project_id: StringName) -> int:
 		game.clock.tick += 1
 		ticks += 1
 	return ticks
+
+
+## Starts Excavation survey (E01) in [param game] through the command, adding a staffed
+## Workshop first (M7: Engineering runs in the Workshop). For the older flows that used to
+## start it from the old Research tab.
+static func start_survey(game: GameState) -> CommandResult:
+	workshop(game)
+	return ConstructionFixture.run(game, StartResearchCommand.create(&"excavation_survey"))

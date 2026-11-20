@@ -59,6 +59,8 @@ func tick(state: GameState) -> void:
 	worlds.horizon_records[world_id] = true
 	state.events.post(&"horizon_record_taken", [world_id])
 	WorldProgress.record_horizon(state, world_id)
+	if ResearchPerks.has(state, ResearchPerks.ATMOSPHERIC_SAMPLING):
+		WorldProgress.record_hazards(state, world_id)
 	if _deliver_first_lock_documents(state, world_id):
 		state.events.post(&"pause_requested", [PAUSE_REASON])
 

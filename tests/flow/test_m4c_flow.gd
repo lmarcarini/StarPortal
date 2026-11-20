@@ -30,6 +30,7 @@ func after_test() -> void:
 
 func _new_game() -> void:
 	_state = GameState.new_game(7, _defs.balance)
+	UnlockFixture.defence_plans(_state)
 	_simulation = GameSetup.build_new(_state, _defs).value
 	_simulation.event_posted.connect(_on_event)
 	_state.clock.mode = ClockState.Mode.RUNNING
