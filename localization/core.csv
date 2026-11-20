@@ -139,6 +139,8 @@ MENU_SCENARIOS,Scenarios,Cenários
 MENU_QUIT,Quit,Sair
 MENU_NO_SAVE,There is no save to continue.,Não há jogo salvo para continuar.
 MENU_RETURN,Main menu,Menu principal
+PAUSE_TITLE,PAUSED,PAUSADO
+PAUSE_GAMEPLAY,GAMEPLAY,JOGO
 PAUSE_RESUME,Resume,Continuar
 PAUSE_SAVE,Save,Salvar
 PAUSE_LOAD,Load,Carregar
