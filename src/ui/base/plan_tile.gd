@@ -13,6 +13,9 @@ var progress: float = 0.0
 var caption: String = ""
 var slots: int = 0
 var letters: Array[String] = []
+## While a person is being placed (STAFF drag): &"ok" when this room takes them, &"no" when
+## not, &"" otherwise.
+var assign: StringName = &""
 ## POWER mode: the room's MW tag ("+30 MW", "5 MW") and whether it produces.
 var power_view: bool = false
 var mw: String = ""

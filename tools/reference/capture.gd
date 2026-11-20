@@ -49,6 +49,8 @@ func _process(_delta: float) -> void:
 		_shoot.bind("base_power"),
 		_to_base.bind(BaseSubTabs.STAFF),
 		_shoot.bind("base_staff"),
+		_to_base.bind(BaseSubTabs.SECURITY),
+		_shoot.bind("base_security"),
 		get_tree().quit,
 	]
 	if _step < steps.size():

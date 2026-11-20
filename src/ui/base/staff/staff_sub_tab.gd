@@ -13,6 +13,8 @@ signal person_chosen(person_id: StringName)
 signal assign_pressed
 ## Staff changed: the list should be redrawn.
 signal staff_changed
+## A face's drag began: show which rooms take [param person_id].
+signal drag_started(person_id: StringName)
 ## A face was dropped on the tray: unassign [param person_id].
 signal tray_drop(person_id: StringName)
 
@@ -92,6 +94,7 @@ func show_state(state: GameState, selected: StringName) -> void:
 		)
 		tile.button_pressed = person.id == selected
 		tile.pressed.connect(person_chosen.emit.bind(person.id))
+		tile.drag_started.connect(drag_started.emit)
 		_list.add_child(tile)
 	assign_button.disabled = selected == &""
 

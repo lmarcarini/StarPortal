@@ -6,6 +6,9 @@ extends Button
 ## place them on the plan).
 ## Bible: docs/content/interface-reference.md section 8
 
+## A drag of this tile began (the plan highlights the rooms that take the person).
+signal drag_started(person_id: StringName)
+
 ## Tile size, in pixels.
 const SIZE: Vector2 = Vector2(104, 124)
 
@@ -27,6 +30,7 @@ func _init() -> void:
 
 func _get_drag_data(_at: Vector2) -> Variant:
 	StaffDragLine.begin(self)
+	drag_started.emit(person_id)
 	return {"person": person_id}
 
 
