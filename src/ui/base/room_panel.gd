@@ -51,7 +51,7 @@ func show_room(
 			BasePanelText.upkeep(UnlockRules.upkeep_k(unlocks, def)),
 			BasePanelText.status(room, def, progress),
 			BasePanelText.now(def),
-			BasePanelText.later(def),
+			"",
 		]
 	)
 	install_list.show_room(room)

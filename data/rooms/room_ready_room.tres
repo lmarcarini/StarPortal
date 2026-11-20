@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RoomDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/room_def.gd" id="1_room"]
+
+; docs/content/research-and-progression.md sections 3 and 9 (M7-02).
+[resource]
+script = ExtResource("1_room")
+size_cells = Vector2i(3, 2)
+rotatable = true
+build_cost_k = 300
+build_ticks = 240
+power_draw_mw = 5.0
+upkeep_k = 20
+staff_slots = 0
+name_key = &"ROOM_READY_ROOM_NAME"
+description_key = &"ROOM_READY_ROOM_NOW"
+id = &"room_ready_room"

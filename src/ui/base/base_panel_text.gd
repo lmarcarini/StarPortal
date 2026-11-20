@@ -40,24 +40,6 @@ static func now(def: RoomDef) -> String:
 	return _tr(def.description_key)
 
 
-## "Later: Squads move between levels." for [param def] (its ROOM_*_LATER key, next to its
-## name key), or "" when the room has no later line (Infirmary).
-static func later(def: RoomDef) -> String:
-	var key: String = later_key(def)
-	var text: String = _tr(StringName(key))
-	if key.is_empty() or text == key:
-		return ""
-	return _tr(&"ROOM_LATER_LINE").format({"text": text})
-
-
-## The ROOM_*_LATER key of [param def], from its ROOM_*_NAME key; "" for another name key.
-static func later_key(def: RoomDef) -> String:
-	var name: String = def.name_key
-	if not name.ends_with("_NAME"):
-		return ""
-	return name.trim_suffix("_NAME") + "_LATER"
-
-
 ## "Unlock: Lift shaft" for [param project_id] (an UnlockRules project).
 static func unlock(project_id: StringName) -> String:
 	var project: String = _tr(UnlockRules.project_name_key(project_id))

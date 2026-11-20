@@ -84,9 +84,7 @@ func test_bank_array() -> void:
 	assert_int(game.unlocks.bank_cap).is_equal(3)
 
 
-## R7: the Workshop may be built.
-func test_field_engineering() -> void:
+## The Workshop is known from the start (M7-02: Engineering opens at the start).
+func test_workshop_from_the_start() -> void:
 	var game: GameState = ResearchFixture.state()
-	assert_bool(_can_build(game, &"room_workshop")).is_false()
-	ResearchFixture.finish(game, &"field_engineering")
 	assert_bool(_can_build(game, &"room_workshop")).is_true()

@@ -16,17 +16,3 @@ const SHORT: Dictionary[StringName, StringName] = {
 static func title(def: RoomDef) -> String:
 	var key: StringName = SHORT.get(def.id, def.name_key)
 	return TranslationServer.translate(key).to_upper()
-
-
-## "Unlock: <project>" for room [param def_id], from the research that unlocks it; a generic
-## line when none does.
-static func locked_reason(def_id: StringName) -> String:
-	var simulation: Simulation = SimClock.simulation
-	if simulation == null:
-		return TranslationServer.translate(&"BASE_CARD_LOCKED")
-	for project: ResearchDef in simulation.state.research_defs.values():
-		for effect: Resource in project.effects:
-			var unlock: UnlockRoomEffect = effect as UnlockRoomEffect
-			if unlock != null and unlock.room == def_id:
-				return BasePanelText.unlock(project.id)
-	return TranslationServer.translate(&"BASE_CARD_LOCKED")

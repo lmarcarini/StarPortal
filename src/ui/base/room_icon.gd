@@ -13,6 +13,10 @@ const TYPES: Array[StringName] = [
 	&"room_power_plant",
 	&"room_capacitor_bank",
 	&"room_workshop",
+	&"room_personnel_office",
+	&"room_xenotech_lab",
+	&"room_bio_lab",
+	&"room_ready_room",
 	&"room_infirmary",
 	&"room_artefact_vault",
 	&"room_containment",
@@ -59,6 +63,29 @@ static func draw(
 				centre + Vector2(-r, r), centre + Vector2(r * 0.4, -r * 0.4), ink, _W * 1.4
 			)
 			canvas.draw_circle(centre + Vector2(r * 0.5, -r * 0.5), r * 0.4, ink)
+		&"room_personnel_office":
+			canvas.draw_circle(centre - Vector2(0, r * 0.45), r * 0.35, ink)
+			canvas.draw_arc(centre + Vector2(0, r * 0.9), r * 0.8, PI, TAU, 16, ink, _W, true)
+		&"room_xenotech_lab":
+			var diamond := PackedVector2Array(
+				[
+					centre + Vector2(0, -r),
+					centre + Vector2(r, 0),
+					centre + Vector2(0, r),
+					centre + Vector2(-r, 0),
+					centre + Vector2(0, -r)
+				]
+			)
+			canvas.draw_polyline(diamond, ink, _W, true)
+			canvas.draw_circle(centre, r * 0.25, ink)
+		&"room_bio_lab":
+			canvas.draw_arc(centre, r * 0.9, 0.0, TAU, 20, ink, _W, true)
+			canvas.draw_circle(centre + Vector2(r * 0.2, -r * 0.1), r * 0.3, ink)
+		&"room_ready_room":
+			canvas.draw_rect(
+				Rect2(centre - Vector2(r * 0.7, r * 0.6), Vector2(r * 1.4, r * 1.6)), ink, false, _W
+			)
+			canvas.draw_arc(centre - Vector2(0, r * 0.6), r * 0.4, PI, TAU, 10, ink, _W, true)
 		&"room_infirmary":
 			canvas.draw_rect(Rect2(centre - Vector2(r * 0.3, r), Vector2(r * 0.6, r * 2)), ink)
 			canvas.draw_rect(Rect2(centre - Vector2(r, r * 0.3), Vector2(r * 2, r * 0.6)), ink)

@@ -33,6 +33,10 @@ const ROOMS: Array[StringName] = [
 	&"room_power_plant",
 	&"room_capacitor_bank",
 	&"room_workshop",
+	&"room_personnel_office",
+	&"room_xenotech_lab",
+	&"room_bio_lab",
+	&"room_ready_room",
 	&"room_infirmary",
 	&"room_artefact_vault",
 	&"room_containment",
@@ -102,8 +106,9 @@ func _init() -> void:
 
 
 ## Fills the palette with the rooms of [param defs] (RoomDef by id) in [constant ROOMS] that
-## are in [param unlocked] (UnlockState.rooms): a room research has not unlocked is not offered
-## at all. A room in [param blocked] (def id: reason) is unlocked but can't be built right now
+## are in [param unlocked] (UnlockState.rooms): a room whose plan is not known is not shown
+## at all (M7-02: no locked cards). A room in [param blocked] (def id: reason) is unlocked
+## but can't be built right now
 ## (the Capacitor Bank cap, say): it shows greyed, its line giving the reason (owner change
 ## 2026-11-14).
 func show_rooms(
@@ -117,13 +122,11 @@ func show_rooms(
 	_buttons.clear()
 	for def_id: StringName in ROOMS:
 		var def: RoomDef = _defs.get(def_id)
-		if def == null:
+		if def == null or not def_id in unlocked:
 			continue
 		var button: RoomCardKey = _card(def_id, def)
-		button.disabled = _blocked.has(def_id) or not def_id in unlocked
-		if not def_id in unlocked:
-			button.set_help(BuildCardText.locked_reason(def_id))
-		elif _blocked.has(def_id):
+		button.disabled = _blocked.has(def_id)
+		if _blocked.has(def_id):
 			button.set_help(_blocked[def_id])
 		else:
 			button.set_help(BuildText.summary(def))
