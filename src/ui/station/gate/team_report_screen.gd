@@ -174,6 +174,8 @@ func _world_row(state: GameState) -> HBoxContainer:
 	row.add_child(_icon(_MISSION_ICONS[mission], ""))
 	if _debrief.days > 0:
 		row.add_child(_icon(&"clock", str(_debrief.days)))
+	if _debrief.specimens > 0:
+		row.add_child(_icon(&"specimen", str(_debrief.specimens)))
 	return row
 
 

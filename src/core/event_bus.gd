@@ -209,6 +209,10 @@ signal research_queue_changed(room_id: StringName)
 signal research_queue_started(project_id: StringName, room_id: StringName)
 ## An artefact's hazard struck (logged, non-pausing message).
 signal artefact_hazard(artefact_id: StringName)
+## A specimen of alien life arrived in holding (uid, the world it came from).
+signal specimen_arrived(uid: int, world_id: StringName)
+## A specimen spoiled for want of a cold store (uid, world).
+signal specimen_spoiled(uid: int, world_id: StringName)
 ## A research project became visible for the first time ("new research").
 signal research_revealed(project_id: StringName)
 ## A story effect set a flag.

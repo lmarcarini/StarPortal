@@ -57,6 +57,12 @@ func refresh() -> void:
 			if not ArtefactRules.house_error(state, record.uid, room_filter).is_empty():
 				continue
 		_list.add_child(_row(state, record))
+	if room_filter < 0:
+		for specimen: SpecimenRecord in state.artefacts.specimens:
+			var line := Label.new()
+			line.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+			line.text = SpecimenText.line(state, specimen)
+			_list.add_child(line)
 
 
 ## Returns the action buttons, in order.

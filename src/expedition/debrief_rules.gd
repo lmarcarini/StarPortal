@@ -26,6 +26,8 @@ class Debrief:
 	var leader: String = ""
 	## Field days done (0 when unknown).
 	var days: int = 0
+	## Specimens of alien life the team brought home (M7-03).
+	var specimens: int = 0
 	## True when an object (an artefact) came back.
 	var brought_object: bool = false
 
@@ -45,6 +47,7 @@ static func of_return(state: GameState, world: StringName, summary: Dictionary) 
 	d.people = people_named(state, names)
 	d.leader = str(names[0]) if not names.is_empty() else ""
 	d.days = type_convert(summary.get("days", 0), TYPE_INT)
+	d.specimens = type_convert(summary.get("specimens", 0), TYPE_INT)
 	if state.worlds.has_reached(world, WorldsState.WorldStatus.SURVEYED):
 		d.findings.append(&"surveyed")
 	for document: Dictionary in state.expedition.documents:
