@@ -16,11 +16,11 @@ enum Mode { LOAD, SAVE }
 
 ## The name field for a new save, and its Save key.
 var name_field := LineEdit.new()
-var save_new_button := Button.new()
+var save_new_button := RefKey.new()
 ## A hint or the confirm question.
 var note := Label.new()
 ## Goes back.
-var back_button := Button.new()
+var back_button := RefKey.new()
 
 var _mode: Mode = Mode.LOAD
 var _rows := VBoxContainer.new()
@@ -30,24 +30,29 @@ var _new_row := HBoxContainer.new()
 
 func _init() -> void:
 	name = &"SlotList"
+	add_theme_constant_override(&"separation", 10)
+	_rows.add_theme_constant_override(&"separation", 8)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(560, 260)
+	scroll.custom_minimum_size = Vector2(520, 300)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	SlotListLook.well(scroll)
 	_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_rows)
 	add_child(scroll)
 	name_field.placeholder_text = "SAVES_NEW_NAME"
 	name_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	SlotListLook.field(name_field)
+	_new_row.add_theme_constant_override(&"separation", 10)
 	name_field.text_submitted.connect(func(_text: String) -> void: save_new())
 	_new_row.add_child(name_field)
-	save_new_button.text = &"SAVES_SAVE_NEW"
+	SlotListLook.key(save_new_button, &"SAVES_SAVE_NEW", 200.0)
 	save_new_button.pressed.connect(save_new)
 	_new_row.add_child(save_new_button)
 	add_child(_new_row)
-	note.theme_type_variation = &"StencilLabel"
+	SlotListLook.note(note)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(note)
-	back_button.text = &"SAVES_BACK"
+	SlotListLook.key(back_button, &"SAVES_BACK", 520.0)
 	back_button.pressed.connect(cancelled.emit)
 	add_child(back_button)
 
@@ -108,9 +113,7 @@ func choose(slot: StringName) -> void:
 
 
 func _row(entry: Dictionary) -> Button:
-	var button := Button.new()
-	button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	var button := SlotRow.new()
 	button.text = SlotText.row(entry)
 	var slot: StringName = entry["slot"]
 	var usable: bool = StringName(str(entry.get("error", ""))) == &""

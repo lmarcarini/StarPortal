@@ -3,7 +3,8 @@ extends Node
 ## scripts/reference.sh), the clock running at fast speed: gate_idle (SILL selected),
 ## gate_open (SILL dialled and open, send rail and mission sheet), other_station (Base) and
 ## the Base states base_build, base_power, base_staff and base_security (BaseCapture),
-## then the pause menu (pause_menu) and its confirm question (pause_confirm).
+## then the pause menu (pause_menu) and its confirm question (pause_confirm)
+## and its save list (pause_saves).
 ## Writes <state>.png into REF_OUT (default build/reference/). Not part of the game: lives
 ## in tools/, never in src/.
 ## Reference: docs/content/interface-reference.md section 6
@@ -21,6 +22,7 @@ var _out: String = ""
 func _ready() -> void:
 	Station3D.force_enabled = OS.get_environment("REF_3D") == "1"
 	Station3D.skip_lightmaps = true
+	SaveService.saves_dir = "user://reference_saves"
 	_out = OS.get_environment("REF_OUT")
 	if _out.is_empty():
 		_out = ProjectSettings.globalize_path("res://build/reference/")
@@ -56,6 +58,8 @@ func _process(_delta: float) -> void:
 		_shoot.bind("pause_menu"),
 		_to_pause_confirm,
 		_shoot.bind("pause_confirm"),
+		_to_pause_saves,
+		_shoot.bind("pause_saves"),
 		get_tree().quit,
 	]
 	if _step < steps.size():
@@ -111,6 +115,17 @@ func _to_pause_confirm() -> void:
 	var found: Object = _shell.get("pause_menu")
 	var menu: PauseMenu = found as PauseMenu
 	menu.quit_button.pressed.emit()
+
+
+func _to_pause_saves() -> void:
+	var found: Object = _shell.get("pause_menu")
+	var menu: PauseMenu = found as PauseMenu
+	menu.back()
+	for slot: String in ["cairn_day_two", "before_the_dig"]:
+		menu.save_button.pressed.emit()
+		menu.slots.name_field.text = slot
+		menu.slots.save_new()
+	menu.save_button.pressed.emit()
 
 
 func _shoot(state_name: String) -> void:
