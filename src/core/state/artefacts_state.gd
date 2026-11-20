@@ -1,16 +1,23 @@
 class_name ArtefactsState
 extends RefCounted
-## Saved state of the artefacts the player holds, in arrival order.
-## Saved shape: {"items": [ArtefactRecord], "next_uid"}.
-## Bible: docs/content/m4-core-systems.md sections 5 and 9
+## Saved state of what the player holds: the artefacts and (M7-03) the specimens of alien
+## life, each in arrival order.
+## Saved shape: {"items": [ArtefactRecord], "next_uid", "specimens": [SpecimenRecord],
+## "next_specimen_uid"}.
+## Bible: docs/content/m4-core-systems.md sections 5 and 9,
+## docs/content/research-and-progression.md section 10
 
 ## Saved keys, in to_dict() order.
-const KEYS: Array[String] = ["items", "next_uid"]
+const KEYS: Array[String] = ["items", "next_uid", "specimens", "next_specimen_uid"]
 
 ## Every artefact held, in arrival order.
 var items: Array[ArtefactRecord] = []
 ## Next artefact uid.
 var next_uid: int = 0
+## Every specimen held, in arrival order.
+var specimens: Array[SpecimenRecord] = []
+## Next specimen uid.
+var next_specimen_uid: int = 0
 
 
 ## Returns JSON-safe data for saving.
@@ -18,7 +25,15 @@ func to_dict() -> Dictionary:
 	var item_data: Array = []
 	for record: ArtefactRecord in items:
 		item_data.append(record.to_dict())
-	return {"items": item_data, "next_uid": next_uid}
+	var specimen_data: Array = []
+	for record: SpecimenRecord in specimens:
+		specimen_data.append(record.to_dict())
+	return {
+		"items": item_data,
+		"next_uid": next_uid,
+		"specimens": specimen_data,
+		"next_specimen_uid": next_specimen_uid,
+	}
 
 
 ## Builds the state from valid saved [param data].
@@ -27,10 +42,13 @@ static func from_dict(data: Dictionary) -> ArtefactsState:
 	for entry: Dictionary in SaveFields.dicts_in(data.get("items")):
 		state.items.append(ArtefactRecord.from_dict(entry))
 	state.next_uid = SaveFields.read_int(data.get("next_uid"))
+	for entry: Dictionary in SaveFields.dicts_in(data.get("specimens")):
+		state.specimens.append(SpecimenRecord.from_dict(entry))
+	state.next_specimen_uid = SaveFields.read_int(data.get("next_specimen_uid"))
 	return state
 
 
-## Errors of saved [param data]: both keys, valid records with distinct uids, next_uid above
+## Errors of saved [param data]: every key, valid records with distinct uids, next uids above
 ## every uid.
 static func validate_dict(data: Dictionary) -> Array[String]:
 	var errors: Array[String] = SaveFields.missing(data, KEYS)
@@ -42,6 +60,14 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 	if data["items"] is Array:
 		var records: Array = data["items"]
 		errors.append_array(SaveFields.next_uid_errors(data, records))
+	errors.append_array(
+		SaveFields.record_list_errors(data["specimens"], "specimens", SpecimenRecord.validate_dict)
+	)
+	if data["specimens"] is Array:
+		var specimen_records: Array = data["specimens"]
+		var uid_data: Dictionary = {"next_uid": data["next_specimen_uid"]}
+		for error: String in SaveFields.next_uid_errors(uid_data, specimen_records):
+			errors.append(error.replace("next_uid", "next_specimen_uid"))
 	return errors
 
 

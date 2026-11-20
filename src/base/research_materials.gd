@@ -25,6 +25,6 @@ static func pieces_held(state: GameState, artefact_id: StringName) -> int:
 	return count
 
 
-## Specimens [param state] holds (none until specimens exist, M7-03).
-static func specimens_held(_state: GameState) -> int:
-	return 0
+## Specimens [param state] holds.
+static func specimens_held(state: GameState) -> int:
+	return state.artefacts.specimens.size()

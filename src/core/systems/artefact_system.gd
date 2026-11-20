@@ -17,7 +17,7 @@ func tick(state: GameState) -> void:  # gdlint: ignore=unused-argument
 	pass
 
 
-## The daily hazard rolls, in arrival order.
+## The daily hazard rolls, in arrival order; then specimens past their days spoil (M7-03).
 func on_day(state: GameState) -> void:
 	var rng: RandomNumberGenerator = state.random.stream(get_id())
 	for record: ArtefactRecord in state.artefacts.items.duplicate():
@@ -27,6 +27,7 @@ func on_day(state: GameState) -> void:
 		if rng.randi_range(0, 99) < def.hazard_chance_pct:
 			StoryRules.apply_all(state, def.hazard, def.id)
 			state.events.post(&"artefact_hazard", [def.id])
+	SpecimenRules.spoil(state)
 
 
 ## True when [param record] sits in a room whose class is containment.

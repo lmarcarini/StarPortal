@@ -62,6 +62,8 @@ func _move_canister(state: GameState) -> void:
 	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, world_id)
 	var biohazard: int = facts.biohazard if facts != null else WorldDef.Biohazard.UNKNOWN
 	state.events.post(&"canister_returned", [world_id, biohazard])
+	if state.flags.get(SpecimenRules.CANISTER_FLAG, false) == true:
+		SpecimenRules.add(state, world_id)
 
 
 func _move_moth(state: GameState) -> void:
@@ -88,6 +90,8 @@ func _finish_scan(state: GameState, run: MothRun) -> void:
 		_end_run(state, &"shot_down")
 		return
 	MothScanEffects.apply(state, run.world_id, scan, target_id)
+	if state.flags.get(SpecimenRules.SAMPLER_FLAG, false) == true and scan != MothRules.Scan.RECALL:
+		SpecimenRules.add(state, run.world_id)
 	state.events.post(&"moth_scan_finished", [scan as int, target_id])
 	if scan == MothRules.Scan.RECALL:
 		state.probes.rack += 1

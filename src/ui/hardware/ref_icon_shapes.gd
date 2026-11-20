@@ -37,6 +37,7 @@ static func drawers() -> Dictionary[StringName, Callable]:
 		&"moth": moth,
 		&"team": team,
 		&"hail": hail,
+		&"specimen": specimen,
 	}
 
 
@@ -123,6 +124,15 @@ static func clock(p: RefPen) -> void:
 	p.ellipse(Vector2(-1, -1), Vector2(1, 1))
 	p.line([Vector2(0, 0), Vector2(0, -0.6)])
 	p.line([Vector2(0, 0), Vector2(0.45, 0.2)])
+
+
+## A specimen jar: lid, body and a sprig inside.
+static func specimen(p: RefPen) -> void:
+	p.box(Vector2(-0.5, -1), Vector2(0.5, -0.7))
+	p.box(Vector2(-0.7, -0.7), Vector2(0.7, 1))
+	p.line([Vector2(0, 0.7), Vector2(0, -0.2)])
+	p.line([Vector2(0, 0.2), Vector2(-0.35, -0.1)])
+	p.line([Vector2(0, 0.0), Vector2(0.35, -0.3)])
 
 
 static func pause(p: RefPen) -> void:

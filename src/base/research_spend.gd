@@ -7,7 +7,7 @@ extends RefCounted
 
 
 ## Removes [param def]'s pieces from [param state]'s artefacts (those in holding first) and
-## its specimens (M7-03).
+## its specimens, the oldest first.
 static func spend(state: GameState, def: ResearchDef) -> void:
 	var left: int = def.piece_count
 	for pass_housed: bool in [false, true]:
@@ -18,3 +18,4 @@ static func spend(state: GameState, def: ResearchDef) -> void:
 			if item.artefact == def.piece_artefact and housed == pass_housed:
 				state.artefacts.items.erase(item)
 				left -= 1
+	SpecimenRules.spend(state, def.specimen_count)

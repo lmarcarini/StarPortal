@@ -1,5 +1,5 @@
 {
-	"format_version": 27,
+	"format_version": 28,
 	"game_version": "0.0.0",
 	"saved_at_unix": 1794842951,
 	"state": {
@@ -76,7 +76,9 @@
 		},
 		"artefacts": {
 			"items": [],
-			"next_uid": 0
+			"next_uid": 0,
+			"specimens": [],
+			"next_specimen_uid": 0
 		},
 		"base": {
 			"doors": [],

@@ -75,6 +75,11 @@ ARTEFACT_STATE_RECOVERED,Recovered,[EN] Recovered
 ARTEFACT_STATE_HOUSED,Housed,[EN] Housed
 ARTEFACT_STATE_STUDIED,Studied,[EN] Studied
 ARTEFACT_RETRIEVE,Retrieve,[EN] Retrieve
+SPECIMEN_KIND_PLANTS,Plants,Plantas
+SPECIMEN_KIND_ANIMALS,Animal tissue,Tecido animal
+SPECIMEN_FROM,{kind} from {world},{kind} de {world}
+SPECIMEN_SPOILS,spoils in {days} d,estraga em {days} d
+SPECIMEN_COLD,kept cold,em câmara fria
 ARTEFACT_HOUSE,House in {room},[EN] House in {room}
 ARTEFACT_REMOVE,Remove to holding,[EN] Remove to holding
 ARTEFACT_REFUSED_HOLDING_FULL,Holding is full.,[EN] Holding is full.
