@@ -11,10 +11,11 @@ static func work(state: GameState, room: RoomState, def: RoomDef) -> Array:
 	if not room.is_built() or room.is_demolishing():
 		var site: SiteProgress = SiteProgress.of_room(state, room)
 		return [ProgressText.status(site).to_upper(), site.fraction]
-	if def.staff_role == &"role_scientist" and state.research.is_running():
-		var project: ResearchDef = Registry.get_def(state.research.active) as ResearchDef
+	var bench: ResearchBench = state.research.bench_of(room.id)
+	if not def.research_discipline.is_empty() and bench != null and bench.is_running():
+		var project: ResearchDef = state.research_defs.get(bench.active)
 		var name: String = "" if project == null else _tr(project.name_key)
-		return [name.to_upper(), ResearchRules.progress(state)]
+		return [name.to_upper(), ResearchSpeed.progress(state, room.id)]
 	return ["", -1.0]
 
 
@@ -37,15 +38,15 @@ static func people(state: GameState, room: RoomState) -> Array[PersonState]:
 	return out
 
 
-## "STAFF 2/4 · SPEED 67%" (the speed only for a lab), or "" for a room without slots.
+## "STAFF 2/4 · SPEED 67%" (the speed only for a research building), or "" for a room without slots.
 static func staff(state: GameState, room: RoomState, def: RoomDef) -> String:
 	if def.staff_slots <= 0:
 		return ""
 	var line: String = _tr(&"BASE_STAFF_LINE").format(
 		{"n": people(state, room).size(), "of": def.staff_slots}
 	)
-	if def.staff_role == &"role_scientist":
-		line += " · " + _tr(&"BASE_SPEED").format({"pct": ResearchRules.speed_percent(state)})
+	if not def.research_discipline.is_empty():
+		line += " · " + _tr(&"BASE_SPEED").format({"pct": ResearchSpeed.percent(state, room)})
 	return line
 
 

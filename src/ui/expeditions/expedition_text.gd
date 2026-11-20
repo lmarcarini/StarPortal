@@ -97,10 +97,10 @@ static func base_loss(state: GameState, person: PersonState) -> String:
 	var room: RoomState = state.base.find_room(person.room_id)
 	if room == null:
 		return ""
+	if room.def_id == ResearchRules.LAB_DEF:
+		var skill: int = ResearchSpeed.skill(state, room)
+		return _line(&"EXPEDITION_LOSS_RESEARCH", _speed(skill), _speed(skill - person.skill))
 	match room.def_id:
-		ResearchRules.LAB_DEF:
-			var skill: int = ResearchRules.scientist_skill(state, true)
-			return _line(&"EXPEDITION_LOSS_RESEARCH", _speed(skill), _speed(skill - person.skill))
 		BuildSpeed.WORKSHOP_DEF:
 			var crew: int = _engineer_skill(state)
 			return _line(&"EXPEDITION_LOSS_BUILD", _bonus(crew), _bonus(crew - person.skill))
@@ -108,12 +108,12 @@ static func base_loss(state: GameState, person: PersonState) -> String:
 
 
 static func _speed(skill: int) -> int:
+	if skill <= 0:
+		return 0
 	var rate: int = clampi(
-		ResearchRules.SPEED_PER_SKILL * maxi(0, skill),
-		ResearchRules.MIN_SPEED,
-		ResearchRules.MAX_SPEED
+		ResearchSpeed.SPEED_PER_SKILL * skill, ResearchSpeed.MIN_SPEED, ResearchSpeed.MAX_SPEED
 	)
-	return rate * 100 / ResearchRules.SPEED_DENOMINATOR
+	return rate * 100 / ResearchSpeed.SPEED_DENOMINATOR
 
 
 static func _bonus(skill: int) -> int:

@@ -31,7 +31,8 @@ func test_add_move_remove_and_wait() -> void:
 	_box.get_row_buttons(0)[2].pressed.emit()
 	assert_array(_box.get_names()).is_equal(["1. Second plant"])
 	assert_str(_box.get_wait_text()).is_empty()
-	_state.research.active = &""
+	for bench: ResearchBench in _state.research.benches.values():
+		bench.active = &""
 	_state.budget.funds_k = 0
 	_box.refresh()
 	assert_str(_box.get_wait_text()).is_equal("Waiting for funds")

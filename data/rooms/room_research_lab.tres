@@ -19,4 +19,5 @@ staff_role = &"role_scientist"
 staff_slots = 4
 name_key = &"ROOM_RESEARCH_LAB_NAME"
 description_key = &"ROOM_RESEARCH_LAB_NOW"
+research_discipline = &"science"
 id = &"room_research_lab"

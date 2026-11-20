@@ -20,8 +20,8 @@ func before_test() -> void:
 	_study = ResearchDef.new()
 	_study.id = &"study_loom"
 	_study.order = 50
-	_study.days = 1
-	_study.category = &"research_alien"
+	_study.hours = 24
+	_study.discipline = &"science"
 	_study.name_key = &"Loom study"
 	var held := HasArtefactCondition.new()
 	held.artefact = ARTEFACT
@@ -33,6 +33,7 @@ func before_test() -> void:
 	var follow := ResearchDef.new()
 	follow.id = &"loom_weaving"
 	follow.order = 51
+	follow.discipline = &"science"
 	follow.needs = [_study.id]
 	follow.effects = [ModifierEffect.new()]
 	_state.research_defs[follow.id] = follow
@@ -44,16 +45,12 @@ func test_locked_until_held_then_studied() -> void:
 	)
 	StoryRulesItems.give_artefact(_state, ARTEFACT)
 	StoryRulesItems.give_artefact(_state, ARTEFACT)
-	assert_bool(ResearchRules.is_available(_state, _study)).is_true()
-	(
-		assert_bool(ResearchRules.is_available(_state, _state.research_defs[&"loom_weaving"]))
-		. is_false()
-	)
-	_state.research.active = _study.id
-	ResearchSystem.finish(_state, _study)
+	assert_bool(ResearchRules.available(_state, _study)).is_true()
+	assert_bool(ResearchRules.available(_state, _state.research_defs[&"loom_weaving"])).is_false()
+	ResearchSystem.finish(_state, _study, &"")
 	for record: ArtefactRecord in _state.artefacts.items:
 		assert_int(record.state).is_equal(ArtefactRecord.ArtefactState.STUDIED)
-	assert_bool(ResearchRules.is_available(_state, _state.research_defs[&"loom_weaving"])).is_true()
+	assert_bool(ResearchRules.available(_state, _state.research_defs[&"loom_weaving"])).is_true()
 	assert_str(ArtefactText.describe(_state, _state.artefacts.items[0])).contains(
 		"Studied by Loom study"
 	)
@@ -61,16 +58,17 @@ func test_locked_until_held_then_studied() -> void:
 
 func test_hand_over_pauses() -> void:
 	StoryRulesItems.give_artefact(_state, ARTEFACT)
-	_state.research.active = _study.id
+	var lab: RoomState = PowerFixture.lab(_state)
+	var bench: ResearchBench = _state.research.ensure_bench(lab.id)
+	bench.active = _study.id
 	var system := ResearchSystem.new()
-	_state.base.add_room(&"room_research_lab", 1, Vector2i(30, 2))
 	var take := TakeArtefactEffect.new()
 	take.artefact = ARTEFACT
 	StoryRules.apply(_state, take, &"x")
-	var before: int = _state.research.ticks_done
+	var before: int = bench.ticks_done
 	for tick: int in 20:
 		system.tick(_state)
-	assert_int(_state.research.ticks_done).is_equal(before)
+	assert_int(bench.ticks_done).is_equal(before)
 
 
 func test_content_check_pairs_study_with_has_artefact() -> void:

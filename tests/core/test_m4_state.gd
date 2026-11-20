@@ -53,7 +53,7 @@ func _filled() -> GameState:
 	artefact.arrived_tick = 4500
 	state.artefacts.items.append(artefact)
 	state.artefacts.next_uid = 1
-	state.research.queue.append(&"research_a")
+	state.research.ensure_bench(&"room_1").queue.append(&"research_a")
 	state.research.revealed.append(&"research_hidden")
 	state.gate.incoming_faction = &"faction_kindred"
 	state.gate.incoming_conversation = &"conv_gift"
@@ -134,7 +134,7 @@ func test_malformed_sections_are_rejected() -> void:
 		[["artefacts", "items", 0, "state"], 3],
 		[["artefacts", "items", 0, "room_uid"], -4],
 		[["artefacts", "items", 0, "uid"], 9007199254740994.0],
-		[["research", "queue"], ["a", ""]],
+		[["research", "benches"], {"r": {"active": "", "ticks_done": 0, "queue": ["a", ""]}}],
 		[["research", "revealed"], 5],
 		[["gate", "incoming"], {"faction": "x"}],
 		[["gate", "incoming"], []],

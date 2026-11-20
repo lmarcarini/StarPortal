@@ -42,6 +42,9 @@ extends DefBase
 ## The storage class it houses: &"vault" or &"containment" (which also houses vault
 ## artefacts); &"" for rooms without artefact slots.
 @export var artefact_class: StringName = &""
+## The research discipline this room runs, one project at a time with its own queue, with
+## its staff of [member staff_role] (ResearchDef.DISCIPLINES); &"" when it researches nothing.
+@export var research_discipline: StringName = &""
 
 
 ## The staff role, when the room has one.
@@ -57,6 +60,13 @@ func get_content_errors(_defs: Dictionary[StringName, DefBase]) -> Array[String]
 	var errors: Array[String] = []
 	if (artefact_slots > 0) != (not artefact_class.is_empty()):
 		errors.append("needs both artefact slots and an artefact class, or neither")
+	if (
+		not research_discipline.is_empty()
+		and (not research_discipline in ResearchDef.DISCIPLINES or staff_slots == 0)
+	):
+		errors.append(
+			"researches '%s' without staff slots or a known discipline" % research_discipline
+		)
 	if not artefact_class.is_empty() and not ArtefactDef.STORAGE_CLASSES.has(artefact_class):
 		errors.append("has artefact class '%s', not vault or containment" % artefact_class)
 	if artefact_slots < 0:

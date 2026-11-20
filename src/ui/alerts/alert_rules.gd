@@ -51,13 +51,13 @@ static func _base_alerts(state: GameState) -> Array[AlertEntry]:
 
 
 static func _lab_idle(state: GameState) -> bool:
-	if state.research.active != &"" or not state.research.queue.is_empty():
-		return false
 	for room: RoomState in state.base.rooms:
-		if room.def_id != &"room_research_lab":
-			continue
 		var def: RoomDef = state.room_defs.get(room.def_id)
-		if PowerRules.is_running(room, def):
+		if def == null or def.research_discipline.is_empty():
+			continue
+		var bench: ResearchBench = state.research.bench_of(room.id)
+		var busy: bool = bench != null and (bench.is_running() or not bench.queue.is_empty())
+		if not busy and ResearchSpeed.speed(state, room) > 0:
 			return true
 	return false
 

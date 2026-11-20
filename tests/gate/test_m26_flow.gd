@@ -136,7 +136,7 @@ func _build_lab_on_a_painted_corridor(player: M15Player) -> void:
 	var lab: RoomState = PowerFixture.first_room(player.state(), LAB_DEF)
 	assert_int(_wait(player, lab.is_built)).is_equal(8 * 60)
 	assert_bool(lab.powered_on).is_true()
-	assert_int(ResearchRules.speed_percent(player.state())).is_equal(100)
+	assert_int(ResearchSpeed.percent(player.state(), lab)).is_equal(100)
 
 
 ## SILL's lock energy is ready about 17.3 hours in (m25-lean-start.md section 1); it locks.
@@ -190,7 +190,7 @@ func _assign_to_the_lab(player: M15Player, person_id: StringName) -> void:
 	_free_ui()
 	var lab: RoomState = PowerFixture.first_room(player.state(), LAB_DEF)
 	assert_str(player.state().staff.find_person(person_id).room_id).is_equal(lab.id)
-	assert_int(ResearchRules.speed_percent(player.state())).is_equal(150)
+	assert_int(ResearchSpeed.percent(player.state(), lab)).is_equal(150)
 
 
 ## The tech tree's Excavation survey node and Start begin the survey ($400k); at 150% its
@@ -205,7 +205,7 @@ func _start_survey_from_the_tree(player: M15Player) -> void:
 	assert_str(start.text).is_equal("Start")
 	await UiInput.click(start)
 	_free_ui()
-	assert_str(String(player.state().research.active)).is_equal("excavation_survey")
+	assert_array(player.state().research.running()).is_equal([&"excavation_survey"])
 	var done: Callable = func() -> bool:
 		return player.state().research.is_done(&"excavation_survey")
 	assert_int(_wait(player, done)).is_between(SURVEY_TICKS * 2 / 3, SURVEY_TICKS * 2 / 3 + 1)

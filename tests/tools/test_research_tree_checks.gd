@@ -8,7 +8,7 @@ static func _def(id: StringName, needs: Array[StringName], order: int) -> Resear
 	def.id = id
 	def.needs = needs
 	def.order = order
-	def.category = &"research_energy"
+	def.discipline = &"science"
 	return def
 
 
@@ -25,7 +25,7 @@ func test_cycle() -> void:
 
 func test_never_visible_need_and_orders() -> void:
 	var hidden: ResearchDef = _def(&"hidden", [], 1)
-	hidden.reveal = &"hidden"
+	hidden.story = true
 	hidden.requires = [FactionMetCondition.new()]
 	var after: ResearchDef = _def(&"after", [&"hidden"], 1)
 	var none: Dictionary[StringName, bool] = {}
@@ -46,5 +46,5 @@ func test_revealed_ids_and_report() -> void:
 	assert_dict(ContentCheckResearchTree.revealed_ids(defs)).is_equal({&"hidden": true})
 	var list: Array[ResearchDef] = [_def(&"x", [], 1), _def(&"y", [&"x"], 2), _def(&"z", [&"y"], 3)]
 	var lines: Array[String] = ContentCheckResearchTree.report(list)
-	assert_str(lines[0]).is_equal("research: research_energy has 3 project(s)")
+	assert_str(lines[0]).is_equal("research: science has 3 project(s)")
 	assert_str(lines[-1]).is_equal("research: deepest needs chain is 3 project(s)")

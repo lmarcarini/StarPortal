@@ -95,10 +95,11 @@ static func _complete(state: GameState, project: StringName) -> bool:
 	var def: ResearchDef = state.research_defs.get(project)
 	if def == null or state.research.is_done(project):
 		return false
-	if state.research.active == project:
-		ResearchSystem.finish(state, def)
+	var room_id: StringName = state.research.room_running(project)
+	if not room_id.is_empty():
+		ResearchSystem.finish(state, def, room_id)
 		return true
 	StoryRules.apply_all(state, def.effects, def.id)
 	state.research.done.append(project)
-	state.events.post(&"research_done", [project])
+	state.events.post(&"research_done", [project, &""])
 	return true

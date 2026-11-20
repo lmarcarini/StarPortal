@@ -34,11 +34,12 @@ static func charge(state: GameState) -> void:
 	state.power.stored_mwh = PowerRules.capacity_mwh(state)
 
 
-## Finishes the current research project.
+## Finishes every running research project.
 static func finish_research(state: GameState) -> void:
-	var def: ResearchDef = state.research_defs.get(state.research.active)
-	if def != null:
-		ResearchSystem.finish(state, def)
+	for room_id: StringName in state.research.benches.keys():
+		var def: ResearchDef = state.research_defs.get(state.research.benches[room_id].active)
+		if def != null:
+			ResearchSystem.finish(state, def, room_id)
 
 
 ## Finishes every site and dig on their next tick.
@@ -77,18 +78,14 @@ static func unlock_all_research(state: GameState) -> void:
 	var defs: Array[ResearchDef] = []
 	defs.assign(state.research_defs.values())
 	defs.sort_custom(func(a: ResearchDef, b: ResearchDef) -> bool: return a.order < b.order)
-	var active: StringName = state.research.active
 	for def: ResearchDef in defs:
 		if not state.research.is_done(def.id):
 			StoryRules.apply_all(state, def.effects, def.id)
 			state.research.done.append(def.id)
 			if not state.research.revealed.has(def.id):
 				state.research.revealed.append(def.id)
-	if state.research.is_done(active):
-		state.research.active = &""
-		state.research.ticks_done = 0
-	state.research.queue.clear()
-	state.events.post(&"research_done", [&""])
+	state.research.benches.clear()
+	state.events.post(&"research_done", [&"", &""])
 
 
 ## Heals every injured person.

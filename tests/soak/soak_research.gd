@@ -58,12 +58,14 @@ static func work_research(simulation: Simulation, order: Array[StringName]) -> b
 ## queue is empty and the project may be queued. True when it sent a command.
 static func _queue_next(simulation: Simulation, order: Array[StringName]) -> bool:
 	var state: GameState = simulation.state
-	if not state.research.queue.is_empty():
+	var running: Array[StringName] = state.research.running()
+	var room_id: StringName = state.research.room_running(running[0])
+	if not state.research.bench_of(room_id).queue.is_empty():
 		return false
 	for project_id: StringName in order:
-		if state.research.is_done(project_id) or state.research.active == project_id:
+		if state.research.is_done(project_id) or project_id in running:
 			continue
-		var next := QueueResearchCommand.new(project_id)
+		var next := QueueResearchCommand.new(project_id, room_id)
 		if not next.validate(state).is_ok:
 			return false
 		simulation.submit(next)

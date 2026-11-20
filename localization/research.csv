@@ -33,7 +33,7 @@ RESEARCH_START,Start,Iniciar
 RESEARCH_CANCEL,Cancel ({refund} back),Cancelar ({refund} de volta)
 RESEARCH_SELECTED,SELECTED,SELECIONADO
 RESEARCH_ERR_OTHER,Not possible right now.,Não é possível agora.
-RESEARCH_ONE_LAB_ENOUGH,More labs hold more scientists.,Mais laboratórios comportam mais cientistas.
+RESEARCH_ONE_LAB_ENOUGH,A second lab runs a second project.,Um segundo laboratório conduz um segundo projeto.
 RESEARCH_CAT_CONSTRUCTION,Construction,Construção
 RESEARCH_CAT_ENERGY,Energy,Energia
 RESEARCH_CAT_GATE,Gate,Portal
