@@ -105,11 +105,30 @@ func _draw() -> void:
 
 func _draw_squads(state: GameState) -> void:
 	var picked: SquadState = state.security.squad_of(preview_squad)
+	var cells: Dictionary[Vector3i, RoomState] = BasePaths.occupancy(state.base, state.room_defs)
+	var stacked: Dictionary[StringName, int] = {}
 	for squad: SquadState in state.security.squads:
 		var key: String = "squad:" + String(squad.post_room)
-		if squad.pos.z == _plan.level and shown.has(key):
-			var number: int = SquadRules.number_of(state, squad.post_room)
-			SecurityMarks.tag(self, _screen(shown[key]), number, squad == picked)
+		if squad.pos.z != _plan.level or not shown.has(key):
+			continue
+		var at: Vector2 = _screen(shown[key])
+		var room: RoomState = cells.get(squad.pos)
+		if room != null and room.def_id != StartingBase.CORRIDOR_DEF:
+			var index: int = stacked.get(room.id, 0)
+			stacked[room.id] = index + 1
+			at = _corner(state, room, index)
+		var number: int = SquadRules.number_of(state, squad.post_room)
+		SecurityMarks.tag(self, at, number, squad == picked)
+
+
+# The centre of the [param index]th tag in [param room]'s bottom-right corner (screen
+# pixels), stacked leftward, clear of the room's name along the top and above its staff slots.
+func _corner(state: GameState, room: RoomState, index: int) -> Vector2:
+	var def: RoomDef = state.room_defs[room.def_id]
+	var area: Rect2 = PlanTiles.rect_of(_plan, BaseRules.footprint(room, def), 4.0)
+	var step: float = SecurityMarks.TAG * 2.0 + 6.0
+	var lift: float = SecurityMarks.TAG + (46.0 if def.staff_slots > 0 else 10.0)
+	return area.end - Vector2(SecurityMarks.TAG + 10.0 + index * step, lift)
 
 
 func _screen(at: Vector2) -> Vector2:

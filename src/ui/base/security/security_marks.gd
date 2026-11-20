@@ -5,8 +5,9 @@ extends RefCounted
 ## and the objective's target mark. Every mark has a shape as well as a colour.
 ## Bible: docs/content/m4c-incursions.md section 7
 
+## Half the side of a squad tag, in screen pixels.
+const TAG: float = 15.0
 const _SIZE: float = 9.0
-const _TAG: float = 15.0
 
 
 ## A squad tag: a filled square with [param number] in it.
@@ -20,7 +21,7 @@ static func square(canvas: CanvasItem, at: Vector2, number: int, font: Font, ink
 ## A squad tag on the plan, in screen pixels: a steel square with [param number], amber
 ## when [param lit] (the picked squad).
 static func tag(canvas: CanvasItem, at: Vector2, number: int, lit: bool) -> void:
-	var box := Rect2(at - Vector2(_TAG, _TAG), Vector2(_TAG, _TAG) * 2.0)
+	var box := Rect2(at - Vector2(TAG, TAG), Vector2(TAG, TAG) * 2.0)
 	canvas.draw_rect(box.grow(2.0), Color(0, 0, 0, 0.6))
 	canvas.draw_rect(box, RefPaint.AMBER if lit else RefPaint.TEXT)
 	canvas.draw_rect(box, RefPaint.EDGE, false, 1.5)
