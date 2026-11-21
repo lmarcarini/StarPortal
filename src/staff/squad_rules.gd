@@ -73,7 +73,8 @@ static func sync(state: GameState) -> void:
 	state.security.squads = wanted
 
 
-## Walks [param squad] of [param state] one tick along its path: squad_cells_per_tick steps,
+## Walks [param squad] of [param state] one tick along its path: squad_cells_per_tick steps
+## (twice as many with Rapid response, O09),
 ## a change of level costing squad_level_ticks ticks' worth. Arriving holds. Returns true
 ## when it moved.
 static func walk(state: GameState, squad: SquadState) -> bool:
@@ -85,7 +86,7 @@ static func walk(state: GameState, squad: SquadState) -> bool:
 	if path.size() <= 1:
 		squad.order = SquadState.Order.HOLD
 		return false
-	var budget: int = state.balance.squad_cells_per_tick
+	var budget: int = OfficePerks.squad_cells_per_tick(state)
 	var level_cost: int = state.balance.squad_level_ticks * budget
 	var index: int = 1
 	while index < path.size():

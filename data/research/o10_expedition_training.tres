@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/conditions/room_built_condition.gd" id="3"]
+
+; docs/content/research-and-progression.md section 10 (O10).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+flag = &"teams_of_five"
+
+[sub_resource type="Resource" id="c1"]
+script = ExtResource("3")
+room = &"room_ready_room"
+
+[resource]
+script = ExtResource("1")
+order = 10
+discipline = &"office"
+tier = 2
+cost_k = 500
+hours = 36
+needs = Array[StringName]([])
+reveal_when = Array[Resource]([SubResource("c1")])
+requires = Array[Resource]([])
+story = false
+effects = Array[Resource]([SubResource("fx0")])
+name_key = &"RESEARCH_EXPEDITION_TRAINING_NAME"
+line_key = &"RESEARCH_EXPEDITION_TRAINING_LINE"
+id = &"expedition_training"

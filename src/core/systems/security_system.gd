@@ -16,5 +16,6 @@ func tick(state: GameState) -> void:
 		return
 	SquadRules.sync(state)
 	for squad: SquadState in state.security.squads:
+		OfficePerks.auto_fall_back(state, squad)
 		if SquadRules.walk(state, squad):
 			state.events.post(&"squad_changed", [squad.post_room])

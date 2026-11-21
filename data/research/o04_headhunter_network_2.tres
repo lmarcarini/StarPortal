@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="2"]
+
+; docs/content/research-and-progression.md section 10 (O04).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+flag = &"hr_candidate_tier_3"
+
+[resource]
+script = ExtResource("1")
+order = 4
+discipline = &"office"
+tier = 3
+cost_k = 1500
+hours = 108
+needs = Array[StringName]([&"headhunter_network_1"])
+reveal_when = Array[Resource]([])
+requires = Array[Resource]([])
+story = false
+effects = Array[Resource]([SubResource("fx0")])
+name_key = &"RESEARCH_HEADHUNTER_NETWORK_2_NAME"
+line_key = &"RESEARCH_HEADHUNTER_NETWORK_2_LINE"
+id = &"headhunter_network_2"

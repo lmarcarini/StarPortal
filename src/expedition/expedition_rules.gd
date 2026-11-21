@@ -114,9 +114,11 @@ static func open_ticks_left(state: GameState) -> int:
 
 
 ## True when a Survey of [param plan] in [param state] would go in blind (M4c-22): the world
-## is Locked but was never Probed.
+## is Locked but was never Probed. Never with Survival training (O11).
 static func is_blind(state: GameState, plan: ExpeditionState) -> bool:
 	if plan.objective != ExpeditionState.Objective.SURVEY:
+		return false
+	if ResearchPerks.has(state, OfficePerks.SURVIVAL_TRAINING):
 		return false
 	return not state.worlds.has_reached(plan.world_id, WorldsState.WorldStatus.PROBED)
 
