@@ -114,6 +114,10 @@ func get_shown_texts() -> Array[String]:
 	return [_title.text, _source.text, _received.text, _body.get_parsed_text()]
 
 
+func _state_now() -> GameState:
+	return SimClock.simulation.state if SimClock.simulation != null else null
+
+
 func _show() -> void:
 	var has_document: bool = not _document_id.is_empty()
 	_empty.visible = not has_document
@@ -129,6 +133,9 @@ func _show() -> void:
 	_image.visible = image != null
 	var body_key: StringName = _def.body_key if _def != null else &""
 	_body.text = DocumentText.body_bbcode(tr(body_key)) if not body_key.is_empty() else ""
+	var gloss: String = DocumentText.gloss(_def, _state_now())
+	if not gloss.is_empty():
+		_body.text += ("\n\n" if not _body.text.is_empty() else "") + gloss
 	_body.visible = not _body.text.is_empty()
 	if not has_document:
 		_read_with.disabled = true

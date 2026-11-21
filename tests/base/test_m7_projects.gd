@@ -184,3 +184,12 @@ func test_gate_calibration_marks_the_need() -> void:
 	gauge.show_state(_state, 50.0)
 	assert_float(gauge.get_need_share()).is_greater_equal(0.0)
 	gauge.free()
+
+
+func test_xenolinguistics_glosses_alien_text() -> void:
+	var rubbing: DocumentDef = Registry.get_def(&"doc_lintel_rubbing") as DocumentDef
+	assert_str(DocumentText.gloss(rubbing, _state)).is_empty()
+	_done(&"xenolinguistics")
+	assert_str(DocumentText.gloss(rubbing, _state)).contains("Partial translation")
+	var note: DocumentDef = Registry.get_def(&"doc_lintel_note") as DocumentDef
+	assert_str(DocumentText.gloss(note, _state)).is_empty()
