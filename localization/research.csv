@@ -95,8 +95,8 @@ RESEARCH_EFFIGY_WARDS_NAME,Effigy wards,[EN] Effigy wards
 RESEARCH_EFFIGY_WARDS_LINE,Dialing costs 10% less energy.,[EN] Dialing costs 10% less energy.
 RESEARCH_FIELD_MEDICINE_NAME,Field medicine,[EN] Field medicine
 RESEARCH_FIELD_MEDICINE_LINE,Field checks are a little easier.,[EN] Field checks are a little easier.
-RESEARCH_SURVIVAL_TRAINING_NAME,Survival training,[EN] Survival training
-RESEARCH_SURVIVAL_TRAINING_LINE,Field checks are a little easier again.,[EN] Field checks are a little easier again.
+RESEARCH_SURVIVAL_TRAINING_NAME,"Survival training","Treinamento de sobrevivência"
+RESEARCH_SURVIVAL_TRAINING_LINE,"The blind-expedition penalty is removed.","A penalidade de expedição às cegas é removida."
 RESEARCH_COMMAND_STAFF_NAME,Command staff,[EN] Command staff
 RESEARCH_COMMAND_STAFF_LINE,The Committee adds $20k a day.,[EN] The Committee adds $20k a day.
 RESEARCH_STAFF_WELFARE_NAME,Staff welfare,[EN] Staff welfare
@@ -177,3 +177,29 @@ RESEARCH_CULTURAL_EXCHANGE_OSSAR_NAME,"Ossar envoys","Enviados Ossar"
 RESEARCH_CULTURAL_EXCHANGE_OSSAR_LINE,"Envoy exchange: the Ossar's daily favour.","Troca de enviados: o favor diário dos Ossar."
 RESEARCH_DOMAIN_GLYPHS_NAME,"Domain glyphs","Glifos de domínio"
 RESEARCH_DOMAIN_GLYPHS_LINE,"Story.","História."
+RESEARCH_HEADHUNTER_NETWORK_1_NAME,"Headhunter network I","Rede de recrutadores I"
+RESEARCH_HEADHUNTER_NETWORK_1_LINE,"Candidates of tier 2.","Candidatos de nível 2."
+RESEARCH_RECRUITMENT_DRIVE_1_NAME,"Recruitment drive I","Campanha de recrutamento I"
+RESEARCH_RECRUITMENT_DRIVE_1_LINE,"Five candidates per batch.","Cinco candidatos por lote."
+RESEARCH_FAST_TRACK_1_NAME,"Fast-track I","Via rápida I"
+RESEARCH_FAST_TRACK_1_LINE,"The board refreshes every 5 days.","O quadro se renova a cada 5 dias."
+RESEARCH_HEADHUNTER_NETWORK_2_NAME,"Headhunter network II","Rede de recrutadores II"
+RESEARCH_HEADHUNTER_NETWORK_2_LINE,"Candidates of tier 3, specialists.","Candidatos de nível 3, especialistas."
+RESEARCH_RECRUITMENT_DRIVE_2_NAME,"Recruitment drive II","Campanha de recrutamento II"
+RESEARCH_RECRUITMENT_DRIVE_2_LINE,"Seven candidates per batch.","Sete candidatos por lote."
+RESEARCH_FAST_TRACK_2_NAME,"Fast-track II","Via rápida II"
+RESEARCH_FAST_TRACK_2_LINE,"The board refreshes every 3 days.","O quadro se renova a cada 3 dias."
+RESEARCH_COMMITTEE_LIAISON_NAME,"Committee liaison","Ligação com o Comitê"
+RESEARCH_COMMITTEE_LIAISON_LINE,"A new call to the Committee: emergency funds, once a month.","Uma nova ligação ao Comitê: verba de emergência, uma vez por mês."
+RESEARCH_SQUAD_DOCTRINE_NAME,"Squad doctrine","Doutrina de esquadrão"
+RESEARCH_SQUAD_DOCTRINE_LINE,"Squads fall back by themselves when losing.","Esquadrões recuam sozinhos quando estão perdendo."
+RESEARCH_RAPID_RESPONSE_NAME,"Rapid response","Resposta rápida"
+RESEARCH_RAPID_RESPONSE_LINE,"Squads move twice as fast.","Esquadrões se movem duas vezes mais rápido."
+RESEARCH_EXPEDITION_TRAINING_NAME,"Expedition training","Treinamento de expedição"
+RESEARCH_EXPEDITION_TRAINING_LINE,"Teams of five.","Equipes de cinco."
+RESEARCH_SHIFT_SYSTEM_NAME,"Shift system","Sistema de turnos"
+RESEARCH_SHIFT_SYSTEM_LINE,"Research and building 50% faster.","Pesquisa e construção 50% mais rápidas."
+RESEARCH_HALCYON_CONTRACTS_NAME,"Halcyon contracts","Contratos Halcyon"
+RESEARCH_HALCYON_CONTRACTS_LINE,"Story.","História."
+RESEARCH_BLACK_FUNDS_NAME,"Black funds","Verbas secretas"
+RESEARCH_BLACK_FUNDS_LINE,"Story.","História."
