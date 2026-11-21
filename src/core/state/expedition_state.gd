@@ -80,10 +80,13 @@ var last_plans: Dictionary[String, Dictionary] = {}
 ## The mission order running or last ended (M4.9-12, format v25). Kept by clear().
 var order: MissionOrder = MissionOrder.new()
 
+## A long stay (Field camp, E19): the objective's field days doubled.
+var long_stay: bool = false
 
-## Field days of the planned objective.
+
+## Field days of the planned objective (twice as many on a long stay).
 func days() -> int:
-	return OBJECTIVE_DAYS[objective]
+	return OBJECTIVE_DAYS[objective] * (2 if long_stay else 1)
 
 
 ## The person ids of the team, in slot order.
@@ -148,6 +151,7 @@ func clear() -> void:
 	day_results.clear()
 	recalled = false
 	blind = false
+	long_stay = false
 	delay_ticks = 0
 	missed_tick = -1
 	signal_tick = -1
@@ -183,6 +187,7 @@ func to_dict() -> Dictionary:
 		"signal_tick": signal_tick,
 		"documents": documents.duplicate(true),
 		"blind": blind,
+		"long_stay": long_stay,
 		"delay_ticks": delay_ticks,
 		"heard_tick": heard_tick,
 		"heard_days": heard_days,
@@ -215,6 +220,7 @@ static func from_dict(data: Dictionary) -> ExpeditionState:
 			expedition.day_results.append(str(result))
 	expedition.recalled = data.get("recalled", false) == true
 	expedition.blind = data.get("blind", false) == true
+	expedition.long_stay = data.get("long_stay", false) == true
 	var delay: int = type_convert(data.get("delay_ticks", 0), TYPE_INT)
 	expedition.delay_ticks = maxi(0, delay)
 	expedition.missed_tick = type_convert(data.get("missed_tick", -1), TYPE_INT)

@@ -196,6 +196,10 @@ GAME_OVER_LOAD_LAST,Load last save,Carregar último save
 PAUSE_FAILURE_STATES,Failure states (the game can be lost),Estados de derrota (o jogo pode ser perdido)
 PAUSE_AUTO_TEAM_REPORT,Open the team report on return,Abrir o relatório da equipe no retorno
 ALARM_INCOMING,UNSCHEDULED INCOMING — {ticks},CHEGADA NÃO PROGRAMADA — {ticks}
+ALARM_OBJECTIVE,OBJECTIVE: {name},OBJETIVO: {name}
+INCURSION_OBJECTIVE_SABOTAGE,SABOTAGE,SABOTAGEM
+INCURSION_OBJECTIVE_THEFT,THEFT,ROUBO
+INCURSION_OBJECTIVE_ASSAULT,ASSAULT,ATAQUE
 ALARM_BREACHES_SHUTTER,They have a way through the Shutter,Eles têm como passar pelo Obturador
 ALARM_INTRUDERS,INTRUDERS ON LEVEL {levels},INTRUSOS NO NÍVEL {levels}
 ALARM_OVERRUN,CONTROL ROOM FALLS IN {ticks},SALA DE CONTROLE CAI EM {ticks}

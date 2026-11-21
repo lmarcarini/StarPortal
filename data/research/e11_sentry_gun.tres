@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="2"]
+
+; docs/content/research-and-progression.md section 10 (E11).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+flag = &"plan_sentry_gun"
+
+[resource]
+script = ExtResource("1")
+order = 11
+discipline = &"engineering"
+tier = 3
+cost_k = 1500
+hours = 108
+needs = Array[StringName]([&"plan_security_post"])
+reveal_when = Array[Resource]([])
+requires = Array[Resource]([])
+story = false
+effects = Array[Resource]([SubResource("fx0")])
+name_key = &"RESEARCH_SENTRY_GUN_NAME"
+line_key = &"RESEARCH_SENTRY_GUN_LINE"
+id = &"sentry_gun"

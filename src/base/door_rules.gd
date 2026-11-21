@@ -17,10 +17,13 @@ static func find(base: BaseState, level: int, cell: Vector2i) -> DoorState:
 	return null
 
 
-## Whether a door may be built at [param cell] on [param level] of [param state]: on a built
-## corridor cell (&"not_corridor"), not beside the Gate Room (&"gate_doorway"), none there
+## Whether a door may be built at [param cell] on [param level] of [param state]: its plan
+## known (Blast doors, E10; &"needs_research"), on a built corridor cell (&"not_corridor"),
+## not beside the Gate Room (&"gate_doorway"), none there
 ## already (&"door_exists").
 static func can_build(state: GameState, level: int, cell: Vector2i) -> CommandResult:
+	if not ResearchPerks.has(state, ResearchPerks.BLAST_DOOR):
+		return CommandResult.fail(&"needs_research", "blast_doors")
 	var cells: Dictionary[Vector3i, RoomState] = BasePaths.occupancy(state.base, state.room_defs)
 	var room: RoomState = cells.get(Vector3i(cell.x, cell.y, level))
 	if room == null or room.def_id != StartingBase.CORRIDOR_DEF:

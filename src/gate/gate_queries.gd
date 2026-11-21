@@ -78,4 +78,7 @@ static func can_hail(state: GameState) -> bool:
 ## The longest a wormhole stays open, in ticks (minutes): the balance plus the
 ## wormhole_minutes modifier (M4), at least 1.
 static func max_open_ticks(state: GameState) -> int:
-	return maxi(1, state.balance.max_open_ticks + ModifierRules.total(state, &"wormhole_minutes"))
+	var minutes: int = (
+		state.balance.max_open_ticks + ModifierRules.total(state, &"wormhole_minutes")
+	)
+	return maxi(1, minutes * (100 + ModifierRules.total(state, &"wormhole_open_pct")) / 100)

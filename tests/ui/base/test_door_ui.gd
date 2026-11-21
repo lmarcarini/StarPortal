@@ -14,6 +14,7 @@ func before_test() -> void:
 	TranslationServer.set_locale("en")
 	var defs: GameDefs = GameDefs.from_registry(Registry)
 	_simulation = GameSetup.build_new(GameState.new_game(1, defs.balance), defs).value
+	UnlockFixture.defence_plans(_simulation.state)
 	_root = Control.new()
 	_root.size = Vector2(1280, 640)
 	_view = (load(VIEW_SCENE) as PackedScene).instantiate() as BaseView

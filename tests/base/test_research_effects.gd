@@ -53,22 +53,12 @@ func test_second_plant() -> void:
 	var game: GameState = ResearchFixture.state()
 	var supply: float = PowerRules.supply_mw(game)
 	assert_bool(_can_build(game, &"room_power_plant")).is_false()
+	game.research.revealed.append(&"second_plant")
 	ResearchFixture.finish(game, &"second_plant")
 	_assert_cache_fresh(game)
 	assert_bool(_can_build(game, &"room_power_plant")).is_true()
 	game.base.add_room(&"room_power_plant", 1, Vector2i(5, 12))
 	assert_float(PowerRules.supply_mw(game)).is_equal(supply + 30.0)
-	_assert_cache_fresh(game)
-
-
-## R5: every diesel plant's upkeep drops from $150k to $100k per 30 days.
-func test_fuel_contracts() -> void:
-	var game: GameState = ResearchFixture.state()
-	var before: int = EconomySystem.upkeep_k(game.base, game.room_defs, game.unlocks)
-	ResearchFixture.finish(game, &"second_plant")
-	ResearchFixture.finish(game, &"fuel_contracts")
-	var after: int = EconomySystem.upkeep_k(game.base, game.room_defs, game.unlocks)
-	assert_int(before - after).is_equal(50)
 	_assert_cache_fresh(game)
 
 
@@ -81,7 +71,8 @@ func test_bank_array() -> void:
 	)
 	ResearchFixture.finish(game, &"bank_array")
 	assert_bool(_can_build(game, &"room_capacitor_bank")).is_true()
-	assert_int(game.unlocks.bank_cap).is_equal(3)
+	assert_int(game.unlocks.bank_cap).is_equal(2)
+	assert_int(ModifierRules.total(game, &"charge_rate_pct")).is_equal(100)
 
 
 ## The Workshop is known from the start (M7-02: Engineering opens at the start).

@@ -12,11 +12,12 @@ var _simulation: Simulation
 func before_test() -> void:
 	var defs: GameDefs = GameDefs.from_registry(Registry)
 	_state = GameState.new_game(7, defs.balance)
+	UnlockFixture.defence_plans(_state)
 	_simulation = GameSetup.build_new(_state, defs).value
 	_state.clock.mode = ClockState.Mode.RUNNING
 	_state.budget.funds_k += 20000
 	# The Vault needs Secure storage (owner change 2026-11-14); its research is not this test.
-	UnlockFixture.apply_project(_state.unlocks, &"secure_storage")
+	UnlockFixture.apply_project(_state.unlocks, &"artefact_vault")
 
 
 func _ticks(count: int) -> void:
@@ -94,6 +95,7 @@ func test_m4b_loop() -> void:
 	)
 	assert_bool(ResearchRules.visible(_state, pedagogy)).is_true()
 	# Queue three visible projects behind the running one.
+	ResearchFixture.workshop(_state)
 	_submit(StartResearchCommand.create(&"excavation_survey"))
 	var lab_id: StringName = PowerFixture.first_room(_state, &"room_research_lab").id
 	var queued: Array[StringName] = []
@@ -101,7 +103,11 @@ func test_m4b_loop() -> void:
 		if queued.size() < 3 and ResearchRules.queue_error(_state, def.id, lab_id).is_empty():
 			_submit(QueueResearchCommand.new(def.id, lab_id))
 			queued.append(def.id)
-	assert_array(_state.research.bench_of(lab_id).queue).is_equal(queued)
+	var bench: ResearchBench = _state.research.bench_of(lab_id)
+	var held: Array[StringName] = bench.queue.duplicate()
+	if bench.is_running():
+		held.push_front(bench.active)
+	assert_array(held).is_equal(queued)
 	assert_int(queued.size()).is_equal(3)
 	# The Effigy: a Vault refuses it, and in holding its hazard goes off.
 	StoryRulesItems.give_artefact(_state, &"ossar_effigy")

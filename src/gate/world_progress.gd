@@ -10,6 +10,8 @@ extends RefCounted
 
 ## Source id of the pole camera's horizon record.
 const POLE_CAMERA_SOURCE: StringName = &"pole_camera"
+## Source id of a hazard fact from Atmospheric sampling (S03).
+const SAMPLING_SOURCE: StringName = &"sampling"
 ## Confidence the horizon record gives the facts its sampling line measures (atmosphere,
 ## temperature, radiation): FAIR, a direct reading shown as its true value.
 const POLE_CAMERA_CONFIDENCE: WorldReport.Confidence = WorldReport.Confidence.FAIR
@@ -44,6 +46,15 @@ static func record_horizon(state: GameState, world_id: StringName) -> void:
 			world_id, WorldReport.Fact.THREAT, WorldReport.Confidence.POOR, POLE_CAMERA_SOURCE
 		)
 	)
+
+
+## Atmospheric sampling (S03): the pole camera's samples also give [param world_id]'s
+## hazards (biohazard and atmosphere) at good confidence, before a team goes.
+static func record_hazards(state: GameState, world_id: StringName) -> void:
+	for fact: WorldReport.Fact in [WorldReport.Fact.BIOHAZARD, WorldReport.Fact.ATMOSPHERE]:
+		raise_fact(
+			state, FactChange.create(world_id, fact, WorldReport.Confidence.GOOD, SAMPLING_SOURCE)
+		)
 
 
 ## Raises [param change]'s fact of its world to its confidence, stamped with the current tick,

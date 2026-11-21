@@ -55,7 +55,7 @@ func test_effect_fields_and_references() -> void:
 	var modifier: ModifierEffect = _entry("modifier_effect")
 	assert_str(String(modifier.key)).is_equal("research_speed_pct")
 	assert_int(modifier.amount).is_equal(10)
-	assert_int(ModifierEffect.KEYS.size()).is_equal(10)
+	assert_int(ModifierEffect.KEYS.size()).is_equal(12)
 
 
 ## The request states match the order of the design.

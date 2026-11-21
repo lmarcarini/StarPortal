@@ -101,3 +101,16 @@ static func _emphasis(text: String) -> String:
 
 static func _translate(key: StringName) -> String:
 	return String(TranslationServer.translate(key))
+
+
+## The partial translation of [param def]'s alien text once Xenolinguistics (S09) is done in
+## [param state]: its DOC_*_GLOSS text in italics, or "" (before the research, or when the
+## document has no alien text).
+static func gloss(def: DocumentDef, state: GameState) -> String:
+	if def == null or not ResearchPerks.has(state, ResearchPerks.XENOLINGUISTICS):
+		return ""
+	var key: StringName = StringName("DOC_%s_GLOSS" % String(def.id).trim_prefix("doc_").to_upper())
+	var text: String = TranslationServer.translate(key)
+	if text == String(key):
+		return ""
+	return "[i]%s[/i]" % TranslationServer.translate(&"DOC_GLOSS").format({"text": text})

@@ -13,6 +13,8 @@ const CAUSE_KEY: StringName = &"STORY_CAUSE"
 
 ## True when [param condition] holds in [param state]; an unknown condition is false.
 static func check(state: GameState, condition: ConditionDef) -> bool:
+	if ProgressConditions.handles(condition):
+		return ProgressConditions.check(state, condition)
 	if condition is FlagIsCondition:
 		var flag_is: FlagIsCondition = condition
 		return _flag_equals(state.flags.get(flag_is.flag, false), flag_is.value)

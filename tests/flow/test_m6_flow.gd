@@ -51,6 +51,7 @@ func test_build_a_room_through_the_palette_ghost() -> void:
 
 func test_dig_level_two_from_the_level_keys() -> void:
 	StaffChanges.auto_assign(_state(), PowerFixture.lab(_state()))
+	ResearchFixture.workshop(SimClock.simulation.state)
 	var result: CommandResult = SimClock.simulation.submit(StartResearchCommand.create(SURVEY))
 	assert_bool(result.is_ok).is_true()
 	while _state().research.is_running():
@@ -179,6 +180,8 @@ func _screen_of(room_id: StringName) -> Vector2:
 # the seed's people take the soldier role when it has none).
 func _arm() -> void:
 	var state: GameState = _state()
+	UnlockFixture.defence_plans(state)
+	_base().get_build().refresh()
 	var build: BaseBuild = _base().get_build()
 	var cell: Vector2i = _free_cell(build, &"room_security_post")
 	build.get_ghost().confirm()

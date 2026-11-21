@@ -18,7 +18,7 @@ const SaveServiceScript := preload("res://src/services/save_service.gd")
 const SoakBot := preload("res://tests/soak/soak_bot.gd")
 
 ## Base seed of both runs.
-const SEED: int = 20260101
+const SEED: int = 20260105
 ## Days in the soak year (2026 is not a leap year).
 const YEAR_DAYS: int = 365
 ## Ticks in the soak year: 525,600.

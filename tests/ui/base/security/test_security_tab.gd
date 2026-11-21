@@ -16,6 +16,7 @@ func before_test() -> void:
 	TranslationServer.set_locale("en")
 	var defs: GameDefs = GameDefs.from_registry(Registry)
 	_simulation = GameSetup.build_new(GameState.new_game(1, defs.balance), defs).value
+	UnlockFixture.defence_plans(_simulation.state)
 	SimClock.start(_simulation)
 	SimClock.pause()
 	_root = Control.new()

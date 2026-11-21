@@ -5,6 +5,9 @@ extends PaperCard
 ## scroll inside it), with keys to swap to the previous or next document without leaving.
 ## Bible: docs/content/interface-rethink.md section 4 (Gate, Composing)
 
+## The clipped document changed (another one shown).
+signal document_changed
+
 const _READER: PackedScene = preload("res://src/ui/archive/document_reader.tscn")
 const _TYPE_FONT: Font = preload("res://art/fonts/ibm_plex_mono/IBMPlexMono-Regular.ttf")
 ## The steel clip at the top of the board, in pixels.
@@ -112,6 +115,7 @@ func _documents() -> Array[StringName]:
 
 
 func _show() -> void:
+	document_changed.emit()
 	if _reader == null:
 		return
 	var id: StringName = get_document_id()

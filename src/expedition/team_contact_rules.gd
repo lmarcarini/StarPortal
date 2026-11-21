@@ -29,15 +29,15 @@ const ORDER_NAMES: Array[String] = [
 
 
 ## True when the base can hail its team: its own wormhole (not a call) is open to the world of
-## a team in the field.
+## a team in the field, or (MOTH Mk III, E17) to any world, the MOTH relaying the hail.
 static func can_hail_team(state: GameState) -> bool:
 	var plan: ExpeditionState = state.expedition
-	return (
-		state.gate.mode == GateState.RingMode.LOCKED
-		and not state.gate.is_incoming_lock()
-		and plan.is_out()
-		and state.gate.connected_world_id == plan.world_id
-	)
+	if state.gate.mode != GateState.RingMode.LOCKED or state.gate.is_incoming_lock():
+		return false
+	if not plan.is_out():
+		return false
+	var relay: bool = ResearchPerks.has(state, ResearchPerks.MOTH_RELAY)
+	return relay or state.gate.connected_world_id == plan.world_id
 
 
 ## True while the open wormhole is the team's answered call.

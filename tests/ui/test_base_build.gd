@@ -97,7 +97,6 @@ func test_palette_offers_only_unlocked_rooms() -> void:
 				&"room_research_lab",
 				&"room_quarters",
 				&"room_corridor",
-				&"room_security_post",
 				&"room_workshop",
 			]
 		)
@@ -136,6 +135,7 @@ func test_lift_ghost_on_a_shaft_shows_the_segment_price() -> void:
 ## below, then a refresh.
 func _unlock_everything() -> void:
 	ConstructionFixture.unlock_all(_simulation.state)
+	UnlockFixture.defence_plans(_simulation.state)
 	ExpeditionUnlock.unlock(_simulation.state)
 	_simulation.state.budget.funds_k = 100000
 	_simulation.state.base.levels.append(LevelState.new())

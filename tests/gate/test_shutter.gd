@@ -25,7 +25,7 @@ func before_test() -> void:
 
 
 func _install() -> void:
-	_state.research.done.append(&"the_shutter")
+	_state.research.done.append(&"iris_studies")
 	for room: RoomState in _state.base.rooms:
 		if room.def_id == StartingBase.GATE_ROOM_DEF:
 			(

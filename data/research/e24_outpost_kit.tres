@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="2"]
+
+; docs/content/research-and-progression.md section 10 (E24).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+flag = &"outpost_kit"
+
+[resource]
+script = ExtResource("1")
+order = 24
+discipline = &"engineering"
+tier = 4
+cost_k = 3000
+hours = 240
+needs = Array[StringName]([&"field_camp"])
+reveal_when = Array[Resource]([])
+requires = Array[Resource]([])
+story = true
+effects = Array[Resource]([SubResource("fx0")])
+name_key = &"RESEARCH_OUTPOST_KIT_NAME"
+line_key = &"RESEARCH_OUTPOST_KIT_LINE"
+id = &"outpost_kit"

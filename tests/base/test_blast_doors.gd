@@ -10,6 +10,7 @@ var _simulation: Simulation
 
 func before_test() -> void:
 	_state = GameState.new_game(5, Registry.balance())
+	UnlockFixture.defence_plans(_state)
 	var built: Result = GameSetup.build_new(_state, GameDefs.from_registry(Registry))
 	_simulation = built.value
 

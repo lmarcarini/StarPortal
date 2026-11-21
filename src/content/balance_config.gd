@@ -87,9 +87,9 @@ const BALANCE_ID: StringName = &"balance"
 @export var starting_room_unlocks: Array[StringName] = [
 	&"room_capacitor_bank",
 	&"room_research_lab",
+	&"room_workshop",
 	&"room_corridor",
 	&"room_quarters",
-	&"room_security_post",
 ]
 
 @export_group("Dial outcomes")

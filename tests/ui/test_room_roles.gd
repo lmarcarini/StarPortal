@@ -105,18 +105,6 @@ func test_selected_panel_shows_now_and_later_lines() -> void:
 	assert_str(lines[7]).is_empty()
 
 
-func test_panel_upkeep_uses_the_fuel_contracts_override() -> void:
-	var plant: RoomState = _find(&"room_power_plant")
-	assert_object(plant).is_not_null()
-	_view.get_plan().select(plant.id)
-	var before: String = _view.get_room_panel().lines()[4]
-	assert_str(before).contains(str(_def(&"room_power_plant").upkeep_k))
-	UnlockFixture.apply_project(_simulation.state.unlocks, &"fuel_contracts")
-	_view.get_plan().select(&"")
-	_view.get_plan().select(plant.id)
-	assert_str(_view.get_room_panel().lines()[4]).is_equal("Upkeep $100k per 30 days")
-
-
 func _def(def_id: StringName) -> RoomDef:
 	return _simulation.state.room_defs[def_id]
 

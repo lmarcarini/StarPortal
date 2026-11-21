@@ -90,7 +90,15 @@ static func _check_research_tree(registry: RegistryScript) -> Array[String]:
 	var revealed: Dictionary[StringName, bool] = ContentCheckResearchTree.revealed_ids(
 		registry.get_all_of(DefBase)
 	)
-	return ContentCheckResearchTree.check(research, revealed)
+	var errors: Array[String] = ContentCheckResearchTree.check(research, revealed)
+	var rooms: Array[RoomDef] = []
+	for def: DefBase in registry.get_all_of(RoomDef):
+		rooms.append(def as RoomDef)
+	var ids: Dictionary[StringName, bool] = {}
+	for def: DefBase in registry.get_all_of(DefBase):
+		ids[def.id] = true
+	errors.append_array(ContentCheckResearchReveal.check(research, rooms, ids))
+	return errors
 
 
 ## The checks of conversations: nested conditions and effects, and text keys (speakers'

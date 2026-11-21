@@ -41,6 +41,8 @@ static func unlock_all(game: GameState) -> GameState:
 		&"room_xenotech_lab",
 		&"room_bio_lab",
 		&"room_ready_room",
+		&"room_power_plant",
+		&"room_security_post",
 	]:
 		UnlockRules.apply(game.unlocks, UnlockRules.EFFECT_UNLOCK_ROOM, storage)
 	return game

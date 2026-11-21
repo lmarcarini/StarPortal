@@ -56,13 +56,12 @@ func test_bank_cap() -> void:
 	assert_str(String(second.error_code)).is_equal("bank_cap")
 	assert_str(second.detail).is_equal("bank_array")
 	UnlockFixture.apply_project(_game.unlocks, &"bank_array")
-	_game.base.add_room(&"room_capacitor_bank", 1, Vector2i(0, 0))
 	assert_bool(BaseRules.can_build_room(_game, &"room_capacitor_bank").is_ok).is_true()
-	var third: RoomState = _game.base.add_room(&"room_capacitor_bank", 1, Vector2i(4, 0))
-	var fourth: CommandResult = BaseRules.can_build_room(_game, &"room_capacitor_bank")
-	assert_str(String(fourth.error_code)).is_equal("bank_cap")
-	assert_str(fourth.detail).is_empty()
-	third.demolish_ticks_left = 5
+	var second_bank: RoomState = _game.base.add_room(&"room_capacitor_bank", 1, Vector2i(4, 0))
+	var third: CommandResult = BaseRules.can_build_room(_game, &"room_capacitor_bank")
+	assert_str(String(third.error_code)).is_equal("bank_cap")
+	assert_str(third.detail).is_empty()
+	second_bank.demolish_ticks_left = 5
 	assert_bool(BaseRules.can_build_room(_game, &"room_capacitor_bank").is_ok).is_true()
 
 
@@ -110,12 +109,12 @@ func test_projects() -> void:
 		. is_equal(
 			[
 				&"excavation_survey",
+				&"plan_personnel_office",
+				&"survey_drones",
+				&"bank_array",
+				&"prefab_modules",
 				&"lift_shaft",
 				&"deep_excavation",
-				&"second_plant",
-				&"fuel_contracts",
-				&"bank_array",
-				&"field_engineering",
 			]
 		)
 	)

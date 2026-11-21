@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/unlock_room_effect.gd" id="2"]
+
+; docs/content/research-and-progression.md section 10 (E02).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+room = &"room_personnel_office"
+
+[resource]
+script = ExtResource("1")
+order = 2
+discipline = &"engineering"
+tier = 1
+cost_k = 200
+hours = 6
+needs = Array[StringName]([])
+reveal_when = Array[Resource]([])
+requires = Array[Resource]([])
+story = false
+effects = Array[Resource]([SubResource("fx0")])
+name_key = &"RESEARCH_PLAN_PERSONNEL_OFFICE_NAME"
+line_key = &"RESEARCH_PLAN_PERSONNEL_OFFICE_LINE"
+id = &"plan_personnel_office"

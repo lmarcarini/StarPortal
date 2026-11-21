@@ -6,14 +6,19 @@ extends RefCounted
 
 ## Power comes in 5 MW blocks; the bot lowers charging by whole blocks.
 const BLOCK_MW: int = 5
-## The projects the bot researches, in order (R1-R6; Field engineering is left out).
+## The Engineering projects the bot researches in the Workshop, in order (M7: the Security
+## Post and blast door plans first, E02, E09, E10; then E01, E04, E03, E06, E07, E05; none
+## needs a reveal beyond its needs).
 const ORDER: Array[StringName] = [
+	&"plan_personnel_office",
+	&"plan_security_post",
+	&"blast_doors",
 	&"excavation_survey",
+	&"bank_array",
+	&"survey_drones",
 	&"lift_shaft",
 	&"deep_excavation",
-	&"second_plant",
-	&"fuel_contracts",
-	&"bank_array",
+	&"prefab_modules",
 ]
 
 

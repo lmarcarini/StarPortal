@@ -49,6 +49,7 @@ func _ready() -> void:
 	z_index = 5
 	_station.setup(Registry.get_def(STATION_ID) as StationSceneDef)
 	_station.visible = false
+	_clue.document_changed.connect(_render)
 	for glyph: int in GateAddress.GLYPH_COUNT:
 		var key: GlyphKey = GlyphKey.new()
 		key.name = "Glyph%02d" % glyph
@@ -241,8 +242,16 @@ func _draw_disc() -> void:
 func _render() -> void:
 	if not is_node_ready():
 		return
+	var seen: PackedInt32Array = PackedInt32Array()
+	if _simulation != null:
+		var clipped_id: StringName = _clue.get_document_id()
+		var clipped: DocumentDef = null
+		if not clipped_id.is_empty():
+			clipped = Registry.get_def(clipped_id) as DocumentDef
+		seen = GlyphFrequency.marked(_simulation.state, clipped)
 	for key: GlyphKey in _keys:
 		key.set_lit(_compose.has(key.get_glyph()))
+		key.set_marked(seen.has(key.get_glyph()))
 	_lamps.show_draft(_compose, _origin())
 
 

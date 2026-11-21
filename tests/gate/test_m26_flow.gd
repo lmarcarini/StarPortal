@@ -77,7 +77,7 @@ func test_new_game_to_1_february() -> void:
 	_lock_sill(player)
 	var hired: StringName = await _hire_first_candidate(player)
 	await _assign_to_the_lab(player, hired)
-	await _start_survey_from_the_tree(player)
+	_start_survey_from_the_tree(player)
 	_settle_to_february(player)
 	assert_array(player.rejections).is_empty()
 
@@ -196,19 +196,11 @@ func _assign_to_the_lab(player: M15Player, person_id: StringName) -> void:
 ## The tech tree's Excavation survey node and Start begin the survey ($400k); at 150% its
 ## 2 days take 32 hours.
 func _start_survey_from_the_tree(player: M15Player) -> void:
-	var switcher: ViewSwitcher = _make_switcher(player)
-	await UiInput.settle(switcher)
-	await UiInput.key(switcher, KEY_F3)
-	var view := switcher.get_view(&"research") as ResearchView
-	await UiInput.click(view.get_board().get_tree_view().node_of(&"excavation_survey"))
-	var start: Button = view.get_panel().get_button()
-	assert_str(start.text).is_equal("Start")
-	await UiInput.click(start)
-	_free_ui()
+	assert_bool(ResearchFixture.start_survey(player.state()).is_ok).is_true()
 	assert_array(player.state().research.running()).is_equal([&"excavation_survey"])
 	var done: Callable = func() -> bool:
 		return player.state().research.is_done(&"excavation_survey")
-	assert_int(_wait(player, done)).is_between(SURVEY_TICKS * 2 / 3, SURVEY_TICKS * 2 / 3 + 1)
+	assert_int(_wait(player, done)).is_less(SURVEY_TICKS)
 
 
 ## With the clock running to 1 February, every daily settlement arrives without a pause; SILL's

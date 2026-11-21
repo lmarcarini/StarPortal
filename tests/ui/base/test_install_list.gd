@@ -27,8 +27,8 @@ func test_locked_then_install_then_remove() -> void:
 	var texts: Array[String] = InstallList.offer_text(
 		state, _gate, state.installation_defs[ShutterRules.DEF_ID]
 	)
-	assert_str(texts[1]).is_equal("Needs research: The Shutter")
-	state.research.done.append(&"the_shutter")
+	assert_str(texts[1]).is_equal("Needs research: Iris studies")
+	state.research.done.append(&"iris_studies")
 	var list := InstallList.new()
 	add_child(list)
 	list.show_room(_gate)

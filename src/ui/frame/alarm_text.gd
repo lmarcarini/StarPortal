@@ -16,7 +16,7 @@ static func strip(state: GameState) -> String:
 		var def: IncursionDef = state.incursion_defs.get(incursion.def_id)
 		if def != null and def.breaches_shutter and ShutterRules.is_installed(state):
 			text += "  " + _tr(&"ALARM_BREACHES_SHUTTER")
-		return text
+		return text + OriginText.objective(state)
 	var text: String = _tr(&"ALARM_INTRUDERS").format({"levels": levels(state)})
 	var left: int = FailureRules.overrun_left(state)
 	if left >= 0:

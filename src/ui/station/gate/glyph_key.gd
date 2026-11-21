@@ -16,6 +16,7 @@ const MIN_SIDE: float = 72.0
 
 var _glyph: int = -1
 var _lit: bool = false
+var _marked: bool = false
 var _pulse: float = 0.0
 var _icon: GlyphIcon = GlyphIcon.new()
 
@@ -62,6 +63,17 @@ func is_lit() -> bool:
 	return _lit
 
 
+## Marks the key as a glyph seen in the clipped document (Glyph frequency, S04).
+func set_marked(on: bool) -> void:
+	_marked = on
+	queue_redraw()
+
+
+## True when marked.
+func is_marked() -> bool:
+	return _marked
+
+
 ## Pulses the key for a second (a typed name found it).
 func pulse() -> void:
 	_pulse = 1.0
@@ -94,6 +106,8 @@ func _draw() -> void:
 	draw_arc(c, r - 3.0, PI * 1.15, PI * 1.85, 16, Color8(120, 121, 106), 2.0, true)
 	if _lit:
 		draw_arc(c, r - 2.5, 0, TAU, 48, RefPaint.AMBER, 3.0, true)
+	if _marked:
+		draw_circle(c + Vector2(r * 0.62, -r * 0.62), 4.0, RefPaint.AMBER)
 	if is_hovered():
 		draw_circle(c, r, Color(1, 1, 1, 0.06))
 	if _pulse > 0.0:

@@ -27,7 +27,7 @@ static func check_categories(
 		if not keys.is_empty() and not keys.has(String(category.name_key)):
 			errors.append("research category %s: text key is in no table" % category.id)
 	for def: ResearchDef in research:
-		if not known.has(def.category):
+		if not def.category.is_empty() and not known.has(def.category):
 			errors.append("research %s: unknown category '%s'" % [def.id, def.category])
 	return errors
 
@@ -36,15 +36,16 @@ static func check_categories(
 ## research and base tables; skipped when empty).
 static func check(research: Array[ResearchDef], keys: Dictionary[String, bool]) -> Array[String]:
 	var errors: Array[String] = []
-	var orders: Dictionary[int, StringName] = {}
+	var orders: Dictionary[String, StringName] = {}
 	var by_id: Dictionary[StringName, ResearchDef] = {}
 	for def: ResearchDef in research:
 		by_id[def.id] = def
-		if orders.has(def.order):
+		var slot: String = "%s/%d" % [def.discipline, def.order]
+		if orders.has(slot):
 			errors.append(
-				"research %s: order %d also used by %s" % [def.id, def.order, orders[def.order]]
+				"research %s: order %d also used by %s" % [def.id, def.order, orders[slot]]
 			)
-		orders[def.order] = def.id
+		orders[slot] = def.id
 		for key: StringName in [def.name_key, def.line_key]:
 			if not keys.is_empty() and not keys.has(String(key)):
 				errors.append("research %s: text key '%s' is in no table" % [def.id, key])
