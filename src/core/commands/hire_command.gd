@@ -53,6 +53,7 @@ func apply(state: GameState) -> void:
 	person.role = candidate.role
 	person.skill = candidate.skill
 	person.salary_k = candidate.salary_k
+	person.appearance = candidate.appearance.duplicate()
 	person.arrives_tick = state.clock.tick + candidate.arrival_ticks
 	state.staff.add_person(person)
 	state.recruitment.remove_candidate(candidate_id)

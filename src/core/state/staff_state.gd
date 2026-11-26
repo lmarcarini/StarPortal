@@ -26,10 +26,15 @@ var auto_assign: Array[StringName] = []
 var lent_due: Array[int] = []
 
 
-## Adds [param person] with the next free id and returns it.
+## Adds [param person] with the next free id and returns it. A person with no appearance
+## record gets one seeded from the new id and the role (AppearanceRules.roll_seeded(), M8-01).
 func add_person(person: PersonState) -> PersonState:
 	person.id = StringName("person_%d" % next_person_number)
 	next_person_number += 1
+	if person.appearance.is_empty():
+		person.appearance = AppearanceRules.roll_seeded(
+			String(person.id), AppearanceRules.field_for_role(person.role)
+		)
 	people.append(person)
 	return person
 

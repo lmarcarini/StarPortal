@@ -101,9 +101,9 @@ func test_names_are_seeded() -> void:
 	for attempt: int in 2:
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 42
-		drawn.append(StaffNames.draw(rng, names, role))
+		drawn.append(StaffNames.draw(rng, names, role, "female"))
 	assert_str(drawn[0]).is_equal(drawn[1])
 	assert_str(drawn[0]).starts_with("Dr ")
 	var analyst: RoleDef = load("res://data/staff/role_analyst.tres")
 	var rng := RandomNumberGenerator.new()
-	assert_int(StaffNames.draw(rng, names, analyst).split(" ").size()).is_equal(2)
+	assert_int(StaffNames.draw(rng, names, analyst, "male").split(" ").size()).is_equal(2)

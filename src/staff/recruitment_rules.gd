@@ -17,12 +17,12 @@ const UNKNOWN_PERSON: StringName = &"unknown_person"
 const HIRED: StringName = &"hired"
 ## staff_changed reason of a dismissal (count 1; the def of the room left, or empty).
 const DISMISSED: StringName = &"dismissed"
-## The fixed first list (section 2), as [name, role id, skill].
+## The fixed first list (section 2), as [name, role id, skill, sex].
 const FIRST_LIST: Array = [
-	["Dr Ines Moreau", StartingStaff.SCIENTIST, 3],
-	["Dr Kenji Arai", StartingStaff.SCIENTIST, 3],
-	["Sgt Dan Kowalski", StartingStaff.ENGINEER, 3],
-	["Cpl Sara Lind", StartingStaff.ENGINEER, 3],
+	["Dr Ines Moreau", StartingStaff.SCIENTIST, 3, "female"],
+	["Dr Kenji Arai", StartingStaff.SCIENTIST, 3, "male"],
+	["Sgt Dan Kowalski", StartingStaff.ENGINEER, 3, "male"],
+	["Cpl Sara Lind", StartingStaff.ENGINEER, 3, "female"],
 ]
 ## Days between two arrivals (docs/content/m27-daily-rhythm.md section 3).
 const ARRIVAL_EVERY_DAYS: int = 3
@@ -45,7 +45,7 @@ const EXPEDITION_ROLE_ODDS: int = 4
 
 
 ## The first list of a new game under [param balance] (no ids yet), leaving on days 3, 6, 9
-## and 12.
+## and 12; each appearance is seeded from the candidate's fixed name.
 static func first_list(balance: BalanceConfig) -> Array[CandidateState]:
 	var list: Array[CandidateState] = []
 	for index: int in FIRST_LIST.size():
@@ -55,6 +55,10 @@ static func first_list(balance: BalanceConfig) -> Array[CandidateState]:
 		var skill: int = entry[2]
 		var candidate: CandidateState = _candidate(balance, display_name, role, skill)
 		candidate.leaves_day = (index + 1) * ARRIVAL_EVERY_DAYS
+		var sex: String = entry[3]
+		candidate.appearance = AppearanceRules.roll_seeded(
+			display_name, AppearanceRules.field_for_role(role), sex
+		)
 		list.append(candidate)
 	return list
 
@@ -92,14 +96,18 @@ static func unlocked_arrival_role(
 	return arrival_role(rng, base, list)
 
 
-## A candidate of [param role] drawn with [param rng]: the skill, then the name
-## (StaffNames.draw()). No id or leave day yet. Same generator state, same candidate.
+## A candidate of [param role] drawn with [param rng]: the skill, the sex, a name that fits it
+## (StaffNames.draw()), then the appearance record of that sex (AppearanceRules.roll(), M8-01).
+## No id or leave day yet. Same generator state, same candidate.
 static func draw_candidate(
 	rng: RandomNumberGenerator, balance: BalanceConfig, role: RoleDef, names: StaffNameListDef
 ) -> CandidateState:
 	var skill: int = draw_skill(rng, balance.candidate_skill_weights)
-	var display_name: String = StaffNames.draw(rng, names, role)
-	return _candidate(balance, display_name, role.id, skill)
+	var sex: String = AppearanceRules.roll_sex(rng)
+	var display_name: String = StaffNames.draw(rng, names, role, sex)
+	var candidate: CandidateState = _candidate(balance, display_name, role.id, skill)
+	candidate.appearance = AppearanceRules.roll(rng, AppearanceRules.field_for_role(role.id), sex)
+	return candidate
 
 
 ## True when a candidate arrives on the settlement of day [param day]: every

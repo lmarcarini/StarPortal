@@ -39,6 +39,7 @@ func _hire(id: StringName) -> PersonState:
 	person.name = String(id)
 	person.skill = 3
 	person.room_id = _post.id
+	person.appearance = AppearanceRules.roll_seeded(String(id), "military")
 	_state.staff.people.append(person)
 	return person
 
