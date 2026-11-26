@@ -14,7 +14,9 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
-STATES = ("gate_idle", "gate_open", "other_station", "base_build", "base_power", "base_staff")
+STATES = (
+    "gate_idle", "gate_open", "other_station", "base_build", "base_power", "base_staff", "lab"
+)
 # The overlay drawn for each state (the Base states share one).
 OVERLAYS = {"base_build": "base", "base_power": "base", "base_staff": "base"}
 SIZE = (1920, 1080)

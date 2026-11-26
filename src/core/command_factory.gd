@@ -60,6 +60,7 @@ static func register_defaults() -> void:
 	_types[HailCommand.TYPE] = HailCommand
 	_types[QueueResearchCommand.TYPE] = QueueResearchCommand
 	_types[UnqueueResearchCommand.TYPE] = UnqueueResearchCommand
+	_types[OpenResearchCommand.TYPE] = OpenResearchCommand
 	_types[HouseArtefactCommand.TYPE] = HouseArtefactCommand
 	_types[UnhouseArtefactCommand.TYPE] = UnhouseArtefactCommand
 	_types[RetrieveArtefactCommand.TYPE] = RetrieveArtefactCommand
