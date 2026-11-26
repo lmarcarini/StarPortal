@@ -21,14 +21,14 @@ const MEDIC: StringName = &"role_medic"
 const AUTO_ASSIGN_DEFS: Array[StringName] = [&"room_research_lab", &"room_workshop"]
 ## Def id of the room the analyst starts in.
 const CONTROL_ROOM_DEF: StringName = &"room_control"
-## The crew, as [name, role id, skill, starts in the Control Room]. The names are fixed by the
+## The crew, as [name, role id, skill, starts in the Control Room, sex]. The names are fixed by the
 ## design (section 7), so every new game opens the same way.
 const CREW: Array = [
-	["Dr Ana Ferreira", SCIENTIST, 3, false],
-	["Dr Tom Okafor", SCIENTIST, 3, false],
-	["Sgt Lena Brandt", ENGINEER, 3, false],
-	["Cpl Raul Mendes", ENGINEER, 2, false],
-	["Mira Kovacs", ANALYST, 3, true],
+	["Dr Ana Ferreira", SCIENTIST, 3, false, "female"],
+	["Dr Tom Okafor", SCIENTIST, 3, false, "male"],
+	["Sgt Lena Brandt", ENGINEER, 3, false, "female"],
+	["Cpl Raul Mendes", ENGINEER, 2, false, "male"],
+	["Mira Kovacs", ANALYST, 3, true, "female"],
 ]
 
 
@@ -44,8 +44,9 @@ static func build(base: BaseState, balance: BalanceConfig) -> StaffState:
 		person.role = entry[1]
 		person.skill = entry[2]
 		person.salary_k = StaffRules.salary_for_skill(balance, person.skill)
+		var sex: String = entry[4]
 		person.appearance = AppearanceRules.roll_seeded(
-			person.name, AppearanceRules.field_for_role(person.role)
+			person.name, AppearanceRules.field_for_role(person.role), sex
 		)
 		var in_control: bool = entry[3]
 		if in_control:

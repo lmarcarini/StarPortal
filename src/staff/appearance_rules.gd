@@ -2,7 +2,8 @@ class_name AppearanceRules
 extends RefCounted
 ## The appearance record of a staff member (docs/content/portraits.md, "The appearance
 ## record"): plain data rolled once from a seeded generator, saved with the person, and drawn
-## by the UI. Same generator state, same record. The option lists and weights follow the
+## by the UI. Same generator state, same record. The sex is drawn before the name, so the name
+## fits it (StaffNames.draw()). The option lists and weights follow the
 ## prototype's make_person() (tools/portraits/pixel_portraits.py): no full beard on young
 ## staff, grey hair likely on older staff, glasses likelier in a lab coat or shirt and tie.
 ## Saved shape: {"sex", "age", "skin", "hair_colour", "eye_colour", "head", "face_width",
@@ -92,13 +93,21 @@ static func field_for_role(role: StringName) -> String:
 	return ROLE_FIELDS.get(role, DEFAULT_FIELD)
 
 
-## A record for someone of [param field] drawn with [param rng] only. An unknown field rolls
-## as [constant DEFAULT_FIELD]. Same generator state, same record.
-static func roll(rng: RandomNumberGenerator, field: String) -> Dictionary:
+## A sex ("female" or "male") drawn with [param rng]: one rng.randi_range(),
+## [constant FEMALE_PERCENT] female. Drawn before the name, so the name can fit it.
+static func roll_sex(rng: RandomNumberGenerator) -> String:
+	return SEXES[0] if rng.randi_range(1, 100) <= FEMALE_PERCENT else SEXES[1]
+
+
+## A record for someone of [param field] and [param sex] drawn with [param rng] only; an empty
+## or unknown [param sex] is drawn first (roll_sex()). An unknown field rolls as
+## [constant DEFAULT_FIELD]. Same generator state, same record.
+static func roll(rng: RandomNumberGenerator, field: String, sex: String = "") -> Dictionary:
 	var uniform_field: String = field if VARIANTS.has(field) else DEFAULT_FIELD
-	var female: bool = rng.randi_range(1, 100) <= FEMALE_PERCENT
+	var record_sex: String = sex if sex in SEXES else roll_sex(rng)
+	var female: bool = record_sex == SEXES[0]
 	var record: Dictionary = {
-		"sex": SEXES[0] if female else SEXES[1],
+		"sex": record_sex,
 		"age": _weighted(rng, AGES, AGE_WEIGHTS),
 		"skin": rng.randi_range(0, SKIN_TONES - 1),
 		"hair_colour": rng.randi_range(0, NATURAL_HAIR_COLOURS - 1),
@@ -121,12 +130,13 @@ static func roll(rng: RandomNumberGenerator, field: String) -> Dictionary:
 	return record
 
 
-## A record for [param field] from a generator seeded with [param seed_text] (the fixed
-## starting crew and first candidate list, which have no stream draw).
-static func roll_seeded(seed_text: String, field: String) -> Dictionary:
+## A record for [param field] and [param sex] (empty: drawn) from a generator seeded with
+## [param seed_text] (the fixed starting crew and first candidate list, which have no stream
+## draw, and anyone added without a record).
+static func roll_seeded(seed_text: String, field: String, sex: String = "") -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(seed_text)
-	return roll(rng, field)
+	return roll(rng, field, sex)
 
 
 ## Human-readable errors of saved [param record], empty when valid: every key present, the

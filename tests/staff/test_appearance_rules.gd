@@ -2,6 +2,7 @@ extends GdUnitTestSuite
 ## Tests of AppearanceRules (card M8-01, docs/content/portraits.md "The appearance record").
 
 const ROLLS: int = 2000
+const NAMES_PATH: String = "res://data/staff/staff_names.tres"
 
 
 func _rng(seed_value: int) -> RandomNumberGenerator:
@@ -150,3 +151,48 @@ func test_starting_crew_and_hires_have_records() -> void:
 		assert_array(AppearanceRules.validate(person.appearance)).is_empty()
 	for candidate: CandidateState in RecruitmentRules.first_list(BalanceConfig.new()):
 		assert_array(AppearanceRules.validate(candidate.appearance)).is_empty()
+
+
+func test_drawn_names_fit_the_sex() -> void:
+	var names: StaffNameListDef = load(NAMES_PATH)
+	var balance := BalanceConfig.new()
+	var rng: RandomNumberGenerator = _rng(11)
+	var seen_unisex: Dictionary = {}
+	for role_path: String in [
+		"res://data/staff/role_scientist.tres", "res://data/staff/role_analyst.tres"
+	]:
+		var role: RoleDef = load(role_path)
+		for _i: int in ROLLS:
+			var candidate: CandidateState = RecruitmentRules.draw_candidate(
+				rng, balance, role, names
+			)
+			var parts: PackedStringArray = candidate.name.split(" ")
+			var given: String = parts[parts.size() - 2]
+			var sex: String = candidate.appearance["sex"]
+			assert_array(names.given_names_for(sex)).contains([given])
+			if given in names.unisex_names:
+				seen_unisex["%s=%s" % [given, sex]] = true
+	assert_bool(seen_unisex.has("Alex=female") and seen_unisex.has("Alex=male")).is_true()
+
+
+func test_fixed_names_have_their_sex() -> void:
+	var staff: StaffState = StartingStaff.build(BaseState.new(), BalanceConfig.new())
+	for person: PersonState in staff.people:
+		assert_str(person.appearance["sex"]).is_equal(
+			"male" if person.name in ["Dr Tom Okafor", "Cpl Raul Mendes"] else "female"
+		)
+	for candidate: CandidateState in RecruitmentRules.first_list(BalanceConfig.new()):
+		assert_str(candidate.appearance["sex"]).is_equal(
+			"male" if candidate.name in ["Dr Kenji Arai", "Sgt Dan Kowalski"] else "female"
+		)
+
+
+func test_name_lists_are_valid() -> void:
+	var names: StaffNameListDef = load(NAMES_PATH)
+	assert_array(names.get_content_errors({})).is_empty()
+	var bad := StaffNameListDef.new()
+	bad.female_names = ["Alex"]
+	bad.male_names = ["Leo"]
+	bad.unisex_names = ["Alex"]
+	bad.surnames = ["Berg"]
+	assert_array(bad.get_content_errors({})).is_not_empty()
