@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="InstallationDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/installation_def.gd" id="1"]
+
+; docs/content/research-and-progression.md section 9 (M7-06).
+[resource]
+script = ExtResource("1")
+name_key = &"INSTALLATION_COLD_STORE_NAME"
+effect_key = &"INSTALLATION_COLD_STORE_EFFECT"
+hosts = Array[StringName]([&"room_bio_lab"])
+requires_research = &"cold_store"
+cost_k = 400
+build_ticks = 480
+max_per_host = 1
+health = 0
+effects = Array[Resource]([])
+id = &"installation_cold_store"

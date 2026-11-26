@@ -30,8 +30,11 @@ static func lines(state: GameState) -> Array[CommandLine]:
 	var modifier: int = modifiers_k(state)
 	if modifier != 0:
 		out.append(CommandLine.create(CommandLine.Kind.MODIFIERS, modifier))
+	var contracts: int = ContractWork.daily_k(state) * ConfidenceRules.PERIOD_DAYS
+	if contracts != 0:
+		out.append(CommandLine.create(CommandLine.Kind.CONTRACTS, contracts))
 	var costs: int = costs_k(state)
-	var income: int = allocation * ConfidenceRules.PERIOD_DAYS + modifier
+	var income: int = allocation * ConfidenceRules.PERIOD_DAYS + modifier + contracts
 	var net := CommandLine.create(CommandLine.Kind.NET, income - costs)
 	net.per_day_tenths = roundi((income - costs) * 10.0 / ConfidenceRules.PERIOD_DAYS)
 	out.append(net)

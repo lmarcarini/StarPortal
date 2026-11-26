@@ -64,6 +64,7 @@ REQ_OSSAR_CLOSED_TEXT,The Ossar demand that no wormhole open from Earth for five
 LOG_LINE_DEBUG,(debug) {line},(debug) {line}
 DEBUG_CAUSE,(debug),(debug)
 COMMAND_LINE_MODIFIERS,Modifiers,[EN] Modifiers
+COMMAND_LINE_CONTRACTS,Contract work,Serviços contratados
 LOG_LINE_ARTEFACT_HAZARD,Hazard: {name} acted up outside Containment.,[EN] Hazard: {name} acted up outside Containment.
 ARTEFACT_HEADER,Holding {held}/{capacity}  At the gate: {gate},[EN] Holding {held}/{capacity}  At the gate: {gate}
 ARTEFACT_WHILE_ON,While on: {effects},[EN] While on: {effects}
