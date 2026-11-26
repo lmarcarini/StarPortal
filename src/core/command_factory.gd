@@ -99,6 +99,7 @@ static func register_defaults() -> void:
 	_types[DigLevelCommand.TYPE] = DigLevelCommand
 	_types[StartResearchCommand.TYPE] = StartResearchCommand
 	_types[CancelResearchCommand.TYPE] = CancelResearchCommand
+	_types[AskEmergencyFundsCommand.TYPE] = AskEmergencyFundsCommand
 	_types[AssignStaffCommand.TYPE] = AssignStaffCommand
 	_types[UnassignStaffCommand.TYPE] = UnassignStaffCommand
 	_types[HireCommand.TYPE] = HireCommand

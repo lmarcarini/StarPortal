@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="2"]
+
+; docs/content/research-and-progression.md section 10 (O11).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+flag = &"survival_training"
+
+[resource]
+script = ExtResource("1")
+order = 11
+discipline = &"office"
+tier = 3
+cost_k = 1500
+hours = 108
+needs = Array[StringName]([&"expedition_training"])
+reveal_when = Array[Resource]([])
+requires = Array[Resource]([])
+story = false
+effects = Array[Resource]([SubResource("fx0")])
+name_key = &"RESEARCH_SURVIVAL_TRAINING_NAME"
+line_key = &"RESEARCH_SURVIVAL_TRAINING_LINE"
+id = &"survival_training"
