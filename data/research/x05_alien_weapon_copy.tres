@@ -11,7 +11,7 @@ flag = &"alien_weapon_copy"
 
 [resource]
 script = ExtResource("1")
-order = 5
+order = 15
 discipline = &"xenotech"
 tier = 4
 cost_k = 3000

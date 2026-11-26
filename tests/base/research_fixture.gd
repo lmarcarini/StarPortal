@@ -58,12 +58,12 @@ static func bench_for(game: GameState, discipline: StringName) -> RoomState:
 	for def: RoomDef in game.room_defs.values():
 		if def.research_discipline != discipline:
 			continue
-		var room: RoomState = game.base.add_room(
-			def.id, 1, BENCH_ORIGINS.get(discipline, Vector2i(30, 2))
-		)
+		var origin: Vector2i = BENCH_ORIGINS.get(discipline, Vector2i(30, 2))
+		var room: RoomState = game.base.add_room(def.id, 1, origin)
 		for index: int in 2:
 			var person := PersonState.new()
 			person.id = StringName("bench_%s_%d" % [discipline, index])
+			person.name = "Bench %d" % index
 			person.role = def.staff_role
 			person.skill = 3
 			person.room_id = room.id

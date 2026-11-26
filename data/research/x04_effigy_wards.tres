@@ -11,7 +11,7 @@ flag = &"effigy_wards"
 
 [resource]
 script = ExtResource("1")
-order = 4
+order = 14
 discipline = &"xenotech"
 tier = 3
 cost_k = 1500

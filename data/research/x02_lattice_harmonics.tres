@@ -11,7 +11,7 @@ flag = &"lattice_harmonics"
 
 [resource]
 script = ExtResource("1")
-order = 2
+order = 12
 discipline = &"xenotech"
 tier = 3
 cost_k = 1500

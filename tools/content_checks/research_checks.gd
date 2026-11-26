@@ -73,7 +73,8 @@ static func _project_errors(
 				)
 			)
 	for need: StringName in def.needs:
-		if by_id.has(need) and by_id[need].order >= def.order:
+		var same: bool = by_id.has(need) and by_id[need].discipline == def.discipline
+		if same and _rank(by_id[need]) >= _rank(def):
 			errors.append("research %s: needs %s, which comes later in the list" % [def.id, need])
 	return errors
 
@@ -104,3 +105,9 @@ static func _requires_artefact(def: ResearchDef, artefact: StringName) -> bool:
 		):
 			return true
 	return false
+
+
+# A project's place in the list: its discipline (in ResearchDef.DISCIPLINES order), then its
+# order.
+static func _rank(def: ResearchDef) -> int:
+	return ResearchDef.DISCIPLINES.find(def.discipline) * 1000 + def.order

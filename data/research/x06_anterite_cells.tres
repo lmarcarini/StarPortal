@@ -11,7 +11,7 @@ flag = &"anterite_cells"
 
 [resource]
 script = ExtResource("1")
-order = 6
+order = 16
 discipline = &"xenotech"
 tier = 5
 cost_k = 3500
