@@ -56,9 +56,11 @@ func test_every_option_reachable() -> void:
 	}
 	for key: String in lists:
 		for option: String in lists[key]:
-			assert_bool(seen.has("%s=%s" % [key, option])).override_failure_message(
-				"never rolled %s=%s" % [key, option]
-			).is_true()
+			(
+				assert_bool(seen.has("%s=%s" % [key, option]))
+				. override_failure_message("never rolled %s=%s" % [key, option])
+				. is_true()
+			)
 	for index: int in AppearanceRules.SKIN_TONES:
 		assert_bool(seen.has("skin=%d" % index)).is_true()
 	for index: int in AppearanceRules.HAIR_COLOURS:
