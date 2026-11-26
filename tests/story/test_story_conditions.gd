@@ -58,9 +58,9 @@ func test_faction_met() -> void:
 
 func test_research_done() -> void:
 	var condition := ResearchDoneCondition.new()
-	condition.project = &"later_capacitor_lattice"
+	condition.project = &"capacitor_lattice"
 	assert_bool(_check(condition)).is_false()
-	_state.research.done.append(&"later_capacitor_lattice")
+	_state.research.done.append(&"capacitor_lattice")
 	assert_bool(_check(condition)).is_true()
 
 

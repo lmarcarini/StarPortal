@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/conditions/standing_at_least_condition.gd" id="3"]
+
+; docs/content/research-and-progression.md section 10 (B07).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+flag = &"alien_physiology"
+
+[sub_resource type="Resource" id="c1"]
+script = ExtResource("3")
+faction = &"faction_kindred"
+amount = 60
+
+[resource]
+script = ExtResource("1")
+order = 7
+discipline = &"xenobiology"
+tier = 4
+cost_k = 3000
+hours = 240
+needs = Array[StringName]([&"regenerative_compounds"])
+reveal_when = Array[Resource]([SubResource("c1")])
+requires = Array[Resource]([])
+story = false
+specimen_count = 3
+effects = Array[Resource]([SubResource("fx0")])
+name_key = &"RESEARCH_ALIEN_PHYSIOLOGY_NAME"
+line_key = &"RESEARCH_ALIEN_PHYSIOLOGY_LINE"
+id = &"alien_physiology"

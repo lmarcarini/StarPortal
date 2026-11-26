@@ -37,3 +37,5 @@ DOC_STILLWATER_DOSSIER_BODY,"WORLD DOSSIER: STILLWATER (PRELIMINARY)\nSource of 
 DOC_GLOSS,"Partial translation: {text}","Tradução parcial: {text}"
 DOC_LINTEL_RUBBING_GLOSS,"""...the way between... the stone that stands over the door...""","""...o caminho entre... a pedra que fica sobre a porta..."""
 DOC_MILESTONE_FRAME_1_GLOSS,"""...count the roads from the marker... the first light...""","""...conte as estradas a partir do marco... a primeira luz..."""
+DOC_TRANSLATION,"Kindred text, translated: {text}","Texto Kindred, traduzido: {text}"
+DOC_LINTEL_RUBBING_TRANSLATION,"""Here the way between worlds is opened; the stone that stands over the door keeps the count.""","""Aqui se abre o caminho entre mundos; a pedra que fica sobre a porta guarda a conta."""

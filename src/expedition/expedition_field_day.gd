@@ -32,7 +32,7 @@ static func resolve(state: GameState, _day: int, rng: RandomNumberGenerator) -> 
 	var percent: int = FieldCheck.chance(skill, FieldCheck.difficulty(def, facts))
 	var outcome: String = FINDING
 	if not FieldCheck.succeeds(rng.randi_range(0, 99), percent):
-		outcome = _apply_setback(def.setback, roller, members)
+		outcome = _apply_setback(XenoPerks.field_injury(state, def.setback), roller, members)
 	var person_name: String = "" if roller == null else roller.name
 	state.events.post(EVENT, [plan.world_id, def.id, outcome, person_name])
 	return _day_result(outcome)

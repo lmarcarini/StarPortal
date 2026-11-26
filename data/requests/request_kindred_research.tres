@@ -7,7 +7,7 @@
 
 [sub_resource type="Resource" id="r1"]
 script = ExtResource("2")
-project = &"later_capacitor_lattice"
+project = &"capacitor_lattice"
 
 [sub_resource type="Resource" id="r2"]
 script = ExtResource("3")

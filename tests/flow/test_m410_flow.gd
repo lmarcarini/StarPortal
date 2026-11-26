@@ -85,8 +85,8 @@ func _start_research_from_the_wire() -> void:
 	await _runner.simulate_frames(1)
 	var card: WireCard = _wire().card_of(&"lab_idle")
 	assert_object(card).is_not_null()
-	assert_int(card.get_keys().size()).is_equal(1)
-	var first: RefKey = card.get_keys()[0]
+	assert_int(card.get_keys().size()).is_greater_equal(1)
+	var first: RefKey = card.get_keys().back()
 	assert_bool(first.disabled).is_false()
 	first.pressed.emit()
 	await _runner.simulate_frames(1)

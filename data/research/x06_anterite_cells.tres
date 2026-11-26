@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="2"]
+
+; docs/content/research-and-progression.md section 10 (X06).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+flag = &"anterite_cells"
+
+[resource]
+script = ExtResource("1")
+order = 16
+discipline = &"xenotech"
+tier = 5
+cost_k = 3500
+hours = 480
+needs = Array[StringName]([])
+reveal_when = Array[Resource]([])
+requires = Array[Resource]([])
+story = true
+effects = Array[Resource]([SubResource("fx0")])
+name_key = &"RESEARCH_ANTERITE_CELLS_NAME"
+line_key = &"RESEARCH_ANTERITE_CELLS_LINE"
+id = &"anterite_cells"

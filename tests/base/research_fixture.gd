@@ -6,6 +6,10 @@ extends RefCounted
 ## Bible: docs/content/m25-lean-start.md section 3, docs/content/m26-staff-and-money.md section 3
 
 const RESEARCH_DIR: String = "res://data/research/"
+## Where bench_for() puts the other research buildings.
+const BENCH_ORIGINS: Dictionary[StringName, Vector2i] = {
+	&"office": Vector2i(30, 2), &"xenotech": Vector2i(30, 12), &"xenobiology": Vector2i(34, 12)
+}
 ## Where workshop() puts the Workshop: Level 1, east of the Control Room, on the spine.
 const WORKSHOP_ORIGIN: Vector2i = Vector2i(24, 11)
 
@@ -42,12 +46,38 @@ static func workshop(game: GameState) -> RoomState:
 	return found
 
 
+## Returns a standing, staffed research building of [param discipline] in [param game],
+## adding one (with two staff of its field when none wait) when there is none.
+static func bench_for(game: GameState, discipline: StringName) -> RoomState:
+	PowerFixture.load_room_defs(game)
+	var rooms: Array[RoomState] = ResearchRules.buildings(game, discipline)
+	if not rooms.is_empty():
+		return rooms[0]
+	if discipline == &"engineering":
+		return workshop(game)
+	for def: RoomDef in game.room_defs.values():
+		if def.research_discipline != discipline:
+			continue
+		var origin: Vector2i = BENCH_ORIGINS.get(discipline, Vector2i(30, 2))
+		var room: RoomState = game.base.add_room(def.id, 1, origin)
+		for index: int in 2:
+			var person := PersonState.new()
+			person.id = StringName("bench_%s_%d" % [discipline, index])
+			person.name = "Bench %d" % index
+			person.role = def.staff_role
+			person.skill = 3
+			person.room_id = room.id
+			game.staff.people.append(person)
+		return room
+	return null
+
+
 ## Starts [param project_id] on [param game] (it must be allowed) and ticks a ResearchSystem
 ## and the clock until it is done; returns the ticks it took.
 static func finish(game: GameState, project_id: StringName) -> int:
 	var def: ResearchDef = game.research_defs.get(project_id)
-	if def != null and def.discipline == &"engineering":
-		workshop(game)
+	if def != null:
+		bench_for(game, def.discipline)
 	var result: CommandResult = ConstructionFixture.run(
 		game, StartResearchCommand.create(project_id)
 	)

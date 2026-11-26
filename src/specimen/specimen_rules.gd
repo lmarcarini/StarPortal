@@ -17,6 +17,8 @@ const SAMPLER_FLAG: StringName = &"moth_sampler"
 ## The cold store installation (M7-06) and its host.
 const COLD_STORE: StringName = &"installation_cold_store"
 const BIO_LAB: StringName = &"room_bio_lab"
+## Source id of the life fact Specimen analysis (B01) gives.
+const ANALYSIS_SOURCE: StringName = &"specimen_analysis"
 
 
 ## The kind of specimen world [param world_id] gives, or &"" for none (no life, or unknown).
@@ -46,6 +48,13 @@ static func add(state: GameState, world_id: StringName) -> int:
 	record.arrived_tick = state.clock.tick
 	state.artefacts.specimens.append(record)
 	state.events.post(&"specimen_arrived", [record.uid, world_id])
+	if ResearchPerks.has(state, XenoPerks.SPECIMEN_ANALYSIS):
+		WorldProgress.raise_fact(
+			state,
+			WorldProgress.FactChange.create(
+				world_id, WorldReport.Fact.LIFE, WorldReport.Confidence.GOOD, ANALYSIS_SOURCE
+			)
+		)
 	return record.uid
 
 

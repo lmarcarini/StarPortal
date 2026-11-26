@@ -51,7 +51,7 @@ static func start(state: GameState, def_id: StringName) -> CommandResult:
 	var incursion: IncursionState = state.incursion
 	incursion.phase = IncursionState.Phase.WARNING
 	incursion.def_id = def_id
-	incursion.countdown = maxi(1, def.warning_ticks)
+	incursion.countdown = maxi(1, XenoPerks.warning_ticks(state, def.warning_ticks))
 	incursion.groups.clear()
 	incursion.last_day[def.faction] = TimeMath.day_index(state.clock.tick)
 	close_outgoing(state)

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="2"]
+
+; docs/content/research-and-progression.md section 10 (X05).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+flag = &"alien_weapon_copy"
+
+[resource]
+script = ExtResource("1")
+order = 15
+discipline = &"xenotech"
+tier = 4
+cost_k = 3000
+hours = 240
+needs = Array[StringName]([&"study_ossar_effigy"])
+reveal_when = Array[Resource]([])
+requires = Array[Resource]([])
+story = true
+effects = Array[Resource]([SubResource("fx0")])
+name_key = &"RESEARCH_ALIEN_WEAPON_COPY_NAME"
+line_key = &"RESEARCH_ALIEN_WEAPON_COPY_LINE"
+id = &"alien_weapon_copy"

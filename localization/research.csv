@@ -42,8 +42,8 @@ RESEARCH_CAT_STAFF,Staff,Pessoal
 RESEARCH_EMPTY,Nothing to research yet,Nada para pesquisar ainda
 RESEARCH_STUB,from {name},de {name}
 LOG_LINE_RESEARCH_DIG,Level {n} can now be dug from the Base tab.,O Nível {n} já pode ser escavado na aba Base.
-RESEARCH_CAPACITOR_LATTICE_NAME,Capacitor lattice,Treliça de capacitores
-RESEARCH_CAPACITOR_LATTICE_LINE,Banks charge 25% faster.,Os bancos carregam 25% mais rápido.
+RESEARCH_CAPACITOR_LATTICE_NAME,"Capacitor lattice","Treliça de capacitores"
+RESEARCH_CAPACITOR_LATTICE_LINE,"Bank capacity doubled.","Capacidade dos bancos dobrada."
 RESEARCH_CONTAINMENT_NAME,Containment,Contenção
 RESEARCH_CONTAINMENT_LINE,Unlocks the Containment room for dangerous artefacts.,Libera a sala de Contenção para artefatos perigosos.
 RESEARCH_CAT_DEFENCE,Defence,Defesa
@@ -82,19 +82,19 @@ RESEARCH_MOTH_BATTERIES_LINE,The MOTH flies 50% longer.,[EN] The MOTH flies 50% 
 RESEARCH_MOTH_SHIELDING_NAME,MOTH shielding,[EN] MOTH shielding
 RESEARCH_MOTH_SHIELDING_LINE,The MOTH flies another 25% longer.,[EN] The MOTH flies another 25% longer.
 RESEARCH_STUDY_RESONANT_LATTICE_NAME,Study the Lattice,[EN] Study the Lattice
-RESEARCH_STUDY_RESONANT_LATTICE_LINE,Learn what the Lattice does.,[EN] Learn what the Lattice does.
-RESEARCH_LATTICE_HARMONICS_NAME,Lattice harmonics,[EN] Lattice harmonics
-RESEARCH_LATTICE_HARMONICS_LINE,Banks charge 15% faster.,[EN] Banks charge 15% faster.
+RESEARCH_STUDY_RESONANT_LATTICE_LINE,"Its hazard controlled; follow-ups revealed.","Seu perigo controlado; continuações reveladas."
+RESEARCH_LATTICE_HARMONICS_NAME,"Lattice harmonics","Harmônicos da Treliça"
+RESEARCH_LATTICE_HARMONICS_LINE,"The Resonant Lattice recharges the capacitors.","A Treliça Ressonante recarrega os capacitores."
 RESEARCH_STUDY_KINDRED_LOOM_NAME,Study the Loom,[EN] Study the Loom
-RESEARCH_STUDY_KINDRED_LOOM_LINE,Learn how the Loom teaches.,[EN] Learn how the Loom teaches.
+RESEARCH_STUDY_KINDRED_LOOM_LINE,"Its hazard controlled; follow-ups revealed.","Seu perigo controlado; continuações reveladas."
 RESEARCH_LOOM_PEDAGOGY_NAME,Loom pedagogy,[EN] Loom pedagogy
 RESEARCH_LOOM_PEDAGOGY_LINE,Research is 10% faster.,[EN] Research is 10% faster.
 RESEARCH_STUDY_OSSAR_EFFIGY_NAME,Study the Effigy,[EN] Study the Effigy
-RESEARCH_STUDY_OSSAR_EFFIGY_LINE,Learn what the Effigy wards against.,[EN] Learn what the Effigy wards against.
-RESEARCH_EFFIGY_WARDS_NAME,Effigy wards,[EN] Effigy wards
-RESEARCH_EFFIGY_WARDS_LINE,Dialing costs 10% less energy.,[EN] Dialing costs 10% less energy.
-RESEARCH_FIELD_MEDICINE_NAME,Field medicine,[EN] Field medicine
-RESEARCH_FIELD_MEDICINE_LINE,Field checks are a little easier.,[EN] Field checks are a little easier.
+RESEARCH_STUDY_OSSAR_EFFIGY_LINE,"Its hazard controlled; follow-ups revealed.","Seu perigo controlado; continuações reveladas."
+RESEARCH_EFFIGY_WARDS_NAME,"Effigy wards","Proteções da Efígie"
+RESEARCH_EFFIGY_WARDS_LINE,"Incursion warnings come twice as early.","Alertas de incursão chegam com o dobro de antecedência."
+RESEARCH_FIELD_MEDICINE_NAME,"Field medicine","Medicina de campo"
+RESEARCH_FIELD_MEDICINE_LINE,"Injured team members are treated in the field.","Membros feridos da equipe são tratados em campo."
 RESEARCH_SURVIVAL_TRAINING_NAME,"Survival training","Treinamento de sobrevivência"
 RESEARCH_SURVIVAL_TRAINING_LINE,"The blind-expedition penalty is removed.","A penalidade de expedição às cegas é removida."
 RESEARCH_COMMAND_STAFF_NAME,Command staff,[EN] Command staff
@@ -203,3 +203,21 @@ RESEARCH_HALCYON_CONTRACTS_NAME,"Halcyon contracts","Contratos Halcyon"
 RESEARCH_HALCYON_CONTRACTS_LINE,"Story.","História."
 RESEARCH_BLACK_FUNDS_NAME,"Black funds","Verbas secretas"
 RESEARCH_BLACK_FUNDS_LINE,"Story.","História."
+RESEARCH_LOOM_TRANSLATOR_NAME,"Loom translator","Tradutor do Tear"
+RESEARCH_LOOM_TRANSLATOR_LINE,"All Kindred text readable.","Todo texto Kindred legível."
+RESEARCH_ALIEN_WEAPON_COPY_NAME,"Alien weapon copy","Cópia de arma alienígena"
+RESEARCH_ALIEN_WEAPON_COPY_LINE,"Story.","História."
+RESEARCH_ANTERITE_CELLS_NAME,"Anterite cells","Células de anterita"
+RESEARCH_ANTERITE_CELLS_LINE,"Story.","História."
+RESEARCH_SPECIMEN_ANALYSIS_NAME,"Specimen analysis","Análise de espécimes"
+RESEARCH_SPECIMEN_ANALYSIS_LINE,"A world's life shown in its report; specimens graded.","A vida de um mundo aparece no relatório; espécimes classificados."
+RESEARCH_COLD_STORE_NAME,"Cold store","Câmara fria"
+RESEARCH_COLD_STORE_LINE,"Installation: a specimen cold store in the Bio Lab.","Instalação: uma câmara fria de espécimes no Laboratório Bio."
+RESEARCH_ISOLATION_WARD_NAME,"Isolation ward","Ala de isolamento"
+RESEARCH_ISOLATION_WARD_LINE,"Story.","História."
+RESEARCH_REGENERATIVE_COMPOUNDS_NAME,"Regenerative compounds","Compostos regenerativos"
+RESEARCH_REGENERATIVE_COMPOUNDS_LINE,"Serious injuries heal twice as fast.","Ferimentos graves saram duas vezes mais rápido."
+RESEARCH_TOXIN_RESISTANCE_NAME,"Toxin resistance","Resistência a toxinas"
+RESEARCH_TOXIN_RESISTANCE_LINE,"Hazardous worlds' risk lowered one step.","O risco de mundos perigosos cai um nível."
+RESEARCH_ALIEN_PHYSIOLOGY_NAME,"Alien physiology","Fisiologia alienígena"
+RESEARCH_ALIEN_PHYSIOLOGY_LINE,"How alien bodies work.","Como funcionam os corpos alienígenas."
