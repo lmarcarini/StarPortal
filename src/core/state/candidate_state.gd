@@ -3,12 +3,15 @@ extends RefCounted
 ## Saved state of one candidate on the rolling list (docs/content/m27-daily-rhythm.md
 ## section 3): who they are, what they would cost, how long they take to arrive and the day
 ## they leave the list. Hiring turns a candidate into a PersonState; the fee is 30 days' salary.
-## Saved shape: {"id", "name", "role", "skill", "salary_k", "arrival_ticks", "leaves_day"}
+## Saved shape: {"id", "name", "role", "skill", "salary_k", "arrival_ticks", "leaves_day",
+## "appearance"}
 ## ("leaves_day" may be missing from an older v14 save; it then reads as day 0).
 ## Bible: docs/content/m27-daily-rhythm.md section 3, technical-architecture.md#data-model
 
 ## Saved keys, in to_dict() order.
-const _KEYS: Array[String] = ["id", "name", "role", "skill", "salary_k", "arrival_ticks"]
+const _KEYS: Array[String] = [
+	"id", "name", "role", "skill", "salary_k", "arrival_ticks", "appearance"
+]
 
 ## Unique id among candidates, e.g. &"candidate_3"; never reused.
 var id: StringName = &""
@@ -25,6 +28,9 @@ var arrival_ticks: int = 0
 ## Day index (TimeMath.day_index()) on whose settlement the candidate leaves the list; fixed
 ## at arrival (arrival day + RecruitmentRules.STAY_DAYS) and never moved.
 var leaves_day: int = 0
+## The appearance record (AppearanceRules), rolled when the candidate was drawn; hiring
+## copies it to the person.
+var appearance: Dictionary = {}
 
 
 ## Returns a candidate with the given values and an empty id (RecruitmentState.add_candidate()
@@ -50,6 +56,7 @@ func to_dict() -> Dictionary:
 		"salary_k": salary_k,
 		"arrival_ticks": arrival_ticks,
 		"leaves_day": leaves_day,
+		"appearance": appearance.duplicate(),
 	}
 
 
@@ -66,6 +73,9 @@ static func from_dict(data: Dictionary) -> CandidateState:
 	candidate.salary_k = RoomState.read_count(data.get("salary_k"))
 	candidate.arrival_ticks = RoomState.read_count(data.get("arrival_ticks"))
 	candidate.leaves_day = RoomState.read_count(data.get("leaves_day", 0))
+	var record: Variant = data.get("appearance", {})
+	var saved: Dictionary = record if record is Dictionary else {}
+	candidate.appearance = AppearanceRules.from_saved(saved)
 	return candidate
 
 
@@ -96,4 +106,9 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'arrival_ticks' is not a whole number of at least 1")
 	if data.has("leaves_day") and not RoomState.is_count(data["leaves_day"]):
 		errors.append("'leaves_day' is not a whole number of at least 0")
+	if not data["appearance"] is Dictionary:
+		errors.append("'appearance' is not a dictionary")
+	else:
+		var record: Dictionary = data["appearance"]
+		errors.append_array(AppearanceRules.validate(record))
 	return errors

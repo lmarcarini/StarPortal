@@ -5,7 +5,8 @@ extends RefCounted
 ## (or none) and the tick they arrive on base. Points at its RoleDef and room by id.
 ## M3 adds whether the Directorate lent them (no bed) and their injury with the recovery left.
 ## Saved shape: {"id", "name", "role", "skill", "salary_k", "room_id", "arrives_tick", "lent",
-## "injury", "recovery_left"}.
+## "injury", "recovery_left", "appearance"}; "appearance" is an
+## AppearanceRules record (docs/content/portraits.md, M8-01).
 ## Bible: docs/content/m26-staff-and-money.md sections 1 and 3,
 ## technical-architecture.md#data-model,
 ## docs/content/m3-beyond-the-ring.md section 4 (lent soldiers, injuries)
@@ -28,7 +29,8 @@ const _KEYS: Array[String] = [
 	"arrives_tick",
 	"lent",
 	"injury",
-	"recovery_left"
+	"recovery_left",
+	"appearance"
 ]
 ## Saved names of the injuries, indexed by Injury value.
 const INJURY_NAMES: Array[String] = ["none", "light", "serious"]
@@ -53,6 +55,8 @@ var lent: bool = false
 var injury: Injury = Injury.NONE
 ## Recovery left, in ticks at normal (1x) speed; 0 when well.
 var recovery_left: int = 0
+## The appearance record (AppearanceRules), rolled once when the person was drawn.
+var appearance: Dictionary = {}
 
 
 ## True when the person has a room.
@@ -78,6 +82,7 @@ func to_dict() -> Dictionary:
 		"lent": lent,
 		"injury": INJURY_NAMES[injury],
 		"recovery_left": recovery_left,
+		"appearance": appearance.duplicate(),
 	}
 
 
@@ -100,6 +105,9 @@ static func from_dict(data: Dictionary) -> PersonState:
 	person.lent = data.get("lent") == true
 	person.injury = maxi(0, INJURY_NAMES.find(str(data.get("injury", "none")))) as Injury
 	person.recovery_left = RoomState.read_count(data.get("recovery_left"))
+	var record: Variant = data.get("appearance", {})
+	var saved: Dictionary = record if record is Dictionary else {}
+	person.appearance = AppearanceRules.from_saved(saved)
 	return person
 
 
@@ -107,7 +115,8 @@ static func from_dict(data: Dictionary) -> PersonState:
 ## present; "lent" a bool; "injury" "none", "light" or "serious"; "id", "name" and "role"
 ## non-empty strings; "room_id" a string; "skill" a whole
 ## number from [constant MIN_SKILL] to [constant MAX_SKILL]; "salary_k", "arrives_tick" and
-## "recovery_left" whole numbers of at least 0. Role and room ids are checked against the
+## "recovery_left" whole numbers of at least 0; "appearance" a valid AppearanceRules
+## record. Role and room ids are checked against the
 ## content and the base
 ## by StaffSaveChecks.
 static func validate_dict(data: Dictionary) -> Array[String]:
@@ -132,4 +141,9 @@ static func validate_dict(data: Dictionary) -> Array[String]:
 		errors.append("'lent' is not a bool")
 	if not str(data["injury"]) in INJURY_NAMES or not data["injury"] is String:
 		errors.append("'injury' is not one of %s" % ", ".join(INJURY_NAMES))
+	if not data["appearance"] is Dictionary:
+		errors.append("'appearance' is not a dictionary")
+	else:
+		var record: Dictionary = data["appearance"]
+		errors.append_array(AppearanceRules.validate(record))
 	return errors

@@ -18,15 +18,18 @@ var next_candidate_number: int = 1
 func replace_list(fresh: Array[CandidateState]) -> void:
 	candidates.clear()
 	for candidate: CandidateState in fresh:
-		candidate.id = StringName("candidate_%d" % next_candidate_number)
-		next_candidate_number += 1
-		candidates.append(candidate)
+		add_candidate(candidate)
 
 
-## Adds [param candidate] at the end of the list with the next free id.
+## Adds [param candidate] at the end of the list with the next free id; one with no
+## appearance record gets one seeded from the new id and the role (M8-01).
 func add_candidate(candidate: CandidateState) -> void:
 	candidate.id = StringName("candidate_%d" % next_candidate_number)
 	next_candidate_number += 1
+	if candidate.appearance.is_empty():
+		candidate.appearance = AppearanceRules.roll_seeded(
+			String(candidate.id), AppearanceRules.field_for_role(candidate.role)
+		)
 	candidates.append(candidate)
 
 

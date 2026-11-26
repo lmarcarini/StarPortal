@@ -3,7 +3,8 @@ extends RefCounted
 ## Builds the crew a new game starts with (docs/content/m26-staff-and-money.md section 7):
 ## five people with fixed names, the analyst in the Control Room and the others Unassigned, the
 ## scientists waiting for the first Research Lab and the engineers for the first Workshop
-## (StaffChanges.auto_assign()). Pure: depends only on the base and the BalanceConfig.
+## (StaffChanges.auto_assign()). Each appearance record is seeded from the fixed name
+## (M8-01). Pure: depends only on the base and the BalanceConfig.
 ## Bible: docs/content/m26-staff-and-money.md section 7
 
 ## Scientist role id.
@@ -43,6 +44,9 @@ static func build(base: BaseState, balance: BalanceConfig) -> StaffState:
 		person.role = entry[1]
 		person.skill = entry[2]
 		person.salary_k = StaffRules.salary_for_skill(balance, person.skill)
+		person.appearance = AppearanceRules.roll_seeded(
+			person.name, AppearanceRules.field_for_role(person.role)
+		)
 		var in_control: bool = entry[3]
 		if in_control:
 			person.room_id = control_id

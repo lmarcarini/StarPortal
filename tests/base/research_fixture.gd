@@ -67,6 +67,9 @@ static func bench_for(game: GameState, discipline: StringName) -> RoomState:
 			person.role = def.staff_role
 			person.skill = 3
 			person.room_id = room.id
+			person.appearance = AppearanceRules.roll_seeded(
+				String(person.id), AppearanceRules.field_for_role(person.role)
+			)
 			game.staff.people.append(person)
 		return room
 	return null

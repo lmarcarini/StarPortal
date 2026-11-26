@@ -45,7 +45,7 @@ const EXPEDITION_ROLE_ODDS: int = 4
 
 
 ## The first list of a new game under [param balance] (no ids yet), leaving on days 3, 6, 9
-## and 12.
+## and 12; each appearance is seeded from the candidate's fixed name.
 static func first_list(balance: BalanceConfig) -> Array[CandidateState]:
 	var list: Array[CandidateState] = []
 	for index: int in FIRST_LIST.size():
@@ -55,6 +55,9 @@ static func first_list(balance: BalanceConfig) -> Array[CandidateState]:
 		var skill: int = entry[2]
 		var candidate: CandidateState = _candidate(balance, display_name, role, skill)
 		candidate.leaves_day = (index + 1) * ARRIVAL_EVERY_DAYS
+		candidate.appearance = AppearanceRules.roll_seeded(
+			display_name, AppearanceRules.field_for_role(role)
+		)
 		list.append(candidate)
 	return list
 
@@ -92,14 +95,17 @@ static func unlocked_arrival_role(
 	return arrival_role(rng, base, list)
 
 
-## A candidate of [param role] drawn with [param rng]: the skill, then the name
-## (StaffNames.draw()). No id or leave day yet. Same generator state, same candidate.
+## A candidate of [param role] drawn with [param rng]: the skill, the name
+## (StaffNames.draw()), then the appearance record (AppearanceRules.roll(), M8-01). No id or
+## leave day yet. Same generator state, same candidate.
 static func draw_candidate(
 	rng: RandomNumberGenerator, balance: BalanceConfig, role: RoleDef, names: StaffNameListDef
 ) -> CandidateState:
 	var skill: int = draw_skill(rng, balance.candidate_skill_weights)
 	var display_name: String = StaffNames.draw(rng, names, role)
-	return _candidate(balance, display_name, role.id, skill)
+	var candidate: CandidateState = _candidate(balance, display_name, role.id, skill)
+	candidate.appearance = AppearanceRules.roll(rng, AppearanceRules.field_for_role(role.id))
+	return candidate
 
 
 ## True when a candidate arrives on the settlement of day [param day]: every
