@@ -15,7 +15,7 @@ static func of(card: WireCardData, state: GameState) -> String:
 			return _candidate(state)
 		&"phone_call":
 			return _caller(state)
-		&"request_offered":
+		&"request_offered", &"new_research":
 			return card.detail
 		&"incoming_call":
 			return _tr(&"WIRE_LINE_INCOMING")

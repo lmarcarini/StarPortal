@@ -182,7 +182,8 @@ func open_command() -> void:
 	view_switcher.show_view(ViewSwitcher.COMMAND)
 
 
-## Shows [param view_id], on the Base's [param sub_tab] when one is given (the top bar).
+## Shows [param view_id], on its [param sub_tab] when one is given (the Base's mode, the
+## Command's sub-tab, the Lab's discipline).
 func open_view(view_id: StringName, sub_tab: StringName = &"") -> void:
 	view_switcher.show_view(view_id)
 	var base: BaseView = view_switcher.get_view(view_id) as BaseView
@@ -191,6 +192,9 @@ func open_view(view_id: StringName, sub_tab: StringName = &"") -> void:
 	var command: CommandView = view_switcher.get_view(view_id) as CommandView
 	if command != null:
 		command.show_sub_tab(sub_tab)
+	var lab: ResearchView = view_switcher.get_view(view_id) as ResearchView
+	if lab != null and sub_tab != &"":
+		lab.show_discipline(sub_tab)
 
 
 ## Selects the target of the alert [param entry] once its screen is open: a research project;
@@ -201,8 +205,7 @@ func _on_alert_chosen(entry: AlertEntry) -> void:
 		return
 	var research: ResearchView = view_switcher.get_view(entry.view_id) as ResearchView
 	if research != null and entry.target != &"" and research.is_available():
-		research.get_board().jump_to(entry.target)
-		research.get_board().project_chosen.emit(entry.target)
+		research.select_project(entry.target)
 
 
 ## Returns the rescue alert.

@@ -3,6 +3,7 @@ extends Node
 ## scripts/reference.sh), the clock running at fast speed: gate_idle (SILL selected),
 ## gate_open (SILL dialled and open, send rail and mission sheet), other_station (Base) and
 ## the Base states base_build, base_power, base_staff and base_security (BaseCapture),
+## the Lab (LabCapture),
 ## then the pause menu (pause_menu) and its confirm question (pause_confirm)
 ## and its save list (pause_saves).
 ## Writes <state>.png into REF_OUT (default build/reference/). Not part of the game: lives
@@ -54,6 +55,8 @@ func _process(_delta: float) -> void:
 		_shoot.bind("base_staff"),
 		_to_base.bind(BaseSubTabs.SECURITY),
 		_shoot.bind("base_security"),
+		_to_lab,
+		_shoot.bind("lab"),
 		_to_pause,
 		_shoot.bind("pause_menu"),
 		_to_pause_confirm,
@@ -103,6 +106,10 @@ func _to_other() -> void:
 func _to_base(mode: StringName) -> void:
 	BaseCapture.furnish(SimClock.simulation.state)
 	BaseCapture.show(_switcher(), mode)
+
+
+func _to_lab() -> void:
+	LabCapture.show(_switcher())
 
 
 func _to_pause() -> void:

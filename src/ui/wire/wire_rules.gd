@@ -10,6 +10,7 @@ extends RefCounted
 const ICONS: Dictionary[StringName, StringName] = {
 	&"funds_red": &"funds",
 	&"lab_idle": &"lab",
+	&"new_research": &"lab",
 	&"research_done": &"lab",
 	&"staff_unassigned": &"people",
 	&"beds_full": &"base",
@@ -59,7 +60,7 @@ static func from_alert(state: GameState, entry: AlertEntry) -> WireCardData:
 
 
 ## Cards the old alerts did not have: offered requests, an incoming wormhole, waiting phone
-## calls, low charge and a team's return (from the last day of the Log).
+## calls, low charge, a team's return (from the last day of the Log) and new research.
 static func extra_cards(state: GameState) -> Array[WireCardData]:
 	var found: Array[WireCardData] = []
 	for record: RequestRecord in state.requests.items:
@@ -78,7 +79,28 @@ static func extra_cards(state: GameState) -> Array[WireCardData]:
 		low.actions = [WireAction.go(&"go_to", &"go_to", ViewSwitcher.BASE, BaseSubTabs.ENERGY)]
 		found.append(low)
 	found.append_array(_returns(state))
+	var fresh: WireCardData = new_research(state)
+	if fresh != null:
+		found.append(fresh)
 	return found
+
+
+## The NEW RESEARCH card while visible projects wait unopened: its line names the discipline
+## of the newest one and how many there are ("Xenotech · 1"); its key opens that discipline
+## in the Lab. Null when there are none.
+static func new_research(state: GameState) -> WireCardData:
+	var fresh: Array[StringName] = []
+	for id: StringName in state.research.revealed:
+		var def: ResearchDef = state.research_defs.get(id)
+		if def != null and state.research.is_new(id) and ResearchRules.visible(state, def):
+			fresh.append(id)
+	if fresh.is_empty():
+		return null
+	var newest: ResearchDef = state.research_defs.get(fresh[-1])
+	var card: WireCardData = _card(&"new_research", state.clock.tick, AlertEntry.INFO)
+	card.detail = "%s · %d" % [LabText.discipline_name(newest.discipline), fresh.size()]
+	card.actions = [WireAction.go(&"go_to", &"go_to", ViewSwitcher.RESEARCH, newest.discipline)]
+	return card
 
 
 static func _request_card(state: GameState, record: RequestRecord) -> WireCardData:

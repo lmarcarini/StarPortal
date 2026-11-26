@@ -2,7 +2,8 @@ class_name ShellLayout
 extends RefCounted
 ## Where the shell puts the views under the frame (interface-reference.md sections 1, 2 and
 ## 4): the Gate station full bleed behind every bar and panel (its console drawn over the
-## bottom bar); every other station's views in the station area, with their own folder strip
+## bottom bar), the Base and the Lab over the whole window (their regions are the reference's,
+## console included); every other station's views in the station area, with their own folder strip
 ## inside it when the station has more than one folder, on the plain backdrop.
 ## Bible: docs/content/interface-reference.md sections 1, 2 and 4
 
@@ -23,7 +24,9 @@ static func raise_overlays(shell: Node, frame: Frame) -> void:
 ## Lays out [param switcher], [param backdrop] and [param frame] for the current station.
 static func fit(switcher: ViewSwitcher, backdrop: Control, frame: Frame) -> void:
 	var gate: bool = switcher.current_station() == &"gate"
-	var full: bool = gate or switcher.current_view_id() == ViewSwitcher.BASE
+	var full: bool = (
+		gate or switcher.current_view_id() in [ViewSwitcher.BASE, ViewSwitcher.RESEARCH]
+	)
 	backdrop.visible = not gate
 	frame.show_station_console(not gate)
 	var folders: Array = ViewSwitcher.STATIONS.get(switcher.current_station(), [])

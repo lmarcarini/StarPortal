@@ -221,3 +221,32 @@ RESEARCH_TOXIN_RESISTANCE_NAME,"Toxin resistance","Resistência a toxinas"
 RESEARCH_TOXIN_RESISTANCE_LINE,"Hazardous worlds' risk lowered one step.","O risco de mundos perigosos cai um nível."
 RESEARCH_ALIEN_PHYSIOLOGY_NAME,"Alien physiology","Fisiologia alienígena"
 RESEARCH_ALIEN_PHYSIOLOGY_LINE,"How alien bodies work.","Como funcionam os corpos alienígenas."
+LAB_DISCIPLINE_ENGINEERING,Engineering,Engenharia
+LAB_DISCIPLINE_SCIENCE,Science,Ciência
+LAB_DISCIPLINE_XENOTECH,Xenotech,Xenotecnologia
+LAB_DISCIPLINE_OFFICE,Office,Escritório
+LAB_DISCIPLINE_XENOBIOLOGY,Xenobiology,Xenobiologia
+LAB_FIELD_ENG,ENG.,ENG.
+LAB_FIELD_SCI,SCI.,CIÊN.
+LAB_FIELD_ANA,ANA.,ANAL.
+LAB_FIELD_MED,MED.,MÉD.
+LAB_DONE,Done,Concluído
+LAB_NEW,New,Nova
+LAB_QUEUED,Queued {n},Na fila {n}
+LAB_LEFT,{time} left,faltam {time}
+LAB_NO_STAFF,no staff,sem equipe
+LAB_TIER,TIER {n},NÍVEL {n}
+LAB_PIECES,{n} PCS,{n} PÇS
+LAB_SPECIMENS,{n} SPEC.,{n} ESP.
+LAB_GIVES,GIVES,DÁ
+LAB_NEEDS,NEEDS,REQUER
+LAB_START,START,INICIAR
+LAB_CANCEL,CANCEL,CANCELAR
+LAB_ADD_TO_QUEUE,ADD TO QUEUE,ADICIONAR À FILA
+LAB_IDLE_PICK,IDLE · PICK A PROJECT,PARADO · ESCOLHA UM PROJETO
+LAB_ERR_BENCH_BUSY,That bench is busy: add it to the queue.,Essa bancada está ocupada: adicione à fila.
+LAB_ERR_NO_BENCH,No building of this discipline stands.,Nenhum prédio desta disciplina está de pé.
+LAB_ERR_QUEUE_FULL,That queue is full.,Essa fila está cheia.
+LAB_ERR_QUEUED,Already in a queue.,Já está em uma fila.
+LAB_ERR_PIECES,Needs more artefact pieces.,Precisa de mais peças de artefato.
+LAB_ERR_SPECIMENS,Needs more specimens.,Precisa de mais espécimes.

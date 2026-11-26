@@ -215,6 +215,8 @@ signal specimen_arrived(uid: int, world_id: StringName)
 signal specimen_spoiled(uid: int, world_id: StringName)
 ## A research project became visible for the first time ("new research").
 signal research_revealed(project_id: StringName)
+## The player opened a revealed project in the Lab (its NEW lamp goes out).
+signal research_opened(project_id: StringName)
 ## A story effect set a flag.
 signal flag_changed(flag: StringName)
 ## Emitted when an artefact is handed over, with its id (outbox).
