@@ -187,7 +187,8 @@ static func capacity_mwh(state: GameState) -> float:
 static func capacity_of(state: GameState, sums: PackedFloat64Array) -> float:
 	if state.balance == null:
 		return 0.0
-	return sums[BANKS] * state.balance.capacitor_bank_capacity_mwh
+	var capacity: float = sums[BANKS] * state.balance.capacitor_bank_capacity_mwh
+	return ModifierRules.percent(state, &"bank_capacity_pct", capacity)
 
 
 ## MWh per tick a charge rate of [param rate_mw] gives.

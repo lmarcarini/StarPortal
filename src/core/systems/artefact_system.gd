@@ -22,12 +22,23 @@ func on_day(state: GameState) -> void:
 	var rng: RandomNumberGenerator = state.random.stream(get_id())
 	for record: ArtefactRecord in state.artefacts.items.duplicate():
 		var def: ArtefactDef = state.artefact_defs.get(record.artefact)
-		if def == null or def.hazard_chance_pct <= 0 or is_contained(state, record):
+		if (
+			def == null
+			or def.hazard_chance_pct <= 0
+			or is_contained(state, record)
+			or _controlled(record)
+		):
 			continue
 		if rng.randi_range(0, 99) < def.hazard_chance_pct:
 			StoryRules.apply_all(state, def.hazard, def.id)
 			state.events.post(&"artefact_hazard", [def.id])
 	SpecimenRules.spoil(state)
+	XenoPerks.recharge(state)
+
+
+# A studied artefact's hazard is under control (X01).
+static func _controlled(record: ArtefactRecord) -> bool:
+	return record.state == ArtefactRecord.ArtefactState.STUDIED
 
 
 ## True when [param record] sits in a room whose class is containment.

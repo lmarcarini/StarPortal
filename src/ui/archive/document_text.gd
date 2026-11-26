@@ -107,7 +107,16 @@ static func _translate(key: StringName) -> String:
 ## [param state]: its DOC_*_GLOSS text in italics, or "" (before the research, or when the
 ## document has no alien text).
 static func gloss(def: DocumentDef, state: GameState) -> String:
-	if def == null or not ResearchPerks.has(state, ResearchPerks.XENOLINGUISTICS):
+	if def == null:
+		return ""
+	var stem: String = String(def.id).trim_prefix("doc_").to_upper()
+	if ResearchPerks.has(state, XenoPerks.LOOM_TRANSLATOR):
+		var full: String = TranslationServer.translate(StringName("DOC_%s_TRANSLATION" % stem))
+		if full != "DOC_%s_TRANSLATION" % stem:
+			return (
+				"[i]%s[/i]" % TranslationServer.translate(&"DOC_TRANSLATION").format({"text": full})
+			)
+	if not ResearchPerks.has(state, ResearchPerks.XENOLINGUISTICS):
 		return ""
 	var key: StringName = StringName("DOC_%s_GLOSS" % String(def.id).trim_prefix("doc_").to_upper())
 	var text: String = TranslationServer.translate(key)

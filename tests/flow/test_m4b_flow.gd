@@ -87,12 +87,13 @@ func test_m4b_loop() -> void:
 	_submit(
 		SwitchRoomCommand.create(PowerFixture.first_room(_state, &"room_research_lab").id, true)
 	)
-	var pedagogy: ResearchDef = _state.research_defs[&"loom_pedagogy"]
+	var pedagogy: ResearchDef = _state.research_defs[&"loom_translator"]
 	assert_bool(ResearchRules.visible(_state, pedagogy)).is_false()
 	ResearchFixture.finish(_state, &"study_kindred_loom")
 	assert_int(ArtefactRules.find(_state, loom).state).is_equal(
 		ArtefactRecord.ArtefactState.STUDIED
 	)
+	_state.research.done.append(&"xenolinguistics")
 	assert_bool(ResearchRules.visible(_state, pedagogy)).is_true()
 	# Queue three visible projects behind the running one.
 	ResearchFixture.workshop(_state)

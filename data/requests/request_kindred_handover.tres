@@ -17,7 +17,7 @@ delta = 20
 
 [sub_resource type="Resource" id="r3"]
 script = ExtResource("4")
-project = &"kindred_archive"
+project = &"loom_translator"
 
 [resource]
 script = ExtResource("1")

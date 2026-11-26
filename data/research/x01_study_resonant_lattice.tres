@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="ResearchDef" format=3]
+
+[ext_resource type="Script" path="res://src/content/research_def.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/story/effects/study_artefact_effect.gd" id="2"]
+[ext_resource type="Script" path="res://src/content/story/effects/set_flag_effect.gd" id="3"]
+[ext_resource type="Script" path="res://src/content/story/conditions/has_artefact_condition.gd" id="4"]
+
+; docs/content/research-and-progression.md section 10 (X01).
+
+[sub_resource type="Resource" id="fx0"]
+script = ExtResource("2")
+artefact = &"resonant_lattice"
+
+[sub_resource type="Resource" id="fx1"]
+script = ExtResource("3")
+flag = &"studied_resonant_lattice"
+
+[sub_resource type="Resource" id="c2"]
+script = ExtResource("4")
+artefact = &"resonant_lattice"
+
+[sub_resource type="Resource" id="c3"]
+script = ExtResource("4")
+artefact = &"resonant_lattice"
+
+[resource]
+script = ExtResource("1")
+order = 1
+discipline = &"xenotech"
+tier = 2
+cost_k = 500
+hours = 36
+needs = Array[StringName]([])
+reveal_when = Array[Resource]([SubResource("c2")])
+requires = Array[Resource]([SubResource("c3")])
+story = false
+effects = Array[Resource]([SubResource("fx0"), SubResource("fx1")])
+name_key = &"RESEARCH_STUDY_RESONANT_LATTICE_NAME"
+line_key = &"RESEARCH_STUDY_RESONANT_LATTICE_LINE"
+id = &"study_resonant_lattice"

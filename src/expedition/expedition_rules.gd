@@ -124,14 +124,19 @@ static func is_blind(state: GameState, plan: ExpeditionState) -> bool:
 
 
 ## The facts the run of [param state] rolls its risks against: the world's, with the threat
-## one step higher (capped at HIGH) on a blind run.
+## one step higher (capped at HIGH) on a blind run, and the biohazard one step lower with
+## Toxin resistance (B06).
 static func risk_facts(state: GameState) -> WorldFacts:
 	var facts: WorldFacts = WorldFactRules.facts_for_id(state.galaxy, state.expedition.world_id)
-	if facts == null or not state.expedition.blind:
+	var resistant: bool = ResearchPerks.has(state, XenoPerks.TOXIN_RESISTANCE)
+	if facts == null or not (state.expedition.blind or resistant):
 		return facts
 	var copy: WorldFacts = _copy(facts)
-	var steps: int = state.balance.blind_threat_steps
-	copy.threat = mini(facts.threat + steps, WorldDef.Threat.HIGH) as WorldDef.Threat
+	if state.expedition.blind:
+		var steps: int = state.balance.blind_threat_steps
+		copy.threat = mini(facts.threat + steps, WorldDef.Threat.HIGH) as WorldDef.Threat
+	if resistant and facts.biohazard > WorldDef.Biohazard.NONE:
+		copy.biohazard = (facts.biohazard - 1) as WorldDef.Biohazard
 	return copy
 
 

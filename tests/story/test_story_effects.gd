@@ -118,14 +118,14 @@ func test_give_take_and_study_artefact() -> void:
 
 func test_unlock_and_complete_research() -> void:
 	var unlock := UnlockResearchEffect.new()
-	unlock.project = &"later_capacitor_lattice"
+	unlock.project = &"capacitor_lattice"
 	assert_bool(_apply(unlock)).is_true()
 	assert_bool(_apply(unlock)).is_false()
-	assert_array(_state.research.revealed).is_equal([&"later_capacitor_lattice"])
+	assert_array(_state.research.revealed).is_equal([&"capacitor_lattice"])
 	var complete := CompleteResearchEffect.new()
-	complete.project = &"later_capacitor_lattice"
+	complete.project = &"capacitor_lattice"
 	assert_bool(_apply(complete)).is_true()
-	assert_bool(_state.research.is_done(&"later_capacitor_lattice")).is_true()
+	assert_bool(_state.research.is_done(&"capacitor_lattice")).is_true()
 	assert_bool(_apply(complete)).is_false()
 	complete.project = &"research_nothing"
 	assert_bool(_apply(complete)).is_false()

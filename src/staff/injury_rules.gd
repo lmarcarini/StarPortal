@@ -65,7 +65,8 @@ static func recover(state: GameState, away: Array[StringName] = []) -> Array[Per
 	for person: PersonState in state.staff.people:
 		if not by_id.has(person.id):
 			continue
-		person.recovery_left = maxi(0, person.recovery_left - by_id[person.id])
+		var speed: int = XenoPerks.recovery_speed(state, person, by_id[person.id])
+		person.recovery_left = maxi(0, person.recovery_left - speed)
 		if person.recovery_left == 0:
 			person.injury = PersonState.Injury.NONE
 			healed.append(person)
