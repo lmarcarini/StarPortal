@@ -49,7 +49,7 @@ func tick(state: GameState) -> void:
 ## Runs the daily settlement, then files reports on every 15th day.
 func on_day(state: GameState) -> void:
 	DailySettlement.settle(state, _balance.daily_allocation_k, costs_k(state))
-	var bonus_k: int = ModifierRules.total(state, &"allocation_k")
+	var bonus_k: int = ModifierRules.total(state, &"allocation_k") + ContractWork.daily_k(state)
 	if bonus_k != 0:
 		state.budget.funds_k += bonus_k
 		state.events.post(&"budget_changed", [state.budget.funds_k])

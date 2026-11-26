@@ -35,6 +35,8 @@ static func line_name(state: GameState, line: CommandLine) -> String:
 			return _tr(key).format({"count": line.count})
 		CommandLine.Kind.MODIFIERS:
 			return _tr(&"COMMAND_LINE_MODIFIERS")
+		CommandLine.Kind.CONTRACTS:
+			return _tr(&"COMMAND_LINE_CONTRACTS")
 	return _tr(&"COMMAND_LINE_NET")
 
 
