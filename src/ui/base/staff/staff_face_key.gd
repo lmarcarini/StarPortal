@@ -18,6 +18,7 @@ var room_line: String = ""
 
 
 func _init() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	focus_mode = Control.FOCUS_ALL
 	toggle_mode = true
 	custom_minimum_size = SIZE

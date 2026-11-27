@@ -20,6 +20,8 @@ var assign: StringName = &""
 var power_view: bool = false
 var mw: String = ""
 var produces: bool = false
+## POWER mode: the MW the room makes or draws (0 for none), shown as batteries.
+var mw_value: float = 0.0
 
 
 ## The tile of [param room] built from [param def] in [param state_now], with [param site]
@@ -36,6 +38,7 @@ static func of(room: RoomState, def: RoomDef, state_now: GameState, site: SitePr
 		tile.caption = "%s · %s" % [tile.name, ProgressText.caption(site).to_upper()]
 	tile.mw = PowerTrayText.tag(room, def)
 	tile.produces = def.power_output_mw > 0.0
+	tile.mw_value = def.power_output_mw if tile.produces else maxf(def.power_draw_mw, 0.0)
 	tile.slots = def.staff_slots
 	if state_now != null:
 		for person: PersonState in state_now.staff.people:

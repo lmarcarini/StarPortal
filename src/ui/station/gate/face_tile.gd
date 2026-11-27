@@ -41,16 +41,27 @@ static func draw_face(item: CanvasItem, rect: Rect2, person: PersonState) -> voi
 		item.draw_rect(rect, Color(RefPaint.INK, 0.4), false, 2.0)
 		return
 	item.draw_rect(rect, TONES[hash(person.id) % TONES.size()])
-	var s: float = rect.size.x / 52.0
-	var head: Vector2 = rect.position + Vector2(26, 18) * s
-	item.draw_circle(head, 10.0 * s, Color8(214, 190, 160))
-	var body: Vector2 = rect.position + Vector2(26, 48) * s
-	item.draw_arc(body, 9.0 * s, PI, TAU, 16, Color8(54, 60, 50), 18.0 * s)
+	if not person.appearance.is_empty():
+		# The real portrait's face window (owner request 2026-11-27: the Base STAFF keys
+		# showed the stand-in silhouette while the Personnel office showed the portrait).
+		var full: ImageTexture = PortraitCache.texture_for(person.id, person.appearance)
+		item.draw_texture_rect_region(full, rect, Rect2(StaffPortrait.FACE))
+	else:
+		_draw_stand_in(item, rect)
 	item.draw_rect(rect, RefPaint.INK, false, 2.0)
 	if person.injury != PersonState.Injury.NONE:
 		HardwareIcons.draw(
 			item, &"injured", Rect2(rect.end.x - 20, rect.position.y + 2, 18, 18), RefPaint.RED
 		)
+
+
+## The head-and-shoulders silhouette for a person with no portrait record.
+static func _draw_stand_in(item: CanvasItem, rect: Rect2) -> void:
+	var s: float = rect.size.x / 52.0
+	var head: Vector2 = rect.position + Vector2(26, 18) * s
+	item.draw_circle(head, 10.0 * s, Color8(214, 190, 160))
+	var body: Vector2 = rect.position + Vector2(26, 48) * s
+	item.draw_arc(body, 9.0 * s, PI, TAU, 16, Color8(54, 60, 50), 18.0 * s)
 
 
 func _draw() -> void:
