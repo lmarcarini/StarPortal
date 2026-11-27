@@ -1,6 +1,7 @@
 class_name PersonnelPanel
 extends VBoxContainer
 ## The SELECTED panel of the Personnel tab (docs/content/m26-staff-and-money.md section 6).
+## The portrait (docs/content/portraits.md, M8-02) sits above the name at 1:1.
 ## For a person: name, role, skill and salary, room or arrival, then Assign…, Unassign and
 ## Dismiss (hold, because it is destructive). For a candidate: name, role, skill and salary,
 ## pipeline, fee and arrival time, then Hire. Assign… swaps the buttons for the rooms with a
@@ -20,6 +21,7 @@ signal hire_pressed(candidate_id: StringName)
 signal show_on_plan_pressed(person_id: StringName)
 
 var _heading: Label = _add_label(16)
+var _portrait: StaffPortrait = _add_portrait()
 var _name: Label = _add_label(22)
 var _role: Label = _add_label(16)
 var _skill: Label = _add_label(16)
@@ -55,9 +57,13 @@ func show_id(state: GameState, id: StringName) -> void:
 	_show_on_plan.visible = false
 	var person: PersonState = state.staff.find_person(id)
 	var candidate: CandidateState = state.recruitment.find_candidate(id)
+	_portrait.show_record(&"", {})
+	_portrait.visible = false
 	if person != null:
+		_show_portrait(person.id, person.appearance)
 		_show_person(person)
 	elif candidate != null:
+		_show_portrait(candidate.id, candidate.appearance)
 		_show_candidate(candidate)
 	else:
 		_id = &""
@@ -85,6 +91,11 @@ func room_buttons() -> Array[Button]:
 		if child is Button and not child.is_queued_for_deletion():
 			found.append(child as Button)
 	return found
+
+
+## Returns the portrait shown above the name.
+func get_portrait() -> StaffPortrait:
+	return _portrait
 
 
 ## Returns the Hire button.
@@ -211,6 +222,19 @@ func _make_button(text: String, action: Callable) -> Button:
 	button.text = text
 	button.pressed.connect(action)
 	return button
+
+
+func _show_portrait(id: StringName, record: Dictionary) -> void:
+	_portrait.show_record(id, record)
+	_portrait.visible = not record.is_empty()
+
+
+func _add_portrait() -> StaffPortrait:
+	var portrait := StaffPortrait.new()
+	portrait.size_flags_horizontal = SIZE_SHRINK_BEGIN
+	portrait.visible = false
+	add_child(portrait)
+	return portrait
 
 
 func _add_label(font_size: int) -> Label:
