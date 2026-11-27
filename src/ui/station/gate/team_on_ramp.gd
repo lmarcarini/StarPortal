@@ -48,18 +48,25 @@ var _ramp: Array[StringName] = []
 var _posts: Dictionary[StringName, StringName] = {}
 var _grace: float = 0.0
 var _post_in: float = 0.0
-var _sheet: MissionSheet = null
+## The mission sheet (a MissionSheet; untyped so the hall loads without the UI scripts).
+var _sheet: Control = null
 var _camera: Camera3D = null
 
 
+## The autoloads are looked up by path: this script is loaded with the hall scene by tools
+## that run without autoloads (the content validator).
 func _enter_tree() -> void:
-	EventBus.team_sent.connect(_on_team_sent)
-	EventBus.team_returned.connect(_on_team_returned)
+	var bus: Node = get_node_or_null(^"/root/EventBus")
+	if bus != null:
+		bus.connect(&"team_sent", _on_team_sent)
+		bus.connect(&"team_returned", _on_team_returned)
 
 
 func _exit_tree() -> void:
-	EventBus.team_sent.disconnect(_on_team_sent)
-	EventBus.team_returned.disconnect(_on_team_returned)
+	var bus: Node = get_node_or_null(^"/root/EventBus")
+	if bus != null and bus.is_connected(&"team_sent", _on_team_sent):
+		bus.disconnect(&"team_sent", _on_team_sent)
+		bus.disconnect(&"team_returned", _on_team_returned)
 
 
 func _ready() -> void:
@@ -69,7 +76,7 @@ func _ready() -> void:
 		view = view.get_parent()
 	if view != null:
 		var found: Object = view.call(&"get_mission_sheet")
-		_sheet = found as MissionSheet
+		_sheet = found as Control
 
 
 ## The sprite of [param id], or null.
@@ -207,10 +214,12 @@ func _process(delta: float) -> void:
 func _follow_sheet(delta: float) -> void:
 	if _sheet == null:
 		return
-	if _sheet.is_visible_in_tree() and _sheet.get_draft() != null and not _sheet.is_order():
+	var draft: Object = _sheet.call(&"get_draft")
+	if _sheet.is_visible_in_tree() and draft != null and not _sheet.call(&"is_order"):
 		_grace = GRACE
+		var team: Dictionary = draft.get(&"team")
 		var ids: Array[StringName] = []
-		ids.assign(_sheet.get_draft().team.values())
+		ids.assign(team.values())
 		show_ramp_team(ids.slice(0, SLOTS))
 		return
 	_grace -= delta
@@ -338,7 +347,10 @@ func _marker_at(marker_name: StringName, fallback: Vector3) -> Vector3:
 
 
 func _state() -> GameState:
-	return SimClock.simulation.state if SimClock.simulation != null else null
+	var clock: Node = get_node_or_null(^"/root/SimClock")
+	var simulation: Object = clock.get(&"simulation") if clock != null else null
+	var state: Object = simulation.get(&"state") if simulation != null else null
+	return state as GameState
 
 
 static func _length(path: PackedVector3Array) -> float:
@@ -349,5 +361,10 @@ static func _length(path: PackedVector3Array) -> float:
 
 
 static func _along(path: PackedVector3Array, distance: float) -> Vector3:
-	var total: float = _length(path)
-	return FloorPaths3D.along(path, distance / total if total > 0.0 else 1.0)
+	var left: float = maxf(0.0, distance)
+	for i: int in range(1, path.size()):
+		var seg: float = path[i - 1].distance_to(path[i])
+		if left <= seg and seg > 0.0:
+			return path[i - 1].lerp(path[i], left / seg)
+		left -= seg
+	return path[path.size() - 1]
