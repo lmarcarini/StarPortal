@@ -46,6 +46,9 @@ var _sprites: Dictionary[StringName, StaffSprite3D] = {}
 var _walks: Dictionary[StringName, Walk] = {}
 var _ramp: Array[StringName] = []
 var _posts: Dictionary[StringName, StringName] = {}
+## Members of the last team sent or back who have no sprite (no appearance record): the
+## floor keeps mannequins for them.
+var _unshown: int = 0
 var _grace: float = 0.0
 var _post_in: float = 0.0
 ## The mission sheet (a MissionSheet; untyped so the hall loads without the UI scripts).
@@ -89,6 +92,16 @@ func ramp_team() -> Array[StringName]:
 	return _ramp
 
 
+## Members of the team walking now who have no sprite (FloorActors3D draws them).
+func unshown() -> int:
+	return _unshown
+
+
+## True when someone stands at post [param spot] (a post_* marker name).
+func covers_post(spot: StringName) -> bool:
+	return _posts.has(spot)
+
+
 ## The ids walking now.
 func walkers() -> Array[StringName]:
 	return _walks.keys()
@@ -100,13 +113,16 @@ func posts() -> Dictionary[StringName, StringName]:
 
 
 ## Stands [param ids] on the ramp (empty clears it); people already walking are left alone.
+## Without the mission sheet open the ramp clears after GRACE seconds (GO without team_sent).
 func show_ramp_team(ids: Array[StringName]) -> void:
 	if ids == _ramp:
 		return
-	for id: StringName in _ramp:
-		if not id in ids and not _walks.has(id):
-			_hide(id)
+	var old: Array[StringName] = _ramp
 	_ramp = ids.duplicate()
+	_grace = GRACE
+	for id: StringName in old:
+		if not id in _ramp:
+			_hide(id)
 	for i: int in _ramp.size():
 		var sprite: StaffSprite3D = _sprite_for(_ramp[i])
 		if sprite == null:
@@ -117,28 +133,34 @@ func show_ramp_team(ids: Array[StringName]) -> void:
 		sprite.set_wanted(true)
 
 
-## Sends [param ids] up the ramp into the horizon (from their slots, else the ramp foot).
-func send(ids: Array[StringName]) -> void:
+## Sends [param ids] up the ramp into the horizon (from their slots, else the ramp foot);
+## returns how many have a sprite (the rest have no appearance record).
+func send(ids: Array[StringName]) -> int:
 	var ramp: PackedVector3Array = _ramp_path()
+	var shown: int = 0
 	for i: int in ids.size():
 		var sprite: StaffSprite3D = _sprite_for(ids[i])
 		if sprite == null:
 			continue
+		shown += 1
 		_release_post(ids[i])
 		var from: Vector3 = sprite.position if ids[i] in _ramp else ramp[1]
 		var top: Vector3 = ramp[0] + Vector3(from.x, 0.0, 0.0)
 		_start(ids[i], PackedVector3Array([from, top, top + Vector3(0, 0, -HORIZON_DEPTH)]), i)
 	_ramp.clear()
+	return shown
 
 
 ## Brings [param ids] out of the horizon and down the ramp to the blast door; the people in
-## [param injured] walk slower.
-func bring_back(ids: Array[StringName], injured: Array[StringName]) -> void:
+## [param injured] walk slower. Returns how many have a sprite.
+func bring_back(ids: Array[StringName], injured: Array[StringName]) -> int:
 	var ramp: PackedVector3Array = _ramp_path()
 	var door: Vector3 = _marker_at(&"door_left", Vector3(-13.6, 0, 1.3))
+	var shown: int = 0
 	for i: int in ids.size():
 		if _sprite_for(ids[i]) == null:
 			continue
+		shown += 1
 		_release_post(ids[i])
 		var side: Vector3 = Vector3((i % 2 - 0.5) * 0.6, 0, 0)
 		var path := PackedVector3Array(
@@ -148,6 +170,7 @@ func bring_back(ids: Array[StringName], injured: Array[StringName]) -> void:
 		if ids[i] in injured:
 			walk.speed = SPEED * INJURED_SHARE
 			_sprites[ids[i]].speed_scale = INJURED_SHARE
+	return shown
 
 
 ## Moves the walkers on by [param delta] seconds and keeps the ramp and posts in step.
@@ -158,12 +181,30 @@ func advance(delta: float) -> void:
 	_post_in -= delta
 	if _post_in <= 0.0:
 		_post_in = POST_SECONDS
+		_forget_gone(_state())
 		refresh_posts(_state())
+
+
+## Frees the sprites of people no longer on the roster (died, left).
+func _forget_gone(state: GameState) -> void:
+	if state == null:
+		return
+	var roster: Array[StringName] = []
+	for person: PersonState in state.staff.people:
+		roster.append(person.id)
+	for id: StringName in _sprites.keys():
+		if id in roster:
+			continue
+		_walks.erase(id)
+		_ramp.erase(id)
+		_release_post(id)
+		_sprites[id].queue_free()
+		_sprites.erase(id)
 
 
 ## Puts staff on base (not away, not on the ramp, not walking) at the posts of [param state].
 func refresh_posts(state: GameState) -> void:
-	var people: Dictionary[StringName, StringName] = TeamOnRamp.post_crew(state, _busy())
+	var people: Dictionary[StringName, StringName] = RampCrew.post_crew(state, _busy(), POSTS)
 	for spot: StringName in _posts:
 		if people.get(spot, &"") != _posts[spot]:
 			_hide(_posts[spot])
@@ -179,27 +220,6 @@ func refresh_posts(state: GameState) -> void:
 		sprite.set_wanted(true)
 
 
-## Post marker to the id who stands there in [param state]: staff on base in roster order,
-## leaving out [param busy] and the expedition team. Empty during an incursion.
-static func post_crew(
-	state: GameState, busy: Array[StringName]
-) -> Dictionary[StringName, StringName]:
-	var crew: Dictionary[StringName, StringName] = {}
-	if state == null or state.incursion.phase != IncursionState.Phase.NONE:
-		return crew
-	var used: Array[StringName] = busy.duplicate()
-	used.append_array(state.expedition.member_ids())
-	for spot: StringName in POSTS:
-		for person: PersonState in state.staff.people:
-			if person.role != POSTS[spot][0] or person.id in used:
-				continue
-			if person.is_on_base(state.clock.tick) and not person.appearance.is_empty():
-				crew[spot] = person.id
-				used.append(person.id)
-				break
-	return crew
-
-
 ## Where ramp slot [param index] is (marker ramp_slot_<index>, else spaced on the ramp).
 func slot(index: int) -> Vector3:
 	var ramp: PackedVector3Array = _ramp_path()
@@ -212,16 +232,15 @@ func _process(delta: float) -> void:
 
 
 func _follow_sheet(delta: float) -> void:
-	if _sheet == null:
-		return
-	var draft: Object = _sheet.call(&"get_draft")
-	if _sheet.is_visible_in_tree() and draft != null and not _sheet.call(&"is_order"):
-		_grace = GRACE
-		var team: Dictionary = draft.get(&"team")
-		var ids: Array[StringName] = []
-		ids.assign(team.values())
-		show_ramp_team(ids.slice(0, SLOTS))
-		return
+	var draft: Object = _sheet.call(&"get_draft") if _sheet != null else null
+	if _sheet != null and _sheet.is_visible_in_tree() and draft != null:
+		if not _sheet.call(&"is_order"):
+			var team: Dictionary = draft.get(&"team")
+			var ids: Array[StringName] = []
+			ids.assign(team.values())
+			show_ramp_team(ids.slice(0, SLOTS))
+			_grace = GRACE
+			return
 	_grace -= delta
 	if _grace <= 0.0 and not _ramp.is_empty():
 		show_ramp_team([])
@@ -245,12 +264,12 @@ func _step(id: StringName, walk: Walk, delta: float) -> void:
 		walk.delay -= delta
 		return
 	walk.travelled += walk.speed * delta
-	var at: Vector3 = _along(walk.path, walk.travelled)
+	var at: Vector3 = RampCrew.along(walk.path, walk.travelled)
 	var motion: Vector3 = at - sprite.position
 	sprite.position = at
 	sprite.face_motion(motion, _camera)
 	sprite.set_wanted(walk.travelled > HORIZON_DEPTH or not _from_horizon(walk.path))
-	if walk.travelled >= _length(walk.path):
+	if walk.travelled >= RampCrew.length(walk.path):
 		_walks.erase(id)
 		_hide(id)
 
@@ -263,7 +282,7 @@ func _on_team_sent(_world: StringName, _objective: int, team: Array, _blind: boo
 	var ids: Array[StringName] = _ids_of(team)
 	if ids.is_empty():
 		ids = _ramp.duplicate()
-	send(ids)
+	_unshown = maxi(0, team.size() - send(ids))
 
 
 func _on_team_returned(_world: StringName, _objective: int, _success: bool, team: Array) -> void:
@@ -273,7 +292,7 @@ func _on_team_returned(_world: StringName, _objective: int, _success: bool, team
 	for person: PersonState in state.staff.people if state != null else []:
 		if person.id in ids and person.is_injured():
 			injured.append(person.id)
-	bring_back(ids, injured)
+	_unshown = maxi(0, team.size() - bring_back(ids, injured))
 
 
 ## Ids of the people named in [param team] (events carry names), in that order.
@@ -351,20 +370,3 @@ func _state() -> GameState:
 	var simulation: Object = clock.get(&"simulation") if clock != null else null
 	var state: Object = simulation.get(&"state") if simulation != null else null
 	return state as GameState
-
-
-static func _length(path: PackedVector3Array) -> float:
-	var total: float = 0.0
-	for i: int in range(1, path.size()):
-		total += path[i - 1].distance_to(path[i])
-	return total
-
-
-static func _along(path: PackedVector3Array, distance: float) -> Vector3:
-	var left: float = maxf(0.0, distance)
-	for i: int in range(1, path.size()):
-		var seg: float = path[i - 1].distance_to(path[i])
-		if left <= seg and seg > 0.0:
-			return path[i - 1].lerp(path[i], left / seg)
-		left -= seg
-	return path[path.size() - 1]

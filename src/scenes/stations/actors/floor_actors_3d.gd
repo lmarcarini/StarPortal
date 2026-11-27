@@ -44,22 +44,29 @@ func _process(_delta: float) -> void:
 func refresh() -> void:
 	if _floor == null:
 		return
-	var sprites: bool = _view.get_root().has_node(^"TeamOnRamp")
+	var ramp: TeamOnRamp = _view.get_root().get_node_or_null(^"TeamOnRamp") as TeamOnRamp
 	var people: Array[Actor] = []
-	if not sprites:
-		people = _floor.get_idle().duplicate()
+	for person: Actor in _floor.get_idle():
+		if ramp == null or not ramp.covers_post(StringName("post_%s" % person.spot)):
+			people.append(person)
 	if _floor.get_crosser() != null:
 		people.append(_floor.get_crosser())
 	var props: Array[Actor] = []
+	var mannequins: int = ramp.unshown() if ramp != null else -1
 	for actor: Actor in _floor.get_actors():
-		if not actor.has_started() or (sprites and _is_team(actor)):
+		if not actor.has_started():
 			continue
+		if mannequins >= 0 and _is_team(actor):
+			if mannequins == 0:
+				continue
+			mannequins -= 1
 		(props if actor.figure < 0 else people).append(actor)
 	_place_people(people)
 	_place_props(props)
 
 
-## Teams and the staff at posts are drawn by the hall's TeamOnRamp when it has one (M8-04).
+## Teams and the staff at posts are drawn by the hall's TeamOnRamp when it has one (M8-04);
+## only people it has no sprite for (no appearance record) keep a mannequin.
 static func _is_team(actor: Actor) -> bool:
 	return actor.figure >= 0 and actor.route in [Actor.Route.OUT, Actor.Route.IN]
 

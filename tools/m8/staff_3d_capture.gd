@@ -1,5 +1,6 @@
 extends Node
-## Captures the 2D-HD staff in the 3D Gate hall (M8-04) for the PR: the team on the ramp
+## Captures the 2D-HD staff in the 3D Gate hall (M8-04) for the PR (the team leaves the
+## scientists free for the console posts): the team on the ramp
 ## (staff_ramp.png), the frames of its walk into the horizon and of a return with one
 ## injured member (gif/*.png, joined into a GIF by the caller), and the frame time with
 ## and without six sprites (only that when STAFF_TIMING=1). Writes into STAFF_OUT
@@ -100,9 +101,12 @@ func _frame_ms(count: int) -> float:
 
 func _team(count: int) -> Array[StringName]:
 	var ids: Array[StringName] = []
-	for person: PersonState in SimClock.simulation.state.staff.people:
-		if not person.appearance.is_empty() and ids.size() < count:
-			ids.append(person.id)
+	var people: Array[PersonState] = SimClock.simulation.state.staff.people
+	for scientists: bool in [false, true]:
+		for person: PersonState in people:
+			var fits: bool = (person.role == &"role_scientist") == scientists
+			if fits and not person.appearance.is_empty() and ids.size() < count:
+				ids.append(person.id)
 	return ids
 
 

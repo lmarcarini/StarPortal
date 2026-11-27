@@ -8,7 +8,9 @@ extends AnimatedSprite3D
 ## with flip_h when walking left on screen) from the way it moves seen from the camera.
 ## The sheets cost about 185 ms each to draw, so they are built lazily: a sprite asks with
 ## [method show_person], waits in a queue, and at most one sheet is drawn per frame for all
-## sprites together. The sprite stays hidden until its sheet is ready.
+## sprites together; whichever queued sprite processes first builds the head, so a
+## paused or hidden head does not stall the queue. The sprite stays hidden until its sheet
+## is ready.
 ## Bible: docs/content/portraits.md; art-and-audio ("Characters")
 
 ## Metres per sprite pixel: a 112 px tall person (head to boots) stands about 1.8 m.
@@ -121,14 +123,13 @@ static func build_next() -> void:
 
 
 func _process(_delta: float) -> void:
-	if _queue.is_empty() or _queue[0] != self:
+	if _queue.is_empty():
 		return
 	var now: int = Engine.get_process_frames()
 	if now == _built_frame:
 		return
 	_built_frame = now
-	_queue.pop_front()
-	_build()
+	build_next()
 
 
 func _build() -> void:
