@@ -41,7 +41,8 @@ func test_a_team_walks_from_the_door_up_the_ramp_into_the_horizon() -> void:
 	_floor.play(ActorCues.Cue.TEAM_OUT, 4)
 	_floor.advance(3.0)
 	_floor.get_floor_3d().refresh()
-	assert_int(_floor.get_floor_3d().shown_figures()).is_greater(0)
+	# The hall's TeamOnRamp draws teams as staff sprites (M8-04): no mannequins for them.
+	assert_int(_floor.get_floor_3d().shown_figures()).is_equal(0)
 
 
 func test_props_show_while_their_cue_plays() -> void:

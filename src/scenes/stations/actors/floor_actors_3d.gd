@@ -44,15 +44,24 @@ func _process(_delta: float) -> void:
 func refresh() -> void:
 	if _floor == null:
 		return
-	var people: Array[Actor] = _floor.get_idle().duplicate()
+	var sprites: bool = _view.get_root().has_node(^"TeamOnRamp")
+	var people: Array[Actor] = []
+	if not sprites:
+		people = _floor.get_idle().duplicate()
 	if _floor.get_crosser() != null:
 		people.append(_floor.get_crosser())
 	var props: Array[Actor] = []
 	for actor: Actor in _floor.get_actors():
-		if actor.has_started():
-			(props if actor.figure < 0 else people).append(actor)
+		if not actor.has_started() or (sprites and _is_team(actor)):
+			continue
+		(props if actor.figure < 0 else people).append(actor)
 	_place_people(people)
 	_place_props(props)
+
+
+## Teams and the staff at posts are drawn by the hall's TeamOnRamp when it has one (M8-04).
+static func _is_team(actor: Actor) -> bool:
+	return actor.figure >= 0 and actor.route in [Actor.Route.OUT, Actor.Route.IN]
 
 
 func _place_people(people: Array[Actor]) -> void:
