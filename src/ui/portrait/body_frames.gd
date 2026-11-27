@@ -11,7 +11,8 @@ extends RefCounted
 ## - "legs": leg style, "stand".
 ## - "step_l", "step_r": foot forward of the hip (side view), in pixels.
 ## - "lift_l", "lift_r": foot lifted off the baseline, in pixels.
-## - "swing_l", "swing_r": hand forward of the shoulder (side view), in pixels.
+## - "swing_l", "swing_r": hand forward of the shoulder (side view), in pixels; from the
+##   front and back the hand rises half that when forward and drops half when back.
 ## - "hand_l", "hand_r": hand moved down this many pixels (working hands).
 ## "l" and "r" are the person's own left and right.
 ## Bible: docs/content/portraits.md; art-and-audio ("Characters": walk, work and idle cycles)
@@ -44,10 +45,10 @@ const POSES: Dictionary[String, Dictionary] = {
 		"fps": 6.0,
 		"frames":
 		[
-			{"step_l": 5, "step_r": -5, "lift_r": 1, "swing_l": -4, "swing_r": 4},
-			{"bob": -1, "step_l": 1, "step_r": -1, "lift_r": 3},
-			{"step_l": -5, "step_r": 5, "lift_l": 1, "swing_l": 4, "swing_r": -4},
-			{"bob": -1, "step_l": -1, "step_r": 1, "lift_l": 3},
+			{"step_l": 5, "step_r": -5, "lift_r": 1, "swing_l": -5, "swing_r": 5},
+			{"bob": -1, "step_l": 1, "step_r": -1, "lift_r": 2},
+			{"step_l": -5, "step_r": 5, "lift_l": 1, "swing_l": 5, "swing_r": -5},
+			{"bob": -1, "step_l": -1, "step_r": 1, "lift_l": 2},
 		],
 	},
 	"work":

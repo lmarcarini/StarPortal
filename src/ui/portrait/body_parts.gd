@@ -4,7 +4,7 @@ extends RefCounted
 ## in the uniform colours of the portrait (PortraitPartsOutfit) and with the limb styles the
 ## pose table names ("arms": "hang" or "forward"; "legs": "stand"). Head, hair and face are
 ## in BodyPartsHead. Layers, back to front: far limbs, torso, uniform details, head, near
-## limbs; from the back, working forearms are hidden behind the torso.
+## limbs; from the back, working arms show elbows out and the forearms go in behind.
 ## Bible: docs/content/portraits.md ("Uniform variant by field")
 
 const CX: int = BodyPainter.CX
@@ -58,7 +58,6 @@ const PATCHES: Array[String] = ["standard", "expedition", "coverall", "fatigues"
 ## Draws the whole figure of [param c] for its direction and frame.
 static func draw(c: BodyPainter) -> void:
 	var side: bool = c.direction == "side"
-	var hidden_arms: bool = c.direction == "back" and c.pose.get("arms") == "forward"
 	if side:
 		_leg(c, "r", _darker(_hex(c, 1)))
 		_arm(c, "r", _darker(_hex(c, 0)))
@@ -66,16 +65,13 @@ static func draw(c: BodyPainter) -> void:
 	else:
 		_leg(c, "l", _hex(c, 1))
 		_leg(c, "r", _hex(c, 1))
-	if hidden_arms:
-		_arm(c, "l", _hex(c, 0))
-		_arm(c, "r", _hex(c, 0))
 	BodyPartsHead.draw_neck(c)
 	_torso(c)
 	_details(c)
 	BodyPartsHead.draw(c)
 	if side:
 		_arm(c, "l", _hex(c, 0))
-	elif not hidden_arms:
+	else:
 		_arm(c, "l", _hex(c, 0))
 		_arm(c, "r", _hex(c, 0))
 
@@ -112,7 +108,7 @@ static func _coat(c: BodyPainter) -> bool:
 
 ## Row of the shoulders and of the waist (belt bottom) this frame.
 static func shoulder_y(c: BodyPainter) -> int:
-	return 31 + c.up
+	return 29 + c.up
 
 
 static func waist_y(c: BodyPainter) -> int:
@@ -130,8 +126,8 @@ static func _leg(c: BodyPainter, limb: String, hex: String) -> void:
 	if c.direction == "side":
 		var foot: int = CX + c.value("step_" + limb)
 		var points: Array[Vector2i] = [
-			Vector2i(CX - c.leg, top),
-			Vector2i(CX + c.leg, top),
+			Vector2i(CX - c.leg - 2, top),
+			Vector2i(CX + c.leg + 2, top),
 			Vector2i(foot + 4, ankle + 1),
 			Vector2i(foot - 3, ankle + 1),
 		]
@@ -143,7 +139,7 @@ static func _leg(c: BodyPainter, limb: String, hex: String) -> void:
 	else:
 		var x: int = CX + c.screen_side(limb) * (c.leg + 2)
 		shape = BodyPainter.rect(x - c.leg, top, x + c.leg, ankle)
-		boot = BodyPainter.rect(x - c.leg - 1, ankle, x + c.leg + 1, floor_y)
+		boot = BodyPainter.rect(x - c.leg, ankle, x + c.leg + 1, floor_y)
 	c.shaded(shape, PortraitRamp.ramp(hex))
 	c.shaded(boot, PortraitRamp.ramp(BOOT))
 
@@ -156,12 +152,12 @@ static func _torso(c: BodyPainter) -> void:
 	var low: int = c.depth - 1 if c.direction == "side" else c.hip
 	var flare: int = 2 if _coat(c) else 0
 	var points: Array[Vector2i] = [
-		Vector2i(CX - half + 2, sy),
-		Vector2i(CX + half - 2, sy),
-		Vector2i(CX + half + 1, sy + 4),
+		Vector2i(CX - half + 1, sy),
+		Vector2i(CX + half, sy),
+		Vector2i(CX + half + 1, sy + 2),
 		Vector2i(CX + low + 1 + flare, hem + 1),
 		Vector2i(CX - low - flare, hem + 1),
-		Vector2i(CX - half, sy + 4),
+		Vector2i(CX - half, sy + 2),
 	]
 	c.shaded(BodyPainter.poly(points), _top(c), 3)
 	var belt_x: int = (c.depth - 1) if c.direction == "side" else c.hip
@@ -186,7 +182,7 @@ static func _arm(c: BodyPainter, limb: String, hex: String) -> void:
 	var hand: Vector2i
 	var points: Array[Vector2i]
 	if c.direction == "side":
-		hand = Vector2i(CX + swing, 66 + c.up - (absi(swing) >> 1))
+		hand = Vector2i(CX + swing, 65 + c.up - (absi(swing) >> 1))
 		points = [
 			Vector2i(CX - 3, sy + 1),
 			Vector2i(CX + 3, sy + 1),
@@ -196,15 +192,23 @@ static func _arm(c: BodyPainter, limb: String, hex: String) -> void:
 	else:
 		var s: int = c.screen_side(limb)
 		var w: int = c.shoulder
-		hand = Vector2i(CX + s * (w + 3), 66 + c.up - (absi(swing) >> 2))
+		hand = Vector2i(CX + s * (w + 3), 65 + c.up - (swing >> 1))
 		points = [
-			Vector2i(CX + s * (w - 1), sy + 1),
-			Vector2i(CX + s * (w + 4), sy + 4),
-			Vector2i(CX + s * (w + 5), hand.y),
-			Vector2i(CX + s * (w + 1), hand.y),
+			Vector2i(CX + s * w, sy),
+			Vector2i(CX + s * (w + 4), sy + 1),
+			Vector2i(CX + s * (w + 6), sy + 4),
+			Vector2i(CX + s * (w + 6), hand.y),
+			Vector2i(CX + s * w, hand.y),
 		]
 	c.shaded(BodyPainter.poly(points), sleeve)
-	c.shaded(BodyPainter.ellipse(hand.x, hand.y + 2, 2, 3), c.skin, 1)
+	_hand(c, hand.x, hand.y)
+
+
+## A 3×4 skin hand hanging from ([param x], [param y]), shadowed underneath.
+static func _hand(c: BodyPainter, x: int, y: int) -> void:
+	c.fill(BodyPainter.rect(x - 1, y, x + 1, y + 3), c.skin[PortraitRamp.MID])
+	c.hline(x - 1, x + 1, y + 3, c.skin[PortraitRamp.SHADOW])
+	c.vline(x + 1, y, y + 3, c.skin[PortraitRamp.SHADOW])
 
 
 ## An arm bent forward at chest height, hand moved by the frame's "hand_" value.
@@ -226,13 +230,14 @@ static func _arm_forward(c: BodyPainter, limb: String, sleeve: Array[Color]) -> 
 		]
 	else:
 		var s: int = c.screen_side(limb)
-		elbow = Vector2i(CX + s * (c.shoulder + 2), 52 + c.up)
-		hand = Vector2i(CX + s * 6, 48 + c.up + dy)
+		var back: bool = c.direction == "back"
+		elbow = Vector2i(CX + s * (c.shoulder + (5 if back else 3)), 50 + c.up)
+		hand = Vector2i(CX + s * (c.shoulder - 3 if back else 6), 47 + c.up + dy)
 		upper = [
-			Vector2i(CX + s * (c.shoulder - 1), sy + 1),
-			Vector2i(CX + s * (c.shoulder + 4), sy + 4),
+			Vector2i(CX + s * c.shoulder, sy),
+			Vector2i(CX + s * (c.shoulder + 5), sy + 2),
 			Vector2i(elbow.x + s * 2, elbow.y + 2),
-			Vector2i(elbow.x - s * 3, elbow.y + 2),
+			Vector2i(elbow.x - s * 4, elbow.y + 2),
 		]
 	var fore: Array[Vector2i] = [
 		Vector2i(elbow.x, elbow.y - 2),
@@ -241,7 +246,8 @@ static func _arm_forward(c: BodyPainter, limb: String, sleeve: Array[Color]) -> 
 		Vector2i(elbow.x, elbow.y + 3),
 	]
 	c.shaded(BodyPainter.union(BodyPainter.poly(upper), BodyPainter.poly(fore)), sleeve)
-	c.shaded(BodyPainter.ellipse(hand.x, hand.y, 2, 2), c.skin, 1)
+	if c.direction != "back":
+		_hand(c, hand.x, hand.y - 1)
 
 
 ## Collar, tie, zipper, straps, vest panels, coat opening, epaulettes and shoulder patch.

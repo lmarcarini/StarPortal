@@ -2,7 +2,8 @@ extends Node
 ## Writes a sheet of 20 portraits drawn by the Godot painter, laid out like the reference
 ## (docs/reference/portraits_sheet.png): 3× scale, five columns (Military, Office, Science,
 ## Engineering, Medicine), 12 px gaps. Records are AppearanceRules.roll_seeded("sheet-<n>").
-## With a third argument "bodies" it writes the body sheet instead (body_sheet()).
+## With a third argument "bodies" it writes the body sheet instead (body_sheet()), with
+## "close" one person's row at 4×.
 ## Run: godot --headless --path . res://tools/portraits/sheet.tscn -- [out.png] [first seed]
 ## [bodies]
 ## Bible: docs/content/portraits.md ("Reference")
@@ -19,8 +20,13 @@ func _ready() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	var path: String = args[0] if args.size() > 0 else DEFAULT_PATH
 	var first: int = int(args[1]) if args.size() > 1 else 100
-	var bodies: bool = args.size() > 2 and args[2] == "bodies"
-	var error: Error = (body_sheet(first) if bodies else sheet(first)).save_png(path)
+	var mode: String = args[2] if args.size() > 2 else ""
+	var image: Image = sheet(first)
+	if mode == "bodies":
+		image = body_sheet(first, COLUMNS, SCALE)
+	elif mode == "close":
+		image = body_sheet(first, 1, 4)
+	var error: Error = image.save_png(path)
 	print("sheet: %s (%s)" % [path, error_string(error)])
 	get_tree().quit(0 if error == OK else 1)
 
@@ -43,10 +49,9 @@ static func sheet(first: int) -> Image:
 	return out
 
 
-## One row per field (seeds from [param first], as sheet()): the portrait, then every frame
-## of every pose × direction of the full-body sprite, at 2× on the sheet background.
-static func body_sheet(first: int) -> Image:
-	var scale: int = 2
+## [param people] rows, one per field (seeds from [param first], as sheet()): the portrait,
+## then every frame of every pose × direction of the full-body sprite, at [param scale]×.
+static func body_sheet(first: int, people: int, scale: int) -> Image:
 	var cell := Vector2i(BodyPainter.W * scale, BodyPainter.H * scale)
 	var frames: int = 0
 	for pose: String in BodyFrames.poses():
@@ -54,9 +59,9 @@ static func body_sheet(first: int) -> Image:
 	var head: int = PortraitPainter.SIZE * scale
 	var width: int = PAD + head + PAD + frames * (cell.x + 4) + PAD
 	var row_h: int = cell.y + PAD
-	var out := Image.create_empty(width, COLUMNS * row_h + PAD, false, Image.FORMAT_RGBA8)
+	var out := Image.create_empty(width, people * row_h + PAD, false, Image.FORMAT_RGBA8)
 	out.fill(Color.html("#0e1420"))
-	for i: int in COLUMNS:
+	for i: int in people:
 		var record: Dictionary = AppearanceRules.roll_seeded("sheet-%d" % (first + i), FIELDS[i])
 		var y: int = PAD + i * row_h
 		var portrait: Image = PortraitPainter.paint(record)

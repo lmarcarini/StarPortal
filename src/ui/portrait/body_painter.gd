@@ -16,7 +16,7 @@ const H: int = 128
 const CX: int = 32
 ## Lowest row of the boots in every frame.
 const BASELINE: int = 123
-## Shoulder half-width of each build (men; women 2 px narrower).
+## Shoulder half-width of each build (men: 26, 30, 34 px across; women 4 px narrower).
 const BUILDS: Array[int] = [13, 15, 17]
 const BUILD_WEIGHTS: Array[int] = [1, 2, 1]
 ## A shape is W×H bytes (1 inside) followed by its box: x0, y0, x1, y1.
@@ -55,10 +55,10 @@ func _init(look: Dictionary, view: String, frame_data: Dictionary) -> void:
 	rng.seed = hash("body:" + JSON.stringify(look, "", true))
 	var build: int = _weighted(rng, BUILD_WEIGHTS)
 	shoulder = BUILDS[build] - (2 if female else 0)
-	hip = shoulder - (2 if female else 4)
-	depth = 8 + build - (1 if female else 0)
-	leg = 4 + (1 if build == 2 else 0)
-	drop = rng.randi_range(0, 3) + (2 if female else 0)
+	hip = shoulder - (0 if female else 2)
+	depth = 8 + build
+	leg = 3
+	drop = rng.randi_range(0, 2) + (1 if female else 0)
 	var bob: int = frame_data.get("bob", 0)
 	up = drop + bob
 	skin = PortraitRamp.ramp(_pick(PortraitRamp.SKINS, look.get("skin", 0)))
