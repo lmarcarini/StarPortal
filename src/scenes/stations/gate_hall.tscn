@@ -19,6 +19,7 @@
 [ext_resource type="Material" path="res://src/scenes/stations/materials/screen.tres" id="e17"]
 [ext_resource type="Material" path="res://src/scenes/stations/materials/lamp_glow.tres" id="e18"]
 [ext_resource type="LightmapGIData" uid="uid://c6h6j7ylqln2t" path="res://src/scenes/stations/gate_hall.lmbake" id="lmbake"]
+[ext_resource type="Script" path="res://src/ui/station/gate/team_on_ramp.gd" id="team_on_ramp"]
 [ext_resource type="Script" uid="uid://cmgv5rajeiis3" path="res://src/scenes/stations/gate_hall.gd" id="script"]
 
 [sub_resource type="Environment" id="s1"]
@@ -1347,6 +1348,36 @@ curve = SubResource("s45")
 
 [node name="crossing" type="Path3D" parent="Markers" unique_id=1508120413]
 curve = SubResource("s46")
+
+[node name="ramp_slot_0" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.707, 2.6)
+
+[node name="ramp_slot_1" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.553, 3.8)
+
+[node name="ramp_slot_2" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.399, 5)
+
+[node name="ramp_slot_3" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.244, 6.2)
+
+[node name="post_console_left" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 0, 2.7)
+
+[node name="post_console_right" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9, 0, 2.7)
+
+[node name="post_blast_door" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8, 0, 2.2)
+
+[node name="post_catwalk_left" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 5.125, 3)
+
+[node name="post_catwalk_right" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 5.125, 3)
+
+[node name="TeamOnRamp" type="Node3D" parent="."]
+script = ExtResource("team_on_ramp")
 
 [node name="LightmapGI" type="LightmapGI" parent="." unique_id=1224760121]
 quality = 2
