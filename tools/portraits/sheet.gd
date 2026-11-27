@@ -3,7 +3,7 @@ extends Node
 ## (docs/reference/portraits_sheet.png): 3× scale, five columns (Military, Office, Science,
 ## Engineering, Medicine), 12 px gaps. Records are AppearanceRules.roll_seeded("sheet-<n>").
 ## With a third argument "bodies" it writes the body sheet instead (body_sheet()), with
-## "close" one person's row at 4×.
+## "close" one person's row at 4×, with "builds" the build and height lineup (builds_sheet()).
 ## Run: godot --headless --path . res://tools/portraits/sheet.tscn -- [out.png] [first seed]
 ## [bodies]
 ## Bible: docs/content/portraits.md ("Reference")
@@ -26,6 +26,8 @@ func _ready() -> void:
 		image = body_sheet(first, COLUMNS, SCALE)
 	elif mode == "close":
 		image = body_sheet(first, 1, 4)
+	elif mode == "builds":
+		image = builds_sheet(first)
 	var error: Error = image.save_png(path)
 	print("sheet: %s (%s)" % [path, error_string(error)])
 	get_tree().quit(0 if error == OK else 1)
@@ -76,4 +78,33 @@ static func body_sheet(first: int, people: int, scale: int) -> Image:
 					body.resize(cell.x, cell.y, Image.INTERPOLATE_NEAREST)
 					out.blend_rect(body, Rect2i(Vector2i.ZERO, cell), Vector2i(x, y))
 					x += cell.x + 4
+	return out
+
+
+## M8-05 lineup at 3×, idle front, on a baseline: row 1 the same person (seed [param first])
+## with only "build" changed (slim, average, broad) and then only "height" changed (-4..+3);
+## row 2 ten people (seeds from [param first]) with their rolled build and height.
+static func builds_sheet(first: int) -> Image:
+	var cell := Vector2i(BodyPainter.W * SCALE, BodyPainter.H * SCALE)
+	var looks: Array[Dictionary] = []
+	var person: Dictionary = AppearanceRules.roll_seeded("sheet-%d" % first, FIELDS[0])
+	for build: String in AppearanceRules.BUILDS:
+		looks.append(person.merged({"build": build, "height": 0}, true))
+	for h: int in range(AppearanceRules.HEIGHT_MIN, AppearanceRules.HEIGHT_MAX + 1):
+		looks.append(person.merged({"height": h}, true))
+	for i: int in 11:
+		looks.append(AppearanceRules.roll_seeded("sheet-%d" % (first + i), FIELDS[i % COLUMNS]))
+	var per_row: int = 11
+	var out := Image.create_empty(
+		PAD + per_row * (cell.x + 4), 2 * (cell.y + PAD) + PAD, false, Image.FORMAT_RGBA8
+	)
+	out.fill(Color.html("#0e1420"))
+	for i: int in looks.size():
+		var at := Vector2i(PAD + (i % per_row) * (cell.x + 4), PAD + (i / per_row) * (cell.y + PAD))
+		var body: Image = BodyPainter.paint(looks[i], "idle", "front", 0)
+		body.resize(cell.x, cell.y, Image.INTERPOLATE_NEAREST)
+		out.blend_rect(body, Rect2i(Vector2i.ZERO, cell), at)
+		out.fill_rect(
+			Rect2i(at.x, at.y + (BodyPainter.BASELINE + 1) * SCALE, cell.x, 1), Color.GRAY
+		)
 	return out
