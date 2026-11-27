@@ -1362,10 +1362,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.399, 5)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.244, 6.2)
 
 [node name="post_console_left" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 0, 2.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.3, 0, 2.7)
 
 [node name="post_console_right" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9, 0, 2.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3, 0, 2.7)
 
 [node name="post_blast_door" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8, 0, 2.2)

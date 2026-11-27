@@ -23,6 +23,7 @@ var _def: RoomDef = null
 
 
 func _init() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	power_key.name = "PowerKey"
 	power_key.label_size = 16

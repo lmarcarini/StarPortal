@@ -59,9 +59,7 @@ static func room(canvas: CanvasItem, area: Rect2, tile: PlanTile) -> void:
 	var name_style: RefText = RefText.make(RefText.LABEL, 18, RefPaint.TEXT, 2.0)
 	name_style.draw(canvas, area.position + Vector2(44, 24), tile.name, "lm")
 	if tile.power_view:
-		var ink: Color = RefPaint.GREEN if tile.produces else RefPaint.AMBER
-		var tag: RefText = RefText.make(RefText.MONO_BOLD, 15, ink)
-		tag.draw(canvas, Vector2(area.end.x - 10, area.position.y + 24), tile.mw, "rm")
+		PowerCells.draw(canvas, area, tile.mw_value, tile.produces)
 		return
 	if tile.state == &"on":
 		RefPaint.lamp_on(
