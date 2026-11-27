@@ -8,8 +8,9 @@ extends RefCounted
 ## staff, grey hair likely on older staff, glasses likelier in a lab coat or shirt and tie.
 ## Saved shape: {"sex", "age", "skin", "hair_colour", "eye_colour", "head", "face_width",
 ## "jaw", "eyes", "brows", "nose", "mouth", "facial_hair", "hair", "accessory", "field",
-## "variant"}; "skin", "hair_colour" and "eye_colour" are palette indices, "face_width" an
-## offset from -1 to 1, every other value a string from its list.
+## "variant", "build", "height"}; "skin", "hair_colour" and "eye_colour" are palette indices,
+## "face_width" an offset from -1 to 1, "height" a whole-pixel offset from the base height
+## (HEIGHT_MIN..HEIGHT_MAX), every other value a string from its list.
 ## Bible: docs/content/portraits.md
 
 ## Sexes.
@@ -50,6 +51,17 @@ const FEMALE_HAIR: Array[String] = ["ponytail", "long", "curly", "bun", "side", 
 const MALE_HAIR: Array[String] = [
 	"military", "military", "buzz", "side", "messy", "curly", "receding", "bald"
 ]
+## Body builds (M8-05), weighted by sex.
+const BUILDS: Array[String] = ["slim", "average", "broad"]
+const FEMALE_BUILD_WEIGHTS: Array[int] = [3, 4, 1]
+const MALE_BUILD_WEIGHTS: Array[int] = [2, 4, 2]
+## Height: whole pixels above (+) or below (-) the base height on the 64x128 body sprite,
+## weighted toward 0 for men and about 2 px lower for women. Weights run HEIGHT_MIN..HEIGHT_MAX.
+const HEIGHT_MIN: int = -4
+const HEIGHT_MAX: int = 3
+const HEIGHTS: Array[String] = ["-4", "-3", "-2", "-1", "0", "1", "2", "3"]
+const MALE_HEIGHT_WEIGHTS: Array[int] = [1, 1, 2, 4, 6, 4, 2, 1]
+const FEMALE_HEIGHT_WEIGHTS: Array[int] = [3, 5, 6, 4, 2, 1, 0, 0]
 ## Uniform variants by field.
 const VARIANTS: Dictionary[String, Array] = {
 	"military": ["standard", "officer", "expedition", "casual", "command"],
@@ -81,6 +93,7 @@ const _STRING_FIELDS: Dictionary[String, Array] = {
 	"facial_hair": FACIAL_HAIR,
 	"hair": HAIR,
 	"accessory": ACCESSORIES,
+	"build": BUILDS,
 }
 ## Keys whose value is a palette index, with the palette size.
 const _INDEX_FIELDS: Dictionary[String, int] = {
@@ -127,6 +140,7 @@ static func roll(rng: RandomNumberGenerator, field: String, sex: String = "") ->
 	record["variant"] = str(variants[rng.randi_range(0, variants.size() - 1)])
 	if record["variant"] in GLASSES_VARIANTS and rng.randi_range(1, 100) <= GLASSES_PERCENT:
 		record["accessory"] = "glasses"
+	_roll_body(rng, record, female)
 	return record
 
 
@@ -141,7 +155,7 @@ static func roll_seeded(seed_text: String, field: String, sex: String = "") -> D
 
 ## Human-readable errors of saved [param record], empty when valid: every key present, the
 ## string fields from their lists, the palette indices in range, "face_width" from -1 to 1,
-## "variant" one of its "field"'s variants.
+## "variant" one of its "field"'s variants, "height" from HEIGHT_MIN to HEIGHT_MAX.
 static func validate(record: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for key: String in _STRING_FIELDS:
@@ -153,6 +167,8 @@ static func validate(record: Dictionary) -> Array[String]:
 			errors.append("appearance '%s' is not a whole number in range" % key)
 	if not _is_int_in(record.get("face_width"), -1, 1):
 		errors.append("appearance 'face_width' is not -1, 0 or 1")
+	if not _is_int_in(record.get("height"), HEIGHT_MIN, HEIGHT_MAX):
+		errors.append("appearance 'height' is not a whole number from -4 to 3")
 	var field: Variant = record.get("field")
 	if not (field is String and VARIANTS.has(field)):
 		errors.append("appearance 'field' is not a known field")
@@ -164,7 +180,7 @@ static func validate(record: Dictionary) -> Array[String]:
 ## [param record] with whole floats (from JSON) turned back into ints.
 static func from_saved(record: Dictionary) -> Dictionary:
 	var out: Dictionary = record.duplicate()
-	for key: String in ["skin", "hair_colour", "eye_colour", "face_width"]:
+	for key: String in ["skin", "hair_colour", "eye_colour", "face_width", "height"]:
 		var value: Variant = out.get(key)
 		if value is float:
 			var number: float = value
@@ -185,6 +201,13 @@ static func _roll_hair(rng: RandomNumberGenerator, record: Dictionary, female: b
 			record["hair"] = "receding"
 	if record["age"] == "young" and record["facial_hair"] == "beard":
 		record["facial_hair"] = "stubble"
+
+
+## Build and height, drawn last so the face fields of a seed do not move (M8-05).
+static func _roll_body(rng: RandomNumberGenerator, record: Dictionary, female: bool) -> void:
+	record["build"] = _weighted(rng, BUILDS, FEMALE_BUILD_WEIGHTS if female else MALE_BUILD_WEIGHTS)
+	var heights: Array[int] = FEMALE_HEIGHT_WEIGHTS if female else MALE_HEIGHT_WEIGHTS
+	record["height"] = _weighted(rng, HEIGHTS, heights).to_int()
 
 
 static func _pick(rng: RandomNumberGenerator, options: Array[String]) -> String:

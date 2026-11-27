@@ -114,3 +114,49 @@ func test_cache_keeps_sprite_frames_until_the_record_changes() -> void:
 	var skin: int = record["skin"]
 	changed["skin"] = (skin + 1) % AppearanceRules.SKIN_TONES
 	assert_object(PortraitCache.sprite_frames_for(&"s1", changed)).is_not_same(first)
+
+
+func _top_opaque_row(image: Image) -> int:
+	for y: int in image.get_height():
+		for x: int in image.get_width():
+			if image.get_pixel(x, y).a > 0.0:
+				return y
+	return -1
+
+
+func _opaque_width(image: Image, y: int) -> int:
+	var count: int = 0
+	for x: int in image.get_width():
+		if image.get_pixel(x, y).a > 0.0:
+			count += 1
+	return count
+
+
+## M8-05: changing only "build" widens the shoulders; slim < average < broad.
+func test_build_comes_from_the_record() -> void:
+	var record: Dictionary = _record("build", "engineering")
+	var widths: Array[int] = []
+	for build: String in AppearanceRules.BUILDS:
+		var look: Dictionary = record.duplicate()
+		look["build"] = build
+		look["height"] = 0
+		var image: Image = BodyPainter.paint(look, "idle", "front", 0)
+		widths.append(
+			_opaque_width(image, BodyParts.shoulder_y(BodyPainter.new(look, "front", {})) + 4)
+		)
+	assert_bool(widths[0] < widths[1] and widths[1] < widths[2]).is_true()
+
+
+## M8-05: "height" moves the top of the head by whole pixels; the feet stay on the baseline.
+func test_height_comes_from_the_record() -> void:
+	var record: Dictionary = _record("height", "office")
+	record["hair"] = "buzz"
+	var tops: Array[int] = []
+	for h: int in [AppearanceRules.HEIGHT_MIN, 0, AppearanceRules.HEIGHT_MAX]:
+		var look: Dictionary = record.duplicate()
+		look["height"] = h
+		var image: Image = BodyPainter.paint(look, "idle", "front", 0)
+		tops.append(_top_opaque_row(image))
+		assert_int(_lowest_opaque_row(image)).is_equal(BodyPainter.BASELINE)
+	assert_int(tops[0] - tops[1]).is_equal(-AppearanceRules.HEIGHT_MIN)
+	assert_int(tops[1] - tops[2]).is_equal(AppearanceRules.HEIGHT_MAX)

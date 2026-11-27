@@ -3,8 +3,8 @@ extends RefCounted
 ## Paints the 64×128 full-body sprite of an appearance record (docs/content/portraits.md,
 ## "Full body"), one frame at a time from the pose table (BodyFrames), on a transparent
 ## background. Same skin, hair, uniform variant and accessories as the portrait; the build
-## (slim, average, broad) and height are drawn from a generator seeded by the record, so the
-## same record always gives the same pixels. Feet stand on BASELINE in every frame and every
+## (slim, average, broad) and height come from the record's "build" and "height" (M8-05), so
+## the same record always gives the same pixels. Feet stand on BASELINE in every frame and every
 ## offset is a whole pixel. An instance is the canvas of one frame: the image, the person's
 ## colours and measures, and the shape and shading operations the parts draw with.
 ## Bible: docs/content/portraits.md
@@ -18,7 +18,6 @@ const CX: int = 32
 const BASELINE: int = 123
 ## Shoulder half-width of each build (men: 26, 30, 34 px across; women 4 px narrower).
 const BUILDS: Array[int] = [13, 15, 17]
-const BUILD_WEIGHTS: Array[int] = [1, 2, 1]
 ## A shape is W×H bytes (1 inside) followed by its box: x0, y0, x1, y1.
 const BOX: int = W * H
 ## Outline colour of drawn features (eyes, glasses).
@@ -38,7 +37,7 @@ var shoulder: int = 15
 var hip: int = 11
 var depth: int = 8
 var leg: int = 4
-## Rows the upper body sits below the tallest build (height), and that plus the frame's bob.
+## Rows the upper body sits below the tallest height (HEIGHT_MAX - "height"), plus the bob.
 var drop: int = 0
 var up: int = 0
 var skin: Array[Color] = []
@@ -51,14 +50,17 @@ func _init(look: Dictionary, view: String, frame_data: Dictionary) -> void:
 	direction = view
 	pose = frame_data
 	female = str(look.get("sex", "")) == "female"
-	var rng := RandomNumberGenerator.new()
-	rng.seed = hash("body:" + JSON.stringify(look, "", true))
-	var build: int = _weighted(rng, BUILD_WEIGHTS)
+	var build: int = maxi(0, AppearanceRules.BUILDS.find(str(look.get("build", "average"))))
 	shoulder = BUILDS[build] - (2 if female else 0)
 	hip = shoulder - (0 if female else 2)
 	depth = 8 + build
 	leg = 3
-	drop = rng.randi_range(0, 2) + (1 if female else 0)
+	var saved_height: Variant = look.get("height", 0)
+	var height: int = saved_height if saved_height is int else 0
+	drop = (
+		AppearanceRules.HEIGHT_MAX
+		- clampi(height, AppearanceRules.HEIGHT_MIN, AppearanceRules.HEIGHT_MAX)
+	)
 	var bob: int = frame_data.get("bob", 0)
 	up = drop + bob
 	skin = PortraitRamp.ramp(_pick(PortraitRamp.SKINS, look.get("skin", 0)))
@@ -242,18 +244,6 @@ static func _box(shape: PackedByteArray) -> Rect2i:
 
 static func _in(shape: PackedByteArray, x: int, y: int) -> bool:
 	return x >= 0 and y >= 0 and x < W and y < H and shape[y * W + x] != 0
-
-
-static func _weighted(rng: RandomNumberGenerator, weights: Array[int]) -> int:
-	var total: int = 0
-	for w: int in weights:
-		total += w
-	var roll: int = rng.randi_range(1, total)
-	for i: int in weights.size():
-		roll -= weights[i]
-		if roll <= 0:
-			return i
-	return weights.size() - 1
 
 
 static func _pick(palette: Array[String], index: Variant) -> String:

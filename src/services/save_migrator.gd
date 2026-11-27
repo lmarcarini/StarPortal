@@ -11,14 +11,14 @@ extends RefCounted
 ## rejected with &"old_format_version" (owner ruling on card #133). v26 (M4.9-16, address pins
 ## and the alien panel's draft) is a clean break too: save compatibility does not matter
 ## before alpha (owner, 2026-11-16). v27 (M7-01, research benches per building) and v28
-## (M7-03, specimens) and v29 (M8-01, appearance records) are clean breaks too. Steps for
-## later versions go in built_in_steps().
+## (M7-03, specimens), v29 (M8-01, appearance records) and v30 (M8-05, build and height)
+## are clean breaks too. Steps for later versions go in built_in_steps().
 ## Bible: technical-architecture.md#save-system
 
 ## The save format version the game writes and loads.
-const TARGET_VERSION: int = 29
+const TARGET_VERSION: int = 30
 ## The oldest save format the game still loads; older saves fail with &"old_format_version".
-const OLDEST_VERSION: int = 29
+const OLDEST_VERSION: int = 30
 
 
 ## Returns the built-in steps, keyed by the version they migrate from. (A function, not a

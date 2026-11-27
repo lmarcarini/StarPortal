@@ -1,5 +1,5 @@
 {
-	"format_version": 29,
+	"format_version": 30,
 	"game_version": "0.0.0",
 	"saved_at_unix": 1794842951,
 	"state": {
@@ -1244,7 +1244,9 @@
 						"field": "science",
 						"hair": "messy",
 						"facial_hair": "none",
-						"variant": "labcoat"
+						"variant": "labcoat",
+						"build": "broad",
+						"height": 0
 					}
 				},
 				{
@@ -1272,7 +1274,9 @@
 						"field": "science",
 						"hair": "receding",
 						"facial_hair": "beard",
-						"variant": "overalls"
+						"variant": "overalls",
+						"build": "average",
+						"height": 1
 					}
 				},
 				{
@@ -1300,7 +1304,9 @@
 						"field": "engineering",
 						"hair": "military",
 						"facial_hair": "none",
-						"variant": "casual"
+						"variant": "casual",
+						"build": "broad",
+						"height": 0
 					}
 				},
 				{
@@ -1328,7 +1334,9 @@
 						"field": "engineering",
 						"hair": "ponytail",
 						"facial_hair": "none",
-						"variant": "vest"
+						"variant": "vest",
+						"build": "broad",
+						"height": -3
 					}
 				}
 			],
@@ -1384,7 +1392,9 @@
 						"field": "science",
 						"hair": "ponytail",
 						"facial_hair": "none",
-						"variant": "labcoat"
+						"variant": "labcoat",
+						"build": "slim",
+						"height": -3
 					}
 				},
 				{
@@ -1415,7 +1425,9 @@
 						"field": "science",
 						"hair": "military",
 						"facial_hair": "none",
-						"variant": "shirt_tie"
+						"variant": "shirt_tie",
+						"build": "average",
+						"height": -1
 					}
 				},
 				{
@@ -1446,7 +1458,9 @@
 						"field": "engineering",
 						"hair": "side",
 						"facial_hair": "none",
-						"variant": "jacket"
+						"variant": "jacket",
+						"build": "broad",
+						"height": -3
 					}
 				},
 				{
@@ -1477,7 +1491,9 @@
 						"field": "engineering",
 						"hair": "receding",
 						"facial_hair": "stubble",
-						"variant": "casual"
+						"variant": "casual",
+						"build": "slim",
+						"height": -1
 					}
 				},
 				{
@@ -1508,7 +1524,9 @@
 						"field": "office",
 						"hair": "messy",
 						"facial_hair": "none",
-						"variant": "blazer"
+						"variant": "blazer",
+						"build": "average",
+						"height": -3
 					}
 				},
 				{
@@ -1539,7 +1557,9 @@
 						"field": "military",
 						"hair": "messy",
 						"facial_hair": "none",
-						"variant": "standard"
+						"variant": "standard",
+						"build": "average",
+						"height": -3
 					}
 				},
 				{
@@ -1570,7 +1590,9 @@
 						"field": "military",
 						"hair": "side",
 						"facial_hair": "stubble",
-						"variant": "standard"
+						"variant": "standard",
+						"build": "broad",
+						"height": -3
 					}
 				}
 			]
