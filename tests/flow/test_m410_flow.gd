@@ -1,5 +1,5 @@
 ## The M4.10 frame end to end on the real content, from the "Gate station" scenario in the
-## full shell: from the Base, a candidate on the wire and HIRE; a lab idle card starts a
+## full shell: from the Base, a candidate on the wire and REVIEW; a lab idle card starts a
 ## project; the phone call card ANSWERs and the briefing's request is accepted inside the
 ## conversation; the gate monitor lights during a dial from another station; the station keys
 ## reach every old screen.
@@ -61,16 +61,17 @@ func test_the_frame_end_to_end() -> void:
 	await _station_keys_reach_every_screen()
 
 
-## From the Base: the candidate card's HIRE hires the first candidate.
+## From the Base: the candidate card's REVIEW opens Personnel on the Candidates sub-tab.
 func _hire_from_the_base() -> void:
 	_shell.frame.station_keys.get_key(&"base").pressed.emit()
 	await _runner.simulate_frames(1)
 	assert_str(String(_shell.view_switcher.current_station())).is_equal("base")
-	var people: int = _sim().state.staff.people.size()
-	var candidate: StringName = _sim().state.recruitment.candidates[0].id
-	await _press(&"candidate_waiting", &"hire")
-	assert_int(_sim().state.staff.people.size()).is_equal(people + 1)
-	assert_object(_sim().state.recruitment.find_candidate(candidate)).is_null()
+	await _press(&"candidate_waiting", &"review")
+	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("personnel")
+	var view: PersonnelView = (
+		_shell.view_switcher.get_view(ViewSwitcher.PERSONNEL) as PersonnelView
+	)
+	assert_int(view.get_board().get_page()).is_equal(PersonnelBoard.Page.CANDIDATES)
 
 
 ## A finished, powered lab with nothing to do: the lab idle card's one key opens the Lab.
