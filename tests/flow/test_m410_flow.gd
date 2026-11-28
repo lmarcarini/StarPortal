@@ -68,9 +68,8 @@ func _hire_from_the_base() -> void:
 	assert_str(String(_shell.view_switcher.current_station())).is_equal("base")
 	await _press(&"candidate_waiting", &"review")
 	assert_str(String(_shell.view_switcher.current_view_id())).is_equal("personnel")
-	var view: PersonnelView = (
-		_shell.view_switcher.get_view(ViewSwitcher.PERSONNEL) as PersonnelView
-	)
+	var node: GameView = _shell.view_switcher.get_view(ViewSwitcher.PERSONNEL)
+	var view: PersonnelView = node as PersonnelView
 	assert_int(view.get_board().get_page()).is_equal(PersonnelBoard.Page.CANDIDATES)
 
 
