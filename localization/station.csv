@@ -93,6 +93,7 @@ WIRE_CHARGE_LOW,CHARGE LOW,CARGA BAIXA
 WIRE_TEAM_RETURNED,TEAM HOME,EQUIPE VOLTOU
 WIRE_KEY_TREE,Research tree,Árvore de pesquisa
 WIRE_KEY_HIRE,Hire,Contratar
+WIRE_KEY_REVIEW,Review candidates,Ver candidatos
 WIRE_KEY_PASS,Pass,Dispensar
 WIRE_KEY_ACCEPT,Accept,Aceitar
 WIRE_KEY_DECLINE,Decline,Recusar
@@ -130,7 +131,7 @@ FRAME_MONITOR_SHUTTER,SHUTTER,OBTURADOR
 FRAME_MONITOR_RETURNING,TEAM RETURNING,EQUIPE VOLTANDO
 FRAME_MONITOR_OPEN,OPEN · {world},ABERTO · {world}
 WIRE_LINE_LAB,Research Lab · {n} scientists,Laboratório · {n} cientistas
-WIRE_LINE_CANDIDATE,{role} · skill {skill},{role} · nível {skill}
+WIRE_LINE_CANDIDATES,{n} candidates available,{n} candidatos disponíveis
 WIRE_LINE_INCOMING,Unscheduled wormhole,Buraco de minhoca imprevisto
 STATION_SHUTTER,SHUTTER,OBTURADOR
 STATION_DESTINATIONS,DESTINATIONS,DESTINOS

@@ -62,18 +62,20 @@ func test_every_old_alert_kind_has_a_card_with_a_title_and_keys() -> void:
 		assert_array(card.actions).override_failure_message(kind).is_not_empty()
 
 
-func test_a_candidate_card_hires_with_the_old_command() -> void:
+func test_a_candidate_card_opens_the_candidates_sub_tab() -> void:
+	var keys: Array[WireAction] = WireActions.candidate()
+	assert_str(String(keys[0].view_id)).is_equal(String(ViewSwitcher.PERSONNEL))
+	assert_str(String(keys[0].sub_tab)).is_equal("candidates")
+	assert_object(keys[0].command).is_null()
+
+
+func test_one_candidate_card_counts_every_candidate() -> void:
 	var state: GameState = SimClock.simulation.state
-	if state.recruitment.candidates.is_empty():
-		return
-	var keys: Array[WireAction] = WireActions.candidate(state)
-	assert_str(String(keys[0].command.get_type())).is_equal(String(HireCommand.TYPE))
-	var before: int = state.staff.people.size()
-	var data: WireCardData = WireRules.from_alert(
-		state, AlertEntry.create(&"candidate_waiting", AlertEntry.INFO, ViewSwitcher.PERSONNEL, 0)
-	)
-	_wire().press(data, keys[0])
-	assert_int(state.staff.people.size()).is_equal(before + 1)
+	var count: int = state.recruitment.candidates.size()
+	var cards: int = 0
+	for entry: AlertEntry in AlertRules.current(state):
+		cards += 1 if entry.kind == &"candidate_waiting" else 0
+	assert_int(cards).is_equal(1 if count > 0 else 0)
 
 
 func test_a_refused_key_is_greyed_with_its_reason() -> void:
