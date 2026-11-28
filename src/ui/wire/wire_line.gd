@@ -1,7 +1,7 @@
 class_name WireLine
 extends RefCounted
 ## The one short line under a wire card's title (interface-reference.md section 4: no
-## sentences on the wire): "Research Lab · 2 scientists", "Engineer · skill 3", the caller,
+## sentences on the wire): "Research Lab · 2 scientists", "3 candidates available", the caller,
 ## the request. Empty when a kind has none. Pure.
 ## Bible: docs/content/interface-reference.md section 4 (the wire)
 
@@ -27,12 +27,10 @@ static func _count(state: GameState, role: StringName) -> int:
 
 
 static func _candidate(state: GameState) -> String:
-	if state.recruitment.candidates.is_empty():
+	var count: int = state.recruitment.candidates.size()
+	if count == 0:
 		return ""
-	var first: CandidateState = state.recruitment.candidates[0]
-	var role: RoleDef = Registry.get_def(first.role) as RoleDef
-	var name: String = String(first.role) if role == null else _tr(role.name_key)
-	return _tr(&"WIRE_LINE_CANDIDATE").format({"role": name, "skill": first.skill})
+	return _tr(&"WIRE_LINE_CANDIDATES").format({"n": count})
 
 
 static func _caller(state: GameState) -> String:

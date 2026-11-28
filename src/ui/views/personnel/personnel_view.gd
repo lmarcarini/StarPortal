@@ -75,6 +75,14 @@ func needs_attention() -> bool:
 	return _board.new_candidates
 
 
+## Shows sub-tab [param id] (&"candidates" or &"roster"); anything else keeps the current one.
+func show_sub_tab(id: StringName) -> void:
+	if id == &"candidates":
+		_board.show_page(PersonnelBoard.Page.CANDIDATES)
+	elif id == &"roster":
+		_board.show_page(PersonnelBoard.Page.ROSTER)
+
+
 ## Returns the board, for tests.
 func get_board() -> PersonnelBoard:
 	return _board

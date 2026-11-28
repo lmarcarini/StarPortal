@@ -192,6 +192,9 @@ func open_view(view_id: StringName, sub_tab: StringName = &"") -> void:
 	var command: CommandView = view_switcher.get_view(view_id) as CommandView
 	if command != null:
 		command.show_sub_tab(sub_tab)
+	var personnel: PersonnelView = view_switcher.get_view(view_id) as PersonnelView
+	if personnel != null:
+		personnel.show_sub_tab(sub_tab)
 	var lab: ResearchView = view_switcher.get_view(view_id) as ResearchView
 	if lab != null and sub_tab != &"":
 		lab.show_discipline(sub_tab)

@@ -1,7 +1,7 @@
 class_name WireActions
 extends RefCounted
 ## The action keys of each wire card (interface-rethink.md section 6), each carrying the
-## command the old screens sent: the best next research projects and TREE; HIRE and PASS;
+## command the old screens sent: the best next research projects and TREE; REVIEW and PASS;
 ## ACCEPT and DECLINE; HOUSE and STUDY; SWITCH ON and ASSIGN; RESCUE; ANSWER and IGNORE; GO TO
 ## the place that fixes it; REPORT. Pure.
 ## Bible: docs/content/interface-rethink.md section 6
@@ -13,7 +13,7 @@ static func for_alert(state: GameState, entry: AlertEntry) -> Array[WireAction]:
 		&"lab_idle", &"research_done":
 			return research(state)
 		&"candidate_waiting":
-			return candidate(state)
+			return candidate()
 		&"artefact_at_gate":
 			return artefact(state, int(String(entry.target)))
 		&"site_finished":
@@ -38,16 +38,13 @@ static func research(state: GameState) -> Array[WireAction]:
 	return keys
 
 
-## HIRE the first candidate; PASS dismisses the card.
-static func candidate(state: GameState) -> Array[WireAction]:
-	var keys: Array[WireAction] = []
-	if not state.recruitment.candidates.is_empty():
-		var first: CandidateState = state.recruitment.candidates[0]
-		keys.append(
-			WireAction.submit(&"hire", &"hire", "WIRE_KEY_HIRE", HireCommand.create(first.id))
-		)
-	keys.append(WireAction.step(&"pass", &"pass", &"dismiss"))
-	return keys
+## REVIEW opens the Candidates sub-tab of Personnel, where every candidate can be compared;
+## PASS dismisses the card.
+static func candidate() -> Array[WireAction]:
+	return [
+		WireAction.go(&"review", &"candidate", ViewSwitcher.PERSONNEL, &"candidates"),
+		WireAction.step(&"pass", &"pass", &"dismiss"),
+	]
 
 
 ## ACCEPT and DECLINE request [param uid].
